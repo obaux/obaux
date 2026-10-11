@@ -72,4 +72,11 @@
     outline: var(--focus-outline-width, 2px) var(--focus-outline-style, solid) var(--focus-outline-color, currentColor) !important;
     outline-offset: var(--focus-outline-offset, 3px) !important;
   }
+
+  /* A section a link of "On this page" moves focus to (so a screen reader follows) is not a control: no outline, in
+     any input mode (Will, 04:17). Links, buttons and fields keep their ring when someone Tabs to them. */
+  [tabindex='-1']:focus,
+  [tabindex='-1']:focus-visible {
+    outline: none !important;
+  }
 }

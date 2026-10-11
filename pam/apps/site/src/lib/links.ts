@@ -39,3 +39,11 @@ export const SITE_URL = (
  * later, behind a switch that is off.
  */
 export const HELP_EMAIL = 'hello@joinpam.org';
+
+/**
+ * The help desk's form posts here (`help-request`, D-521; the contract is `docs/help-request-contract.md`). It answers
+ * 503 `{"live": false}` until Will switches it on, and every failure shows `HELP_EMAIL` instead.
+ */
+export const HELP_REQUEST_URL = `${(
+  process.env['NEXT_PUBLIC_SUPABASE_URL'] ?? 'https://shobqzuhicoiymtumiaz.supabase.co'
+).replace(/\/$/, '')}/functions/v1/help-request`;

@@ -10,6 +10,45 @@
  * no puns, the post's own words where they are short enough.
  */
 export const SECTION_LABELS: Readonly<Record<string, Readonly<Record<string, string>>>> = {
+  'is-the-place-told': {
+    'Before you go': 'Before you go',
+    'If they didn’t know you were coming': 'They didn’t know',
+    'If the place was wrong': 'The place was wrong',
+    'For programs': 'For programs',
+  },
+  'cant-sign-in': {
+    'Who can join, and how': 'Who can join',
+    'I want to add my program': 'Add my program',
+    'I want to be a case manager': 'Be a case manager',
+    'The code didn’t come': 'Code didn’t come',
+    'The code didn’t work': 'Code didn’t work',
+    'The invite didn’t work': 'Invite didn’t work',
+    'Still can’t get in?': 'Still can’t get in',
+  },
+  'your-safety': {
+    'In danger right now?': 'In danger',
+    'In crisis?': 'In crisis',
+    'Tell Pam what happened': 'Tell Pam',
+    'A message feels unsafe': 'Unsafe message',
+  },
+  'case-manager-assignments': {
+    'A case manager looks after their own members': 'Who looks after you',
+    'Every change to your account has a reason': 'Changes have a reason',
+  },
+  'keeping-your-listing-up-to-date': {
+    'Small edits go live straight away': 'Small edits',
+    'Big edits get a quick check first': 'Big edits',
+    'Why the difference?': 'Why',
+  },
+  'signing-a-programs-rules': {
+    'What a policy is': 'What a policy is',
+    'How you sign': 'How you sign',
+    'Signing never stops you booking a visit': 'You can still book',
+    'What a program sees': 'What programs see',
+    'A policy does not change after you sign': 'It won’t change',
+    'What your signature means': 'Your signature',
+    'For programs': 'For programs',
+  },
   'start-here': {
     'The code didn’t come': 'Code didn’t come',
     'The code didn’t work': 'Code didn’t work',

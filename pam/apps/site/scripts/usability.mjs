@@ -151,6 +151,51 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
   await ctx.close();
 }
 
+// "Still stuck?": the address while the help-request function is off (503), the form when it is on (400 to an empty
+// probe), then Sent or That did not send. The function is stood in for here (Nico's contract, D-521).
+{
+  const run = async (probe, submit) => {
+    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    const page = await ctx.newPage();
+    const calls = [];
+    await page.route('**/functions/v1/help-request', async (route) => {
+      const body = route.request().postData() ?? '';
+      calls.push(body);
+      const [status, json] = body === '{}' ? probe : submit;
+      await route.fulfill({ status, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(json) });
+    });
+    await page.goto(base + '/support/start-here/', { waitUntil: 'networkidle' });
+    await page.waitForTimeout(300);
+    return { page, ctx, calls };
+  };
+  {
+    const { page, ctx } = await run([503, { live: false }], [503, { live: false }]);
+    if (await page.getByRole('textbox', { name: /What’s wrong/ }).count()) fail('help form: shown while the function is off');
+    if (!(await page.getByRole('link', { name: 'hello@joinpam.org' }).count())) fail('help form: no address while the function is off');
+    await ctx.close();
+  }
+  for (const [label, submit, expected] of [
+    ['on, sends', [200, { ok: true }], 'Sent. Thank you.'],
+    ['on, fails', [502, { error: 'send_failed' }], 'That did not send.'],
+  ]) {
+    const { page, ctx, calls } = await run([400, { error: 'invalid', field: 'body' }], submit);
+    const box = page.getByRole('textbox', { name: /What’s wrong/ });
+    if (!(await box.count())) {
+      fail(`help form (${label}): not shown when the function is on`);
+    } else {
+      await box.fill('I cannot get the code');
+      await page.getByRole('textbox', { name: /How should we answer you/ }).fill('a@example.org');
+      await page.getByRole('button', { name: 'Send to Pam' }).click();
+      await page.waitForTimeout(400);
+      if (!(await page.getByText(expected).count())) fail(`help form (${label}): did not say “${expected}”`);
+      const sent = calls.find((c) => c !== '{}');
+      if (!sent || JSON.parse(sent).website !== '' || JSON.parse(sent).page !== '/support/start-here/') fail(`help form (${label}): the request is wrong: ${sent}`);
+      if (expected.startsWith('That') && !(await page.getByRole('link', { name: 'hello@joinpam.org' }).count())) fail('help form: a failed send does not show the address');
+    }
+    await ctx.close();
+  }
+}
+
 // W3: no page jumps as it loads (layout shift under 0.1 on a cold load), at phone and desktop width. The jump was the
 // font swapping in; scripts/preload-font.mjs starts its download with the page.
 {

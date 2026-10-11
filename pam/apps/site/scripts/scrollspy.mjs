@@ -78,13 +78,14 @@ for (const view of views) {
         const bar = Array.from(document.querySelectorAll('nav[aria-label="On this page"]')).find((n) => n.offsetParent !== null && getComputedStyle(n).position === 'sticky' && n.getBoundingClientRect().top <= 1);
         const stuck = bar ? bar.getBoundingClientRect().bottom : 0;
         const link = Array.from(document.querySelectorAll('nav[aria-label="On this page"]')).filter((n) => n.offsetParent !== null).flatMap((n) => Array.from(n.querySelectorAll(`a[href="#${id}"]`)))[0];
-        return { top: rect.top, bottom: rect.bottom, stuck, vh: innerHeight, current: link?.getAttribute('aria-current'), hash: location.hash, focused: document.activeElement?.id };
+        return { top: rect.top, bottom: rect.bottom, stuck, vh: innerHeight, current: link?.getAttribute('aria-current'), hash: location.hash, focused: document.activeElement?.id, outline: document.activeElement ? getComputedStyle(document.activeElement).outlineStyle : '' };
       }, id);
       checked += 1;
       if (r.top < r.stuck - 0.5) fail(`${label} #${id}: heading hidden under the menu (top ${Math.round(r.top)}, menu bottom ${Math.round(r.stuck)})`);
       if (r.bottom > r.vh + 0.5) fail(`${label} #${id}: heading below the screen (bottom ${Math.round(r.bottom)} of ${r.vh})`);
       if (r.current !== 'location') fail(`${label} #${id}: the link tapped is not aria-current (${r.current})`);
       if (r.hash !== `#${id}`) fail(`${label} #${id}: the address did not follow (${r.hash})`);
+      if (r.outline !== 'none') fail(`${label} #${id}: the focused section shows an outline (${r.outline})`);
       if (r.focused !== id) fail(`${label} #${id}: focus did not move to the section (${r.focused})`);
     }
     // scrolling by hand moves the highlight: top of the page is the first section

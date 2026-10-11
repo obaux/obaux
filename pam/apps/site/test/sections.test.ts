@@ -21,7 +21,8 @@ describe('section ids (the "On this page" menu links to them)', () => {
 describe('the menu label of each section', () => {
   it('uses the section’s own, then Sage’s label for that post, then the full title', () => {
     expect(sectionLabel('your-language', 'Pick it when you join')).toBe(SECTION_LABELS['your-language']!['Pick it when you join']);
-    expect(sectionLabel('cant-sign-in', 'Who can join, and how')).toBe('Who can join, and how');
+    expect(sectionLabel('cant-sign-in', 'Who can join, and how')).toBe('Who can join');
+    expect(sectionLabel('cant-sign-in', 'A heading with no label')).toBe('A heading with no label');
     expect(sectionLabel('your-language', 'Pick it when you join', 'Mine')).toBe('Mine');
     expect(sectionLabel(undefined, 'A title')).toBe('A title');
   });
@@ -29,7 +30,7 @@ describe('the menu label of each section', () => {
   it('names, in section-labels.ts, only headings the post really has', () => {
     const FILES: Record<string, string> = Object.fromEntries(
       readdirSync(join(__dirname, '../src/content'))
-        .filter((f) => f.endsWith('.tsx'))
+        .filter((f) => f.endsWith('.tsx') || f === 'rules.ts')
         .map((f) => [f, readFileSync(join(__dirname, '../src/content', f), 'utf8')]),
     );
     const all = Object.values(FILES).join('\n');

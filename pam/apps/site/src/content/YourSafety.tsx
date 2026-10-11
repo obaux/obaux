@@ -3,7 +3,7 @@ import { Link } from '@astryxdesign/core/Link';
 import { tap } from '../lib/tap';
 import { HowTo } from '../components/HowTo';
 import { Body, P, ReadMore, Section } from '../components/Prose';
-import { HelpAddress } from '../components/StillStuck';
+import { HelpAddress } from '../components/HelpAddress';
 
 /**
  * Support post: Your safety (everyone). Words by Sage (docs/help-drafts/your-safety.md), signed by Will (a59). The

@@ -56,6 +56,7 @@ export function TextsFromPam() {
       </Section>
 
       <Section title="Texts Pam does not send yet">
+        {PLACE_TEXTS_LIVE ? null : <P>Pam does not text you when a place you saved closes or moves.</P>}
         <P>
           {VISIT_REMINDERS_LIVE
             ? 'Pam does not text you when someone messages you, and it does not text you when someone wants to connect.'

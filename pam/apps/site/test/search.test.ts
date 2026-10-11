@@ -111,6 +111,12 @@ describe('the A28 posts are found by the words people use', () => {
     }
   });
 
+  it('puts someone who writes a word of danger on the safety post first', () => {
+    for (const q of ['suicidal', 'kill myself', 'hurt myself', 'self harm', 'violence', 'domestic violence', 'stalking', 'followed']) {
+      expect(find(q).posts[0]?.slug, q).toBe('your-safety');
+    }
+  });
+
   it('reads “call” and “phone number” as a way to reach a person, never a number', () => {
     for (const q of ['call', 'phone number', 'pam phone number', 'call pam']) {
       expect(find(q).posts.slice(0, 3).map((p) => p.slug), q).toContain('talking-to-pam');

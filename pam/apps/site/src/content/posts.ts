@@ -43,7 +43,7 @@ const ALL: readonly SupportPost[] = [
     summary: 'What to do if you are in danger, in crisis, or a message feels unsafe.',
     updated: '2026-10-11',
     stillStuck: false,
-    keywords: ['safety', 'safe', 'danger', 'emergency', '911', '988', 'crisis', 'unsafe', 'scared', 'afraid', 'threat', 'hurt', 'report', 'suspicious', 'block', 'suicide', 'abuse', 'harassed'],
+    keywords: ['safety', 'safe', 'danger', 'emergency', '911', '988', 'crisis', 'unsafe', 'scared', 'afraid', 'threat', 'hurt', 'report', 'suspicious', 'block', 'suicide', 'abuse', 'harassed', 'suicidal', 'kill myself', 'hurt myself', 'self harm', 'violence', 'domestic violence', 'stalking', 'followed'],
   },
   {
     slug: 'start-here',
