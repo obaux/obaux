@@ -508,6 +508,7 @@
   "place.closed": "Закрыто",
   "place.closedUntil": "Закрыто · откроется в {time}",
   "place.schedule": "Запланировать визит",
+  "place.schedule.pickService": "Выберите услугу выше, чтобы запланировать визит.",
   "place.directions": "Как добраться",
   "place.flag": "Здесь что-то не так",
   "place.hours": "Часы работы",

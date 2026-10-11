@@ -484,6 +484,7 @@
   "place.closed": "Closed",
   "place.closedUntil": "Closed · opens {time}",
   "place.schedule": "Plan a trip",
+  "place.schedule.pickService": "Pick a service above to plan a trip.",
   "place.directions": "How to get there",
   "place.flag": "Something is wrong here",
   "place.hours": "Opening hours",

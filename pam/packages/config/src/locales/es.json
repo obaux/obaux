@@ -484,6 +484,7 @@
   "place.closed": "Cerrado",
   "place.closedUntil": "Cerrado · abre a las {time}",
   "place.schedule": "Planear una visita",
+  "place.schedule.pickService": "Elija un servicio arriba para planear una visita.",
   "place.directions": "Cómo llegar",
   "place.flag": "Algo está mal aquí",
   "place.hours": "Horario",

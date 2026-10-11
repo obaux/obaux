@@ -487,6 +487,7 @@
   "place.closed": "已关门",
   "place.closedUntil": "已关门 · {time}开门",
   "place.schedule": "安排预约",
+  "place.schedule.pickService": "请先在上面选一项服务，再安排预约。",
   "place.directions": "怎么去",
   "place.flag": "这里有问题",
   "place.hours": "开放时间",

@@ -1951,3 +1951,7 @@ Branch `claude/places-programs-add-program-link` (D-496). Preview picture `publi
 ## Places & programs · lead-added vs gathered programs (11 October 2026) — on `main`, live
 
 Branch `claude/places-programs-lead-added-vs-gathered` (D-498). Migration `20261011002026`: `service_has_lead` / `places_with_leads` (a place has a lead when its organisation has an active provider account). A member planning a visit at a place with no lead is told the place is not told (English signed by Will on 11 October; the other six languages are Lena's drafts). A real lead with no program sees Add your program on Home and "Add your program first" on Policies and services, not the example. Test `52_which_places_have_a_program_lead_on_pam_test.sql`; e2e `places-without-a-lead.spec.ts`. Merged as f6a245d; the migration was **applied live** on 11 October as `a_place_says_whether_a_program_lead_on_pam_runs_it` (both functions match the file by md5, search path pinned, anon cannot run them, authenticated can; advisors: nothing new).
+
+## Places & programs · the pick-a-service line (11 October 2026) — READY, not merged
+
+Branch `claude/places-programs-pick-a-service-line` (Will's wording, 11 October). A place with services says "Pick a service above to plan a trip." under the greyed Plan a trip until one is picked (`place.schedule.pickService`). e2e `place-pick-a-service.spec.ts`.
