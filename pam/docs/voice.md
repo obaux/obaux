@@ -114,6 +114,46 @@ person at the desk: chattier when you walk in, quieter when you're filling in a 
 | **Errors and waiting** | Calmest. Reassuring. | Not your fault, what happened, what to do, a person to call. No jokes, ever. | "We could not send the code" + "This is not your fault…" (`signin.failed.send.*`) |
 | **Privacy, terms, notices, the transparency screen** | Plainest of all. Exact. | Only what is true and only what is promised. No personality, no softening that changes meaning. Lena signs the meaning. | "Not their chats, photos or documents." (`join.privacy.admin.3`) |
 
+### The website's headline lane: short, snappy, human
+
+Will, 11 October 2026, on the Callout card options: "I really liked your tone in Option C, let's
+remember to use copy more in that lane." The lines he meant:
+
+- "Find help in your city. Plan your visit. Keep going."
+- "Your policies, signed before they arrive."
+- "Their plans, your guidance, in one place."
+
+What they share, and what to write more of on the website:
+
+- **Short beats, often three.** A full stop where a comma would go. Each beat is one thing a person does
+  or gets: "Plan your visit. Keep going."
+- **"Your" up front.** The line belongs to the reader: "Your policies…", "Their plans, your guidance…".
+- **A turn at the end.** The last beat lands the benefit: "…signed before they arrive", "Keep going."
+- **Plain words only.** Snappy comes from rhythm, not slang or idioms, so it still translates.
+- **One supporting sentence underneath** carries the facts. The headline earns attention; the sentence
+  keeps it true.
+
+The headline lane is for the website, welcome moments and section headings. Tasks, errors and privacy
+stay plain (above).
+
+### People are guided, never watched
+
+Will, 11 October 2026: "we don't want to market anything saying: Know where your people are going,
+because it sounds like surveillance." The SOP says it in other words: admin is not surveillance.
+
+When you write about case managers, programs or anyone who can see something about a member, write
+about **helping**, not watching. The case manager is a guide and a mentor; the member is the one moving.
+
+| Write | Not |
+|---|---|
+| "Guide your people from plan to progress." | "Know where your people are going." |
+| "Walk with your people, one visit at a time." | "Know who showed up." |
+| "See the steps they take, and message them along the way." | "Track", "monitor", "keep tabs on", "check up on", "see if they went" |
+| "Their plans, your guidance, in one place." | "Everything about your caseload, at a glance." |
+
+What a case manager can see is a promise to members (the transparency screen), so it is told plainly
+where members read it, in the app and the privacy page. Marketing doesn't lead with it.
+
 **Personality is never a substitute for a fact.** The website can be bold about *how*
 Pam helps; it cannot claim what Pam doesn't do (support hours, reminders that aren't
 live, features in progress). Check the app's own strings and `apps/site/src/content/flags.ts`
@@ -210,6 +250,8 @@ runs a program…").
   authenticate, verify (say "check"), configure, settings updated.
 - **Jargon and buzzwords:** leverage, empower, seamless, solution, resources, engagement,
   gamified, intake, AI-powered (unless Will decides to say it, and it is true).
+- **Watching words about people:** track, monitor, keep tabs, know where they are, see if they showed up.
+  Guide, walk with, help, cheer on instead (see "People are guided, never watched").
 - **Blame and pressure:** "you failed to", "you must", "don't miss out", countdowns.
 - **Cheer that isn't earned:** "Awesome!", "Yay!", exclamation marks on titles.
 
@@ -263,6 +305,7 @@ Before you send words to Will:
 - [ ] No justice terms, no hints at someone's past, no system words, no buzzwords.
 - [ ] Our words. App: member, case manager / your guide, program lead, program, place, visit, join, sign in, text, call Pam. Website: residents, providers, case managers / guides.
 - [ ] No idioms, no pieced-together sentences, `{placeholders}` whole, no gender.
-- [ ] Right tone for the moment: personality on the website and welcomes; plainest in errors and privacy.
+- [ ] Right tone for the moment: on the website and in welcomes, the headline lane (short beats, "your", a turn at the end); plainest in errors and privacy.
+- [ ] Does anything sound like watching people? Write it as guiding them.
 - [ ] Touches a promise (privacy, terms, transparency, notices)? Lena reads the meaning.
 - [ ] Sent to Mira as a QUESTION for Will. Nothing ships unsigned.

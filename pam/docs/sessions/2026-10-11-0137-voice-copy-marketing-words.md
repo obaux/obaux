@@ -15,6 +15,12 @@
   word list brought in line. D-505.
 - The "Copy proposals" page in Figma stays as a sketch. Nobody builds from it.
 
+- **Same session, later (Will):** "Know where your people are going" sounds like surveillance. I took it out
+  of the component (case managers now: "Guide your people from plan to progress." / "Invite the people you
+  work with, see the steps they take, and message them in Pam along the way.") and out of the sketch page,
+  and the guide now says "People are guided, never watched". Will liked Option C's tone, so the guide names
+  it as the website's headline lane.
+
 ## What was wrong, and what missed it
 
 - The longer text made the three phone variants grow (546 → 576/601px), and the component set's fixed
@@ -34,6 +40,10 @@
 | `docs/voice.md` only | no build impact |
 
 ## Left undone
+
+- The same watching lines are still live elsewhere: the website's Home ("Know where your people are going,
+  and connect them in a tap.", `apps/site/src/screens/HomeScreen.tsx`, Wren's) and the app (`about.how.admin`,
+  `onboarding.admin.1` "Know who showed up, without chasing calls."). Reported as FINDINGs, not changed here.
 
 - Help-centre search phrases (Will, 01:24, with Wren): next job, its own branch.
 

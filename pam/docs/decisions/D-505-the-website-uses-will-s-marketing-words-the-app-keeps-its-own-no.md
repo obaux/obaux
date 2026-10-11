@@ -13,12 +13,20 @@
 - "We don't need to translate it right away. Only when the website is merged, then handle languages after.
   It's too soon in the collaborative flow to start translating. We're just brainstorming inside Figma."
 
+- "we don't want to market anything saying: Know where your people are going, because it sounds like
+  surveillance."
+- "I really liked your tone in Option C, let's remember to use copy more in that lane."
+
 ## What it changes
 
 - `docs/voice.md` has a table of app words against website words, and a section "How we work on words".
   It replaces the guide's earlier suggestion (D-503) that the website say "members" and "program lead".
   The app's words do not change: member, program lead, case manager, "your guide".
 - Support posts explain the app, so they keep the app's words.
+- Marketing frames case managers as guides, never as watching ("People are guided, never watched" in
+  `docs/voice.md`). The Callout card's case-manager line is now "Guide your people from plan to progress."
+- The headline lane for the website is the Option C tone: short beats, "your" up front, a turn at the end,
+  and one supporting sentence for the facts.
 - Sage writes into Will's Figma component when he asks, and only that component. The first pass was the
   Callout card (node 18:517), on 11 October.
 - Website words are translated after the website change merges, not while they are in Figma. App strings
