@@ -331,14 +331,18 @@ function CheckInButton({
   const [burst, setBurst] = useState(0);
   const [isTipOpen, setTipOpen] = useState(false);
   const [isAsking, setAsking] = useState(false);
+  const [failed, setFailed] = useState(false);
   useEffect(() => {
     if (!isTipOpen) return;
-    const timer = setTimeout(() => setTipOpen(false), 1600);
+    const timer = setTimeout(() => {
+      setTipOpen(false);
+      setFailed(false);
+    }, 1600);
     return () => clearTimeout(timer);
   }, [isTipOpen]);
   return (
     <HStack xstyle={styles.checkWrap}>
-      <Tooltip content={t('schedule.checkedIn')} isOpen={isTipOpen} placement="above">
+      <Tooltip content={failed ? t('join.failed.title') : t('schedule.checkedIn')} isOpen={isTipOpen} placement="above">
         <IconButton
           label={tPlain(isChecked ? 'schedule.checkin.undo' : 'schedule.checkin.do', { name })}
           variant="ghost"
@@ -349,9 +353,17 @@ function CheckInButton({
               setAsking(true);
               return;
             }
-            checkIn(id);
-            setBurst((n) => n + 1);
-            setTipOpen(true);
+            // A real visit is saved first; the circle fills when the database says yes.
+            void checkIn(id).then((ok) => {
+              if (!ok) {
+                setFailed(true);
+                setTipOpen(true);
+                return;
+              }
+              setFailed(false);
+              setBurst((n) => n + 1);
+              setTipOpen(true);
+            });
           }}
           xstyle={[styles.check, isChecked && styles.checkOn, burst > 0 && styles.checkSquash]}
         />
@@ -374,8 +386,11 @@ function CheckInButton({
         body={t('schedule.checkin.undo.body')}
         confirmLabel={t('schedule.checkin.undo.confirm')}
         onConfirm={() => {
-          undoCheckIn(id);
-          setAsking(false);
+          void undoCheckIn(id).then((ok) => {
+            setFailed(!ok);
+            setTipOpen(!ok);
+            setAsking(false);
+          });
         }}
         cancelLabel={t('schedule.checkin.undo.keep')}
         onCancel={() => setAsking(false)}

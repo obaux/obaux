@@ -52,3 +52,54 @@ test('Home lists the visits planned at the lead\'s own program, by first name, w
   // A member's page is not the program's to open: no link on the name.
   await expect(page.getByRole('link', { name: 'Tanya' })).toHaveCount(0);
 });
+
+const VISIT = 'aaaaaaaa-0000-4000-8000-000000005701';
+const here = (checkedInAt: string | null = null) => ({
+  appointment_id: VISIT, member_id: 'm1', first_name: 'Tanya', starts_at: soon(0), ends_at: null,
+  status: checkedInAt ? 'attended' : 'scheduled', service_name: 'GED class', checked_in_at: checkedInAt,
+});
+
+test('tapping here asks check_in_visit for that visit, and the circle fills once the database says yes', async ({ page }) => {
+  await signedInLead(page, [here()]);
+  const asked: unknown[] = [];
+  await page.route('**/rest/v1/rpc/check_in_visit*', (route) => {
+    asked.push(route.request().postDataJSON());
+    return route.fulfill(json([{ appointment_id: VISIT, status: 'attended', checked_in_at: new Date().toISOString(), points: 100 }]));
+  });
+  await page.goto('/');
+  await settled(page);
+  const circle = page.getByRole('button', { name: 'Check Tanya in' });
+  await circle.click();
+  await expect.poll(() => asked.length).toBe(1);
+  expect(asked[0]).toEqual({ p_appointment_id: VISIT });
+  await expect(page.getByRole('button', { name: /Tanya is checked in/ })).toBeVisible();
+});
+
+test('when the database refuses, the circle stays empty', async ({ page }) => {
+  await signedInLead(page, [here()]);
+  await page.route('**/rest/v1/rpc/check_in_visit*', (route) =>
+    route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ message: 'OUTSIDE_THE_VISIT_WINDOW' }) }),
+  );
+  await page.goto('/');
+  await settled(page);
+  await page.getByRole('button', { name: 'Check Tanya in' }).click();
+  await expect(page.getByText('We could not save')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Check Tanya in' })).toBeVisible();
+});
+
+test('a visit the database has as checked in shows filled, and undo asks first, then asks undo_check_in', async ({ page }) => {
+  await signedInLead(page, [here(new Date().toISOString())]);
+  const undone: unknown[] = [];
+  await page.route('**/rest/v1/rpc/undo_check_in*', (route) => {
+    undone.push(route.request().postDataJSON());
+    return route.fulfill(json([{ appointment_id: VISIT, status: 'scheduled', checked_in_at: null, points: -100 }]));
+  });
+  await page.goto('/');
+  await settled(page);
+  await page.getByRole('button', { name: /Tanya is checked in/ }).click();
+  expect(undone).toHaveLength(0);
+  await page.getByRole('dialog').getByRole('button', { name: 'Undo check-in' }).click();
+  await expect.poll(() => undone.length).toBe(1);
+  expect(undone[0]).toEqual({ p_appointment_id: VISIT });
+  await expect(page.getByRole('button', { name: 'Check Tanya in' })).toBeVisible();
+});

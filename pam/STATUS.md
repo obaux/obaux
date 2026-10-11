@@ -2075,3 +2075,7 @@ Branch `claude/places-programs-no-examples-places` (D-509 extended). The example
 ## Places & programs · attendance part A: leads see real visits (11 October 2026) — READY, not merged
 
 Branch `claude/places-programs-attendance-a-visits` (D-526). `my_program_visits` (migration `20261011050637`): a program lead's own program's visits, first names only; the lead's Home lists them. Test `56_a_program_lead_reads_the_visits_at_their_own_test.sql`; e2e `program-visits.spec.ts`. Parts B–D follow.
+
+## Places & programs · attendance part B: check-in and points (11 October 2026) — READY, not merged (on top of part A)
+
+Branch `claude/places-programs-attendance-b-checkin` (D-526). `check_in_visit` / `undo_check_in` (migration `20261011051257`): own-program lead only, 100 points once per visit, undo reverses once. The lead's circle asks the database for real visits. Test `57_a_program_lead_checks_in_a_visit_test.sql`; e2e in `program-visits.spec.ts`. No new strings. Parts C–D follow.

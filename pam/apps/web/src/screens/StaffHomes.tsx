@@ -14,6 +14,7 @@ import { SetupCard, type SetupCardProps } from '@pam/ui/SetupCard';
 import { SubPage } from '@pam/ui/SubPage';
 import { useProgramSetup, type ProgramSetup } from '@/lib/programSetup';
 import { useProgramVisits } from '@/lib/useProgramVisits';
+import { seedCheckIns } from '@/lib/checkIns';
 import { FloatingAction } from '@pam/ui/FloatingAction';
 import { openConversation } from '@/lib/openConversation';
 import { DUMMY_SELF_ID, dummyConversationIdBetween } from '@pam/config/dummy-conversations';
@@ -157,6 +158,10 @@ export function ProgramHome() {
   const setup = useProgramSetup(session);
   const booked = useBookedForMembers();
   const realVisits = useProgramVisits(Boolean(setup.program?.isLive));
+  // What the database says about who has arrived (D-526) is what the circles show.
+  useEffect(() => {
+    if (realVisits.length > 0) seedCheckIns(realVisits);
+  }, [realVisits]);
   const appointments: Appointment[] = [
     ...(setup.isExample ? exampleAppointments(t) : []),
     // Visits the program booked for people (D-316), on its own schedule too.
