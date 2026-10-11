@@ -85,7 +85,11 @@ export function AboutScreen() {
       <VStack gap={3}>
         <Text xstyle={styles.how}>{t(`about.how.${who}`)}</Text>
         {/* Keyed by who, so switching starts their story at its first slide. */}
-        <OnboardingSlides key={who} slides={slides} label={t(`about.tab.${who}`)} variant="inline" showLines={false} />
+        <OnboardingSlides key={who} slides={slides} label={t(`about.tab.${who}`)} variant="inline"
+          showLines={false}
+          pauseLabel={tPlain('carousel.pause')}
+          playLabel={tPlain('carousel.play')}
+        />
       </VStack>
 
       <VStack gap={2}>

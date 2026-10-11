@@ -1703,5 +1703,7 @@
   "transparency.group.people": "أشخاصك ورسائلك",
   "copy.page": "نسخ هذه الصفحة",
   "copy.done": "تم النسخ",
-  "copy.failed": "تعذر النسخ. اضغط مطولا على النص لنسخه."
+  "copy.failed": "تعذر النسخ. اضغط مطولا على النص لنسخه.",
+  "carousel.pause": "إيقاف مؤقت",
+  "carousel.play": "تشغيل"
 }
