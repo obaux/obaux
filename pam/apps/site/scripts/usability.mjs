@@ -151,6 +151,31 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
   await ctx.close();
 }
 
+// W3: no page jumps as it loads (layout shift under 0.1 on a cold load), at phone and desktop width. The jump was the
+// font swapping in; scripts/preload-font.mjs starts its download with the page.
+{
+  const { readdirSync, existsSync } = await import('node:fs');
+  const slugs = readdirSync(join(out, 'support'), { withFileTypes: true })
+    .filter((d) => d.isDirectory() && existsSync(join(out, 'support', d.name, 'index.html')))
+    .map((d) => d.name);
+  for (const width of [390, 1280]) {
+    for (const slug of ['', ...slugs]) {
+      const page = await browser.newPage({ viewport: { width, height: 844 } });
+      await page.addInitScript(() => {
+        window.__cls = 0;
+        new PerformanceObserver((list) => {
+          for (const e of list.getEntries()) if (!e.hadRecentInput) window.__cls += e.value;
+        }).observe({ type: 'layout-shift', buffered: true });
+      });
+      await page.goto(`${base}/support/${slug ? `${slug}/` : ''}`, { waitUntil: 'networkidle' });
+      await page.waitForTimeout(600);
+      const cls = await page.evaluate(() => window.__cls);
+      if (cls > 0.1) fail(`layout shift: /support/${slug} at ${width}px shifts ${cls.toFixed(3)} while loading`);
+      await page.close();
+    }
+  }
+}
+
 await browser.close();
 server.close();
 console.log(failures ? `\n${failures} problem(s).` : 'usability: all clear');

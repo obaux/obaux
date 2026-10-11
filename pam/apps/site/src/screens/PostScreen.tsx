@@ -35,7 +35,10 @@ const styles = stylex.create({
     borderRadius: '8px',
     backgroundColor: colorVars['--color-background-gray'],
     fontWeight: 600,
+    // On a phone the title is right below, so the path stops at "Support" (it read three times at 320px).
+    display: { default: 'inline-block', '@media (max-width: 519px)': 'none' },
   },
+  arrow: { display: { default: 'inline-block', '@media (max-width: 519px)': 'none' } },
   title: { maxWidth: '24ch' },
   // "Who this is for": an outlined box under the title, like Figma's "Who can use this feature".
   meta: {
@@ -100,7 +103,7 @@ export function PostScreen({ slug, allowDraft = false }: { readonly slug: string
           <VStack gap={4} xstyle={styles.header}>
             <HStack as="nav" gap={2} xstyle={styles.crumbs} aria-label="Breadcrumb">
               <Link href="/support/" xstyle={tap.link}>Support</Link>
-              <Text type="supporting" aria-hidden>
+              <Text type="supporting" aria-hidden xstyle={styles.arrow}>
                 →
               </Text>
               <Text aria-current="page" xstyle={styles.here}>
