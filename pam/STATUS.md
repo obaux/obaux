@@ -1419,8 +1419,9 @@ caption ("Your badge"), and Sign in's field label and consent line at 14px. D-50
 
 Branch `claude/pam-design-tokens`. Foundations now says what the code does for card radius (24px; sheets 28px), spacing (4px steps,
 half-steps inside components) and colour (all 146 tokens, generated from the theme, with a test); a decision records who was right
-for each of Wren's five items (D-504). Needs Will: two visible changes: raise the theme's body size (14px to 16px, with 3 in 4
-text elements currently under 15px), and dark `background-muted` to `#262626`.
+for each of Wren's five items (D-504). Will has answered both visible items: body size left as is, with the exceptions written as A27
+(the "3 in 4 under 15px" figure was wrong, it is 38%; see A27 and D-504); dark `background-muted` to `#262626`: yes (a49), on
+`claude/pam-design-dark-muted`.
 
 ## Design system & Storybook · Sign in on a short phone, small targets (11 October) — on `main`
 
