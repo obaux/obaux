@@ -1386,6 +1386,12 @@ state with a (+)) instead of the "Proposed (a22)" cards; the generator gets `dra
 mouse stepped it on again (D-494, fixed; phones were not affected). Figma: Case manager, Program lead and
 Overview redrawn, one image replaced on Member; drawn from the branch, so redraw from `main` only after it merges.
 
+## Design system & Storybook · Sign in on a short phone, small targets (11 October)
+
+Branch `claude/pam-design-signin-short`. Sign in's Privacy / Terms / About links flow after the content instead of
+being pinned, so they never cover "Send me a code" at 320×568 (Iris S1, D-500); `TextLink` is 48px wide as well as tall
+(the Trips banner's "Sign", the signature sheet's "Clear"), and the policy header's "Done" too (W4). Needs Will: nothing.
+
 ## Design system & Storybook · legal tabs follow the reader (10 October)
 
 Branch `claude/pam-design-legal-tabs`. Privacy and Terms: the highlighted tab is the section whose heading has reached the
