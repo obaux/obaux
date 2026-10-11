@@ -928,6 +928,16 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Voice & UX copy · Pam's voice guide; website Home proposals (11 October)
+
+A new lane (Sage, Will's brief of 11 October). **`docs/voice.md`** is how Pam sounds: who we write for, four
+traits (plain, warm, steady, respectful) with do/don't pairs from real `en.json` keys, a tone that flexes from
+the website (most personality) to errors and privacy (plainest), patterns, the word list, writing for seven
+languages and a checklist (D-503). Storybook's Foundations › Writing is a short summary linking to it. No app
+or site words changed. **Waiting on Will:** the Figma page "Copy proposals" in "Pam — Website" (node 31-290)
+has new words for each Home section beside his own; nothing is built until he says "build it", then it is
+Wren's. Open word: "program lead" vs "Program partner" for program staff.
+
 ## Merge desk & platform · deploys: only `main`, and checked (10–11 October)
 
 On 10 October the web project hit Vercel's daily deploy limit: 3f0bb5e and 00bde97 were refused ("Deployment rate
