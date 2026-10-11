@@ -15,7 +15,6 @@ move the row here to "Done".
 |---|---|---|---|
 | i got a new phone number | anyone | Changing your phone number: call Pam, and what happens to your account and texts. | Sage, Wren |
 | does the place know im coming | resident | Is the place told about my visit? Only a place with a program lead on Pam sees it; a place from a public list is not told (D-498). | Sage, Wren |
-| they said i missed it | resident | A visit marked missed: who marks it, who sees it, and what to do if it is wrong. | Sage, Wren |
 | why is this happening | anyone | When something isn’t working, start here: the common reasons (a code, a link, a paused account, no connection), each with what to do, then how to call Pam. | Sage, Wren |
 | something went wrong | anyone | Same post as “why is this happening”. | Sage, Wren |
 | the page is blank | anyone | Same post as “why is this happening”. | Sage, Wren |
@@ -34,6 +33,14 @@ move the row here to "Done".
 | who is coming to my program | provider | Your calendar: who is coming, by day, and checking people in when they arrive. | Sage, Wren |
 | why wasnt i told about a visit | provider | Same post as “does the place know im coming”, from the program’s side: visits show on your calendar only for a program you added. | Sage, Wren |
 | approve a staff request | anyone |  | Sage, Wren |
+
+## Parked
+
+Not written on purpose. The phrase stays in `search-phrases.ts`, so the search still says "We do not have an article for that yet" and shows the way to a person.
+
+| Phrase | Who is asking | Why it is parked | Revisit when |
+|---|---|---|---|
+| they said i missed it | A resident told they missed a visit they think they made. | Pam does not record attendance yet (`checkIns.ts` only keeps it in the browser), so a post would describe something that does not happen. Sage's FINDING to the merge desk, 11 October. | Attendance is recorded and a program can mark a visit missed. |
 
 ## Done
 
