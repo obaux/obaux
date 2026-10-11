@@ -20,8 +20,8 @@ export const SECTION_LABELS: Readonly<Record<string, Readonly<Record<string, str
     'A place is missing or wrong': 'A place is wrong',
   },
   'talking-to-pam': {
-    'Call us': 'Call us',
-    'If we are closed': 'When we’re closed',
+    'Start here, on the help desk': 'Find an answer',
+    'Still stuck? Write to us': 'Write to us',
     'What we can help with': 'What we help with',
     'In danger right now?': 'In danger',
     'A message feels unsafe': 'Unsafe message',
