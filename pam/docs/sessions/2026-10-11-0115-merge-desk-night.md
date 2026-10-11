@@ -286,6 +286,18 @@
   - "I'm here" (D-535, 3451ecb9, tree = df4d63ce), for a63 and a66;
   - the calendar link (D-538, 57029b02), discreet by default ("Pam visit"; name and address only if the member
     switches them on), for its own Privacy card.
+- **Batch b18 pushed at b770551, live, main CI green.** Iris re-tested all five privacy items and they pass.
+- **Batch b19 (small):**
+  - Piper's area hint ("Like 19107." under the picker);
+  - Lena's fit-audit fix: `pnpm audit:fit` now passes `--known`, as CI does. The "13 findings" were already accepted;
+  - Lena's host guard now covers the edge functions (Twilio, Resend, translation, link preview; Google pending);
+  - Nico's link-preview User-Agent now names joinpam.org instead of an old vercel address;
+  - one merge-desk line: the guard flagged the old address as no longer named, so I dropped its entry.
+
+  link-preview is to be redeployed after the push. Card a70 asks Will to read the translation account's retention
+  setting, because Privacy says the company "keeps nothing", which nobody has checked. a69 asks whether Pam should
+  ever read a member's calendar (the finder). My advice is "not yet". The Google sync (D-539) is built, off, and
+  waits for a68.
 
 ## What was wrong, and what missed it
 
@@ -432,6 +444,9 @@
 | Gateway and Postgres logs, 25 hours (Piper, read-only) | no coordinates in any log; the gateway keeps path, status, account, IP, user agent and time |
 | Batch b18: db / config / copy:status / ui / web unit / site tests / e2e full | 1288 ok, 0 not ok / 1101 / in step / 124 / 135 / 94 / 1454 passed, 19 skipped |
 | Batch b18: builds, budget, storybook, site a11y / usability / scrollspy; host guard | all 0; 15.7 kB spare; builds; 120 scans 0 / clear / 300 links 0; 7/7 |
+| main CI on b770551 (b18); Iris's b18 re-test | all four green, READY; five of five pass |
+| Batch b19 (5ae7c49): db / config / ui / web unit / site / e2e full / storybook / site checks | 1288 ok / 1101 / 124 / 135 / 94 / 1454 passed, 19 skipped / builds / 120 scans 0, clear, 300 links 0 |
+| Batch b19 + functions guard + User-Agent + guard cleanup: config | 1106 passed |
 
 ## Left undone
 
