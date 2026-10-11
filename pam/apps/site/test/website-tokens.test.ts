@@ -58,6 +58,13 @@ describe('website colours: AA in both themes', () => {
       expect(ratio('accent-success', 'surface-page', mode)).toBeGreaterThanOrEqual(3);
     });
   }
+  it('the AA variants pass where the Figma values do not', () => {
+    for (const mode of ['light', 'dark'] as Mode[])
+      for (const s of ['surface-page', 'surface-muted', 'surface-gray', 'surface-green', 'surface-purple'] as const)
+        expect(ratio('text-muted-strong', s, mode), `${mode} muted-strong on ${s}`).toBeGreaterThanOrEqual(4.5);
+    expect(ratio('text-success', 'surface-page', 'light')).toBeGreaterThanOrEqual(4.5);
+    expect(ratio('text-success', 'surface-page', 'dark')).toBeGreaterThanOrEqual(4.5);
+  });
   it('light: Text/Muted is not for Gray, Green or Purple surfaces (below 4.5:1)', () => {
     for (const s of ['surface-gray', 'surface-green', 'surface-purple'] as const)
       expect(ratio('text-muted', s, 'light')).toBeLessThan(4.5);
