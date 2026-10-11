@@ -1720,5 +1720,13 @@
   "copy.done": "تم النسخ",
   "copy.failed": "تعذر النسخ. اضغط مطولا على النص لنسخه.",
   "carousel.pause": "إيقاف مؤقت",
-  "carousel.play": "تشغيل"
+  "carousel.play": "تشغيل",
+  "supportReply.title": "الرد برسالة نصية",
+  "supportReply.to": "إلى {phone}",
+  "supportReply.label": "ردك",
+  "supportReply.count": "{used} من {max}",
+  "supportReply.send": "إرسال رسالة نصية",
+  "supportReply.sent": "في قائمة الانتظار. تُرسل خلال خمس دقائق.",
+  "supportReply.noNumber": "لا يوجد رقم لإرسال رسالة نصية إليه.",
+  "supportReply.failed": "لم تُرسل. حاول مرة أخرى."
 }

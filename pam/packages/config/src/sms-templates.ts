@@ -34,7 +34,9 @@ export type SmsTemplateKey =
   | 'booking_changed'
   | 'trip_planned'
   | 'staff_request_approved'
-  | 'staff_request_denied';
+  | 'staff_request_denied'
+  | 'support_reply'
+  | 'reply_no_read';
 
 /** The languages whose texts are signed off one by one; English and Spanish are signed with the template. */
 export type MoreLocale = Exclude<Locale, 'en' | 'es'>;
@@ -626,6 +628,36 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     },
     vars: [],
     reviewedBy: REVIEWED_BY,
+    isFirstContact: false,
+  },
+  /**
+   * A super admin's answer to a help request, as one text to the number the person typed into the help
+   * form (A28, D-524). `{reply}` is what the super admin wrote (150 characters at most, checked when it is
+   * queued and again by the dispatcher's last check). The wrapper is the signed copy; the words are theirs.
+   * Held by `texts_live` like any non-account text. **Unsigned**: it cannot send until Will signs it.
+   */
+  support_reply: {
+    key: 'support_reply',
+    en: 'Pam: {reply}',
+    es: 'Pam: {reply}',
+    vars: ['reply'],
+    maxVarLengths: { reply: 120 },
+    reviewedBy: '',
+    // The person has never had a text from this number, so the way out travels with it (Twilio): the
+    // answer therefore has 120 characters, not 150, to leave room for "Reply STOP to stop texts."
+    isFirstContact: true,
+  },
+  /**
+   * The one fixed answer to anyone who texts a reply to Pam, which cannot read replies (D-524; Mira's advice,
+   * card a61). Not wired to anything yet: the inbound function still answers nothing (D-460) until Will decides.
+   * **Unsigned**: cannot send until Will signs it.
+   */
+  reply_no_read: {
+    key: 'reply_no_read',
+    en: "Pam: This number can't read replies. Write to hello@joinpam.org.",
+    es: 'Pam: Este numero no puede leer respuestas. Escriba a hello@joinpam.org.',
+    vars: [],
+    reviewedBy: '',
     isFirstContact: false,
   },
 };
