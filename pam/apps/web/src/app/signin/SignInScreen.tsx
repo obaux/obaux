@@ -125,7 +125,7 @@ export function SignInScreen({
    */
   readonly audience?: InviteRole | null;
 } = {}) {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   const supportPhone = useSupportPhone();
   const live = usePhoneSignIn();
   const flow = preview?.flow ?? live;
@@ -372,7 +372,13 @@ export function SignInScreen({
           // hero belongs to the first step only, and the card rides up over
           // its bottom edge instead of sitting in a header-then-card stack.
           <VStack gap={0} align="center" xstyle={styles.heroGroup}>
-            <OnboardingSlides slides={slides} label={t('onboarding.label')} header={heroHeader} />
+            <OnboardingSlides
+              slides={slides}
+              label={t('onboarding.label')}
+              header={heroHeader}
+              pauseLabel={tPlain('carousel.pause')}
+              playLabel={tPlain('carousel.play')}
+            />
             <VStack gap={3} align="center" xstyle={styles.overlapCard}>
               {failedNotice}
               {card}
