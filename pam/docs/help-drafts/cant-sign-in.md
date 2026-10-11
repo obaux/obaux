@@ -23,10 +23,14 @@ the link doesn't work.
 | You are | How you get in |
 |---|---|
 | **A resident** | Anyone can join on their own. Open Pam, sign in with your phone, and leave the code box empty. Pam is only in some cities for now. If it isn't in yours yet, you can save your city. |
-| **Someone who runs a program** | You join with an invite link. A case manager, a program lead or the Pam team can send you one. |
+| **Someone who runs a program** | Join as a resident, then ask us to add your program: Contact Pam and tell us its name and address. Pam checks every program by hand before people can find it. You can also join with an invite link from a case manager, a program lead or the Pam team. |
 | **A case manager** | You join with an invite link. Another case manager or the Pam team can send you one. |
 
-## I want to be a case manager or add my program
+## I want to add my program
+- Sign in to Pam as a resident first.
+- Contact Pam and tell us your program's name and address. We add it, and Pam checks it by hand before people can find it.
+
+## I want to be a case manager
 - Ask a case manager you work with, or the Pam team, for an invite link. (Contact Pam, below.)
 - The person who invites you sends you the link, by text or another app. Pam also emails it to you. Open it on your phone: it only works with the phone number it was made for.
 - A link works once, for one person, and lasts 30 days. If it's too old, ask for a new one.
@@ -51,11 +55,13 @@ the link doesn't work.
 
 ---
 
+**When "Add my program" ships (Piper), swap in:**
+- Table row: | **Someone who runs a program** | Anyone can add a program. Sign in, then tap "Add my program" [where Piper puts it]. Pam checks every program by hand before people can find it. |
+- Section "I want to add my program": "1. Sign in to Pam. 2. Tap "Add my program" [place]. 3. Tell us what it is, where it is and how people reach you. 4. Pam checks it by hand. Your Program tab shows where it is." (the last line is `join.program.review.note`'s own promise)
+
 **Check before it ships:**
-- **Will's guess "any member can create a program" is not true today.** Program leads join by invite link, like case
-  managers (D-369: "special links for login for programs and case managers… We don't want to let members select that
-  they're a staff by mistake"). A request path exists in the code but no screen calls it. If Will wants members to
-  add programs themselves, that's a build job first; the post says only what's true.
+- **Will, 03:22: "anyone should be able to create a program".** This replaces D-369's invite-only rule for programs. Until
+  Piper's "Add my program" ships, the post says to ask through Contact Pam; the swap-in lines above are ready.
 - **"Case manager links are sent by our team" is half true:** a super admin (the Pam team) can, and so can any case
   manager (Sending an invite: "A case manager: members, programs and other case managers").
 - **"Contact Pam"** stands in for every "call Pam", per Will ("let's avoid people calling"). It needs the Contact Pam
