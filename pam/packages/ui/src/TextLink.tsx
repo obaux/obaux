@@ -39,8 +39,10 @@ const linkLook = {
 } as const;
 
 const styles = stylex.create({
-  link: { minHeight: pam['--pam-touch-target-min'], fontSize: pam['--pam-link-size'], ...linkLook },
-  quiet: { minHeight: pam['--pam-touch-target-min'], fontSize: '15px', ...linkLook },
+  // 48px both ways (§2.5): a short word ("Sign", "Clear", "تم") was as wide as its letters, 25 to 40px, and a thumb
+  // 20px from the centre missed it (Iris's member pass, W4; D-500).
+  link: { minHeight: pam['--pam-touch-target-min'], minWidth: pam['--pam-touch-target-min'], fontSize: pam['--pam-link-size'], ...linkLook },
+  quiet: { minHeight: pam['--pam-touch-target-min'], minWidth: pam['--pam-touch-target-min'], fontSize: '15px', ...linkLook },
 });
 
 /**

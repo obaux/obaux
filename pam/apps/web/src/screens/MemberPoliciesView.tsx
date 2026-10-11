@@ -125,6 +125,8 @@ const styles = stylex.create({
   // "Done" in the header, as on the Location drawer (D-275, D-279).
   doneButton: {
     minHeight: '48px',
+    // "تم" is 24px wide on its own: 48px a thumb can hit (Iris's member pass, W4; D-500).
+    minWidth: '48px',
     paddingInline: '4px',
     fontSize: '17px',
     fontWeight: 700,
