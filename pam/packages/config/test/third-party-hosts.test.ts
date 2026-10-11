@@ -23,7 +23,7 @@ import { EN } from './_bundles.js';
 const ROOTS = [
   { dir: '../../../apps/web', skip: ['node_modules', '.next', 'out', 'storybook-static', 'test-results', 'user-flows-out', 'e2e', 'stories', 'public', 'scripts'] },
   { dir: '../../ui/src', skip: ['stories'] },
-  // The public website, joinpam.org: "the only part of Pam that loads anything from Google" (sharing.p5) covers it too.
+  // The public website, joinpam.org: "the only part of Pam that your phone loads from Google" (sharing.p5) covers it too.
   { dir: '../../../apps/site', skip: ['node_modules', '.next', 'out', 'public', 'scripts', 'social', 'test', 'screenshots.json'] },
   { dir: '../src', skip: ['locales'] },
 ] as const;
@@ -141,14 +141,14 @@ describe('who else the app talks to (a67)', () => {
   });
 
   it('keeps the Maps script the only thing Pam loads from Google', () => {
-    // privacy.s.sharing.p5 (a67): “The map is the only part of Pam that loads anything from Google.” A Google font, a
+    // privacy.s.sharing.p5 (a67): “The map is the only part of Pam that your phone loads from Google.” A Google font, a
     // sign-in, an analytics tag or a second Maps host would make that false: tell Privacy first.
     const google = Object.entries(HOSTS)
       .filter(([host, entry]) => /google|gstatic|googleusercontent|doubleclick/.test(host) && entry.kind === 'loaded')
       .map(([host]) => host);
     expect(google).toEqual(['maps.googleapis.com']);
     const sayingIt = EN['privacy.s.sharing.p5'];
-    if (sayingIt) expect(sayingIt).toMatch(/only part of Pam that loads anything from Google/);
+    if (sayingIt) expect(sayingIt).toMatch(/only part of Pam that your phone loads from Google/);
   });
 
   it('lists every file that makes requests of its own', () => {
