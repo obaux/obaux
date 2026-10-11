@@ -24,9 +24,23 @@ Astryx `gap` / `padding` number: `gap={4}` is 16px.
 
 ## Radii
 
+What the screens draw (counted over 70 role screens, D-504; the theme's `.astryx-card` rule, not a token, sets the card):
+
 - **Pills** (`--radius-full`) for every button and chip.
-- **Cards** (`--radius-page`, 28px) for cards and sheets on a screen.
-- **Fields** (`--radius-element`) for text inputs.
+- **Cards: 24px.** Every `Card` (`.astryx-card` in the theme). This page used to say 28px: that is the sheet.
+- **Sheets and drawers: 28px** (`--radius-page`): the map drawer, the signature sheet, the booking sheets.
+- **Fields and rows: 10px** (`--radius-element`) for text inputs and `MenuList` rows.
+- **Small panels: 12px** (`--radius-container`), and 14px for a few inline cards.
+- Components set their own radius in StyleX (16, 12, 14, 24px) rather than reading the tokens: there is no
+  `--radius-card` yet, so a new card takes `Card`, not a raw number.
+
+## The spacing scale
+
+Space is in **4px steps**: `gap={1}` is 4px, `2` is 8, `3` is 12, `4` is 16, `6` is 24 (Astryx's own scale), and it is
+what goes *between* things. **Inside a component, 2px and 6px half-steps are allowed** for optical alignment: an icon
+against a label, the inset of a pill, a dot beside a name. The code has about 40 of them (2, 6, 10, 14, 18, 22px) beside
+about 170 on-grid values, and that is fine. Not allowed: a 1, 3 or 5px gap, and a half-step between sections. Three
+stragglers are known (a 1px, a 3px and a 15px) and are to be tidied the next time their component is opened.
 
 ## Layout patterns
 
