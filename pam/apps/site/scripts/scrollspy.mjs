@@ -98,6 +98,61 @@ for (const view of views) {
       return { first, current: link?.getAttribute('href') };
     });
     if (first.current && first.current !== `#${first.first}`) fail(`${label}: at the top of the page the highlight is ${first.current}, not #${first.first}`);
+    // Enter on a menu link (the keyboard): the section gets focus and shows no ring (Iris, SP5)
+    {
+      await page.mouse.wheel(0, -100000);
+      await page.waitForTimeout(200);
+      if (!wide) {
+        const trigger = nav.locator('button').first();
+        if ((await trigger.getAttribute('aria-expanded')) !== 'true') await trigger.click();
+      }
+      const second = nav.locator('a').nth(1);
+      await second.focus();
+      await page.keyboard.press('Enter');
+      await page.waitForTimeout(400);
+      const k = await page.evaluate(() => ({ id: document.activeElement?.id, outline: document.activeElement ? getComputedStyle(document.activeElement).outlineStyle : '' }));
+      if (k.outline !== 'none') fail(`${label}: Enter on a menu link leaves a ring on the section (${k.outline})`);
+    }
+    // At 1280 the menu comes before the post in Tab order (Iris, SP4)
+    if (wide) {
+      await page.goto(base + path, { waitUntil: 'networkidle' });
+      let first = '';
+      for (let i = 0; i < 40 && !first; i += 1) {
+        await page.keyboard.press('Tab');
+        first = await page.evaluate(() => {
+          const el = document.activeElement;
+          if (el?.closest('nav[aria-label="On this page"]')) return 'menu';
+          if (el?.closest('article')) return 'post';
+          return '';
+        });
+      }
+      if (first !== 'menu') fail(`${label}: Tab reaches ${first || 'nothing'} before the "On this page" menu`);
+    }
+    // at the very bottom the last section is the one you are in (Iris, SP1/SP3)
+    await page.mouse.move(view.viewport.width / 2, view.viewport.height / 2);
+    await page.mouse.wheel(0, 100); // a hand on the page lets the highlight follow it again
+    // lazy pictures make the page taller as it is scrolled, so go to the bottom until it stops moving
+    for (let i = 0; i < 4; i += 1) {
+      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      await page.waitForTimeout(500);
+    }
+    await page.waitForTimeout(500);
+    const last = await page.evaluate(() => {
+      const ids = Array.from(document.querySelectorAll('[data-post-section]')).map((e) => e.id);
+      const link = Array.from(document.querySelectorAll('nav[aria-label="On this page"]')).filter((n) => n.offsetParent !== null).flatMap((n) => Array.from(n.querySelectorAll('a[aria-current="location"]')))[0];
+      return { last: ids[ids.length - 1], current: link?.getAttribute('href') };
+    });
+    if (last.current !== `#${last.last}`) fail(`${label}: at the bottom of the page the highlight is ${last.current}, not #${last.last}`);
+    // Esc closes the open list on a phone
+    if (!wide) {
+      const trigger = nav.locator('button').first();
+      await page.mouse.wheel(0, -100000);
+      await page.waitForTimeout(300);
+      if ((await trigger.getAttribute('aria-expanded')) !== 'true') await trigger.click();
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(300);
+      if ((await trigger.getAttribute('aria-expanded')) === 'true') fail(`${label}: Esc does not close the open list`);
+    }
   }
   await ctx.close();
 }

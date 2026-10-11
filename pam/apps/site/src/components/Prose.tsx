@@ -7,11 +7,14 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { Link } from '@astryxdesign/core/Link';
 import { sectionId } from '../lib/slug';
 import { tap } from '../lib/tap';
+import { website } from '../lib/website.stylex';
+import { type } from '../lib/website-type.stylex';
 
 const styles = stylex.create({
   // Text keeps a readable line length; the cards (how to find it, pictures) use the full width.
   measure: { maxWidth: '760px' },
-  lead: { maxWidth: '760px', fontWeight: 400 },
+  lead: { maxWidth: '760px', fontWeight: 400, color: website['--website-text-primary'] },
+  head: { maxWidth: '760px', color: website['--website-text-primary'], margin: 0 },
   // A section a link can scroll to: its top lands clear of whatever is stuck to the top of the screen
   // (`--post-scroll-offset`, set in globals.css: the "On this page" bar on a phone).
   anchor: { scrollMarginTop: 'var(--post-scroll-offset, 24px)' },
@@ -33,7 +36,7 @@ export function Body({ children }: { readonly children: ReactNode }) {
 /** The one-or-two-sentence answer, before anything else. */
 export function Lead({ children }: { readonly children: ReactNode }) {
   return (
-    <Text type="large" as="p" xstyle={styles.lead}>
+    <Text as="p" xstyle={[type.lead_large20, styles.lead]}>
       {children}
     </Text>
   );
@@ -46,7 +49,7 @@ export function Lead({ children }: { readonly children: ReactNode }) {
 export function Section({ title, short: shortLabel, children }: { readonly title: string; readonly short?: string; readonly children: ReactNode }) {
   return (
     <VStack gap={3} id={sectionId(title)} data-post-section={menuLabel(shortLabel, title)} tabIndex={-1} xstyle={styles.anchor}>
-      <Heading level={2} xstyle={styles.measure}>
+      <Heading level={2} xstyle={[type.heading_title24, styles.head]}>
         {title}
       </Heading>
       {children}

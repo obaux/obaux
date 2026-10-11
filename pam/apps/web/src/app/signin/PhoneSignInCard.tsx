@@ -10,6 +10,7 @@ import { BigButton, CompactNotice, TextField, TextLink } from '@pam/ui';
 import { CodeBoxes } from '@pam/ui/CodeBoxes';
 import { useI18n } from '@/lib/i18n';
 import type { PhoneSignIn } from '@/lib/usePhoneSignIn';
+import { SITE_URL } from '@/lib/project';
 
 /**
  * Give us your number; type what we sent.
@@ -141,6 +142,12 @@ export function PhoneSignInCard({
             isDisabled={busy || flow.resendIn > 0}
             size="quiet"
           />
+          {/*
+            A way to a person on the code step (A26, A28; Iris CP1): a code that is wrong, expired or never came
+            left nobody to ask. Quiet, under Send again and outside the alert (D-510). This person is signed
+            out, so it goes to the help desk's post for it rather than to Help in the app.
+          */}
+          <TextLink label={t('help.needHelp')} href={`${SITE_URL}/support/cant-sign-in/`} size="quiet" />
         </VStack>
       </VStack>
     );

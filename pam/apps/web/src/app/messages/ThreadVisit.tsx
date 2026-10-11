@@ -22,16 +22,16 @@ import { intlLocale } from '@pam/config';
  * time — with a chevron here, because here it goes somewhere: the place,
  * which shows the visit too, and whose Back returns to this conversation.
  *
- * Pinned above every message, it is the compact card (D-400, Will, 9
- * October: "should be smaller"), and the conversation fades out as it
- * scrolls up under it rather than stopping at a line (ThreadView).
+ * At the top of the conversation, with who they are, it is the compact card
+ * (D-400, Will, 9 October: "should be smaller") and scrolls away with the
+ * messages (D-526).
  *
  * Example trips only, as Trips itself is (D-213): the program is matched to
  * an example place by name, and the soonest visit there is shown. Nothing
  * when there is no visit, or no program.
  */
 const styles = stylex.create({
-  // Pinned with the header above the messages, never scrolled away.
+  // The last thing in the intro, above the first message.
   wrap: { width: '100%', flexShrink: 0, paddingBlockEnd: '8px' },
 });
 

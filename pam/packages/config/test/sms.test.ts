@@ -40,6 +40,8 @@ const WORST_CASE_VARS: Readonly<Record<string, string>> = {
   time: '10:00 AM',
   address: '1234 Martin Luther King Jr Blvd',
   supportPhone: '555-555-0134',
+  // The longest a super admin's answer may be (D-524).
+  reply: 'x'.repeat(120),
   // A real imported name, at the length where the budget starts clipping it.
   // The longest reason phrase, so the length assertion sees the worst case.
   reason: 'not taking new people, so there is no need to go',
@@ -55,7 +57,7 @@ const keys = Object.keys(SMS_TEMPLATES) as SmsTemplateKey[];
  * the test below. Signing one means removing it from this list in the same
  * commit.
  */
-const AWAITING_SIGNATURE: SmsTemplateKey[] = [];
+const AWAITING_SIGNATURE: SmsTemplateKey[] = ['support_reply', 'reply_no_read'];
 /** The four Text alerts texts, approved by Will on 10 October 2026. */
 const ALERT_KEYS: SmsTemplateKey[] = ['message_waiting', 'visit_booked', 'booking_changed', 'trip_planned'];
 
@@ -70,7 +72,9 @@ describe('SMS templates', () => {
     // ...and while unsigned, none of them renders, in any language.
     for (const key of AWAITING_SIGNATURE) {
       for (const locale of SUPPORTED_LOCALES) {
-        expect(() => renderSms({ key, locale, vars: WORST_CASE_VARS }), `${key} ${locale}`).toThrow(UnreviewedTemplateError);
+        // A template with no wording in a language fails for want of one; either way it does not render.
+        const expected = locale === 'en' || locale === 'es' ? UnreviewedTemplateError : Error;
+        expect(() => renderSms({ key, locale, vars: WORST_CASE_VARS }), `${key} ${locale}`).toThrow(expected);
       }
     }
   });

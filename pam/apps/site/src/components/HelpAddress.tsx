@@ -4,7 +4,14 @@ import { HELP_EMAIL } from '../lib/links';
 
 const styles = stylex.create({
   // The address can be selected and copied as well as tapped.
-  address: { userSelect: 'text', overflowWrap: 'anywhere', fontWeight: 600 },
+  address: {
+    userSelect: 'text',
+    overflowWrap: 'anywhere',
+    fontWeight: 600,
+    position: 'relative',
+    // A finger-sized target around the address without changing the sentence: 48px tall (the 48px rule).
+    '::after': { content: '""', position: 'absolute', insetBlock: '-14px', insetInline: '-8px' },
+  },
 });
 
 /** hello@joinpam.org as a mailto link and as text a person can select and copy. */

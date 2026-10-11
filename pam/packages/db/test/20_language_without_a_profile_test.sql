@@ -102,7 +102,10 @@ begin
 end;
 $$;
 
--- Asking again, in another language, replaces the first (the same row).
+-- Asking again, in another language, replaces the first (the same row) — once the first was
+-- answered: a request still waiting is not sent twice (D-525), so it is turned down first.
+reset role;
+update public.staff_requests set decision = 'denied', reviewed_at = now() where user_id = '33333333-0000-0000-0000-0000000005a1';
 set role authenticated;
 select test.as_user(:'vera');
 do $$ begin perform public.request_staff_access('admin', 'Vera', 'Ivanova', 'North',
@@ -116,6 +119,8 @@ begin
   raise notice 'ok    asking again updates the language along with the rest';
 end;
 $$;
+reset role;
+update public.staff_requests set decision = 'denied', reviewed_at = now() where user_id = '33333333-0000-0000-0000-0000000005a1';
 set role authenticated;
 select test.as_user(:'vera');
 do $$ begin perform public.request_staff_access('admin', 'Vera', 'Ivanova', 'North',

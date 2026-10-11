@@ -13,8 +13,8 @@ import { SetupArt } from '@pam/ui/SetupArt';
  * Every nested screen — one you reach by tapping into something: a round back
  * button that says where it goes, then the screen's name, large, then its
  * content. The name moves into the sticky bar as the page scrolls. A
- * conversation uses it too, its ⋯ in the bar (D-411 — there was a compact
- * form until then); `footer` pins one action to the bottom of the screen with
+ * conversation uses it too, as `variant="bar"` — the bar alone (D-526; D-411
+ * had the large title in a conversation, D-193 a compact form before it); `footer` pins one action to the bottom of the screen with
  * a fade above it.
  */
 const meta = {
@@ -69,16 +69,20 @@ export const WithSubtitle: Story = {
 };
 
 /**
- * A conversation's header (D-411): back and ⋯ where they are on every nested
- * screen, the name large, who they are on one line under it (D-400).
+ * A conversation's bar (D-526, after D-411): the same bar every nested screen
+ * has, so back and ⋯ sit exactly where they do everywhere, with the name in it.
+ * The conversation puts who they are — photo, name, who they are, the visit
+ * card — at the top of its messages, where it scrolls away with them; the
+ * bar's name fades in once that one has gone under the bar
+ * (`isBarTitleShown`).
  */
 export const Conversation: Story = {
   args: {
     title: 'Renee',
     backHref: '/messages/',
     backLabel: 'Back to Messages',
-    subtitle: 'Program lead at Example Food Pantry of North Philadelphia',
-    hasOneLineSubtitle: true,
+    variant: 'bar',
+    isBarTitleShown: true,
     actions: (
       <IconButton
         label="More"

@@ -1,7 +1,10 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
+import { Avatar } from '@astryxdesign/core/Avatar';
+import { Heading } from '@astryxdesign/core/Heading';
+import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
@@ -26,14 +29,16 @@ import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
  * contract) — `position: fixed` only takes the frame itself out of the
  * document; it is not what pins the composer within it.
  *
- * `ThreadHeader` is the nested-page template as every other screen you tap
- * into has it (Will, 9 October, D-411 — it was a one-row compact bar, D-193,
- * whose back and ⋯ sat a few pixels off from everywhere else): the round
- * back at the top left and the ⋯ at the top right, in exactly the places
- * they are on Legal or a place, then the name, large, and under it who they
- * are to you on one line (D-187, D-395, D-400 — nothing for staff looking at
- * a member). `ThreadTop` has `Page`'s own padding so the bar lands where
- * `Page` puts it.
+ * `ThreadHeader` is the nested-page template's bar and nothing else (Will,
+ * 11 October, D-526: "the one that scrolls and shows info on top, smaller"):
+ * the round back at the top left and the ⋯ at the top right, in exactly the
+ * places they are on Legal or a place (D-411 — the one-row bar of D-193 had
+ * them a few pixels off), the name between them once it has gone from the
+ * screen. Who they are — photo, name, who they are to you (D-187, D-395 —
+ * nothing for staff looking at a member) and the visit card (D-276) — is
+ * `ThreadIntro`, the first thing in the messages' scroll region, so it
+ * scrolls away with them. `ThreadTop` has `Page`'s own padding so the bar
+ * lands where `Page` puts it.
  *
  * No help link on this screen (A14, D-194) — the third screen in Pam
  * without one (a fourth, Messages itself, followed at A15). Back leads to
@@ -92,14 +97,96 @@ const styles = stylex.create({
   },
 });
 
+/**
+ * Whether the name in the intro is on screen (D-526). The bar above shows the name only while it is not,
+ * so it is never said twice: `ThreadIntro` reports, `ThreadHeader` reads.
+ */
+const IntroNameContext = createContext<{ readonly onScreen: boolean; readonly report: (onScreen: boolean) => void }>({
+  onScreen: false,
+  report: () => {},
+});
+
 export function ThreadFrame({ children }: { readonly children: ReactNode }) {
-  return <main {...stylex.props(styles.frame)}>{children}</main>;
+  // Until the intro has said otherwise its name counts as on screen, so the bar's name does not flash in
+  // before the conversation has drawn.
+  const [onScreen, setOnScreen] = useState(true);
+  return (
+    <IntroNameContext.Provider value={{ onScreen, report: setOnScreen }}>
+      <main {...stylex.props(styles.frame)}>{children}</main>
+    </IntroNameContext.Provider>
+  );
 }
 
-/** The pinned block above the messages: the thread header, then the visit card, if any. */
+/** The bar's height from the top of the screen: where the intro's name goes under it. */
+const BAR_BOTTOM = 76;
+
+/** The pinned bar above the messages: back, the name, ⋯ (Will, 11 October, D-526). */
 export function ThreadTop({ children }: { readonly children: ReactNode }) {
   return (
     <VStack gap={4} xstyle={styles.top}>
+      {children}
+    </VStack>
+  );
+}
+
+const intro = stylex.create({
+  // First thing in the conversation's scroll region: it moves up with the messages and is gone from
+  // view once they have; the pinned bar above it keeps the name.
+  wrap: { width: '100%', paddingInline: spacingVars['--spacing-4'], paddingBlockEnd: spacingVars['--spacing-2'] },
+  name: { fontSize: '22px', lineHeight: 1.2, fontWeight: 700, textAlign: 'center' },
+  line: { fontSize: '16px', lineHeight: 1.4, textAlign: 'center' },
+});
+
+/**
+ * Who this is, at the top of the conversation, smaller than a page title (Will, 11 October, D-526:
+ * "the one that scrolls and shows info on top, smaller"): their photo, their name, who they are to
+ * you on a line (D-187, D-395: nothing for staff looking at a member), and — for a member talking to
+ * a program — the visit card (D-276). It scrolls with the messages; the bar above stays.
+ */
+export function ThreadIntro({
+  name,
+  photoUrl,
+  context,
+  children,
+}: {
+  readonly name: string;
+  readonly photoUrl?: string | null;
+  readonly context: string | null;
+  /** The visit card, when there is one. */
+  readonly children?: ReactNode;
+}) {
+  const { report } = useContext(IntroNameContext);
+  const heading = useRef<HTMLHeadingElement>(null);
+
+  // The name counts as on screen until it has scrolled under the bar. If it goes (the intro is unmounted)
+  // the bar shows its own.
+  useEffect(() => {
+    const el = heading.current;
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      report(false);
+      return;
+    }
+    const observer = new IntersectionObserver(([entry]) => report(entry?.isIntersecting ?? false), {
+      rootMargin: `-${BAR_BOTTOM}px 0px 0px 0px`,
+    });
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      report(false);
+    };
+  }, [report]);
+
+  return (
+    <VStack gap={2} align="center" xstyle={intro.wrap}>
+      <Avatar size="lg" name={name} {...(photoUrl ? { src: photoUrl } : {})} tooltip={false} alt="" />
+      <Heading level={1} ref={heading} xstyle={intro.name}>
+        {name}
+      </Heading>
+      {context ? (
+        <Text type="supporting" xstyle={intro.line}>
+          {context}
+        </Text>
+      ) : null}
       {children}
     </VStack>
   );
@@ -111,26 +198,25 @@ export function ThreadTop({ children }: { readonly children: ReactNode }) {
  */
 export function ThreadHeader({
   name,
-  context,
   backHref,
   backLabel,
   menuHref,
 }: {
   readonly name: string;
-  /** "Case manager", or "Program lead at …" — under the name; `null` draws nothing (D-187, D-395). */
-  readonly context: string | null;
   readonly backHref: string;
   readonly backLabel: string;
   /** The ⋯ page — report, the program's details (D-213). */
   readonly menuHref?: string;
 }) {
   const { t } = useI18n();
+  const { onScreen } = useContext(IntroNameContext);
   return (
     <SubPageHeader
+      variant="bar"
+      isBarTitleShown={!onScreen}
       title={name}
       backHref={backHref}
       backLabel={backLabel}
-      {...(context ? { subtitle: context, hasOneLineSubtitle: true } : {})}
       actions={
         menuHref ? (
           <IconButton

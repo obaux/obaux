@@ -10,7 +10,7 @@ import { sendDemoThreadMessage, useDemoThread } from '@/lib/demoMessages';
 import { displayFileName, type MessageFile, type OutgoingAttachment } from '@/lib/messageFile';
 import { staffPhotoFor } from '@pam/config/dummy-connections';
 import { ThreadView } from './ThreadView';
-import { ThreadHeader, ThreadTop } from './ThreadFrame';
+import { ThreadHeader, ThreadIntro, ThreadTop } from './ThreadFrame';
 import { ThreadVisit } from './ThreadVisit';
 
 /**
@@ -104,20 +104,27 @@ export function DemoThread({
       <ThreadTop>
         <ThreadHeader
           name={other?.firstName ?? t('messages.thread.someone')}
-          context={context}
           backHref={backHref}
           backLabel={backLabel ?? t('nav.back.messages')}
           menuHref={`/messages/thread/options/?id=${encodeURIComponent(conversationId)}`}
         />
-        {/* A member's visit with this program, under the name (D-276). */}
-        {role === 'member' && other?.role === 'provider' ? (
-          <ThreadVisit programName={other.orgName ?? null} threadId={conversationId} />
-        ) : null}
       </ThreadTop>
       <ThreadView
         messages={messages}
         otherName={other?.firstName ?? null}
         otherPhotoUrl={staffPhotoFor(other?.firstName, other?.orgName)}
+        intro={
+          <ThreadIntro
+            name={other?.firstName ?? t('messages.thread.someone')}
+            photoUrl={staffPhotoFor(other?.firstName, other?.orgName)}
+            context={context}
+          >
+            {/* A member's visit with this program, under the name (D-276). */}
+            {role === 'member' && other?.role === 'provider' ? (
+              <ThreadVisit programName={other.orgName ?? null} threadId={conversationId} />
+            ) : null}
+          </ThreadIntro>
+        }
         onSend={send}
         sending={false}
         sendFailed={false}
