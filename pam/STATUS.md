@@ -1575,6 +1575,8 @@ fine and the fit audit was over-counting (D-448).
 
 ## Website · public site and help centre (10 October) — `apps/site`, on `main`
 
+**On this page menu (11 October, D-517; branch).** Every help post has a scrollspy menu: a side column from 1180px, a bar at the top on a phone, built from the post's `Section` headings (`short` label optional; Sage writes them). `scripts/scrollspy.mjs` checks every link at 320, 390 and 1280px.
+
 **Three help posts (11 October; branch, signed by Will, card a51).** `start-here`, `talking-to-pam`, `your-language`, from Sage's drafts; the search puts them first for their phrases. 16 posts live. Waiting: "Is the place told about my visit?" (unsigned).
 
 **Carousel pause/play (11 October, D-501; on `main`).** Will approved "Pause" and "Play" and asked for it subtle, tucked in a corner: a 32px see-through disc in a 48px tap target, top start corner. Lena's six languages are in. `OnboardingSlides` has a pause/play button on Sign in, About Pam and the site hero; labels are required props.

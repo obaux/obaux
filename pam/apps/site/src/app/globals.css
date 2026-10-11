@@ -44,4 +44,15 @@
     white-space: normal;
     text-overflow: clip;
   }
+
+  /* Where a link to a section of a post lands its heading: clear of whatever is stuck to the top of the screen.
+     From 1180px the "On this page" menu is a side column and nothing is stuck there; narrower, it is a bar of 57px. */
+  :root {
+    --post-scroll-offset: 80px;
+  }
+  @media (min-width: 1180px) {
+    :root {
+      --post-scroll-offset: 24px;
+    }
+  }
 }

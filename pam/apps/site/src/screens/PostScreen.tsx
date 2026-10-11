@@ -7,13 +7,24 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { Frame } from '../components/Frame';
+import { PostNav } from '../components/PostNav';
 import { StillStuck } from '../components/StillStuck';
+import { STILL_STUCK, collectSections } from '../lib/sections';
 import { BODIES } from '../content/bodies';
 import { anyPostBySlug, formatDate, postBySlug } from '../content/posts';
 
 const styles = stylex.create({
+  // The post and, from 1180px, its "On this page" column beside it.
+  layout: {
+    display: 'grid',
+    gridTemplateColumns: { default: 'minmax(0, 1fr)', '@media (min-width: 1180px)': 'minmax(0, 860px) 220px' },
+    columnGap: '40px',
+    justifyContent: 'center',
+    alignItems: 'start',
+    width: '100%',
+  },
   // One centred reading column for the whole post, as on Figma Learn: header, who it is for, body.
-  column: { width: '100%', maxWidth: '920px', marginInline: 'auto' },
+  column: { width: '100%', maxWidth: '920px', marginInline: 'auto', minWidth: 0 },
   header: { alignItems: 'center', textAlign: 'center' },
   crumbs: { alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' },
   // The page you are on, as a small gray pill at the end of the path.
@@ -74,8 +85,11 @@ export function PostScreen({ slug, allowDraft = false }: { readonly slug: string
   const post = allowDraft ? anyPostBySlug(slug) : postBySlug(slug);
   const Body = BODIES[slug];
   if (!post || !Body) return null;
+  // The sections, read from the body's own element: the menu is in the first paint.
+  const sections = [...collectSections(Body()), STILL_STUCK];
   return (
     <Frame width="wide" gap={6}>
+      <div {...stylex.props(styles.layout)}>
       <VStack as="article" gap={10} xstyle={styles.column} data-page="post">
         {post.status === 'draft' ? (
           <Banner status="warning" title="Draft, not published: held until the feature ships. Not on the site, in Support or in search." />
@@ -104,9 +118,12 @@ export function PostScreen({ slug, allowDraft = false }: { readonly slug: string
             <Text type="supporting">Updated {formatDate(post.updated)}</Text>
           </VStack>
         </VStack>
+        <PostNav sections={sections} variant="bar" />
         <Body />
         <StillStuck />
       </VStack>
+      <PostNav sections={sections} variant="side" />
+      </div>
     </Frame>
   );
 }

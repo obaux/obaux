@@ -5,11 +5,15 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Link } from '@astryxdesign/core/Link';
+import { sectionId } from '../lib/slug';
 
 const styles = stylex.create({
   // Text keeps a readable line length; the cards (how to find it, pictures) use the full width.
   measure: { maxWidth: '760px' },
   lead: { maxWidth: '760px', fontWeight: 400 },
+  // A section a link can scroll to: its top lands clear of whatever is stuck to the top of the screen
+  // (`--post-scroll-offset`, set in globals.css: the "On this page" bar on a phone).
+  anchor: { scrollMarginTop: 'var(--post-scroll-offset, 24px)' },
 });
 
 /**
@@ -34,15 +38,24 @@ export function Lead({ children }: { readonly children: ReactNode }) {
   );
 }
 
-export function Section({ title, children }: { readonly title: string; readonly children: ReactNode }) {
+/**
+ * A headed section of a post. It is a stop in the post's "On this page" menu: `short` is the label the
+ * menu shows (a few words that sum the section up); without one the menu uses the heading.
+ */
+export function Section({ title, short: shortLabel, children }: { readonly title: string; readonly short?: string; readonly children: ReactNode }) {
   return (
-    <VStack gap={3}>
+    <VStack gap={3} id={sectionId(title)} data-post-section={menuLabel(shortLabel, title)} tabIndex={-1} xstyle={styles.anchor}>
       <Heading level={2} xstyle={styles.measure}>
         {title}
       </Heading>
       {children}
     </VStack>
   );
+}
+
+/** The menu label: the short one, or the heading. */
+function menuLabel(label: string | undefined, title: string): string {
+  return label && label.length ? label : title;
 }
 
 export function P({ children }: { readonly children: ReactNode }) {

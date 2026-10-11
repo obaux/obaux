@@ -11,6 +11,8 @@ import { APP_URL } from '../lib/links';
 const styles = stylex.create({
   // A light outline, so the gray card reads as a card on the gray page.
   card: { borderWidth: '1px', borderStyle: 'solid', borderColor: colorVars['--color-border'] },
+  // The last stop in a post's "On this page" menu.
+  anchor: { scrollMarginTop: 'var(--post-scroll-offset, 24px)' },
 });
 
 /**
@@ -21,6 +23,7 @@ const styles = stylex.create({
  */
 export function StillStuck() {
   return (
+    <VStack id="still-stuck" data-post-section="Still stuck?" tabIndex={-1} xstyle={styles.anchor}>
     <Card padding={6} variant="muted" xstyle={styles.card}>
       <VStack gap={3} maxWidth={720}>
         <Heading level={2}>Still stuck?</Heading>
@@ -36,5 +39,6 @@ export function StillStuck() {
         </HStack>
       </VStack>
     </Card>
+    </VStack>
   );
 }
