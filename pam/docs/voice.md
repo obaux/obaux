@@ -280,8 +280,11 @@ runs a program…").
   when the website is merged, then handle languages after. It's too soon in the collaborative flow to start
   translating. We're just brainstorming inside Figma." Website words are translated after the change is
   merged. App strings still go into all seven languages when they are built (`docs/copy-changes.md`).
-- **Everything still goes to Will.** A Figma pass is his to keep or change; nothing reaches the live site
-  until he says so.
+- **Sage signs new sentences (A29).** Will, 11 October 2026: "let's change it so every new sentence doesn't need my
+  yes." Sage signs new and changed English in the app, on the website and in help posts, and records it in
+  `docs/signed-english.md`. Lanes send their English to Sage before READY. **Still Will's:** texts and emails Pam sends,
+  Privacy and Terms, and any new promise about what Pam does. When in doubt, it goes to him.
+- **Figma stays Will's.** A copy pass there is his to keep or change.
 
 ## 7. Writing for seven languages
 
@@ -322,4 +325,4 @@ Before you send words to Will:
 - [ ] Right tone for the moment: on the website and in welcomes, the headline lane (short beats, "your", a turn at the end); plainest in errors and privacy.
 - [ ] Does anything sound like watching people? Write it as guiding them.
 - [ ] Touches a promise (privacy, terms, transparency, notices)? Lena reads the meaning.
-- [ ] Sent to Mira as a QUESTION for Will. Nothing ships unsigned.
+- [ ] Signed in `docs/signed-english.md` (Sage). A text, an email, Privacy or Terms, or a new promise? It goes to Will on a card (A29).
