@@ -31,12 +31,33 @@ describe('a program sees the visits planned at its own program (D-526)', () => {
 
   it('is said on the Privacy page, with exactly what the program sees', () => {
     expect(sharing).toMatch(/sign up with them or plan a visit there/);
-    expect(sharing).toMatch(/your first name, the day and time, the service you picked, and whether you were marked as there/);
+    expect(sharing).toMatch(/your first name, the day and time, the service you picked, and whether you were marked as there\./);
     // Not “they marked you”: a member can mark their own visit (“I’m here”, “I went”, D-535), and the program sees only that the
     // visit is there, never who marked it or how.
     expect(sharing).not.toMatch(/whether they marked you/);
     // The page says the visit is marked as there, by whoever marked it; it does not say "you came".
     expect(sharing).not.toMatch(/\byou (came|went|checked in)\b/i);
+  });
+
+  it('says a program sees that a member marked their own visit, but not where they were (D-535, Mira, 11 October)', () => {
+    expect(sharing).toMatch(/and whether you were marked as there\. If you marked it yourself, they see that, but not where you were\./);
+    expect(ADMIN_CAN_SEE).toContain('visit_marked_by_the_member_themselves');
+    // Never the method: the page does not tell the program which door the member used.
+    expect(sharing).not.toMatch(/I.m here|I went|by position|by word/i);
+  });
+
+  it('uses the same “whether you were marked as there” on the screens that list what the place sees, once they are on main', () => {
+    // Piper’s trips.booked.hasLead and place.lead.sees (attendance part D) show BEFORE any mark exists, so they end
+    // “whether you were marked as there” and Privacy carries the rest (Sage, 16:15). They are not on main yet: the check
+    // starts on the day they land, and “they marked you” is no longer true of either.
+    for (const key of ['trips.booked.hasLead', 'place.lead.sees']) {
+      const line = EN[key];
+      if (line === undefined) continue;
+      expect(line, key).toMatch(/whether you were marked as there/);
+      expect(line, key).not.toMatch(/whether they marked you/);
+    }
+    const byMember = EN['schedule.checkin.byMember'];
+    if (byMember !== undefined) expect(byMember).toBe('{name} marked this visit themselves');
   });
 
   it('tells a member what they control: cancelling takes the visit away from the program', () => {
