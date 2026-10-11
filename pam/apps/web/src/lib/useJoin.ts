@@ -109,6 +109,8 @@ export async function submitDetails(details: JoinDetails): Promise<JoinOutcome> 
           }
         : {}),
     }, details.language);
+    // A request that is already waiting is on file: a retry after a dropped answer is not a failure (D-525).
+    if (error && (error as { message?: string }).message?.includes('REQUEST_ALREADY_WAITING')) return { result: 'staff' };
     return error ? { result: 'failed' } : { result: 'staff' };
   } catch {
     return { result: 'failed' };

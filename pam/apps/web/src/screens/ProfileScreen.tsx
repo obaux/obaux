@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { DUMMY_CONNECTIONS } from '@pam/config/dummy-connections';
 import { DUMMY_SELF } from '@pam/config/dummy-people';
 import { useRouter } from 'next/navigation';
+import { useProgramRequest } from '@/lib/useProgramRequest';
 import { signOut, useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useExamplesOn } from '@/lib/useExamplesOn';
@@ -34,6 +35,7 @@ export function ProfileScreen() {
   const examplesOn = useExamplesOn();
   const { points, loading: pointsLoading } = usePointsState(signedIn ? session.session.userId : null);
   const { state: saved } = useSavedPlaces(signedIn, demoRole);
+  const { state: request } = useProgramRequest(session);
   const [remindersOn, setRemindersOn] = useState(false);
   const { t } = useI18n();
   // A staff photo (D-345): shown at once from the phone, kept if the upload
@@ -83,6 +85,12 @@ export function ProfileScreen() {
       connectionsCount={role === 'member' && examplesOn ? DUMMY_CONNECTIONS.length : 0}
       remindersOn={remindersOn}
       canViewAs={trueRole === 'super_admin'}
+      addProgram={
+        signedIn && !demoRole && role === 'member' && !session.session.roles.includes('provider') &&
+        (request.status === 'none' || request.status === 'waiting' || request.status === 'denied')
+          ? { status: request.status }
+          : null
+      }
       canUseAs={signedIn && session.session.roles.includes('member') && session.session.roles.includes('provider')}
       headerActions={<HeaderActions role={viewedRole} enabled={signedIn} />}
       onSignOut={() => {
