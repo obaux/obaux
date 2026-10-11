@@ -11,6 +11,26 @@ STATUS row too.
 
 ## Open
 
+- [ ] **Google Calendar sync: Will makes the Google Cloud project, then it goes on** (Piper, 11 October 2026, D-539). The sync is built and
+  switched OFF (`GOOGLE_SYNC_LIVE` unset: the app hides the section, the function touches nothing, the 15-minute clock does nothing).
+  To turn it on, in order. **No value goes in the repository.** (1) In Google Cloud Console, make a project (say "Pam"); enable the
+  **Google Calendar API**. (2) OAuth consent screen: user type External; app name Pam; support email; the app's home page
+  `https://joinpam.org`; privacy page `https://joinpam.org/…` (the live Privacy page) and terms; authorised domain `joinpam.org`;
+  **add one scope only: `https://www.googleapis.com/auth/calendar.app.created`** (if Google asks for any other scope, stop and tell
+  the merge desk). While "Testing", only people added as test users can connect, and Google signs them out after 7 days; for everyone,
+  press "Publish app" and follow Google's verification (it may ask for a demo video and a written reason for the scope; this one is
+  limited to calendars Pam made itself, which makes the reason short). (3) Credentials > Create OAuth client ID > Web application; authorised
+  redirect URI exactly `https://shobqzuhicoiymtumiaz.supabase.co/functions/v1/google-calendar/callback`. (4) Make two random secrets:
+  `GOOGLE_TOKEN_KEY` (32 random bytes, base64: `openssl rand -base64 32`; it encrypts every member's Google token, so keep a copy in the
+  password manager: lose it and every member must reconnect) and `GOOGLE_STATE_SECRET` (any long random string). (5) In Supabase >
+  Edge Functions > Secrets, set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_TOKEN_KEY`, `GOOGLE_STATE_SECRET`; `DISPATCH_SECRET`
+  is already there. (6) The merge desk deploys `google-calendar` with JWT verification OFF and applies migration `20261011174053`.
+  (7) LAST, set `GOOGLE_SYNC_LIVE` to `on`. (8) Try it with your own account: Profile > Calendar > Connect Google Calendar; a visit you
+  plan appears in a "Pam visits" calendar within 15 minutes; move it, cancel it; turn on "Show the place's name and address"; then
+  Disconnect and check the calendar is gone from Google and that **Google Account > Security > Third-party access** no longer lists Pam.
+  Also: when a member's account is erased, their Google token row goes with it, but the calendar stays in their Google account and
+  the token is not revoked (a gap to close: erase should call Disconnect first).
+
 - [ ] **Calendar link: someone taps it on a real phone** (Piper, 11 October 2026, D-538). (1) On an Android phone, make a link on
   Profile > Calendar and tap "Open Google Calendar on the web": it should reach Google Calendar's "add by URL" page in the
   phone's browser; if Google sends the phone to its app or a sign-in that loses the page, the line above the button

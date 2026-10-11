@@ -25,6 +25,8 @@ async function signedIn(page: Page, status: { is_on: boolean; show_details: bool
     route.fulfill(json({ id: ME, role: 'member', first_name: 'Marcus', region_id: null, regions: null, access_status: 'active', onboarded_at: '2026-09-14T00:00:00Z' })),
   );
   await page.route('**/rest/v1/notifications*', (route) => route.fulfill(json([])));
+  // Google is not switched on unless a test says so.
+  await page.route('**/functions/v1/google-calendar/status*', (route) => route.fulfill(json({ live: false })));
   await page.route('**/rest/v1/rpc/calendar_link_status*', (route) => route.fulfill(json([{ ...status, made_at: status.is_on ? '2026-10-11T12:00:00Z' : null }])));
 }
 
@@ -138,5 +140,86 @@ test.describe('Add to Apple Calendar', () => {
       // The way for Google's phone app is the web page, and the page says so.
       await expect(page.getByRole('link', { name: 'Open Google Calendar on the web' })).toBeVisible();
     });
+  });
+});
+
+test.describe('Google Calendar (D-539)', () => {
+  const live = (page: Page, answer: { connected: boolean; state: string | null }) =>
+    page.route('**/functions/v1/google-calendar/status*', (route) => route.fulfill(json({ live: true, ...answer })));
+
+  test('is not there at all until it is switched on', async ({ page }) => {
+    await signedIn(page, { is_on: false, show_details: false });
+    await page.goto('/calendar/');
+    await settled(page);
+    await expect(page.getByRole('button', { name: 'Make my calendar link' })).toBeVisible();
+    await expect(page.getByText('Google Calendar', { exact: true })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Connect Google Calendar' })).toHaveCount(0);
+  });
+
+  test('offers to connect, says what Pam can see, and sends the member where the function says', async ({ page }) => {
+    await signedIn(page, { is_on: false, show_details: false });
+    await live(page, { connected: false, state: null });
+    let asked = 0;
+    await page.route('**/functions/v1/google-calendar/connect*', (route) => {
+      asked += 1;
+      // Stands in for Google's page: back to the app, as if the member had said yes.
+      return route.fulfill(json({ url: `${new URL(page.url()).origin}/calendar/?google=connected` }));
+    });
+    await page.goto('/calendar/');
+    await settled(page);
+    await expect(page.getByText(/Pam can see and change only that calendar, not your others/)).toBeVisible();
+    await page.getByRole('button', { name: 'Connect Google Calendar' }).click();
+    await expect.poll(() => asked).toBe(1);
+    await expect(page.getByText('Google Calendar is connected.')).toBeVisible();
+    const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
+    expect(results.violations).toEqual([]);
+  });
+
+  test('connected: says so, shares the place switch with the link, and Disconnect asks first, then asks the function', async ({ page }) => {
+    await signedIn(page, { is_on: false, show_details: false });
+    await live(page, { connected: true, state: 'connected' });
+    const disconnected: number[] = [];
+    await page.route('**/functions/v1/google-calendar/disconnect*', (route) => {
+      disconnected.push(1);
+      return route.fulfill(json({ ok: true, calendarRemoved: true, revoked: true }));
+    });
+    await page.goto('/calendar/');
+    await settled(page);
+    await expect(page.getByText('Your visits are in a Google calendar called “Pam visits”.')).toBeVisible();
+    // The one setting for the place's name and address is here even with no link.
+    await expect(page.getByRole('switch', { name: 'Show the place’s name and address in my calendar' })).toBeVisible();
+    await page.getByRole('button', { name: 'Disconnect Google Calendar' }).click();
+    expect(disconnected).toHaveLength(0);
+    await page.getByRole('dialog').getByRole('button', { name: 'Disconnect' }).click();
+    await expect.poll(() => disconnected.length).toBe(1);
+    await expect(page.getByRole('button', { name: 'Connect Google Calendar' })).toBeVisible();
+  });
+
+  test('says plainly when the calendar could not be removed from Google', async ({ page }) => {
+    await signedIn(page, { is_on: false, show_details: false });
+    await live(page, { connected: true, state: 'connected' });
+    await page.route('**/functions/v1/google-calendar/disconnect*', (route) => route.fulfill(json({ ok: true, calendarRemoved: false, revoked: false })));
+    await page.goto('/calendar/');
+    await settled(page);
+    await page.getByRole('button', { name: 'Disconnect Google Calendar' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Disconnect' }).click();
+    await expect(page.getByText(/Pam couldn’t finish removing the calendar from Google/)).toBeVisible();
+  });
+
+  test('broken: says Pam cannot reach Google and offers to reconnect', async ({ page }) => {
+    await signedIn(page, { is_on: false, show_details: false });
+    await live(page, { connected: true, state: 'broken' });
+    await page.goto('/calendar/');
+    await settled(page);
+    await expect(page.getByText('Pam can’t reach your Google Calendar any more.')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Reconnect Google' })).toBeVisible();
+  });
+
+  test('a failed sign-in says so', async ({ page }) => {
+    await signedIn(page, { is_on: false, show_details: false });
+    await live(page, { connected: false, state: null });
+    await page.goto('/calendar/?google=failed');
+    await settled(page);
+    await expect(page.getByText('We couldn’t connect Google Calendar. Please try again.')).toBeVisible();
   });
 });

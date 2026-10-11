@@ -357,6 +357,8 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/calendar_link_make', () => ({ body: 'storybook-example-address-not-a-real-secret' })),
     on('/rpc/calendar_link_set_details', () => ({ body: true })),
     on('/rpc/calendar_link_off', () => ({ body: null })),
+    // Google Calendar (D-539): switched on, not connected. Nothing leaves the story.
+    on('/functions/v1/google-calendar/status', () => ({ body: { live: true, connected: false, state: null } })),
     on('/rpc/book_trip_at_service', (_url, _method, body) => {
       const args = (body ?? {}) as { p_starts_at: string; p_note?: string | null };
       const row = savedTripRow(savedTrips.length + 1, args.p_starts_at, args.p_note ?? null);

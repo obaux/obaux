@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
+import { Banner } from '@astryxdesign/core/Banner';
 import { Card } from '@astryxdesign/core/Card';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Switch } from '@astryxdesign/core/Switch';
@@ -13,6 +14,7 @@ import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { appleUrl, feedUrl, isAppleDevice, useCalendarLink } from '@/lib/useCalendarLink';
+import { useGoogleCalendar } from '@/lib/useGoogleCalendar';
 import { ConfirmDialog } from './ConfirmDialog';
 import { HelpButton } from './HelpButton';
 
@@ -39,8 +41,9 @@ export function CalendarLinkView() {
   const { t, tPlain } = useI18n();
   const { state: session } = useSession();
   const signedIn = session.status === 'signed-in';
-  const { state, busy, failed, make, setShowDetails, turnOff } = useCalendarLink(signedIn);
-  const [asking, setAsking] = useState<'new' | 'off' | null>(null);
+  const { state, busy, failed, make, setShowDetails, turnOff, showDetails } = useCalendarLink(signedIn);
+  const google = useGoogleCalendar(signedIn);
+  const [asking, setAsking] = useState<'new' | 'off' | 'google' | null>(null);
   const [copied, setCopied] = useState(false);
   // Apple Calendar's button only where a webcal:// address opens something. Read after the page is up (the
   // first paint is the server's); until then, and when the device cannot be told, it is shown.
@@ -72,6 +75,46 @@ export function CalendarLinkView() {
           body={t('notice.something_went_wrong.body')}
           contactLabel={t('help.contact.action')}
         />
+      ) : null}
+
+      {/* Pam's own calendar in the member's Google account (D-539). Not shown until it is switched on. */}
+      {google.returned === 'connected' ? <Banner status="success" title={t('calendar.google.done')} /> : null}
+      {google.returned === 'failed' || google.failed ? <Banner status="warning" title={t('calendar.google.failed')} /> : null}
+      {google.leftover ? <Banner status="info" title={t('calendar.google.leftover')} /> : null}
+      {google.state.status === 'off' || google.state.status === 'connected' || google.state.status === 'broken' ? (
+        <Card padding={6}>
+          <VStack gap={3}>
+            <Text xstyle={styles.label}>{t('calendar.google.title')}</Text>
+            {google.state.status === 'off' ? (
+              <>
+                <Text type="supporting" xstyle={styles.small}>
+                  {t('calendar.google.intro')}
+                </Text>
+                <BigButton label={t('calendar.google.connect')} variant="secondary" isDisabled={google.busy} onPress={() => void google.connect()} />
+              </>
+            ) : null}
+            {google.state.status === 'connected' ? (
+              <>
+                <Text type="supporting" xstyle={styles.small}>
+                  {t('calendar.google.connected')}
+                </Text>
+                <Text type="supporting" xstyle={styles.small}>
+                  {t('calendar.google.wait')}
+                </Text>
+                <TextLink label={t('calendar.google.disconnect')} onClick={() => setAsking('google')} />
+              </>
+            ) : null}
+            {google.state.status === 'broken' ? (
+              <>
+                <Text type="supporting" xstyle={styles.small}>
+                  {t('calendar.google.broken')}
+                </Text>
+                <BigButton label={t('calendar.google.reconnect')} variant="secondary" isDisabled={google.busy} onPress={() => void google.connect()} />
+                <TextLink label={t('calendar.google.disconnect')} onClick={() => setAsking('google')} />
+              </>
+            ) : null}
+          </VStack>
+        </Card>
       ) : null}
 
       {state.status === 'off' ? <BigButton label={t(busy ? 'calendar.making' : 'calendar.make')} isDisabled={busy} onPress={() => void make()} /> : null}
@@ -114,17 +157,6 @@ export function CalendarLinkView() {
             </VStack>
           </Card>
 
-          <Card padding={6}>
-            <HStack gap={3} align="center" wrap="nowrap">
-              <VStack gap={1} xstyle={styles.words}>
-                <Text xstyle={styles.label}>{t('calendar.details')}</Text>
-                <Text type="supporting" xstyle={styles.small}>
-                  {t('calendar.details.hint')}
-                </Text>
-              </VStack>
-              <Switch label={t('calendar.details')} isLabelHidden value={state.showDetails} changeAction={(on) => void setShowDetails(on)} />
-            </HStack>
-          </Card>
 
           <VStack gap={3}>
             <TextLink label={t('calendar.new')} onClick={() => setAsking('new')} />
@@ -133,6 +165,33 @@ export function CalendarLinkView() {
         </>
       ) : null}
 
+      {/* The place's name and address in the calendar, for the link and for Google (one setting, off unless asked). */}
+      {state.status === 'on' || google.state.status === 'connected' || google.state.status === 'broken' ? (
+          <Card padding={6}>
+            <HStack gap={3} align="center" wrap="nowrap">
+              <VStack gap={1} xstyle={styles.words}>
+                <Text xstyle={styles.label}>{t('calendar.details')}</Text>
+                <Text type="supporting" xstyle={styles.small}>
+                  {t('calendar.details.hint')}
+                </Text>
+              </VStack>
+              <Switch label={t('calendar.details')} isLabelHidden value={showDetails} changeAction={(on) => void setShowDetails(on)} />
+            </HStack>
+          </Card>
+      ) : null}
+
+      <ConfirmDialog
+        isOpen={asking === 'google'}
+        title={t('calendar.google.disconnect.title')}
+        body={t('calendar.google.disconnect.body')}
+        confirmLabel={t('calendar.google.disconnect.confirm')}
+        onConfirm={() => {
+          setAsking(null);
+          void google.disconnect();
+        }}
+        cancelLabel={t('calendar.google.disconnect.keep')}
+        onCancel={() => setAsking(null)}
+      />
       <ConfirmDialog
         isOpen={asking === 'new'}
         title={t('calendar.new.title')}

@@ -143,8 +143,13 @@ set role authenticated;
 select set_config('request.jwt.claim.sub', :'mem2', false);
 insert into link select t, encode(extensions.digest(t, 'sha256'), 'hex') from (select public.calendar_link_make() as t) x;
 select set_config('request.jwt.claim.sub', :'mem1', false);
-select test.check_raises_like('a member with no address of their own cannot change anyone else''s (NO_CALENDAR_LINK)',
-  $f$select public.calendar_link_set_details(true)$f$, '%NO_CALENDAR_LINK%');
+select test.check('the setting is each member''s own: mem1 turning details on changes nothing for mem2',
+  (select public.calendar_link_set_details(true))::int, 1);
+reset role;
+select test.check('...mem2''s own setting is still off',
+  (select count(*) from public.calendar_prefs where member_id = :'mem2' and show_details), 0::bigint);
+set role authenticated;
+select set_config('request.jwt.claim.sub', :'mem1', false);
 select set_config('request.jwt.claim.sub', :'lead1', false);
 select test.check_raises_like('a program lead cannot make one', $f$select public.calendar_link_make()$f$, '%NOT_A_MEMBER%');
 select set_config('request.jwt.claim.sub', :'memx', false);

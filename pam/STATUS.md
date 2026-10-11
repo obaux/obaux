@@ -2160,3 +2160,7 @@ Branch `claude/places-programs-calendar-link` (D-538). A member makes a secret c
 ## Places & programs · no street-address call to the city (11 October 2026) — on `main` (b18)
 
 Branch `claude/places-programs-no-city-call` (D-536). The browser no longer asks the City of Philadelphia about a typed address; the picker says ZIP code or neighborhood; a member's first name is out of the policies address; the Google map in Trips opens on the whole city, never fitted to the pins. No migration.
+
+## Places & programs · Google Calendar sync (11 October 2026) — READY soon, held with the calendar link
+
+Branch `claude/places-programs-google-sync` (D-539), on `claude/places-programs-calendar-link`. Pam keeps a "Pam visits" calendar in a member's Google account; scope `calendar.app.created` only; token sealed; off until `GOOGLE_SYNC_LIVE`. Migration `20261011174053`, edge function `google-calendar`, test 62. Needs Will's Google Cloud setup and Privacy line.

@@ -10,7 +10,7 @@ import { SUPABASE_URL } from './project';
  */
 export type CalendarLinkState =
   | { readonly status: 'loading' }
-  | { readonly status: 'off' }
+  | { readonly status: 'off'; readonly showDetails: boolean }
   | { readonly status: 'on'; readonly showDetails: boolean; readonly token: string | null }
   | { readonly status: 'error' };
 
@@ -51,7 +51,7 @@ export function useCalendarLink(enabled: boolean) {
         if (!live) return;
         const row = (Array.isArray(data) ? data[0] : data) as StatusRow | undefined;
         if (error || !row) return setState({ status: 'error' });
-        setState(row.is_on ? { status: 'on', showDetails: row.show_details, token: null } : { status: 'off' });
+        setState(row.is_on ? { status: 'on', showDetails: row.show_details, token: null } : { status: 'off', showDetails: row.show_details });
       } catch {
         if (live) setState({ status: 'error' });
       }
@@ -68,7 +68,7 @@ export function useCalendarLink(enabled: boolean) {
     try {
       const { data, error } = await (await client()).rpc('calendar_link_make');
       if (error || typeof data !== 'string') throw new Error('make');
-      setState((s) => ({ status: 'on', showDetails: s.status === 'on' ? s.showDetails : false, token: data }));
+      setState((s) => ({ status: 'on', showDetails: s.status === 'on' || s.status === 'off' ? s.showDetails : false, token: data }));
     } catch {
       setFailed(true);
     } finally {
@@ -82,7 +82,7 @@ export function useCalendarLink(enabled: boolean) {
       try {
         const { error } = await (await client()).rpc('calendar_link_set_details', { p_show: show });
         if (error) throw new Error('details');
-        setState((s) => (s.status === 'on' ? { ...s, showDetails: show } : s));
+        setState((s) => (s.status === 'on' || s.status === 'off' ? { ...s, showDetails: show } : s));
       } catch {
         setFailed(true);
       }
@@ -96,7 +96,7 @@ export function useCalendarLink(enabled: boolean) {
     try {
       const { error } = await (await client()).rpc('calendar_link_off');
       if (error) throw new Error('off');
-      setState({ status: 'off' });
+      setState((s) => ({ status: 'off', showDetails: s.status === 'on' ? s.showDetails : false }));
     } catch {
       setFailed(true);
     } finally {
@@ -104,5 +104,6 @@ export function useCalendarLink(enabled: boolean) {
     }
   }, [client]);
 
-  return { state, busy, failed, make, setShowDetails, turnOff };
+  const showDetails = state.status === 'on' || state.status === 'off' ? state.showDetails : false;
+  return { state, busy, failed, make, setShowDetails, turnOff, showDetails };
 }
