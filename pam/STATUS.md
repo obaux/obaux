@@ -983,10 +983,10 @@ Branch `claude/lena-a28-help` (D-514, D-515), Will's words signed 03:37 UTC (car
 website (`lib/helpDesk.ts`, `SITE_URL/support/`, new tab); What we can help with has "Still stuck?" and the same row; Your safety keeps Call 911, adds a one-tap
 "Call or text 988" row and "Talk to someone now" (opens `/support/` until Wren's "Your safety" post); Privacy › Copy and Delete end in Dot's Contact Pam.
 31 "call Pam" / privacy / terms lines, two labels and the wrong-code alert (Sage's A29 line) are signed English in place, in seven languages (`notices.ts` follows, pinned to `en.json`);
-`onboarding.phone.callInstead` removed. The two live texts that carried the number are Nico's D-519 for the English; my six translations go on top of it once it is on `main`
-(Mira, 04:19) — **the live `dispatch-sms` is still the old function** (Nico). The promise check found three lines untrue since D-481 (the saved-place text is
+`onboarding.phone.callInstead` removed. The two live texts that carried the number are Nico's D-519 for the English; my six translations are on `claude/lena-a28-texts` (one message each, in the b13 batch)
+— **the live `dispatch-sms` is still the old function** (Nico). The promise check found three lines untrue since D-481 (the saved-place text is
 held): `flag.done.body`, `reminders.today.member`, `profile.promo.reminders.body` now say what is true (Sage signed them), with restore lines in `docs/before-launch.md`.
-**Open:** the two texts' translations (above), "Reply HELP to reach a person" (Sage), Ava's in-app copy/delete (the two privacy lines change then), the help-request line on the
+**Open:** the live texts (above), "Reply HELP to reach a person" (Sage), Ava's in-app copy/delete (the two privacy lines change then), the help-request line on the
 privacy page (the day Nico's form works), the public site's "call Pam" (Wren) — all listed in `docs/before-launch.md` › *A28*.
 
 ## Languages & legal · 10 October in one place; from now on, one batch a week (Friday)
@@ -1461,6 +1461,14 @@ Branch `claude/pam-design-wrong-code-alert` (D-510). `CompactNotice` in `@pam/ui
 
 Branch `claude/pam-design-legal-back-to-site` (D-508). The website's Privacy and Terms links carry `?from=site&return=<path>`; the app's pages show "Back to the website" and go to `https://joinpam.org` + the path, only if it is a plain path on the site (no `//`, no scheme; otherwise Back to Legal as before). Tabs and the other-document link keep it. New string `nav.back.website` (six drafts for Lena). Tests: `siteReturn.test.ts`, `apps/site/test/legal-links.test.ts`, `e2e/legal-site.spec.ts`.
 
+## Design system & Storybook · Profile's hero card loads as skeletons (11 October)
+
+Branch `claude/pam-design-real-accounts-no-examples` (D-520). `ProfileSummary isLoading` and `ProfileStat.value: null`: the photo, name, role and stats are pulses the size of the real card (measured), on `/account/` while the account loads and on the numbers while they arrive; a failed call ends the pulse in a 0. CLS under 0.01 in `profile-skeleton.spec.ts`.
+
+## Design system & Storybook · a real account sees no examples on Profile, Points, Connections (11 October)
+
+Branch `claude/pam-design-real-accounts-no-examples` (D-518). The code landed on `main` first via D-511 (`lib/examples.ts`, `examplesOn()`) and Piper's gate; what is left is `e2e/no-examples-profile.spec.ts`, holding Profile, Points and Connections to it.
+
 ## Design system & Storybook · Contact Pam replaces Call Pam (11 October)
 
 Branch `claude/pam-design-contact-pam` (D-512, A28). `Notice` offers Contact Pam (a link to Help); `useSupportPhone` and all `supportPhone` props are gone; the Help screen's first row opens the website's help desk; Privacy's data pages end in Contact Pam. `place.call` is untouched. About 33 English strings still say "call Pam": for Sage and Lena.
@@ -1476,6 +1484,10 @@ Branch `claude/pam-design-dark-info-alert` (D-513). One token, `--astryx-theme-n
 ## Design system & Storybook · focus ring only on text boxes (11 October)
 
 Branch `claude/pam-design-focus-text-boxes` (D-523, replaces D-411's focus line). Script-focused `tabindex=-1` non-controls, dialogs and sheets show no ring in any input mode; text boxes keep their field highlight; buttons and links ring on Tab. `e2e/focus-text-boxes.spec.ts`.
+
+## Design system & Storybook · the sign-in code step has a way to a person (11 October)
+
+Branch `claude/pam-design-signin-code-contact` (D-527, Iris CP1). A quiet "Need help? Contact Pam" link under Send again, to `SITE_URL/support/cant-sign-in/`; outside the D-510 alert.
 
 ## Design system & Storybook · badge caption 12px (11 October) — on `main`
 
@@ -2107,3 +2119,7 @@ Branch `claude/places-programs-trips-launch` (D-509). A real account sees only i
 ## Places & programs · places, Explore and Saved without examples (11 October 2026) — READY, not merged (on top of the Trips launch audit)
 
 Branch `claude/places-programs-no-examples-places` (D-509 extended). The example services, policies, places, reports, people and program are for a demo or Storybook only; a lead's Book for a member and Add a person use their own program. e2e `no-examples-for-real-accounts.spec.ts`; the example-walking specs opt in with `pam.examples`.
+
+## Places & programs · Add my program (11 October 2026) — READY, not merged
+
+Branch `claude/places-programs-add-my-program` (D-525). A member taps Add my program on Profile, answers the lead's questions, and the request goes to Pam's team (`request_staff_access`); being checked / not approved + ask again / approved (gains the provider role next to the member side, D-491). Migration `20261011044654`: no second ask while waiting or approved; a denied one reopens. Test `55_asking_again_to_add_a_program_test.sql`; e2e `add-my-program.spec.ts`.
