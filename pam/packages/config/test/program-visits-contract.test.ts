@@ -30,7 +30,7 @@ describe('a program sees the visits planned at its own program (D-526)', () => {
   });
 
   it('is said on the Privacy page, with exactly what the program sees', () => {
-    expect(sharing).toMatch(/sign up with them or plan a visit there/);
+    expect(sharing).toMatch(/after you write to them, sign their rules, sign up with them or plan a visit there/);
     expect(sharing).toMatch(/your first name, the day and time, the service you picked, and whether you were marked as there\. If nobody marks you as there/);
     // Not “they marked you”: a member can mark their own visit (“I’m here”, “I went”, D-535), and the program sees only that the
     // visit is there, never who marked it or how.

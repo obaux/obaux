@@ -1361,7 +1361,6 @@
   "memberPolicies.none": "這個計劃沒有需要簽署的守則。",
   "memberPolicy.count": "第{current}份守則，共{total}份",
   "memberPolicy.sign": "簽署",
-  "transparency.canSee.signed": "您為某個計劃簽署的守則，以及簽署的日期。您加入的計劃也會看到這項。",
   "memberPolicy.record": "計劃會保存您所簽守則的記錄，包括日期。",
   "memberPolicy.readPages": "請閱讀每一頁，然後簽名。",
   "memberPolicy.record.meaning": "在這裏簽名，就是您已閱讀並同意的記錄。",
