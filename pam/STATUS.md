@@ -1386,9 +1386,9 @@ state with a (+)) instead of the "Proposed (a22)" cards; the generator gets `dra
 mouse stepped it on again (D-494, fixed; phones were not affected). Figma: Case manager, Program lead and
 Overview redrawn, one image replaced on Member; drawn from the branch, so redraw from `main` only after it merges.
 
-## Design system & Storybook · Sign in on a short phone, small targets (11 October)
+## Design system & Storybook · Sign in on a short phone, small targets (11 October) — on `main`
 
-Branch `claude/pam-design-signin-short`. Sign in's Privacy / Terms / About links flow after the content instead of
+Merged from `claude/pam-design-signin-short` (9d89383). Sign in's Privacy / Terms / About links flow after the content instead of
 being pinned, so they never cover "Send me a code" at 320×568 (Iris S1, D-500); `TextLink` is 48px wide as well as tall
 (the Trips banner's "Sign", the signature sheet's "Clear"), and the policy header's "Done" too (W4). Needs Will: nothing.
 
@@ -1509,9 +1509,9 @@ fine and the fit audit was over-counting (D-448).
 
 ## Website · public site and help centre (10 October) — `apps/site`, on `main`
 
-**Carousel pause/play (11 October, D-501; branch, waits on the six languages for `carousel.pause` / `carousel.play` and Will's sign-off of the English).** `OnboardingSlides` has a pause/play button on Sign in, About Pam and the site hero; labels are required props.
+**Carousel pause/play (11 October, D-501; on `main`).** Will approved "Pause" and "Play" and asked for it subtle, tucked in a corner: a 32px see-through disc in a 48px tap target, top start corner. Lena's six languages are in. `OnboardingSlides` has a pause/play button on Sign in, About Pam and the site hero; labels are required props.
 
-**Hero carousel (11 October, D-499; branch, not yet merged).** Home's hero has the About Pam picture carousel to the right of the headline from 900px, under it on a phone. In the app, About Pam's carousel shows pictures only (`OnboardingSlides showLines={false}`); Sign in is unchanged. Figma "Pam — Website" Home has the Hero carousel component.
+**Hero carousel (11 October, D-499; on `main`, live).** Home's hero has the About Pam picture carousel to the right of the headline from 900px, under it on a phone. In the app, About Pam's carousel shows pictures only (`OnboardingSlides showLines={false}`); Sign in is unchanged. Figma "Pam — Website" Home has the Hero carousel component.
 
 The public site, `joinpam.org` (Vercel project `pam-site`; the app is `app.joinpam.org`), is a static
 Next export on the app's theme (`pnpm --filter @pam/site dev|build|test`; no Supabase, no sign-in; D-433,
