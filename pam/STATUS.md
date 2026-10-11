@@ -928,6 +928,16 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Voice & UX copy · Pam's voice guide; website Home proposals (11 October)
+
+A new lane (Sage, Will's brief of 11 October). **`docs/voice.md`** is how Pam sounds: who we write for, four
+traits (plain, warm, steady, respectful) with do/don't pairs from real `en.json` keys, a tone that flexes from
+the website (most personality) to errors and privacy (plainest), patterns, the word list, writing for seven
+languages and a checklist (D-503). Storybook's Foundations › Writing is a short summary linking to it. No app
+or site words changed. **Waiting on Will:** the Figma page "Copy proposals" in "Pam — Website" (node 31-290)
+has new words for each Home section beside his own; nothing is built until he says "build it", then it is
+Wren's. Open word: "program lead" vs "Program partner" for program staff.
+
 ## Merge desk & platform · deploys: only `main`, and checked (10–11 October)
 
 On 10 October the web project hit Vercel's daily deploy limit: 3f0bb5e and 00bde97 were refused ("Deployment rate
@@ -1393,6 +1403,12 @@ half-steps inside components) and colour (all 146 tokens, generated from the the
 for each of Wren's five items (D-504). Needs Will: two visible changes: raise the theme's body size (14px to 16px, with 3 in 4
 text elements currently under 15px), and dark `background-muted` to `#262626`.
 
+## Design system & Storybook · Sign in on a short phone, small targets (11 October) — on `main`
+
+Merged from `claude/pam-design-signin-short` (9d89383). Sign in's Privacy / Terms / About links flow after the content instead of
+being pinned, so they never cover "Send me a code" at 320×568 (Iris S1, D-500); `TextLink` is 48px wide as well as tall
+(the Trips banner's "Sign", the signature sheet's "Clear"), and the policy header's "Done" too (W4). Needs Will: nothing.
+
 ## Design system & Storybook · legal tabs follow the reader (10 October)
 
 Branch `claude/pam-design-legal-tabs`. Privacy and Terms: the highlighted tab is the section whose heading has reached the
@@ -1510,7 +1526,9 @@ fine and the fit audit was over-counting (D-448).
 
 ## Website · public site and help centre (10 October) — `apps/site`, on `main`
 
-**Hero carousel (11 October, D-499; branch, not yet merged).** Home's hero has the About Pam picture carousel to the right of the headline from 900px, under it on a phone. In the app, About Pam's carousel shows pictures only (`OnboardingSlides showLines={false}`); Sign in is unchanged. Figma "Pam — Website" Home has the Hero carousel component.
+**Carousel pause/play (11 October, D-501; on `main`).** Will approved "Pause" and "Play" and asked for it subtle, tucked in a corner: a 32px see-through disc in a 48px tap target, top start corner. Lena's six languages are in. `OnboardingSlides` has a pause/play button on Sign in, About Pam and the site hero; labels are required props.
+
+**Hero carousel (11 October, D-499; on `main`, live).** Home's hero has the About Pam picture carousel to the right of the headline from 900px, under it on a phone. In the app, About Pam's carousel shows pictures only (`OnboardingSlides showLines={false}`); Sign in is unchanged. Figma "Pam — Website" Home has the Hero carousel component.
 
 The public site, `joinpam.org` (Vercel project `pam-site`; the app is `app.joinpam.org`), is a static
 Next export on the app's theme (`pnpm --filter @pam/site dev|build|test`; no Supabase, no sign-in; D-433,

@@ -176,6 +176,8 @@ export default function GalleryPage() {
       >
         <OnboardingSlides
           label="How Pam works"
+          pauseLabel="Pause"
+          playLabel="Play"
           header={<img src="/pam-wordmark-white.svg" alt="Pam" {...stylex.props(styles.heroMark)} />}
           slides={[
             {

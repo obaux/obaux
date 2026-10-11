@@ -5,8 +5,10 @@ import * as stylex from '@stylexjs/stylex';
 import { animate } from 'framer-motion';
 import { Carousel, type CarouselHandle } from '@astryxdesign/core/Carousel';
 import { HStack } from '@astryxdesign/core/HStack';
+import { IconButton } from '@astryxdesign/core/IconButton';
 import { Skeleton } from '@astryxdesign/core/Skeleton';
 import { Text } from '@astryxdesign/core/Text';
+import { pam } from './tokens.stylex.js';
 
 /**
  * What Pam is, before somebody has any reason to care.
@@ -129,6 +131,14 @@ export interface OnboardingSlidesProps {
    * reads. Pass the line through `tPlain` then — it is a name, not drawn text.
    */
   readonly showLines?: boolean;
+  /**
+   * Names of the pause and play button, passed through `tPlain`: a name, not
+   * drawn text. Required, not optional: pictures that move by themselves for
+   * more than five seconds need a way to stop them (WCAG 2.2.2, SOP §12), so a
+   * caller cannot forget the control by forgetting the words.
+   */
+  readonly pauseLabel: string;
+  readonly playLabel: string;
 }
 
 const styles = stylex.create({
@@ -239,6 +249,36 @@ const styles = stylex.create({
     transitionDuration: '150ms',
   },
   here: { opacity: 1, width: '20px', borderRadius: '4px' },
+  // The pause/play button (D-501; made quiet at Will's word, 11 October: "subtle and tucked neatly
+  // in a corner"). The tap target stays the full 48px (`--pam-touch-target-min`); what is drawn is a
+  // 32px translucent disc with a hairline rim and a small white mark, readable over a light or a dark
+  // picture and over neither's detail. Top corner on the start side, 16px in from the edge to
+  // match the page gutter, away from the words (bottom) and the locale switcher (other side).
+  control: {
+    position: 'absolute',
+    insetInlineStart: '8px',
+    top: 'calc(20px + env(safe-area-inset-top, 0px))',
+    zIndex: 2,
+    width: pam['--pam-touch-target-min'],
+    height: pam['--pam-touch-target-min'],
+    minWidth: pam['--pam-touch-target-min'],
+    borderRadius: '50%',
+    color: '#FFFFFF',
+  },
+  disc: {
+    width: '32px',
+    height: '32px',
+    minWidth: '32px',
+    flexShrink: 0,
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    boxShadow: 'inset 0 0 0 1px rgba(255, 255, 255, 0.4)',
+    backdropFilter: 'blur(4px)',
+  },
+  controlInline: { top: '4px', insetInlineStart: '4px' },
   // The inline frame (D-259): in line with the page, rounded, words centred.
   regionInline: { width: '100%', marginInline: 0 },
   trackInline: { borderRadius: '28px' },
@@ -299,13 +339,18 @@ const AUTOPLAY_MS = 6000;
 // smoothly-eased scroll rather than a hard jump.
 const SCROLL_EASE_MS = 600;
 
-export function OnboardingSlides({ slides, label, header, variant = 'hero', showLines = true }: OnboardingSlidesProps) {
+export function OnboardingSlides({ slides, label, header, variant = 'hero', showLines = true, pauseLabel, playLabel }: OnboardingSlidesProps) {
   const isInline = variant === 'inline';
   const region = useRef<HTMLElement>(null);
   const carousel = useRef<CarouselHandle>(null);
   const [here, setHere] = useState(0);
   const [loaded, setLoaded] = useState<ReadonlySet<string>>(new Set());
   const reducedMotion = usePrefersReducedMotion();
+  // Stopped by the person (stays stopped until Play), or held while focus is inside, so a
+  // keyboard user arriving at the button is not carried to another picture mid-reach.
+  const [paused, setPaused] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const running = !reducedMotion && !paused && !focused;
 
   /**
    * Preload every slide's artwork up front (there are only three, each
@@ -397,16 +442,24 @@ export function OnboardingSlides({ slides, label, header, variant = 'hero', show
    * comment).
    */
   useEffect(() => {
-    if (reducedMotion || slides.length < 2) return;
+    if (!running || slides.length < 2) return;
     const timer = setInterval(() => {
       scrollToEased((here + 1) % slides.length);
     }, AUTOPLAY_MS);
     return () => clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- scrollToEased closes over `here`/`reducedMotion`, both already deps
-  }, [here, reducedMotion, slides.length]);
+  }, [here, running, slides.length]);
 
   return (
-    <section ref={region} aria-label={label} {...stylex.props(styles.region, isInline && styles.regionInline)}>
+    <section
+      ref={region}
+      aria-label={label}
+      onFocus={() => setFocused(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(false);
+      }}
+      {...stylex.props(styles.region, isInline && styles.regionInline)}
+    >
       {/*
         The name lives on the section, not on the carousel inside it. Both
         carrying it made two regions with the same name, which a screen reader
@@ -453,6 +506,31 @@ export function OnboardingSlides({ slides, label, header, variant = 'hero', show
       </Carousel>
 
       {header ? <div {...stylex.props(styles.header)}>{header}</div> : null}
+
+      {/* Only when something moves: with reduced motion the carousel never advances, so there is nothing to stop. */}
+      {!reducedMotion && slides.length > 1 ? (
+        <IconButton
+          label={paused ? playLabel : pauseLabel}
+          variant="ghost"
+          onClick={() => setPaused((p) => !p)}
+          icon={
+            // The tap target is the full 48px; what is drawn is a small quiet disc inside it.
+            <span aria-hidden="true" {...stylex.props(styles.disc)}>
+              {paused ? (
+                <svg width="14" height="14" viewBox="0 0 24 24" focusable="false">
+                  <path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z" fill="currentColor" />
+                </svg>
+              ) : (
+                <svg width="14" height="14" viewBox="0 0 24 24" focusable="false">
+                  <rect x="6" y="4" width="4.5" height="16" rx="1.2" fill="currentColor" />
+                  <rect x="13.5" y="4" width="4.5" height="16" rx="1.2" fill="currentColor" />
+                </svg>
+              )}
+            </span>
+          }
+          xstyle={[styles.control, isInline && styles.controlInline]}
+        />
+      ) : null}
 
       <HStack gap={1} justify="center" align="center" aria-hidden="true" xstyle={[styles.dots, isInline && styles.dotsInline]}>
         {slides.map((slide, index) => (

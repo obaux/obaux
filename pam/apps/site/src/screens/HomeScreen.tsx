@@ -96,6 +96,8 @@ export function HomeScreen({ showAbout = ABOUT_ON_HOME }: { readonly showAbout?:
         <OnboardingSlides
           slides={HOW.map((item, i) => ({ id: `hero-${i + 1}`, image: item.image, text: `${item.title}. ${item.body}` }))}
           label="Pam in pictures"
+          pauseLabel="Pause"
+          playLabel="Play"
           variant="inline"
           showLines={false}
         />

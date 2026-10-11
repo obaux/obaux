@@ -15,7 +15,7 @@ import { useSession } from '@/lib/useSession';
 import { useAlertBanner } from '@/lib/alertBanner';
 import { LanguageSwitcher } from '../LanguageSwitcher';
 import { PhoneSignInCard } from './PhoneSignInCard';
-import { LegalFooter } from './LegalFooter';
+import { LegalLinks } from './LegalFooter';
 import { recallInvite, rememberInvite, type Invite, type InviteRole } from '@/lib/appUrl';
 import { pendingInviteForMe, previewInvite } from '@/lib/useInviteLinks';
 import { navigate } from '@/lib/navigate';
@@ -125,7 +125,7 @@ export function SignInScreen({
    */
   readonly audience?: InviteRole | null;
 } = {}) {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   const supportPhone = useSupportPhone();
   const live = usePhoneSignIn();
   const flow = preview?.flow ?? live;
@@ -360,13 +360,25 @@ export function SignInScreen({
       ) : null}
       {/* Centred under the hero; the code step is a nested page, left-aligned
           like every other (D-253), with only "Sent to" centred. */}
-      <Page align={onFirstStep ? 'center' : 'start'} gap={3}>
+      <Page
+        align={onFirstStep ? 'center' : 'start'}
+        gap={3}
+        // Privacy and Terms (D-251), last in the page and in the flow, never over the button (D-500).
+        footer={<LegalLinks from="signin" />}
+        isFooterInFlow
+      >
         {onFirstStep ? (
           // Somebody waiting on a code has already decided what Pam is: the
           // hero belongs to the first step only, and the card rides up over
           // its bottom edge instead of sitting in a header-then-card stack.
           <VStack gap={0} align="center" xstyle={styles.heroGroup}>
-            <OnboardingSlides slides={slides} label={t('onboarding.label')} header={heroHeader} />
+            <OnboardingSlides
+              slides={slides}
+              label={t('onboarding.label')}
+              header={heroHeader}
+              pauseLabel={tPlain('carousel.pause')}
+              playLabel={tPlain('carousel.play')}
+            />
             <VStack gap={3} align="center" xstyle={styles.overlapCard}>
               {failedNotice}
               {card}
@@ -393,8 +405,6 @@ export function SignInScreen({
           </>
         )}
       </Page>
-      {/* Privacy and Terms, pinned to the foot of the screen (D-251). */}
-      <LegalFooter from="signin" />
     </>
   );
 }

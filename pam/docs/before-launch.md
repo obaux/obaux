@@ -397,6 +397,8 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   its own `lang`, so "Русский" should be spoken in a Russian voice and the tag not at
   all. Nothing has been heard yet: try the Language screen and the sign-in menu with
   VoiceOver and TalkBack, in English and in Arabic.
+  Also the carousel's round button on Sign in and About Pam (D-501): its name says "Pause" or "Play" (`carousel.pause`, `carousel.play`, six translations by Claude, 11 October) beside the
+  carousel's own name; hear it in each language.
 
 - [ ] **Run an Arabic screen reader pass** (VoiceOver and TalkBack on a phone, and
   NVDA if it can be had): that the labels on icon buttons, cards, photos and the

@@ -1568,5 +1568,7 @@
   "transparency.group.people": "您的聯繫人和訊息",
   "copy.page": "複製此頁面",
   "copy.done": "已複製",
-  "copy.failed": "無法複製。請長按文字進行複製。"
+  "copy.failed": "無法複製。請長按文字進行複製。",
+  "carousel.pause": "暫停",
+  "carousel.play": "播放"
 }
