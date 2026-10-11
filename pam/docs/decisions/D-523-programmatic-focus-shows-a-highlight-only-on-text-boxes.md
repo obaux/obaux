@@ -14,6 +14,8 @@ In `globals.css`, one rule after the global `:focus-visible`: `[tabindex='-1']:n
 
 **Tests.** `e2e/focus-text-boxes.spec.ts`: Privacy and Terms contents links (mouse and keyboard; Tab on from there still rings), a sheet (the place's hours drawer; mouse and keyboard), a confirm dialog (remove a policy; mouse and keyboard), a search box focused on arrival still shows its field highlight, and in each Tab then rings the first button. `messages.spec.ts` adds the photo viewer in both modes. With the rule taken out the keyboard sheet and keyboard confirm-dialog tests fail.
 
+**Checked, no gap (Wren's note, 04:35).** On the help site Astryx's own `outline-style: none` beat the global `:focus-visible` and left no focus at all. In the app a Tab through Profile shows a 3px ring on every control: the header buttons, the feature tiles, the list rows, Sign out and the tab bar. (A first reading showed 0px: the ring grows in over a moment on some Astryx controls, so the test reads it once it has.) `focus-text-boxes.spec.ts` keeps that true. No stylesheet change was needed.
+
 **Not part of this.** Wren is doing the same for the help desk's "On this page" on the website; this is the app's stylesheet only.
 
 **What a later session might reverse.** Nothing about Tab: a control still rings.

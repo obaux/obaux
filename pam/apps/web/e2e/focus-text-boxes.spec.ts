@@ -202,3 +202,44 @@ test.describe('a search box focused on arrival still shows its field highlight',
     expect((await focused(page)).ring).toBe(true);
   });
 });
+
+/**
+ * Astryx styles its own links, tiles, tabs and list rows, and on the help site its outline-style:none beat the
+ * global :focus-visible rule, leaving no visible focus at all (Iris; Wren's note, 11 October). The app does not
+ * have that gap: every control on Profile rings when Tab lands on it. Checked so it stays true.
+ */
+test.describe('Tab shows a ring on every control (the Astryx tiles, rows, tabs and buttons)', () => {
+  test('Profile: the header buttons, the tiles, the list rows, Sign out and the tab bar', async ({ page }) => {
+    await signedIn(page);
+    await page.route('**/rest/v1/rpc/member_points*', (route) => route.fulfill(json(400)));
+    await page.goto('/profile/');
+    await settled(page);
+    await page.locator('body').click({ position: { x: 5, y: 5 } });
+
+    const seen: string[] = [];
+    for (let i = 0; i < 14; i += 1) {
+      await page.keyboard.press('Tab');
+      const el = await page.evaluate(() => {
+        const e = document.activeElement as HTMLElement;
+        return { tag: e.tagName.toLowerCase(), name: (e.getAttribute('aria-label') || e.textContent || '').trim().slice(0, 30) };
+      });
+      if (el.tag === 'body') break;
+      // The ring grows in over a moment on some Astryx controls, so read it once it has.
+      await expect
+        .poll(
+          () =>
+            page.evaluate(() => {
+              const s = getComputedStyle(document.activeElement as HTMLElement);
+              return s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) >= 2;
+            }),
+          { message: `no ring on ${el.tag} "${el.name}"` },
+        )
+        .toBe(true);
+      seen.push(`${el.tag}:${el.name}`);
+    }
+    // The tiles, the rows, Sign out and the tab bar were all reached.
+    expect(seen.join('|')).toMatch(/Connections/);
+    expect(seen.join('|')).toMatch(/Sign out/);
+    expect(seen.length).toBeGreaterThanOrEqual(9);
+  });
+});
