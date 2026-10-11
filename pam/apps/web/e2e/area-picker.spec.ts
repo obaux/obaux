@@ -53,6 +53,8 @@ test.describe('choosing an area', () => {
     // find the pencil to discover that this is theirs to set.
     await page.getByRole('button', { name: 'Near City Hall' }).click();
     await expect(page.getByRole('textbox', { name: 'ZIP code' })).toBeVisible();
+    // The search finds ZIP codes and neighborhoods, so the picker says what to type.
+    await expect(page.getByText('Like 19107, or Fishtown.')).toBeVisible();
   });
 
   test('the pencil beside it does the same thing, and says so', async ({ page }) => {
