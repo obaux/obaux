@@ -220,7 +220,8 @@ const tile = stylex.create({
     paddingInline: '8px',
     paddingBlock: '2px',
     borderRadius: '999px',
-    fontSize: '11px',
+    // 12px, the smallest text Pam draws (A27: nothing is under 12px); it was 11px.
+    fontSize: '12px',
     lineHeight: 1.4,
     fontWeight: 700,
     letterSpacing: '0.02em',

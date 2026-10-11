@@ -1400,6 +1400,11 @@ recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or 
 connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
+## Design system & Storybook · badge caption 12px (11 October)
+
+Branch `claude/pam-design-badge-caption`. The "Your badge" caption on the Profile badge tile is 12px, not 11px, following A27 (nothing under
+12px). Fit audit in 8 languages: nothing new.
+
 ## Design system & Storybook · map: staff Home is live (10 October)
 
 Branch `claude/pam-design-flow-map-3`. The user-flow map shows the live staff Home (rings, and the empty
