@@ -26,7 +26,7 @@ App words in brackets. Answers the gap phrase "this place is closed".
 - Nobody at the place is told who said so. (`flag.intro`)
 
 ## If it didn't send
-- Your connection may have dropped, or someone already reported the place. Try again, or call Pam. (`flag.failed.body`)
+- Your connection may have dropped, or someone already reported the place. Try again, or contact Pam. (`flag.failed.body`, A28 wording)
 
 ---
 
