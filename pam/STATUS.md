@@ -1421,6 +1421,10 @@ Branch `claude/pam-design-wrong-code-alert` (D-510). `CompactNotice` in `@pam/ui
 
 Branch `claude/pam-design-legal-back-to-site` (D-508). The website's Privacy and Terms links carry `?from=site&return=<path>`; the app's pages show "Back to the website" and go to `https://joinpam.org` + the path, only if it is a plain path on the site (no `//`, no scheme; otherwise Back to Legal as before). Tabs and the other-document link keep it. New string `nav.back.website` (six drafts for Lena). Tests: `siteReturn.test.ts`, `apps/site/test/legal-links.test.ts`, `e2e/legal-site.spec.ts`.
 
+## Design system & Storybook · a Saved tip when a place is saved (11 October)
+
+Branch `claude/pam-design-saved-tooltip` (D-516). `@pam/ui/ConfirmTip`: a small "Saved" by the bookmark for about two seconds, then a fade (none with reduce-motion), also announced politely. On the place bar and every place card; unsave says nothing. Uses the existing `places.saved`.
+
 ## Design system & Storybook · badge caption 12px (11 October) — on `main`
 
 Merged from `claude/pam-design-badge-caption` (3472970). The "Your badge" caption on the Profile badge tile is 12px, not 11px, following A27 (nothing under

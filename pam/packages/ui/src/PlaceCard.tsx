@@ -1,4 +1,6 @@
-import type { ReactNode } from 'react';
+'use client';
+
+import { useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -11,6 +13,7 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import type { Category } from '@pam/config';
 import { BookmarkIcon } from './icons.js';
 import { CategoryArt } from './CategoryArt.js';
+import { ConfirmTip } from './ConfirmTip.js';
 import { VisitTag } from './VisitTag.js';
 import { pam } from './tokens.stylex.js';
 
@@ -195,6 +198,7 @@ export function PlaceCard({
   action,
   labels,
 }: PlaceCardProps) {
+  const [savedTaps, setSavedTaps] = useState(0);
   return (
     <Card padding={4} xstyle={styles.card}>
       <VStack gap={3}>
@@ -220,14 +224,20 @@ export function PlaceCard({
               {action ? (
                 <HStack xstyle={styles.action}>{action}</HStack>
               ) : onSave ? (
-                <IconButton
-                  label={isSaved ? labels.saved : labels.save}
-                  icon={<BookmarkIcon isFilled={isSaved} />}
-                  variant="ghost"
-                  onClick={onSave}
-                  aria-pressed={isSaved}
-                  xstyle={styles.save}
-                />
+                // "Saved" by the button when a tap saves it (Will, 11 October); nothing when it is taken off.
+                <ConfirmTip text={labels.saved} trigger={savedTaps}>
+                  <IconButton
+                    label={isSaved ? labels.saved : labels.save}
+                    icon={<BookmarkIcon isFilled={isSaved} />}
+                    variant="ghost"
+                    onClick={() => {
+                      if (!isSaved) setSavedTaps((n) => n + 1);
+                      onSave();
+                    }}
+                    aria-pressed={isSaved}
+                    xstyle={styles.save}
+                  />
+                </ConfirmTip>
               ) : null}
             </HStack>
 
