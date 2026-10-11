@@ -52,12 +52,23 @@ test('a member with no request sees the row, answers the questions, and the requ
   await expect(page).toHaveURL(/\/profile\/add-program\/$/);
   await page.getByRole('textbox', { name: 'Program name' }).fill('Ada’s Atelier');
   // Through the questions to the last one, whose button is "Add program".
-  for (let i = 0; i < 8; i++) {
-    const button = page.getByRole('button', { name: /^(Next|Skip for now|Add program)/ }).first();
-    await button.waitFor();
-    if (/^Add program/.test((await button.innerText()).trim())) break;
-    await button.click();
+  // Next is one button at the foot whose label changes on the last step, and a tap re-renders a beat later,
+  // so each tap waits for the question to change before the next one, and only Next or Skip is pressed here.
+  const add = page.getByRole('button', { name: /^Add program/ });
+  const next = page.getByRole('button', { name: /^(Next|Skip for now)/ }).first();
+  const review = page.getByRole('heading', { name: 'Review details', level: 1 });
+  const question = async () =>
+    `${await page.getByRole('heading', { level: 1 }).first().innerText()}|${await page
+      .getByRole('heading', { level: 2 })
+      .first()
+      .innerText({ timeout: 500 })
+      .catch(() => '')}`;
+  for (let i = 0; i < 10 && !(await review.isVisible()); i++) {
+    const before = await question();
+    await next.click();
+    await expect.poll(question).not.toBe(before);
   }
+  await expect(add).toBeVisible();
   await page.getByRole('button', { name: /^Add program/ }).click();
   await expect(page.getByRole('heading', { name: 'Sent to Pam' })).toBeVisible();
   expect(asked).toHaveLength(1);
