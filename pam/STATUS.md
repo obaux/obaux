@@ -977,6 +977,18 @@ without it the cached, unpatched Next shipped), a Vercel redirect for document r
 `app_settings.app_url`, migration `20261010190831_texts_link_to_app_joinpam_org` (data only), **applied live**
 10 October. Emails build their link from the Edge Function setting `APP_URL`, which Will set to app.joinpam.org the same evening.
 
+## Languages & legal · A28: no phone line in the Help screen, the privacy page or the terms (11 October)
+
+Branch `claude/lena-a28-help` (D-514, D-515), Will's words signed 03:37 UTC (card a59). Get help's first row is Contact Pam and opens the help desk on the
+website (`lib/helpDesk.ts`, `SITE_URL/support/`, new tab); What we can help with has "Still stuck?" and the same row; Your safety keeps Call 911, adds a one-tap
+"Call or text 988" row and "Talk to someone now" (opens `/support/` until Wren's "Your safety" post); Privacy › Copy and Delete end in Dot's Contact Pam.
+31 "call Pam" / privacy / terms lines, two labels and the wrong-code alert (Sage's A29 line) are signed English in place, in seven languages (`notices.ts` follows, pinned to `en.json`);
+`onboarding.phone.callInstead` removed. The two live texts that carried the number are Nico's D-519 for the English; my six translations go on top of it once it is on `main`
+(Mira, 04:19) — **the live `dispatch-sms` is still the old function** (Nico). The promise check found three lines untrue since D-481 (the saved-place text is
+held): `flag.done.body`, `reminders.today.member`, `profile.promo.reminders.body` now say what is true (Sage signed them), with restore lines in `docs/before-launch.md`.
+**Open:** the two texts' translations (above), "Reply HELP to reach a person" (Sage), Ava's in-app copy/delete (the two privacy lines change then), the help-request line on the
+privacy page (the day Nico's form works), the public site's "call Pam" (Wren) — all listed in `docs/before-launch.md` › *A28*.
+
 ## Languages & legal · 10 October in one place; from now on, one batch a week (Friday)
 
 Done and on `main` today (each has its own section below): the promise sweep (D-474), Spanish "visita" (D-480), the privacy page on email and signatures (D-482, D-490: Will's three sentences, live),
@@ -1431,6 +1443,7 @@ recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or 
 connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
+
 ## Design system & Storybook · Contact Pam replaces Call Pam (11 October)
 
 Branch `claude/pam-design-contact-pam` (D-512, A28). `Notice` offers Contact Pam (a link to Help); `useSupportPhone` and all `supportPhone` props are gone; the Help screen's first row opens the website's help desk; Privacy's data pages end in Contact Pam. `place.call` is untouched. About 33 English strings still say "call Pam": for Sage and Lena.
@@ -1442,6 +1455,10 @@ Branch `claude/pam-design-wrong-code-alert` (D-510). `CompactNotice` in `@pam/ui
 ## Design system & Storybook · legal pages go Back to the website (11 October)
 
 Branch `claude/pam-design-legal-back-to-site` (D-508). The website's Privacy and Terms links carry `?from=site&return=<path>`; the app's pages show "Back to the website" and go to `https://joinpam.org` + the path, only if it is a plain path on the site (no `//`, no scheme; otherwise Back to Legal as before). Tabs and the other-document link keep it. New string `nav.back.website` (six drafts for Lena). Tests: `siteReturn.test.ts`, `apps/site/test/legal-links.test.ts`, `e2e/legal-site.spec.ts`.
+
+## Design system & Storybook · Contact Pam replaces Call Pam (11 October)
+
+Branch `claude/pam-design-contact-pam` (D-512, A28). `Notice` offers Contact Pam (a link to Help); `useSupportPhone` and all `supportPhone` props are gone; the Help screen's first row opens the website's help desk; Privacy's data pages end in Contact Pam. `place.call` is untouched. About 33 English strings still say "call Pam": for Sage and Lena.
 
 ## Design system & Storybook · a Saved tip when a place is saved (11 October)
 

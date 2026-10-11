@@ -26,7 +26,8 @@ import { useI18n } from '@/lib/i18n';
  * The two actions are what the privacy policy already offers ("Ask us for a
  * copy of what we keep about you, or ask us to delete it"). Neither is
  * self-serve in Pam today, so each opens a page that says so plainly and
- * puts the call to Pam one tap away — not a button that pretends.
+ * puts Contact Pam one tap away (it opens Help, which leads to the help desk:
+ * Pam has no phone line, A28) — not a button that pretends.
  */
 const styles = stylex.create({
   intro: { fontSize: '18px', lineHeight: 1.5 },
