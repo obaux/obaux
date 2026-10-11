@@ -50,10 +50,14 @@ describe('a program sees the visits planned at its own program (D-526)', () => {
     }
   });
 
-  it('says the same words in both places: the program marks the member as there', () => {
-    // The Privacy page says "marked you as there"; the transparency line says "visits you plan there".
-    // Neither may say a program sees whether the member "went or missed" it: part A returns the mark, not a miss.
-    expect(sharing).not.toMatch(/missed/i);
-    expect(appointments?.en.split('A program sees')[1] ?? '').not.toMatch(/missed|went/i);
+  it('names the label a program sees on a visit nobody marked: missed, a day after it ends (part C)', () => {
+    // The program sees `status`, so a visit nobody marked reaches it as "missed". A member is told that,
+    // in the words of the fact (nobody marked it), not as a claim that they did not come.
+    expect(sharing).toMatch(/A visit nobody marks shows as missed a day after it ends\./);
+    expect(sharing).not.toMatch(/\byou (missed|did not come|didn.t come)\b/i);
+  });
+
+  it('keeps the transparency line to the visits: the guide’s “went or missed” half is the guide’s, the sentence about a program is not a claim about who came', () => {
+    expect(appointments?.en.split('A program sees')[1] ?? '').not.toMatch(/missed|went|came/i);
   });
 });

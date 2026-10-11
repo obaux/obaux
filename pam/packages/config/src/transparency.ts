@@ -47,7 +47,10 @@ export const ADMIN_CAN_SEE = [
    * `my_program_visits()` returns, for the caller's OWN program only and for a program lead with an active
    * account, each visit that is not cancelled with the member's first name, the day and time, the service
    * they picked and whether the program marked them as there (`checked_in_at`) — no last name, phone,
-   * address or photo. The member does not have to have signed up: planning the visit is enough. Said to the
+   * address or photo. Part C adds the label "missed": a visit still `scheduled` a day after it ends,
+   * at a program with a lead on Pam, is marked missed overnight (`sweep_missed_visits()`), and
+   * `my_program_visits()` returns that status; it pays and takes nothing, and nobody is texted.
+   * The member does not have to have signed up: planning the visit is enough. Said to the
    * member on `transparency.canSee.appointments` ("A program sees the visits you plan there too.") and on
    * the Privacy page (`privacy.s.sharing.p2`); `program-visits-contract.test.ts` holds the three together.
    * It does NOT widen `member_activity_for_a_program` below: a member's trips to OTHER programs stay hidden.
