@@ -56,14 +56,6 @@ export const ADMIN_CAN_SEE = [
    * It does NOT widen `member_activity_for_a_program` below: a member's trips to OTHER programs stay hidden.
    */
   'visits_planned_at_their_own_program',
-  /**
-   * D-535 ("I'm here", Piper; Mira, 11 October): a member can mark their own visit. The program's lead sees THAT the member
-   * marked it themselves (`my_program_own_marks()` returns visit ids only; the lead's screen shows "{name} marked this visit
-   * themselves", `schedule.checkin.byMember`, with no undo), not HOW: `how_a_visit_was_marked` below stays hidden. Mira kept it
-   * visible on purpose: hiding it would tell the lead the same thing by implication. Said on the Privacy page
-   * (`privacy.s.sharing.p2`), with the same words as `trips.booked.hasLead` and `place.lead.sees`.
-   */
-  'visit_marked_by_the_member_themselves',
   'points_and_level',
   /**
    * Said on the screen since D-413 (Will, 9 October: "Case manager can see
@@ -173,13 +165,14 @@ export const ADMIN_CANNOT_SEE = [
    */
   'member_activity_for_a_program',
   /**
-   * D-526 / D-535 (Mira, 11 October): a program's lead sees a visit's status (booked, there, missed) and whether the member marked
-   * it themselves (`visit_marked_by_the_member_themselves` above), never HOW: not the member's position, not "I’m here" or "I went".
-   * `my_program_visits()` returns the status and `my_program_own_marks()` visit ids only, neither the method. Only the member sees
-   * how, and an admin's audit row says only that a check-in happened. (Privacy p9 says what Pam keeps; `privacy.s.sharing.p2`
-   * says what a program sees; this entry is why neither says "how".)
+   * D-526 / D-535 (Mira, 11 October): a program's lead sees a visit's status (booked, there, missed), never who marked it or how.
+   * A member can mark their own visit ("I’m here", "I went"), so a visit may show as there without the lead having marked it; the
+   * lead cannot tell the two apart (no label, no function that says; undoing a member's mark is a quiet no-op for the lead), and
+   * cannot tell by position or by word. `my_program_visits()` returns the status and not the method. Only the member sees how,
+   * and an admin's audit row says only that a check-in happened. (Privacy p9 says what Pam keeps; `privacy.s.sharing.p2` says
+   * what a program sees; this entry is why neither says who or how.)
    */
-  'how_a_visit_was_marked',
+  'who_marked_a_visit_or_how',
 ] as const;
 
 export type AdminHiddenField = (typeof ADMIN_CANNOT_SEE)[number];

@@ -31,19 +31,12 @@ describe('a program sees the visits planned at its own program (D-526)', () => {
 
   it('is said on the Privacy page, with exactly what the program sees', () => {
     expect(sharing).toMatch(/sign up with them or plan a visit there/);
-    expect(sharing).toMatch(/your first name, the day and time, the service you picked, and whether you were marked as there\./);
+    expect(sharing).toMatch(/your first name, the day and time, the service you picked, and whether you were marked as there\. If nobody marks you as there/);
     // Not “they marked you”: a member can mark their own visit (“I’m here”, “I went”, D-535), and the program sees only that the
     // visit is there, never who marked it or how.
     expect(sharing).not.toMatch(/whether they marked you/);
     // The page says the visit is marked as there, by whoever marked it; it does not say "you came".
     expect(sharing).not.toMatch(/\byou (came|went|checked in)\b/i);
-  });
-
-  it('says a program sees that a member marked their own visit, but not where they were (D-535, Mira, 11 October)', () => {
-    expect(sharing).toMatch(/and whether you were marked as there\. If you marked it yourself, they see that, but not where you were\./);
-    expect(ADMIN_CAN_SEE).toContain('visit_marked_by_the_member_themselves');
-    // Never the method: the page does not tell the program which door the member used.
-    expect(sharing).not.toMatch(/I.m here|I went|by position|by word/i);
   });
 
   it('uses the same “whether you were marked as there” on the screens that list what the place sees, once they are on main', () => {
@@ -56,8 +49,8 @@ describe('a program sees the visits planned at its own program (D-526)', () => {
       expect(line, key).toMatch(/whether you were marked as there/);
       expect(line, key).not.toMatch(/whether they marked you/);
     }
-    const byMember = EN['schedule.checkin.byMember'];
-    if (byMember !== undefined) expect(byMember).toBe('{name} marked this visit themselves');
+    // There is no “marked this visit themselves” label: the lead cannot tell who marked a visit (Mira, 16:15).
+    expect(EN['schedule.checkin.byMember']).toBeUndefined();
   });
 
   it('tells a member what they control: cancelling takes the visit away from the program', () => {
@@ -84,11 +77,12 @@ describe('a program sees the visits planned at its own program (D-526)', () => {
   it('keeps the transparency line to the visits: the guide’s “went or missed” half is the guide’s, the sentence about a program is not a claim about who came', () => {
     expect(appointments?.en.split('A program sees')[1] ?? '').not.toMatch(/missed|went|came/i);
   });
-  it('says a program never sees how a visit was marked: the status, not the method (D-535)', () => {
-    expect(ADMIN_CANNOT_SEE).toContain('how_a_visit_was_marked');
+  it('says a program never sees who marked a visit or how: the status, not the method (D-535)', () => {
+    expect(ADMIN_CANNOT_SEE).toContain('who_marked_a_visit_or_how');
+    expect(ADMIN_CAN_SEE).not.toContain('visit_marked_by_the_member_themselves');
     // So the Privacy page and the screen name no method to the program: not “checked in”, not “marked by”, not “I’m here”.
     for (const line of [sharing, appointments?.en ?? '']) {
-      expect(line).not.toMatch(/checked in|marked by|who marked|I.m here|I went/i);
+      expect(line).not.toMatch(/checked in|marked by|who marked|I.m here|I went|marked it yourself|by position|by word/i);
     }
   });
 });
