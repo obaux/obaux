@@ -35,9 +35,10 @@
 
 | Check | Result |
 |---|---|
-| Every `en.json` key the guide cites exists, with the quoted words | checked by script (see READY) |
+| Every `en.json` key the guide cites exists, with the quoted words | 30 quoted strings checked against en.json by script: all match (one quotes a heading and its body together) |
 | Figma page built; Will's frames unchanged | page 31-290 holds only the copy and the notes; Home page untouched |
-| Storybook build | see READY |
+| `pnpm --filter @pam/web build-storybook` | passes; `foundations-writing--about` renders, with its link to the guide |
+| Site word check scope | `apps/site/test/content.test.ts` reads `apps/site/src` only, so the forbidden words listed in `docs/voice.md` set nothing off |
 
 ## Left undone
 
