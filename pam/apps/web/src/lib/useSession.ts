@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { DEFAULT_LOCALE, isSupportedLocale, type Locale, type Role } from '@pam/config';
+import { setDemoAccount } from './examples';
 
 /**
  * Who is signed in, and what they are allowed to be shown.
@@ -162,6 +163,7 @@ export function useSession(): { state: SessionState; refresh: () => void } {
           },
         };
         lastSignedIn = next;
+        setDemoAccount(next.session.isDemo);
         setState(next);
       } catch {
         lastSignedIn = null;

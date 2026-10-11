@@ -11,6 +11,7 @@ import { BookmarkIcon, FlagIcon, MessagesIcon, ShareIcon } from '@pam/ui';
 import { roundAction } from '@pam/ui/roundAction';
 import { DUMMY_PROGRAM_LEADS } from '@pam/config/dummy-people';
 import { DUMMY_SELF_ID, dummyConversationIdBetween } from '@pam/config/dummy-conversations';
+import { examplesOn } from '@/lib/examples';
 import { useI18n } from '@/lib/i18n';
 
 // The bar's round buttons — save and ⋯ — are `roundAction.plain`: white, with no outline and no
@@ -34,7 +35,8 @@ export { newMessageFrom } from '@/lib/placeMessages';
  * back to the program — text, then return to book (Will, 6 October, D-313).
  */
 export function messageHrefFor(placeName: string, placeId?: string): string {
-  const lead = DUMMY_PROGRAM_LEADS.find((person) => person.orgName === placeName);
+  // Examples only where they are allowed; a real account goes to Messages, where New message is.
+  const lead = examplesOn() ? DUMMY_PROGRAM_LEADS.find((person) => person.orgName === placeName) : undefined;
   const fromPlace = placeId ? `&from=place&place=${encodeURIComponent(placeId)}` : '';
   return lead
     ? `/messages/thread/?id=${encodeURIComponent(dummyConversationIdBetween(DUMMY_SELF_ID.member, lead.id))}${fromPlace}`
@@ -51,7 +53,7 @@ export function leadMessageFor(
   placeName: string,
   placeId?: string,
 ): { readonly firstName: string; readonly href: string } | null {
-  const lead = DUMMY_PROGRAM_LEADS.find((person) => person.orgName === placeName);
+  const lead = examplesOn() ? DUMMY_PROGRAM_LEADS.find((person) => person.orgName === placeName) : undefined;
   if (!lead) return null;
   const fromPlace = placeId ? `&from=place&place=${encodeURIComponent(placeId)}` : '';
   return {

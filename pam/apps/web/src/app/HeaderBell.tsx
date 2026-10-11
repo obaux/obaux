@@ -6,6 +6,7 @@ import { NotificationBell } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { useNotifications, unreadCount } from '@/lib/useNotifications';
 import { isFreshAccount } from '@/lib/programSetup';
+import { useExamplesOn } from '@/lib/useExamplesOn';
 
 /**
  * The bell, wherever a signed-in screen needs one.
@@ -57,15 +58,16 @@ export function HeaderBell({
   const { state } = useNotifications(enabled);
   const [dummyUnread, setDummyUnread] = useState<number | null>(null);
 
-  const needsDummy = state.status === 'ready' && (state.items.length === 0 || isDemo) && Boolean(role);
+  // Example alerts are for Storybook and demo accounts only; a real account's bell counts its real ones.
+  const examples = useExamplesOn();
+  const needsDummy = examples && state.status === 'ready' && (state.items.length === 0 || isDemo) && Boolean(role);
 
   useEffect(() => {
     if (!needsDummy) return;
     let cancelled = false;
     void (async () => {
-      const { USE_DUMMY_PEOPLE } = await import('@pam/config/dummy-flag');
       // A fresh account (D-361) has no example alerts: the bell is quiet.
-      if (!USE_DUMMY_PEOPLE || isFreshAccount()) return;
+      if (isFreshAccount()) return;
       const { DUMMY_NOTIFICATIONS } = await import('@pam/config/dummy-notifications');
       if (cancelled) return;
       setDummyUnread(DUMMY_NOTIFICATIONS[role as Role].filter((item) => item.isNew).length);

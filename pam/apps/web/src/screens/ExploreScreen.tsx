@@ -23,6 +23,7 @@ import { CITY_HALL, loadOrigin, saveOrigin, type AreaOption } from '@/lib/useAre
 import { AreaSearch, AreaTrigger } from '../app/places/AreaPicker';
 import { CATEGORY_ICONS, ExploreView, type ExploreCategory } from './ExploreView';
 import { HeaderActions } from './HeaderActions';
+import { useMessagingReach } from '@/lib/useMessagingReach';
 import { HelpButton } from './HelpButton';
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
@@ -170,6 +171,8 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
   // are on Profile), the search bar at rest is a centred launcher, and the
   // next visit sits above the list. Staff reach this screen as All programs.
   const isMember = mode === 'tab' && (demoRole ?? trueRole) === 'member';
+  // No one to message means no Messages tab (useMessagingReach); the bell then moves to this header.
+  const noMessagesTab = useMessagingReach(session.status === 'signed-in', '') === false;
   // A visit moved with "Change appointment" (D-281), read after mount.
   const [moves, setMoves] = useState<Readonly<Record<string, string>>>({});
   useEffect(() => setMoves(readMoves()), []);
@@ -225,8 +228,10 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
             />
             <HelpButton />
           </>
-        ) : isMember ? undefined : (
-          <HeaderActions role={demoRole ?? trueRole} enabled={session.status === 'signed-in'} />
+        ) : isMember && !noMessagesTab ? undefined : (
+          // A member's Home has no header actions, unless the Messages tab is hidden (nobody to message):
+          // the bell lives there then, so notifications stay one tap away (Will, 11 October 2026).
+          <HeaderActions role={demoRole ?? trueRole} enabled={session.status === 'signed-in'} hasHelp={!isMember} />
         )
       }
       nextTrip={
