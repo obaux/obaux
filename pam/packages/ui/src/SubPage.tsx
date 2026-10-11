@@ -84,6 +84,13 @@ export interface SubPageHeaderProps {
    * the title says what the page is.
    */
   readonly hero?: ReactNode;
+  /**
+   * `large` (the default): back in the bar, the title large beneath it.
+   * `bar`: the bar alone, with the title in it from the start — a conversation, whose name and who
+   * they are scroll with the messages under it (Will, 11 October, D-526). The bar is the same bar, so
+   * back and the actions sit exactly where they do on every other page (D-411).
+   */
+  readonly variant?: 'large' | 'bar';
 }
 
 const COLLAPSE_AT = 48;
@@ -175,6 +182,7 @@ export function SubPageHeader({
   backIcon = 'back',
   isBackFixed = false,
   hero,
+  variant = 'large',
 }: SubPageHeaderProps) {
   const [collapsed, setCollapsed] = useState(false);
   const fit = useFitTitle<HTMLHeadingElement>(title);
@@ -196,6 +204,24 @@ export function SubPageHeader({
   // 240px; the bar is pulled back up over it to 12px from the top; the title
   // starts 16px under the picture.
   const isHero = hero !== undefined && hero !== null && hero !== false;
+
+  if (variant === 'bar') {
+    return (
+      <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.bar}>
+        {back}
+        <HStack align="center" wrap="nowrap" xstyle={styles.middle}>
+          <Text xstyle={[styles.barTitle, styles.shown]} aria-hidden="true">
+            {title}
+          </Text>
+        </HStack>
+        {actions ? (
+          <HStack gap={1} align="center" wrap="nowrap" xstyle={styles.actions}>
+            {actions}
+          </HStack>
+        ) : null}
+      </HStack>
+    );
+  }
 
   return (
     <>

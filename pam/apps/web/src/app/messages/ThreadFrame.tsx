@@ -2,6 +2,9 @@
 
 import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
+import { Avatar } from '@astryxdesign/core/Avatar';
+import { Heading } from '@astryxdesign/core/Heading';
+import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
@@ -96,10 +99,52 @@ export function ThreadFrame({ children }: { readonly children: ReactNode }) {
   return <main {...stylex.props(styles.frame)}>{children}</main>;
 }
 
-/** The pinned block above the messages: the thread header, then the visit card, if any. */
+/** The pinned bar above the messages: back, the name, ⋯ (Will, 11 October, D-526). */
 export function ThreadTop({ children }: { readonly children: ReactNode }) {
   return (
     <VStack gap={4} xstyle={styles.top}>
+      {children}
+    </VStack>
+  );
+}
+
+const intro = stylex.create({
+  // First thing in the conversation's scroll region: it moves up with the messages and is gone from
+  // view once they have; the pinned bar above it keeps the name.
+  wrap: { width: '100%', paddingInline: spacingVars['--spacing-4'], paddingBlockEnd: spacingVars['--spacing-2'] },
+  name: { fontSize: '22px', lineHeight: 1.2, fontWeight: 700, textAlign: 'center' },
+  line: { fontSize: '16px', lineHeight: 1.4, textAlign: 'center' },
+});
+
+/**
+ * Who this is, at the top of the conversation, smaller than a page title (Will, 11 October, D-526:
+ * "the one that scrolls and shows info on top, smaller"): their photo, their name, who they are to
+ * you on a line (D-187, D-395: nothing for staff looking at a member), and — for a member talking to
+ * a program — the visit card (D-276). It scrolls with the messages; the bar above stays.
+ */
+export function ThreadIntro({
+  name,
+  photoUrl,
+  context,
+  children,
+}: {
+  readonly name: string;
+  readonly photoUrl?: string | null;
+  readonly context: string | null;
+  /** The visit card, when there is one. */
+  readonly children?: ReactNode;
+}) {
+  return (
+    <VStack gap={2} align="center" xstyle={intro.wrap}>
+      <Avatar size="lg" name={name} {...(photoUrl ? { src: photoUrl } : {})} tooltip={false} alt="" />
+      <Heading level={1} xstyle={intro.name}>
+        {name}
+      </Heading>
+      {context ? (
+        <Text type="supporting" xstyle={intro.line}>
+          {context}
+        </Text>
+      ) : null}
       {children}
     </VStack>
   );
@@ -111,14 +156,11 @@ export function ThreadTop({ children }: { readonly children: ReactNode }) {
  */
 export function ThreadHeader({
   name,
-  context,
   backHref,
   backLabel,
   menuHref,
 }: {
   readonly name: string;
-  /** "Case manager", or "Program lead at …" — under the name; `null` draws nothing (D-187, D-395). */
-  readonly context: string | null;
   readonly backHref: string;
   readonly backLabel: string;
   /** The ⋯ page — report, the program's details (D-213). */
@@ -127,10 +169,10 @@ export function ThreadHeader({
   const { t } = useI18n();
   return (
     <SubPageHeader
+      variant="bar"
       title={name}
       backHref={backHref}
       backLabel={backLabel}
-      {...(context ? { subtitle: context, hasOneLineSubtitle: true } : {})}
       actions={
         menuHref ? (
           <IconButton
