@@ -62,7 +62,7 @@ test('a member with no request sees the row, answers the questions, and the requ
   await expect(page.getByRole('heading', { name: 'Sent to Pam' })).toBeVisible();
   expect(asked).toHaveLength(1);
   expect(asked[0]).toMatchObject({ p_wants_role: 'provider', p_program_name: 'Ada’s Atelier', p_first_name: 'Ada', p_city: 'Philadelphia' });
-  await expect(page.getByText(/We will text you when it is ready/)).toBeVisible();
+  await expect(page.getByText(/We will text you when we have checked it/)).toBeVisible();
 });
 
 test('a request being checked shows on Profile and is a status, not the questions', async ({ page }) => {
