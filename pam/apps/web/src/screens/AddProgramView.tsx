@@ -6,6 +6,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { markSetupDone, readSentProgram, saveSentProgram } from '@/lib/programSetup';
+import { askToAddProgram } from '@/lib/useProgramRequest';
 import { asksForOwnProgram, resendOwnProgram, submitOwnProgram, useOwnProgram } from '@/lib/useOwnProgram';
 import { useSession } from '@/lib/useSession';
 import { Notice } from '@pam/ui';
@@ -49,20 +50,36 @@ const EMPTY: ProgramDetails = {
  * (D-361). It covers the bottom bar like any page you tap into, so Back
  * from the first question goes Home and Next is pinned to the foot (D-383).
  */
-export function AddProgramView({ isTab = false }: { readonly isTab?: boolean } = {}) {
-  const { t } = useI18n();
+export function AddProgramView({
+  isTab = false,
+  mode = 'lead',
+  initial,
+  onAsked,
+}: {
+  readonly isTab?: boolean;
+  /**
+   * `ask`: a member asking to add a program from Profile (D-525). The same questions, but the send is a
+   * request Pam's team approves (`request_staff_access`), and the account stays a member until then.
+   */
+  readonly mode?: 'lead' | 'ask';
+  /** What was sent before, when asking again after a no. */
+  readonly initial?: ProgramDetails;
+  /** Said once the request is on file. */
+  readonly onAsked?: () => void;
+} = {}) {
+  const { t, locale } = useI18n();
   const params = useSearchParams();
   const fromHome = params?.get('from') === 'home';
   // Editing after Pam asked for changes (D-381): what was sent, at the review.
   const isEditing = params?.get('edit') === '1';
-  const [program, setProgram] = useState<ProgramDetails>(() => (isEditing ? readSentProgram()?.details : null) ?? EMPTY);
+  const [program, setProgram] = useState<ProgramDetails>(() => initial ?? (isEditing ? readSentProgram()?.details : null) ?? EMPTY);
   const [step, setStep] = useState(() => (isEditing ? PROGRAM_STEPS.length - 1 : 0));
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
   const { state: session } = useSession();
   // A signed-in program lead, not a demo account: their send is saved for real.
-  const isReal = asksForOwnProgram(session) !== null;
+  const isReal = mode === 'lead' && asksForOwnProgram(session) !== null;
   // Editing after Pam asked for changes sends the same submission again; it is
   // not a second send (`submit_program` would refuse while this one is open).
   const own = useOwnProgram(session);
@@ -78,6 +95,24 @@ export function AddProgramView({ isTab = false }: { readonly isTab?: boolean } =
     value: program,
     onChange: setProgram,
     onSubmit: async () => {
+      if (mode === 'ask') {
+        if (session.status !== 'signed-in') return;
+        setBusy(true);
+        setFailed(false);
+        const result = await askToAddProgram(program, {
+          firstName: session.session.firstName ?? '',
+          city: session.session.regionName ?? '',
+          language: locale,
+        });
+        setBusy(false);
+        // Already waiting or approved counts as sent: the request is on file.
+        if (result === 'failed') {
+          setFailed(true);
+          return;
+        }
+        onAsked?.();
+        return;
+      }
       if (isReal) {
         setBusy(true);
         setFailed(false);
@@ -107,7 +142,9 @@ export function AddProgramView({ isTab = false }: { readonly isTab?: boolean } =
     <SubPage
       // The last step is its own page by name (Will, 7 October, D-367).
       title={t(PROGRAM_STEPS[step] === 'review' ? 'programs.new.review.title' : 'programs.new.title')}
-      {...(isTab || fromHome
+      {...(mode === 'ask'
+        ? { backHref: '/profile/', backLabel: t('nav.back.profile') }
+        : isTab || fromHome
         ? { backHref: '/', backLabel: t('nav.back.home'), isBackFixed: isTab }
         : isEditing
           ? { backHref: '/program/', backLabel: t('nav.back.program') }

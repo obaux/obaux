@@ -379,7 +379,7 @@ export function NewTripView({
           }).toString()}`}
         />
         {hasLead ? (
-          forMember ? null : <Banner status="info" title={t('place.lead.sees', { place: place.name })} />
+          forMember ? null : <Banner status="info" title={t('trips.booked.hasLead', { place: place.name })} />
         ) : (
           <Banner status="info" title={t('place.noLead', { place: place.name })} />
         )}

@@ -122,5 +122,5 @@ test('past visits say what the program marked: checked in, or not marked as arri
   await settled(page);
   await expect(page.getByText('Past visits')).toBeVisible();
   await expect(page.getByText('Checked in')).toHaveCount(1);
-  await expect(page.getByText('Not marked as arrived')).toHaveCount(1);
+  await expect(page.getByText('Not marked as there')).toHaveCount(1);
 });

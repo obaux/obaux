@@ -42,6 +42,7 @@ import { PrototypeProgramReview } from './PrototypeProgramReview';
 import { ProgramsToCheckScreen } from '../../screens/ProgramsToCheckScreen';
 import { InvitesLogScreen } from '../../screens/InvitesLogScreen';
 import TermsPage from '../../app/terms/page';
+import { AddMyProgramScreen } from '../../screens/AddMyProgramScreen';
 import { ProfileScreen } from '../../screens/ProfileScreen';
 import { ViewAsView } from '../../screens/ViewAsView';
 import { InviteView } from '../../screens/InviteView';
@@ -187,6 +188,7 @@ export const REDESIGN_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   // Profile for whoever is signed in (D-217); the Account screen is gone
   // from the redesign (D-213), so its old address opens Profile too.
   '/profile/': screen(() => <ProfileScreen />),
+  '/profile/add-program/': screen(() => <AddMyProgramScreen />),
   '/account/': screen(() => <ProfileScreen />),
   // A program's list is its Home now (D-212), so the old address opens it.
   '/interested/': screen(() => <HomeScreen />),

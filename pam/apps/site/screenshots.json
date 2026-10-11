@@ -105,5 +105,20 @@
     "out": "planning-a-visit/past-visits.png",
     "name": "Trips with a past visit: a coming-up visit, and under it the heading Past visits",
     "scrollTo": "Past visits"
+  },
+  {
+    "id": "member-created--explore",
+    "out": "../home/explore.png",
+    "name": "Home page: the Explore screen"
+  },
+  {
+    "id": "program-lead-screens--home",
+    "out": "../home/calendar.png",
+    "name": "Home page: a program lead calendar"
+  },
+  {
+    "id": "case-manager-screens--conversation",
+    "out": "../home/conversation.png",
+    "name": "Home page: a case manager conversation"
   }
 ]

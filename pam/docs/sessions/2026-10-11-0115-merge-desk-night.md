@@ -190,8 +190,88 @@
   and the "Does the place know I'm coming?" post untrue. It ships with a Privacy line Will signs, Wren's post
   update and the member-facing words from part D.
 
+- **Batch b12 pushed at 48a0449 (05:27), live on both projects at about 05:36.** Iris confirmed SP5 closed on
+  it (no ring on a section "On this page" moves to).
+- **Batch b13 pushed at e25e08f (09:28).** It holds:
+  - Dot's D-518/D-520: the Profile hero card loads as pulses; D-518 is a test only.
+  - Dot's D-527: "Need help? Contact Pam" on the sign-in code step (Iris's CP1). It opens the cant-sign-in post.
+  - Piper's D-525: Add my program. Its migration went live as 20261011092734, applied just before the push,
+    because it makes a second waiting request an error that the live app's sign-up retry didn't yet handle.
+  - Wren's site follow-ups: the bottom section becomes current, Esc closes the list, the hello@ link is 48px,
+    and blocked.png is back.
+  - Lena's two account texts in six languages, and es help.needHelp in tú.
+  - Sage's ledger.
+- **Nico's D-524 (Answer by text) moved out of b13** into its own step. Its migration replaces
+  claim_outbound_messages, which carries every live account text, sign-in codes included. Nico supplied:
+  - a line diff showing one added cancel step and nothing else;
+  - a plan for proving it on live;
+  - the rollback block from 20261010141859, md5 ed8918a0… (checked).
+  The step runs after b13, and Will's sign-in code is the real proof.
+- **Attendance (Piper, D-526) A, B and C are built and held for card a63.** Lena and Sage wrote four lines:
+  Privacy sharing.p2 (with "missed" named), the transparency line, place.lead.sees and trips.booked.hasLead.
+  Lena's contract test (477a904c) matches the card word for word. "I'm here" is approved and being built:
+  - a cap of 3 self-reported visits a week, and a +40 upgrade when a lead confirms;
+  - it works without a lead;
+  - Lena's location paragraph (p9) waits on Piper's log check.
+  Lena also found that Explore's "Stays on this phone" isn't true, since the search sends the position to the
+  server (in a POST body, and nothing keeps it). Sage and Lena are fixing the line.
+- **Will, 09:1x:**
+  1. Build the new website from his Figma (wizzRwn3cjixue2p6eeZfG), desktop and mobile, with motion like the
+     app's (Wren).
+  2. A tappable carousel whose images flip through and float. Guardrails: a pause control (WCAG 2.2.2),
+     nothing moving under reduced motion, transform only.
+  3. Clean up the Figma colours and text into website-only "Website/" styles and components, mirrored as
+     apps/site tokens (Dot).
+  4. Bring back the thread header that shows info on top and scrolls into a smaller bar. That reverses part of
+     D-411; the buttons keep D-411's positions (Nico).
+
+- **Batch b14 pushed at 07d8287 (10:16), live, main CI green.** It holds:
+  - Nico's D-524 (Answer by text, off);
+  - Wren's SP4 and the help-request probe fix;
+  - Dot's D-528 (the website-only colours and text styles in Figma and apps/site, with two AA text variants).
+  Will's card a65 has the website words: five held lines with true fallbacks, Sage's privacy sentence, and two
+  colours. Card a66 has the location paragraphs for "I'm here" (p9, p10).
+- **Batch b15 pushed at f0fb902, live: Vercel web and pam-site READY, main CI green.** It holds:
+  - Nico's D-529: the conversation's own header is back, with the info on top scrolling into a small bar
+    whose name fades in. It reverses part of D-411; the buttons keep D-411's positions.
+  - Dot's D-530: the code boxes read left to right in Arabic and accept Arabic-Indic and Persian digits.
+  - Lena's places.area.hereNote: "Used for this search only."
+  - Sage's ledger.
+  - Wren's D-531, all four stages of the new website from Will's Figma: Home, Support index and the post
+    template, About Pam, and Still stuck? The Home carousel flips, drifts and has Pause.
+- **Iris tested b15** (`docs/research/2026-10-11-b15-website-thread-codes.md`). Nothing stops anyone. She
+  found three W items and two polish items:
+  - T1: in an Arabic thread, English messages showed their punctuation on the wrong side;
+  - T2: the small bar cut the start of a long Latin name;
+  - H1: Pause on Home looked like plain text and sat below the first screen on a phone;
+  - H2: "Search Support" at 4.3:1 in dark. Withdrawn: her script measured the visually-hidden label;
+  - C1: Sign in turned on after one digit.
+- **Batch b16**, for those findings:
+  - Nico's D-533: dir="auto" on what people wrote and on names in a conversation, including SubPageHeader's
+    bar title in @pam/ui;
+  - Wren's H1: Pause is a pill with an icon on the picture stack, inside the first screen at 320x568 and
+    390x844, with a usability guard;
+  - Dot's D-532: Sign in waits for six digits, because a short code went to Supabase and came back as "wrong
+    code". The search pill's contrast pairs are now in the site's contrast test;
+  - Iris's report.
+
+- **Batch b16 pushed at 4e0c32f, live: Vercel web and pam-site READY, main CI green.** Iris re-tested T1, T2,
+  H1 and C1, and all four pass.
+- **Batch b17:** Dot's D-534, names in headings keep their own direction:
+  - `@pam/ui/DataHeading`;
+  - `SubPageHeader`'s `isTitleData`, which is off by default; the conversation passes it;
+  - used for the place and program title, a policy's title (the program's own words), the profile card's
+    name, and the names in staff lists. Pam's own headings, including "Policies", keep the page's direction;
+  - plus Iris's b16 re-test note.
+
 ## What was wrong, and what missed it
 
+- **A targeted e2e run against a stale build.** Before b16's full suite I ran the sign-in specs alone, and
+  Dot's new test failed in all three projects. Playwright serves `apps/web/out`, which was still b15's build.
+  After rebuilding, all 75 passed. A targeted e2e run needs `pnpm --filter @pam/web build` first. The full
+  suite script already builds before e2e.
+- **A contrast check that counts hidden text.** Iris's H2 came from a page sweep that measured a 1x1, clipped
+  label. Dot's axe run and hand measurement showed the drawn text passes. Iris now skips hidden text.
 - **Ava won't push on the merge desk's word, and that is right.** The merge desk passed on Will's "remove" at
   00:33 and asked her to push at 00:25 and again at 01:02. Each time she stopped with "say 'push the switcher
   branch' in this chat".
@@ -238,6 +318,29 @@
   The field's frame is drawn after the drawer opens, so the test now waits for it like the file's other ring
   checks do (144 of 144 over six repeats).
 
+- **Branch-local e2e runs missed cross-branch breaks.** D-520 replaced Account's spinner with pulses and ran
+  only its own specs, so loading.spec (which asked /account/ for the spinner) went red in b13. Add my program's
+  loop read the footer button's label before a tap had re-rendered, and failed on 2 of 3 phones once the
+  machine was busier. Both were fixed in b13 as test changes (108 of 108 over three repeats). Lesson: a READY
+  that changes a shared loading state or wizard says which shared specs it ran, and the merge desk's full run
+  stays the gate.
+
+- **"A sign-in code is the proof" was wrong.** The D-524 plan, and the merge desk, said
+  claim_outbound_messages carries sign-in codes. It doesn't: the app calls supabase.auth.signInWithOtp, so
+  Supabase Auth sends the code, and outbound_messages has never held a verify_code row. The function carries
+  the account texts (staff request approved or denied, and the rest). A card asking Will to sign in as proof
+  was withdrawn a minute after it went up. 20261011042645 is live as 20261011093720. All six bodies match
+  the file by md5 of prosrc, args and result are unchanged, and a rolled-back dry run claimed 0.
+- **The site's help form probes the live function on every page load.** Between 09:30 and 09:40, main CI's
+  site checks for b13 (HeadlessChrome, Microsoft IPs) made about 410 refused OPTIONS calls to help-request.
+  Each is an Edge Function invocation on the free plan, and a real visitor costs two per page view. Wren
+  will probe only from joinpam.org, only near "Still stuck?", and once per visit.
+
+- **Branch CI keeps calling the help function until branches pick up the fix.** After e27694a2, bursts of
+  about 200 refused calls still arrived. They matched each branch push's site checks (different Azure IPs,
+  around 5 minutes each) on branches cut before the fix, not main's own run. They stop as branches merge
+  main. That's a few thousand calls a day at most, well inside the free plan.
+
 ## Decisions
 
 - Will's answer on a card goes to the teammate waiting on it the same turn. If that teammate needs Will's own
@@ -278,6 +381,22 @@
 | Batch b12: e2e full, three projects | 1336 passed, 19 skipped, 1 flaky (fixed), 3 failed = place.spec:255 (stale, fixed); then place + focus-text-boxes 57 passed, focus-text-boxes x6 no retries 144 passed |
 | Batch b12 with Wren's ec56f0f: site tsc / tests / build / a11y | 0 / 76 / 0 / 120 scans, 0 problems |
 | Phone links left in app and site source | a place's own number, 911, 988 (and stories) only |
+| main CI on 48a0449 (b12) | all four green; Vercel web and pam-site READY |
+| Batch b13 (e25e08f): db / config / copy:status / ui / web tsc / site tsc / web unit / site tests | 1272 ok, 0 not ok / 1082 / in step / 124 / 0 / 0 / 125 / 76 |
+| Batch b13: builds, budget, site a11y / usability / scrollspy, storybook | all 0; 20.9 kB spare; 120 scans 0 problems / clear / 300 links 0 problems; builds |
+| Batch b13: e2e full | 1374 passed, 19 skipped; loading.spec (D-520) and add-my-program (race) red, fixed: 108 of 108 over three repeats |
+| 20261011044654 live | applied as 20261011092734; request_staff_access md5 92d080c9 before, 7e98d9e4 after; grants (authenticated, service_role) and search_path unchanged |
+| Batch b14 (07d8287): db / config / ui / web unit / site tests / e2e full / site a11y, usability, scrollspy | 1288 ok / 1094 / 124 / 125 / 89 / 1400 passed, 19 skipped / 120 scans 0, clear, 300 links 0 |
+| main CI on 07d8287; Vercel web and pam-site | all four green; READY |
+| Batch b15 (before stages 3 and 4): db / config / ui / web unit / site tests / e2e full / storybook / site checks | 1288 ok / 1094 / 124 / 125 / 92 / 1418 passed, 19 skipped / builds / 120 scans 0, clear, 300 links 0; budget 15.3 kB spare |
+| main CI on f0fb902 (b15); Vercel web and pam-site | all four green; READY |
+| Batch b16: sign-in e2e after rebuilding (signin-wrong-code, code-boxes-ltr, short) | 75 passed |
+| Batch b16: db / config / copy:status / ui / web unit / site tests / e2e full | 1288 ok, 0 not ok / 1094 / in step / 124 / 125 / 94 / 1433 passed, 19 skipped |
+| Batch b16: builds, budget, storybook, site a11y / usability / scrollspy | all 0; 15.3 kB spare; builds; 120 scans 0 problems / clear / 300 links 0 problems |
+| main CI on 4e0c32f (b16); Vercel web and pam-site | all four green; READY |
+| Iris's b16 re-test: T1, T2, H1, C1 | all pass |
+| Batch b17: db / config / copy:status / ui / web unit / site tests / e2e full | 1288 ok, 0 not ok / 1094 / in step / 124 / 125 / 94 / 1451 passed, 19 skipped |
+| Batch b17: builds, budget, storybook, site a11y / usability / scrollspy | all 0; 15.2 kB spare; builds; 120 scans 0 problems / clear / 300 links 0 problems |
 
 ## Left undone
 

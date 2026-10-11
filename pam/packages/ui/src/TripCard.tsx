@@ -32,7 +32,7 @@ export interface TripCardProps {
    * program asks for none.
    */
   readonly policies?: { readonly label: string; readonly isDone: boolean } | null;
-  /** After the visit (D-526): what the program marked — "Checked in" or "Not marked as arrived". Omitted before. */
+  /** After the visit (D-526): what the program marked — "Checked in" or "Not marked as there". Omitted before. */
   readonly mark?: string | null;
 }
 

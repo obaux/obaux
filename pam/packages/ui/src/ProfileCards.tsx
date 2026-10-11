@@ -4,12 +4,14 @@ import { Avatar } from '@astryxdesign/core/Avatar';
 import { Card } from '@astryxdesign/core/Card';
 import { ClickableCard } from '@astryxdesign/core/ClickableCard';
 import { Divider } from '@astryxdesign/core/Divider';
-import { Heading } from '@astryxdesign/core/Heading';
+import { DataHeading } from './DataHeading.js';
 import { HStack } from '@astryxdesign/core/HStack';
 import { IconButton } from '@astryxdesign/core/IconButton';
+import { Skeleton } from '@astryxdesign/core/Skeleton';
 import { Spinner } from '@astryxdesign/core/Spinner';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
+import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { CameraFilledIcon } from './icons.js';
 import { pam } from './tokens.stylex.js';
@@ -25,7 +27,8 @@ import { pam } from './tokens.stylex.js';
 // Who you are
 
 export interface ProfileStat {
-  readonly value: string;
+  /** `null` while the number is still arriving: a pulse the size of the number is drawn in its place. */
+  readonly value: string | null;
   readonly label: string;
 }
 
@@ -53,6 +56,15 @@ export interface ProfileSummaryProps {
   readonly photoLabel?: string;
   /** While a photo uploads: a spinner on the avatar, the button resting. */
   readonly isPhotoBusy?: boolean;
+  /**
+   * Nothing is known yet (Will, 11 October: "skeleton loaders for the image, stats and labels in profile hero
+   * card"): the photo, the name, the role and each stat are drawn as pulses sized exactly like the real content,
+   * so nothing moves when it arrives. `loadingStatCount` is how many stats there will be (3 for a member, 0 for
+   * staff). Say what is happening to a screen reader with `loadingLabel`.
+   */
+  readonly isLoading?: boolean;
+  readonly loadingStatCount?: number;
+  readonly loadingLabel?: string;
 }
 
 const summary = stylex.create({
@@ -93,6 +105,9 @@ const summary = stylex.create({
   // The file picker itself is never seen: the camera button opens it.
   fileInput: { position: 'absolute', width: '1px', height: '1px', opacity: 0, pointerEvents: 'none' },
   label: { fontSize: '13px', lineHeight: 1.3 },
+  // The pulses stand where the words will be: the same line boxes as `name`, `role`, `value` and `label` above.
+  centredBar: { alignSelf: 'center' },
+  statBar: { marginBlock: 0 },
 });
 
 export function ProfileSummary({
@@ -105,8 +120,12 @@ export function ProfileSummary({
   onPhotoPick,
   photoLabel,
   isPhotoBusy = false,
+  isLoading = false,
+  loadingStatCount = 0,
+  loadingLabel,
 }: ProfileSummaryProps) {
   const picker = useRef<HTMLInputElement>(null);
+  if (isLoading) return <ProfileSummarySkeleton statCount={loadingStatCount} label={loadingLabel} />;
   return (
     <Card padding={6} xstyle={summary.card}>
       {corner ? <HStack xstyle={summary.corner}>{corner}</HStack> : null}
@@ -152,9 +171,9 @@ export function ProfileSummary({
           </VStack>
           <VStack gap={0.5} align="center">
             <HStack gap={0} align="center" justify="center" wrap="nowrap">
-              <Heading level={2} xstyle={summary.name} maxLines={2}>
+              <DataHeading level={2} xstyle={summary.name} maxLines={2}>
                 {name}
-              </Heading>
+              </DataHeading>
               {nameAddon}
             </HStack>
             <Text type="supporting" xstyle={summary.role}>
@@ -168,7 +187,11 @@ export function ProfileSummary({
               <VStack key={stat.label} gap={2}>
                 {index > 0 ? <Divider /> : null}
                 <VStack gap={0}>
-                  <Text xstyle={summary.value}>{stat.value}</Text>
+                  {stat.value === null ? (
+                    <Skeleton width={36} height={VALUE_LINE_PX} index={index} xstyle={summary.statBar} />
+                  ) : (
+                    <Text xstyle={summary.value}>{stat.value}</Text>
+                  )}
                   <Text type="supporting" xstyle={summary.label}>
                     {stat.label}
                   </Text>
@@ -301,5 +324,51 @@ export function PromoCard({ title, body, href, art }: PromoCardProps) {
         </VStack>
       </HStack>
     </ClickableCard>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// While it loads
+
+/** The line boxes of the real content, so a pulse and its words take the same room. */
+const NAME_LINE_PX = 31; // 26px × 1.2
+const ROLE_LINE_PX = 25; // 15px supporting text (measured)
+const VALUE_LINE_PX = 24; // 20px × 1.2
+const LABEL_LINE_PX = 17; // 13px × 1.3
+const AVATAR_PX = 128; // Avatar `xl` (measured)
+
+function ProfileSummarySkeleton({ statCount, label }: { readonly statCount: number; readonly label?: string | undefined }) {
+  return (
+    <Card padding={6} xstyle={summary.card} aria-busy="true">
+      {label ? (
+        <VisuallyHidden>
+          <span role="status" aria-live="polite">
+            {label}
+          </span>
+        </VisuallyHidden>
+      ) : null}
+      <HStack gap={4} align="center" wrap="nowrap" aria-hidden="true">
+        <VStack gap={2} align="center" xstyle={[summary.person, statCount === 0 && summary.personAlone]}>
+          <Skeleton width={AVATAR_PX} height={AVATAR_PX} radius="rounded" index={0} />
+          <VStack gap={0.5} align="center">
+            <Skeleton width={128} height={NAME_LINE_PX} index={1} xstyle={summary.centredBar} />
+            <Skeleton width={72} height={ROLE_LINE_PX} index={2} xstyle={summary.centredBar} />
+          </VStack>
+        </VStack>
+        {statCount > 0 ? (
+          <VStack gap={3} xstyle={summary.stats}>
+            {Array.from({ length: Math.min(statCount, 3) }, (_, index) => (
+              <VStack key={index} gap={2}>
+                {index > 0 ? <Divider /> : null}
+                <VStack gap={0}>
+                  <Skeleton width={36} height={VALUE_LINE_PX} index={3 + index * 2} />
+                  <Skeleton width={88} height={LABEL_LINE_PX} index={4 + index * 2} />
+                </VStack>
+              </VStack>
+            ))}
+          </VStack>
+        ) : null}
+      </HStack>
+    </Card>
   );
 }

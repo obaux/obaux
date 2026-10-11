@@ -117,12 +117,35 @@ function useSpy(ids: readonly string[], line: number): [string, (id: string, set
         timer = setTimeout(pick, wait + 30);
         return;
       }
+      // At the very bottom the last sections of a short post can never reach the line: the last one is the one you are in
+      // (Iris, SP1/SP3: "Still stuck?" never became current, and an earlier section stayed marked while off screen).
+      const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2 && window.scrollY > 0;
+      if (atBottom) {
+        setActive(els[els.length - 1]!.id);
+        return;
+      }
+      // A heading is "the one you are in" once it is in the upper part of the screen, so a section whose text has scrolled
+      // away is not left marked while the next one is already showing (Iris, SP3).
+      if (window.scrollY < 8) {
+        setActive(els[0]!.id);
+        return;
+      }
+      const reach = line + window.innerHeight * 0.25;
       let current = els[0]!.id;
       for (const el of els) {
-        if (el.getBoundingClientRect().top <= line) current = el.id;
+        if (el.getBoundingClientRect().top <= reach) current = el.id;
         else break;
       }
       setActive(current);
+    };
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        pick();
+      });
     };
     // The zone is between `line` and the lower 60% of the screen: a heading crossing `line` is an event.
     pickRef.current = pick;
@@ -130,7 +153,10 @@ function useSpy(ids: readonly string[], line: number): [string, (id: string, set
     els.forEach((el) => io.observe(el));
     pick();
     window.addEventListener('resize', pick);
+    // The IntersectionObserver says nothing when a heading is already past the line and the page then stops at the bottom.
+    window.addEventListener('scroll', onScroll, { passive: true });
     return () => {
+      window.removeEventListener('scroll', onScroll);
       clearTimeout(timer);
       io.disconnect();
       window.removeEventListener('resize', pick);
@@ -180,6 +206,15 @@ export function PostNav({ sections, variant }: { readonly sections: readonly Pos
   }, []);
   const ids = items.map((s) => s.id);
   const [active, go] = useSpy(ids, LINE[variant]);
+  // Esc closes the open list on a phone (Iris).
+  useEffect(() => {
+    if (!open) return;
+    const close = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    window.addEventListener('keydown', close);
+    return () => window.removeEventListener('keydown', close);
+  }, [open]);
   if (items.length < 2) return null;
   const here = items.find((s) => s.id === active)?.label ?? items[0]!.label;
 

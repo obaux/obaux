@@ -10,6 +10,7 @@ import { BigButton, CompactNotice, TextField, TextLink } from '@pam/ui';
 import { CodeBoxes } from '@pam/ui/CodeBoxes';
 import { useI18n } from '@/lib/i18n';
 import type { PhoneSignIn } from '@/lib/usePhoneSignIn';
+import { SITE_URL } from '@/lib/project';
 
 /**
  * Give us your number; type what we sent.
@@ -47,6 +48,9 @@ export interface PhoneSignInCardProps {
   /** No shadow or outline — Sign in, where it sits on the page (D-266). */
   readonly isFlat?: boolean;
 }
+
+/** Supabase's phone codes are six digits; Sign in waits for all of them (D-532). */
+const CODE_LENGTH = 6;
 
 const styles = stylex.create({
   title: { fontSize: '28px', lineHeight: 1.2 },
@@ -110,6 +114,7 @@ export function PhoneSignInCard({
         <CodeBoxes
           id={codeId}
           label={t('signin.code.label')}
+          length={CODE_LENGTH}
           value={code}
           onChange={onCodeChange}
           onComplete={(full) => {
@@ -123,7 +128,7 @@ export function PhoneSignInCard({
         <BigButton
           label={busy ? t('signin.verifying') : codeAction ?? t('signin.code.action')}
           onPress={() => void verifyCode(code)}
-          isDisabled={busy || code.trim().length === 0}
+          isDisabled={busy || code.replace(/\D/g, '').length < CODE_LENGTH}
         />
         {/* Centred, Send again under the number (Will, 3 October, D-253). */}
         <VStack gap={0} align="center">
@@ -141,6 +146,12 @@ export function PhoneSignInCard({
             isDisabled={busy || flow.resendIn > 0}
             size="quiet"
           />
+          {/*
+            A way to a person on the code step (A26, A28; Iris CP1): a code that is wrong, expired or never came
+            left nobody to ask. Quiet, under Send again and outside the alert (D-510). This person is signed
+            out, so it goes to the help desk's post for it rather than to Help in the app.
+          */}
+          <TextLink label={t('help.needHelp')} href={`${SITE_URL}/support/cant-sign-in/`} size="quiet" />
         </VStack>
       </VStack>
     );

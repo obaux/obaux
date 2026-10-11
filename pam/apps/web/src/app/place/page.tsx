@@ -303,9 +303,10 @@ function PlaceScreen() {
    * in the bar instead (it was put here on 16 September so this screen would
    * not show less than its neighbours; that still holds).
    */
-  const header = (title: string, bar?: React.ReactNode) => (
+  const header = (title: string, bar?: React.ReactNode, isName = false) => (
     <SubPageHeader
       title={title}
+      isTitleData={isName}
       backHref={back.href}
       backLabel={t(back.labelKey)}
       actions={
@@ -481,6 +482,7 @@ function PlaceScreen() {
           flagHref={`/flag/?place=${encodeURIComponent(place!.id)}`}
           messageHref={messageHrefFor(place!.name, place!.id)}
         />,
+        true,
       )}
 
       <PlaceDetail

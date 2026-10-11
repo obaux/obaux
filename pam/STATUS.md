@@ -963,9 +963,9 @@ app.joinpam.org). Checked live: `/programs/new/` carries its own title and `og:i
 vercel.app host `/signin/index.txt` answers 200 instead of redirecting (D-495). The merge desk now checks the
 Vercel status after every push (`docs/team.md`). Emails link to app.joinpam.org: Will changed `APP_URL`.
 
-## Merge desk & platform · the night of 11 October: batches b1 to b12
+## Merge desk & platform · the night of 11 October: batches b1 to b13
 
-On `main` and live: D-498 (its migration `a_place_says_whether_a_program_lead_on_pam_runs_it` applied live), D-499, D-500, D-501, D-502, D-503 (Sage's voice guide), D-504 (Foundations match the code), Piper's pick-a-service line, Lena's D-498 review, and the Principles page in line with A24, A25 and A26. Each batch ran the full checks before its push; every push was confirmed READY on Vercel for `web` and `pam-site`. Sage joined (Voice & UX copy). Open with Will: "go on Ask Pam" for the help centre; a push word in Ava's session; a56 (attendance). **A28 (Will, a54):** Pam has no phone line; help goes problem → help desk → email to hello@joinpam.org. In progress in six lanes; the number is still on `main` until Dot's and Wren's changes merge. **Launch cleanup (a55):** real accounts see no example data: Trips done (D-509); Messages, places, Explore, Saved and Profile next. On `main` since: D-508 (legal Back to the website), D-510 (wrong code stays on the code step), D-509, D-513 (dark blue alert 10%), D-516 ("Saved" tip), D-511 (no example messages; no Messages tab with nobody to message). A29: Sage signs new sentences (`docs/signed-english.md`). Also on `main`: D-519 (alerts follow texts_live; the two account texts lose the number in the repo, live after Will refiles), one examples gate (`examples.ts`), D-521 (the help-request forward, deployed live as v1, off; its migration 20261011041940 is for Will to paste, card a62), and **A28 in batch b12**: D-512 (Contact Pam), D-514/D-515 (Lena, seven languages), D-522/D-517 (Wren's help desk: Still stuck? is email, the form behind the switch) and D-523 (a highlight on a script-moved focus only for text boxes). Next, b13: D-518/D-520 (Profile skeletons), D-524 (Answer by text, off; migration 20261011042645), D-525 (Add my program; migration 20261011044654). Held: D-526 attendance part A, until a Privacy line Will signs ships with it. Log: `docs/sessions/2026-10-11-0115-merge-desk-night.md`.
+On `main` and live: D-498 (its migration `a_place_says_whether_a_program_lead_on_pam_runs_it` applied live), D-499, D-500, D-501, D-502, D-503 (Sage's voice guide), D-504 (Foundations match the code), Piper's pick-a-service line, Lena's D-498 review, and the Principles page in line with A24, A25 and A26. Each batch ran the full checks before its push; every push was confirmed READY on Vercel for `web` and `pam-site`. Sage joined (Voice & UX copy). Open with Will: "go on Ask Pam" for the help centre; a push word in Ava's session; a56 (attendance). **A28 (Will, a54):** Pam has no phone line; help goes problem → help desk → email to hello@joinpam.org. In progress in six lanes; the number is still on `main` until Dot's and Wren's changes merge. **Launch cleanup (a55):** real accounts see no example data: Trips done (D-509); Messages, places, Explore, Saved and Profile next. On `main` since: D-508 (legal Back to the website), D-510 (wrong code stays on the code step), D-509, D-513 (dark blue alert 10%), D-516 ("Saved" tip), D-511 (no example messages; no Messages tab with nobody to message). A29: Sage signs new sentences (`docs/signed-english.md`). Also on `main`: D-519 (alerts follow texts_live; the two account texts lose the number in the repo, live after Will refiles), one examples gate (`examples.ts`), D-521 (the help-request forward, deployed live as v1, off; its migration 20261011041940 is for Will to paste, card a62), and **A28 in batch b12**: D-512 (Contact Pam), D-514/D-515 (Lena, seven languages), D-522/D-517 (Wren's help desk: Still stuck? is email, the form behind the switch) and D-523 (a highlight on a script-moved focus only for text boxes). **b13 on main (e25e08f):** D-518/D-520 (Profile skeletons), D-527 (Need help? on the sign-in code step), D-525 (Add my program; migration live as 20261011092734), Wren's site follow-ups, Lena's two texts in six languages. Next: D-524 (Answer by text) as its own step, since its migration replaces claim_outbound_messages. Held for Will: attendance A to C (card a63) and the help form switch (a62). **b14 (07d8287):** D-524 (Answer by text, off; migration live as 20261011093720), Dot's website styles (D-528). **b15 (f0fb902):** Wren's new website from Will's Figma (D-531: Home, Support, a post, About, Still stuck?), Nico's thread header back (D-529), Arabic code boxes left to right (D-530), Explore's "Used for this search only." **b16 (4e0c32f):** Iris's b15 findings: names and messages keep their own direction in Arabic (D-533), Pause pictures is a real button on the first screen, and Sign in waits for six digits (D-532). **b17:** names in headings keep their own direction (D-534, `@pam/ui/DataHeading`, `isTitleData`). In progress: Piper's "I'm here" (card a66). Held for Will: a65 (website words and two colours). Log: `docs/sessions/2026-10-11-0115-merge-desk-night.md`.
 
 ## Merge desk & platform · a failed in-app load opens the screen; texts link to app.joinpam.org (10 October)
 
@@ -983,10 +983,10 @@ Branch `claude/lena-a28-help` (D-514, D-515), Will's words signed 03:37 UTC (car
 website (`lib/helpDesk.ts`, `SITE_URL/support/`, new tab); What we can help with has "Still stuck?" and the same row; Your safety keeps Call 911, adds a one-tap
 "Call or text 988" row and "Talk to someone now" (opens `/support/` until Wren's "Your safety" post); Privacy › Copy and Delete end in Dot's Contact Pam.
 31 "call Pam" / privacy / terms lines, two labels and the wrong-code alert (Sage's A29 line) are signed English in place, in seven languages (`notices.ts` follows, pinned to `en.json`);
-`onboarding.phone.callInstead` removed. The two live texts that carried the number are Nico's D-519 for the English; my six translations go on top of it once it is on `main`
-(Mira, 04:19) — **the live `dispatch-sms` is still the old function** (Nico). The promise check found three lines untrue since D-481 (the saved-place text is
+`onboarding.phone.callInstead` removed. The two live texts that carried the number are Nico's D-519 for the English; my six translations are on `claude/lena-a28-texts` (one message each, in the b13 batch)
+— **the live `dispatch-sms` is still the old function** (Nico). The promise check found three lines untrue since D-481 (the saved-place text is
 held): `flag.done.body`, `reminders.today.member`, `profile.promo.reminders.body` now say what is true (Sage signed them), with restore lines in `docs/before-launch.md`.
-**Open:** the two texts' translations (above), "Reply HELP to reach a person" (Sage), Ava's in-app copy/delete (the two privacy lines change then), the help-request line on the
+**Open:** the live texts (above), "Reply HELP to reach a person" (Sage), Ava's in-app copy/delete (the two privacy lines change then), the help-request line on the
 privacy page (the day Nico's form works), the public site's "call Pam" (Wren) — all listed in `docs/before-launch.md` › *A28*.
 
 ## Languages & legal · 10 October in one place; from now on, one batch a week (Friday)
@@ -1178,11 +1178,22 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · Arabic direction in a conversation (11 October 2026)
+
+Branch `claude/messages-thread-direction` (D-533, Iris T1/T2). `dir="auto"` on the words people wrote and on names in a
+conversation, the pinned bar and the Messages list.
+
+## Messages & notifications · the thread header, small bar and scrolling info (11 October 2026)
+
+Branch `claude/messages-thread-header-back` (D-529). A conversation's header is the nested-page bar alone (`SubPageHeader variant="bar"`);
+who they are (photo, name, who, the visit card) scrolls with the messages, and the bar's name fades in when it has gone under the bar.
+
 ## Messages & notifications · the help request forward (11 October 2026)
 
 Branch `claude/messages-help-request-forward` (D-521, A28). Edge function `help-request`, off behind `HELP_REQUESTS_LIVE`;
 guarded (origin, honeypot, caps, rate limit in the database, migration 20261011041940). Contract: `docs/help-request-contract.md`.
-Nothing is sent until Will says "test it". Next: the text reply.
+Nothing is sent until Will says "test it". Text reply built off (D-524, migration 20261011042645, test 54, page `/reply/`): the
+forward of replies, the auto-answer and the form's phone field wait for Will (a61).
 
 ## Messages & notifications · alerts truth and two texts without the number (11 October 2026)
 
@@ -1456,6 +1467,14 @@ Branch `claude/pam-design-wrong-code-alert` (D-510). `CompactNotice` in `@pam/ui
 
 Branch `claude/pam-design-legal-back-to-site` (D-508). The website's Privacy and Terms links carry `?from=site&return=<path>`; the app's pages show "Back to the website" and go to `https://joinpam.org` + the path, only if it is a plain path on the site (no `//`, no scheme; otherwise Back to Legal as before). Tabs and the other-document link keep it. New string `nav.back.website` (six drafts for Lena). Tests: `siteReturn.test.ts`, `apps/site/test/legal-links.test.ts`, `e2e/legal-site.spec.ts`.
 
+## Design system & Storybook · Profile's hero card loads as skeletons (11 October)
+
+Branch `claude/pam-design-real-accounts-no-examples` (D-520). `ProfileSummary isLoading` and `ProfileStat.value: null`: the photo, name, role and stats are pulses the size of the real card (measured), on `/account/` while the account loads and on the numbers while they arrive; a failed call ends the pulse in a 0. CLS under 0.01 in `profile-skeleton.spec.ts`.
+
+## Design system & Storybook · a real account sees no examples on Profile, Points, Connections (11 October)
+
+Branch `claude/pam-design-real-accounts-no-examples` (D-518). The code landed on `main` first via D-511 (`lib/examples.ts`, `examplesOn()`) and Piper's gate; what is left is `e2e/no-examples-profile.spec.ts`, holding Profile, Points and Connections to it.
+
 ## Design system & Storybook · Contact Pam replaces Call Pam (11 October)
 
 Branch `claude/pam-design-contact-pam` (D-512, A28). `Notice` offers Contact Pam (a link to Help); `useSupportPhone` and all `supportPhone` props are gone; the Help screen's first row opens the website's help desk; Privacy's data pages end in Contact Pam. `place.call` is untouched. About 33 English strings still say "call Pam": for Sage and Lena.
@@ -1471,6 +1490,10 @@ Branch `claude/pam-design-dark-info-alert` (D-513). One token, `--astryx-theme-n
 ## Design system & Storybook · focus ring only on text boxes (11 October)
 
 Branch `claude/pam-design-focus-text-boxes` (D-523, replaces D-411's focus line). Script-focused `tabindex=-1` non-controls, dialogs and sheets show no ring in any input mode; text boxes keep their field highlight; buttons and links ring on Tab. `e2e/focus-text-boxes.spec.ts`.
+
+## Design system & Storybook · the sign-in code step has a way to a person (11 October)
+
+Branch `claude/pam-design-signin-code-contact` (D-527, Iris CP1). A quiet "Need help? Contact Pam" link under Send again, to `SITE_URL/support/cant-sign-in/`; outside the D-510 alert.
 
 ## Design system & Storybook · badge caption 12px (11 October) — on `main`
 
@@ -1633,6 +1656,8 @@ fine and the fit audit was over-counting (D-448).
 ## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, merged 9 October (PR #29)
 
 ## Website · public site and help centre (10 October) — `apps/site`, on `main`
+
+**New website, stage 1 (11 October, D-531; branch).** Home, header and footer rebuilt from Will's Figma on Dot's Website tokens (D-528): hero with a tappable, flipping, floating picture stack (Pause/Play, reduced-motion safe), the Philadelphia band, three feature rows with real Pam screens, Privacy/Support callouts, deep-green footer. Words in `content/home-copy.ts`; untrue or promise lines are held with true fallbacks (`HELD`). Stages 2–4 (Support, post template, About, Still stuck) follow.
 
 **A28 on the help site (11 October, D-522; branch).** No phone on the site: "Still stuck?" says to write to hello@joinpam.org (Sage's signed words), at the end of every post and under an empty search; the form waits for Nico's switch (off). New posts `cant-sign-in` and `your-safety` (`/support/your-safety/`, the app's "Your safety" opens it). A site test fails on "call Pam" and on any `tel:` but 911 and 988. Section labels from Sage drive the menu. Iris's findings S1, S2, W1–W6 done (`scripts/usability.mjs`: focus rings, 48px targets, `?q=`, skip link, Esc, layout shift). The "Still stuck?" form is built to Nico's contract and shows only when `help-request` answers (off: the address). Held: the blocked-conversation picture (the app still says "Call Pam" there), Sage's line for the saved-place text.
 
@@ -2091,15 +2116,15 @@ Branch `claude/places-programs-add-program-link` (D-496). Preview picture `publi
 
 Branch `claude/places-programs-lead-added-vs-gathered` (D-498). Migration `20261011002026`: `service_has_lead` / `places_with_leads` (a place has a lead when its organisation has an active provider account). A member planning a visit at a place with no lead is told the place is not told (English signed by Will on 11 October; the other six languages are Lena's drafts). A real lead with no program sees Add your program on Home and "Add your program first" on Policies and services, not the example. Test `52_which_places_have_a_program_lead_on_pam_test.sql`; e2e `places-without-a-lead.spec.ts`. Merged as f6a245d; the migration was **applied live** on 11 October as `a_place_says_whether_a_program_lead_on_pam_runs_it` (both functions match the file by md5, search path pinned, anon cannot run them, authenticated can; advisors: nothing new).
 
-## Places & programs · the pick-a-service line (11 October 2026) — READY, not merged
+## Places & programs · the pick-a-service line (11 October 2026) — on `main`
 
 Branch `claude/places-programs-pick-a-service-line` (Will's wording, 11 October). A place with services says "Pick a service above to plan a trip." under the greyed Plan a trip until one is picked (`place.schedule.pickService`). e2e `place-pick-a-service.spec.ts`.
 
-## Places & programs · Trips launch audit (11 October 2026) — READY, not merged
+## Places & programs · Trips launch audit (11 October 2026) — on `main`
 
 Branch `claude/places-programs-trips-launch` (D-509). A real account sees only its own trips: the example trips, visits and policies are for Storybook, a demo and `pam.examples` only (`lib/exampleMode.ts`). The drawn map is never drawn over a real account's empty Trips; trips whose pins would overprint are one "2 trips" pin; empty drawer: "No trips yet / Plan a visit and it shows here." e2e `trips-real-account.spec.ts`.
 
-## Places & programs · places, Explore and Saved without examples (11 October 2026) — READY, not merged (on top of the Trips launch audit)
+## Places & programs · places, Explore and Saved without examples (11 October 2026) — on `main`
 
 Branch `claude/places-programs-no-examples-places` (D-509 extended). The example services, policies, places, reports, people and program are for a demo or Storybook only; a lead's Book for a member and Add a person use their own program. e2e `no-examples-for-real-accounts.spec.ts`; the example-walking specs opt in with `pam.examples`.
 
@@ -2114,3 +2139,23 @@ Branch `claude/places-programs-attendance-b-checkin` (D-526). `check_in_visit` /
 ## Places & programs · attendance part C: missed visits (11 October 2026) — READY, not merged (on top of part B)
 
 Branch `claude/places-programs-attendance-c-missed` (D-526). `sweep_missed_visits()` (migration `20261011053445`), nightly 04:20 UTC: a scheduled visit at a program with a lead, 24 h after it ended, becomes missed; pays and takes nothing, no text. Test `58_the_nightly_sweep_marks_unmarked_visits_missed_test.sql`. Part D follows.
+
+## Places & programs · Add my program (11 October 2026) — on `main`
+
+Branch `claude/places-programs-add-my-program` (D-525). A member taps Add my program on Profile, answers the lead's questions, and the request goes to Pam's team (`request_staff_access`); being checked / not approved + ask again / approved (gains the provider role next to the member side, D-491). Migration `20261011044654`: no second ask while waiting or approved; a denied one reopens. Test `55_asking_again_to_add_a_program_test.sql`; e2e `add-my-program.spec.ts`.
+
+## Design system · Arabic code boxes fill from the left (11 October 2026) — on `main`
+
+The sign-in code's six boxes were filling from the right in Arabic (typed 1234 showed 4321); they and the hidden field are now left to right in every language, like the phone number (D-530, from Iris's research). E2E in Arabic covers typing and paste. Log: `docs/sessions/2026-10-11-1010-arabic-sign-in-code-boxes.md`.
+
+## Design system · website-only styles (11 October 2026) — on `main`
+
+The website has its own colours and type, apart from the app's (D-528). In Figma (Pam — Website): a `Website` variable collection (23 colours, Light and Dark) and 32 text styles `Website/<Group>/<Name>`, bound across all pages. In `apps/site`: `lib/website.stylex.ts`, `lib/website-type.stylex.ts` and a contrast test. `packages/ui` and the app are untouched. Light-mode limits: Text/Muted not on Gray/Green/Purple; Accent/Success for icons and strokes only. Log: `docs/sessions/2026-10-11-0933-website-styles-in-figma-and-site-tokens.md`.
+
+## Design system · b15 polish (11 October 2026) — on `main`
+
+Sign in on the code step is off until all six digits are in (D-532). The Support search placeholder contrast (Iris H2) was not reproduced: 5.65:1 in dark, 0 axe findings; the pairing is now in the site's contrast test. Log: `docs/sessions/` newest `b15-polish-h2-and-c1`.
+
+## Design system · names in headings keep their own direction (11 October 2026) — on `main`
+
+`@pam/ui/DataHeading` and `SubPageHeader isTitleData` mark a heading's text as data, so a Latin name on an Arabic page (and the reverse) reads in its own direction while Pam's own headings follow the page (D-534). On place pages, profile cards, staff person rows and the conversation bar. Log: `docs/sessions/` newest `data-headings-keep`.

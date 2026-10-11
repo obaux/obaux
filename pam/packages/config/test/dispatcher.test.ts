@@ -39,6 +39,7 @@ const VARS: Record<string, string> = {
   time: '10:00 AM',
   address: '1234 Market St',
   supportPhone: '555-555-0134',
+  reply: 'We can help.',
   reason: 'closed, so there is no need to go',
 };
 
@@ -47,8 +48,8 @@ const VARS: Record<string, string> = {
  * bundle on purpose — the dispatcher refuses them, which is the point — and
  * these tests hold them to exactly that. `sms.test.ts` keeps the list honest.
  */
-const AWAITING_SIGNATURE = [];
-// (Empty since Will approved the four Text alerts texts on 10 October 2026; kept so a template may be added unsigned on purpose.)
+// The two support texts (D-524) are in the bundle unsigned on purpose: the dispatcher refuses them until Will signs.
+const AWAITING_SIGNATURE = ['support_reply', 'reply_no_read'];
 const signedKeys = (templates: Record<string, unknown>) => Object.keys(templates).filter((k) => !AWAITING_SIGNATURE.includes(k));
 
 describe('the shipped bundle', () => {
@@ -103,7 +104,7 @@ describe('the shipped bundle', () => {
 });
 
 describe('rendering a reviewed message', () => {
-  it.each(Object.keys(REVIEWED.templates))('%s renders in both languages inside the limit', (key) => {
+  it.each(signedKeys(REVIEWED.templates))('%s renders in both languages inside the limit', (key) => {
     for (const locale of ['en', 'es'] as const) {
       const body = render(REVIEWED, key, locale, VARS);
       expect(body.startsWith('Pam: ')).toBe(true);
@@ -192,9 +193,9 @@ describe('a language is used while it carries an approval, and English when it d
     }
     // 53, plus the three appointment reminders in the four scripts (D-431) = 65,
     // plus the four Text alerts texts in all five later languages (10 October) = 85,
-    // less the two account texts that no longer carry a phone number (A28, 11 October): their five
-    // later-language wordings are Lena's to write, and until then those people get English = 75.
-    expect(inTheirLanguage).toBe(75);
+    // The two account texts that no longer carry a phone number (A28, 11 October) lost their five
+    // later-language wordings for a while (75); Lena wrote them again, without the number = 85.
+    expect(inTheirLanguage).toBe(85);
   });
 
   it('writes every one in English once the approvals are emptied, for every template', () => {
@@ -259,10 +260,11 @@ describe('the dispatcher and the config package say the same words', () => {
       time: '10:00 AM',
       address: '18200 Northwest Martin Luther King Junior Memorial Boulevard',
       supportPhone: '+12673095265',
+      reply: 'We can help.',
     };
   };
 
-  it.each(Object.keys(SIGNED.templates))('%s', (key) => {
+  it.each(signedKeys(SIGNED.templates))('%s', (key) => {
     for (const locale of SUPPORTED_LOCALES) {
       const template = SIGNED.templates[key]!;
       const has = locale === 'en' || locale === 'es' || template.more?.[locale];

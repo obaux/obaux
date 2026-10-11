@@ -67,9 +67,9 @@ test.describe('a code that did not work', () => {
     await expect(field).toHaveValue('');
     await expect(field).toBeFocused();
 
-    // The way on is the field and the link that is already there; nobody is asked to call.
-    await expect(page.getByRole('button', { name: en['help.callSupport'] })).toHaveCount(0);
-    await expect(page.getByRole('link', { name: en['help.callSupport'] })).toHaveCount(0);
+    // The way on is the field and Send again; there is no big Contact Pam button here, and nobody is asked to
+    // call (the quiet "Need help? Contact Pam" link is its own test below).
+    await expect(page.getByRole('button', { name: /Contact Pam|Call/ })).toHaveCount(0);
     await expect(page.locator('a[href^="tel:"]')).toHaveCount(0);
     await expect(page.getByText(en['signin.failed.send.title'])).toHaveCount(0);
     await expect(page.getByRole('button', { name: new RegExp(en['signin.code.again']) })).toBeVisible();
@@ -93,6 +93,20 @@ test.describe('a code that did not work', () => {
     await expect(page).not.toHaveURL(/\/signin\//);
   });
 
+  test('Sign in waits for all six digits (D-532): a short code is never sent to be called wrong', async ({ page }) => {
+    const attempts = await toTheCodeStep(page, '654321');
+    const field = page.getByLabel(en['signin.code.label']);
+    const signIn = page.getByRole('button', { name: en['signin.code.action'] });
+    await expect(signIn).toBeDisabled();
+    await field.pressSequentially('1');
+    await expect(signIn).toBeDisabled();
+    await field.pressSequentially('2345');
+    await expect(signIn).toBeDisabled();
+    expect(attempts()).toBe(0);
+    await field.pressSequentially('6');
+    await expect.poll(attempts).toBe(1);
+  });
+
   test('the alert goes as soon as they start typing', async ({ page }) => {
     await toTheCodeStep(page, '654321');
     const field = page.getByLabel(en['signin.code.label']);
@@ -112,4 +126,24 @@ test.describe('a code that did not work', () => {
       .analyze();
     expect(results.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
   });
+
+  test('there is a way to a person on the code step: Need help? Contact Pam, to the help desk post (A26, A28)', async ({ page }) => {
+    await toTheCodeStep(page, '654321');
+    const field = page.getByLabel(en['signin.code.label']);
+    await field.fill('123456');
+    await expect(page.getByRole('alert').filter({ hasText: en['signin.code.wrong'] })).toBeVisible();
+
+    // Under Send again, outside the alert, and nothing to call.
+    const help = page.getByRole('link', { name: en['help.needHelp'] });
+    await expect(help).toBeVisible();
+    await expect(help).toHaveAttribute('href', 'https://joinpam.org/support/cant-sign-in/');
+    await expect(page.getByRole('alert').getByRole('link')).toHaveCount(0);
+    await expect(page.locator('a[href^="tel:"]')).toHaveCount(0);
+    const again = (await page.getByRole('button', { name: new RegExp(en['signin.code.again']) }).boundingBox())!;
+    const box = (await help.boundingBox())!;
+    expect(box.y).toBeGreaterThan(again.y);
+    // A finger can hit it (§2.5).
+    expect(box.height).toBeGreaterThanOrEqual(44);
+  });
 });
+
