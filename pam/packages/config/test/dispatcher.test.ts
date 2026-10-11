@@ -192,9 +192,9 @@ describe('a language is used while it carries an approval, and English when it d
     }
     // 53, plus the three appointment reminders in the four scripts (D-431) = 65,
     // plus the four Text alerts texts in all five later languages (10 October) = 85,
-    // less the two account texts that no longer carry a phone number (A28, 11 October): their five
-    // later-language wordings are Lena's to write, and until then those people get English = 75.
-    expect(inTheirLanguage).toBe(75);
+    // The two account texts that no longer carry a phone number (A28, 11 October) lost their five
+    // later-language wordings for a while (75); Lena wrote them again, without the number = 85.
+    expect(inTheirLanguage).toBe(85);
   });
 
   it('writes every one in English once the approvals are emptied, for every template', () => {

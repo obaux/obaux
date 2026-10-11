@@ -346,7 +346,29 @@
     "staff_request_denied": {
       "key": "staff_request_denied",
       "en": "Pam: Your request was not approved. Questions? Visit joinpam.org/support",
-      "es": "Pam: Your request was not approved. Questions? Visit joinpam.org/support",
+      "es": "Pam: Su solicitud no fue aprobada. Preguntas? Visite joinpam.org/support",
+      "more": {
+        "pt-BR": {
+          "body": "Pam: Seu pedido nao foi aprovado. Duvidas? Acesse joinpam.org/support",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "zh-CN": {
+          "body": "Pam: 您的申请未获批准。有疑问请访问 joinpam.org/support",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "zh-HK": {
+          "body": "Pam: 你的申請未獲批准。如有疑問請瀏覽 joinpam.org/support",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "ru": {
+          "body": "Pam: Заявку не одобрили. Вопросы? Зайдите на joinpam.org/support",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "ar": {
+          "body": "Pam: لم تتم الموافقة على طلبك. للاستفسار: joinpam.org/support",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        }
+      },
       "vars": [],
       "reviewedBy": "Will (Oba), 17 September 2026",
       "isFirstContact": false
@@ -539,7 +561,29 @@
     "access_limited_notice": {
       "key": "access_limited_notice",
       "en": "Pam: Some parts of Pam are turned off for now. Questions? Visit joinpam.org/support",
-      "es": "Pam: Some parts of Pam are turned off for now. Questions? Visit joinpam.org/support",
+      "es": "Pam: Algunas partes de Pam estan apagadas por ahora. Preguntas? Visite joinpam.org/support",
+      "more": {
+        "pt-BR": {
+          "body": "Pam: Algumas partes de Pam estao desligadas por enquanto. Duvidas? Acesse joinpam.org/support",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "zh-CN": {
+          "body": "Pam: Pam 的部分功能暂时关闭。有疑问请访问 joinpam.org/support",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "zh-HK": {
+          "body": "Pam: Pam 部分功能暫時關閉。如有疑問請瀏覽 joinpam.org/support",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "ru": {
+          "body": "Pam: Часть функций пока отключена. Вопросы: joinpam.org/support",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "ar": {
+          "body": "Pam: بعض ميزات Pam متوقفة الآن. للاستفسار: joinpam.org/support",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        }
+      },
       "vars": [],
       "reviewedBy": "Will (Oba), 13 September 2026",
       "isFirstContact": false
