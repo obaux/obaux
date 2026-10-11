@@ -121,6 +121,14 @@ export interface OnboardingSlidesProps {
    * corners, shorter, and the words in the middle of the picture.
    */
   readonly variant?: 'hero' | 'inline';
+  /**
+   * Draw each slide's line over its picture (default). `false` (About Pam,
+   * Will 10 October: "only tab and image — it's redundant text"): the
+   * picture stands alone, with no wash over it, and the line moves to the
+   * slide's accessible name, so nobody loses a word that a screen reader
+   * reads. Pass the line through `tPlain` then — it is a name, not drawn text.
+   */
+  readonly showLines?: boolean;
 }
 
 const styles = stylex.create({
@@ -251,7 +259,9 @@ const styles = stylex.create({
  * this still matches what was asked for than to prove two or three separate
  * declarations still compose to it.
  */
-function heroBackground(image: string, scrim = 0, isInline = false): string {
+function heroBackground(image: string, scrim = 0, isInline = false, hasLine = true): string {
+  // Inline with no words on it (About Pam): the picture as it is, no wash.
+  if (isInline && !hasLine) return `url(${image}) lightgray 50% / cover no-repeat`;
   // Inline, the words sit in the middle, so the wash is even rather than a
   // gradient to the foot (D-259).
   if (isInline) {
@@ -289,7 +299,7 @@ const AUTOPLAY_MS = 6000;
 // smoothly-eased scroll rather than a hard jump.
 const SCROLL_EASE_MS = 600;
 
-export function OnboardingSlides({ slides, label, header, variant = 'hero' }: OnboardingSlidesProps) {
+export function OnboardingSlides({ slides, label, header, variant = 'hero', showLines = true }: OnboardingSlidesProps) {
   const isInline = variant === 'inline';
   const region = useRef<HTMLElement>(null);
   const carousel = useRef<CarouselHandle>(null);
@@ -411,7 +421,16 @@ export function OnboardingSlides({ slides, label, header, variant = 'hero' }: On
         xstyle={[styles.track, isInline && styles.trackInline]}
       >
         {slides.map((slide, index) => (
-          <div key={slide.id} data-slide={index} {...stylex.props(styles.slide, isInline && styles.slideInline)}>
+          <div
+            key={slide.id}
+            data-slide={index}
+            // With the line not drawn, the picture is the slide, and the line
+            // is its name; drawn, the line is the slide and the picture is
+            // decoration (below).
+            role={showLines ? undefined : 'img'}
+            aria-label={showLines ? undefined : slide.text}
+            {...stylex.props(styles.slide, isInline && styles.slideInline)}
+          >
             {/*
               `aria-hidden` here, not `alt=""` on an `<img>`: the artwork is a
               CSS background precisely so the dynamic per-slide URL never has
@@ -423,12 +442,12 @@ export function OnboardingSlides({ slides, label, header, variant = 'hero' }: On
               <div
                 aria-hidden="true"
                 {...stylex.props(styles.art)}
-                style={{ background: heroBackground(slide.image, slide.scrim, isInline) }}
+                style={{ background: heroBackground(slide.image, slide.scrim, isInline, showLines) }}
               />
             ) : (
               <Skeleton width="100%" height="100%" radius="none" xstyle={styles.skeleton} />
             )}
-            <Text xstyle={[styles.line, isInline && styles.lineInline]}>{slide.text}</Text>
+            {showLines ? <Text xstyle={[styles.line, isInline && styles.lineInline]}>{slide.text}</Text> : null}
           </div>
         ))}
       </Carousel>

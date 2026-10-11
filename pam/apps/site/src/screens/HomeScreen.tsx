@@ -6,6 +6,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Button } from '@pam/ui/Button';
+import { OnboardingSlides } from '@pam/ui/OnboardingSlides';
 import { SecondaryButton } from '../components/SecondaryButton';
 import { Frame } from '../components/Frame';
 import { ABOUT, ABOUT_ART, ABOUT_ON_HOME, aboutPath } from '../content/about';
@@ -14,7 +15,17 @@ import { ReadMore } from '../components/Prose';
 import { SIGN_IN_URL } from '../lib/links';
 
 const styles = stylex.create({
-  hero: { paddingBlock: '48px 16px' },
+  // The headline and the picture carousel side by side from 900px, stacked
+  // (words first) below it (Will, 10 October: "bring that carousel to the right
+  // of header text on hero"). `minmax(0, 1fr)` so a wide picture can never push
+  // a column past the screen.
+  hero: {
+    display: 'grid',
+    alignItems: 'center',
+    gap: '32px',
+    paddingBlock: '48px 16px',
+    gridTemplateColumns: { default: 'minmax(0, 1fr)', '@media (min-width: 900px)': 'minmax(0, 1fr) minmax(0, 1fr)' },
+  },
   title: { maxWidth: '18ch' },
   lede: { maxWidth: '56ch' },
   actions: { flexWrap: 'wrap' },
@@ -66,19 +77,29 @@ const WHO = [
 export function HomeScreen({ showAbout = ABOUT_ON_HOME }: { readonly showAbout?: boolean }) {
   return (
     <Frame gap={10}>
-      <VStack gap={4} xstyle={styles.hero}>
-        <Heading level={1} type="display-2" xstyle={styles.title}>
-          Pam helps you find people and places that can help.
-        </Heading>
-        <Text type="large" color="secondary" xstyle={styles.lede}>
-          Pam connects people coming home with the programs, mentors and case managers who can help:
-          learning, earning and family support, in one app.
-        </Text>
-        <HStack gap={3} xstyle={styles.actions}>
-          <Button label="Sign in" variant="primary" size="lg" href={SIGN_IN_URL} />
-          <SecondaryButton label="How Pam works" size="lg" href="/support/" />
-        </HStack>
-      </VStack>
+      <div {...stylex.props(styles.hero)}>
+        <VStack gap={4}>
+          <Heading level={1} type="display-2" xstyle={styles.title}>
+            Pam helps you find people and places that can help.
+          </Heading>
+          <Text type="large" color="secondary" xstyle={styles.lede}>
+            Pam connects people coming home with the programs, mentors and case managers who can help:
+            learning, earning and family support, in one app.
+          </Text>
+          <HStack gap={3} xstyle={styles.actions}>
+            <Button label="Sign in" variant="primary" size="lg" href={SIGN_IN_URL} />
+            <SecondaryButton label="How Pam works" size="lg" href="/support/" />
+          </HStack>
+        </VStack>
+        {/* The app's own About Pam carousel: three pictures, no words on them. Each picture is named by the
+            same line the cards below show, so a screen reader loses nothing. */}
+        <OnboardingSlides
+          slides={HOW.map((item, i) => ({ id: `hero-${i + 1}`, image: item.image, text: `${item.title}. ${item.body}` }))}
+          label="Pam in pictures"
+          variant="inline"
+          showLines={false}
+        />
+      </div>
 
       <VStack gap={4}>
         <Heading level={2}>How Pam helps</Heading>
