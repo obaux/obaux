@@ -38,6 +38,34 @@ export const SupportSearch: Story = {
 };
 
 /**
+ * Support search with a person's own words (D-506): a sentence about what happened, not a keyword. The small words are
+ * dropped and the best post comes first.
+ */
+export const SupportSearchOwnWords: Story = {
+  render: () => <WebsiteWalker start="/support/" />,
+  play: async ({ canvasElement }) => {
+    const box = await within(canvasElement).findByRole('textbox', { name: 'Search Support' });
+    await userEvent.type(box, 'why did my text not come');
+    await expect(await within(canvasElement).findByText(/results? for/)).toBeInTheDocument();
+  },
+};
+
+/**
+ * Support search that finds nothing: it says so plainly, keeps the topics, and keeps the way to a person ("Still stuck?",
+ * the same words as Pam's Help screen). Never a dead end (A26).
+ */
+export const SupportSearchNothingFound: Story = {
+  render: () => <WebsiteWalker start="/support/" />,
+  play: async ({ canvasElement }) => {
+    const box = await within(canvasElement).findByRole('textbox', { name: 'Search Support' });
+    await userEvent.type(box, 'zzzz');
+    await expect(await within(canvasElement).findByText(/Nothing matched/)).toBeInTheDocument();
+    await expect(await within(canvasElement).findByText('Still stuck?')).toBeInTheDocument();
+    await expect(await within(canvasElement).findByText('Browse by topic')).toBeInTheDocument();
+  },
+};
+
+/**
  * A support post. One story for all of them: choose which in the controls.
  * **Drafts are here too**, with a banner, so they can be reviewed before they
  * are published; the site itself never builds them.
