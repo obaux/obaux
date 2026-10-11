@@ -2071,3 +2071,7 @@ Branch `claude/places-programs-trips-launch` (D-509). A real account sees only i
 ## Places & programs · places, Explore and Saved without examples (11 October 2026) — READY, not merged (on top of the Trips launch audit)
 
 Branch `claude/places-programs-no-examples-places` (D-509 extended). The example services, policies, places, reports, people and program are for a demo or Storybook only; a lead's Book for a member and Add a person use their own program. e2e `no-examples-for-real-accounts.spec.ts`; the example-walking specs opt in with `pam.examples`.
+
+## Places & programs · Add my program (11 October 2026) — READY, not merged
+
+Branch `claude/places-programs-add-my-program` (D-525). A member taps Add my program on Profile, answers the lead's questions, and the request goes to Pam's team (`request_staff_access`); being checked / not approved + ask again / approved (gains the provider role next to the member side, D-491). Migration `20261011044654`: no second ask while waiting or approved; a denied one reopens. Test `55_asking_again_to_add_a_program_test.sql`; e2e `add-my-program.spec.ts`.

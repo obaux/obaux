@@ -58,6 +58,11 @@ export interface ProfileViewProps {
    * which opens its own page. Never shown to a single-role account.
    */
   readonly canUseAs?: boolean;
+  /**
+   * A member who has no program (D-525): the "Add my program" row, which opens the questions, and,
+   * once they are sent, where the request stands. Null for everybody else.
+   */
+  readonly addProgram?: { readonly status: 'none' | 'waiting' | 'denied' } | null;
   /** This account's photo (D-345). */
   readonly photoUrl?: string | null;
   /** Staff only: a photo was picked from the camera button. */
@@ -80,6 +85,7 @@ export function ProfileView({
   onSignOut,
   canViewAs = false,
   canUseAs = false,
+  addProgram = null,
   photoUrl = null,
   onPhotoPick,
   isPhotoBusy = false,
@@ -226,6 +232,19 @@ export function ProfileView({
                     value: t(role === 'provider' ? 'useAs.provider' : 'useAs.member'),
                     href: '/use-as/',
                     icon: <PeopleIcon {...ICON} />,
+                  },
+                ]
+              : []),
+            ...(addProgram
+              ? [
+                  {
+                    id: 'add-program',
+                    label: t('profile.menu.addProgram'),
+                    ...(addProgram.status === 'none'
+                      ? {}
+                      : { value: t(addProgram.status === 'waiting' ? 'addProgram.ask.waiting.title' : 'addProgram.ask.denied.title') }),
+                    href: '/profile/add-program/',
+                    icon: <PlacesIcon {...ICON} />,
                   },
                 ]
               : []),
