@@ -1580,5 +1580,13 @@
   "copy.done": "Copied",
   "copy.failed": "Could not copy. Press and hold the text to copy it.",
   "carousel.pause": "Pause",
-  "carousel.play": "Play"
+  "carousel.play": "Play",
+  "supportReply.title": "Answer by text",
+  "supportReply.to": "To {phone}",
+  "supportReply.label": "Your answer",
+  "supportReply.count": "{used} of {max}",
+  "supportReply.send": "Send text",
+  "supportReply.sent": "Queued. It goes out within five minutes.",
+  "supportReply.noNumber": "No number to text.",
+  "supportReply.failed": "It did not go. Try again."
 }

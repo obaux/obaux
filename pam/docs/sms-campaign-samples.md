@@ -116,7 +116,7 @@ to the reminders screen below (D-139, 17 September) — sign-in codes are not
 optional the way reminders are, so the room to be honest about STOP, HELP and
 rates belongs on the screen where a member is actually choosing something.
 
-> End users opt in inside the Pam app, on a screen dedicated to that choice, and nothing is pre-selected. A person is invited by a staff member and enters their own mobile number on the sign-in screen to request a one-time code; Pam has no passwords, so requesting the code is the request to be texted it. After signing in, the person is shown a "Text reminders" screen listing what would be sent (for a member: a reminder before a planned visit and a note if a saved place closes or moves), saying plainly which of them Pam sends today, and that STOP stops them permanently, HELP reaches a person, and rates may apply. Consent is a button labelled "Agree to receive texts": pressing it is the affirmative act, and the words agreed to are on the control itself. There is no checkbox, so nothing can arrive pre-selected. A "Not now" button records the decline, and Pam works either way, so consent is never required to use Pam. Numbers are never bought, rented, or entered by staff for anyone.
+> End users opt in inside the Pam app, on a screen dedicated to that choice, and nothing is pre-selected. A person is invited by a staff member and enters their own mobile number on the sign-in screen to request a one-time code; Pam has no passwords, so requesting the code is the request to be texted it. After signing in, the person is shown a "Text reminders" screen listing what would be sent (for a member: a reminder before a planned visit and a note if a saved place closes or moves), saying plainly which of them Pam sends today, and that STOP stops them permanently, HELP reaches a person, and rates may apply. Consent is a button labelled "Agree to receive texts": pressing it is the affirmative act, and the words agreed to are on the control itself. There is no checkbox, so nothing can arrive pre-selected. A "Not now" button records the decline, and Pam works either way, so consent is never required to use Pam. Numbers are never bought, rented, or entered by staff for anyone. *(Pending Will's answer on card a61: a person asking for help on joinpam.org may also type their own mobile number into the help form to ask for an answer by text. Pam sends that one answer to that number, once, with STOP and HELP, and nothing else.)*
 
 Attach the **Text reminders** screenshot, not the sign-in one. The reviewer is
 checking that the box is really unticked and that the wording quoted here is
@@ -124,7 +124,7 @@ really on that screen.
 
 ## The campaign description, to paste as written
 
-The field caps at **1024 characters**. What follows is 981, so it fits with a
+The field caps at **1024 characters**. What follows is 1015, so it fits with a
 little room — if you edit it, count before you paste. Every message type a person
 can receive is named on purpose: reviewers compare the description against the
 samples and, later, against real traffic, and a description narrower than what
@@ -132,7 +132,7 @@ actually sends is how an approved campaign gets suspended.
 
 > Pam is an app by Oba that connects people to community programs, services and the staff who support them. People get messages only after entering their own phone number on Pam's sign-in screen, which says Pam will text them and how to stop.
 >
-> Messages are account notifications and appointment reminders, at low volume. First comes a one-time sign-in code. After that a person who agreed may receive a reminder the day before an appointment they scheduled in the app, a notice when a saved place has closed or moved, and a notice that a message is waiting; staff may receive a decision on their request, or a notice of a visit booked, changed or planned.
+> Messages are account notifications and appointment reminders, at low volume. First comes a one-time sign-in code. After that a person who agreed may receive a reminder the day before an appointment they scheduled in the app, a notice when a saved place has closed or moved, and a notice that a message is waiting, and one answer to a help request; staff may receive a decision on their request, or a notice of a visit booked, changed or planned.
 >
 > Nothing is promotional or third-party, and numbers are never sold or shared. Every message names Pam. Languages: English, Spanish, Portuguese, Chinese, Russian, Arabic. A message is one segment, except appointment reminders in Chinese, Russian and Arabic: two. STOP ends all messages permanently; HELP returns support contact.
 
@@ -216,6 +216,14 @@ changes with it. The templates stay in `sms-templates.ts`.
 > Pam: Someone on your list planned a visit. Open Pam to see it: {link}
 >
 > _Spanish:_ Pam: Alguien de su lista planeo una visita. Abra Pam para verla: {link}
+
+**10. An answer to a help request (built off, D-524; a person types their number into the help form and asks for a text back; sent only when texts are on, once, and signed by Will)**
+
+> Pam: {reply} Reply STOP to stop texts.
+>
+> _The answer is a short sentence a person at Pam writes, 120 characters at most, e.g._ Pam: We can help. Write to hello@joinpam.org. Reply STOP to stop texts.
+
+The fixed answer to anyone who texts Pam back (D-524, unsigned, not sent until Will decides): *Pam: This number can't read replies. Write to hello@joinpam.org.*
 
 6–9 are the texts behind the **Text alerts** switches (Will, 10 October 2026). They say that
 something happened, never what or to whom: no name, no place, no day. Will approved them on

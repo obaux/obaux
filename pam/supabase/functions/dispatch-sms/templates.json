@@ -587,6 +587,27 @@
       "vars": [],
       "reviewedBy": "Will (Oba), 13 September 2026",
       "isFirstContact": false
+    },
+    "support_reply": {
+      "key": "support_reply",
+      "en": "Pam: {reply}",
+      "es": "Pam: {reply}",
+      "vars": [
+        "reply"
+      ],
+      "maxVarLengths": {
+        "reply": 120
+      },
+      "reviewedBy": "",
+      "isFirstContact": true
+    },
+    "reply_no_read": {
+      "key": "reply_no_read",
+      "en": "Pam: This number can't read replies. Write to hello@joinpam.org.",
+      "es": "Pam: Este numero no puede leer respuestas. Escriba a hello@joinpam.org.",
+      "vars": [],
+      "reviewedBy": "",
+      "isFirstContact": false
     }
   },
   "reasons": {
