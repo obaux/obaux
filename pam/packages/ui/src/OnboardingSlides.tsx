@@ -249,25 +249,36 @@ const styles = stylex.create({
     transitionDuration: '150ms',
   },
   here: { opacity: 1, width: '20px', borderRadius: '4px' },
-  // The pause/play button (D-501): a dark round button with a lighter rim and a white mark, the
-  // photo viewer's own (D-401), 48px so it is a full touch target. Top corner, away from the words
-  // (bottom) and the locale switcher (top, other side); the corner follows the reading direction.
+  // The pause/play button (D-501; made quiet at Will's word, 11 October: "subtle and tucked neatly
+  // in a corner"). The tap target stays the full 48px (`--pam-touch-target-min`); what is drawn is a
+  // 32px translucent disc with a hairline rim and a small white mark, readable over a light or a dark
+  // picture and over neither's detail. Top corner on the start side, 16px in from the edge to
+  // match the page gutter, away from the words (bottom) and the locale switcher (other side).
   control: {
     position: 'absolute',
-    insetInlineStart: '16px',
-    top: 'calc(24px + env(safe-area-inset-top, 0px))',
+    insetInlineStart: '8px',
+    top: 'calc(20px + env(safe-area-inset-top, 0px))',
     zIndex: 2,
     width: pam['--pam-touch-target-min'],
     height: pam['--pam-touch-target-min'],
     minWidth: pam['--pam-touch-target-min'],
     borderRadius: '50%',
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: pam['--pam-viewer-control-rim'],
-    backgroundColor: pam['--pam-viewer-control'],
     color: '#FFFFFF',
   },
-  controlInline: { top: '8px', insetInlineStart: '8px' },
+  disc: {
+    width: '32px',
+    height: '32px',
+    minWidth: '32px',
+    flexShrink: 0,
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    boxShadow: 'inset 0 0 0 1px rgba(255, 255, 255, 0.4)',
+    backdropFilter: 'blur(4px)',
+  },
+  controlInline: { top: '4px', insetInlineStart: '4px' },
   // The inline frame (D-259): in line with the page, rounded, words centred.
   regionInline: { width: '100%', marginInline: 0 },
   trackInline: { borderRadius: '28px' },
@@ -500,18 +511,22 @@ export function OnboardingSlides({ slides, label, header, variant = 'hero', show
       {!reducedMotion && slides.length > 1 ? (
         <IconButton
           label={paused ? playLabel : pauseLabel}
+          variant="ghost"
           onClick={() => setPaused((p) => !p)}
           icon={
-            paused ? (
-              <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z" fill="currentColor" />
-              </svg>
-            ) : (
-              <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <rect x="6" y="4" width="4.5" height="16" rx="1.2" fill="currentColor" />
-                <rect x="13.5" y="4" width="4.5" height="16" rx="1.2" fill="currentColor" />
-              </svg>
-            )
+            // The tap target is the full 48px; what is drawn is a small quiet disc inside it.
+            <span aria-hidden="true" {...stylex.props(styles.disc)}>
+              {paused ? (
+                <svg width="14" height="14" viewBox="0 0 24 24" focusable="false">
+                  <path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z" fill="currentColor" />
+                </svg>
+              ) : (
+                <svg width="14" height="14" viewBox="0 0 24 24" focusable="false">
+                  <rect x="6" y="4" width="4.5" height="16" rx="1.2" fill="currentColor" />
+                  <rect x="13.5" y="4" width="4.5" height="16" rx="1.2" fill="currentColor" />
+                </svg>
+              )}
+            </span>
           }
           xstyle={[styles.control, isInline && styles.controlInline]}
         />
