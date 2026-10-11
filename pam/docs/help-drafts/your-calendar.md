@@ -28,6 +28,7 @@ they arrive.
 ## Check someone in
 - When someone arrives, tap the circle beside their name. (`home.calendar.preview.intro`)
 - Tapped the wrong one? Tap it again and choose "Undo check-in". (`schedule.checkin.undo.*`)
+- For now, a check-in stays on the phone or computer you tapped it on. It is not shared with anyone else yet.
 
 ## Nobody on a day?
 - "Nobody is booked" means no one has a time with you that day. (`schedule.none.*`)
@@ -35,6 +36,5 @@ they arrive.
 ---
 
 **Check before it ships:**
-- Check-ins are kept on the device you tapped them on for now: nothing saves them to Pam yet (`checkIns.ts`). The
-  post doesn't promise more than the tap, so it stays true, but it should not say a case manager sees the check-in
-  (see the attendance FINDING).
+- "A check-in stays on the phone or computer you tapped it on" is true today: nothing saves check-ins to Pam yet
+  (`checkIns.ts`). Take the line out the day check-ins are saved. See the attendance FINDING.
