@@ -1579,6 +1579,6 @@
   "supportReply.count": "{used} de {max}",
   "supportReply.send": "Enviar texto",
   "supportReply.sent": "Na fila. Sai em até cinco minutos.",
-  "supportReply.noNumber": "Não há número para enviar.",
-  "supportReply.failed": "Não foi. Tente de novo."
+  "supportReply.noNumber": "Não há número para enviar o texto.",
+  "supportReply.failed": "Não foi enviado. Tente de novo."
 }

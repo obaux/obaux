@@ -1579,6 +1579,6 @@
   "supportReply.count": "已用 {used} / {max}",
   "supportReply.send": "发送短信",
   "supportReply.sent": "已排队，五分钟内发出。",
-  "supportReply.noNumber": "没有可发送的号码。",
+  "supportReply.noNumber": "没有可发短信的号码。",
   "supportReply.failed": "没有发出。请重试。"
 }

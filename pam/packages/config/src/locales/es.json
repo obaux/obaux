@@ -1578,7 +1578,7 @@
   "supportReply.label": "Su respuesta",
   "supportReply.count": "{used} de {max}",
   "supportReply.send": "Enviar texto",
-  "supportReply.sent": "En cola. Sale en cinco minutos.",
-  "supportReply.noNumber": "No hay número al que escribir.",
+  "supportReply.sent": "En cola. Sale en un máximo de cinco minutos.",
+  "supportReply.noNumber": "No hay número al que enviar el texto.",
   "supportReply.failed": "No salió. Inténtelo de nuevo."
 }

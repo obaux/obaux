@@ -1657,12 +1657,12 @@
   "copy.failed": "Не удалось скопировать. Нажмите на текст и удерживайте, чтобы скопировать.",
   "carousel.pause": "Приостановить",
   "carousel.play": "Воспроизвести",
-  "supportReply.title": "Ответить сообщением",
+  "supportReply.title": "Ответить по SMS",
   "supportReply.to": "Кому: {phone}",
   "supportReply.label": "Ваш ответ",
   "supportReply.count": "{used} из {max}",
-  "supportReply.send": "Отправить сообщение",
+  "supportReply.send": "Отправить SMS",
   "supportReply.sent": "В очереди. Уйдёт в течение пяти минут.",
-  "supportReply.noNumber": "Нет номера для сообщения.",
-  "supportReply.failed": "Не ушло. Попробуйте ещё раз."
+  "supportReply.noNumber": "Нет номера для SMS.",
+  "supportReply.failed": "Не отправлено. Попробуйте ещё раз."
 }
