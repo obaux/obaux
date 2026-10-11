@@ -1413,6 +1413,10 @@ recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or 
 connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
+## Design system & Storybook · legal pages go Back to the website (11 October)
+
+Branch `claude/pam-design-legal-back-to-site` (D-508). The website's Privacy and Terms links carry `?from=site&return=<path>`; the app's pages show "Back to the website" and go to `https://joinpam.org` + the path, only if it is a plain path on the site (no `//`, no scheme; otherwise Back to Legal as before). Tabs and the other-document link keep it. New string `nav.back.website` (six drafts for Lena). Tests: `siteReturn.test.ts`, `apps/site/test/legal-links.test.ts`, `e2e/legal-site.spec.ts`.
+
 ## Design system & Storybook · badge caption 12px (11 October) — on `main`
 
 Merged from `claude/pam-design-badge-caption` (3472970). The "Your badge" caption on the Profile badge tile is 12px, not 11px, following A27 (nothing under
