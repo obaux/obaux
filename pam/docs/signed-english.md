@@ -18,7 +18,7 @@ sentence.
 | Key or place | English, as signed | Signed | Note |
 |---|---|---|---|
 | `nav.back.website` | Back to the website | Sage, 2026-10-11 04:00 | D-508. Matches every other "Back to …" label. |
-| `signin.code.wrong` | **That code did not work. Check it, or tap Send it again.** | Sage, 2026-10-11 04:00 | D-510. **Changed** from "That code did not work. Try again.": the notice also shows for an expired code, and trying an expired code again goes nowhere. "Send it again" is the button's own name (`signin.code.resend`). For Lena: one changed key, six translations. |
+| `signin.code.wrong` | **That code did not work. Check it, or tap Send again.** | Sage, 2026-10-11 04:02 | D-510. **Changed** from "That code did not work. Try again.": the notice also shows for an expired code, and trying an expired code again goes nowhere. "Send again" is the button under the code boxes (`signin.code.again`, `PhoneSignInCard.tsx`; Mira caught that the first draft named `signin.code.resend`, which this screen does not show). For Lena: one changed key, six translations, each using its own `signin.code.again`. |
 | `trips.empty.body` | Plan a visit and it shows here. | Sage, 2026-10-11 04:00 | D-509. An empty state: what will appear, and how to fill it. |
 | `places.saved` (Dot's "Saved" tip) | Saved | — | Nothing new: an existing, signed string reused. |
 | `trips.map.many` | {count} trips | Sage, 2026-10-11 04:00 | Piper. "Trips" is the app's word (the tab, `glossary.trip.*`). Only for two or more; Lena gives Russian and Arabic their plural forms. |
