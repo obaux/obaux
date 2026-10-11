@@ -638,7 +638,7 @@
   "signin.code.label": "O código que enviamos por mensagem",
   "signin.code.resend": "Enviar de novo",
   "signin.code.resendIn": "Enviar de novo em {seconds}s",
-  "signin.code.wrong": "Esse código não funcionou. Tente de novo.",
+  "signin.code.wrong": "Esse código não funcionou. Confira o código ou toque em Enviar de novo.",
   "signin.code.title": "Digite o seu código",
   "signin.code.sent": "Enviado para {phone}.",
   "signin.code.again": "Enviar de novo",

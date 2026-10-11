@@ -22,8 +22,6 @@ import {
   SMS_WORST_CASE_LINK_LENGTH,
   APPROVED_TO_LEARN_FROM,
   APPROVED_TO_LEARN_FROM_ALERTS,
-  APPROVED_TO_LEARN_FROM_A28,
-  A28_REVIEWED_BY,
   type MoreLocale,
   type SmsTemplate,
   type SmsTemplateKey,
@@ -60,8 +58,6 @@ const keys = Object.keys(SMS_TEMPLATES) as SmsTemplateKey[];
 const AWAITING_SIGNATURE: SmsTemplateKey[] = [];
 /** The four Text alerts texts, approved by Will on 10 October 2026. */
 const ALERT_KEYS: SmsTemplateKey[] = ['message_waiting', 'visit_booked', 'booking_changed', 'trip_planned'];
-/** The two account texts that used to carry Pam's phone number (A28, signed 11 October 2026 03:37 UTC). */
-const A28_KEYS: SmsTemplateKey[] = ['staff_request_denied', 'access_limited_notice'];
 
 describe('SMS templates', () => {
   it('has a human recorded against every template', () => {
@@ -323,17 +319,7 @@ describe('texts in the newer languages', () => {
     expect(APPROVED_TO_LEARN_FROM).toContain('no native reader yet');
     // The four Text alerts texts carry the same words, dated the day Will approved them.
     for (const { key, locale, draft } of drafts.filter((d) => !AWAITING_SIGNATURE.includes(d.key))) {
-      expect(draft.reviewedBy, `${key} (${locale})`).toBe(
-        ALERT_KEYS.includes(key) ? APPROVED_TO_LEARN_FROM_ALERTS : A28_KEYS.includes(key) ? APPROVED_TO_LEARN_FROM_A28 : APPROVED_TO_LEARN_FROM,
-      );
-    }
-    // The A28 texts name the day and hour Will signed the English (card a59), and no longer carry a phone number.
-    expect(APPROVED_TO_LEARN_FROM_A28).toMatch(/^Will \(Oba\), 11 October 2026 03:37 UTC/);
-    expect(APPROVED_TO_LEARN_FROM_A28).toContain('no native reader yet');
-    for (const key of A28_KEYS) {
-      expect(SMS_TEMPLATES[key].reviewedBy, key).toBe(A28_REVIEWED_BY);
-      expect(SMS_TEMPLATES[key].vars, `${key} carries no variable: Pam has no phone line`).toEqual([]);
-      expect(SMS_TEMPLATES[key].en, key).toContain('joinpam.org/support');
+      expect(draft.reviewedBy, `${key} (${locale})`).toBe(ALERT_KEYS.includes(key) ? APPROVED_TO_LEARN_FROM_ALERTS : APPROVED_TO_LEARN_FROM);
     }
     expect(APPROVED_TO_LEARN_FROM_ALERTS).toMatch(/^Will \(Oba\), 10 October 2026/);
     expect(APPROVED_TO_LEARN_FROM_ALERTS).toContain('no native reader yet');

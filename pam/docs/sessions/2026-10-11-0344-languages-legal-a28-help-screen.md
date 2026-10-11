@@ -13,11 +13,14 @@ and **D-515** (the saved-place text lines).
   Your safety keeps Call 911, gets a one-tap "Call or text 988" row (Mira, 03:25) and "Talk to someone now", which opens `/support/` until Wren's "Your safety" post exists.
   Copy and Delete end in Dot's Contact Pam button, which opens Help. New keys `help.desk.*`, `help.stuck.*`, `help.safety.talk.*`, `help.safety.crisis.*`; the old `help.call.*`,
   `help.menu.call`, `help.closed.*`, `help.safety.call.*` and `onboarding.phone.callInstead` are deleted.
-- **Thirty-one lines plus two labels** (Sage's §4 and §1) are the signed English in place, with the six translations: the notice and failure bodies, `account.change`,
+- **Thirty-one lines, two labels and the wrong-code alert** (Sage's §4 and §1) are the signed English in place, with the six translations: the notice and failure bodies, `account.change`,
   `join.staff.title`, three privacy lines (`privacy.s.contact.p1` now names `hello@joinpam.org`), two privacy-controls bodies, two terms lines. `notices.ts` carries the English of seven
   notices and a test pins it to `en.json`, so it changed too.
-- **The two live texts that carried Pam's number** (`staff_request_denied`, `access_limited_notice`) say "Questions? Visit joinpam.org/support" in seven languages, signed
-  with Will's date and hour; the dispatcher bundle in the repo is regenerated. The Russian one lost the word "Pam" (67 → 63 characters): a test wants four to spare in one 70-character segment.
+- **The wrong-code alert** `signin.code.wrong` (Dot's D-510 line) is Sage's A29 English, "That code did not work. Check it, or tap Send again.", with each
+  language's own `signin.code.again` for the button's name; it is a one-row alert, so Russian and Arabic were measured.
+- **The two live texts that carried Pam's number are not in this branch.** I first carried them here (seven languages, signed with Will's hour, bundle regenerated), then Mira
+  (04:19 UTC) routed them: Nico's D-519 puts Will's signed English in `sms-templates.ts` and drops the old other-language lines, so my six translations go on top of it once
+  it is on `main`. I took my edits to `sms-templates.ts`, `sms.test.ts`, `dispatcher.test.ts` and the bundle back out. Staged drafts, lengths measured (zh 40–45, ru 63–64, ar 61–62 of 70).
 - **The promise check** (item 4 of the job) found three lines untrue since D-481: `flag.done.body`, `reminders.today.member`, `profile.promo.reminders.body`. Fixed in seven languages
   (D-515), with restore lines in `docs/before-launch.md`; Sage signed all three under A29 at about 04:10 UTC (her ledger, `claude/sage-signs` @ 38496ece). "Get your texts" in the terms is true today and stays.
 - While in those files: pt-BR "O Pam" → "Pam" (three places), zh-HK "還未會" (Cantonese) → written Chinese, zh spaces round "Pam" removed, es `help.intro` usted → tú to match the rest of
@@ -30,6 +33,7 @@ and **D-515** (the saved-place text lines).
   covers these three lines too, under the same flag, so the day texts go on they are put back together with the others. Still true: a test cannot read the live database; the before-launch list is the net.
 - **Two texts carried the number and were in no bundle.** A search of `en.json` for "call Pam" cannot find them; `grep supportPhone` did. Found because the job's own list said "~30 strings in seven languages".
 - **The repo is ahead of what is live.** The live `dispatch-sms` is still the old function, which fills `{supportPhone}`, so until Nico redeploys it the two texts still give the number. Nothing in the repo shows that.
+- **I was about to edit the same lines as Nico.** Both of us were putting Will's signed English into `sms-templates.ts`; Mira's routing note came after I had pushed it. Taking mine out cost a revert and a re-run of the config tests; the lesson is to ask who owns a file before carrying words into it, which the job's table (Nico changes the templates) already said.
 - **A key vanished between staging and applying** (D-510 removed `signin.failed.verify.body`). My staging script refused to run on a key the bundle no longer had, which is why it was caught before a bad write.
 - **Dot's D-512 and my branch rewrote the same five files.** Mira's order (hers first) settled it; I merged her branch into mine on Mira's instruction and took mine in the Help and Privacy screens.
 
@@ -44,7 +48,7 @@ On `4b9cf14` (`main` b979a49 plus Dot's D-512 branch plus this):
 
 | Check | Result |
 |---|---|
-| `@pam/config` | 1068 tests green (run twice: the first run regenerates the dispatcher bundle), `copy:status` in step |
+| `@pam/config` | 1068 tests green, `copy:status` in step |
 | `@pam/ui` / `@pam/web` unit | 120 / 119 green; `tsc` clean |
 | Every `t('…')` key in the source exists in `en.json` | yes (script) |
 | Storybook | builds |
@@ -55,7 +59,7 @@ On `4b9cf14` (`main` b979a49 plus Dot's D-512 branch plus this):
 
 ## Left undone
 
-- **Sage's one changed key, `signin.code.wrong`** (A29, 04:03 UTC): "That code did not work. Check it, or tap Send again." with each language's own `signin.code.again`. Queued for after Dot's Contact Pam batch is on `main` (Mira); not in this branch.
+- **My six translations of the two texts**, on top of Nico's D-519 once it is on `main` (Mira, 04:19 UTC).
 
 Listed with owners in `docs/before-launch.md` › *A28*: the live `dispatch-sms` (Nico), "Reply HELP to reach a person" (Sage), Ava's in-app copy/delete (the two privacy lines change then), the help-request line on the
 privacy page (the day Nico's form works), the your-safety post address (Wren), the public site's "call Pam" in eight files (Wren). A native reader for the six languages.

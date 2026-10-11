@@ -345,32 +345,34 @@
     },
     "staff_request_denied": {
       "key": "staff_request_denied",
-      "en": "Pam: Your request was not approved. Questions? Visit joinpam.org/support",
-      "es": "Pam: Su solicitud no fue aprobada. Preguntas? Visite joinpam.org/support",
+      "en": "Pam: Your request was not approved. Questions? Call {supportPhone}.",
+      "es": "Pam: Su solicitud no fue aprobada. Preguntas? Llame al {supportPhone}.",
       "more": {
         "pt-BR": {
-          "body": "Pam: Seu pedido nao foi aprovado. Duvidas? Acesse joinpam.org/support",
-          "reviewedBy": "Will (Oba), 11 October 2026 03:37 UTC (card a59, A28) — approved to learn from; no native reader yet"
+          "body": "Pam: Seu pedido nao foi aprovado. Duvidas? Ligue para {supportPhone}.",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-CN": {
-          "body": "Pam: 您的申请未获批准。有疑问请访问 joinpam.org/support",
-          "reviewedBy": "Will (Oba), 11 October 2026 03:37 UTC (card a59, A28) — approved to learn from; no native reader yet"
+          "body": "Pam: 您的申请未获批准。有疑问请拨打 {supportPhone}。",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-HK": {
-          "body": "Pam: 你的申請未獲批准。如有疑問請瀏覽 joinpam.org/support",
-          "reviewedBy": "Will (Oba), 11 October 2026 03:37 UTC (card a59, A28) — approved to learn from; no native reader yet"
+          "body": "Pam: 你的申請未獲批准。如有疑問請致電 {supportPhone}。",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "ru": {
-          "body": "Pam: Заявку не одобрили. Вопросы? Зайдите на joinpam.org/support",
-          "reviewedBy": "Will (Oba), 11 October 2026 03:37 UTC (card a59, A28) — approved to learn from; no native reader yet"
+          "body": "Pam: Заявку не одобрили. Вопросы? Звоните {supportPhone}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "ar": {
-          "body": "Pam: لم تتم الموافقة على طلبك. للاستفسار: joinpam.org/support",
-          "reviewedBy": "Will (Oba), 11 October 2026 03:37 UTC (card a59, A28) — approved to learn from; no native reader yet"
+          "body": "Pam: لم تتم الموافقة على طلبك. للاستفسار: {supportPhone}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         }
       },
-      "vars": [],
-      "reviewedBy": "Will (Oba), 11 October 2026 03:37 UTC (card a59, A28: \"signed\")",
+      "vars": [
+        "supportPhone"
+      ],
+      "reviewedBy": "Will (Oba), 17 September 2026",
       "isFirstContact": false
     },
     "connection_request": {
@@ -560,32 +562,34 @@
     },
     "access_limited_notice": {
       "key": "access_limited_notice",
-      "en": "Pam: Some parts of Pam are turned off for now. Questions? Visit joinpam.org/support",
-      "es": "Pam: Algunas partes de Pam estan apagadas por ahora. Preguntas? Visite joinpam.org/support",
+      "en": "Pam: Some parts of Pam are turned off for now. Call {supportPhone} with questions.",
+      "es": "Pam: Algunas partes de Pam estan apagadas por ahora. Llame al {supportPhone} si tiene preguntas.",
       "more": {
         "pt-BR": {
-          "body": "Pam: Algumas partes de Pam estao desligadas por enquanto. Duvidas? Acesse joinpam.org/support",
-          "reviewedBy": "Will (Oba), 11 October 2026 03:37 UTC (card a59, A28) — approved to learn from; no native reader yet"
+          "body": "Pam: Algumas partes do Pam estao desligadas por enquanto. Ligue para {supportPhone} se tiver duvidas.",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-CN": {
-          "body": "Pam: Pam 的部分功能暂时关闭。有疑问请访问 joinpam.org/support",
-          "reviewedBy": "Will (Oba), 11 October 2026 03:37 UTC (card a59, A28) — approved to learn from; no native reader yet"
+          "body": "Pam: Pam 的部分功能暂时关闭。有疑问请拨打 {supportPhone}。",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-HK": {
-          "body": "Pam: Pam 部分功能暫時關閉。如有疑問請瀏覽 joinpam.org/support",
-          "reviewedBy": "Will (Oba), 11 October 2026 03:37 UTC (card a59, A28) — approved to learn from; no native reader yet"
+          "body": "Pam: Pam 部分功能暫時關閉。如有疑問請致電 {supportPhone}。",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "ru": {
-          "body": "Pam: Часть функций пока отключена. Вопросы: joinpam.org/support",
-          "reviewedBy": "Will (Oba), 11 October 2026 03:37 UTC (card a59, A28) — approved to learn from; no native reader yet"
+          "body": "Pam: Часть функций Pam пока отключена. Звоните {supportPhone}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "ar": {
-          "body": "Pam: بعض ميزات Pam متوقفة الآن. للاستفسار: joinpam.org/support",
-          "reviewedBy": "Will (Oba), 11 October 2026 03:37 UTC (card a59, A28) — approved to learn from; no native reader yet"
+          "body": "Pam: بعض ميزات Pam متوقفة الآن. اتصل بـ {supportPhone}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         }
       },
-      "vars": [],
-      "reviewedBy": "Will (Oba), 11 October 2026 03:37 UTC (card a59, A28: \"signed\")",
+      "vars": [
+        "supportPhone"
+      ],
+      "reviewedBy": "Will (Oba), 13 September 2026",
       "isFirstContact": false
     }
   },

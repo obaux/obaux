@@ -248,18 +248,6 @@ const alertDraft = (body: string): SmsDraft => ({ body, reviewedBy: APPROVED_TO_
 const ALERTS_REVIEWED_BY = 'Will (Oba), 10 October 2026';
 
 /**
- * Will signed the A28 words on 11 October 2026 at 03:37 UTC (Control Room card a59: "signed"),
- * relayed word for word by the merge desk. They cover the two account texts that used to tell a
- * person to call Pam's number. He signed the English; Spanish follows it under the template's own
- * `reviewedBy`, as for the alert texts, and the other languages are drafts under the 9 October
- * approval to learn from, dated for the day the English was signed.
- */
-export const A28_REVIEWED_BY = 'Will (Oba), 11 October 2026 03:37 UTC (card a59, A28: "signed")';
-export const APPROVED_TO_LEARN_FROM_A28 =
-  'Will (Oba), 11 October 2026 03:37 UTC (card a59, A28) — approved to learn from; no native reader yet';
-const a28Draft = (body: string): SmsDraft => ({ body, reviewedBy: APPROVED_TO_LEARN_FROM_A28 });
-
-/**
  * Who read this copy and signed it off.
  *
  * Every template shipped with this empty, and `renderSms` threw on an
@@ -476,23 +464,22 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
    * number, skipping the quiet-hours/STOP check every other message goes
    * through (Will, 17 September — deliberate, see `0055_staff_denied_sms.sql`
    * and DECISIONS.md). Names no role, same reason as `staff_request_approved`.
-   * Points to the help desk (joinpam.org/support) because Will asked specifically that someone
-   * denied has somewhere real to ask why; it used to carry Pam's phone number (A28: Pam has no
-   * phone line).
+   * Carries `{supportPhone}` because Will asked specifically that someone
+   * denied has somewhere real to ask why.
    */
   staff_request_denied: {
     key: 'staff_request_denied',
-    en: 'Pam: Your request was not approved. Questions? Visit joinpam.org/support',
-    es: 'Pam: Su solicitud no fue aprobada. Preguntas? Visite joinpam.org/support',
+    en: 'Pam: Your request was not approved. Questions? Call {supportPhone}.',
+    es: 'Pam: Su solicitud no fue aprobada. Preguntas? Llame al {supportPhone}.',
     more: {
-      'pt-BR': a28Draft('Pam: Seu pedido nao foi aprovado. Duvidas? Acesse joinpam.org/support'),
-      'zh-CN': a28Draft('Pam: 您的申请未获批准。有疑问请访问 joinpam.org/support'),
-      'zh-HK': a28Draft('Pam: 你的申請未獲批准。如有疑問請瀏覽 joinpam.org/support'),
-      'ru': a28Draft('Pam: Заявку не одобрили. Вопросы? Зайдите на joinpam.org/support'),
-      'ar': a28Draft('Pam: لم تتم الموافقة على طلبك. للاستفسار: joinpam.org/support'),
+      'pt-BR': approved('Pam: Seu pedido nao foi aprovado. Duvidas? Ligue para {supportPhone}.'),
+      'zh-CN': approved('Pam: 您的申请未获批准。有疑问请拨打 {supportPhone}。'),
+      'zh-HK': approved('Pam: 你的申請未獲批准。如有疑問請致電 {supportPhone}。'),
+      'ru': approved('Pam: Заявку не одобрили. Вопросы? Звоните {supportPhone}'),
+      'ar': approved('Pam: لم تتم الموافقة على طلبك. للاستفسار: {supportPhone}'),
     },
-    vars: [],
-    reviewedBy: A28_REVIEWED_BY,
+    vars: ['supportPhone'],
+    reviewedBy: 'Will (Oba), 17 September 2026',
     isFirstContact: false,
   },
   /** §6.2: no names in a connection-request SMS. */
@@ -624,17 +611,17 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
   },
   access_limited_notice: {
     key: 'access_limited_notice',
-    en: 'Pam: Some parts of Pam are turned off for now. Questions? Visit joinpam.org/support',
-    es: 'Pam: Algunas partes de Pam estan apagadas por ahora. Preguntas? Visite joinpam.org/support',
+    en: 'Pam: Some parts of Pam are turned off for now. Call {supportPhone} with questions.',
+    es: 'Pam: Algunas partes de Pam estan apagadas por ahora. Llame al {supportPhone} si tiene preguntas.',
     more: {
-      'pt-BR': a28Draft('Pam: Algumas partes de Pam estao desligadas por enquanto. Duvidas? Acesse joinpam.org/support'),
-      'zh-CN': a28Draft('Pam: Pam 的部分功能暂时关闭。有疑问请访问 joinpam.org/support'),
-      'zh-HK': a28Draft('Pam: Pam 部分功能暫時關閉。如有疑問請瀏覽 joinpam.org/support'),
-      'ru': a28Draft('Pam: Часть функций пока отключена. Вопросы: joinpam.org/support'),
-      'ar': a28Draft('Pam: بعض ميزات Pam متوقفة الآن. للاستفسار: joinpam.org/support'),
+      'pt-BR': approved('Pam: Algumas partes do Pam estao desligadas por enquanto. Ligue para {supportPhone} se tiver duvidas.'),
+      'zh-CN': approved('Pam: Pam 的部分功能暂时关闭。有疑问请拨打 {supportPhone}。'),
+      'zh-HK': approved('Pam: Pam 部分功能暫時關閉。如有疑問請致電 {supportPhone}。'),
+      'ru': approved('Pam: Часть функций Pam пока отключена. Звоните {supportPhone}'),
+      'ar': approved('Pam: بعض ميزات Pam متوقفة الآن. اتصل بـ {supportPhone}'),
     },
-    vars: [],
-    reviewedBy: A28_REVIEWED_BY,
+    vars: ['supportPhone'],
+    reviewedBy: REVIEWED_BY,
     isFirstContact: false,
   },
 };

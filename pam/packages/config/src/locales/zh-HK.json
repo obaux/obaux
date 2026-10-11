@@ -638,7 +638,7 @@
   "signin.code.label": "我們以短訊傳送給您的驗證碼",
   "signin.code.resend": "重新傳送",
   "signin.code.resendIn": "{seconds}秒後可重新傳送",
-  "signin.code.wrong": "驗證碼不正確。請再試一次。",
+  "signin.code.wrong": "驗證碼不正確。請檢查一下，或點按「重新傳送」。",
   "signin.code.title": "輸入您的驗證碼",
   "signin.code.sent": "已傳送至{phone}。",
   "signin.code.again": "重新傳送",

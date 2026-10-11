@@ -677,7 +677,7 @@
   "signin.code.label": "Код, который мы отправили вам по SMS",
   "signin.code.resend": "Отправить ещё раз",
   "signin.code.resendIn": "Отправить ещё раз через {seconds} сек.",
-  "signin.code.wrong": "Этот код не подошёл. Попробуйте ещё раз.",
+  "signin.code.wrong": "Этот код не подошёл. Проверьте его или нажмите «Отправить снова».",
   "signin.code.title": "Введите ваш код",
   "signin.code.sent": "Отправлено на {phone}.",
   "signin.code.again": "Отправить снова",

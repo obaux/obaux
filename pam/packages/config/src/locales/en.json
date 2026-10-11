@@ -635,7 +635,7 @@
   "signin.code.label": "The code we texted you",
   "signin.code.resend": "Send it again",
   "signin.code.resendIn": "Send it again in {seconds}s",
-  "signin.code.wrong": "That code did not work. Try again.",
+  "signin.code.wrong": "That code did not work. Check it, or tap Send again.",
   "signin.code.title": "Enter your code",
   "signin.code.sent": "Sent to {phone}.",
   "signin.code.again": "Send again",

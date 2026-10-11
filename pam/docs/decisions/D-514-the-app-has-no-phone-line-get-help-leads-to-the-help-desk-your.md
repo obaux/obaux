@@ -31,12 +31,13 @@ does not exist. The path is now: the problem, then the help desk on the website 
 - **Two older labels** (`help.callSupport` "Contact Pam", `help.needHelp` "Need help? Contact Pam", Sage's §1) are signed
   and applied; real screens no longer use them (Dot's `help.contact.action` and `nav.help` took over), a story and an e2e
   assertion still do.
-- **Two texts that carried the number** (`staff_request_denied`, `access_limited_notice`) now say "Questions? Visit
-  joinpam.org/support" (Sage's §5), in seven languages. `reviewedBy` carries Will's date and hour (03:37 UTC, card a59);
-  the English is his, Spanish follows it as for the alert texts, and the other five are drafts under the 9 October
-  approval to learn from, dated the day the English was signed, on the merge desk's instruction. The dispatcher bundle
-  (`supabase/functions/dispatch-sms/templates.json`) is regenerated. **The live `dispatch-sms` is still the old function:
-  until Nico redeploys it, the live texts still carry the number.**
+- **The wrong-code alert** (`signin.code.wrong`, Dot's D-510 line) is Sage's A29 English, "That code did not work. Check it, or tap Send
+  again.", with each language's own `signin.code.again` as the button name. It is one row, so the Russian and Arabic lines were measured.
+- **Two texts that carried the number** (`staff_request_denied`, `access_limited_notice`): the English ("Questions? Visit
+  joinpam.org/support", Sage's §5, signed with the rest) goes in with Nico's D-519, which also drops the old other-language lines
+  (they fall back to English). **Not in this branch**, on Mira's routing (04:19 UTC): my six translations go on top of D-519 once it
+  is on `main`, in one 70-character segment where the script allows, signed the usual way. The live `dispatch-sms` is still the
+  old function; until Nico redeploys it, the live texts still carry the number.
 
 **What a later session might reverse, or must still do.**
 - "Talk to someone now" opens `/support/`, not the safety post, until Wren confirms the post's address.

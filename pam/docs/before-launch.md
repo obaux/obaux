@@ -14,9 +14,9 @@ STATUS row too.
 - [ ] **A28: finish taking Pam's number off every place a person reads it** (Lena, 11 October 2026, D-514, D-515).
   The app, the privacy page and the terms are done and signed (card a59). What is still open, each with an owner:
   1. **The live texts still carry the number.** `staff_request_denied` and `access_limited_notice` say
-     "Questions? Visit joinpam.org/support" in the repo (seven languages, signed 11 October 03:37 UTC) and
-     `supabase/functions/dispatch-sms/templates.json` is regenerated, but the **live `dispatch-sms` is still the old
-     function**, which fills `{supportPhone}`. Until Nico redeploys it, those two account texts (they go today) still give
+     "Questions? Visit joinpam.org/support" in the repo once Nico's D-519 is on `main` (English signed, card a59); the other
+     six languages follow on top of it (Lena, Mira's routing 04:19 UTC). The **live `dispatch-sms` is still the old
+     function**, which fills `{supportPhone}`: until Nico redeploys it, those two account texts (they go today) still give
      the number. The redeploy waits on the carrier re-filing (see *File the updated text-message registration*): decide
      which comes first. Nico also updates `docs/sms-campaign-samples.md` and Will pastes Sage's HELP auto-reply into
      Twilio ("Get help at joinpam.org/support or write to hello@joinpam.org. Reply STOP to stop.").

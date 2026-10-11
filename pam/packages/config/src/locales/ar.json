@@ -703,7 +703,7 @@
   "signin.code.label": "الرمز الذي أرسلناه إليك برسالة نصية",
   "signin.code.resend": "إعادة الإرسال",
   "signin.code.resendIn": "إعادة الإرسال بعد {seconds} ث",
-  "signin.code.wrong": "لم يعمل هذا الرمز. حاول مرة أخرى.",
+  "signin.code.wrong": "لم يعمل هذا الرمز. تحقق منه أو اضغط على إرسال مرة أخرى.",
   "signin.code.title": "أدخل رمزك",
   "signin.code.sent": "تم الإرسال إلى {phone}.",
   "signin.code.again": "إرسال مرة أخرى",

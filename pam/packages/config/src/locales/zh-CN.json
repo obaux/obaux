@@ -638,7 +638,7 @@
   "signin.code.label": "我们短信发给您的验证码",
   "signin.code.resend": "重新发送",
   "signin.code.resendIn": "{seconds}秒后可重新发送",
-  "signin.code.wrong": "验证码不对。请再试一次。",
+  "signin.code.wrong": "验证码不对。请检查一下，或点按“重新发送”。",
   "signin.code.title": "输入验证码",
   "signin.code.sent": "已发送至{phone}。",
   "signin.code.again": "重新发送",

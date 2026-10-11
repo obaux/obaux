@@ -169,9 +169,8 @@ describe('a language is used while it carries an approval, and English when it d
   it('carries Will’s approval on every draft in the shipped bundle', () => {
     for (const template of Object.values(REAL.templates).filter((t) => !AWAITING_SIGNATURE.includes(t.key))) {
       for (const [locale, draft] of Object.entries(template.more ?? {})) {
-        // 9 October for the first drafts; 10 October for the four Text alerts texts; 11 October (03:37 UTC)
-        // for the two account texts that stopped carrying Pam's phone number (A28).
-        expect(draft.reviewedBy, `${template.key} ${locale}`).toMatch(/^Will \(Oba\), (9|10) October 2026|^Will \(Oba\), 11 October 2026 03:37 UTC/);
+        // 9 October for the first drafts; 10 October for the four Text alerts texts.
+        expect(draft.reviewedBy, `${template.key} ${locale}`).toMatch(/^Will \(Oba\), (9|10) October 2026/);
       }
     }
   });
