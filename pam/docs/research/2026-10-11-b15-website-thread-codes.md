@@ -107,9 +107,7 @@ first screen.**
 - **How sure:** medium. WCAG only asks that a pause exists, and it does; this is about
   being found.
 
-**H2 (polish). "Search Support" in dark mode is 4.3:1 against the 4.5 needed.**
-
-- **Page:** `/support/`, all widths, dark.
+**H2: withdrawn (12:15 UTC).** "Search Support" is the search field's visually-hidden label: two 1×1px spans clipped to `rect(0,0,0,0)`, never drawn. My contrast script counted hidden text and measured it against the nearest coloured background, `#9E9E9E` on `#4A2F51`. The drawn placeholder passes, as Dot measured (5.65:1 on the pill).
 
 **C1 (polish). Sign in turns on after one digit.**
 
