@@ -30,6 +30,22 @@ STATUS row too.
   4. Seven languages: the system shows the string in the phone's language, so each of the six translations goes in the
      native project's per-language strings the day those exist (signed by Will with the Privacy page, as it repeats it).
 
+- [ ] **The request log: keep `privacy.s.what-we-keep.p11` true** (Lena, 11 October 2026, a66; facts from Piper's read-only check).
+  Privacy says the servers that run Pam write down, for each request, when, what was asked for, which account, the IP
+  address and the kind of phone or browser, plus the phone number at sign-in; that messages and searches are not written
+  down; and that the record "is deleted within a week". True today because: Supabase is on the **Free** plan (logs kept 1
+  day; the oldest row was 25 hours old), Vercel's plan could not be read from the API (the deploy limit the team hit is
+  Hobby's, whose request logs last about an hour; Pro a day). Will can read Vercel's plan in Settings › Billing.
+  1. **Before the Supabase plan goes to Team (28 days) or Enterprise (90), or Vercel to Enterprise,** change p11 and its six
+     translations first. Pro (7 days) is still "within a week". Moving to Pro before launch is likely (the Free plan has
+     no backups to restore from); nothing to change for it.
+  2. **Do not add a log drain or an error tracker** (Sentry, an analytics tool, a Vercel Speed Insights switch) without
+     reading p11 first: a copy elsewhere has its own retention. None exists today (Piper searched the code and package.json).
+  3. `no-typed-text-in-urls.test.ts` keeps "what you search for" out of the logged URL: a new GET filter must be on an id,
+     a state or a setting, and typed words go in a POST body (an rpc).
+  4. **Twilio keeps its own record of every text** (number, text, time, status). Its retention setting was not read; Will or
+     Nico to read it. Privacy says only that "the one that sends our texts" handles the information (`sharing.p3`).
+
 - [ ] **A28: finish taking Pam's number off every place a person reads it** (Lena, 11 October 2026, D-514, D-515).
   The app, the privacy page and the terms are done and signed (card a59). What is still open, each with an owner:
   1. **The live texts still carry the number.** `staff_request_denied` and `access_limited_notice` say
