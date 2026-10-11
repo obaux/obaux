@@ -197,3 +197,69 @@ No sign-in, accounts or sends.
   4. Explore's story made no outside request.
 
 Iris
+
+---
+
+## b20 re-test: neighbourhoods (11 October, 21:55 UTC)
+
+`main` at `e27afa24`. No sign-in, accounts or sends.
+
+**1. Area search (D-540): PASS.**
+
+- **Finding the right place.** The search runs in the database (`search_areas`). Postgres
+  is installed here but PostGIS isn't, so `pnpm --filter @pam/db test` can't run. Instead I
+  took the function's rules (every word typed must appear, in any order; labels that start
+  with the first word come first, then landmarks, then A to Z) and ran them over the 205
+  seeded areas (159 neighbourhoods, 46 ZIPs, City Hall). A logic check, not a database run:
+
+  | Typed | First result |
+  |---|---|
+  | "fishtown" | Fishtown - Lower Kensington |
+  | "kens" | Kensington, Old, then Kensington, West; East Kensington; Fishtown - Lower Kensington; Upper Kensington |
+  | "east germantown" | Germantown, East |
+  | "old kensington" | Kensington, Old |
+  | "19107" | 19107 |
+  | "city hall" | City Hall (landmark; both words match) |
+
+  The new db test `63_…` asserts the same three sorted-name cases.
+- **The words, from main's Storybook at 320** (`member-created-states-explore--live`, picker
+  open), in the seven languages:
+
+  | | Label (placeholder) | Hint |
+  |---|---|---|
+  | en | ZIP code or neighborhood | Like 19107, or Fishtown. |
+  | es | Código postal o barrio | Como 19107, o Fishtown. |
+  | pt-BR | CEP ou bairro | Como 19107, ou Fishtown. |
+  | zh-CN | 邮政编码或街区 | 例如：19107，或 Fishtown。 |
+  | zh-HK | ZIP 郵遞區號或社區 | 例如19107，或 Fishtown。 |
+  | ru | Почтовый индекс (ZIP) или район | Например, 19107 или Fishtown. |
+  | ar | الرمز البريدي (ZIP) أو الحي | مثل 19107، أو Fishtown. (rtl) |
+
+  Nothing is cut or wider than 320 in any language, and the picker makes no outside
+  request. Shot: `shots/2026-10-11-b20-area-picker-ar-320.png`.
+- **Notes, not fails:**
+  - **Screen readers:** the field's name is announced twice ("ZIP code or neighborhood ZIP
+    code or neighborhood"), from the label and the placeholder together. The hint isn't
+    linked to the field (`aria-describedby`), so a screen reader doesn't hear it with the
+    field.
+  - **Wording, for Lena:** the comma before "o"/"ou" in es and pt-BR reads stiffly ("Por
+    ejemplo, 19107 o Fishtown" is more natural), and pt-BR's "CEP" is the Brazilian word,
+    not a US ZIP code.
+
+**2. Legal > Data sources: PASS.**
+
+- **The text** (`member-created--legal`, 320, all seven languages) credits "Philadelphia
+  Neighborhoods" by Abaca Labs and says Pam changed it to keep one point per neighbourhood
+  instead of its boundaries.
+- **The links:** "See the source data" goes to
+  `github.com/azavea/geo-data/tree/5c4538b…/philadelphia-neighborhoods`, and "License: CC BY
+  4.0" goes to `creativecommons.org/licenses/by/4.0/`. Both are 288×48, and nothing is cut
+  at 320 in any language.
+- **Do the links work?** Both hosts are blocked from this environment for a browser. A git
+  fetch of that commit shows the folder exists, and its `license.txt` reads: "released under
+  the Creative Commons 4.0 Attribution license… https://creativecommons.org/licenses/by/4.0/
+  and attribute the data to Abaca Labs", which matches the page.
+
+**3. Enrollments lockdown (D-541 part 1):** nothing to test on screen, as briefed.
+
+Iris
