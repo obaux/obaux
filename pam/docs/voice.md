@@ -168,11 +168,11 @@ A spinner, not a sentence (A10). Don't write loading copy.
 | Say | Not | Why |
 |---|---|---|
 | **Pam** | PAM | The name is a person's name. Invite codes keep `PAM-XXXX`. |
-| **member** | user, client, participant, resident | A person who belongs. On the website, "people looking for help" or "someone coming home" when "member" means nothing yet. |
+| **member** | user, client, participant | A person who belongs. In the app only; the website says **residents** (see "The app and the website use different words", below). |
 | **case manager** | caseworker, officer, PO, supervisor | The role's one name (A1), and the phrase members recognise. |
-| **your guide** | — | The member's short word for their case manager or whoever invited them, **defined once on the screen where it appears** (D-416). Use "case manager" where there is no guide card, and on the website. |
-| **program** | provider, vendor, resource, service provider | What a member visits. |
-| **program lead** | provider, admin | The staff person who runs a program. *Open:* the invite says "Program partner" (`join.invited.role.provider`); About says "program lead" (`about.signin.provider`). One should win; Will decides. |
+| **your guide** | — | The member's short word for their case manager or whoever invited them, **defined once on the screen where it appears** (D-416). Use "case manager" where there is no guide card. On the website, "Guides" is one of Will's words for case managers. |
+| **program** | vendor, resource, service provider | What a member visits. ("Providers" on the website means the staff who run programs, not the program itself.) |
+| **program lead** | admin | The staff person who runs a program, in the app. The invite still says "Program partner" (`join.invited.role.provider`); "program lead" is the app's word. The website says **providers** instead. |
 | **place** | location, facility, site | What's on the map. |
 | **visit** | appointment, booking, engagement | What a member plans. The tab is **Trips** (`glossary.trip.*` defines a trip); Spanish says "Visitas". |
 | **join** | enroll, register, sign up for | "Ask to join". |
@@ -180,6 +180,22 @@ A spinner, not a sentence (A10). Don't write loading copy.
 | **text** | SMS, message (for SMS) | "Pam texts you". "Message" is for chat in the app. |
 | **call Pam** | contact support | A person, a verb. |
 | **Learning, Earning, and Family Support** | — | Pam's three kinds of help, capitalised as names. |
+
+### The app and the website use different words
+
+Will, 11 October 2026: "No need to say Program lead on marketing site, we call members: Residents or people
+looking for help, Program leads = Providers or social services, and Case Managers = Case Managers or Guides."
+
+| Who | In the app | On the website (marketing) |
+|---|---|---|
+| A person using Pam for themselves | member | **Residents**, or people looking for help |
+| Staff who run a program | program lead | **Providers**, or social services ("Program Providers" on the Home chips) |
+| Staff who guide members | case manager (and "your guide", defined on screen) | **Case managers**, or Guides |
+
+The app's words stay as they are: they are on hundreds of screens in seven languages, and a member
+learns them once. The website talks to people before they have an account, in the words they already use.
+Support posts explain the app, so they use the app's words and may say both ("A program lead, the person who
+runs a program…").
 
 ### Words we never use
 
@@ -197,7 +213,21 @@ A spinner, not a sentence (A10). Don't write loading copy.
 - **Blame and pressure:** "you failed to", "you must", "don't miss out", countdowns.
 - **Cheer that isn't earned:** "Awesome!", "Yay!", exclamation marks on titles.
 
-## 6. Writing for seven languages
+## 6. How we work on words
+
+- **In Figma, Sage writes straight into Will's component when he asks** (Will, 11 October 2026: "When I ask
+  for help in Figma, you can go ahead and write over the text in component. It's collaborative, but I need
+  someone to be responsible for the copy pass."). Only the component he names: "Just the component, not
+  all home page." Change the words, not the design. If longer words make a variant grow, keep variants from
+  overlapping and tell him. Figma comments don't reach the team; his asks come through Mira with the link.
+- **No translation while words are still in Figma.** Will: "We don't need to translate it right away. Only
+  when the website is merged, then handle languages after. It's too soon in the collaborative flow to start
+  translating. We're just brainstorming inside Figma." Website words are translated after the change is
+  merged. App strings still go into all seven languages when they are built (`docs/copy-changes.md`).
+- **Everything still goes to Will.** A Figma pass is his to keep or change; nothing reaches the live site
+  until he says so.
+
+## 7. Writing for seven languages
 
 Every English line becomes six more (Spanish, Brazilian Portuguese, Simplified and
 Traditional Chinese, Russian, Arabic), translated from your words and checked to
@@ -220,7 +250,7 @@ fit at 320px.
 - **Changing an English string makes the other six stale** (`copy:status`). A wording
   tweak that doesn't change meaning is marked so on purpose (`copy:ack --keep`).
 
-## 7. One-screen checklist
+## 8. One-screen checklist
 
 Before you send words to Will:
 
@@ -231,7 +261,7 @@ Before you send words to Will:
 - [ ] Does a confirmation say what happens next? Does an error say it's not their fault, what to do, and who to call?
 - [ ] Is every claim true in the app today? (Hours, texts, reminders, languages, features.)
 - [ ] No justice terms, no hints at someone's past, no system words, no buzzwords.
-- [ ] Our words: member, case manager / your guide, program, place, visit, join, sign in, text, call Pam.
+- [ ] Our words. App: member, case manager / your guide, program lead, program, place, visit, join, sign in, text, call Pam. Website: residents, providers, case managers / guides.
 - [ ] No idioms, no pieced-together sentences, `{placeholders}` whole, no gender.
 - [ ] Right tone for the moment: personality on the website and welcomes; plainest in errors and privacy.
 - [ ] Touches a promise (privacy, terms, transparency, notices)? Lena reads the meaning.
