@@ -1403,6 +1403,11 @@ hero has scrolled away (D-502; the code step's bar was already pinned). Sign in'
 being pinned, so they never cover "Send me a code" at 320×568 (Iris S1, D-500); `TextLink` is 48px wide as well as tall
 (the Trips banner's "Sign", the signature sheet's "Clear"), and the policy header's "Done" too (W4). Needs Will: nothing.
 
+## Design system & Storybook · Principles page in line with A24 and A26 (11 October) — on `main`
+
+Merged from `claude/pam-design-principles` (98c87e9). Foundations › Principles (and Writing) now say seven languages (A24) and help where
+people get stuck, not on every screen (A26). Docs only.
+
 ## Design system & Storybook · legal tabs follow the reader (10 October)
 
 Branch `claude/pam-design-legal-tabs`. Privacy and Terms: the highlighted tab is the section whose heading has reached the
