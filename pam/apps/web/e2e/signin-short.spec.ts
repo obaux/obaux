@@ -61,3 +61,57 @@ for (const locale of ['en', 'es', 'ar'] as const) {
     });
   }
 }
+
+/**
+ * The header stays on top as the page scrolls (Will, 11 October: "otherwise they lose context"; D-502): the invite line,
+ * which is the reason they are here, pinned at the very top, and under it a compact bar with the mark and the language
+ * switch once the hero has scrolled away. The bar is drawn over the content, not in the flow, so the tap test above
+ * (the button whole and tappable at 320×568 with the bar in the page) is the proof it takes no room.
+ */
+for (const locale of ['en', 'es', 'ar'] as const) {
+  for (const invited of [true, false]) {
+    test(`320×568, ${invited ? 'invited' : 'not invited'}, ${locale}: the header stays on top as the page scrolls`, async ({ page }) => {
+      await open(page, locale, invited);
+      // At the top the hero carries the mark: the compact bar is not shown yet.
+      const barMarks = () =>
+        page.evaluate(() =>
+          [...document.querySelectorAll('img[alt="Pam"]')]
+            .filter((img) => getComputedStyle(img.closest('[class]')!).visibility !== 'hidden')
+            .map((img) => Math.round(img.getBoundingClientRect().top))
+            .filter((top) => top >= 0 && top < 130).length,
+        );
+      await page.evaluate(() => window.scrollTo({ top: 300, behavior: 'instant' }));
+      await page.waitForTimeout(400);
+
+      const pinned = await page.evaluate(() => {
+        const note = document.querySelector('[role="note"]');
+        const marks = [...document.querySelectorAll('img[alt="Pam"]')].filter((img) => {
+          const r = img.getBoundingClientRect();
+          return r.top >= 0 && r.bottom <= 130 && getComputedStyle(img.parentElement!).visibility !== 'hidden';
+        });
+        const buttons = [...document.querySelectorAll('button')].filter((b) => {
+          const r = b.getBoundingClientRect();
+          return r.top >= 0 && r.bottom <= 140 && getComputedStyle(b).visibility !== 'hidden';
+        });
+        return {
+          scrolled: window.scrollY,
+          noteTop: note ? Math.round(note.getBoundingClientRect().top) : null,
+          marks: marks.length,
+          buttons: buttons.length,
+        };
+      });
+      expect(pinned.scrolled).toBeGreaterThan(100);
+      if (invited) expect(pinned.noteTop).toBe(0);
+      expect(pinned.marks).toBeGreaterThanOrEqual(1);
+      expect(pinned.buttons).toBeGreaterThanOrEqual(1);
+      void barMarks;
+
+      // Back at the top the bar is gone again and the button is where it was, whole.
+      await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+      await page.waitForTimeout(300);
+      const button = page.getByRole('button').filter({ hasText: LOCALES[locale]['signin.phone.action'] });
+      const box = (await button.boundingBox())!;
+      expect(box.y + box.height).toBeLessThanOrEqual(568);
+    });
+  }
+}

@@ -3,9 +3,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
-import { Notice, Page, TextLink } from '@pam/ui';
+import { AppHeader, Notice, Page, TextLink } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { OnboardingSlides } from '@pam/ui/OnboardingSlides';
 import { useI18n } from '@/lib/i18n';
@@ -66,6 +67,25 @@ const styles = stylex.create({
   // isn't touching top of screen") — the hero is meant to run flush to the
   // very top of the viewport, the same reasoning `OnboardingSlides`' own
   // negative side margins already use to reach both edges.
+  // What stays at the top of the first step while the page scrolls (Will, 11 October: "we need the header of sign in
+  // screen to stay sticky on top as the user scrolls down, otherwise they lose context"): the invite line, which
+  // is the reason they are here, and, once the hero has scrolled away, a compact bar with the mark and the language
+  // switch. The bar is drawn over the content below the invite line, not in the flow, so it takes no room from the
+  // button on a short screen (D-502).
+  pinned: { position: 'sticky', top: 0, zIndex: 12, width: '100%' },
+  pinBar: {
+    position: 'absolute',
+    top: '100%',
+    insetInline: 0,
+    paddingInline: '16px',
+    backgroundColor: colorVars['--color-background-body'],
+    boxShadow: '0 1px 0 var(--color-border), 0 6px 16px light-dark(oklch(0 0 0 / 6%), oklch(0 0 0 / 40%))',
+    opacity: 0,
+    visibility: 'hidden',
+    transitionProperty: 'opacity',
+    transitionDuration: '150ms',
+  },
+  pinBarShown: { opacity: 1, visibility: 'visible' },
   heroGroup: { width: '100%', marginBlockStart: '-24px' },
   heroHeader: { position: 'relative', width: '100%' },
   heroBrand: { width: 'fit-content', marginInline: 'auto' },
@@ -346,18 +366,36 @@ export function SignInScreen({
     </div>
   );
 
+  // Past the hero's own mark and globe: the compact bar takes over (see `pinned`).
+  const [pinBarShown, setPinBarShown] = useState(false);
+  useEffect(() => {
+    const read = () => setPinBarShown(window.scrollY > 72);
+    read();
+    window.addEventListener('scroll', read, { passive: true });
+    return () => window.removeEventListener('scroll', read);
+  }, []);
+
   return (
     <>
       {/*
         Who invited them to be what (D-254): a thin black line across the top,
         above the pictures, on both steps — the reason they are here should
-        not scroll away or vanish once they have typed their number.
+        not scroll away or vanish once they have typed their number. On the
+        first step it is pinned, with the compact mark bar under it once the hero has gone
+        (D-502). The code step's own bar (`SubPageHeader`) is already pinned.
       */}
-      {invite ? (
-        <Text role="note" xstyle={styles.invited}>
-          {t(`signin.invited.${invite.role}`)}
-        </Text>
-      ) : null}
+      <VStack xstyle={onFirstStep ? styles.pinned : undefined}>
+        {invite ? (
+          <Text role="note" xstyle={styles.invited}>
+            {t(`signin.invited.${invite.role}`)}
+          </Text>
+        ) : null}
+        {onFirstStep ? (
+          <VStack xstyle={[styles.pinBar, pinBarShown && styles.pinBarShown]}>
+            <AppHeader homeHref={null} trailing={<LanguageSwitcher />} />
+          </VStack>
+        ) : null}
+      </VStack>
       {/* Centred under the hero; the code step is a nested page, left-aligned
           like every other (D-253), with only "Sent to" centred. */}
       <Page
