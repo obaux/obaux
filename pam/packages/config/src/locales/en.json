@@ -498,7 +498,7 @@
   "place.shared": "Copied. Paste it into a message.",
   "place.website": "Their website",
   "places.all": "All",
-  "places.areaLabel": "ZIP code",
+  "places.areaLabel": "ZIP code or neighborhood",
   "places.areaNone": "Nothing matched that. Try a ZIP code.",
   "places.areaPrivacy": "Pam remembers the area you pick on this phone only.",
   "places.areaResults": "Areas you can choose",
@@ -1432,7 +1432,7 @@
   "places.kind.neighborhood": "Neighborhood",
   "places.kind.landmark": "Landmark",
   "places.kind.address": "Address",
-  "places.areaHint": "Like 19107.",
+  "places.areaHint": "Like 19107, or Fishtown.",
   "messages.visit.label": "Your visit, {day} at {time}. See the place.",
   "points.hero.toNext": "{count} more to {next}",
   "points.hero.top": "You have reached the top of the ladder.",
@@ -1594,5 +1594,9 @@
   "supportReply.send": "Send text",
   "supportReply.sent": "Queued. It goes out within five minutes.",
   "supportReply.noNumber": "No number to text.",
-  "supportReply.failed": "It did not go. Try again."
+  "supportReply.failed": "It did not go. Try again.",
+  "legal.sources.title": "Data sources",
+  "legal.sources.neighborhoods": "The neighborhood names in the area search come from “Philadelphia Neighborhoods”, made by Abaca Labs. Pam changed it to keep one point for each neighborhood instead of its boundaries.",
+  "legal.sources.link": "See the source data",
+  "legal.sources.licence": "License: CC BY 4.0"
 }

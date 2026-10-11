@@ -501,7 +501,7 @@
   "place.shared": "Copiado. Cole em uma mensagem.",
   "place.website": "Site do lugar",
   "places.all": "Todos",
-  "places.areaLabel": "CEP",
+  "places.areaLabel": "CEP ou bairro",
   "places.areaNone": "Nada encontrado. Tente um CEP.",
   "places.areaPrivacy": "Pam lembra a área que você escolhe somente neste telefone.",
   "places.areaResults": "Áreas que você pode escolher",
@@ -1425,7 +1425,7 @@
   "places.kind.neighborhood": "Bairro",
   "places.kind.landmark": "Ponto de referência",
   "places.kind.address": "Endereço",
-  "places.areaHint": "Como 19107.",
+  "places.areaHint": "Como 19107, ou Fishtown.",
   "messages.visit.label": "Sua visita, {day} às {time}. Ver o lugar.",
   "points.hero.toNext": "Mais {count} para chegar a {next}",
   "points.hero.top": "Você chegou ao topo da escada.",
@@ -1587,5 +1587,9 @@
   "supportReply.send": "Enviar texto",
   "supportReply.sent": "Na fila. Sai em até cinco minutos.",
   "supportReply.noNumber": "Não há número para enviar o texto.",
-  "supportReply.failed": "Não foi enviado. Tente de novo."
+  "supportReply.failed": "Não foi enviado. Tente de novo.",
+  "legal.sources.title": "Fontes de dados",
+  "legal.sources.neighborhoods": "Os nomes dos bairros na busca por área vêm de “Philadelphia Neighborhoods”, criado pela Abaca Labs. Pam o modificou para guardar um ponto por bairro em vez dos limites.",
+  "legal.sources.link": "Ver os dados de origem",
+  "legal.sources.licence": "Licença: CC BY 4.0"
 }
