@@ -34,4 +34,14 @@
   body:has([data-page='post']) {
     background-color: var(--color-background-card);
   }
+
+  /* Support's search suggestions (the app's search bar): the list never runs past the screen, and a long question or
+     title wraps onto a second line instead of being cut with "…" (a question somebody has to read to choose). */
+  .astryx-typeahead-dropdown {
+    max-width: calc(100vw - 48px);
+  }
+  .astryx-typeahead-dropdown * {
+    white-space: normal;
+    text-overflow: clip;
+  }
 }
