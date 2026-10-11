@@ -124,9 +124,16 @@ function useSpy(ids: readonly string[], line: number): [string, (id: string, set
         setActive(els[els.length - 1]!.id);
         return;
       }
+      // A heading is "the one you are in" once it is in the upper part of the screen, so a section whose text has scrolled
+      // away is not left marked while the next one is already showing (Iris, SP3).
+      if (window.scrollY < 8) {
+        setActive(els[0]!.id);
+        return;
+      }
+      const reach = line + window.innerHeight * 0.25;
       let current = els[0]!.id;
       for (const el of els) {
-        if (el.getBoundingClientRect().top <= line) current = el.id;
+        if (el.getBoundingClientRect().top <= reach) current = el.id;
         else break;
       }
       setActive(current);
