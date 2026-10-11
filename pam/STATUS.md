@@ -1400,6 +1400,12 @@ recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or 
 connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
+## Design system & Storybook · A27: legal and consent text (11 October)
+
+Branch `claude/pam-design-a27-legal`. Will (a52): "leave it. Legal texts should always run smaller and less emphatic." A27 and Typography now
+say legal and consent text (the consent sentence, the footer's legal links, legal notes) runs smaller and quieter than the screen's
+content; Sign in's two 14px lines are decided, not a gap. Docs only.
+
 ## Design system & Storybook · map: staff Home is live (10 October)
 
 Branch `claude/pam-design-flow-map-3`. The user-flow map shows the live staff Home (rings, and the empty
