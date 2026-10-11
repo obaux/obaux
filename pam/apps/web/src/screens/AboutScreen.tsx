@@ -23,8 +23,10 @@ import { goBack } from '@/lib/navigate';
  *   where the round buttons usually sit.
  * - One sentence for what Pam is; then a pill switch for who is reading, a
  *   line for how it helps them, and their three-slide story — the Sign in
- *   carousel, but in line with the page, rounded, the words in the middle.
- *   The slides are the same lines Sign in shows each of them (D-254).
+ *   carousel, but in line with the page and rounded, with the pictures alone:
+ *   no words over them (Will, 10 October: "only tab and image — it's
+ *   redundant text"). Each picture is named for a screen reader by the same
+ *   line Sign in shows that person (D-254), through `tPlain`.
  * - The way on: "Sign in as …", one row each, opening Sign in with that
  *   person's slides.
  */
@@ -42,16 +44,16 @@ const styles = stylex.create({
 });
 
 export function AboutScreen() {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   const [who, setWho] = useState<Who>('member');
   const lines = who === 'member' ? 'onboarding.' : `onboarding.${who}.`;
   const slides = useMemo(
     () => [
-      { id: `${who}-1`, image: '/onboarding/hero-city.webp', text: t(`${lines}1`) },
-      { id: `${who}-2`, image: '/onboarding/hero-phone.webp', text: t(`${lines}2`) },
-      { id: `${who}-3`, image: '/onboarding/hero-sneakers.webp', text: t(`${lines}3`) },
+      { id: `${who}-1`, image: '/onboarding/hero-city.webp', text: tPlain(`${lines}1`) },
+      { id: `${who}-2`, image: '/onboarding/hero-phone.webp', text: tPlain(`${lines}2`) },
+      { id: `${who}-3`, image: '/onboarding/hero-sneakers.webp', text: tPlain(`${lines}3`) },
     ],
-    [t, who, lines],
+    [tPlain, who, lines],
   );
 
   return (
@@ -83,7 +85,7 @@ export function AboutScreen() {
       <VStack gap={3}>
         <Text xstyle={styles.how}>{t(`about.how.${who}`)}</Text>
         {/* Keyed by who, so switching starts their story at its first slide. */}
-        <OnboardingSlides key={who} slides={slides} label={t(`about.tab.${who}`)} variant="inline" />
+        <OnboardingSlides key={who} slides={slides} label={t(`about.tab.${who}`)} variant="inline" showLines={false} />
       </VStack>
 
       <VStack gap={2}>
