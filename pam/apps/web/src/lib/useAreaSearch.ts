@@ -80,6 +80,12 @@ export function loadOrigin(): AreaOption {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return CITY_HALL;
     const parsed = JSON.parse(raw) as AreaOption;
+    // A phone's own position kept by an earlier version is thrown away, and the next visit
+    // starts from City Hall (D-536).
+    if (parsed?.id === 'here') {
+      window.localStorage.removeItem(STORAGE_KEY);
+      return CITY_HALL;
+    }
     if (typeof parsed?.lat === 'number' && typeof parsed?.lon === 'number' && parsed.label) {
       return parsed;
     }

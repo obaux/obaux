@@ -20,7 +20,7 @@ Config 1094, web tests, tsc, e2e area-picker, focus-text-boxes, places (74 passe
 
 ## Left undone
 
-Street-address search through Pam's own server (Mira: after "I'm here"). English for Sage: `places.areaLabel` "ZIP code or neighborhood", `places.areaHint` "Like 19107, or Fishtown.", `places.areaPrivacy` "Pam does not save where you look."
+Street-address search through Pam's own server (Mira: after "I'm here"). Picker strings signed by Sage: `places.areaLabel` "ZIP code", `places.areaHint` "Like 19107.", `places.areaPrivacy` "Pam remembers the area you pick on this phone only." (translations by Lena, merged).
 
 ## Needs a human
 

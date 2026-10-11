@@ -10,6 +10,7 @@ describe('the remembered starting point', () => {
       localStorage: {
         getItem: (k: string) => store.get(k) ?? null,
         setItem: (k: string, v: string) => void store.set(k, v),
+        removeItem: (k: string) => void store.delete(k),
       },
     });
   });
@@ -29,5 +30,11 @@ describe('the remembered starting point', () => {
     saveOrigin({ id: 'a2', kind: 'zip', label: '19122', lat: 39.977653, lon: -75.143016 });
     saveOrigin({ id: 'here', kind: 'address', label: 'your location', lat: 39.9, lon: -75.1 });
     expect(loadOrigin().label).toBe('19122');
+  });
+
+  it('throws away a position an earlier version kept, and starts from City Hall', () => {
+    store.set('pam.origin', JSON.stringify({ id: 'here', kind: 'address', label: 'your location', lat: 39.9, lon: -75.1 }));
+    expect(loadOrigin()).toEqual(CITY_HALL);
+    expect(store.has('pam.origin')).toBe(false);
   });
 });
