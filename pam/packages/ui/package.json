@@ -9,6 +9,7 @@
     ".": "./src/index.ts",
     "./RoleSwitch": "./src/RoleSwitch.tsx",
     "./CodeBoxes": "./src/CodeBoxes.tsx",
+    "./ConfirmTip": "./src/ConfirmTip.tsx",
     "./SavedStrip": "./src/SavedStrip.tsx",
     "./PeopleStrip": "./src/PeopleStrip.tsx",
     "./TabBar": "./src/TabBar.tsx",

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { useRouter } from 'next/navigation';
 import { DropdownMenu } from '@astryxdesign/core/DropdownMenu';
@@ -9,6 +10,7 @@ import { IconButton } from '@astryxdesign/core/IconButton';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BookmarkIcon, FlagIcon, MessagesIcon, ShareIcon } from '@pam/ui';
 import { roundAction } from '@pam/ui/roundAction';
+import { ConfirmTip } from '@pam/ui/ConfirmTip';
 import { DUMMY_PROGRAM_LEADS } from '@pam/config/dummy-people';
 import { DUMMY_SELF_ID, dummyConversationIdBetween } from '@pam/config/dummy-conversations';
 import { useI18n } from '@/lib/i18n';
@@ -80,14 +82,20 @@ export function PlaceBarActions({
 }) {
   const { t } = useI18n();
   const router = useRouter();
+  // Each tap that saves says "Saved" by the button for about two seconds (Will, 11 October); taking it off says nothing.
+  const [savedTaps, setSavedTaps] = useState(0);
   return (
     <>
       {onSave ? (
+        <ConfirmTip text={t('places.saved')} trigger={savedTaps}>
         <IconButton
           label={isSaved ? t('places.saved') : t('place.save')}
           variant="ghost"
           aria-pressed={isSaved}
-          onClick={onSave}
+          onClick={() => {
+            if (!isSaved) setSavedTaps((n) => n + 1);
+            onSave();
+          }}
           icon={
             <HStack>
               <BookmarkIcon {...ICON} isFilled={isSaved} />
@@ -95,6 +103,7 @@ export function PlaceBarActions({
           }
           xstyle={[roundAction.plain, isSaved && styles.saved]}
         />
+        </ConfirmTip>
       ) : null}
       <DropdownMenu
         button={{
