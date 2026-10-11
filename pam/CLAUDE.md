@@ -226,9 +226,12 @@ These come from the build SOP and are enforced by tests, not convention:
   appointment reminders, D-431), carry emoji, or send
   without a human recorded in `reviewedBy` **for that language**. A language
   nobody has signed is texted in English, never in a draft (A25).
-- **Never dead-end.** Every screen has a visible way back and a visible way to
-  get help. (The hero template's screens keep the way back but carry no help —
-  Will's exception, `docs/sop-amendments.md` A19.)
+- **Never dead-end.** Every screen has a visible way back. A visible way to get
+  help is required where a person can get stuck: sign-in and joining, forms and
+  their errors, anything failed or waiting, each step of a multi-step task, and any
+  screen that says to call. Screens for looking around (the tabs, lists, a place)
+  need none: help is one tap from Profile and on Home (Will, 11 October,
+  `docs/amendments/A26-…`; the hero template's exception is A19).
 - **One primary action per screen.** Two primary `BigButton`s means the screen
   is doing two things (a `variant="secondary"` one beside it is fine — D-239).
 - **48px minimum touch target, 56px primary buttons (secondary the same — D-239), 16px body text on mobile (A23).**
