@@ -13,7 +13,8 @@ import { MenuList } from '@pam/ui/MenuList';
 import { intlLocale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { openConversation } from '@/lib/openConversation';
-import { useProgramMemberCard } from '@/lib/useProgramMemberCard';
+import { useCanMessage, useProgramMemberCard } from '@/lib/useProgramMemberCard';
+import { useSession } from '@/lib/useSession';
 
 /**
  * What a program lead sees of a member linked to their program (D-542, Will 11 October): their first name, the visits planned
@@ -31,6 +32,9 @@ export function ProgramMemberCardView({ id, header }: { readonly id: string | nu
   const { t, tPlain, locale } = useI18n();
   const router = useRouter();
   const state = useProgramMemberCard(id, true);
+  const { state: session } = useSession();
+  // Hidden for a pair where either has blocked the other, and until that is known: a row that lands on Messages with no reason is worse.
+  const canMessage = useCanMessage(id, session.status === 'signed-in' ? session.session.userId : null);
 
   if (state.status === 'loading') {
     return (
@@ -73,17 +77,19 @@ export function ProgramMemberCardView({ id, header }: { readonly id: string | nu
       <DataHeading level={1} xstyle={styles.name}>
         {card.firstName}
       </DataHeading>
-      <MenuList
-        label={tPlain('person.actions.label', { name: card.firstName })}
-        items={[
-          {
-            id: 'message',
-            label: t('person.message.action', { name: card.firstName }),
-            icon: <MessagesIcon width={26} height={26} />,
-            onSelect: message,
-          },
-        ]}
-      />
+      {canMessage ? (
+        <MenuList
+          label={tPlain('person.actions.label', { name: card.firstName })}
+          items={[
+            {
+              id: 'message',
+              label: t('person.message.action', { name: card.firstName }),
+              icon: <MessagesIcon width={26} height={26} />,
+              onSelect: message,
+            },
+          ]}
+        />
+      ) : null}
       <VStack gap={3}>
         <Heading level={2} xstyle={styles.section}>
           {t('person.visits.title')}

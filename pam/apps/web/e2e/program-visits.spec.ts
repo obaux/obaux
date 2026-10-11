@@ -128,6 +128,7 @@ test('a program lead opening a linked member sees a small card: first name, this
       { appointment_id: 'a1', starts_at: soon(2), ends_at: null, status: 'scheduled', service_name: 'GED class', checked_in_at: null },
     ] })),
   );
+  await page.route('**/rest/v1/rpc/is_blocked_between*', (route) => route.fulfill(json(false)));
   await page.goto('/person/?id=m1');
   await settled(page);
   await expect(page.getByRole('heading', { name: 'Tanya', level: 1 })).toBeVisible();
@@ -145,4 +146,16 @@ test('a member who is not linked to the program is "not found" to its lead (D-54
   await page.goto('/person/?id=m9');
   await settled(page);
   await expect(page.getByText('We could not find that person').first()).toBeVisible();
+});
+
+test('the card has no Message row when either has blocked the other (D-542)', async ({ page }) => {
+  await signedInLead(page, []);
+  await page.route('**/rest/v1/rpc/program_member_card*', (route) =>
+    route.fulfill(json({ member_id: 'm1', first_name: 'Tanya', visits: [] })),
+  );
+  await page.route('**/rest/v1/rpc/is_blocked_between*', (route) => route.fulfill(json(true)));
+  await page.goto('/person/?id=m1');
+  await settled(page);
+  await expect(page.getByRole('heading', { name: 'Tanya', level: 1 })).toBeVisible();
+  await expect(page.getByText('Message Tanya')).toHaveCount(0);
 });

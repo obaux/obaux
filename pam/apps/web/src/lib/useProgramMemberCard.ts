@@ -71,3 +71,31 @@ export function useProgramMemberCard(memberId: string | null, enabled: boolean):
   }, [memberId, enabled]);
   return state;
 }
+
+/**
+ * Whether messaging this member is possible at all: false when either of them has blocked the other (0076). `null` until it is
+ * known, and when it cannot be told, so the Message row is shown only for a pair known to be free to write (D-542).
+ */
+export function useCanMessage(memberId: string | null, myId: string | null): boolean | null {
+  const [can, setCan] = useState<boolean | null>(null);
+  useEffect(() => {
+    if (!memberId || !myId) {
+      setCan(null);
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      try {
+        const { createClient } = await import('./supabase');
+        const { data, error } = await createClient().rpc('is_blocked_between', { a: myId, b: memberId });
+        if (!cancelled) setCan(error || typeof data !== 'boolean' ? null : !data);
+      } catch {
+        if (!cancelled) setCan(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [memberId, myId]);
+  return can;
+}
