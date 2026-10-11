@@ -6,6 +6,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Link } from '@astryxdesign/core/Link';
 import { sectionId } from '../lib/slug';
+import { tap } from '../lib/tap';
 
 const styles = stylex.create({
   // Text keeps a readable line length; the cards (how to find it, pictures) use the full width.
@@ -73,9 +74,9 @@ export function P({ children }: { readonly children: ReactNode }) {
  */
 export function ReadMore({ label, href }: { readonly label: string; readonly href: string }) {
   return (
-    <VStack paddingBlock={2}>
+    <VStack>
       <HStack>
-        <Link href={href} hasUnderline isStandalone>
+        <Link href={href} hasUnderline isStandalone xstyle={tap.link}>
           {label}
         </Link>
       </HStack>

@@ -21,9 +21,30 @@ export interface SupportPost {
    * Website journey (with a Draft banner). Remove the line to publish.
    */
   readonly status?: 'draft';
+  /** `false`: the post carries its own way to a person, so it does not end with "Still stuck?" (Your safety). */
+  readonly stillStuck?: false;
 }
 
 const ALL: readonly SupportPost[] = [
+  {
+    slug: 'cant-sign-in',
+    topic: 'members',
+    audience: 'everyone',
+    title: 'I can’t sign in',
+    summary: 'How to get into Pam: who can join on their own, who needs an invite, and what to do when the code or the link doesn’t work.',
+    updated: '2026-10-11',
+    keywords: ['sign in', 'signin', 'login', 'log in', 'cant login', 'join', 'become a case manager', 'case manager', 'add my program', 'program', 'invite', 'code', 'no code', 'wrong code', 'password', 'locked out', 'get in', 'become a member'],
+  },
+  {
+    slug: 'your-safety',
+    topic: 'members',
+    audience: 'everyone',
+    title: 'Your safety',
+    summary: 'What to do if you are in danger, in crisis, or a message feels unsafe.',
+    updated: '2026-10-11',
+    stillStuck: false,
+    keywords: ['safety', 'safe', 'danger', 'emergency', '911', '988', 'crisis', 'unsafe', 'scared', 'afraid', 'threat', 'hurt', 'report', 'suspicious', 'block', 'suicide', 'abuse', 'harassed'],
+  },
   {
     slug: 'start-here',
     topic: 'members',

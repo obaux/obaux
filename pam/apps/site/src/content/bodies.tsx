@@ -14,6 +14,8 @@ import { StaffRequests } from './StaffRequests';
 import { StartHere } from './StartHere';
 import { TalkingToPam } from './TalkingToPam';
 import { YourLanguage } from './YourLanguage';
+import { CantSignIn } from './CantSignIn';
+import { YourSafety } from './YourSafety';
 import { PlaceTold } from './PlaceTold';
 import { TextsFromPam } from './TextsFromPam';
 import { WhatOthersCanSee } from './WhatOthersCanSee';
@@ -27,6 +29,8 @@ import { WhoIsMyGuide } from './WhoIsMyGuide';
  * lists, so nothing else needs touching.
  */
 export const BODIES: Record<string, () => JSX.Element> = {
+  'cant-sign-in': CantSignIn,
+  'your-safety': YourSafety,
   'case-manager-assignments': CaseManagerAssignments,
   'keeping-your-listing-up-to-date': KeepingYourListing,
   'who-is-my-guide': WhoIsMyGuide,

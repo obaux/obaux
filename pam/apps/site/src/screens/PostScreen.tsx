@@ -6,6 +6,7 @@ import { Link } from '@astryxdesign/core/Link';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { tap } from '../lib/tap';
 import { Frame } from '../components/Frame';
 import { PostNav } from '../components/PostNav';
 import { StillStuck } from '../components/StillStuck';
@@ -86,7 +87,8 @@ export function PostScreen({ slug, allowDraft = false }: { readonly slug: string
   const Body = BODIES[slug];
   if (!post || !Body) return null;
   // The sections, read from the body's own element: the menu is in the first paint.
-  const sections = [...collectSections(Body()), STILL_STUCK];
+  const withStuck = post.stillStuck !== false;
+  const sections = withStuck ? [...collectSections(Body(), slug), STILL_STUCK] : collectSections(Body(), slug);
   return (
     <Frame width="wide" gap={6}>
       <div {...stylex.props(styles.layout)}>
@@ -97,7 +99,7 @@ export function PostScreen({ slug, allowDraft = false }: { readonly slug: string
         <VStack gap={6} paddingBlockStart={8}>
           <VStack gap={4} xstyle={styles.header}>
             <HStack as="nav" gap={2} xstyle={styles.crumbs} aria-label="Breadcrumb">
-              <Link href="/support/">Support</Link>
+              <Link href="/support/" xstyle={tap.link}>Support</Link>
               <Text type="supporting" aria-hidden>
                 →
               </Text>
@@ -120,7 +122,7 @@ export function PostScreen({ slug, allowDraft = false }: { readonly slug: string
         </VStack>
         <PostNav sections={sections} variant="bar" />
         <Body />
-        <StillStuck />
+        {withStuck ? <StillStuck /> : null}
       </VStack>
       <PostNav sections={sections} variant="side" />
       </div>

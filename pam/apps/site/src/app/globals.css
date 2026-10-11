@@ -55,4 +55,21 @@
       --post-scroll-offset: 24px;
     }
   }
+
+  /* A visible ring on everything you can reach with Tab (Iris's finding S2, 11 October: the header links, search box,
+     topic and post links, Open Pam and the footer showed none). Astryx's own focus rule loses to an
+     `outline-style: none` that its link, nav and button styles also set, so it is drawn here, from the same tokens. */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  summary:focus-visible,
+  [role='button']:focus-visible,
+  [role='combobox']:focus-visible,
+  [role='tab']:focus-visible,
+  [tabindex]:not([tabindex='-1']):focus-visible {
+    outline: var(--focus-outline-width, 2px) var(--focus-outline-style, solid) var(--focus-outline-color, currentColor) !important;
+    outline-offset: var(--focus-outline-offset, 3px) !important;
+  }
 }

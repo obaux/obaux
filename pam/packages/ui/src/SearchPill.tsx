@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Icon } from '@astryxdesign/core/Icon';
 import { Button } from '@astryxdesign/core/Button';
@@ -56,6 +56,11 @@ export interface SearchPillProps<T extends SearchPillItem> {
   readonly clearSignal?: number;
   /** Focus it on arrival — after the centred launcher was tapped (D-265). */
   readonly hasAutoFocus?: boolean;
+  /**
+   * Words to show in the bar when it first appears, for a search that came back from the address (the public Support
+   * search keeps its query in the URL, so Back restores it). The next keystroke replaces them.
+   */
+  readonly initialQuery?: string;
 }
 
 const styles = stylex.create({
@@ -121,8 +126,21 @@ export function SearchPill<T extends SearchPillItem>({
   itemIcon,
   clearSignal = 0,
   hasAutoFocus = false,
+  initialQuery = '',
 }: SearchPillProps<T>) {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(initialQuery);
+  const groupRef = useRef<HTMLDivElement>(null);
+  // Words that came back from the address go into the box the way typing puts them there: the input's own value is set
+  // and an input event tells the Typeahead, which then reports them. (Its `value` prop would show a chosen token instead.)
+  useEffect(() => {
+    if (!initialQuery) return;
+    const input = groupRef.current?.querySelector('input');
+    if (!input) return;
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set?.call(input, initialQuery);
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    // Once, on arrival.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // The Typeahead keeps its own text; a fresh one is the only clean way to
   // empty it. `round` > 0 also means "focus it", so clearing keeps the cursor.
   const [round, setRound] = useState(0);
@@ -142,7 +160,7 @@ export function SearchPill<T extends SearchPillItem>({
   }, [clearSignal]);
 
   return (
-    <InputGroup label={label} isLabelHidden size="lg" xstyle={styles.group}>
+    <InputGroup ref={groupRef} label={label} isLabelHidden size="lg" xstyle={styles.group}>
       <Typeahead<T>
         key={round}
         label={label}

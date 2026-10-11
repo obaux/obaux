@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { TopNav, TopNavItem } from '@astryxdesign/core/TopNav';
 import { Button } from '@pam/ui/Button';
 import { SIGN_IN_URL } from '../lib/links';
+import { tap } from '../lib/tap';
 import { Frame } from './Frame';
 import { Wordmark } from './Wordmark';
 
@@ -31,17 +32,17 @@ export function SiteNav({ path: given }: { readonly path?: string }) {
     <TopNav
       label="Pam"
       heading={
-        <a href="/" aria-label="Pam, home">
+        <a href="/" aria-label="Pam, home" {...stylex.props(tap.link)}>
           <Wordmark />
         </a>
       }
       startContent={
         <>
-          <TopNavItem label="Home" href="/" isSelected={path === '/'} xstyle={styles.homeLink} />
-          <TopNavItem label="Support" href="/support/" isSelected={path.startsWith('/support')} />
+          <TopNavItem label="Home" href="/" isSelected={path === '/'} xstyle={[styles.homeLink, tap.target]} />
+          <TopNavItem label="Support" href="/support/" isSelected={path.startsWith('/support')} xstyle={tap.target} />
         </>
       }
-      endContent={<Button label="Sign in" variant="primary" href={SIGN_IN_URL} />}
+      endContent={<Button label="Sign in" variant="primary" href={SIGN_IN_URL} xstyle={tap.target} />}
     />
     </Frame>
   );

@@ -89,7 +89,7 @@ export const SupportSearchNothingFound: Story = {
   play: async ({ canvasElement }) => {
     const box = await within(canvasElement).findByRole('combobox', { name: 'Search Support' });
     await userEvent.type(box, 'zzzz');
-    await expect(await within(canvasElement).findByText(/Nothing matched/)).toBeInTheDocument();
+    await expect(await within(canvasElement).findByText(/We do not have an article for that yet/)).toBeInTheDocument();
     await expect(await within(canvasElement).findByText('Still stuck?')).toBeInTheDocument();
     await expect(await within(canvasElement).findByText('Browse by topic')).toBeInTheDocument();
   },

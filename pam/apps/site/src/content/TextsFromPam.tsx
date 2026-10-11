@@ -1,7 +1,7 @@
 import { CompareTable } from '../components/CompareTable';
 import { Body, Lead, P, Section } from '../components/Prose';
 import { HowTo } from '../components/HowTo';
-import { VISIT_REMINDERS_LIVE } from './flags';
+import { PLACE_TEXTS_LIVE, VISIT_REMINDERS_LIVE } from './flags';
 
 /**
  * Support post: Texts from Pam (everyone). Written against the LIVE `dispatch-sms`
@@ -42,10 +42,14 @@ export function TextsFromPam() {
                   },
                 ]
               : []),
-            {
-              label: 'A place you saved has closed or moved',
-              cells: ['When Pam finds out that a place you saved is closed, has moved or is listed wrong.', 'Members who said yes to texts.'],
-            },
+            ...(PLACE_TEXTS_LIVE
+              ? [
+                  {
+                    label: 'A place you saved has closed or moved',
+                    cells: ['When Pam finds out that a place you saved is closed, has moved or is listed wrong.', 'Members who said yes to texts.'],
+                  },
+                ]
+              : []),
           ]}
         />
         <P>Every text starts with Pam’s name, so you know who it is from. Texts come in English or Spanish.</P>

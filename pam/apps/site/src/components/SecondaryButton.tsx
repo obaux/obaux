@@ -2,6 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 import type { ComponentProps } from 'react';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { Button } from '@pam/ui/Button';
+import { tap } from '../lib/tap';
 
 const styles = stylex.create({
   // A secondary button has a pale fill that all but disappears on a gray card or page (Will, 10 October
@@ -18,5 +19,5 @@ type Props = Omit<ComponentProps<typeof Button>, 'variant'>;
  * keeps the site to one edge, its own, until the website's Friday batch drops this border for that one.
  */
 export function SecondaryButton({ xstyle, ...props }: Props) {
-  return <Button {...props} variant="secondary" hasEdge={false} xstyle={[styles.border, xstyle]} />;
+  return <Button {...props} variant="secondary" hasEdge={false} xstyle={[styles.border, tap.target, xstyle]} />;
 }

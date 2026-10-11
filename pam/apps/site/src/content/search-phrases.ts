@@ -34,7 +34,7 @@ export const SEARCH_PHRASES: readonly SearchPhrase[] = [
   { phrase: 'why didnt i get a code', who: 'anyone', answer: 'texts-from-pam', also: ['joining-pam'] },
   { phrase: 'code not coming', who: 'anyone', answer: 'texts-from-pam' },
   { phrase: 'the code doesnt work', who: 'anyone', answer: 'joining-pam', also: ['texts-from-pam'] },
-  { phrase: 'cant sign in', who: 'anyone', answer: 'joining-pam', also: ['texts-from-pam'] },
+  { phrase: 'cant sign in', who: 'anyone', answer: 'cant-sign-in', also: ['joining-pam', 'texts-from-pam'] },
   { phrase: 'it says that code is too old', who: 'resident', answer: 'joining-pam', also: ['sending-an-invite'] },
   { phrase: 'my link expired', who: 'anyone', answer: 'joining-pam', also: ['sending-an-invite', 'joining-as-staff'] },
   { phrase: 'code is for a different phone', who: 'resident', answer: 'joining-pam' },
@@ -44,9 +44,13 @@ export const SEARCH_PHRASES: readonly SearchPhrase[] = [
     answer: null,
     gap: 'Changing your phone number: contact Pam, and what happens to your account.',
   },
+  { phrase: 'i lost my phone', who: 'anyone', answer: null, gap: 'Same post as “i got a new phone number”.' },
+  { phrase: 'change my number', who: 'anyone', answer: null, gap: 'Same post as “i got a new phone number”.' },
+  { phrase: 'password', who: 'anyone', answer: 'cant-sign-in', also: ['joining-pam'] },
+  { phrase: 'i forgot my password', who: 'anyone', answer: 'cant-sign-in', also: ['joining-pam'] },
 
   // Joining
-  { phrase: 'how do i join', who: 'resident', answer: 'joining-pam' },
+  { phrase: 'how do i join', who: 'resident', answer: 'cant-sign-in', also: ['joining-pam'] },
   { phrase: 'i dont have a code', who: 'resident', answer: 'joining-pam' },
   { phrase: 'pam is not in my city', who: 'resident', answer: 'joining-pam' },
   { phrase: 'how do i join as staff', who: 'case manager', answer: 'joining-as-staff' },
@@ -83,6 +87,7 @@ export const SEARCH_PHRASES: readonly SearchPhrase[] = [
   { phrase: 'they didnt know i was coming', who: 'resident', answer: 'is-the-place-told' },
   { phrase: 'i was not on their list', who: 'resident', answer: 'is-the-place-told' },
   { phrase: 'they said i had no appointment', who: 'resident', answer: 'is-the-place-told' },
+  { phrase: 'no appointment', who: 'resident', answer: 'is-the-place-told' },
   { phrase: 'they turned me away', who: 'resident', answer: 'is-the-place-told' },
   {
     phrase: 'they said i missed it',
@@ -102,7 +107,9 @@ export const SEARCH_PHRASES: readonly SearchPhrase[] = [
   { phrase: 'someone is bothering me', who: 'anyone', answer: 'messages-in-pam' },
   { phrase: 'block someone', who: 'anyone', answer: 'messages-in-pam' },
   { phrase: 'report a message', who: 'anyone', answer: 'messages-in-pam' },
-  { phrase: 'i feel unsafe', who: 'anyone', answer: 'messages-in-pam' },
+  { phrase: 'i feel unsafe', who: 'anyone', answer: 'your-safety', also: ['messages-in-pam'] },
+  { phrase: 'i am in danger', who: 'anyone', answer: 'your-safety' },
+  { phrase: 'i am in crisis', who: 'anyone', answer: 'your-safety' },
 
   // Points
   { phrase: 'how do i get points', who: 'resident', answer: 'points-and-badges' },
@@ -155,7 +162,8 @@ export const SEARCH_PHRASES: readonly SearchPhrase[] = [
   },
 
   // Providers
-  { phrase: 'how do i add my program', who: 'provider', answer: 'keeping-your-listing-up-to-date', also: ['joining-as-staff', 'one-phone-two-sides'] },
+  { phrase: 'how do i add my program', who: 'provider', answer: 'cant-sign-in', also: ['keeping-your-listing-up-to-date', 'joining-as-staff', 'one-phone-two-sides'] },
+  { phrase: 'add my program', who: 'provider', answer: 'cant-sign-in', also: ['keeping-your-listing-up-to-date'] },
   { phrase: 'my program is still in review', who: 'provider', answer: 'keeping-your-listing-up-to-date' },
   { phrase: 'change our address', who: 'provider', answer: 'keeping-your-listing-up-to-date' },
   { phrase: 'use pam for myself and my program', who: 'provider', answer: 'one-phone-two-sides' },
@@ -176,7 +184,9 @@ export const SEARCH_PHRASES: readonly SearchPhrase[] = [
   // Second batch (Sage, 11 October): other ways people say the same things
   { phrase: 'the code is not coming', who: 'anyone', answer: 'texts-from-pam' },
   { phrase: 'i did not get a text', who: 'anyone', answer: 'texts-from-pam' },
-  { phrase: 'i cant sign in', who: 'anyone', answer: 'joining-pam' },
+  { phrase: 'i cant sign in', who: 'anyone', answer: 'cant-sign-in', also: ['joining-pam'] },
+  { phrase: 'i cant login', who: 'anyone', answer: 'cant-sign-in', also: ['joining-pam'] },
+  { phrase: 'become a case manager', who: 'case manager', answer: 'cant-sign-in', also: ['joining-as-staff'] },
   { phrase: 'my link to join is too old', who: 'anyone', answer: 'joining-pam' },
   { phrase: 'the code is for a different phone', who: 'anyone', answer: 'joining-pam' },
   { phrase: 'what does the program see about me', who: 'anyone', answer: 'what-others-can-see' },

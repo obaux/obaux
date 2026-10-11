@@ -94,6 +94,52 @@ describe('search forgives typing mistakes', () => {
   });
 });
 
+describe('the A28 posts are found by the words people use', () => {
+  it('sends sign-in and joining questions to “I can’t sign in”', () => {
+    for (const q of ['i cant login', 'cant sign in', 'how do i join', 'become a case manager', 'add my program']) {
+      expect(find(q).posts[0]?.slug, q).toBe('cant-sign-in');
+    }
+  });
+
+  it('sends “my code didn’t come” to the texts post, not to sign-in alone', () => {
+    expect(find('why didnt i get a code').posts.slice(0, 3).map((p) => p.slug)).toContain('texts-from-pam');
+  });
+
+  it('finds the safety post for danger and crisis', () => {
+    for (const q of ['i feel unsafe', 'i am in danger', 'i am in crisis', '911', '988']) {
+      expect(find(q).posts.slice(0, 2).map((p) => p.slug), q).toContain('your-safety');
+    }
+  });
+
+  it('reads “call” and “phone number” as a way to reach a person, never a number', () => {
+    for (const q of ['call', 'phone number', 'pam phone number', 'call pam']) {
+      expect(find(q).posts.slice(0, 3).map((p) => p.slug), q).toContain('talking-to-pam');
+    }
+  });
+
+  it('finds “does the place know I’m coming?” for the ways people say a place was not told', () => {
+    for (const q of ['i showed up but they had no clue', 'they didnt know i was coming', 'not on their list', 'no appointment', 'they turned me away']) {
+      expect(find(q).posts[0]?.slug, q).toBe('is-the-place-told');
+    }
+  });
+});
+
+describe('the words Iris’s help-site review typed (W1, 11 October)', () => {
+  it('finds the right post for each, or says there is no article yet', () => {
+    const first = (q: string) => find(q).posts[0]?.slug;
+    expect(first('i cant login')).toBe('cant-sign-in');
+    expect(first('remider')).toBe('texts-from-pam');
+    expect(find('apointment').posts.slice(0, 3).map((p) => p.slug)).toContain('planning-a-visit');
+    expect(first('invte')).toBe('sending-an-invite');
+    expect(first('gide')).toBe('who-is-my-guide');
+    expect(first('password')).toBe('cant-sign-in');
+    expect(first('spanish')).toBe('your-language');
+    // No post yet for a lost phone or a new number: the page says so, and offers the way to a person.
+    expect(find('lost my phone').gap?.phrase).toBe('i lost my phone');
+    expect(find('change my number').gap?.phrase).toBe('change my number');
+  });
+});
+
 describe('search knows everyday words for the same thing', () => {
   it('finds the post for another word for the same thing', () => {
     expect(find('sms').posts[0]?.slug).toBe('texts-from-pam');

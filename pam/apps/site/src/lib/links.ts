@@ -32,3 +32,10 @@ export function legalUrl(kind: 'privacy' | 'terms', returnPath: string): string 
 export const SITE_URL = (
   process.env['NEXT_PUBLIC_SITE_URL'] ?? 'https://joinpam.org'
 ).replace(/\/$/, '');
+
+/**
+ * The help desk's address (A28, Will, 11 October: no phone calls; people write to us). The one place it is
+ * written: StillStuck and the post "Your safety" read it here. The form that replaces the plain address is
+ * later, behind a switch that is off.
+ */
+export const HELP_EMAIL = 'hello@joinpam.org';
