@@ -56,3 +56,12 @@ describe('no phone calls (A28)', () => {
     }
   });
 });
+
+describe('the app links to “Your safety” (Lena: apps/web/src/lib/helpDesk.ts)', () => {
+  it('has a published post at /support/your-safety/ that does not end with a second Still stuck?', async () => {
+    const { POSTS } = await import('../src/content/posts');
+    const post = POSTS.find((p) => p.slug === 'your-safety');
+    expect(post, 'the app’s “Talk to someone now” opens /support/your-safety/').toBeTruthy();
+    expect(post?.status).toBeUndefined();
+  });
+});
