@@ -17,6 +17,13 @@ const styles = stylex.create({
   form: { width: '100%' },
 });
 
+/** What a field says when it is empty or wrong (Sage, signed, 11 October). */
+const WORDS = {
+  message: 'Tell us what happened, in a few words.',
+  emailEmpty: 'Add your email so we can write back.',
+  emailWrong: 'That email does not look right. Check it and try again.',
+} as const;
+
 type Phase = 'address' | 'form' | 'sending' | 'sent' | 'failed';
 
 /**
@@ -30,7 +37,7 @@ export function HelpRequest() {
   const [phase, setPhase] = useState<Phase>('address');
   const [message, setMessage] = useState('');
   const [email, setEmail] = useState('');
-  const [bad, setBad] = useState<string | null>(null);
+  const [bad, setBad] = useState<{ message?: string; email?: string }>({});
 
   useEffect(() => {
     let alive = true;
@@ -66,9 +73,12 @@ export function HelpRequest() {
 
   const send = async (form: HTMLFormElement) => {
     const trap = (form.elements.namedItem('website') as HTMLInputElement | null)?.value ?? '';
-    if (message.trim().length < 3) return setBad('message');
-    if (!/^\S+@\S+\.\S+$/.test(email.trim())) return setBad('email');
-    setBad(null);
+    const problems: { message?: string; email?: string } = {
+      ...(message.trim().length < 3 ? { message: WORDS.message } : {}),
+      ...(!email.trim() ? { email: WORDS.emailEmpty } : !/^\S+@\S+\.\S+$/.test(email.trim()) ? { email: WORDS.emailWrong } : {}),
+    };
+    if (problems.message || problems.email) return setBad(problems);
+    setBad({});
     setPhase('sending');
     try {
       const r = await fetch(HELP_REQUEST_URL, {
@@ -85,7 +95,7 @@ export function HelpRequest() {
       if (r.ok) return setPhase('sent');
       if (r.status === 400) {
         const body = (await r.json().catch(() => ({}))) as { field?: string };
-        setBad(body.field ?? null);
+        setBad(body.field === 'message' ? { message: WORDS.message } : body.field === 'email' ? { email: WORDS.emailWrong } : {});
         setPhase('form');
         return;
       }
@@ -125,7 +135,7 @@ export function HelpRequest() {
         rows={5}
         maxLength={3000}
         isRequired
-        {...(bad === 'message' ? { status: { type: 'error' as const } } : {})}
+        {...(bad.message ? { status: { type: 'error' as const, message: bad.message } } : {})}
       />
       <TextInput
         label="How should we answer you?"
@@ -135,7 +145,7 @@ export function HelpRequest() {
         value={email}
         onChange={setEmail}
         isRequired
-        {...(bad === 'email' ? { status: { type: 'error' as const } } : {})}
+        {...(bad.email ? { status: { type: 'error' as const, message: bad.email } } : {})}
       />
       <span {...stylex.props(styles.trap)} aria-hidden="true">
         <input type="text" name="website" tabIndex={-1} autoComplete="off" defaultValue="" />

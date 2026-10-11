@@ -183,6 +183,18 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
     if (!(await box.count())) {
       fail(`help form (${label}): not shown when the function is on`);
     } else {
+      if (label === 'on, sends') {
+        await page.getByRole('button', { name: 'Send to Pam' }).click();
+        await page.waitForTimeout(200);
+        if (!(await page.getByText('Tell us what happened, in a few words.').count())) fail('help form: an empty message says nothing about what to do');
+        await box.fill('x y z');
+        await page.getByRole('textbox', { name: /How should we answer you/ }).fill('nope');
+        await page.getByRole('button', { name: 'Send to Pam' }).click();
+        await page.waitForTimeout(200);
+        const wrong = await page.getByText('That email does not look right. Check it and try again.').count();
+        const empty = await page.getByText('Add your email so we can write back.').count();
+        if (!wrong && !empty) fail('help form: a wrong email says nothing about what to do');
+      }
       await box.fill('I cannot get the code');
       await page.getByRole('textbox', { name: /How should we answer you/ }).fill('a@example.org');
       await page.getByRole('button', { name: 'Send to Pam' }).click();
