@@ -231,7 +231,7 @@
   - Dot's D-528 (the website-only colours and text styles in Figma and apps/site, with two AA text variants).
   Will's card a65 has the website words: five held lines with true fallbacks, Sage's privacy sentence, and two
   colours. Card a66 has the location paragraphs for "I'm here" (p9, p10).
-- **Batch b15:**
+- **Batch b15 pushed at f0fb902, live: Vercel web and pam-site READY, main CI green.** It holds:
   - Nico's D-529: the conversation's own header is back, with the info on top scrolling into a small bar
     whose name fades in. It reverses part of D-411; the buttons keep D-411's positions.
   - Dot's D-530: the code boxes read left to right in Arabic and accept Arabic-Indic and Persian digits.
@@ -239,9 +239,33 @@
   - Sage's ledger.
   - Wren's D-531, all four stages of the new website from Will's Figma: Home, Support index and the post
     template, About Pam, and Still stuck? The Home carousel flips, drifts and has Pause.
+- **Iris tested b15** (`docs/research/2026-10-11-b15-website-thread-codes.md`). Nothing stops anyone. She
+  found three W items and two polish items:
+  - T1: in an Arabic thread, English messages showed their punctuation on the wrong side;
+  - T2: the small bar cut the start of a long Latin name;
+  - H1: Pause on Home looked like plain text and sat below the first screen on a phone;
+  - H2: "Search Support" at 4.3:1 in dark. Withdrawn: her script measured the visually-hidden label;
+  - C1: Sign in turned on after one digit.
+- **Batch b16**, for those findings:
+  - Nico's D-533: dir="auto" on what people wrote and on names in a conversation, including SubPageHeader's
+    bar title in @pam/ui;
+  - Wren's H1: Pause is a pill with an icon on the picture stack, inside the first screen at 320x568 and
+    390x844, with a usability guard;
+  - Dot's D-532: Sign in waits for six digits, because a short code went to Supabase and came back as "wrong
+    code". The search pill's contrast pairs are now in the site's contrast test;
+  - Iris's report.
+
+  Next, for Dot: a way to mark a heading's text as data (a place's, program's or person's name), so names
+  outside conversations get the same fix. Not every Heading: Pam's own headings keep the page's direction.
 
 ## What was wrong, and what missed it
 
+- **A targeted e2e run against a stale build.** Before b16's full suite I ran the sign-in specs alone, and
+  Dot's new test failed in all three projects. Playwright serves `apps/web/out`, which was still b15's build.
+  After rebuilding, all 75 passed. A targeted e2e run needs `pnpm --filter @pam/web build` first. The full
+  suite script already builds before e2e.
+- **A contrast check that counts hidden text.** Iris's H2 came from a page sweep that measured a 1x1, clipped
+  label. Dot's axe run and hand measurement showed the drawn text passes. Iris now skips hidden text.
 - **Ava won't push on the merge desk's word, and that is right.** The merge desk passed on Will's "remove" at
   00:33 and asked her to push at 00:25 and again at 01:02. Each time she stopped with "say 'push the switcher
   branch' in this chat".
@@ -359,6 +383,10 @@
 | Batch b14 (07d8287): db / config / ui / web unit / site tests / e2e full / site a11y, usability, scrollspy | 1288 ok / 1094 / 124 / 125 / 89 / 1400 passed, 19 skipped / 120 scans 0, clear, 300 links 0 |
 | main CI on 07d8287; Vercel web and pam-site | all four green; READY |
 | Batch b15 (before stages 3 and 4): db / config / ui / web unit / site tests / e2e full / storybook / site checks | 1288 ok / 1094 / 124 / 125 / 92 / 1418 passed, 19 skipped / builds / 120 scans 0, clear, 300 links 0; budget 15.3 kB spare |
+| main CI on f0fb902 (b15); Vercel web and pam-site | all four green; READY |
+| Batch b16: sign-in e2e after rebuilding (signin-wrong-code, code-boxes-ltr, short) | 75 passed |
+| Batch b16: db / config / copy:status / ui / web unit / site tests / e2e full | 1288 ok, 0 not ok / 1094 / in step / 124 / 125 / 94 / 1433 passed, 19 skipped |
+| Batch b16: builds, budget, storybook, site a11y / usability / scrollspy | all 0; 15.3 kB spare; builds; 120 scans 0 problems / clear / 300 links 0 problems |
 
 ## Left undone
 
