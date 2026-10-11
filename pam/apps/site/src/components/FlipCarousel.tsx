@@ -6,6 +6,8 @@ import { Button } from '@pam/ui/Button';
 import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
 import { VStack } from '@astryxdesign/core/VStack';
 import { radiusVars, shadowVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { website } from '../lib/website.stylex';
+import { type } from '../lib/website-type.stylex';
 import { tap } from '../lib/tap';
 
 /*
@@ -99,8 +101,40 @@ const styles = stylex.create({
     boxShadow: shadowVars['--shadow-med'],
     backfaceVisibility: 'hidden',
   },
-  controls: { alignItems: 'center', paddingBlockStart: '8px' },
+  wrap: { position: 'relative' },
+  // The Pause / Play control sits on the picture stack, in its top corner, so it is on the first screen on a phone (Iris H1):
+  // a pill that looks pressable (veil fill, hairline, an icon and the label).
+  pause: {
+    position: 'absolute',
+    insetBlockStart: '8px',
+    insetInlineEnd: '8px',
+    zIndex: 10,
+    borderRadius: '24px',
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: website['--website-border-strong'],
+    backgroundColor: website['--website-surface-veil'],
+    color: website['--website-text-primary'],
+    paddingInline: '14px',
+  },
 });
+
+function PauseMark() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <rect x="6" y="4" width="4.5" height="16" rx="1.2" fill="currentColor" />
+      <rect x="13.5" y="4" width="4.5" height="16" rx="1.2" fill="currentColor" />
+    </svg>
+  );
+}
+
+function PlayMark() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z" fill="currentColor" />
+    </svg>
+  );
+}
 
 function usePrefersReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);
@@ -189,7 +223,7 @@ export function FlipCarousel({
         }
       }}
     >
-      <div ref={groupRef}>
+      <div ref={groupRef} {...stylex.props(styles.wrap)}>
         <button type="button" aria-label={nextLabel} onClick={() => goTo(index + 1, true)} {...stylex.props(styles.stage)}>
           {slides.map((slide, i) => {
             const pos = (i - index + count) % count;
@@ -215,21 +249,21 @@ export function FlipCarousel({
             );
           })}
         </button>
+        {reduced ? null : (
+          <Button
+            label={paused ? playLabel : pauseLabel}
+            variant="secondary"
+            size="sm"
+            hasEdge={false}
+            icon={paused ? <PlayMark /> : <PauseMark />}
+            onClick={() => setPaused((p) => !p)}
+            xstyle={[type.label_14, styles.pause, tap.target]}
+          />
+        )}
       </div>
       <VisuallyHidden role="status" aria-live="polite">
         {heard}
       </VisuallyHidden>
-      {reduced ? null : (
-        <VStack xstyle={styles.controls}>
-          <Button
-            label={paused ? playLabel : pauseLabel}
-            variant="ghost"
-            size="sm"
-            onClick={() => setPaused((p) => !p)}
-            xstyle={tap.target}
-          />
-        </VStack>
-      )}
     </VStack>
   );
 }

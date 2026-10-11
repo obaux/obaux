@@ -36,6 +36,7 @@ export { AppHeader, type AppHeaderProps } from './AppHeader.js';
 export { AreaChip, type AreaChipProps } from './AreaChip.js';
 export { Page, type PageProps } from './Page.js';
 export { PageTitle, type PageTitleProps } from './PageTitle.js';
+export { DataHeading } from './DataHeading.js';
 export { SubPage, SubPageHeader, type SubPageHeaderProps } from './SubPage.js';
 export { RoleSwitch, type RoleSwitchProps } from './RoleSwitch.js';
 /*

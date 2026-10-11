@@ -8,6 +8,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import {
   AppHeader,
+  DataHeading,
   AreaChip,
   BellIcon,
   BigButton,
@@ -109,6 +110,23 @@ export default function GalleryPage() {
         Every piece Pam is built from, including the states you cannot click your
         way to. Change one here and it changes on every screen.
       </Text>
+
+      <Section
+        title="Data headings"
+        note="A heading whose text is a name (a place, a program, a person) reads in its own direction; Pam's own headings keep the page's (D-534)."
+      >
+        <VStack gap={2}>
+          <Heading level={2} data-testid="pam-heading">
+            Your trips
+          </Heading>
+          <DataHeading level={2} data-testid="latin-name">
+            Second Chance Café (Main St.)
+          </DataHeading>
+          <DataHeading level={2} data-testid="arabic-name">
+            مركز الأمل للتوظيف
+          </DataHeading>
+        </VStack>
+      </Section>
 
       <Section title="Header" note="The mark, and who you are signed in as.">
         <VStack gap={2}>

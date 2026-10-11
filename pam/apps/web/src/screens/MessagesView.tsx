@@ -148,13 +148,15 @@ function MessageListRow({ row, newLabel }: { readonly row: MessageRow; readonly 
         <Avatar size="lg" name={row.name} {...(row.photoUrl ? { src: row.photoUrl } : {})} tooltip={false} alt="" />
       }
       label={
-        <Text xstyle={[styles.name, row.unread && styles.nameUnread]}>
+        <Text dir="auto" xstyle={[styles.name, row.unread && styles.nameUnread]}>
           {row.name}
           {row.unread ? <VisuallyHidden>, {newLabel}</VisuallyHidden> : null}
         </Text>
       }
       description={
-        <Text type="supporting" xstyle={styles.line}>
+        // Who they are is Pam's own words, in the page's direction; the last thing said is theirs, in its own
+        // (Iris, 11 October: an English line in an Arabic page had its full stop on the wrong side).
+        <Text type="supporting" {...(row.context ? {} : { dir: 'auto' as const })} xstyle={styles.line}>
           {row.context ?? row.preview}
         </Text>
       }

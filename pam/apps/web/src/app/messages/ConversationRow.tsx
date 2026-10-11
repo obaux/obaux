@@ -67,7 +67,7 @@ export function ConversationRow({ name, context, preview, when, unread, unreadLa
               {context}
             </Text>
           ) : null}
-          <Text type={unread ? 'body' : 'supporting'} xstyle={unread ? [styles.preview, styles.previewUnread] : styles.preview}>
+          <Text dir="auto" type={unread ? 'body' : 'supporting'} xstyle={unread ? [styles.preview, styles.previewUnread] : styles.preview}>
             {preview}
           </Text>
         </VStack>

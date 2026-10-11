@@ -29,6 +29,7 @@
     "./CategoryChips": "./src/CategoryChips.tsx",
     "./SuccessScreen": "./src/SuccessScreen.tsx",
     "./SubPage": "./src/SubPage.tsx",
+    "./DataHeading": "./src/DataHeading.tsx",
     "./ConnectionCard": "./src/ConnectionCard.tsx",
     "./SavedGrid": "./src/SavedGrid.tsx",
     "./TripCard": "./src/TripCard.tsx",
