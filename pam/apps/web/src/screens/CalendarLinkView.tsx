@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
 import { HStack } from '@astryxdesign/core/HStack';
@@ -12,7 +12,7 @@ import { Button } from '@pam/ui/Button';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
-import { appleUrl, feedUrl, useCalendarLink } from '@/lib/useCalendarLink';
+import { appleUrl, feedUrl, isAppleDevice, useCalendarLink } from '@/lib/useCalendarLink';
 import { ConfirmDialog } from './ConfirmDialog';
 import { HelpButton } from './HelpButton';
 
@@ -32,6 +32,9 @@ const styles = stylex.create({
   actions: { rowGap: '12px' },
 });
 
+/** Google Calendar's page for adding a calendar by its address: it works on the web, not in the phone app. */
+const GOOGLE_ADD_BY_URL = 'https://calendar.google.com/calendar/r/settings/addbyurl';
+
 export function CalendarLinkView() {
   const { t, tPlain } = useI18n();
   const { state: session } = useSession();
@@ -39,6 +42,10 @@ export function CalendarLinkView() {
   const { state, busy, failed, make, setShowDetails, turnOff } = useCalendarLink(signedIn);
   const [asking, setAsking] = useState<'new' | 'off' | null>(null);
   const [copied, setCopied] = useState(false);
+  // Apple Calendar's button only where a webcal:// address opens something. Read after the page is up (the
+  // first paint is the server's); until then, and when the device cannot be told, it is shown.
+  const [apple, setApple] = useState(true);
+  useEffect(() => setApple(isAppleDevice(navigator.userAgent, navigator.platform)), []);
 
   const token = state.status === 'on' ? state.token : null;
   const copy = async () => {
@@ -82,11 +89,16 @@ export function CalendarLinkView() {
                   </Text>
                   <VStack gap={2} xstyle={styles.actions}>
                     <Button label={t(copied ? 'calendar.copied' : 'calendar.copy')} variant="secondary" onClick={() => void copy()} />
-                    <Button label={t('calendar.apple')} variant="secondary" href={appleUrl(token)} />
+                    {apple ? <Button label={t('calendar.apple')} variant="secondary" href={appleUrl(token)} /> : null}
                   </VStack>
                   <Text type="supporting" xstyle={styles.small}>
                     {t('calendar.others')}
                   </Text>
+                  {/* Google's phone app cannot add a calendar from a link; the web page can (D-538). */}
+                  <Text type="supporting" xstyle={styles.small}>
+                    {t('calendar.google.phone')}
+                  </Text>
+                  <Button label={t('calendar.google.open')} variant="secondary" href={GOOGLE_ADD_BY_URL} />
                   <Text type="supporting" xstyle={styles.small}>
                     {t('calendar.slow')}
                   </Text>

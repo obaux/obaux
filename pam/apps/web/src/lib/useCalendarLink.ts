@@ -18,6 +18,18 @@ export const feedUrl = (token: string): string => `${SUPABASE_URL}/functions/v1/
 /** Apple Calendar follows a webcal:// address. */
 export const appleUrl = (token: string): string => feedUrl(token).replace(/^https?:/, 'webcal:');
 
+/**
+ * Whether the device can open a webcal:// address (D-538): iPhone, iPad and Mac, which hand it to Apple Calendar.
+ * On Android or Windows the address opens nothing and a dead button is worse than none. If the device cannot be
+ * told, the button is shown.
+ */
+export function isAppleDevice(userAgent: string, platform = ''): boolean {
+  const text = `${userAgent} ${platform}`;
+  if (/iPhone|iPad|iPod|Macintosh|Mac OS X|MacIntel/i.test(text)) return true;
+  if (/Android|Windows|Win32|Linux|CrOS|X11/i.test(text)) return false;
+  return true;
+}
+
 interface StatusRow {
   readonly is_on: boolean;
   readonly show_details: boolean;

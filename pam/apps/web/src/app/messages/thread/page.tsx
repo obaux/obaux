@@ -187,6 +187,8 @@ function ThreadScreen() {
       : null;
 
   if (state.status === 'ready') {
+    // Only an example's photo is ever looked up by name (a real person sharing one must not get a stranger's face).
+    const examplePhoto = examplesOn ? staffPhotoFor(state.otherName, state.otherProgramName ?? null) : null;
     return (
       <ThreadFrame>
         <ThreadTop>
@@ -201,11 +203,11 @@ function ThreadScreen() {
           messages={state.messages}
           translations={translations}
           otherName={state.otherName}
-          otherPhotoUrl={staffPhotoFor(state.otherName, state.otherProgramName ?? null)}
+          otherPhotoUrl={examplePhoto}
           intro={
             <ThreadIntro
               name={title}
-              photoUrl={staffPhotoFor(state.otherName, state.otherProgramName ?? null)}
+              photoUrl={examplePhoto}
               context={context}
             >
               {/* A member's visit with this program, under the name (D-276). */}

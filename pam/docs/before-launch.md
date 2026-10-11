@@ -11,6 +11,14 @@ STATUS row too.
 
 ## Open
 
+- [ ] **Calendar link: someone taps it on a real phone** (Piper, 11 October 2026, D-538). (1) On an Android phone, make a link on
+  Profile > Calendar and tap "Open Google Calendar on the web": it should reach Google Calendar's "add by URL" page in the
+  phone's browser; if Google sends the phone to its app or a sign-in that loses the page, the line above the button
+  ("ask for the desktop site") is the only way, so say so on the page more plainly. (2) Paste the link into Apple Calendar,
+  Google Calendar (on a computer) and Outlook, and check a visit shows, moves and goes, with the place's name off and on.
+  (3) Deploy `calendar-feed` with JWT verification off and fetch a made-up address: a bare 404. (4) A native reader for
+  `calendar.others` in the six languages (it names buttons in Google Calendar and Outlook).
+
 - [ ] **The native apps ask for location with Pam's own reason** (Lena, 11 October 2026; Mira asked for this to be listed). Pam
   asks the phone for where it is in two places: "Use my current location" in Explore's area picker, and "I'm here" on a visit
   (D-526 part B). In the web app the browser asks. In the iOS and Android apps the system asks, and each store wants one line
@@ -26,6 +34,13 @@ STATUS row too.
      if it is, move the call to POST first. Do not write the label from this item: write it from her answer.
   4. Seven languages: the system shows the string in the phone's language, so each of the six translations goes in the
      native project's per-language strings the day those exist (signed by Will with the Privacy page, as it repeats it).
+
+- [ ] **Read Twilio's own record of every text before texts go on** (Lena for Nico, 11 October 2026, from Piper's log check; Mira).
+  Twilio keeps, for each text Pam sends, the number, the text, the time and the status. Nobody has read its retention
+  setting (Console › Messaging › Settings, or the account's data-retention page). Privacy says only that "the one that sends
+  our texts" handles the information for Pam and may not use it for anything else (`privacy.s.sharing.p3`), and nothing says
+  how long it keeps it. Do it before the first real text: if Twilio keeps them longer than a person would expect, either shorten
+  it there or say so in `privacy.s.how-long` (Sage edits, Will signs). Texts are off today (`texts_live`), so it is not urgent.
 
 - [ ] **A28: finish taking Pam's number off every place a person reads it** (Lena, 11 October 2026, D-514, D-515).
   The app, the privacy page and the terms are done and signed (card a59). What is still open, each with an owner:

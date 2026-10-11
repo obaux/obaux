@@ -43,9 +43,11 @@ test('the warning comes before the button, and making a link shows it once with 
   expect(w.y).toBeLessThan(m.y);
   await make.click();
   await expect(page.getByText(new RegExp(`/functions/v1/calendar-feed/${TOKEN}\\.ics`))).toBeVisible();
-  await expect(page.getByText('Pam shows this link only now. Copy it, or make a new one later.')).toBeVisible();
-  await expect(page.getByText(/This link is a secret address\. Anyone who has it can read your visits/)).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Add to Apple Calendar' })).toHaveAttribute('href', new RegExp(`^webcal://.*/calendar-feed/${TOKEN}\\.ics$`));
+  await expect(page.getByText('Pam shows this link only once. Copy it now. You can make a new one later.')).toBeVisible();
+  await expect(page.getByText(/Keep this link to yourself\. Anyone who has it can see your visits/)).toBeVisible();
+  // Google's phone app cannot add a calendar from a link: the page says so and opens Google Calendar on the web.
+  await expect(page.getByText(/Google Calendar app can’t add a calendar from a link/)).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Open Google Calendar on the web' })).toHaveAttribute('href', 'https://calendar.google.com/calendar/r/settings/addbyurl');
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
   expect(results.violations).toEqual([]);
 });
@@ -106,4 +108,35 @@ test('Profile has a Calendar row for a member', async ({ page }) => {
   await page.goto('/profile/');
   await settled(page);
   await expect(page.getByRole('link', { name: /Calendar/ })).toBeVisible();
+});
+
+const IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 26_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Mobile/15E148 Safari/604.1';
+const ANDROID = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36';
+
+test.describe('Add to Apple Calendar', () => {
+  test.describe('on an iPhone', () => {
+    test.use({ userAgent: IPHONE });
+    test('is there, and opens the webcal address', async ({ page }) => {
+      await signedIn(page, { is_on: false, show_details: false });
+      await page.route('**/rest/v1/rpc/calendar_link_make*', (route) => route.fulfill(json(TOKEN)));
+      await page.goto('/calendar/');
+      await settled(page);
+      await page.getByRole('button', { name: 'Make my calendar link' }).click();
+      await expect(page.getByRole('link', { name: 'Add to Apple Calendar' })).toHaveAttribute('href', new RegExp(`^webcal://.*/calendar-feed/${TOKEN}\\.ics$`));
+    });
+  });
+  test.describe('on an Android phone', () => {
+    test.use({ userAgent: ANDROID });
+    test('is not there, because a webcal address opens nothing', async ({ page }) => {
+      await signedIn(page, { is_on: false, show_details: false });
+      await page.route('**/rest/v1/rpc/calendar_link_make*', (route) => route.fulfill(json(TOKEN)));
+      await page.goto('/calendar/');
+      await settled(page);
+      await page.getByRole('button', { name: 'Make my calendar link' }).click();
+      await expect(page.getByText(new RegExp(TOKEN))).toBeVisible();
+      await expect(page.getByRole('link', { name: 'Add to Apple Calendar' })).toHaveCount(0);
+      // The way for Google's phone app is the web page, and the page says so.
+      await expect(page.getByRole('link', { name: 'Open Google Calendar on the web' })).toBeVisible();
+    });
+  });
 });
