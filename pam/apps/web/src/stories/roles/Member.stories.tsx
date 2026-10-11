@@ -79,6 +79,18 @@ export const PlaceVisit: Story = screen('member', 'A place with a visit', '/plac
   from: 'trips',
   trip: 'dummy-trip-1',
 });
+/*
+ * Two kinds of place (D-498): one a program lead added on Pam, and one gathered from a public
+ * list. Only the first has anybody on Pam to be told about a visit, so the second says the plan
+ * is only the member's.
+ */
+export const PlaceWithLead: Story = screen('member', 'A place with a program lead', '/place/', { id: 'dummy-place-learning' });
+export const PlaceNoLead: Story = screen('member', 'A place with no program lead', '/place/', { id: 'dummy-place-library' });
+export const PlanTripNoLead: Story = screen('member', 'Plan a trip — place with no program lead', '/trips/new/', {
+  place: 'dummy-place-library',
+  name: 'Example Library Tech Lab',
+  category: 'education',
+});
 // A program's policies, read and signed by a member (D-270).
 export const PlacePolicies: Story = screen('member', 'Policies to sign', '/place/policies/', {
   id: 'dummy-place-learning',
