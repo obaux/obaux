@@ -1568,5 +1568,7 @@
   "transparency.group.people": "Suas pessoas e mensagens",
   "copy.page": "Copiar esta página",
   "copy.done": "Copiado",
-  "copy.failed": "Não foi possível copiar. Mantenha o texto pressionado para copiá-lo."
+  "copy.failed": "Não foi possível copiar. Mantenha o texto pressionado para copiá-lo.",
+  "carousel.pause": "Pausar",
+  "carousel.play": "Reproduzir"
 }
