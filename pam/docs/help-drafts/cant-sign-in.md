@@ -23,12 +23,12 @@ the link doesn't work.
 | You are | How you get in |
 |---|---|
 | **A resident** | Anyone can join on their own. Open Pam, sign in with your phone, and leave the code box empty. Pam is only in some cities for now. If it isn't in yours yet, you can save your city. |
-| **Someone who runs a program** | Join as a resident, then ask us to add your program: Contact Pam and tell us its name and address. Pam checks every program by hand before people can find it. You can also join with an invite link from a case manager, a program lead or the Pam team. |
+| **Someone who runs a program** | Join as a resident, then ask us to add your program: Contact Pam and tell us its name and address. We check it by hand, then add it so people can find it. You can also join with an invite link from a case manager, a program lead or the Pam team. |
 | **A case manager** | You join with an invite link. Another case manager or the Pam team can send you one. |
 
 ## I want to add my program
 - Sign in to Pam as a resident first.
-- Contact Pam and tell us your program's name and address. We add it, and Pam checks it by hand before people can find it.
+- Contact Pam and tell us your program's name and address. We check it by hand, then add it so people can find it.
 
 ## I want to be a case manager
 - Ask a case manager you work with, or the Pam team, for an invite link. (Contact Pam, below.)
@@ -69,3 +69,6 @@ the link doesn't work.
 - **"Already have Pam on this number? Pam finds your invite":** from `invite.who.note` ("If they sign in to Pam with it,
   Pam finds the invite even without the link").
 - Checked with Mira (03:15): Pam does not text a case manager's invite (no admin invite template; with `texts_live` off only verify_code, staff_request_*, access_limited_notice, invite_member and invite_provider go out). The inviter sends the link with "Send the link" (Sending an invite), and staff invites are emailed (`invite-email.ts`). So the post says the inviter sends it and Pam emails it.
+
+- "We check it by hand, then add it" is true whichever way the team adds it today (by hand, or by approving a staff
+  request, D-491). Asked Piper to confirm (Mira, 03:29).
