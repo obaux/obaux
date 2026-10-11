@@ -979,13 +979,17 @@ without it the cached, unpatched Next shipped), a Vercel redirect for document r
 
 ## Languages & legal · privacy lines waiting for Will, the calendar strings and the fit audit (11 October, afternoon)
 
-Four cards for Will, each a branch that merges only after its predecessor and is red only on its own missing translations until he signs: **a63** `claude/lena-program-visits-contract`
+Six cards for Will, each a branch that merges only after its predecessor (a70 and the Google card stand alone) and is red only on its own missing translations until he signs: **a70**
+`claude/lena-translation-retention` (`translation.p2` names Claude, an AI made by Anthropic, and says what Anthropic's published terms say: words deleted within 30 days and not used to train, a flagged
+message may be kept up to two years, anything the law requires may be kept; all seven languages are done, so a70 is the one card that is only a signature; it shows on the page only when `MESSAGE_TRANSLATION` is
+switched on), **a71** `claude/lena-google-sync-privacy` (`sharing.p7`, `what-we-keep.p13`; merges with the Google switch), **a63** `claude/lena-program-visits-contract`
 (a program sees "whether you were marked as there"; the contract says it never sees who marked a visit or how), **a66** `claude/lena-im-here-privacy` (p9/p10: Pam does not keep the location
 the phone sends), **a67** `claude/lena-request-log-line` (p11, the request log, "deleted within a week"; `sharing.p5`, the Trips map is Google's), **a68** `claude/lena-calendar-privacy` (`sharing.p6`,
 `what-we-keep.p12`). Six translations of each follow his signature. In b18: the host guard (`third-party-hosts.test.ts`: every outside host the code names, and Privacy must name the ones the page loads from),
 the picker words ("ZIP code", the area is remembered on the phone only), D-536's removal of the City lookup. Calendar link screen: 29 strings in six languages on Piper's D-538 branch (`claude/lena-calendar-google-lines`).
-`pnpm audit:fit` now passes `--known`; the full seven-language run on main exits 0 (13 accepted findings, none new). **Open:** the signatures; Piper's `trips.booked.hasLead` / `place.lead.sees` must say "you were marked"
-before a63 merges; the retention in p11/p12 must change before the Supabase plan goes to Team (`docs/before-launch.md`); Twilio's retention (Nico); a native reader for the calendar screen's app-menu names.
+`pnpm audit:fit` now passes `--known`; the full seven-language run on main exits 0 (13 accepted findings, none new). The calendar link screen at 320px in all seven languages, with the link made and with each of the two
+"are you sure" boxes open, has no cut, clipped or overlapping text (checked on Piper's `claude/places-programs-calendar-link` at 01cd4590; looked at in ru, ar and zh-HK). **Open:** the signatures; Piper's `trips.booked.hasLead` / `place.lead.sees` must say "you were marked"
+before a63 merges; the retention in p11/p12 must change before the Supabase plan goes to Team (`docs/before-launch.md`); Twilio's retention (Nico); a native reader for the calendar screen's app-menu names and for `privacy.s.translation.p2` in all seven languages.
 Log: `docs/sessions/2026-10-11-1721-languages-legal-privacy-lines-calendar-strings-fit-audit.md`.
 
 ## Languages & legal · A28: no phone line in the Help screen, the privacy page or the terms (11 October)
