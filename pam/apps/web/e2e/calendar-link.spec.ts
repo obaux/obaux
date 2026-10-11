@@ -203,7 +203,7 @@ test.describe('Google Calendar (D-539)', () => {
     await settled(page);
     await page.getByRole('button', { name: 'Disconnect Google Calendar' }).click();
     await page.getByRole('dialog').getByRole('button', { name: 'Disconnect' }).click();
-    await expect(page.getByText(/Pam couldn’t finish removing the calendar from Google/)).toBeVisible();
+    await expect(page.getByText(/Pam couldn’t finish removing itself from Google/)).toBeVisible();
   });
 
   test('broken: says Pam cannot reach Google and offers to reconnect', async ({ page }) => {
@@ -220,6 +220,6 @@ test.describe('Google Calendar (D-539)', () => {
     await live(page, { connected: false, state: null });
     await page.goto('/calendar/?google=failed');
     await settled(page);
-    await expect(page.getByText('We couldn’t connect Google Calendar. Please try again.')).toBeVisible();
+    await expect(page.getByText('Pam couldn’t connect Google Calendar. Try again.')).toBeVisible();
   });
 });
