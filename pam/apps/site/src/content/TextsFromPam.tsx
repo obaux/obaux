@@ -24,7 +24,7 @@ export function TextsFromPam() {
         to do when one does not come.
       </Lead>
 
-      <Section title="The texts Pam sends today">
+      <Section title="The texts Pam sends today" short="Texts sent today">
         <CompareTable
           label="The texts Pam sends today"
           rowHeading="The text"
@@ -51,7 +51,7 @@ export function TextsFromPam() {
         <P>Every text starts with Pam’s name, so you know who it is from. Texts come in English or Spanish.</P>
       </Section>
 
-      <Section title="Texts Pam does not send yet">
+      <Section title="Texts Pam does not send yet" short="Not sent yet">
         <P>
           {VISIT_REMINDERS_LIVE
             ? 'Pam does not text you when someone messages you, and it does not text you when someone wants to connect.'
@@ -73,7 +73,7 @@ export function TextsFromPam() {
         />
       </Section>
 
-      <Section title="A text did not come">
+      <Section title="A text did not come" short="A text didn’t come">
         <HowTo
           steps={[
             VISIT_REMINDERS_LIVE

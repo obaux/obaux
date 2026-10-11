@@ -19,7 +19,7 @@ export function MessagesInPam() {
         can start a chat with you.
       </Lead>
 
-      <Section title="Who can write to whom">
+      <Section title="Who can write to whom" short="Who can write">
         <CompareTable
           label="Who can start a chat with whom"
           rowHeading="You are"
@@ -47,7 +47,7 @@ export function MessagesInPam() {
         <P>You can also send a photo or a document. Tap “Add a photo” or “Add a document”.</P>
       </Section>
 
-      <Section title="A new message does not come by text">
+      <Section title="A new message does not come by text" short="No text for messages">
         <P>
           When someone messages you, the bell at the top and a dot on the Messages tab show it. A case manager or program lead also sees the number on Home. Pam does not send a text for a
           message, so open Pam to read it.
@@ -55,7 +55,7 @@ export function MessagesInPam() {
         <ReadMore label="Texts from Pam: which ones, and why one didn’t come" href="/support/texts-from-pam/" />
       </Section>
 
-      <Section title="If a message is not safe">
+      <Section title="If a message is not safe" short="Report a message">
         <HowTo
           steps={[
             'In the conversation, tap “More options”. A screen called Options opens.',
@@ -75,7 +75,7 @@ export function MessagesInPam() {
         </P>
       </Section>
 
-      <Section title="If you do not want messages from someone">
+      <Section title="If you do not want messages from someone" short="Block someone">
         <P>You can block a person from inside a conversation with them.</P>
         <HowTo
           steps={[

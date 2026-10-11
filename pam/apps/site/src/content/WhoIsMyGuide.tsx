@@ -19,7 +19,7 @@ export function WhoIsMyGuide() {
         person.
       </Lead>
 
-      <Section title="Do I have a guide?">
+      <Section title="Do I have a guide?" short="Do I have one?">
         <CompareTable
           label="How you joined and whether you have a guide"
           rowHeading="How you joined"
@@ -36,7 +36,7 @@ export function WhoIsMyGuide() {
         </Needs>
       </Section>
 
-      <Section title="What your guide can see">
+      <Section title="What your guide can see" short="What guides see">
         <P>
           Your guide can see your plans, your progress and who you connect with. Your guide cannot read your
           messages to other people. Your guide sees a message only if you write to them, or if someone says it is
@@ -45,7 +45,7 @@ export function WhoIsMyGuide() {
         <ReadMore label="See the full list of who can see what" href="/support/what-others-can-see/" />
       </Section>
 
-      <Section title="Find it in the app">
+      <Section title="Find it in the app" short="In the app">
         <HowTo
           steps={[
             'Tap Profile.',

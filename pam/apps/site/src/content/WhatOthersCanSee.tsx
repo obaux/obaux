@@ -18,7 +18,7 @@ export function WhatOthersCanSee() {
         list is not shared.
       </Lead>
 
-      <Section title="The short version">
+      <Section title="The short version" short="Short version">
         <P>
           Your guide can see your plans, your progress and who you connect with. Your guide cannot read your
           messages to other people, or what you share with your buddies. Your guide sees a message only if you
@@ -27,7 +27,7 @@ export function WhatOthersCanSee() {
         <P>A program sees you only after you sign up with them, and only what they need to help you.</P>
       </Section>
 
-      <Section title="Who can see what">
+      <Section title="Who can see what" short="Who sees what">
         <CompareTable
           label="What your guide, a program you joined and other members can see"
           rowHeading="What"
@@ -60,14 +60,14 @@ export function WhatOthersCanSee() {
         />
       </Section>
 
-      <Section title="If someone reports a message">
+      <Section title="If someone reports a message" short="Reported messages">
         <P>
           If you say a message is not safe, Pam and your guide see the last message that person sent you, and its
           photo or document if it has one. Nothing else from the chat.
         </P>
       </Section>
 
-      <Section title="If this ever changes">
+      <Section title="If this ever changes" short="If this changes">
         <P>If the list ever changes, Pam will tell you first.</P>
         <LegalLink kind="privacy" label="Read the full privacy policy" variant="read-more" />
       </Section>

@@ -18,7 +18,7 @@ export function JoiningAsStaff() {
         This keeps people from joining as staff by mistake.
       </Lead>
 
-      <Section title="Join with your link">
+      <Section title="Join with your link" short="Join with a link">
         <HowTo
           steps={[
             'Open the link you were sent. Open it on the phone it was sent to.',
@@ -31,7 +31,7 @@ export function JoiningAsStaff() {
         />
       </Section>
 
-      <Section title="If you do not have a link">
+      <Section title="If you do not have a link" short="No link yet">
         <P>
           Ask the person at Pam who works with you to send you one. A case manager or a Pam super admin can send
           one. If you do not know who to ask, contact Pam.
@@ -42,7 +42,7 @@ export function JoiningAsStaff() {
         </Needs>
       </Section>
 
-      <Section title="If your number is already in Pam">
+      <Section title="If your number is already in Pam" short="Number already in Pam">
         <P>
           One phone number can have one account. If your number already has an account, the staff link shows
           “This number is already in Pam”. Ask for the link to be sent to a different number.

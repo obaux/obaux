@@ -14,7 +14,7 @@ export function StartHere() {
     <Body>
       <Lead>Most problems have a simple reason. Find yours below. None of them are your fault.</Lead>
 
-      <Section title="The code didn’t come">
+      <Section title="The code didn’t come" short="Code didn’t come">
         <HowTo
           title="What to do"
           steps={[
@@ -26,7 +26,7 @@ export function StartHere() {
         <ReadMore label="More: Texts from Pam" href="/support/texts-from-pam/" />
       </Section>
 
-      <Section title="The code didn’t work">
+      <Section title="The code didn’t work" short="Code didn’t work">
         <HowTo
           title="What to do"
           steps={[
@@ -36,7 +36,7 @@ export function StartHere() {
         />
       </Section>
 
-      <Section title="The invite code or link didn’t work">
+      <Section title="The invite code or link didn’t work" short="Invite didn’t work">
         <HowTo
           title="What to do"
           steps={[
@@ -47,7 +47,7 @@ export function StartHere() {
         <ReadMore label="More: Joining Pam" href="/support/joining-pam/" />
       </Section>
 
-      <Section title="You can’t send messages, or your account is paused">
+      <Section title="You can’t send messages, or your account is paused" short="Messages off, account paused">
         <HowTo
           title="What to do"
           steps={[
@@ -59,7 +59,7 @@ export function StartHere() {
         <ReadMore label="More: Case manager assignments" href="/support/case-manager-assignments/" />
       </Section>
 
-      <Section title="It says “You’re offline”">
+      <Section title="It says “You’re offline”" short="You’re offline">
         <HowTo
           title="What to do"
           steps={[
@@ -69,7 +69,7 @@ export function StartHere() {
         />
       </Section>
 
-      <Section title="It says “Something went wrong”, or the screen stays empty">
+      <Section title="It says “Something went wrong”, or the screen stays empty" short="Something went wrong">
         <P>This is not your fault.</P>
         <HowTo
           title="What to do"
@@ -81,7 +81,7 @@ export function StartHere() {
         />
       </Section>
 
-      <Section title="A place is missing or wrong">
+      <Section title="A place is missing or wrong" short="A place is wrong">
         <HowTo
           title="What to do"
           steps={[

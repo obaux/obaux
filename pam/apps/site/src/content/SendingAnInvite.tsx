@@ -17,7 +17,7 @@ export function SendingAnInvite() {
         Each invite is a link for one person. You make the link in Pam and send it by text from your own phone.
       </Lead>
 
-      <Section title="Who can invite whom">
+      <Section title="Who can invite whom" short="Who can invite">
         <CompareTable
           label="Who can invite whom"
           rowHeading="You are"
@@ -52,7 +52,7 @@ export function SendingAnInvite() {
         </P>
       </Section>
 
-      <Section title="What to know about a link">
+      <Section title="What to know about a link" short="About links">
         <Needs title="Only the phone number you typed can use the link.">
           If the person signs in to Pam with that number, Pam finds the invite even without the link. A link
           works once, for one person, and it lasts 30 days.
@@ -64,7 +64,7 @@ export function SendingAnInvite() {
         </P>
       </Section>
 
-      <Section title="Seeing who joined (super admins)">
+      <Section title="Seeing who joined (super admins)" short="Who joined">
         <P>
           Super admins can see every invite. Tap “Invited people”. Each row says who invited them. “Active” means
           they joined. “Link open” means they have not used it yet. “Link expired” means the 30 days ran out.

@@ -19,7 +19,7 @@ export function PointsAndBadges() {
         lose points for missing a visit.
       </Lead>
 
-      <Section title="How you earn points today">
+      <Section title="How you earn points today" short="Earn points">
         <CompareTable
           label="Ways to earn points today"
           rowHeading="What you do"
@@ -63,14 +63,14 @@ export function PointsAndBadges() {
         </P>
       </Section>
 
-      <Section title="Who can see your points">
+      <Section title="Who can see your points" short="Who sees your points">
         <P>
           You can. So can the person who invited you, or a staff member who is responsible for guiding you.
           Programs and other members cannot.
         </P>
       </Section>
 
-      <Section title="See your points">
+      <Section title="See your points" short="Find your points">
         <HowTo
           steps={['Tap Profile.', 'Tap the badge with your level on it. It says “Your badge”.', 'Scroll to see the ladder and your badges.']}
           shots={[{ name: 'points-and-badges/points.png', alt: "The top of the “Your points” screen: your badge, the level name, the number of points and a bar showing how many more points to the next level. Under it, the “Ways to earn” list: Plan a trip to a place, Call a place, Save a place and Finish setting up Pam.", caption: "“Your points”, for an example person." }]}

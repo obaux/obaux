@@ -15,11 +15,11 @@ export function StaffRequests() {
         where to find it, and what Approve and Deny do.
       </Lead>
 
-      <Section title="Where requests are">
+      <Section title="Where requests are" short="Find requests">
         <P>A super admin’s Home is the Requests list. It also opens from Profile, under “Staff requests”.</P>
       </Section>
 
-      <Section title="Decide a request">
+      <Section title="Decide a request" short="Approve or deny">
         <HowTo
           steps={[
             'Tap a request in the list.',

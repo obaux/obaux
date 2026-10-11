@@ -18,15 +18,15 @@ export function YourLanguage() {
         <P>English · Español · Português (Brasil) · 简体中文（普通话） · 繁體中文（廣東話） · Русский · العربية</P>
       </Section>
 
-      <Section title="Pick it when you join">
+      <Section title="Pick it when you join" short="Pick when you join">
         <P>One of the first screens asks you to choose a language.</P>
       </Section>
 
-      <Section title="Change it any time">
+      <Section title="Change it any time" short="Change it">
         <HowTo steps={['Open Profile, then tap Language.', 'Pick yours. Pam changes straight away.']} />
       </Section>
 
-      <Section title="What follows your choice">
+      <Section title="What follows your choice" short="What changes">
         <P>Every screen in the app.</P>
       </Section>
 

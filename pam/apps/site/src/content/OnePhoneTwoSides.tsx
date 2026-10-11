@@ -47,7 +47,7 @@ export function OnePhoneTwoSides() {
         <P>Notifications for both sides show in the same bell.</P>
       </Section>
 
-      <Section title="Add your program to an account you already have">
+      <Section title="Add your program to an account you already have" short="Add your program">
         <HowTo
           steps={[
             'Ask to be invited to your program, using the phone number you already use for Pam. The invite is made for that number.',

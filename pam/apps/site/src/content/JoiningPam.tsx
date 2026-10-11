@@ -18,7 +18,7 @@ export function JoiningPam() {
         you, with a code, or on your own.
       </Lead>
 
-      <Section title="Which way is mine?">
+      <Section title="Which way is mine?" short="Three ways to join">
         <CompareTable
           label="The three ways to join Pam"
           rowHeading="How you join"
@@ -40,7 +40,7 @@ export function JoiningPam() {
         />
       </Section>
 
-      <Section title="Step 1: sign in with your phone">
+      <Section title="Step 1: sign in with your phone" short="Sign in">
         <Needs title="You need a phone that can get a text.">
           Pam sends a code to your phone number. You type the code to sign in.
         </Needs>
@@ -59,7 +59,7 @@ export function JoiningPam() {
         <ReadMore label="Texts from Pam: which ones, and why one didn’t come" href="/support/texts-from-pam/" />
       </Section>
 
-      <Section title="Step 2: tell Pam about you">
+      <Section title="Step 2: tell Pam about you" short="About you">
         <HowTo
           steps={[
             'Type your first name and your last name.',

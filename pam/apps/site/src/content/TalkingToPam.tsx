@@ -12,7 +12,7 @@ export function TalkingToPam() {
     <Body>
       <Lead>Someone at Pam can help you. You do not need to know what to ask for.</Lead>
 
-      <Section title="Start here, on the help desk">
+      <Section title="Start here, on the help desk" short="Find an answer">
         <HowTo
           title="Find an answer"
           steps={[
@@ -22,7 +22,7 @@ export function TalkingToPam() {
         />
       </Section>
 
-      <Section title="Still stuck? Write to us">
+      <Section title="Still stuck? Write to us" short="Write to us">
         <P>
           At the end of every article, and when a search finds nothing, “Still stuck?” lets you write to Pam. Tell us
           what happened and what you see on the screen. A person at Pam reads every message.
@@ -30,7 +30,7 @@ export function TalkingToPam() {
         <P>Pam has no phone line. Writing to us is the way to reach a person.</P>
       </Section>
 
-      <Section title="What we can help with">
+      <Section title="What we can help with" short="What we help with">
         <P>Getting into the app.</P>
         <P>Finding a place that can help.</P>
         <P>Changing or missing a visit.</P>
@@ -38,12 +38,12 @@ export function TalkingToPam() {
         <P>Anything else. If we cannot help, we will find someone who can.</P>
       </Section>
 
-      <Section title="In danger right now?">
+      <Section title="In danger right now?" short="In danger">
         <P>Call 911 first.</P>
         <P>In crisis? Call or text 988. Someone answers day and night.</P>
       </Section>
 
-      <Section title="A message feels unsafe">
+      <Section title="A message feels unsafe" short="Unsafe message">
         <HowTo
           steps={[
             'In the chat, tap ⋯ then “Report suspicious activity”.',

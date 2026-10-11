@@ -23,14 +23,14 @@ export function CaseManagerAssignments() {
         you. If you joined another way, you may not have one yet.
       </Text>
 
-      <Section title="A case manager looks after their own members">
+      <Section title="A case manager looks after their own members" short="Who looks after you">
         <Text as="p">
           Each member has one case manager at a time. A case manager looks after the members assigned to
           them, and only those members. They can’t see or change anyone else’s account.
         </Text>
       </Section>
 
-      <Section title="Every change to your account has a reason">
+      <Section title="Every change to your account has a reason" short="Changes have a reason">
         <Text as="p">
           If an account is hurting other people, we can turn off parts of Pam for it. Whoever does it has to
           write down why, and the reason is kept in a log.

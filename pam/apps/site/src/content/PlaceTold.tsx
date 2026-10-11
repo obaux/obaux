@@ -23,7 +23,7 @@ export function PlaceTold() {
         />
       </Section>
 
-      <Section title="If they didn’t know you were coming">
+      <Section title="If they didn’t know you were coming" short="They didn’t know">
         <HowTo
           steps={[
             'Ask for the front desk.',
@@ -33,7 +33,7 @@ export function PlaceTold() {
         />
       </Section>
 
-      <Section title="If the place was wrong">
+      <Section title="If the place was wrong" short="The place was wrong">
         <P>
           If the place has closed, moved, or is not what Pam says, open it in Pam and tap “Something is wrong here”.
           Somebody at Pam checks every report.
