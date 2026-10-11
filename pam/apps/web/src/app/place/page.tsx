@@ -41,7 +41,7 @@ import { countdown } from '@/lib/when';
 import { VisitCard } from '@pam/ui/VisitCard';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
+import { exampleTrips } from '@/lib/exampleMode';
 import { readAddedTrips, TRIPS_CHANGED, withMoves, withoutCancelled } from '@/lib/addedTrips';
 import { cancelSavedOrLocalTrip } from '@/lib/savedTrips';
 import { navigate } from '@/lib/navigate';
@@ -259,7 +259,7 @@ function PlaceScreen() {
   useEffect(() => {
     if (!place) return;
     const read = () => {
-      const here = withoutCancelled(withMoves([...DUMMY_TRIPS, ...readAddedTrips()]))
+      const here = withoutCancelled(withMoves([...exampleTrips(), ...readAddedTrips()]))
         .filter((trip) => trip.placeId === place.id)
         .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
       setHasTrip(here.length > 0);

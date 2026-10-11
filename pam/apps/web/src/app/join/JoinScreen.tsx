@@ -17,7 +17,7 @@ import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/navigate';
 import { forgetInvite, recallInvite, type Invite } from '@/lib/appUrl';
 import { readAddedTrips, withMoves } from '@/lib/addedTrips';
-import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
+import { exampleTrips } from '@/lib/exampleMode';
 import { Confetti } from '@pam/ui/SuccessScreen';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { TransparencyReading } from '@/screens/TransparencyReading';
@@ -412,7 +412,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
   // The booked visit itself, from the example trips or the ones a program
   // added this session (D-322); null when the link carried none.
   const booked = bookedTrip
-    ? (withMoves([...DUMMY_TRIPS, ...readAddedTrips()]).find((trip) => trip.id === bookedTrip) ?? null)
+    ? (withMoves([...exampleTrips(), ...readAddedTrips()]).find((trip) => trip.id === bookedTrip) ?? null)
     : null;
   const bookedDay = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long', month: 'long', day: 'numeric' });
   const bookedTime = new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' });

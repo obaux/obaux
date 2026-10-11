@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
+import { exampleTrips } from '@/lib/exampleMode';
 import { readAddedTrips, TRIPS_CHANGED, withMoves } from './addedTrips';
 import { intlLocale } from '@pam/config';
 
@@ -29,7 +29,7 @@ export function useNextVisits(isOn: boolean): Readonly<Record<string, NextVisit>
     const read = () => {
       const now = Date.now();
       const next: Record<string, NextVisit> = {};
-      for (const trip of withMoves([...DUMMY_TRIPS, ...readAddedTrips()])) {
+      for (const trip of withMoves([...exampleTrips(), ...readAddedTrips()])) {
         if (new Date(trip.startsAt).getTime() <= now) continue;
         const have = next[trip.placeId];
         if (!have || trip.startsAt < have.startsAt) next[trip.placeId] = { id: trip.id, startsAt: trip.startsAt };
