@@ -522,7 +522,7 @@
   "place.shared": "Скопировано. Вставьте в сообщение.",
   "place.website": "Сайт",
   "places.all": "Все",
-  "places.areaLabel": "Почтовый индекс (ZIP)",
+  "places.areaLabel": "Почтовый индекс (ZIP) или район",
   "places.areaNone": "Ничего не нашлось. Попробуйте ввести почтовый индекс (ZIP).",
   "places.areaPrivacy": "Pam запоминает выбранный вами район только на этом телефоне.",
   "places.areaResults": "Районы, которые можно выбрать",
@@ -1501,7 +1501,7 @@
   "places.kind.neighborhood": "Район",
   "places.kind.landmark": "Ориентир",
   "places.kind.address": "Адрес",
-  "places.areaHint": "Например, 19107.",
+  "places.areaHint": "Например, 19107 или Fishtown.",
   "messages.visit.label": "Ваш визит: {day}, {time}. Открыть место.",
   "points.hero.toNext": "Ещё {count} балла до уровня «{next}»",
   "points.hero.toNext.one": "Ещё {count} балл до уровня «{next}»",
@@ -1674,7 +1674,7 @@
   "supportReply.noNumber": "Нет номера для SMS.",
   "supportReply.failed": "Не отправлено. Попробуйте ещё раз.",
   "legal.sources.title": "Источники данных",
-  "legal.sources.neighborhoods": "Названия районов в выборе местоположения взяты из набора данных «Philadelphia Neighborhoods», созданного Abaca Labs. В Pam набор изменён: для каждого района хранится одна точка, а не границы.",
+  "legal.sources.neighborhoods": "Названия районов в выборе местоположения взяты из набора данных «Philadelphia Neighborhoods», созданного Abaca Labs. В Pam набор изменён, чтобы хранить одну точку для каждого района вместо границ.",
   "legal.sources.link": "Посмотреть исходные данные",
   "legal.sources.licence": "Лицензия: CC BY 4.0"
 }

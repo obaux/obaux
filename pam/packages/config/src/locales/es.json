@@ -498,7 +498,7 @@
   "place.shared": "Copiado. Péguelo en un mensaje.",
   "place.website": "Su sitio web",
   "places.all": "Todos",
-  "places.areaLabel": "Código postal",
+  "places.areaLabel": "Código postal o barrio",
   "places.areaNone": "No encontramos eso. Prueba con un código postal.",
   "places.areaPrivacy": "Pam recuerda la zona que eliges solo en este teléfono.",
   "places.areaResults": "Áreas que puede elegir",
@@ -1426,7 +1426,7 @@
   "places.kind.neighborhood": "Barrio",
   "places.kind.landmark": "Lugar conocido",
   "places.kind.address": "Dirección",
-  "places.areaHint": "Como 19107.",
+  "places.areaHint": "Como 19107, o Fishtown.",
   "messages.visit.label": "Tu visita, {day} a las {time}. Ver el lugar.",
   "points.hero.toNext": "{count} más para {next}",
   "points.hero.top": "Llegaste a lo más alto de la escalera.",
@@ -1590,7 +1590,7 @@
   "supportReply.noNumber": "No hay número al que enviar el texto.",
   "supportReply.failed": "No salió. Inténtelo de nuevo.",
   "legal.sources.title": "Fuentes de datos",
-  "legal.sources.neighborhoods": "Los nombres de los barrios en la búsqueda de zona vienen de “Philadelphia Neighborhoods”, creado por Abaca Labs. Pam lo modificó: conserva un punto por cada barrio, no los límites.",
+  "legal.sources.neighborhoods": "Los nombres de los barrios en la búsqueda de zona vienen de “Philadelphia Neighborhoods”, creado por Abaca Labs. Pam lo modificó para conservar un punto por cada barrio en lugar de sus límites.",
   "legal.sources.link": "Ver los datos de origen",
   "legal.sources.licence": "Licencia: CC BY 4.0"
 }

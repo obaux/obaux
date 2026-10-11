@@ -501,7 +501,7 @@
   "place.shared": "已複製。貼到訊息中即可。",
   "place.website": "他們的網站",
   "places.all": "全部",
-  "places.areaLabel": "ZIP 郵遞區號",
+  "places.areaLabel": "ZIP 郵遞區號或社區",
   "places.areaNone": "找不到符合的結果。請試試 ZIP 郵遞區號。",
   "places.areaPrivacy": "Pam只會在這部手機上記住您選擇的地區。",
   "places.areaResults": "您可以選擇的地區",
@@ -1426,7 +1426,7 @@
   "places.kind.neighborhood": "社區",
   "places.kind.landmark": "地標",
   "places.kind.address": "地址",
-  "places.areaHint": "例如19107。",
+  "places.areaHint": "例如19107，或 Fishtown。",
   "messages.visit.label": "您的到訪，{day} {time}。查看該地點。",
   "points.hero.toNext": "再獲{count}積分，升至{next}",
   "points.hero.top": "您已到達階梯的頂端。",
@@ -1590,7 +1590,7 @@
   "supportReply.noNumber": "沒有可傳短訊的號碼。",
   "supportReply.failed": "未能傳送。請再試一次。",
   "legal.sources.title": "資料來源",
-  "legal.sources.neighborhoods": "地區搜尋中的社區名稱來自 Abaca Labs 製作的「Philadelphia Neighborhoods」。Pam已作修改：每個社區只保留一個點，不保留邊界。",
+  "legal.sources.neighborhoods": "地區搜尋中的社區名稱來自 Abaca Labs 製作的「Philadelphia Neighborhoods」。Pam已作修改：每個社區只保留一個點，而不是邊界。",
   "legal.sources.link": "查看原始資料",
   "legal.sources.licence": "授權條款：CC BY 4.0"
 }
