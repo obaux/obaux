@@ -1,0 +1,17 @@
+import * as stylex from '@stylexjs/stylex';
+import { Link } from '@astryxdesign/core/Link';
+import { HELP_EMAIL } from '../lib/links';
+
+const styles = stylex.create({
+  // The address can be selected and copied as well as tapped.
+  address: { userSelect: 'text', overflowWrap: 'anywhere', fontWeight: 600 },
+});
+
+/** hello@joinpam.org as a mailto link and as text a person can select and copy. */
+export function HelpAddress() {
+  return (
+    <Link href={`mailto:${HELP_EMAIL}`} xstyle={styles.address}>
+      {HELP_EMAIL}
+    </Link>
+  );
+}

@@ -11,6 +11,27 @@ STATUS row too.
 
 ## Open
 
+- [ ] **A28: finish taking Pam's number off every place a person reads it** (Lena, 11 October 2026, D-514, D-515).
+  The app, the privacy page and the terms are done and signed (card a59). What is still open, each with an owner:
+  1. **The live texts still carry the number.** `staff_request_denied` and `access_limited_notice` say
+     "Questions? Visit joinpam.org/support" in the repo once Nico's D-519 is on `main` (English signed, card a59); the other
+     six languages follow on top of it (Lena, Mira's routing 04:19 UTC). The **live `dispatch-sms` is still the old
+     function**, which fills `{supportPhone}`: until Nico redeploys it, those two account texts (they go today) still give
+     the number. The redeploy waits on the carrier re-filing (see *File the updated text-message registration*): decide
+     which comes first. Nico also updates `docs/sms-campaign-samples.md` and Will pastes Sage's HELP auto-reply into
+     Twilio ("Get help at joinpam.org/support or write to hello@joinpam.org. Reply STOP to stop.").
+  2. **"Reply HELP to reach a person"** (`reminders.how`, `alerts.how`, the screens the carrier reviewed) now promises more
+     than the new HELP reply gives (an address). Sage to word it; it touches the registration.
+  3. **Ava's in-app copy and delete** (a fresh sign-in code to the account's phone). The day it ships,
+     `privacy.copy.body` and `privacy.delete.body` change from "Contact Pam and ask…" to the in-app steps, and
+     the Privacy › Copy / Delete pages lose their Contact Pam button (Lena carries the words).
+  4. **The help-request line on the privacy page** (what a request sends: what the person typed, how to answer them, the
+     page and the language, no records) is written the day Nico's form works, not before.
+  5. **"Talk to someone now"** opens `/support/` until Wren's "Your safety" post exists; then it opens the post.
+  6. **The public site** still says "call Pam" in `StillStuck.tsx`, `CaseManagerAssignments`, `JoiningAsStaff`,
+     `JoiningPam`, `MessagesInPam` (it quotes the blocked-notice text and the old link), `TextsFromPam` (three places, and
+     it lists the held saved-place text as sent today), `WhoIsMyGuide` and `search-phrases.ts` (Wren).
+
 - [ ] **Visit reminders go live: put back the lines the app stopped saying** (Lena, 10 October 2026, D-474).
   Will's rule (a12): a line says only what Pam does. Until `dispatch-sms` really sends the day-before visit
   reminder, ten lines in the app say what Pam does today. The day it does (check the *live* function and
@@ -28,7 +49,14 @@ STATUS row too.
      | `onboarding.provider.2` | Members find your program and plan a visit. | Fewer no-shows. Pam can remind people for you. |
      | `join.booked.body` | …It is on your Trips now. | {place}, {day} at {time}. Pam will remind you the day before if you said yes to texts. |
      | `trips.new.done.body` | It is on your map. | It is on your map. We will remind you the day before if text reminders are on. |
-     | `profile.promo.reminders.body` | We can text you if a place you saved closes or moves. | We can text you the day before a visit, or if a place you saved closes or moves. |
+     | `profile.promo.reminders.body` | Coming soon: texts about your visits and the places you saved. (A28 check, 11 October: was "We can text you if a place you saved closes or moves."; the saved-place text is held with the rest, D-481) | We can text you the day before a visit, or if a place you saved closes or moves. |
+     | `reminders.today.member` (the Text reminders screen) | Pam does not send any of these yet. They are coming. (was "Today Pam sends only one of these: a note when a place you saved closes or moves. The others are coming.") | Say which of the three are sent that day: Pam sends these. |
+     | `flag.done.body` (A28 check, 11 October) | Somebody at Pam looks at every one of these. | Somebody at Pam looks at every one of these. If the place comes off the list, anyone who saved it and said yes to texts is told. |
+
+     `flag.done.body` lost its second sentence because the only way a person who saved a place hears that it was
+     removed is the held saved-place text (D-481; no bell row is made for them, only for super admins and the
+     savers' case managers). Put it back with the others, with "and said yes to texts" (the text goes only to
+     someone who did).
 
      The original `onboarding.3` and `onboarding.provider.2` said it for everybody; a reminder goes only to
      someone who said yes, so the English above says so. The other three lines wait on their own texts, not on

@@ -149,6 +149,23 @@
   }
 
   /*
+   * Focus put somewhere so a screen reader lands in the right place is not a choice anybody made, so it
+   * shows no ring (Will, 11 October: "Modals and section links (from policy pages) are highlighted. That's
+   * not intended behavior. Let's rewrite the input field rule to only mean text boxes"; D-523, which
+   * replaces D-411's focus line). A visible highlight on programmatic focus belongs to a text box, and only
+   * to one (below). Everything else focused by script is `tabindex="-1"` and not a control: a dialog's or
+   * sheet's content (`landFocus`), the dialog or sheet itself, the photo viewer, and the section a contents
+   * link on Privacy or Terms jumps to. They get no ring in any input mode, mouse or keyboard. Buttons and
+   * links keep the brand ring above when somebody Tabs to them.
+   */
+  [tabindex='-1']:not(input, textarea, select, button, a[href], [contenteditable='true']):focus-visible,
+  dialog:focus-visible,
+  [role='dialog']:focus-visible,
+  [role='alertdialog']:focus-visible {
+    outline: none;
+  }
+
+  /*
    * A text field is drawn as one box, so it should light up as one box.
    *
    * The ring belongs on the frame a person can see, not on the <input> inside

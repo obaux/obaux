@@ -71,7 +71,6 @@ const meta = {
     ),
     onRetry: fn(),
     onClearSearch: fn(),
-    supportPhone: '+12673095265',
   },
 } satisfies Meta<typeof ExploreView>;
 
