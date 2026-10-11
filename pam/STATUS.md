@@ -2175,3 +2175,7 @@ Branch `claude/places-programs-no-city-call` (D-536). The browser no longer asks
 ## Places & programs · neighborhoods in the area search (11 October 2026)
 
 D-540, branch `claude/places-programs-neighborhoods`: 159 neighborhoods (a name and one point each, CC BY 4.0, Abaca Labs, pinned source and checksum) in `areas`, found by the existing search; credit under Legal › Data sources. Migration `20261011194237_the_area_search_knows_philadelphia_s_neighborhoods` for the merge desk to apply (public reference data, expand-only). Waiting on Sage ("or neighborhood" in the picker words) and Lena (seven languages). Log: `docs/sessions/2026-10-11-1942-neighborhoods-in-the-area-search.md`.
+
+## Design system · area search named once (11 October 2026) — READY, not merged
+
+A screen reader reads the Places area search field's name once and reads "Like 19107, or Fishtown." as its description (`SearchField`: empty inner label, optional placeholder, `describedBy`). Nothing looks different. Log: `docs/sessions/` newest `area-picker-screen-reader-fix`.
