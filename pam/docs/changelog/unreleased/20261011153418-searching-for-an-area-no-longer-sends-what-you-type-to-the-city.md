@@ -1,0 +1,3 @@
+# Searching for an area no longer sends what you type to the City
+
+Typing a street address when you choose where to look used to send it, as you typed, to the City of Philadelphia's public address service. It no longer does. You choose by ZIP code or neighborhood, and what you type goes only to Pam, which does not save it. A member's first name also no longer appears in the address of the page that shows which policies they have signed. The map on Trips also opens on the whole city instead of the area around your trips, so Google is not shown where you are going. (D-536)

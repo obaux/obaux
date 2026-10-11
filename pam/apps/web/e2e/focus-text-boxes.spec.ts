@@ -196,7 +196,7 @@ test.describe('a search box focused on arrival still shows its field highlight',
     await page.goto('/places/');
     await settled(page);
     await page.getByRole('button', { name: /Near/ }).first().click();
-    const box = page.getByRole('searchbox').or(page.getByRole('textbox', { name: 'ZIP code or address' })).first();
+    const box = page.getByRole('searchbox').or(page.getByRole('textbox', { name: 'ZIP code or neighborhood' })).first();
     await expect(box).toBeVisible();
     await expect(box).toBeFocused();
     // The field's frame is drawn once the drawer has finished opening: wait for it rather than read it at once.
