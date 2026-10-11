@@ -152,6 +152,8 @@ export const Privacy: Story = screen('member', 'Privacy policy', '/privacy/');
 
 // Before any of it.
 export const SignIn: Story = screen('signed-out', 'Sign in', '/signin/');
+/** The code step after a code that did not work (D-510): a small alert under the boxes, no Call. */
+export const SignInWrongCode: Story = screen('member', 'Sign in — wrong code', '/prototype/signin/', { wrong: '1' });
 // Sign up, step by step, is below (D-319); the whole walk, from the phone, here.
 export const SignUpWalk: Story = screen('member', 'Sign up — the whole walk', '/prototype/join/', { kind: 'member' });
 

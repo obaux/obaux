@@ -1,12 +1,12 @@
 'use client';
 
-import { useId } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
-import { BigButton, TextField, TextLink } from '@pam/ui';
+import { BigButton, CompactNotice, TextField, TextLink } from '@pam/ui';
 import { CodeBoxes } from '@pam/ui/CodeBoxes';
 import { useI18n } from '@/lib/i18n';
 import type { PhoneSignIn } from '@/lib/usePhoneSignIn';
@@ -82,9 +82,21 @@ export function PhoneSignInCard({
   const { state, sendCode, verifyCode } = flow;
   const phoneId = useId();
   const codeId = useId();
+  const codeField = useRef<HTMLInputElement | null>(null);
 
   const busy = state.step === 'sending' || state.step === 'verifying';
   const onCodeStep = state.step === 'code' || state.step === 'verifying';
+  const wrongCode = state.step === 'code' && state.error === 'verify';
+
+  // A wrong or expired code (D-510): the boxes are emptied and the cursor is back in them,
+  // so the next try is typing. Each failure is a new state, so this runs every time.
+  useEffect(() => {
+    if (!wrongCode) return;
+    onCodeChange('');
+    codeField.current?.focus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
+
   const titleStyle = headingLevel === 1 ? styles.title : styles.stepTitle;
 
   if (onCodeStep) {
@@ -104,7 +116,10 @@ export function PhoneSignInCard({
             if (!busy) void verifyCode(full);
           }}
           isDisabled={busy}
+          inputRef={codeField}
         />
+        {/* Right under the boxes it is about; gone as soon as they start typing again. */}
+        {wrongCode && code.length === 0 ? <CompactNotice text={t('signin.code.wrong')} /> : null}
         <BigButton
           label={busy ? t('signin.verifying') : codeAction ?? t('signin.code.action')}
           onPress={() => void verifyCode(code)}
