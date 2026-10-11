@@ -5,7 +5,7 @@
 ## What changed
 
 - New `apps/site/src/lib/search.ts` (stop words, light stemming, weighted ranking, phrase hits, gap detection), used by `SupportScreen`.
-- Sage's `apps/site/src/content/search-phrases.ts` (69 phrases; 21 with no published post) merged from `claude/help-search-phrases` in her shape (`answer`, `also`, `gap`); my first, empty file was dropped. `docs/help-centre-gaps.md` lists the 21 gaps.
+- Sage's `apps/site/src/content/search-phrases.ts` (77 phrases; 21 with no published post) merged from `claude/help-search-phrases` in her shape (`answer`, `also`, `gap`); my first, empty file was dropped. `docs/help-centre-gaps.md` lists the 21 gaps.
 - Empty result: plain "Nothing matched", Browse by topic, and the "Still stuck?" card. A known gap says "We do not have an article for that yet".
 - `apps/site/test/search.test.ts`; a11y script scans the nothing-found state too; two Storybook stories (own words, nothing found).
 

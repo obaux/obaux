@@ -181,6 +181,18 @@ export const SEARCH_PHRASES: readonly SearchPhrase[] = [
   { phrase: 'invite link expired', who: 'case manager', answer: 'sending-an-invite' },
   { phrase: 'what can i see about my people', who: 'case manager', answer: 'case-manager-assignments', also: ['what-others-can-see'] },
   { phrase: 'approve a staff request', who: 'anyone', answer: 'staff-requests' },
+
+  // Second batch (Sage, 11 October): other ways people say the same things
+  { phrase: 'the code is not coming', who: 'anyone', answer: 'texts-from-pam' },
+  { phrase: 'i did not get a text', who: 'anyone', answer: 'texts-from-pam' },
+  { phrase: 'i cant sign in', who: 'anyone', answer: 'joining-pam' },
+  { phrase: 'my link to join is too old', who: 'anyone', answer: 'joining-pam' },
+  { phrase: 'the code is for a different phone', who: 'anyone', answer: 'joining-pam' },
+  { phrase: 'what does the program see about me', who: 'anyone', answer: 'what-others-can-see' },
+  { phrase: 'my guide does not answer', who: 'anyone', answer: 'who-is-my-guide' },
+  { phrase: 'do i have to sign the rules', who: 'anyone', answer: 'signing-a-programs-rules' },
+  { phrase: 'what does this word mean', who: 'anyone', answer: 'pam-words' },
+  { phrase: 'the invite link i sent expired', who: 'anyone', answer: 'sending-an-invite' },
 ];
 
 /** True when the phrase's post exists and is published on the site (not a draft). */
