@@ -2143,3 +2143,7 @@ The website has its own colours and type, apart from the app's (D-528). In Figma
 ## Design system · b15 polish (11 October 2026) — on `main`
 
 Sign in on the code step is off until all six digits are in (D-532). The Support search placeholder contrast (Iris H2) was not reproduced: 5.65:1 in dark, 0 axe findings; the pairing is now in the site's contrast test. Log: `docs/sessions/` newest `b15-polish-h2-and-c1`.
+
+## Design system · names in headings keep their own direction (11 October 2026) — READY, not merged
+
+`@pam/ui/DataHeading` and `SubPageHeader isTitleData` mark a heading's text as data, so a Latin name on an Arabic page (and the reverse) reads in its own direction while Pam's own headings follow the page (D-534). On place pages, profile cards, staff person rows and the conversation bar. Log: `docs/sessions/` newest `data-headings-keep`.
