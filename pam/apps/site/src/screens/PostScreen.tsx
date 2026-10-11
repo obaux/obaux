@@ -25,6 +25,8 @@ const styles = stylex.create({
     width: '100%',
   },
   // One centred reading column for the whole post, as on Figma Learn: header, who it is for, body.
+  // The menu comes first in the page (so Tab reaches it before the post, Iris SP4) and sits in the right-hand column; the post takes the first free cell.
+  menuCell: { alignSelf: 'stretch', gridColumn: { default: 'auto', '@media (min-width: 1180px)': 2 }, gridRow: 1, minWidth: 0 },
   column: { width: '100%', maxWidth: '920px', marginInline: 'auto', minWidth: 0 },
   header: { alignItems: 'center', textAlign: 'center' },
   crumbs: { alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' },
@@ -95,6 +97,9 @@ export function PostScreen({ slug, allowDraft = false }: { readonly slug: string
   return (
     <Frame width="wide" gap={6}>
       <div {...stylex.props(styles.layout)}>
+      <div {...stylex.props(styles.menuCell)}>
+        <PostNav sections={sections} variant="side" />
+      </div>
       <VStack as="article" gap={10} xstyle={styles.column} data-page="post">
         {post.status === 'draft' ? (
           <Banner status="warning" title="Draft, not published: held until the feature ships. Not on the site, in Support or in search." />
@@ -127,7 +132,6 @@ export function PostScreen({ slug, allowDraft = false }: { readonly slug: string
         <Body />
         {withStuck ? <StillStuck /> : null}
       </VStack>
-      <PostNav sections={sections} variant="side" />
       </div>
     </Frame>
   );
