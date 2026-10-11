@@ -1630,6 +1630,12 @@ fine and the fit audit was over-counting (D-448).
 
 ## Website · public site and help centre (10 October) — `apps/site`, on `main`
 
+**A28 on the help site (11 October, D-522; branch).** No phone on the site: "Still stuck?" says to write to hello@joinpam.org (Sage's signed words), at the end of every post and under an empty search; the form waits for Nico's switch (off). New posts `cant-sign-in` and `your-safety` (`/support/your-safety/`, the app's "Your safety" opens it). A site test fails on "call Pam" and on any `tel:` but 911 and 988. Section labels from Sage drive the menu. Iris's findings S1, S2, W1–W6 done (`scripts/usability.mjs`: focus rings, 48px targets, `?q=`, skip link, Esc, layout shift). The "Still stuck?" form is built to Nico's contract and shows only when `help-request` answers (off: the address). Held: the blocked-conversation picture (the app still says "Call Pam" there), Sage's line for the saved-place text.
+
+**On this page menu (11 October, D-517; branch).** Every help post has a scrollspy menu: a side column from 1180px, a bar at the top on a phone, built from the post's `Section` headings (`short` label optional; Sage writes them). `scripts/scrollspy.mjs` checks every link at 320, 390 and 1280px.
+
+**Three help posts (11 October; branch, signed by Will, card a51).** `start-here`, `talking-to-pam`, `your-language`, from Sage's drafts; the search puts them first for their phrases. 16 posts live. Waiting: "Is the place told about my visit?" (unsigned).
+
 **Carousel pause/play (11 October, D-501; on `main`).** Will approved "Pause" and "Play" and asked for it subtle, tucked in a corner: a 32px see-through disc in a 48px tap target, top start corner. Lena's six languages are in. `OnboardingSlides` has a pause/play button on Sign in, About Pam and the site hero; labels are required props.
 
 **Hero carousel (11 October, D-499; on `main`, live).** Home's hero has the About Pam picture carousel to the right of the headline from 900px, under it on a phone. In the app, About Pam's carousel shows pictures only (`OnboardingSlides showLines={false}`); Sign in is unchanged. Figma "Pam — Website" Home has the Hero carousel component.

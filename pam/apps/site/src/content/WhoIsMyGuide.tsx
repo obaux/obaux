@@ -31,7 +31,7 @@ export function WhoIsMyGuide() {
           ]}
         />
         <Needs title="You do not need a guide to use Pam.">
-          You can still find places, save them and earn points. If you would like a guide, call Pam. We will help
+          You can still find places, save them and earn points. If you would like a guide, contact Pam. We will help
           you reach someone.
         </Needs>
       </Section>

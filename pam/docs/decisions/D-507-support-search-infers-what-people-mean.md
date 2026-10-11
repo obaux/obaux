@@ -1,0 +1,16 @@
+# D-507 — Support search infers what people mean
+
+**Date:** 2026-10-11 · **Branch:** `claude/compassionate-bohr-mzrchf`
+
+**Decided by:** Will, 11 October 2026, 02:18 UTC: "how can we improve on the search so it infers what they mean? Use best practices to make this help desk very effective." The merge desk set the order (items 1 to 4 now, 5 later). In the page, no server.
+
+**What.**
+1. **Everyday words** (`content/everyday-words.ts`, 34 groups, Sage owns it; `search-synonyms.ts` reads it and adds eight Spanish basics: ayuda, codigo, texto, cita, cuenta, telefono, llamar, iniciar sesion): groups of words that are one thing to the person (text = sms, guide = case manager = caseworker, sign in = log in ...). Only Pam’s own word (the first) and single everyday words widen a search; a longer phrase somebody typed ("text message") would drag in a second meaning, so it is matched as itself. "log in" is read as "sign in" for a keyword said in order. A word finds posts that say any word in its group, at 0.6 of the weight of the word itself. Accents are ignored (español = espanol).
+2. **Typos forgiven.** A word the site does not know is read as the closest word it does, within one mistake for 4–7 letters and two for 8 or more (none under 4; a swapped pair of letters counts as one). The dictionary is the site's own words: every title, keyword and summary, the phrases and the synonyms, a title word counting for more. The word as written is corrected before it is stemmed ("sining" is "signing"). A word still being typed is left alone.
+3. **Suggestions as you type.** The app's own search bar (`@pam/ui/SearchPill`, the Astryx combobox) replaces the plain box. From two letters, up to five known questions (then post titles) that start the way you are typing, each with the article that answers it, in 56px rows; arrow keys, Enter and tap. Choosing one searches for that question and shows its article first. When no known question starts that way the one row is "Search for “…”": never an empty list, which is not valid ARIA (axe caught it). The list never runs past the screen (a rule in `globals.css`), and a long question wraps.
+4. **"Did you mean…"** when nothing matched: the known questions that share a word with what was typed (typo corrected, synonym read), up to three, as buttons. And **Most asked** on the front page (`content/most-asked.ts`, six questions Sage curates), each linking straight to its article. There is no analytics behind it: a judgement.
+5. **Not built:** learning from what people miss. It counts misses, which touches privacy, so the merge desk takes a design to Will first. Nothing the site does records anything a person types.
+
+**Tests** (`test/search.test.ts`, 53 in the site's suite): every phrase still finds its answer in the top three with a letter dropped or two swapped; every word in every synonym group finds what the group's first word finds; every question has a suggestion that appears by the time 60% of it is typed; Most asked names real, answered questions; did-you-mean and accents.
+
+**What a later session might reverse.** The weights; the typo allowance; the pill look on the site's search box (a rounder, larger box than before); a pause on suggestions while a screen reader reads.
