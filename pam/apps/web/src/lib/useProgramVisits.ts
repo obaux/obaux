@@ -17,6 +17,8 @@ export interface ProgramVisit {
   readonly status: 'scheduled' | 'attended' | 'missed' | 'cancelled';
   readonly serviceName: string | null;
   readonly checkedInAt: string | null;
+  /** The member marked this visit themselves (D-535): the lead cannot undo it. Not how. */
+  readonly markedByMember: boolean;
 }
 
 interface VisitRow {
@@ -30,7 +32,8 @@ interface VisitRow {
   readonly checked_in_at: string | null;
 }
 
-export function visitsFromRows(rows: readonly VisitRow[]): ProgramVisit[] {
+export function visitsFromRows(rows: readonly VisitRow[], ownMarks: readonly string[] = []): ProgramVisit[] {
+  const own = new Set(ownMarks);
   return rows.map((row) => ({
     id: row.appointment_id,
     memberId: row.member_id,
@@ -40,6 +43,7 @@ export function visitsFromRows(rows: readonly VisitRow[]): ProgramVisit[] {
     status: row.status,
     serviceName: row.service_name,
     checkedInAt: row.checked_in_at,
+    markedByMember: own.has(row.appointment_id),
   }));
 }
 
@@ -55,9 +59,12 @@ export function useProgramVisits(enabled: boolean): readonly ProgramVisit[] {
     void (async () => {
       try {
         const { createClient } = await import('./supabase');
-        const { data, error } = await createClient().rpc('my_program_visits');
+        const supabase = createClient();
+        const { data, error } = await supabase.rpc('my_program_visits');
+        // Which marks the member made themselves (D-535); a failed read leaves them as the lead's own.
+        const own = await supabase.rpc('my_program_own_marks');
         if (cancelled) return;
-        setVisits(error ? [] : visitsFromRows((data ?? []) as VisitRow[]));
+        setVisits(error ? [] : visitsFromRows((data ?? []) as VisitRow[], own.error ? [] : ((own.data ?? []) as string[])));
       } catch {
         if (!cancelled) setVisits([]);
       }

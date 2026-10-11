@@ -2163,3 +2163,5 @@ Sign in on the code step is off until all six digits are in (D-532). The Support
 ## Places & programs · "I'm here" check-in (11 October 2026) — READY soon, held off main (on top of attendance C)
 
 Branch `claude/places-programs-im-here` (D-535). `i_am_here` (150 m, 100 points) and `i_went` (60, 3 a week), own visit, window, planned 2 h ahead; the position is compared and never kept. Test `59_a_member_says_i_m_here_or_i_went_test.sql`; e2e `im-here.spec.ts`. Waits for the Privacy line.
+
+Update, "I'm here": the lead's circle shows a member's own mark as marked, by the member, with no undo (`my_program_own_marks`, migration `20261011160433`, test 60).

@@ -1097,6 +1097,7 @@
   "schedule.checkin.undo.body": "ستعود زيارته إلى حالة عدم تسجيل الحضور.",
   "schedule.checkin.undo.keep": "الاحتفاظ به",
   "schedule.checkin.undo.confirm": "التراجع عن تسجيل الحضور",
+  "schedule.checkin.byMember": "{name} marked this visit themselves",
   "home.book": "إنشاء حجز جديد",
   "book.title": "حجز زيارة لعضو",
   "book.intro": "الأشخاص الذين راسلوا برنامجك. اختر شخصا، ثم اليوم والوقت.",
