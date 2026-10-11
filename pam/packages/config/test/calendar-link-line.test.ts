@@ -25,7 +25,7 @@ describe('Privacy on the calendar link (D-538)', () => {
   const sharing = PRIVACY.sections.find((s) => s.id === 'sharing');
   const keep = PRIVACY.sections.find((s) => s.id === 'what-we-keep');
 
-  it('are the last paragraphs of “Who else gets your information” and “What we keep”', () => {
+  it('come after the Google map and the request log, in “Who else gets your information” and “What we keep”', () => {
     expect(sharing?.bodyKeys[5]).toBe('privacy.s.sharing.p6');
     expect(keep?.bodyKeys[11]).toBe('privacy.s.what-we-keep.p12');
   });
