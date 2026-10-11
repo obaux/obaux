@@ -15,6 +15,12 @@ journey to check how the journey is."
 - New test in `e2e/directory.spec.ts`: the super admin's Everyone header has no switch.
 - D-497, a changelog fragment, this log, a STATUS section.
 
+- **Later, 11 October (Iris's member flow, relayed by Mira):** W2 — sign-up step 2 ("What
+  others can see") now has a Call Pam row (the support number from `app_settings`, the hours,
+  one tap to dial), and `e2e/join.spec.ts` checks it. Its missing back arrow is deliberate (the
+  account and the used invite exist by then, so going back to About you would fail on
+  resubmit); asked, not changed. W6 — first-time words drafted for Will, not built.
+
 ## What was wrong, and what missed it
 
 - **The first version of the new test passed on `main` too.** The switch is loaded lazily
@@ -39,6 +45,7 @@ journey to check how the journey is."
 | Playwright: directory, admin, people-strip, place, places, points, staff-home, staff-request-approve, a11y, back, shell-flash | 264 passed (320 light and dark, iPhone SE) |
 | New test against `main` without the change | fails (expected 0, found 1) |
 | `build-storybook` | builds; super admin headers photographed before and after |
+| After W2 and merging main (11 October): typecheck; Playwright join, consent, a11y, directory | clean; 192 passed, then join 36 with the new check |
 
 ## Left undone
 

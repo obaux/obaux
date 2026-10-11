@@ -197,6 +197,8 @@ test.describe('signing up', () => {
 
     // Step 3: what is visible, and what is not.
     await expect(page.getByRole('heading', { name: 'What others can see' })).toBeVisible();
+    // W2 (Iris, 10 October): the step says "call us", so it has a number to tap.
+    await expect(page.getByRole('link', { name: /Call Pam/ })).toHaveAttribute('href', /^tel:\+/);
     await expect(page.getByText('What you say or send to someone else')).toBeVisible();
     // D-394, D-399: photos and documents are named, not left to "message" meaning all.
     await expect(page.getByText('A message, photo or document only if someone says it is not safe')).toBeVisible();
