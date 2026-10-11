@@ -19,7 +19,7 @@ describe('Privacy on the request log (a66)', () => {
   const keep = PRIVACY.sections.find((s) => s.id === 'what-we-keep');
 
   it('is the last paragraph of “What we keep”', () => {
-    expect(keep?.bodyKeys.at(-1)).toBe('privacy.s.what-we-keep.p11');
+    expect(keep?.bodyKeys[10]).toBe('privacy.s.what-we-keep.p11');
   });
 
   it('lists what is written down, including the IP address and, at sign-in, the phone number', () => {

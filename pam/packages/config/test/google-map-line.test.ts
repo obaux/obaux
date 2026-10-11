@@ -21,8 +21,8 @@ describe('Privacy on the Google map in Trips (a67)', () => {
   const sharing = PRIVACY.sections.find((s) => s.id === 'sharing');
   const code = readFileSync(fileURLToPath(new URL('../../../apps/web/src/screens/TripsMap.tsx', import.meta.url)), 'utf8');
 
-  it('is the last paragraph of “Who else gets your information”', () => {
-    expect(sharing?.bodyKeys.at(-1)).toBe('privacy.s.sharing.p5');
+  it('is the paragraph after the email sentence in “Who else gets your information”', () => {
+    expect(sharing?.bodyKeys[4]).toBe('privacy.s.sharing.p5');
   });
 
   it('says the map comes from Google, and that Google gets the IP address and the part of the map looked at', () => {

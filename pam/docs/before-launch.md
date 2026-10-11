@@ -36,7 +36,8 @@ STATUS row too.
   down; and that the record "is deleted within a week". True today because: Supabase is on the **Free** plan (logs kept 1
   day; the oldest row was 25 hours old), Vercel's plan could not be read from the API (the deploy limit the team hit is
   Hobby's, whose request logs last about an hour; Pro a day). Will can read Vercel's plan in Settings › Billing.
-  1. **Before the Supabase plan goes to Team (28 days) or Enterprise (90), or Vercel to Enterprise,** change p11 and its six
+  1. **Before the Supabase plan goes to Team (28 days) or Enterprise (90), or Vercel to Enterprise,** change p11 and
+     `privacy.s.what-we-keep.p12` (the calendar link's request record, which has the same "within a week") and their six
      translations first. Pro (7 days) is still "within a week". Moving to Pro before launch is likely (the Free plan has
      no backups to restore from); nothing to change for it.
   2. **Do not add a log drain or an error tracker** (Sentry, an analytics tool, a Vercel Speed Insights switch) without
