@@ -1413,12 +1413,19 @@ state with a (+)) instead of the "Proposed (a22)" cards; the generator gets `dra
 mouse stepped it on again (D-494, fixed; phones were not affected). Figma: Case manager, Program lead and
 Overview redrawn, one image replaced on Member; drawn from the branch, so redraw from `main` only after it merges.
 
+## Design system & Storybook · A27: text sizes (11 October)
+
+Branch `claude/pam-design-a27-text-size`. Will (a48): "Leave as is. Make exceptions. Update rules." A27 writes the sizes down as built:
+the page and typed text 16px, buttons and rows 17-18, reading text 16, labels 14, captions 12-13, nothing under 12; replaces A23's
+"nothing under 15px". CLAUDE.md, Typography and Principles say it. Docs only; no screen changes. Not done, noted in A27: the one 11px
+caption ("Your badge"), and Sign in's field label and consent line at 14px. D-504's old counts were wrong (corrected: 38% under 15px).
+
 ## Design system & Storybook · tokens reconciled with Foundations (11 October)
 
 Branch `claude/pam-design-tokens`. Foundations now says what the code does for card radius (24px; sheets 28px), spacing (4px steps,
 half-steps inside components) and colour (all 146 tokens, generated from the theme, with a test); a decision records who was right
-for each of Wren's five items (D-504). Needs Will: two visible changes: raise the theme's body size (14px to 16px, with 3 in 4
-text elements currently under 15px), and dark `background-muted` to `#262626`.
+for each of Wren's five items (D-504). Will has answered both visible items: body size left as is, with the exceptions written as A27
+(the "3 in 4 under 15px" figure was wrong, it is 38%; see A27 and D-504); dark `background-muted` is `#262626` now (a49, "yes go for it"; before and after in Storybook › Foundations › Dark muted ground).
 
 ## Design system & Storybook · Sign in on a short phone, small targets (11 October) — on `main`
 
