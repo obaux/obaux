@@ -31,8 +31,11 @@ describe('a program sees the visits planned at its own program (D-526)', () => {
 
   it('is said on the Privacy page, with exactly what the program sees', () => {
     expect(sharing).toMatch(/sign up with them or plan a visit there/);
-    expect(sharing).toMatch(/your first name, the day and time, the service you picked, and whether they marked you as there/);
-    // The program marks a member as there; the member does not check in, so the page does not say "you came".
+    expect(sharing).toMatch(/your first name, the day and time, the service you picked, and whether you were marked as there/);
+    // Not “they marked you”: a member can mark their own visit (“I’m here”, “I went”, D-535), and the program sees only that the
+    // visit is there, never who marked it or how.
+    expect(sharing).not.toMatch(/whether they marked you/);
+    // The page says the visit is marked as there, by whoever marked it; it does not say "you came".
     expect(sharing).not.toMatch(/\byou (came|went|checked in)\b/i);
   });
 
@@ -59,5 +62,12 @@ describe('a program sees the visits planned at its own program (D-526)', () => {
 
   it('keeps the transparency line to the visits: the guide’s “went or missed” half is the guide’s, the sentence about a program is not a claim about who came', () => {
     expect(appointments?.en.split('A program sees')[1] ?? '').not.toMatch(/missed|went|came/i);
+  });
+  it('says a program never sees how a visit was marked: the status, not the method (D-535)', () => {
+    expect(ADMIN_CANNOT_SEE).toContain('how_a_visit_was_marked');
+    // So the Privacy page and the screen name no method to the program: not “checked in”, not “marked by”, not “I’m here”.
+    for (const line of [sharing, appointments?.en ?? '']) {
+      expect(line).not.toMatch(/checked in|marked by|who marked|I.m here|I went/i);
+    }
   });
 });

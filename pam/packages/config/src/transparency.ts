@@ -164,6 +164,14 @@ export const ADMIN_CANNOT_SEE = [
    * planned AT itself, `visits_planned_at_their_own_program` above; that is not a trip to another program.)
    */
   'member_activity_for_a_program',
+  /**
+   * D-526 / D-535 (Mira, 11 October): a program's lead sees a visit's status (booked, there, missed), never who marked it or how.
+   * A member can mark their own visit ("I’m here", "I went"), so a visit may show as there without the lead having marked it; the
+   * lead sees only that it is there, and "undo" appears only on a mark the lead made. `my_program_visits()` returns the status and
+   * not the method. Only the member sees how, and an admin's audit row says only that a check-in happened. (Privacy p9 says what
+   * Pam keeps; `privacy.s.sharing.p2` says what a program sees; this entry is why neither says "how".)
+   */
+  'how_a_visit_was_marked',
 ] as const;
 
 export type AdminHiddenField = (typeof ADMIN_CANNOT_SEE)[number];
