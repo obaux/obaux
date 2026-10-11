@@ -225,6 +225,21 @@
   4. Bring back the thread header that shows info on top and scrolls into a smaller bar. That reverses part of
      D-411; the buttons keep D-411's positions (Nico).
 
+- **Batch b14 pushed at 07d8287 (10:16), live, main CI green.** It holds:
+  - Nico's D-524 (Answer by text, off);
+  - Wren's SP4 and the help-request probe fix;
+  - Dot's D-528 (the website-only colours and text styles in Figma and apps/site, with two AA text variants).
+  Will's card a65 has the website words: five held lines with true fallbacks, Sage's privacy sentence, and two
+  colours. Card a66 has the location paragraphs for "I'm here" (p9, p10).
+- **Batch b15:**
+  - Nico's D-529: the conversation's own header is back, with the info on top scrolling into a small bar
+    whose name fades in. It reverses part of D-411; the buttons keep D-411's positions.
+  - Dot's D-530: the code boxes read left to right in Arabic and accept Arabic-Indic and Persian digits.
+  - Lena's places.area.hereNote: "Used for this search only."
+  - Sage's ledger.
+  - Wren's D-531, all four stages of the new website from Will's Figma: Home, Support index and the post
+    template, About Pam, and Still stuck? The Home carousel flips, drifts and has Pause.
+
 ## What was wrong, and what missed it
 
 - **Ava won't push on the merge desk's word, and that is right.** The merge desk passed on Will's "remove" at
@@ -291,6 +306,11 @@
   Each is an Edge Function invocation on the free plan, and a real visitor costs two per page view. Wren
   will probe only from joinpam.org, only near "Still stuck?", and once per visit.
 
+- **Branch CI keeps calling the help function until branches pick up the fix.** After e27694a2, bursts of
+  about 200 refused calls still arrived. They matched each branch push's site checks (different Azure IPs,
+  around 5 minutes each) on branches cut before the fix, not main's own run. They stop as branches merge
+  main. That's a few thousand calls a day at most, well inside the free plan.
+
 ## Decisions
 
 - Will's answer on a card goes to the teammate waiting on it the same turn. If that teammate needs Will's own
@@ -336,6 +356,9 @@
 | Batch b13: builds, budget, site a11y / usability / scrollspy, storybook | all 0; 20.9 kB spare; 120 scans 0 problems / clear / 300 links 0 problems; builds |
 | Batch b13: e2e full | 1374 passed, 19 skipped; loading.spec (D-520) and add-my-program (race) red, fixed: 108 of 108 over three repeats |
 | 20261011044654 live | applied as 20261011092734; request_staff_access md5 92d080c9 before, 7e98d9e4 after; grants (authenticated, service_role) and search_path unchanged |
+| Batch b14 (07d8287): db / config / ui / web unit / site tests / e2e full / site a11y, usability, scrollspy | 1288 ok / 1094 / 124 / 125 / 89 / 1400 passed, 19 skipped / 120 scans 0, clear, 300 links 0 |
+| main CI on 07d8287; Vercel web and pam-site | all four green; READY |
+| Batch b15 (before stages 3 and 4): db / config / ui / web unit / site tests / e2e full / storybook / site checks | 1288 ok / 1094 / 124 / 125 / 92 / 1418 passed, 19 skipped / builds / 120 scans 0, clear, 300 links 0; budget 15.3 kB spare |
 
 ## Left undone
 
