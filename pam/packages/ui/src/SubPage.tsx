@@ -84,6 +84,19 @@ export interface SubPageHeaderProps {
    * the title says what the page is.
    */
   readonly hero?: ReactNode;
+  /**
+   * `large` (the default): back in the bar, the title large beneath it.
+   * `bar`: the bar alone, with the title in it from the start — a conversation, whose name and who
+   * they are scroll with the messages under it (Will, 11 October, D-526). The bar is the same bar, so
+   * back and the actions sit exactly where they do on every other page (D-411).
+   */
+  readonly variant?: 'large' | 'bar';
+  /**
+   * With `variant="bar"`: whether the name in the bar is showing. A conversation hides it while its own
+   * name is on screen below and fades it in as that name scrolls under the bar (D-526). Only opacity
+   * changes, so nothing moves; the name is out of the accessibility tree either way.
+   */
+  readonly isBarTitleShown?: boolean;
 }
 
 const COLLAPSE_AT = 48;
@@ -130,6 +143,12 @@ const styles = stylex.create({
     transitionDuration: '150ms',
   },
   shown: { opacity: 1 },
+  // The conversation's bar name arrives with Pam's own tempo (PAM_MOTION.enter: 240ms, ease-out) and
+  // at once under reduced motion.
+  barTitleFade: {
+    transitionDuration: { default: '240ms', '@media (prefers-reduced-motion: reduce)': '0ms' },
+    transitionTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)',
+  },
   // 34px, stepping down for a word that will not fit (D-422, `useFitTitle`).
   // While it is being measured a word may not break, so one that is too wide
   // overflows and says so; only past the smallest step is it allowed to.
@@ -175,6 +194,8 @@ export function SubPageHeader({
   backIcon = 'back',
   isBackFixed = false,
   hero,
+  variant = 'large',
+  isBarTitleShown = true,
 }: SubPageHeaderProps) {
   const [collapsed, setCollapsed] = useState(false);
   const fit = useFitTitle<HTMLHeadingElement>(title);
@@ -196,6 +217,24 @@ export function SubPageHeader({
   // 240px; the bar is pulled back up over it to 12px from the top; the title
   // starts 16px under the picture.
   const isHero = hero !== undefined && hero !== null && hero !== false;
+
+  if (variant === 'bar') {
+    return (
+      <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.bar}>
+        {back}
+        <HStack align="center" wrap="nowrap" xstyle={styles.middle}>
+          <Text xstyle={[styles.barTitle, styles.barTitleFade, isBarTitleShown && styles.shown]} aria-hidden="true">
+            {title}
+          </Text>
+        </HStack>
+        {actions ? (
+          <HStack gap={1} align="center" wrap="nowrap" xstyle={styles.actions}>
+            {actions}
+          </HStack>
+        ) : null}
+      </HStack>
+    );
+  }
 
   return (
     <>

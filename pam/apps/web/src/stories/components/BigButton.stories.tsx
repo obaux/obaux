@@ -27,7 +27,7 @@ export const Default: Story = {};
 export const Secondary: Story = { args: { variant: 'secondary', label: 'Not now' } };
 export const Loading: Story = { args: { isLoading: true } };
 export const Disabled: Story = { args: { isDisabled: true } };
-export const AsALink: Story = { args: { label: 'Call Pam', href: 'tel:+12673095265' } };
+export const AsALink: Story = { args: { label: 'Contact Pam', href: '/help/' } };
 
 /** A step count tucked into the left end (D-357): a darker green pill, white text. */
 export const WithStepBadge: Story = { args: { label: 'Next', badge: '2 of 7' } };

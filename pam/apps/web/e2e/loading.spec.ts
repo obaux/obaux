@@ -47,7 +47,8 @@ async function stuckLoading(page: import('@playwright/test').Page) {
 test.describe('waiting for a screen', () => {
   test('shows one spinner, named, and no sentence about places', async ({ page }) => {
     await stuckLoading(page);
-    await page.goto('/account/');
+    // Account draws its hero card as pulses instead (D-520, below), so the spinner is measured on Everyone.
+    await page.goto('/directory/');
 
     // By name, not by role alone: Astryx puts an empty `role="status"` live
     // region inside the help link, which is not a spinner and never says
@@ -57,8 +58,10 @@ test.describe('waiting for a screen', () => {
     // One per view: two spinners for one wait is two things to interpret.
     await expect(spinner).toHaveCount(1);
 
+    // The screen's own header is drawn while it waits (its title, its back); what must never come back is a
+    // sentence about places on a screen that has nothing to do with them (Will, 16 September).
     const text = (await page.locator('main').innerText()).trim();
-    expect(text, 'the loading screen still prints copy').toBe('');
+    expect(text, 'the loading screen talks about places').not.toMatch(/places|nearby/i);
   });
 
   test('sits in the middle of the screen, not under the header', async ({ page }) => {
@@ -81,13 +84,22 @@ test.describe('waiting for a screen', () => {
 
   test('is on every screen somebody can land on', async ({ page }) => {
     await stuckLoading(page);
-    for (const path of ['/', '/account/', '/saved/', '/admin/', '/directory/', '/join/']) {
+    for (const path of ['/', '/saved/', '/admin/', '/directory/', '/join/']) {
       await page.goto(path);
       await expect(
         page.getByRole('status', { name: 'Loading' }),
         `${path} has no spinner`,
       ).toBeVisible();
     }
+  });
+
+  test('Account waits with its hero card as pulses, announced once, not a spinner (D-520)', async ({ page }) => {
+    // Will, 11 October: "skeleton loaders for the image, stats and labels in profile hero card".
+    await stuckLoading(page);
+    await page.goto('/account/');
+    await expect(page.locator('[aria-busy="true"]')).toBeVisible();
+    await expect(page.getByRole('status').filter({ hasText: 'Loading' })).toHaveCount(1);
+    await expect(page.getByRole('status', { name: 'Loading' })).toHaveCount(0);
   });
 
   test('the way to get help is still on the home screen while it waits', async ({ page }) => {

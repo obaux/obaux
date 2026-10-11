@@ -1,161 +1,283 @@
 import * as stylex from '@stylexjs/stylex';
-import { Card } from '@astryxdesign/core/Card';
-import { Grid } from '@astryxdesign/core/Grid';
 import { Heading } from '@astryxdesign/core/Heading';
+import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { HStack } from '@astryxdesign/core/HStack';
-import { Button } from '@pam/ui/Button';
-import { OnboardingSlides } from '@pam/ui/OnboardingSlides';
-import { SecondaryButton } from '../components/SecondaryButton';
-import { Frame } from '../components/Frame';
-import { ABOUT, ABOUT_ART, ABOUT_ON_HOME, aboutPath } from '../content/about';
+import { EducationIcon, FamilyServicesIcon, WorkforceIcon } from '@pam/ui/icons';
+import { FlipCarousel } from '../components/FlipCarousel';
+import { LegalLink } from '../components/LegalLink';
+import { PhonePanel } from '../components/PhonePanel';
+import { Reveal } from '../components/Reveal';
+import { SoftButton } from '../components/SoftButton';
+import { WebFrame } from '../components/WebFrame';
 import { VISIT_REMINDERS_LIVE } from '../content/flags';
-import { ReadMore } from '../components/Prose';
-import { SIGN_IN_URL } from '../lib/links';
+import { HOME } from '../content/home-copy';
+import { APP_URL } from '../lib/links';
+import { website } from '../lib/website.stylex';
+import { type } from '../lib/website-type.stylex';
 
 const styles = stylex.create({
-  // The headline and the picture carousel side by side from 900px, stacked
-  // (words first) below it (Will, 10 October: "bring that carousel to the right
-  // of header text on hero"). `minmax(0, 1fr)` so a wide picture can never push
-  // a column past the screen.
+  page: { backgroundColor: website['--website-surface-page'], color: website['--website-text-primary'], width: '100%' },
+  // Hero: words left, the pictures right from 900px; words first below it.
   hero: {
     display: 'grid',
     alignItems: 'center',
     gap: '32px',
-    paddingBlock: '48px 16px',
+    paddingBlock: '48px',
     gridTemplateColumns: { default: 'minmax(0, 1fr)', '@media (min-width: 900px)': 'minmax(0, 1fr) minmax(0, 1fr)' },
   },
-  title: { maxWidth: '18ch' },
-  lede: { maxWidth: '56ch' },
-  actions: { flexWrap: 'wrap' },
-  // The pictures are the app's own sign-in illustrations, cropped to a banner.
-  about: { width: '100%', height: 'auto', display: 'block', borderRadius: '12px', aspectRatio: '8 / 3' },
-  picture: { width: '100%', height: '180px', objectFit: 'cover', display: 'block', borderRadius: '12px' },
+  h1: {
+    color: website['--website-text-primary'],
+    fontFamily: 'var(--font-family-body)',
+    fontWeight: 600,
+    fontSize: { default: '40px', '@media (min-width: 900px)': '53px' },
+    lineHeight: { default: '41px', '@media (min-width: 900px)': '57px' },
+    letterSpacing: { default: '-0.64px', '@media (min-width: 900px)': '-1px' },
+    margin: 0,
+  },
+  green: { color: website['--website-brand-primary'] },
+  lead: {
+    color: website['--website-text-secondary'],
+    fontFamily: 'var(--font-family-body)',
+    fontWeight: 400,
+    fontSize: { default: '20px', '@media (min-width: 900px)': '26px' },
+    lineHeight: { default: '30px', '@media (min-width: 900px)': '37px' },
+    margin: 0,
+  },
+  // The deep green band: the picture and "Who is Pam for?".
+  band: {
+    display: 'grid',
+    overflow: 'hidden',
+    borderRadius: { default: '28px', '@media (min-width: 900px)': '40px' },
+    backgroundColor: website['--website-surface-brand-deep'],
+    color: website['--website-text-on-brand-deep'],
+    gridTemplateColumns: { default: 'minmax(0, 1fr)', '@media (min-width: 900px)': 'minmax(0, 1fr) minmax(0, 1fr)' },
+    minHeight: { default: 'auto', '@media (min-width: 900px)': '400px' },
+  },
+  bandPicture: {
+    display: 'block',
+    width: '100%',
+    height: '100%',
+    minHeight: { default: '220px', '@media (min-width: 900px)': '400px' },
+    objectFit: 'cover',
+  },
+  bandText: {
+    justifyContent: 'space-between',
+    gap: '32px',
+    boxSizing: 'border-box',
+    padding: { default: '32px 24px', '@media (min-width: 900px)': '48px 48px 48px 60px' },
+  },
+  bandLabel: { color: website['--website-text-on-brand-deep'] },
+  chips: { flexWrap: 'wrap', gap: '12px' },
+  chip: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    minHeight: '48px',
+    boxSizing: 'border-box',
+    paddingInline: '17px',
+    borderRadius: '24px',
+    borderWidth: '1.8px',
+    borderStyle: 'solid',
+    borderColor: website['--website-border-green'],
+    color: website['--website-text-on-brand-deep'],
+    textDecorationLine: 'none',
+    transitionProperty: 'transform, background-color',
+    transitionDuration: '125ms',
+    transitionTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)',
+    ':hover': { transform: 'translateY(-2px)' },
+    ':active': { transform: 'scale(0.97)' },
+  },
+  chipOn: { backgroundColor: website['--website-surface-green'], color: website['--website-text-primary'] },
+  bandLine: { color: website['--website-text-on-brand-deep'], margin: 0 },
+  // A feature row: words and a phone panel, swapped on alternate rows.
+  row: {
+    display: 'grid',
+    alignItems: 'center',
+    gap: { default: '24px', '@media (min-width: 900px)': '60px' },
+    paddingBlock: '48px',
+    gridTemplateColumns: { default: 'minmax(0, 1fr)', '@media (min-width: 900px)': 'minmax(0, 1fr) minmax(0, 1fr)' },
+  },
+  rowText: { gap: '24px', justifyContent: 'space-between', paddingInline: { default: '0px', '@media (min-width: 900px)': '24px' } },
+  rowFlip: { order: { default: 0, '@media (min-width: 900px)': 2 } },
+  head: {
+    color: website['--website-text-primary'],
+    fontFamily: 'var(--font-family-body)',
+    fontWeight: 500,
+    fontSize: { default: '40px', '@media (min-width: 900px)': '48px' },
+    lineHeight: { default: '41px', '@media (min-width: 900px)': '57px' },
+    letterSpacing: '-1px',
+    margin: 0,
+  },
+  body: { color: website['--website-text-secondary'], maxWidth: '400px', margin: 0 },
+  smallChip: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '8px',
+    minHeight: '40px',
+    boxSizing: 'border-box',
+    paddingInline: '12px',
+    borderRadius: '20px',
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: website['--website-border-subtle'],
+    color: website['--website-text-primary'],
+    backgroundColor: website['--website-surface-page'],
+  },
+  // The two callouts side by side in one soft card.
+  callouts: {
+    display: 'grid',
+    gap: '32px',
+    padding: '32px',
+    boxSizing: 'border-box',
+    borderRadius: '24px',
+    backgroundColor: website['--website-surface-muted'],
+    gridTemplateColumns: { default: 'minmax(0, 1fr)', '@media (min-width: 900px)': 'minmax(0, 1fr) minmax(0, 1fr)' },
+  },
+  callout: { gap: '12px', alignItems: 'center', textAlign: 'center' },
+  eyebrow: { color: website['--website-text-muted-strong'], textTransform: 'uppercase', margin: 0 },
+  calloutText: { color: website['--website-text-primary'], margin: 0, maxWidth: '520px' },
+  divided: {
+    borderBlockStartWidth: { default: '1px', '@media (min-width: 900px)': '0px' },
+    borderInlineStartWidth: { default: '0px', '@media (min-width: 900px)': '1px' },
+    borderStyle: 'dashed',
+    borderColor: website['--website-border-strong'],
+    paddingBlockStart: { default: '32px', '@media (min-width: 900px)': '0px' },
+    paddingInlineStart: { default: '0px', '@media (min-width: 900px)': '32px' },
+  },
+  gap: { height: '48px' },
 });
 
-const HOW = [
+const CAROUSEL = [
   {
-    image: '/art/hero-city.webp',
-    title: 'Find a place',
-    body: 'See what your city has to offer: Learning, Earning, and Family Support.',
+    src: '/art/hero-city.webp',
+    alt: 'Find a place. See what your city has to offer: Learning, Earning, and Family Support.',
   },
   {
-    image: '/art/hero-phone.webp',
-    title: 'Talk to a real person',
-    body: 'A real person can point you to the right one and answer questions.',
+    src: '/art/hero-phone.webp',
+    alt: 'Talk to a real person. A real person can point you to the right one and answer questions.',
   },
   {
-    image: '/art/hero-sneakers.webp',
-    title: 'Keep going',
-    body: VISIT_REMINDERS_LIVE
-      ? 'Pam keeps your planned visits in one place, and texts you a reminder before you go.'
-      : 'Pam keeps your planned visits in one place. Texts that remind you are coming.',
+    src: '/art/hero-sneakers.webp',
+    alt: VISIT_REMINDERS_LIVE
+      ? 'Keep going. Pam keeps your planned visits in one place, and texts you a reminder before you go.'
+      : 'Keep going. Pam keeps your planned visits in one place. Texts that remind you are coming.',
   },
-] as const;
+].map((slide, i) => ({ id: `hero-${i + 1}`, width: 900, height: 1102, ...slide }));
 
-const WHO = [
-  {
-    title: 'Members',
-    body: 'For someone coming home: find a place, plan a visit, and keep going with a person in your corner.',
-  },
-  {
-    title: 'Case managers',
-    body: 'Their plans, your guidance, in one place.',
-  },
-  {
-    title: 'Programs',
-    body: 'See who is coming, keep them coming, and get people sent your way.',
-  },
-] as const;
+const CHIP_ICON = [WorkforceIcon, FamilyServicesIcon, EducationIcon] as const;
 
-/**
- * `showAbout` is the "About Pam" section. It follows the English post's sign-off
- * (`content/about.ts`): hidden until Will signs it. Storybook's "Home with About Pam"
- * story turns it on to show it.
- */
-export function HomeScreen({ showAbout = ABOUT_ON_HOME }: { readonly showAbout?: boolean }) {
+/** The new Home (Figma "Pam — Website", Home 24:575 desktop, 7:3 phone). Its words are `content/home-copy.ts`. `showAbout` is kept for Storybook's walker and ignored: the design's Home has no About section. */
+export function HomeScreen(_props: { readonly showAbout?: boolean } = {}) {
   return (
-    <Frame gap={10}>
-      <div {...stylex.props(styles.hero)}>
-        <VStack gap={4}>
-          <Heading level={1} type="display-2" xstyle={styles.title}>
-            Pam helps you find people and places that can help.
-          </Heading>
-          <Text type="large" color="secondary" xstyle={styles.lede}>
-            Pam connects people coming home with the programs, mentors and case managers who can help:
-            learning, earning and family support, in one app.
-          </Text>
-          <HStack gap={3} xstyle={styles.actions}>
-            <Button label="Sign in" variant="primary" size="lg" href={SIGN_IN_URL} />
-            <SecondaryButton label="How Pam works" size="lg" href="/support/" />
-          </HStack>
-        </VStack>
-        {/* The app's own About Pam carousel: three pictures, no words on them. Each picture is named by the
-            same line the cards below show, so a screen reader loses nothing. */}
-        <OnboardingSlides
-          slides={HOW.map((item, i) => ({ id: `hero-${i + 1}`, image: item.image, text: `${item.title}. ${item.body}` }))}
-          label="Pam in pictures"
-          pauseLabel="Pause"
-          playLabel="Play"
-          variant="inline"
-          showLines={false}
-        />
-      </div>
+    <VStack xstyle={styles.page}>
+      <WebFrame>
+        <div {...stylex.props(styles.hero)}>
+          <VStack gap={6}>
+            <Heading level={1} xstyle={styles.h1}>
+              {HOME.hero.before}
+              <span {...stylex.props(styles.green)}>{HOME.hero.green1}</span>
+              {HOME.hero.middle}
+              <span {...stylex.props(styles.green)}>{HOME.hero.green2}</span>
+            </Heading>
+            <Text as="p" xstyle={styles.lead}>
+              {HOME.hero.lead}
+            </Text>
+          </VStack>
+          <FlipCarousel slides={CAROUSEL} label={HOME.hero.pictures} />
+        </div>
+      </WebFrame>
 
-      <VStack gap={4}>
-        <Heading level={2}>How Pam helps</Heading>
-        <Grid columns={{ minWidth: 260 }} gap={4}>
-          {HOW.map((item) => (
-            <Card key={item.title} padding={4}>
-              <VStack gap={3}>
-                <img src={item.image} alt="" {...stylex.props(styles.picture)} />
-                <Heading level={3}>{item.title}</Heading>
-                <Text as="p">{item.body}</Text>
+      <WebFrame>
+        <Reveal>
+          <div {...stylex.props(styles.band)}>
+            <img
+              src="/home/philly-1600.webp"
+              srcSet="/home/philly-900.webp 900w, /home/philly-1600.webp 1600w"
+              sizes="(min-width: 900px) 630px, 100vw"
+              width={2048}
+              height={1494}
+              alt={HOME.band.alt}
+              loading="lazy"
+              decoding="async"
+              {...stylex.props(styles.bandPicture)}
+            />
+            <VStack xstyle={styles.bandText}>
+              <VStack gap={4}>
+                <Text xstyle={[type.label_large, styles.bandLabel]}>{HOME.band.label}</Text>
+                <HStack xstyle={styles.chips}>
+                  {HOME.band.chips.map((chip, i) => (
+                    <a key={chip.label} href={chip.href} {...stylex.props(type.label_chip, styles.chip, i === 0 && styles.chipOn)}>
+                      {chip.label}
+                      <span aria-hidden="true">↗</span>
+                    </a>
+                  ))}
+                </HStack>
               </VStack>
-            </Card>
-          ))}
-        </Grid>
-      </VStack>
-
-      {showAbout ? (
-        <Card padding={6} variant="muted">
-          <Grid columns={{ minWidth: 280 }} gap={6}>
-            <img src={ABOUT_ART.wide} alt={ABOUT.en.artAlt} width={1600} height={600} {...stylex.props(styles.about)} />
-            <VStack gap={2}>
-              <Heading level={2}>{ABOUT.en.title}</Heading>
-              <Text as="p">{ABOUT.en.lead}</Text>
-              <ReadMore label="Read more about Pam" href={aboutPath('en')} />
+              <Heading level={2} xstyle={[type.heading_band, styles.bandLine]}>
+                {HOME.band.line}
+              </Heading>
             </VStack>
-          </Grid>
-        </Card>
-      ) : null}
+          </div>
+        </Reveal>
+      </WebFrame>
 
-      <VStack gap={4}>
-        <Heading level={2}>Who Pam is for</Heading>
-        <Grid columns={{ minWidth: 260 }} gap={4}>
-          {WHO.map((item) => (
-            <Card key={item.title} padding={6} variant="muted">
-              <VStack gap={2}>
-                <Heading level={3}>{item.title}</Heading>
-                <Text as="p">{item.body}</Text>
+      {HOME.rows.map((row, i) => (
+        <WebFrame key={row.id}>
+          <Reveal>
+            <div {...stylex.props(styles.row)}>
+              <VStack xstyle={styles.rowText}>
+                <Heading level={2} xstyle={styles.head}>
+                  {row.head}
+                </Heading>
+                {'chips' in row && row.chips ? (
+                  <HStack xstyle={styles.chips} aria-label="Kinds of help">
+                    {row.chips.map((label, k) => {
+                      const Icon = CHIP_ICON[k]!;
+                      return (
+                        <span key={label} {...stylex.props(type.label_14, styles.smallChip)}>
+                          <Icon width={20} height={20} aria-hidden />
+                          {label}
+                        </span>
+                      );
+                    })}
+                  </HStack>
+                ) : null}
+                <Text as="p" xstyle={[type.lead_17, styles.body]}>
+                  {row.body}
+                </Text>
+                <HStack>
+                  <SoftButton label={row.cta.label} href={row.cta.href === 'app' ? `${APP_URL}/` : row.cta.href} />
+                </HStack>
               </VStack>
-            </Card>
-          ))}
-        </Grid>
-      </VStack>
+              <div {...stylex.props(i % 2 === 0 ? undefined : styles.rowFlip)}>
+                <PhonePanel name={row.image} alt={row.alt} {...('bubble' in row && row.bubble ? { bubble: row.bubble } : {})} />
+              </div>
+            </div>
+          </Reveal>
+        </WebFrame>
+      ))}
 
-      <Card padding={8} variant="muted">
-        <VStack gap={3}>
-          <Heading level={2}>Pam has a lot of moving parts</Heading>
-          <Text as="p">
-            The Support page explains how it works in plain language, including who can do what.
-          </Text>
-          <HStack>
-            <SecondaryButton label="Go to Support" href="/support/" />
-          </HStack>
-        </VStack>
-      </Card>
-    </Frame>
+      <WebFrame>
+        <Reveal>
+          <div {...stylex.props(styles.callouts)}>
+            {HOME.callouts.map((callout, i) => (
+              <VStack key={callout.eyebrow} xstyle={[styles.callout, i === 1 && styles.divided]}>
+                <Text xstyle={[type.eyebrow_13, styles.eyebrow]}>{callout.eyebrow}</Text>
+                <Text as="p" xstyle={[type.lead_large20, styles.calloutText]}>
+                  {callout.text}
+                </Text>
+                {callout.cta.href === 'privacy' ? (
+                  <LegalLink kind="privacy" label={callout.cta.label} variant="soft" />
+                ) : (
+                  <SoftButton label={callout.cta.label} href={callout.cta.href} />
+                )}
+              </VStack>
+            ))}
+          </div>
+        </Reveal>
+      </WebFrame>
+      <div {...stylex.props(styles.gap)} />
+    </VStack>
   );
 }

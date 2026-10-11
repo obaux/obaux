@@ -169,7 +169,7 @@ test.describe('the conversation list', () => {
     await expect(page.getByRole('link', { name: /Marcus/ })).toBeVisible();
     await expect(page.getByRole('button', { name: 'New message' })).toHaveCount(0);
     await expect(page.getByRole('alert').getByText('Some things are turned off')).toBeVisible();
-    await expect(page.getByRole('alert').getByRole('link', { name: /Call/ })).toHaveAttribute('href', /^tel:/);
+    await expect(page.getByRole('alert').getByRole('link', { name: /Contact Pam/ })).toHaveAttribute('href', '/help/');
 
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
     expect(results.violations).toEqual([]);
@@ -635,8 +635,8 @@ test.describe('a conversation', () => {
     await expect(notice.getByText(/^You cannot send messages right now\./)).toBeVisible();
     await expect(notice.getByText(/Your guide turned this off for your account\./)).toBeVisible();
     await expect(notice.getByText(/your plan/i)).toHaveCount(0);
-    const call = notice.getByRole('link', { name: /Call/ });
-    await expect(call).toHaveAttribute('href', /^tel:/);
+    const call = notice.getByRole('link', { name: /Contact Pam/ });
+    await expect(call).toHaveAttribute('href', '/help/');
     // The quiet card: body text at the smallest size (16px), and the call is a
     // link, not a filled primary button — still a 48px target.
     expect(await notice.getByText(/^You cannot send messages/).evaluate((el) => getComputedStyle(el).fontSize)).toBe('16px');
@@ -798,17 +798,17 @@ test.describe('a conversation', () => {
     await settled(page);
 
     await expect(page.getByRole('heading', { name: 'Teresa', level: 1 })).toBeVisible();
-    // Who they are to you sits on the line under the name (D-395, was a tag
-    // beside it — D-193, D-187): just below it, starting where it starts.
+    // Who they are to you sits on the line under the name (D-395, D-526: centred, in the info that
+    // scrolls with the messages): just below it, on the same centre line.
     const heading = await page.getByRole('heading', { name: 'Teresa', level: 1 }).boundingBox();
     const line = await page
       .getByRole('heading', { name: 'Teresa', level: 1 })
-      .locator('xpath=../..')
+      .locator('xpath=..')
       .getByText('Case manager', { exact: true })
       .boundingBox();
     expect(line!.y).toBeGreaterThanOrEqual(heading!.y + heading!.height - 2);
-    expect(line!.y - (heading!.y + heading!.height)).toBeLessThan(8);
-    expect(Math.abs(line!.x - heading!.x)).toBeLessThan(2);
+    expect(line!.y - (heading!.y + heading!.height)).toBeLessThan(10);
+    expect(Math.abs(line!.x + line!.width / 2 - (heading!.x + heading!.width / 2))).toBeLessThan(2);
     await expect(page.getByRole('log')).toBeVisible();
     // The same thread Teresa's own preview reads, from Jordan's side (D-183).
     await expect(page.getByRole('log').getByText(/room 12/)).toBeVisible();
@@ -1275,7 +1275,7 @@ test.describe('the conversation, drawn closer (D-400, D-401)', () => {
     );
   };
 
-  test('who they are stays on one line under the name, however long the program', async ({ page }) => {
+  test('who they are is never cut, however long the program (D-526: the info has the room; it wraps)', async ({ page }) => {
     await signedInAs(page, 'member');
     await withOneConversation(page);
     await page.route(PARTNERS, (route) =>
@@ -1293,29 +1293,31 @@ test.describe('the conversation, drawn closer (D-400, D-401)', () => {
     );
     await page.goto(`/messages/thread/?id=${CONVO}`);
     await settled(page);
-    const line = page.getByText(/^Program lead at Example Food Pantry/);
-    const box = await line.boundingBox();
-    expect(box!.height).toBeLessThan(24);
-    expect(await line.evaluate((el) => getComputedStyle(el).textOverflow)).toBe('ellipsis');
+    const line = page.getByText(/^Program lead at Example Food Pantry of North Philadelphia and the Neighborhoods Around It$/);
+    await expect(line).toBeVisible();
+    const box = (await line.boundingBox())!;
+    // Inside the screen, and nothing clipped: it grows to a second line rather than being cut.
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+    expect(await line.evaluate((el) => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
+    expect(await line.evaluate((el) => getComputedStyle(el).textOverflow)).not.toBe('ellipsis');
   });
 
-  test('the header is the one every nested screen has: back and ⋯ in the same places, the name large, no fade (D-411)', async ({ page }) => {
+  test('the bar is the one every nested screen has: back and ⋯ in the same places, the name once, no fade (D-411, D-526)', async ({ page }) => {
     await signedInAs(page, 'admin');
     await withOneConversation(page);
     await page.goto('/legal/');
     await settled(page);
     const legalBack = (await page.getByRole('link', { name: /^Back/ }).first().boundingBox())!;
-    const legalTitle = (await page.getByRole('heading', { level: 1 }).boundingBox())!;
 
     await page.goto(`/messages/thread/?id=${CONVO}`);
     await settled(page);
     const back = (await page.getByRole('link', { name: /^Back/ }).first().boundingBox())!;
     expect(back).toEqual(legalBack);
-    const title = page.getByRole('heading', { level: 1 });
-    const titleBox = (await title.boundingBox())!;
-    expect(titleBox.x).toBe(legalTitle.x);
-    expect(titleBox.y).toBe(legalTitle.y);
-    expect(await title.evaluate((el) => getComputedStyle(el).fontSize)).toBe('34px');
+
+    // One heading: the name in the info that scrolls with the messages. The bar's copy of it is for the eye only.
+    await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+    expect(await page.getByRole('heading', { level: 1 }).evaluate((el) => getComputedStyle(el).fontSize)).toBe('22px');
 
     // ⋯ at the bar's right edge, as on a place: outlined in a grey you can see, and lifted.
     const more = page.getByRole('link', { name: 'More options' });
@@ -1330,7 +1332,7 @@ test.describe('the conversation, drawn closer (D-400, D-401)', () => {
     expect(look.colour).not.toMatch(/rgba\(0, 0, 0, 0\.0\d+\)/);
     expect(look.shadow).not.toBe('none');
 
-    // No blur or fade laid over the messages under the header.
+    // No blur or fade laid over the messages under the bar.
     const faded = await page.evaluate(() => {
       const top = document.querySelector('main')!.firstElementChild!;
       return [...top.querySelectorAll('*')].some((el) => {
@@ -1339,6 +1341,69 @@ test.describe('the conversation, drawn closer (D-400, D-401)', () => {
       });
     });
     expect(faded).toBe(false);
+  });
+
+  test.describe('the name in the bar (D-526)', () => {
+    const manyMessages = async (page: import('@playwright/test').Page) => {
+      await page.route(MESSAGES, (route) =>
+        route.fulfill(
+          json(
+            Array.from({ length: 40 }, (_, i) => ({
+              id: `bulk-${i}`,
+              conversation_id: CONVO,
+              sender_id: i % 2 ? ME : OTHER,
+              body: `Message number ${i + 1}, long enough to take a line or two on a narrow phone screen.`,
+              created_at: new Date(Date.now() - (40 - i) * 60_000).toISOString(),
+            })),
+          ),
+        ),
+      );
+    };
+    // The bar's copy of the name: the `aria-hidden` text inside the pinned bar, which is the only name there.
+    const barName = (page: import('@playwright/test').Page) => page.locator('main > :first-child [aria-hidden="true"]', { hasText: 'Marcus' });
+
+    test('it is not there while the info shows the name, and fades in as the name goes under the bar', async ({ page }) => {
+      await signedInAs(page, 'admin');
+      await withOneConversation(page);
+      await manyMessages(page);
+      await page.goto(`/messages/thread/?id=${CONVO}`);
+      await settled(page);
+
+      const log = page.getByRole('log');
+      await expect(log).toBeVisible();
+      // Scroll to the top: the name is in the info, the bar's copy is clear.
+      await page.evaluate(() => {
+        for (const el of document.querySelectorAll('*')) {
+          if (el.scrollHeight > el.clientHeight + 4 && /auto|scroll/.test(getComputedStyle(el).overflowY)) el.scrollTop = 0;
+        }
+      });
+      await expect.poll(async () => Number(await barName(page).evaluate((el) => getComputedStyle(el).opacity))).toBe(0);
+      const before = (await barName(page).boundingBox())!;
+
+      // Scroll the conversation to its end: the name is under the bar, so the bar says it.
+      await page.evaluate(() => {
+        for (const el of document.querySelectorAll('*')) {
+          if (el.scrollHeight > el.clientHeight + 4 && /auto|scroll/.test(getComputedStyle(el).overflowY)) el.scrollTop = el.scrollHeight;
+        }
+      });
+      await expect.poll(async () => Number(await barName(page).evaluate((el) => getComputedStyle(el).opacity))).toBe(1);
+      // Only opacity changed: the name did not move.
+      expect(await barName(page).boundingBox()).toEqual(before);
+      // And the page still says it once to a screen reader.
+      await expect(page.getByRole('heading', { level: 1, name: 'Marcus' })).toHaveCount(1);
+      await expect(page.getByText('Marcus', { exact: true })).not.toHaveCount(0);
+    });
+
+    test('with reduced motion it changes at once', async ({ page }) => {
+      await signedInAs(page, 'admin');
+      await withOneConversation(page);
+      await manyMessages(page);
+      await page.goto(`/messages/thread/?id=${CONVO}`);
+      await settled(page);
+      await expect(page.getByRole('log')).toBeVisible();
+      // 0s, or the 0.00001s that a global reduced-motion rule leaves.
+      expect(parseFloat(await barName(page).evaluate((el) => getComputedStyle(el).transitionDuration))).toBeLessThan(0.001);
+    });
   });
 
   test('the send button hugs the box\'s rounder bottom corner; the mic sits nearer its own', async ({ page }) => {
@@ -1374,6 +1439,36 @@ test.describe('the conversation, drawn closer (D-400, D-401)', () => {
     expect(Math.round(p.x - bubble.x)).toBe(8);
     expect(Math.round(words.y - (p.y + p.height))).toBeGreaterThanOrEqual(12);
   });
+
+  for (const byKeyboard of [false, true]) {
+    test(`the photo viewer shows no ring on what it focuses (${byKeyboard ? 'keyboard' : 'mouse'}); Tab rings the close button (D-523)`, async ({ page }) => {
+      await signedInAs(page, 'admin');
+      await withOneConversation(page);
+      await withAPhoto(page);
+      await page.goto(`/messages/thread/?id=${CONVO}`);
+      await settled(page);
+      const photo = page.getByRole('button', { name: 'A photo from Marcus' });
+      if (byKeyboard) {
+        await photo.focus();
+        await page.keyboard.press('Enter');
+      } else {
+        await photo.click();
+      }
+      const dialog = page.locator('dialog.astryx-lightbox');
+      await expect(dialog).toBeVisible();
+      await expect.poll(() => dialog.evaluate((el) => document.activeElement === el)).toBe(true);
+      // Focus is put on the viewer so a screen reader lands in it; it is not a control and shows no ring.
+      expect(await dialog.evaluate((el) => getComputedStyle(el).outlineStyle)).toBe('none');
+      await page.keyboard.press('Tab');
+      const ring = await page.evaluate(() => {
+        const s = getComputedStyle(document.activeElement!);
+        return { tag: document.activeElement!.tagName.toLowerCase(), style: s.outlineStyle, width: parseFloat(s.outlineWidth) };
+      });
+      expect(ring.tag).toBe('button');
+      expect(ring.style).not.toBe('none');
+      expect(ring.width).toBeGreaterThan(0);
+    });
+  }
 
   test('a photo opens on near-black, with a round close button you can see', async ({ page }) => {
     await signedInAs(page, 'admin');

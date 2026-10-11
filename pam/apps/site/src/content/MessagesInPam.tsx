@@ -83,7 +83,7 @@ export function MessagesInPam() {
             'Tap “Block this person”.',
             'Read what it says. Tap “Block”, or tap “Not now” if you change your mind.',
           ]}
-        shots={[{ name: 'messages-in-pam/blocked.png', alt: "A conversation after the other person blocked it. The box for writing a message is gone. In its place: “You can’t send messages here. This person has blocked messages in this conversation. You can still read it. Questions? Call Pam.” and a link, “Call Pam for help”.", caption: "What the other person sees." }]}
+        shots={[{ name: 'messages-in-pam/blocked.png', alt: "A conversation after the other person blocked it. The box for writing a message is gone. In its place: “You can’t send messages here. This person has blocked messages in this conversation. You can still read it. Questions? Contact Pam.” and a link, “Contact Pam”.", caption: "What the other person sees." }]}
         />
         <P>
           Pam asks first. It says: “Neither of you will be able to send messages in this conversation or start
@@ -93,7 +93,7 @@ export function MessagesInPam() {
         <P>
           The other person is told. Where the box for writing a message was, they see “You can’t send messages
           here”. Under it: “This person has blocked messages in this conversation. You can still read it.
-          Questions? Call Pam.”
+          Questions? Contact Pam.”
         </P>
         <P>
           You see “You blocked this person”. It says neither of you can send messages there, and that to

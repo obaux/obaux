@@ -166,6 +166,80 @@
   boxes" (Dot D-523, Wren on the site). **Nico's text-reply scoping** ran into D-460 (Pam never reads people's
   texts): card a61 asks Will whether replies are forwarded, plus the opt-in sentence and reply checks.
 
+- **help-request is deployed, off (v1, verify_jwt off).** The first deploy failed to compile (an unterminated
+  regex at handler.ts:43). Nico rebuilt the control-character pattern from character codes. The merge desk took
+  only handler.ts, its test and his log note from c4ba527, as 821e652. `get_edge_function` shows that the
+  deployed files match the repository. 821e652 went to `main` at about 05:05. Card a62 asks Will for three things:
+  paste 20261011041940 in the SQL editor, add the HELP_REQUEST_SALT secret, and, after b12, add
+  HELP_REQUESTS_LIVE = on and send himself one request from the help desk.
+- **Batch b12: A28 ships together.**
+  - Dot's D-512: Contact Pam replaces Call Pam, and Pam's phone number is gone from the app.
+  - Lena's D-514 and D-515 in seven languages: Get help leads to the help desk; Your safety gets a one-tap
+    988 row; Talk to someone opens the Your safety post; the three lines that promised saved-place texts now
+    say what is true.
+  - Wren's D-522 and D-517: on the site, Still stuck? is email, and the form sits behind Nico's switch. Also On
+    this page, two new posts, search and keyboard fixes, and Sage's signed error words under the form fields
+    (ec56f0f).
+  - Dot's D-523: a focus that a script moves shows a highlight only on text boxes (Will, 04:17).
+  - Every Privacy and Terms change in it is a line Will signed on a59. Sage signed the rest under A29.
+  - The only phone links left in the app or site are a place's own number, 911 and 988.
+- **b13 is lined up.** It holds Dot's D-518/D-520 (Profile skeletons; D-518 is now a test only), Nico's D-524
+  (Answer by text, built off; migration 20261011042645 goes in after 041940; its two texts are on card a61 for
+  Will to sign), Piper's D-525 (Add my program; migration 20261011044654) and Sage's ledger. **Piper's attendance
+  part A (D-526) is held:** a program lead seeing the first names of planned visits makes privacy.s.sharing.p2
+  and the "Does the place know I'm coming?" post untrue. It ships with a Privacy line Will signs, Wren's post
+  update and the member-facing words from part D.
+
+- **Batch b12 pushed at 48a0449 (05:27), live on both projects at about 05:36.** Iris confirmed SP5 closed on
+  it (no ring on a section "On this page" moves to).
+- **Batch b13 pushed at e25e08f (09:28).** It holds:
+  - Dot's D-518/D-520: the Profile hero card loads as pulses; D-518 is a test only.
+  - Dot's D-527: "Need help? Contact Pam" on the sign-in code step (Iris's CP1). It opens the cant-sign-in post.
+  - Piper's D-525: Add my program. Its migration went live as 20261011092734, applied just before the push,
+    because it makes a second waiting request an error that the live app's sign-up retry didn't yet handle.
+  - Wren's site follow-ups: the bottom section becomes current, Esc closes the list, the hello@ link is 48px,
+    and blocked.png is back.
+  - Lena's two account texts in six languages, and es help.needHelp in tú.
+  - Sage's ledger.
+- **Nico's D-524 (Answer by text) moved out of b13** into its own step. Its migration replaces
+  claim_outbound_messages, which carries every live account text, sign-in codes included. Nico supplied:
+  - a line diff showing one added cancel step and nothing else;
+  - a plan for proving it on live;
+  - the rollback block from 20261010141859, md5 ed8918a0… (checked).
+  The step runs after b13, and Will's sign-in code is the real proof.
+- **Attendance (Piper, D-526) A, B and C are built and held for card a63.** Lena and Sage wrote four lines:
+  Privacy sharing.p2 (with "missed" named), the transparency line, place.lead.sees and trips.booked.hasLead.
+  Lena's contract test (477a904c) matches the card word for word. "I'm here" is approved and being built:
+  - a cap of 3 self-reported visits a week, and a +40 upgrade when a lead confirms;
+  - it works without a lead;
+  - Lena's location paragraph (p9) waits on Piper's log check.
+  Lena also found that Explore's "Stays on this phone" isn't true, since the search sends the position to the
+  server (in a POST body, and nothing keeps it). Sage and Lena are fixing the line.
+- **Will, 09:1x:**
+  1. Build the new website from his Figma (wizzRwn3cjixue2p6eeZfG), desktop and mobile, with motion like the
+     app's (Wren).
+  2. A tappable carousel whose images flip through and float. Guardrails: a pause control (WCAG 2.2.2),
+     nothing moving under reduced motion, transform only.
+  3. Clean up the Figma colours and text into website-only "Website/" styles and components, mirrored as
+     apps/site tokens (Dot).
+  4. Bring back the thread header that shows info on top and scrolls into a smaller bar. That reverses part of
+     D-411; the buttons keep D-411's positions (Nico).
+
+- **Batch b14 pushed at 07d8287 (10:16), live, main CI green.** It holds:
+  - Nico's D-524 (Answer by text, off);
+  - Wren's SP4 and the help-request probe fix;
+  - Dot's D-528 (the website-only colours and text styles in Figma and apps/site, with two AA text variants).
+  Will's card a65 has the website words: five held lines with true fallbacks, Sage's privacy sentence, and two
+  colours. Card a66 has the location paragraphs for "I'm here" (p9, p10).
+- **Batch b15:**
+  - Nico's D-529: the conversation's own header is back, with the info on top scrolling into a small bar
+    whose name fades in. It reverses part of D-411; the buttons keep D-411's positions.
+  - Dot's D-530: the code boxes read left to right in Arabic and accept Arabic-Indic and Persian digits.
+  - Lena's places.area.hereNote: "Used for this search only."
+  - Sage's ledger.
+  - Wren's D-531, all four stages of the new website from Will's Figma: Home, Support index and the post
+    template, About Pam, and Still stuck? The Home carousel flips, drifts and has Pause.
+
 ## What was wrong, and what missed it
 
 - **Ava won't push on the merge desk's word, and that is right.** The merge desk passed on Will's "remove" at
@@ -196,6 +270,46 @@
   super admin's preview). Piper folds hers in; Dot rebuilds on it after D-511 lands. Lesson for the merge
   desk: when two lanes touch the same idea, name the owner of the shared piece in the first message, not
   after the READYs arrive.
+
+- **The deploy tool turned two escapes into real characters.** help-request's handler had a regex literal
+  that named LINE SEPARATOR and PARAGRAPH SEPARATOR (U+2028, U+2029) as escapes. On the way to the deploy, the
+  escapes became the real characters, which end a line in JavaScript, so the source stopped compiling. A message
+  from the merge desk explaining it was mangled the same way. Rule: build those two characters from character
+  codes, and name them in words in messages.
+- **A teammate commit carried `pam/node_modules`.** It was a symlink left from a temporary worktree (c4ba527).
+  The merge desk caught it by reading the tree, took only the intended files, and Nico removed it from his
+  branch. Before merging any branch, check that `git ls-tree -r <head> --name-only | grep node_modules` prints
+  nothing.
+- **A stale branch merges with silent leftovers.** Dot's D-512 predated b9 to b11. Four files conflicted, and one
+  more auto-merged wrong: the thread page's not-found notice kept main's phone prop. A grep for the removed hook
+  found it before tsc did. Lena's branch carried a test (place.spec:255) that still expected a phone link and
+  was red with D-512. Her full run caught it, and the merge desk fixed it in b12.
+- **A new test read a highlight too early.** focus-text-boxes.spec.ts:193 failed once in 1359 on narrow-320.
+  The field's frame is drawn after the drawer opens, so the test now waits for it like the file's other ring
+  checks do (144 of 144 over six repeats).
+
+- **Branch-local e2e runs missed cross-branch breaks.** D-520 replaced Account's spinner with pulses and ran
+  only its own specs, so loading.spec (which asked /account/ for the spinner) went red in b13. Add my program's
+  loop read the footer button's label before a tap had re-rendered, and failed on 2 of 3 phones once the
+  machine was busier. Both were fixed in b13 as test changes (108 of 108 over three repeats). Lesson: a READY
+  that changes a shared loading state or wizard says which shared specs it ran, and the merge desk's full run
+  stays the gate.
+
+- **"A sign-in code is the proof" was wrong.** The D-524 plan, and the merge desk, said
+  claim_outbound_messages carries sign-in codes. It doesn't: the app calls supabase.auth.signInWithOtp, so
+  Supabase Auth sends the code, and outbound_messages has never held a verify_code row. The function carries
+  the account texts (staff request approved or denied, and the rest). A card asking Will to sign in as proof
+  was withdrawn a minute after it went up. 20261011042645 is live as 20261011093720. All six bodies match
+  the file by md5 of prosrc, args and result are unchanged, and a rolled-back dry run claimed 0.
+- **The site's help form probes the live function on every page load.** Between 09:30 and 09:40, main CI's
+  site checks for b13 (HeadlessChrome, Microsoft IPs) made about 410 refused OPTIONS calls to help-request.
+  Each is an Edge Function invocation on the free plan, and a real visitor costs two per page view. Wren
+  will probe only from joinpam.org, only near "Still stuck?", and once per visit.
+
+- **Branch CI keeps calling the help function until branches pick up the fix.** After e27694a2, bursts of
+  about 200 refused calls still arrived. They matched each branch push's site checks (different Azure IPs,
+  around 5 minutes each) on branches cut before the fix, not main's own run. They stop as branches merge
+  main. That's a few thousand calls a day at most, well inside the free plan.
 
 ## Decisions
 
@@ -230,6 +344,21 @@
 | Batch b7: ui / web unit / web build / e2e a11y + profile / site tests / site a11y / storybook | 120 / 97 / 0 / 45 passed / 38 / 90 scans, 0 problems / builds |
 | Batch b7 + Lena: config / copy:status / web build / e2e a11y | 1067 / in step / 0 / 45 passed |
 | D-502 + D-501 together, Sign in 320×568 invited, en/ar × light/dark, scrolled 0–300px | the pause disc is on top only when unscrolled; from 40px the pinned invite line is on top of it, and from 120px it is off screen; compact bar shows with the mark at the start (right in Arabic) |
+| help-request deploy: `get_edge_function` vs 821e652 | index.ts, handler.ts (CONTROL from character codes), provider.ts match; v1 ACTIVE, verify_jwt off |
+| main CI on a1ba1ce before pushing 821e652 | all four green; Vercel web and pam-site READY |
+| Batch b12 (b336e3f): config / copy:status / ui / web tsc / site tsc / web unit / site tests | 1042 / in step / 124 / 0 / 0 / 121 / 76 |
+| Batch b12: ui build / web build / budget / site build / site a11y / storybook | 0 / 0 / 21.3 kB spare / 0 / 120 scans, 0 problems / builds |
+| Batch b12: e2e full, three projects | 1336 passed, 19 skipped, 1 flaky (fixed), 3 failed = place.spec:255 (stale, fixed); then place + focus-text-boxes 57 passed, focus-text-boxes x6 no retries 144 passed |
+| Batch b12 with Wren's ec56f0f: site tsc / tests / build / a11y | 0 / 76 / 0 / 120 scans, 0 problems |
+| Phone links left in app and site source | a place's own number, 911, 988 (and stories) only |
+| main CI on 48a0449 (b12) | all four green; Vercel web and pam-site READY |
+| Batch b13 (e25e08f): db / config / copy:status / ui / web tsc / site tsc / web unit / site tests | 1272 ok, 0 not ok / 1082 / in step / 124 / 0 / 0 / 125 / 76 |
+| Batch b13: builds, budget, site a11y / usability / scrollspy, storybook | all 0; 20.9 kB spare; 120 scans 0 problems / clear / 300 links 0 problems; builds |
+| Batch b13: e2e full | 1374 passed, 19 skipped; loading.spec (D-520) and add-my-program (race) red, fixed: 108 of 108 over three repeats |
+| 20261011044654 live | applied as 20261011092734; request_staff_access md5 92d080c9 before, 7e98d9e4 after; grants (authenticated, service_role) and search_path unchanged |
+| Batch b14 (07d8287): db / config / ui / web unit / site tests / e2e full / site a11y, usability, scrollspy | 1288 ok / 1094 / 124 / 125 / 89 / 1400 passed, 19 skipped / 120 scans 0, clear, 300 links 0 |
+| main CI on 07d8287; Vercel web and pam-site | all four green; READY |
+| Batch b15 (before stages 3 and 4): db / config / ui / web unit / site tests / e2e full / storybook / site checks | 1288 ok / 1094 / 124 / 125 / 92 / 1418 passed, 19 skipped / builds / 120 scans 0, clear, 300 links 0; budget 15.3 kB spare |
 
 ## Left undone
 
@@ -238,8 +367,10 @@
 - **Dot:** A27, the text-size rule with its exceptions; then dark muted #262626 with a before-and-after story.
 - **Piper:** Iris's W3, on a fresh branch.
 - **Wren and Sage:** write the 21 gap posts in `docs/help-centre-gaps.md`. The words go to Will first.
-- **A28, the phone coming off:** in progress in six lanes; nothing merged yet. The interim "Still stuck?"
-  shows hello@joinpam.org until Nico's form is switched on.
+- **A28, the phone coming off:** shipped in b12. The two account texts still say "Call {supportPhone}" live
+  until Will refiles. "Still stuck?" shows hello@joinpam.org until Will switches the form on (card a62).
+- **Wren:** Iris's part 2 findings on the On this page menu (SP1 to SP3) and the hello@ link's tap size, after b12.
+- **Lena:** es help.needHelp to tú; six translations of the two texts; the Privacy line for program visits.
 - **Launch cleanup (a55):** Piper Trips, Nico Messages, Dot wrong code and Profile; Ava's screens after her
   push word.
 - **Lena, Friday:** two welcome slides promise example-only features (`onboarding.provider.3`,
@@ -248,7 +379,9 @@
 ## Needs a human
 
 - Will: card a56 (attendance plan A–D; advice: go after Trips, no missed text, no points yet).
-- Will: sign Sage's list of "call Pam" rewrites when it reaches him as a card (A28).
+- Will: card a62 (paste 20261011041940, add HELP_REQUEST_SALT; after b12, HELP_REQUESTS_LIVE = on and one test
+  request from the help desk).
+- Will: card a61 (texting people back: three choices, and the two texts' words to sign).
 - Will: the DMARC record at joinpam.org's DNS, then "test it" for Nico.
 - Will: in Ava's session (the Control Room's "Waiting for you to unblock" strip opens it), type "push the
   switcher branch".

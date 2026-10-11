@@ -3,7 +3,7 @@
 import { useEffect, useState, type ComponentType, type ReactNode } from 'react';
 import { Theme } from '@astryxdesign/core/theme';
 import { pamTheme } from '@pam/ui/theme';
-import { MotionProvider } from '@pam/ui';
+import { ContactHrefProvider, MotionProvider } from '@pam/ui';
 import { I18nProvider } from './i18n';
 import { AlertBannerProvider } from './alertBanner';
 import { ClientNav } from './ClientNav';
@@ -43,7 +43,11 @@ export function Providers({ children }: { children: ReactNode }) {
   // Loaded the same way, for the same reason: a member's saved trips (D-454)
   // are read once they are known, and no route should pay for the code before.
   const [SavedTripsSync, setSavedTripsSync] = useState<ComponentType | null>(null);
+  // Where Contact Pam goes: Help signed in, the help desk signed out (A28). Same lazy load as the two above.
+  const [contactHref, setContactHref] = useState('/help/');
+  const [ContactHrefSync, setContactHrefSync] = useState<ComponentType<{ set: (href: string) => void }> | null>(null);
   useEffect(() => {
+    void import('./ContactHrefSync').then((mod) => setContactHrefSync(() => mod.ContactHrefSync));
     void import('./LocaleSync').then((mod) => setLocaleSync(() => mod.LocaleSync));
     void import('./SavedTripsSync').then((mod) => setSavedTripsSync(() => mod.SavedTripsSync));
   }, []);
@@ -59,9 +63,12 @@ export function Providers({ children }: { children: ReactNode }) {
         <I18nProvider>
           {LocaleSync ? <LocaleSync /> : null}
           {SavedTripsSync ? <SavedTripsSync /> : null}
+          {ContactHrefSync ? <ContactHrefSync set={setContactHref} /> : null}
           {/* Screen to screen without a reload, inside a transition (D-269). */}
           <ClientNav />
-          <AlertBannerProvider>{children}</AlertBannerProvider>
+          <ContactHrefProvider href={contactHref}>
+            <AlertBannerProvider>{children}</AlertBannerProvider>
+          </ContactHrefProvider>
         </I18nProvider>
       </MotionProvider>
     </Theme>

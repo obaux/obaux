@@ -122,7 +122,8 @@ test.describe('the places screen', () => {
     const alert = page.getByRole('alert');
     await expect(alert).toBeVisible();
     // §0: never dead-end. Whatever the message says, there is a way out of it.
-    await expect(alert.getByRole('link')).toHaveAttribute('href', /^tel:\+/);
+    // Signed out here, so Contact Pam opens the help desk on the website directly (A28).
+    await expect(alert.getByRole('link')).toHaveAttribute('href', 'https://joinpam.org/support/');
   });
 
   test('an empty area says so instead of showing nothing', async ({ page }) => {

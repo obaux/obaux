@@ -21,9 +21,66 @@ export interface SupportPost {
    * Website journey (with a Draft banner). Remove the line to publish.
    */
   readonly status?: 'draft';
+  /** `false`: the post carries its own way to a person, so it does not end with "Still stuck?" (Your safety). */
+  readonly stillStuck?: false;
 }
 
 const ALL: readonly SupportPost[] = [
+  {
+    slug: 'cant-sign-in',
+    topic: 'members',
+    audience: 'everyone',
+    title: 'I can’t sign in',
+    summary: 'How to get into Pam: who can join on their own, who needs an invite, and what to do when the code or the link doesn’t work.',
+    updated: '2026-10-11',
+    keywords: ['sign in', 'signin', 'login', 'log in', 'cant login', 'join', 'become a case manager', 'case manager', 'add my program', 'program', 'invite', 'code', 'no code', 'wrong code', 'password', 'locked out', 'get in', 'become a member'],
+  },
+  {
+    slug: 'your-safety',
+    topic: 'members',
+    audience: 'everyone',
+    title: 'Your safety',
+    summary: 'What to do if you are in danger, in crisis, or a message feels unsafe.',
+    updated: '2026-10-11',
+    stillStuck: false,
+    keywords: ['safety', 'safe', 'danger', 'emergency', '911', '988', 'crisis', 'unsafe', 'scared', 'afraid', 'threat', 'hurt', 'report', 'suspicious', 'block', 'suicide', 'abuse', 'harassed', 'suicidal', 'kill myself', 'hurt myself', 'self harm', 'violence', 'domestic violence', 'stalking', 'followed'],
+  },
+  {
+    slug: 'start-here',
+    topic: 'members',
+    audience: 'everyone',
+    title: 'When something isn’t working, start here',
+    summary: 'The most common reasons Pam gets stuck, and what to do about each one.',
+    updated: '2026-10-11',
+    keywords: ['not working', 'problem', 'error', 'stuck', 'something went wrong', 'blank', 'empty', 'wont load', 'offline', 'no signal', 'code', 'invite', 'paused', 'missing place', 'broken', 'help'],
+  },
+  {
+    slug: 'talking-to-pam',
+    topic: 'members',
+    audience: 'everyone',
+    title: 'Getting help from Pam',
+    summary: 'How to find an answer on the help desk, how to write to a person at Pam, and what to do if you are in danger.',
+    updated: '2026-10-11',
+    keywords: ['call', 'phone', 'phone number', 'number', 'talk', 'real person', 'human', 'someone', 'write', 'email', 'contact', 'still stuck', '911', '988', 'crisis', 'danger', 'unsafe', 'report'],
+  },
+  {
+    slug: 'your-language',
+    topic: 'members',
+    audience: 'everyone',
+    title: 'Using Pam in your language',
+    summary: 'The seven languages Pam speaks, how to pick yours, and what changes when you do.',
+    updated: '2026-10-11',
+    keywords: ['language', 'languages', 'español', 'spanish', 'portuguese', 'chinese', 'mandarin', 'cantonese', 'russian', 'arabic', 'english', 'translate', 'translation', 'switch'],
+  },
+  {
+    slug: 'is-the-place-told',
+    topic: 'members',
+    audience: 'residents and programs',
+    title: 'Does the place know I’m coming?',
+    summary: 'Pam does not tell a place about your visit. How to call ahead, and what to do if they did not know you were coming.',
+    updated: '2026-10-11',
+    keywords: ['told', 'know', 'expect', 'expecting', 'coming', 'showed up', 'turned away', 'appointment', 'call ahead', 'front desk', 'list', 'no clue'],
+  },
   {
     slug: 'who-is-my-guide',
     topic: 'members',

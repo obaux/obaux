@@ -153,6 +153,8 @@ export interface ThreadViewProps {
   readonly otherName: string | null;
   /** Their photo when Pam has one (D-335); their initials otherwise. */
   readonly otherPhotoUrl?: string | null;
+  /** Who this is, at the top of the conversation, scrolling with the messages (D-526). */
+  readonly intro?: ReactNode;
   /** Sends the words, a photo or a document, or words with one; true once it has gone. */
   readonly onSend: (body: string, attachment: OutgoingAttachment | null) => Promise<boolean>;
   readonly sending: boolean;
@@ -171,7 +173,6 @@ export interface ThreadViewProps {
   readonly blocked?: 'mine' | 'theirs' | null;
   /** BCP-47 tag for dictation, e.g. "en-US" or "es-US". */
   readonly speechLanguage: string;
-  readonly supportPhone: string;
 }
 
 /**
@@ -198,9 +199,6 @@ const slideMotion = {
 // if you scroll back down by hand it leaves the way it came. Pam's tempo
 // (`PAM_MOTION`, under a quarter second, opacity and transform only), CSS
 // so it costs no download, and none of it with reduced motion.
-// How tall the header's fade is over the top of the conversation (ThreadFrame, D-400).
-const FADE = '32px';
-
 const ARRIVE_MS = 240;
 const SENT_MS = 260;
 const LEAVE_MS = 180;
@@ -346,9 +344,9 @@ const styles = stylex.create({
   dayGap: { marginBlockStart: spacingVars['--spacing-6'], marginBlockEnd: spacingVars['--spacing-2'] },
   dayFirst: { marginBlockEnd: spacingVars['--spacing-2'] },
   // The scroll region's inner column keeps the page's reading width. Its top
-  // padding is the height of the header's fade (ThreadFrame, D-400), so at
-  // the top of the conversation nothing sits under the fade.
-  messages: { width: '100%', paddingBlockStart: FADE },
+  // is the intro (D-526), which scrolls away with the messages; no fade over
+  // it any more (D-411).
+  messages: { width: '100%', paddingBlockStart: '8px' },
   // Reaching the end of the messages must not scroll the page under them.
   layout: { overscrollBehavior: 'contain' },
   scrollWrap: { width: '100%', paddingBlockEnd: '12px', pointerEvents: 'auto' },
@@ -558,13 +556,13 @@ export function ThreadView({
   translations,
   otherName,
   otherPhotoUrl = null,
+  intro = null,
   onSend,
   sending,
   sendFailed,
   limited = false,
   blocked = null,
   speechLanguage,
-  supportPhone,
 }: ThreadViewProps) {
   const { t, tPlain, locale } = useI18n();
   const inputRef = useRef<ChatComposerInputHandle>(null);
@@ -703,9 +701,9 @@ export function ThreadView({
   };
 
   const composer = limited ? (
-    <LimitedNotice supportPhone={supportPhone} />
+    <LimitedNotice />
   ) : blocked ? (
-    <BlockedNotice by={blocked} supportPhone={supportPhone} />
+    <BlockedNotice by={blocked} />
   ) : (
     <ChatComposer
       value={draft}
@@ -884,6 +882,7 @@ export function ThreadView({
       {...dropHandlers}
     >
     <VStack gap={4} xstyle={styles.messages}>
+      {intro}
       <RevealTimes>
         <ChatMessageList
           density="compact"
@@ -992,8 +991,7 @@ export function ThreadView({
             notice="something_went_wrong"
             title={t('messages.thread.failed.title')}
             body={t('messages.thread.failed.body')}
-            supportPhone={supportPhone}
-            callLabel={t('help.callSupport')}
+            contactLabel={t('help.contact.action')}
           />
         </VStack>
       ) : null}
