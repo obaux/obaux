@@ -1480,6 +1480,10 @@ Branch `claude/pam-design-dark-info-alert` (D-513). One token, `--astryx-theme-n
 
 Branch `claude/pam-design-focus-text-boxes` (D-523, replaces D-411's focus line). Script-focused `tabindex=-1` non-controls, dialogs and sheets show no ring in any input mode; text boxes keep their field highlight; buttons and links ring on Tab. `e2e/focus-text-boxes.spec.ts`.
 
+## Design system & Storybook · the sign-in code step has a way to a person (11 October)
+
+Branch `claude/pam-design-signin-code-contact` (D-527, Iris CP1). A quiet "Need help? Contact Pam" link under Send again, to `SITE_URL/support/cant-sign-in/`; outside the D-510 alert.
+
 ## Design system & Storybook · badge caption 12px (11 October) — on `main`
 
 Merged from `claude/pam-design-badge-caption` (3472970). The "Your badge" caption on the Profile badge tile is 12px, not 11px, following A27 (nothing under
