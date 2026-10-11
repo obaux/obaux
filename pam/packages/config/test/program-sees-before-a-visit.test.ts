@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { EN } from './_bundles.js';
@@ -147,5 +147,52 @@ describe('the site says the same true thing', () => {
     expect(site).toContain('Yes, the day only. Never your signature');
     // A case manager and other members read neither.
     expect(site).toMatch(/The day you signed a program’s rules', cells: \['No', 'Yes, the day only\. Never your signature', 'No'\]/);
+  });
+});
+
+/**
+ * The code behind the hidden list (D-542, a63): once Piper's two migrations are on main, what a lead can read of a visit and of a
+ * member is exactly what the Privacy page says, and the contract's hidden entries name what stays out of it.
+ */
+const NARROW = `${REPO}packages/db/migrations/20261011060000_a_program_lead_reads_no_appointment_row_directly.sql`;
+const CARD = `${REPO}packages/db/migrations/20261011203852_a_program_lead_reads_a_small_card_for_a_member_linked_to.sql`;
+
+describe.skipIf(!existsSync(NARROW))('a lead reads no appointment row (20261011060000)', () => {
+  const sql = existsSync(NARROW) ? readFileSync(NARROW, 'utf8') : '';
+
+  it('has no policy that lets a lead read the table: the visit’s four things come through a function', () => {
+    expect(sql).toMatch(/alter policy appointments_provider_select on public\.appointments using \(false\)/);
+  });
+
+  it('is why the contract can keep the member’s note and how a visit was marked hidden', () => {
+    for (const field of ['the_note_a_member_keeps_on_a_visit', 'who_marked_a_visit_or_how'] as const) {
+      expect(ADMIN_CANNOT_SEE).toContain(field);
+    }
+  });
+});
+
+describe.skipIf(!existsSync(CARD))('the lead’s card is a first name and the visits at its own program (20261011203852)', () => {
+  const sql = existsSync(CARD) ? readFileSync(CARD, 'utf8') : '';
+  const keysOf = (text: string) => [...text.matchAll(/'([a-z_]+)'\s*,/g)].map((m) => m[1]);
+
+  it('returns exactly a member id, a first name and the visits', () => {
+    expect(sql).toContain("return jsonb_build_object('member_id', p_member_id, 'first_name', name, 'visits', visits);");
+  });
+
+  it('puts into each visit only what the Privacy page names: the day and time, the service, and whether it is marked as there', () => {
+    const visit = /jsonb_agg\(jsonb_build_object\(([^)]*?)\) order by/s.exec(sql)?.[1] ?? '';
+    expect(keysOf(visit)).toEqual(['appointment_id', 'starts_at', 'ends_at', 'status', 'service_name', 'checked_in_at']);
+  });
+
+  it('never selects a note, how a visit was marked, a last name or a phone number', () => {
+    const code = sql.replace(/--[^\n]*/g, '');
+    expect(code).not.toMatch(/\bnote\b|attendance_method|check_in_code|last_name|\bphone\b|location_text|\bgeo\b/);
+  });
+
+  it('is for a program lead only, and for a member linked to the program', () => {
+    expect(sql).toMatch(/NOT_A_PROGRAM_LEAD/);
+    expect(sql).toMatch(/MEMBER_NOT_LINKED/);
+    expect(ADMIN_CAN_SEE).toContain('first_name_and_words_to_a_program_they_message');
+    expect(ADMIN_CAN_SEE).toContain('visits_planned_at_their_own_program');
   });
 });

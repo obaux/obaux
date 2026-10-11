@@ -207,6 +207,13 @@ export const ADMIN_CANNOT_SEE = [
    * `note`, `attendance_method` and `check_in_code` included. Piper narrows that read in a new migration on
    * `claude/places-programs-im-here`, with a database test. That is a gap being closed, not a thing members are told is
    * shared: nothing member-facing says a program sees the note.
+   *
+   * Closed by Piper's 20261011060000 (`appointments_provider_select` is `using (false)`: a lead reads NO appointment row
+   * directly, test 65); the write side is pinned by test 69 (no role but the owner writes a row, or the columns that say how a
+   * visit was marked or what the member wrote). The lead's door to a member's visits is `my_program_visits()` and, for the
+   * small card a lead sees when they tap a member, `program_member_card()` (20261011203852, D-542, test 66): exactly three
+   * keys (`member_id`, `first_name`, `visits`), each visit only `appointment_id`, `starts_at`, `ends_at`, `status`,
+   * `service_name`, `checked_in_at`. `program-sees-before-a-visit.test.ts` reads both migrations once they are on main.
    */
   'the_note_a_member_keeps_on_a_visit',
   /**
