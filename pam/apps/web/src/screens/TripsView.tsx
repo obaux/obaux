@@ -18,7 +18,6 @@ import { MapDrawer } from '@pam/ui/MapDrawer';
 import { Confetti } from '@pam/ui/SuccessScreen';
 import { useSearchParams } from 'next/navigation';
 import { TripCard } from '@pam/ui/TripCard';
-import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { dummyConnection } from '@pam/config/dummy-connections';
 import { useI18n } from '@/lib/i18n';
 import { BigCategoryIcon, CategoryPicture } from './SavedView';
@@ -309,9 +308,10 @@ export function TripsScreen({ headerActions }: { readonly headerActions?: ReactN
     startsAt: trip.startsAt,
     serviceId: trip.serviceId ?? null,
   }));
-  // `exampleTrips` changes whenever a trip is cancelled, so this reads again then.
-  const examples: Trip[] = withoutCancelled(DUMMY_TRIPS).map((trip) => {
-    const person = dummyConnection(trip.withId);
+  // The example set (a demo or Storybook only, D-509): `exampleTrips` is empty for a real account,
+  // and changes whenever a trip is cancelled, so this reads again then.
+  const examples: Trip[] = exampleTrips.map((trip) => {
+    const person = dummyConnection((trip as { withId?: string }).withId ?? '');
     return {
       id: trip.id,
       placeId: trip.placeId,

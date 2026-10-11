@@ -24,7 +24,8 @@ import { readAddedTrips, withMoves } from '@/lib/addedTrips';
 import { asksForSavedTrips, bookTrip, isSavedPlace, moveSavedOrLocalTrip } from '@/lib/savedTrips';
 import { useTrips } from '@/lib/useTrips';
 import { useSession } from '@/lib/useSession';
-import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
+import { exampleTrips, showsExamples } from '@/lib/exampleMode';
+import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { friendLink } from '@/lib/appUrl';
 import { navigate } from '@/lib/navigate';
 import { countdown } from '@/lib/when';
@@ -183,7 +184,29 @@ export function NewTripView({
 }) {
   const { t, tPlain, locale } = useI18n();
   const router = useRouter();
-  const places = useMemo(() => Object.values(DUMMY_PLACES_BY_ID), []);
+  // The places to pick from (D-509): the member's own saved ones; the example set only in a demo or
+  // Storybook. A real account never plans a trip to a place that is only an example.
+  const [examples, setExamples] = useState(false);
+  useEffect(() => setExamples(showsExamples()), []);
+  const { state: savedState } = useSavedPlaces(true);
+  const places = useMemo<readonly DummySavedPlace[]>(
+    () =>
+      examples
+        ? Object.values(DUMMY_PLACES_BY_ID)
+        : savedState.status === 'ready'
+          ? savedState.places.map((p) => ({
+              id: p.id,
+              name: p.name,
+              category: p.category,
+              address: p.address ?? '',
+              phone: p.phone,
+              lat: p.lat ?? 0,
+              lon: p.lon ?? 0,
+              description: p.description ?? '',
+            }))
+          : [],
+    [examples, savedState],
+  );
   const { forPlace } = useServices();
   const { forPlace: policiesAt } = usePlacePolicies();
   const { progress } = useMySignatures();
@@ -191,7 +214,7 @@ export function NewTripView({
   // Opened on a booked trip (D-333): its place and slot, read once.
   const [bookedTrip] = useState(() => {
     if (!booked) return null;
-    const trip = withMoves([...DUMMY_TRIPS, ...readAddedTrips()]).find((x) => x.id === booked);
+    const trip = withMoves([...exampleTrips(), ...readAddedTrips()]).find((x) => x.id === booked);
     const at = trip ? DUMMY_PLACES_BY_ID[trip.placeId] : undefined;
     return trip && at ? { trip, place: at } : null;
   });

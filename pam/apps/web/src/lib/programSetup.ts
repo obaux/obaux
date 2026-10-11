@@ -5,6 +5,7 @@ import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import type { SessionState } from './useSession';
 import type { ProgramDetails } from './useJoin';
 import type { OwnProgram } from './ownProgram';
+import { isPrototype } from './exampleMode';
 import { useOwnProgram } from './useOwnProgram';
 
 /**
@@ -166,15 +167,6 @@ export interface ProgramSetup {
   readonly programCount: number;
   /** The database is still being asked: screens that choose between Add and the program wait. */
   readonly isLoading: boolean;
-}
-
-/**
- * Whether this page is Storybook's clickable prototype, which answers every
- * Supabase call itself (`stories/journeys/mockSupabase.ts` marks `window` once it
- * does): whoever is signed in there is pretending.
- */
-function isPrototype(): boolean {
-  return typeof window !== 'undefined' && (window as { __pamRealFetch?: unknown }).__pamRealFetch !== undefined;
 }
 
 export function useProgramSetup(session: SessionState): ProgramSetup {
