@@ -169,3 +169,31 @@ captions in the page's `rtl`. With one-word names nothing changes on screen; wit
 two-word Latin name the words would still read in order. Mention only.
 
 Iris
+
+---
+
+## b18 privacy re-test (11 October, 17:40 UTC)
+
+**What I tested:** `main` at `b770551`, two ways:
+- the app built locally (`pnpm --filter @pam/web build`, served from `out/`), every outside
+  request stubbed and logged;
+- `main`'s Chromatic Storybook, logging every request to a host other than Chromatic.
+
+No sign-in, accounts or sends.
+
+| | Result |
+|---|---|
+| **1** Explore's area picker | **Pass.** Typing "1234 Market" makes no outside request in en, es or ar (story `member-created-states-explore--live`). The app's own `area-picker.spec.ts` passes, including its D-536 carto.com watch. The words are there: "ZIP code" / "Código postal" / "الرمز البريدي (ZIP)", and "Pam remembers the area you pick on this phone only." in all three. "Nothing matched that. Try a ZIP code." answers a street. **Note:** "Like 19107." (`places.areaHint`) isn't on screen in the picker; that key is used only in the TextField and VoiceInput stories |
+| **2** Use my current location | **Pass** (local build, `/places/`, with a fake device position). After picking 19122 and then the current location, `pam.origin` still holds 19122, never the device position. A reload comes back "Near 19122". A planted `{id:'here',…}` entry is removed on reload, which falls back to "Near City Hall". With nothing stored, it starts at City Hall. **Note:** in Storybook every reload comes back at City Hall even after a ZIP, so the story resets storage. Test reloads in the local build |
+| **3** A person's policies page | **Pass.** "Policies signed" links to `/person/policies/?id=dummy-m1` (`program-lead-screens--member`), with no name. The source builds it from `{ id }` alone |
+| **4** Messages, D-537 | **Pass.** `messages.spec.ts` (88/88 at 320) passes, including "a real account with an example-matching name gets no photo and no request to the photo host", and that a demo account still sees the example photo |
+| **5** Trips | **Pass.** It loads with the drawn "Map preview", and "coming up" shows, with no script errors |
+
+**Outside requests:**
+- **App:** none from the area picker, current location or reload, and none in the local
+  build.
+- **Storybook:** the member Trips and Messages stories request `images.unsplash.com`. These
+  stories run with example data on, which D-537 allows; the real-account case is the test in
+  4. Explore's story made no outside request.
+
+Iris
