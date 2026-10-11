@@ -39,7 +39,7 @@ None: a review of drafts.
 On `f023058` (main `0402478` plus this): `@pam/config` 1067 tests, `copy:status` in step, the browser suite on all three viewports **1110 passed, 18 skipped** (12.0 min), Storybook builds, and the fit audit
 (7 languages and the pseudo-language): the two stories that draw the no-lead lines (`place-no-lead`, `plan-trip-no-lead`): **0 new**; the 46 stories with "place" in their id: 2 new, both already accepted;
 the 12 with "trips": 17 new, all already accepted. **Not measured:** the needs-a-program screen (`NeedsOwnProgram`, reached from `/program/policies/` and `/program/service/` for a program lead with no program):
-no story draws it. Its two lines are short (the body is at most 72 characters, in Russian).
+no story draws it. Its two lines are short (the body is at most 78 characters, in Russian).
 
 ## Left undone
 
