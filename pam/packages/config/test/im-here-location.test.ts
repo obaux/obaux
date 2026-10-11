@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { EN } from './_bundles.js';
 import { PRIVACY } from '../src/legal.js';
@@ -30,6 +32,16 @@ describe('Privacy on “I’m here” and location (D-526 part B)', () => {
     // the location the phone sends, not the call (“the location your phone sends”, not “where you are”).
     expect(EN['privacy.s.what-we-keep.p10']).toBe('When you search near you, Pam uses your phone’s location for that search and does not keep it.');
     expect(EN['places.area.hereNote']).toBe('Used for this search only.');
+  });
+
+  it('is true that the area picker never writes the phone’s position down (D-536)', () => {
+    // “Used for this search only.” and p10’s “does not keep it” hold for the phone as well as the server only while
+    // saveOrigin skips the “here” pick. Until D-536 it saved the GPS fix in localStorage and reused it as “your location”.
+    const code = readFileSync(fileURLToPath(new URL('../../../apps/web/src/lib/useAreaSearch.ts', import.meta.url)), 'utf8');
+    const save = /export function saveOrigin\([^)]*\)[^{]*\{([\s\S]*?)\n\}/.exec(code)?.[1] ?? '';
+    expect(save, 'saveOrigin not found').not.toBe('');
+    expect(save.indexOf("origin.id === 'here'"), 'saveOrigin must return before writing the “here” pick').toBeGreaterThanOrEqual(0);
+    expect(save.indexOf("origin.id === 'here'")).toBeLessThan(save.indexOf('setItem'));
   });
 
   it('says when Pam asks: on a tap, once, never in the background', () => {
