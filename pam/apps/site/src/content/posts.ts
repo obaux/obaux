@@ -37,10 +37,10 @@ const ALL: readonly SupportPost[] = [
     slug: 'talking-to-pam',
     topic: 'members',
     audience: 'everyone',
-    title: 'Talking to someone at Pam',
-    summary: 'How to call a real person at Pam, when we answer, and what to do when we are closed.',
+    title: 'Getting help from Pam',
+    summary: 'How to find an answer on the help desk, how to write to a person at Pam, and what to do if you are in danger.',
     updated: '2026-10-11',
-    keywords: ['call', 'phone', 'phone number', 'number', 'talk', 'real person', 'human', 'someone', 'hours', 'closed', 'free', '911', 'danger', 'unsafe', 'report', 'contact'],
+    keywords: ['call', 'phone', 'phone number', 'number', 'talk', 'real person', 'human', 'someone', 'write', 'email', 'contact', 'still stuck', '911', '988', 'crisis', 'danger', 'unsafe', 'report'],
   },
   {
     slug: 'your-language',

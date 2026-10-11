@@ -42,7 +42,7 @@ export const SEARCH_PHRASES: readonly SearchPhrase[] = [
     phrase: 'i got a new phone number',
     who: 'anyone',
     answer: null,
-    gap: 'Changing your phone number: call Pam, and what happens to your account and texts.',
+    gap: 'Changing your phone number: contact Pam, and what happens to your account.',
   },
 
   // Joining
@@ -137,7 +137,7 @@ export const SEARCH_PHRASES: readonly SearchPhrase[] = [
     phrase: 'delete my account',
     who: 'anyone',
     answer: null,
-    gap: 'Deleting your account, or getting a copy of what Pam keeps: call Pam, we check it is you.',
+    gap: 'Deleting your account, or getting a copy of what Pam keeps: contact Pam, we check it is you.',
   },
 
   // Finding places

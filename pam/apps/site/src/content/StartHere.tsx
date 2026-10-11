@@ -53,7 +53,7 @@ export function StartHere() {
           steps={[
             'Your guide turned this off. You can still read your messages.',
             'If your account is paused, your guide can turn it back on.',
-            'Call Pam and we will help you reach your guide.',
+            'Contact Pam and we will help you reach your guide.',
           ]}
         />
         <ReadMore label="More: Case manager assignments" href="/support/case-manager-assignments/" />
@@ -76,7 +76,7 @@ export function StartHere() {
           steps={[
             'Close Pam and open it again.',
             'If the circle keeps turning, check your signal or Wi-Fi.',
-            'If it keeps happening, call Pam and we will help.',
+            'If it keeps happening, contact Pam and tell us what you see on the screen.',
           ]}
         />
       </Section>
@@ -85,7 +85,7 @@ export function StartHere() {
         <HowTo
           title="What to do"
           steps={[
-            '“This place is not on Pam right now”: it may come back. Call Pam and we can help you find another place.',
+            '“This place is not on Pam right now”: it may come back. Contact Pam and we can help you find another place.',
             'If a place is closed, has moved or is not what it says, open it and tap “Something is wrong here”.',
           ]}
         />

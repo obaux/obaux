@@ -40,7 +40,7 @@ export function CaseManagerAssignments() {
         </Text>
         <Text as="p">
           A limited account can read messages but can’t send them. A paused account can’t sign in. Pam
-          always tells you when something is turned off and who to call, and you can always call Pam for
+          always tells you when something is turned off and who to ask, and you can always contact Pam for
           help.
         </Text>
         <ReadMore label="Read the privacy policy" href={PRIVACY_URL} />

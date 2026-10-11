@@ -32,7 +32,7 @@ export function YourLanguage() {
 
       <Section title="Good to know">
         <P>These Support pages are in English for now.</P>
-        <P>If a word in your language looks wrong, call Pam and tell us. We fix it.</P>
+        <P>If a word in your language looks wrong, contact Pam and tell us. We fix it.</P>
       </Section>
     </Body>
   );
