@@ -965,7 +965,7 @@ Vercel status after every push (`docs/team.md`). Emails link to app.joinpam.org:
 
 ## Merge desk & platform · the night of 11 October: four batches, one migration
 
-On `main` and live: D-498 (its migration `a_place_says_whether_a_program_lead_on_pam_runs_it` applied live), D-499, D-500, D-501, D-502, D-503 (Sage's voice guide), D-504 (Foundations match the code), Piper's pick-a-service line, Lena's D-498 review, and the Principles page in line with A24, A25 and A26. Each batch ran the full checks before its push; every push was confirmed READY on Vercel for `web` and `pam-site`. Sage joined (Voice & UX copy). Open with Will: "go on Ask Pam" for the help centre; a push word in Ava's session. Log: `docs/sessions/2026-10-11-0115-merge-desk-night.md`.
+On `main` and live: D-498 (its migration `a_place_says_whether_a_program_lead_on_pam_runs_it` applied live), D-499, D-500, D-501, D-502, D-503 (Sage's voice guide), D-504 (Foundations match the code), Piper's pick-a-service line, Lena's D-498 review, and the Principles page in line with A24, A25 and A26. Each batch ran the full checks before its push; every push was confirmed READY on Vercel for `web` and `pam-site`. Sage joined (Voice & UX copy). Open with Will: "go on Ask Pam" for the help centre; a push word in Ava's session; a56 (attendance). **A28 (Will, a54):** Pam has no phone line; help goes problem → help desk → email to hello@joinpam.org. In progress in six lanes; the number is still on `main` until Dot's and Wren's changes merge. **Launch cleanup (a55):** real accounts see no example data (Trips, Messages, Profile first). Log: `docs/sessions/2026-10-11-0115-merge-desk-night.md`.
 
 ## Merge desk & platform · a failed in-app load opens the screen; texts link to app.joinpam.org (10 October)
 
