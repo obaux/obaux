@@ -3,7 +3,7 @@
 Questions people type into Support's search that no post answers yet. Each is a
 `null` entry in `apps/site/src/content/search-phrases.ts`; the site test fails if
 one is missing from this table, so the two cannot drift. Sage and Wren draft the
-post together; the words go to Will before anything ships (D-502 voice guide:
+post together; the words go to Will before anything ships (the voice guide, D-503:
 `docs/voice.md`).
 
 When a post is written: give its slug to the phrase in `search-phrases.ts`, and
