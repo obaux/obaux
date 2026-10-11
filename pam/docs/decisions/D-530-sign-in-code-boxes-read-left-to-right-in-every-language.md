@@ -12,6 +12,10 @@ The boxes and the hidden field behind them are now `dir="ltr"` in `CodeBoxes`, t
 
 A code is a string of digits read in order, in Arabic as in English; it is not text that flows. Phone numbers and one-time codes are conventionally left to right in right-to-left layouts. Lena is asked to confirm that for Arabic readers; if she disagrees the change is one attribute.
 
+## Also
+
+The boxes take the digits an Arabic or Persian keyboard types (٠–٩, ۰–۹) as 0–9, so nobody is stuck on a code they can read (Lena's suggestion).
+
 ## Test
 
 `apps/web/e2e/signin-code-boxes-ltr.spec.ts` (Arabic): typed 1234 reads 1, 2, 3, 4 from the left, a pasted "Your code is 123456" reads 1 to 6 from the left, and the group is `ltr` inside an `rtl` page. It fails without the attribute.

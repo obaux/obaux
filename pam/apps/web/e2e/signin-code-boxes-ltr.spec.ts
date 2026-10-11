@@ -46,4 +46,11 @@ test.describe('the code boxes in Arabic', () => {
     await page.getByLabel(ar['signin.code.label']).fill('Your code is 123456');
     expect(await boxes(page)).toEqual(['1', '2', '3', '4', '5', '6']);
   });
+
+  test('Arabic-Indic and Persian digits count as 0–9', async ({ page }) => {
+    const field = page.getByLabel(ar['signin.code.label']);
+    await field.fill('١٢٣');
+    await field.pressSequentially('۴۵');
+    expect(await boxes(page)).toEqual(['1', '2', '3', '4', '5', '']);
+  });
 });
