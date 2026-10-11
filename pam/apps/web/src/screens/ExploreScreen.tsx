@@ -5,8 +5,7 @@ import { useRouter } from 'next/navigation';
 import { EducationIcon, FamilyServicesIcon, Notice, PlaceCard, PlusIcon, ScrollReveal, WorkforceIcon, textLinkLook } from '@pam/ui';
 import { SearchLauncher, SearchPill, type SearchPillItem } from '@pam/ui/SearchPill';
 import { NextTripCard } from '@pam/ui/NextTripCard';
-import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
-import { readMoves } from '@/lib/addedTrips';
+import { useTrips } from '@/lib/useTrips';
 import { useNextVisits, visitTagLabel } from '@/lib/useNextVisits';
 import { CategoryPicture } from './CategoryPicture';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
@@ -64,14 +63,6 @@ function useDebounced(value: string, ms: number): string {
     return () => clearTimeout(handle);
   }, [value, ms]);
   return debounced;
-}
-
-/** The soonest example visit still ahead — what a member's Explore shows (D-265). */
-function upcomingTrip(moves: Readonly<Record<string, string>>) {
-  const now = Date.now();
-  return DUMMY_TRIPS.map((trip) => (moves[trip.id] ? { ...trip, startsAt: moves[trip.id]! } : trip))
-    .filter((trip) => new Date(trip.startsAt).getTime() > now)
-    .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0] ?? null;
 }
 
 /** "Tue, Oct 7 · 10:00 AM". */
@@ -169,9 +160,9 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
   // next visit sits above the list. Staff reach this screen as All programs.
   const isMember = mode === 'tab' && (demoRole ?? trueRole) === 'member';
   // A visit moved with "Change appointment" (D-281), read after mount.
-  const [moves, setMoves] = useState<Readonly<Record<string, string>>>({});
-  useEffect(() => setMoves(readMoves()), []);
-  const nextTrip = isMember && USE_DUMMY_PEOPLE ? upcomingTrip(moves) : null;
+  // The member's own next visit (saved ones, and the examples only in a demo, D-509), at its moved time.
+  const { all: allTrips } = useTrips();
+  const nextTrip = isMember ? (allTrips.find((trip) => new Date(trip.startsAt).getTime() > Date.now()) ?? null) : null;
   // A member's visits, so a place with one carries Saved's chip and opens as
   // the Visit profile (D-305) — the same wherever the place appears.
   const visits = useNextVisits(isMember && USE_DUMMY_PEOPLE);
@@ -231,7 +222,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
         nextTrip ? (
           <NextTripCard
             categoryLabel={t(categoryLabelKey(nextTrip.category))}
-            categoryIcon={TRIP_ICONS[nextTrip.category]}
+            categoryIcon={TRIP_ICONS[nextTrip.category as keyof typeof TRIP_ICONS] ?? TRIP_ICONS.family_services}
             art={<CategoryPicture category={nextTrip.category} />}
             title={t('explore.nextTrip.title')}
             when={tripWhen(nextTrip.startsAt, locale)}

@@ -7,6 +7,11 @@ import { settled } from './settled';
  * visit", its day and time, and "Change appointment" — which moves the trip
  * rather than adding a second one, and comes back to the place.
  */
+// These walk the example trips, which a demo asks for outright; a real account has none (D-509).
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => window.sessionStorage.setItem('pam.examples', '1'));
+});
+
 const FROM_TRIP = '/place/?id=dummy-place-learning&from=trips&trip=dummy-trip-1';
 
 test('the visit card says it is the next visit, where comes before what, and no WCAG A/AA violations', async ({ page }) => {

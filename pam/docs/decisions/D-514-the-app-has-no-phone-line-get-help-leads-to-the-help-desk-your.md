@@ -28,6 +28,9 @@ does not exist. The path is now: the problem, then the help desk on the website 
   seven notices is also in `packages/config/src/notices.ts`, which a test pins to `en.json`. `onboarding.phone.callInstead`
   is gone: no screen used it. The old Help keys (`help.call.*`, `help.menu.call`, `help.closed.*`, `help.safety.call.*`)
   are deleted.
+- **Two older labels** (`help.callSupport` "Contact Pam", `help.needHelp` "Need help? Contact Pam", Sage's §1) are signed
+  and applied; real screens no longer use them (Dot's `help.contact.action` and `nav.help` took over), a story and an e2e
+  assertion still do.
 - **Two texts that carried the number** (`staff_request_denied`, `access_limited_notice`) now say "Questions? Visit
   joinpam.org/support" (Sage's §5), in seven languages. `reviewedBy` carries Will's date and hour (03:37 UTC, card a59);
   the English is his, Spanish follows it as for the alert texts, and the other five are drafts under the 9 October
