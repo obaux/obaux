@@ -30,11 +30,9 @@ const styles = stylex.create({
 export function ReportedSection({
   state,
   previewing,
-  supportPhone,
 }: {
   readonly state: ReportsState;
   readonly previewing: boolean;
-  readonly supportPhone: string;
 }) {
   const { t } = useI18n();
   const real = !previewing;
@@ -50,8 +48,7 @@ export function ReportedSection({
           notice={failure}
           title={t(NOTICES[failure].titleKey)}
           body={t(NOTICES[failure].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 

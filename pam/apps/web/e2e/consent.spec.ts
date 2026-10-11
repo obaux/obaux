@@ -453,10 +453,8 @@ test.describe('the way in explains itself', () => {
     await page.getByRole('button', { name: en['signin.phone.action'] }).click();
 
     await expect(page.getByText(en['signin.failed.send.title'])).toBeVisible();
-    await expect(page.getByRole('link', { name: en['help.callSupport'] })).toHaveAttribute(
-      'href',
-      /^tel:/,
-    );
+    // Pam has no phone line (A28): the way on is Contact Pam, which opens Help.
+    await expect(page.getByRole('link', { name: en['help.contact.action'] })).toHaveAttribute('href', '/help/');
   });
 });
 

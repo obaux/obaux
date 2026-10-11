@@ -19,7 +19,6 @@ import { addressActionsFor } from '@/lib/addressActions';
 import { useSession } from '@/lib/useSession';
 import { useProgramSetup } from '@/lib/programSetup';
 import { saveOwnProgram, withdrawSubmission } from '@/lib/useOwnProgram';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { AddProgramView } from './AddProgramView';
 import { ProgramReviewView } from './ProgramReviewView';
 import { usePolicies } from '@/lib/usePolicies';
@@ -111,7 +110,6 @@ export function ProgramView({
   const [isSaving, setIsSaving] = useState(false);
   // What was asked of Pam, said once after saving (D-447).
   const [askedPam, setAskedPam] = useState(false);
-  const supportPhone = useSupportPhone();
   const set = (patch: Partial<ProgramDetailsData>) => setDraft((d) => ({ ...d, ...patch }));
   const { policies } = usePolicies();
   const { forPlace } = useServices();
@@ -247,8 +245,7 @@ export function ProgramView({
           notice="something_went_wrong"
           title={t('join.failed.title')}
           body={t('join.failed.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 

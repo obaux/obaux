@@ -10,7 +10,6 @@ import { AppHeader, Notice, Page, TextLink } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { OnboardingSlides } from '@pam/ui/OnboardingSlides';
 import { useI18n } from '@/lib/i18n';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePhoneSignIn, type PhoneSignIn } from '@/lib/usePhoneSignIn';
 import { useSession } from '@/lib/useSession';
 import { useAlertBanner } from '@/lib/alertBanner';
@@ -146,7 +145,6 @@ export function SignInScreen({
   readonly audience?: InviteRole | null;
 } = {}) {
   const { t, tPlain } = useI18n();
-  const supportPhone = useSupportPhone();
   const live = usePhoneSignIn();
   const flow = preview?.flow ?? live;
   const { state, startOver } = flow;
@@ -320,8 +318,7 @@ export function SignInScreen({
         notice="something_went_wrong"
         title={t(`signin.failed.${state.reason}.title`)}
         body={state.phone === null ? t('signin.phone.invalid') : t(`signin.failed.${state.reason}.body`)}
-        supportPhone={supportPhone}
-        callLabel={t('help.callSupport')}
+        contactLabel={t('help.contact.action')}
       />
     ) : null;
 

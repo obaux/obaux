@@ -10,7 +10,6 @@ import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/navigate';
 import { switchRole } from '@/lib/useRoles';
 import { useSession } from '@/lib/useSession';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 
 /**
  * Use Pam as (D-374, D-375): for somebody who is a member and also works at
@@ -26,7 +25,6 @@ const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
 
 export function UseAsView({ preview }: { readonly preview?: { roles: readonly Role[]; role: Role } } = {}) {
   const { t } = useI18n();
-  const supportPhone = useSupportPhone();
   const { state: session } = useSession();
   const live = session.status === 'signed-in' ? session.session : null;
   const roles = preview?.roles ?? live?.roles ?? [];
@@ -76,8 +74,7 @@ export function UseAsView({ preview }: { readonly preview?: { roles: readonly Ro
           notice="something_went_wrong"
           title={t('useAs.failed')}
           body={t('admin.invite.failed.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
     </SubPage>

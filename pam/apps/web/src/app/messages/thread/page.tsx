@@ -7,7 +7,6 @@ import { SubPageHeader } from '@pam/ui/SubPage';
 import { NOTICES, speechLanguageFor } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../../NotIn';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useThread } from '@/lib/useThread';
@@ -58,7 +57,6 @@ const NO_MESSAGES: readonly never[] = [];
 
 function ThreadScreen() {
   const { t, locale } = useI18n();
-  const supportPhone = useSupportPhone();
   const { state: session } = useSession();
   const params = useSearchParams();
   const conversationId = params.get('id');
@@ -124,8 +122,7 @@ function ThreadScreen() {
           notice={key}
           title={t(NOTICES[key].titleKey)}
           body={t(NOTICES[key].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       </Page>
     );
@@ -139,8 +136,7 @@ function ThreadScreen() {
           notice="no_mentors_found"
           title={t('messages.notForRole.title')}
           body={t('messages.notForRole.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       </Page>
     );
@@ -155,7 +151,6 @@ function ThreadScreen() {
           conversationId={conversationId}
           role={viewedRole ?? 'member'}
           speechLanguage={speechLanguage}
-          supportPhone={supportPhone}
           backHref={backHref}
           backLabel={backLabel}
         />
@@ -199,7 +194,6 @@ function ThreadScreen() {
           limited={limited || accountLimited}
           blocked={blocked}
           speechLanguage={speechLanguage}
-          supportPhone={supportPhone}
         />
       </ThreadFrame>
     );
@@ -216,8 +210,7 @@ function ThreadScreen() {
           notice="service_not_available"
           title={t('messages.thread.notFound.title')}
           body={t('messages.thread.notFound.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 
@@ -226,8 +219,7 @@ function ThreadScreen() {
           notice={state.offline ? 'offline' : 'something_went_wrong'}
           title={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].titleKey)}
           body={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
     </Page>

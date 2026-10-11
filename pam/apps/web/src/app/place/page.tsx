@@ -26,7 +26,6 @@ import { categoryLabelKey, displayPhone, distanceLabel, NOTICES, POINTS_RULES, t
 import { DUMMY_PLACES_BY_ID, isDummyPlaceId } from '@pam/config/dummy-places';
 import { useI18n } from '@/lib/i18n';
 import { addressActionsFor } from '@/lib/addressActions';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { logCall } from '@/lib/logCall';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
@@ -221,7 +220,6 @@ function useServiceDetail(id: string | null): State {
 
 function PlaceScreen() {
   const { t, tPlain, locale } = useI18n();
-  const supportPhone = useSupportPhone();
   const params = useSearchParams();
   const id = params.get('id');
   const state = useServiceDetail(id);
@@ -342,8 +340,7 @@ function PlaceScreen() {
           notice={state.status === 'missing' ? 'service_not_available' : key}
           title={state.status === 'missing' ? t('place.notFound.title') : t(NOTICES[key].titleKey)}
           body={state.status === 'missing' ? t('place.notFound.body') : t(NOTICES[key].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
         <BigButton label={t('help.place.action')} href="/" />
       </Page>

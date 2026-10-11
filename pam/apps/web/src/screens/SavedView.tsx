@@ -29,7 +29,6 @@ import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useSavedPlaces, type SavedPlacesState } from '@/lib/useSavedPlaces';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { ConfirmDialog } from './ConfirmDialog';
 import { useLeaveGuard } from '@/lib/useLeaveGuard';
 import { navigate } from '@/lib/navigate';
@@ -46,7 +45,6 @@ export interface SavedViewProps {
   readonly onUnsave: (id: string) => void;
   readonly headerActions?: ReactNode;
   readonly failed?: boolean;
-  readonly supportPhone?: string | null;
   /** On the title's line — a case manager's People / Programs switch (D-218, D-233). */
   readonly switcher?: ReactNode;
   /** Drawn instead of the saved places — a case manager's starred people. */
@@ -101,7 +99,6 @@ export function SavedView({
   onUnsave,
   headerActions,
   failed,
-  supportPhone,
   switcher,
   replace,
   browseHref = '/',
@@ -144,8 +141,7 @@ export function SavedView({
           notice="something_went_wrong"
           title={t('saved.failed.title')}
           body={t('saved.failed.body')}
-          supportPhone={supportPhone ?? null}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 
@@ -227,7 +223,6 @@ export function SavedScreen() {
   const { state, unsave, failed } = useSavedPlaces(session.status === 'signed-in', demoRole);
   // A member's next visits, for the tags on Saved (D-292).
   const visits = useNextVisits(viewedRole === 'member');
-  const supportPhone = useSupportPhone();
   const starred = useStarredPeople();
   const [pane, setPane] = useState<Pane>('people');
   const [isEditing, setIsEditing] = useState(false);
@@ -288,7 +283,6 @@ export function SavedScreen() {
         // manager's too now (Will, 3 October, D-255) — no bell, no Help.
         headerActions={undefined}
         failed={failed}
-        supportPhone={supportPhone}
         browseHref={isCaseManager ? '/programs/' : '/'}
         edit={{
           isOn: isEditing,

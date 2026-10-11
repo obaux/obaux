@@ -205,7 +205,7 @@ test.describe('the help path does not depend on JavaScript', () => {
 
     // Follow it the way a member would, with nothing hydrated.
     await help.click();
-    await expect(page.locator('a[href$="/support/"]')).toBeVisible();
+    await expect(page.getByRole('link', { name: /Contact Pam/ })).toHaveAttribute('href', 'https://joinpam.org/support/');
     // And a way back, which §0 also requires — the nested-page template's
     // round back button (D-213), a real link.
     await expect(page.getByRole('link', { name: /Back to Home/ })).toBeVisible();

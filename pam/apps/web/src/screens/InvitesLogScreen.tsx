@@ -15,7 +15,6 @@ import { useI18n } from '@/lib/i18n';
 import { goBack } from '@/lib/navigate';
 import { useInvitesLog, type InviteLogRow } from '@/lib/useInviteLinks';
 import { useSession } from '@/lib/useSession';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useRoleView } from '@/lib/useViewedRole';
 
 /**
@@ -58,7 +57,6 @@ const STATUS = {
 
 export function InvitesLogScreen() {
   const { t, locale } = useI18n();
-  const supportPhone = useSupportPhone();
   const { state: session } = useSession();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { viewedRole } = useRoleView(trueRole);
@@ -102,8 +100,7 @@ export function InvitesLogScreen() {
           notice="service_not_available"
           title={t('directory.notSuper.title')}
           body={t('directory.notSuper.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : state.status === 'loading' ? (
         <Loading label={t('common.loading')} variant="inline" />
@@ -112,8 +109,7 @@ export function InvitesLogScreen() {
           notice="something_went_wrong"
           title={t(NOTICES.something_went_wrong.titleKey)}
           body={t(NOTICES.something_went_wrong.bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : days.length === 0 ? (
         <Text type="supporting" xstyle={styles.count}>
