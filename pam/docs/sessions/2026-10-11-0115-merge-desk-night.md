@@ -155,6 +155,17 @@
 - **Will, 03:40–03:51:** calendars, both the link and a Google sync limited to a calendar Pam creates, plus a
   switch to find appointments from places' own domains; skeleton loaders on the Profile hero card (Dot, D-520).
 
+- **Batch b10 pushed at 759ea83 (04:19), live.** **Batch b11:** Nico's D-519 (the Text alerts screen reads
+  `texts_live` and shows no switch as live while it is off; the two account texts lose the number in the repo,
+  live only after Will refiles), Piper's places/Explore/Saved without examples with one gate (`examples.ts`,
+  `exampleMode.ts` deleted), and Nico's D-521 (the help-request forward, built off). Full e2e 1307 passed,
+  DB 1266 ok. **D-521's migration did not apply:** `apply_migration` timed out twice at the connector with
+  nothing applied and no locks, as P4 did on 10 October. Nothing uses the table until the function is switched
+  on, so the code went to main and the migration goes to Will to paste, with the salt secret and "test it".
+- **Will, 04:17:** "Modals and section links … are highlighted … rewrite the input field rule to only mean text
+  boxes" (Dot D-523, Wren on the site). **Nico's text-reply scoping** ran into D-460 (Pam never reads people's
+  texts): card a61 asks Will whether replies are forwarded, plus the opt-in sentence and reply checks.
+
 ## What was wrong, and what missed it
 
 - **Ava won't push on the merge desk's word, and that is right.** The merge desk passed on Will's "remove" at
