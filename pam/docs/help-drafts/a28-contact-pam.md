@@ -144,6 +144,15 @@ characters in Chinese, Russian and Arabic). No role named, no emoji, "Pam:" firs
 
 - Will asked (17 September) that someone denied "has somewhere real to ask why". The help desk leads to "Still stuck?"
   and a person, so it still does.
+**The HELP auto-reply** (set in Will's Twilio console, Advanced Opt-Out; filed in `docs/sms-campaign-samples.md`):
+
+| Now | Proposed | Length |
+|---|---|---|
+| Pam: Call {supportPhone} and a person will help you. | **Pam: Get help at joinpam.org/support or write to hello@joinpam.org. Reply STOP to stop.** | 87 |
+
+It names Pam, gives a support contact (a web address and an email both count for carriers), says how to stop, and fits
+one segment. Will pastes it when he refiles; Nico updates the samples file.
+
 - Both need a person who reads them to sign again (`reviewedBy` cleared on the English change). The registered campaign
   samples (`docs/sms-campaign-samples.md`) may need the new wording: Nico to check.
 
