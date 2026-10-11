@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
-import { AppHeader, BigButton, HelpBar, Loading, Notice, Page, PageTitle } from '@pam/ui';
+import { AppHeader, BigButton, HelpBar, Notice, Page, PageTitle } from '@pam/ui';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession, signOut } from '@/lib/useSession';
-import { ProfileScreen } from '../../screens/ProfileScreen';
+import { ProfileLoading, ProfileScreen } from '../../screens/ProfileScreen';
 
 /**
  * Your account — and the way out.
@@ -75,14 +75,8 @@ export default function AccountPage() {
     }
   };
 
-  if (session.status === 'loading') {
-    return (
-      <Page gap={3}>
-        <AppHeader accountHref={null} />
-        <Loading label={t('common.loading')} variant="screen" />
-      </Page>
-    );
-  }
+  // The hero card as pulses, not a spinner (Will, 11 October); an error below is the card's real empty state.
+  if (session.status === 'loading') return <ProfileLoading />;
 
   if (session.status === 'signed-out') {
     return (

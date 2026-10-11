@@ -40,9 +40,15 @@ import { useI18n } from '@/lib/i18n';
 export interface ProfileViewProps {
   readonly name: string;
   readonly role: Role;
-  readonly points: number;
-  readonly savedCount: number;
+  /** `null` while it is still arriving: the number is a pulse the size of the number, not a 0. */
+  readonly points: number | null;
+  readonly savedCount: number | null;
   readonly connectionsCount: number;
+  /**
+   * Nothing is known yet (Will, 11 October: "skeleton loaders for the image, stats and labels in profile hero card"):
+   * the hero card is drawn as pulses sized like the real card.
+   */
+  readonly isLoading?: boolean;
   /** Whether this account has said yes to text reminders. */
   readonly remindersOn: boolean;
   /** The bell and Help, from the caller — they read live data. */
@@ -84,6 +90,7 @@ export function ProfileView({
   onPhotoPick,
   isPhotoBusy = false,
   photoNotice = null,
+  isLoading = false,
 }: ProfileViewProps) {
   const { t, locale } = useI18n();
   const number = (n: number) => new Intl.NumberFormat(intlLocale(locale)).format(n);
@@ -142,12 +149,15 @@ export function ProfileView({
         stats={
           isMember
             ? [
-                { value: number(points), label: t('profile.stat.points') },
-                { value: number(savedCount), label: t('profile.stat.saved') },
+                { value: points === null ? null : number(points), label: t('profile.stat.points') },
+                { value: savedCount === null ? null : number(savedCount), label: t('profile.stat.saved') },
                 { value: number(connectionsCount), label: t('profile.stat.connections') },
               ]
             : []
         }
+        isLoading={isLoading}
+        loadingStatCount={isMember ? 3 : 0}
+        loadingLabel={t('common.loading')}
       />
       {photoNotice ? <Banner status="warning" title={photoNotice} /> : null}
 
@@ -165,11 +175,11 @@ export function ProfileView({
             opening Points. Past visits are still on Trips.
           */}
           <FeatureTile
-            label={t(badgeForPoints(points).labelKey)}
+            label={t(badgeForPoints(points ?? 0).labelKey)}
             hint={t('profile.tile.badgeHint')}
             href="/points/"
             // The level's own picture (D-295) — Rooted is a seedling.
-            art={<BadgeArt badgeKey={badgeForPoints(points).key} size={88} shape="square" />}
+            art={<BadgeArt badgeKey={badgeForPoints(points ?? 0).key} size={88} shape="square" />}
           />
           <FeatureTile label={t('profile.tile.connections')} href="/connections/" art={<ConnectionsArt size={88} />} />
         </FeatureTileRow>

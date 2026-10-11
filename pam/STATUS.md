@@ -1421,6 +1421,10 @@ Branch `claude/pam-design-wrong-code-alert` (D-510). `CompactNotice` in `@pam/ui
 
 Branch `claude/pam-design-legal-back-to-site` (D-508). The website's Privacy and Terms links carry `?from=site&return=<path>`; the app's pages show "Back to the website" and go to `https://joinpam.org` + the path, only if it is a plain path on the site (no `//`, no scheme; otherwise Back to Legal as before). Tabs and the other-document link keep it. New string `nav.back.website` (six drafts for Lena). Tests: `siteReturn.test.ts`, `apps/site/test/legal-links.test.ts`, `e2e/legal-site.spec.ts`.
 
+## Design system & Storybook · Profile's hero card loads as skeletons (11 October)
+
+Branch `claude/pam-design-real-accounts-no-examples` (D-520). `ProfileSummary isLoading` and `ProfileStat.value: null`: the photo, name, role and stats are pulses the size of the real card (measured), on `/account/` while the account loads and on the numbers while they arrive; a failed call ends the pulse in a 0. CLS under 0.01 in `profile-skeleton.spec.ts`.
+
 ## Design system & Storybook · a real account sees no examples on Profile, Points, Connections (11 October)
 
 Branch `claude/pam-design-real-accounts-no-examples` (D-518). `lib/exampleMode` (D-509) `showsExamples`: examples only for a super admin's preview, a demo tab, and Storybook. A real member earns no example Scholar, has Connections 0, and sees "No connections yet". `USE_DUMMY_PEOPLE` (other lanes' screens) is untouched.

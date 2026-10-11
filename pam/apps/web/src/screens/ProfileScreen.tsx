@@ -7,11 +7,14 @@ import { DUMMY_SELF } from '@pam/config/dummy-people';
 import { useRouter } from 'next/navigation';
 import { signOut, useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
-import { usePoints } from '@/lib/usePoints';
+import { usePointsState } from '@/lib/usePoints';
 import { getReminderConsent } from '@/lib/useReminderConsent';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { HeaderActions } from './HeaderActions';
 import { ProfileView } from './ProfileView';
+import { Page } from '@pam/ui';
+import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
+import { ProfileSummary } from '@pam/ui/ProfileCards';
 import { previewOf, uploadStaffPhoto } from '@/lib/staffPhoto';
 import { markSetupDone } from '@/lib/programSetup';
 import { useI18n } from '@/lib/i18n';
@@ -28,7 +31,7 @@ export function ProfileScreen() {
   const signedIn = session.status === 'signed-in';
   const trueRole = signedIn ? session.session.role : null;
   const { viewedRole, demoRole } = useRoleView(trueRole);
-  const points = usePoints(signedIn ? session.session.userId : null);
+  const { points, loading: pointsLoading } = usePointsState(signedIn ? session.session.userId : null);
   const { state: saved } = useSavedPlaces(signedIn, demoRole);
   const [remindersOn, setRemindersOn] = useState(false);
   const { t } = useI18n();
@@ -73,8 +76,9 @@ export function ProfileScreen() {
     <ProfileView
       name={name}
       role={role}
-      points={points ?? 0}
-      savedCount={saved.status === 'ready' ? saved.places.length : 0}
+      // Not 0 until they are known: a pulse in the number's place, so a real 0 never flashes first.
+      points={pointsLoading ? null : (points ?? 0)}
+      savedCount={saved.status === 'ready' ? saved.places.length : saved.status === 'loading' ? null : 0}
       // No real query for "the people on my side" yet, so a real account has none to count (D-518); only an
       // example (a preview, a demo account, Storybook) counts the example cast.
       connectionsCount={role === 'member' && examples ? DUMMY_CONNECTIONS.length : 0}
@@ -90,5 +94,21 @@ export function ProfileScreen() {
       isPhotoBusy={photoBusy}
       photoNotice={photoFailed ? t('profile.photo.failed') : null}
     />
+  );
+}
+
+/**
+ * Profile while the account is still being found out (Will, 11 October: "skeleton loaders for the image, stats
+ * and labels in profile hero card"): the title, then the hero card as pulses the size of the real one, and nothing
+ * under it yet, because what goes there depends on who this is. A member's card (three stats) is drawn; a staff
+ * account's has none, which makes it a little shorter, and that is the one thing that can move.
+ */
+export function ProfileLoading() {
+  const { t } = useI18n();
+  return (
+    <Page gap={4}>
+      <LargeTitleHeader title={t('profile.title')} />
+      <ProfileSummary name="" roleLabel="" stats={[]} isLoading loadingStatCount={3} loadingLabel={t('common.loading')} />
+    </Page>
   );
 }
