@@ -1159,6 +1159,12 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · the invite email in Spam (11 October 2026)
+
+Branch `claude/messages-email-deliverability`. Docs only. The email itself has nothing a filter dislikes; the cause is the
+domain's standing (probably no DMARC record, a new sending domain, a test sent through the forwarding address), which is Will's
+to fix at DNS. Steps are in `docs/email-setup.md` › "If the email lands in Spam".
+
 ## Messages & notifications · why the email service refused (10 October 2026) — merged 10 October
 
 Merged by the merge desk from 0068bcf; deployed with the D-488 bundle. **Sending works (10 October, 17:15):** Resend had never verified `mail.joinpam.org` (its record said "not started" though the DNS was right); the merge desk started verification through the Resend connector, it turned Verified, and the test staff invite to Pam's own inbox was delivered at 17:15 (Resend: delivered). Will is checking the email (card a33).

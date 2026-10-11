@@ -70,6 +70,34 @@ the two don't match (a stray space when pasting is the usual cause): copy it aga
 If the English ever loses its sign-off the sender answers "the wording is not signed" and claims
 nothing, so switching it on early is harmless.
 
+## If the email lands in Spam
+
+Checked 11 October 2026, after Will's first sample (sent from `hello@mail.joinpam.org` through Resend) landed in his Spam
+folder. **Nothing in the email itself is a spam trigger.** It has a plain-text part beside the HTML; it is about 2.5 KB of
+HTML and 0.4 KB of text with one small logo (336×124, 9 KB) and one button, so the image-to-text ratio is fine; the link
+the person is asked to click is written out in full beside the button and matches it; the subject, title and body use no
+words filters dislike beyond "invited"; open and click tracking are off; From is `Pam <hello@mail.joinpam.org>` and
+DKIM and SPF are signed by `mail.joinpam.org` / `send.mail.joinpam.org`, so both align with it. A
+`List-Unsubscribe` header is not needed for a one-off invitation to one person and would make it look like a mailing.
+
+What is left is the **domain's standing**, which is Will's to fix at the DNS and in his mailbox, in this order:
+
+1. **A DMARC record.** Add a TXT record at `_dmarc.joinpam.org` with `v=DMARC1; p=none; rua=mailto:hello@joinpam.org`.
+   `p=none` only asks receivers to report; it blocks nothing. Gmail and Yahoo expect one and mark mail without it down.
+   (This container cannot look up DNS, so whether it exists is for Will to check at his DNS host.)
+2. **Do not judge it by a forwarded copy.** A message sent to `hello@joinpam.org` is forwarded on by ImprovMX, and forwarding
+   breaks SPF at the final inbox, so a mail that arrives that way is often spammed even when it was sent correctly.
+   Send the test **straight to a real inbox** (Gmail, iCloud, Outlook), not to the forwarding address.
+3. **Say "Not spam" on the first one** in each inbox. A brand-new sending domain has no history; a few real
+   "Not spam" and replies teach the filters quickly. A real person replying to it helps most.
+4. **Keep the link on Pam's own domain.** `APP_URL` is the host of the button and the logo. If it is the `vercel.app`
+   address, the email says it is from joinpam.org but points somewhere else, which filters mark down. Use
+   `https://app.joinpam.org` (or the domain Pam is on) once it is live (`docs/changing-the-domain.md`).
+5. Send slowly at first: a handful of invitations a day for the first week, not a batch.
+
+If it still lands in Spam after 1 to 3, a spam-testing service (it needs an email sent to an outside address) will say which
+check fails; that needs Will's yes first.
+
 ## What to know
 
 - Invites made before the migration are not queued: nobody asked for those to go out.
