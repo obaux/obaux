@@ -23,6 +23,8 @@ import { EN } from './_bundles.js';
 const ROOTS = [
   { dir: '../../../apps/web', skip: ['node_modules', '.next', 'out', 'storybook-static', 'test-results', 'user-flows-out', 'e2e', 'stories', 'public', 'scripts'] },
   { dir: '../../ui/src', skip: ['stories'] },
+  // The public website, joinpam.org: "the only part of Pam that loads anything from Google" (sharing.p5) covers it too.
+  { dir: '../../../apps/site', skip: ['node_modules', '.next', 'out', 'public', 'scripts', 'social', 'test', 'screenshots.json'] },
   { dir: '../src', skip: ['locales'] },
 ] as const;
 
@@ -54,6 +56,7 @@ const HOSTS: Record<string, HostEntry> = {
   'shobqzuhicoiymtumiaz.supabase.co': { kind: 'own', why: 'the database and sign-in: “the one that stores our data” (privacy.s.sharing.p3)' },
   'joinpam.org': { kind: 'own', why: 'the public site and its help desk' },
   'app.joinpam.org': { kind: 'own', why: 'the app' },
+  'www.joinpam.org': { kind: 'own', why: 'the public site, with www' },
 
   // Loaded by the page: the company gets the phone’s IP address.
   'maps.googleapis.com': {
@@ -91,6 +94,7 @@ const REQUESTERS: Record<string, string> = {
   'apps/web/src/screens/TripsMap.tsx': 'the Google Maps script (maps.googleapis.com)',
   'apps/web/src/lib/useAreaSearch.ts': 'the city’s address list (phl.carto.com), going away with D-535',
   'packages/ui/src/OnboardingSlides.tsx': 'preloads the slide pictures, which are Pam’s own',
+  'apps/site/src/components/HelpRequest.tsx': 'the help form posts to Pam’s own database function (the Supabase host), behind a switch that is off (D-521)',
 };
 const REQUESTS = /\bfetch\(|\.src\s*=|<iframe|new\s+Image\(|sendBeacon\(|new\s+WebSocket\(|new\s+EventSource\(|<script[\s>]|@import\s+url\(/;
 
@@ -139,6 +143,17 @@ describe('who else the app talks to (a67)', () => {
       expect(words, `${privacy!.key} (Privacy’s line for ${host}) does not exist`).toBeDefined();
       expect(words, `${privacy!.key} must name the company that ${host} belongs to`).toMatch(privacy!.names);
     }
+  });
+
+  it('keeps the Maps script the only thing Pam loads from Google', () => {
+    // privacy.s.sharing.p5 (a67): “The map is the only part of Pam that loads anything from Google.” A Google font, a
+    // sign-in, an analytics tag or a second Maps host would make that false: tell Privacy first.
+    const google = Object.entries(HOSTS)
+      .filter(([host, entry]) => /google|gstatic|googleusercontent|doubleclick/.test(host) && entry.kind === 'loaded')
+      .map(([host]) => host);
+    expect(google).toEqual(['maps.googleapis.com']);
+    const sayingIt = EN['privacy.s.sharing.p5'];
+    if (sayingIt) expect(sayingIt).toMatch(/only part of Pam that loads anything from Google/);
   });
 
   it('lists every file that makes requests of its own', () => {
