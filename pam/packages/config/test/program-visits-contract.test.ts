@@ -53,7 +53,7 @@ describe('a program sees the visits planned at its own program (D-526)', () => {
   it('names the label a program sees on a visit nobody marked: missed, a day after it ends (part C)', () => {
     // The program sees `status`, so a visit nobody marked reaches it as "missed". A member is told that,
     // in the words of the fact (nobody marked it), not as a claim that they did not come.
-    expect(sharing).toMatch(/A visit nobody marks shows as missed a day after it ends\./);
+    expect(sharing).toMatch(/If nobody marks you as there, the visit shows to them as missed a day after it ends\./);
     expect(sharing).not.toMatch(/\byou (missed|did not come|didn.t come)\b/i);
   });
 
