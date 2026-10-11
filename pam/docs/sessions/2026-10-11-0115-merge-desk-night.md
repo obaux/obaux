@@ -255,8 +255,14 @@
     code". The search pill's contrast pairs are now in the site's contrast test;
   - Iris's report.
 
-  Next, for Dot: a way to mark a heading's text as data (a place's, program's or person's name), so names
-  outside conversations get the same fix. Not every Heading: Pam's own headings keep the page's direction.
+- **Batch b16 pushed at 4e0c32f, live: Vercel web and pam-site READY, main CI green.** Iris re-tested T1, T2,
+  H1 and C1, and all four pass.
+- **Batch b17:** Dot's D-534, names in headings keep their own direction:
+  - `@pam/ui/DataHeading`;
+  - `SubPageHeader`'s `isTitleData`, which is off by default; the conversation passes it;
+  - used for the place and program title, a policy's title (the program's own words), the profile card's
+    name, and the names in staff lists. Pam's own headings, including "Policies", keep the page's direction;
+  - plus Iris's b16 re-test note.
 
 ## What was wrong, and what missed it
 
@@ -387,6 +393,10 @@
 | Batch b16: sign-in e2e after rebuilding (signin-wrong-code, code-boxes-ltr, short) | 75 passed |
 | Batch b16: db / config / copy:status / ui / web unit / site tests / e2e full | 1288 ok, 0 not ok / 1094 / in step / 124 / 125 / 94 / 1433 passed, 19 skipped |
 | Batch b16: builds, budget, storybook, site a11y / usability / scrollspy | all 0; 15.3 kB spare; builds; 120 scans 0 problems / clear / 300 links 0 problems |
+| main CI on 4e0c32f (b16); Vercel web and pam-site | all four green; READY |
+| Iris's b16 re-test: T1, T2, H1, C1 | all pass |
+| Batch b17: db / config / copy:status / ui / web unit / site tests / e2e full | 1288 ok, 0 not ok / 1094 / in step / 124 / 125 / 94 / 1451 passed, 19 skipped |
+| Batch b17: builds, budget, storybook, site a11y / usability / scrollspy | all 0; 15.2 kB spare; builds; 120 scans 0 problems / clear / 300 links 0 problems |
 
 ## Left undone
 
