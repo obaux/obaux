@@ -360,6 +360,8 @@ export function MemberPolicyScreen({
     <>
       <SubPage
         title={policy?.title ?? t('memberPolicies.title')}
+        // A policy's title is the program's own words (it is uploaded with the file), so it is data (D-534).
+        isTitleData={Boolean(policy)}
         subtitle={policy ? t('memberPolicy.count', { current: index + 1, total: shown.length }) : undefined}
         // The final screen of a booking's signing (Will, D-336): no back,
         // an × that closes into Trips with the trip's confetti.
