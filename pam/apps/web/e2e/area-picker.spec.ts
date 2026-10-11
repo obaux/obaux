@@ -52,7 +52,7 @@ test.describe('choosing an area', () => {
     // Tapping the area itself opens the picker: a member should not have to
     // find the pencil to discover that this is theirs to set.
     await page.getByRole('button', { name: 'Near City Hall' }).click();
-    await expect(page.getByRole('textbox', { name: 'ZIP code or neighborhood' })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'ZIP code' })).toBeVisible();
   });
 
   test('the pencil beside it does the same thing, and says so', async ({ page }) => {
@@ -62,7 +62,7 @@ test.describe('choosing an area', () => {
     await page.goto('/places/');
 
     await page.getByRole('button', { name: 'Change the area' }).click();
-    await expect(page.getByRole('textbox', { name: 'ZIP code or neighborhood' })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'ZIP code' })).toBeVisible();
   });
 
   test('lives in the header, so the list starts at the top of the page', async ({ page }) => {
@@ -113,7 +113,7 @@ test.describe('choosing an area', () => {
     });
     await page.goto('/places/');
     await page.getByRole('button', { name: 'Change the area' }).click();
-    await page.getByRole('textbox', { name: 'ZIP code or neighborhood' }).fill('1234 Market');
+    await page.getByRole('textbox', { name: 'ZIP code' }).fill('1234 Market');
 
     // The ZIP list answers, from Pam's own search, and the typed text went to it as a POST body.
     await expect(page.getByRole('button', { name: /^19104/ })).toBeVisible();
