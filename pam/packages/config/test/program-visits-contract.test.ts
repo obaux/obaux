@@ -1,0 +1,59 @@
+import { describe, expect, it } from 'vitest';
+import { EN } from './_bundles.js';
+import { ADMIN_CANNOT_SEE, ADMIN_CAN_SEE, TRANSPARENCY_SCREEN } from '../src/transparency.js';
+
+/**
+ * A program sees the visits planned at its own program (D-526, attendance part A).
+ *
+ * `my_program_visits()` hands a program lead, for their own program only, every visit that is not
+ * cancelled with the member's first name, the day and time, the service they picked and whether the
+ * program marked them as there. That is a program seeing more of a member than before, so the contract
+ * changes first and members are told before it ships (`CLAUDE.md`, `transparency.ts`): the contract
+ * entry, the line on the transparency screen and the sentence on the Privacy page say the same thing.
+ * The database side is `56_a_program_lead_reads_the_visits_at_their_own_test.sql`.
+ */
+describe('a program sees the visits planned at its own program (D-526)', () => {
+  const appointments = TRANSPARENCY_SCREEN.canSee.find((l) => l.key === 'transparency.canSee.appointments');
+  const sharing = EN['privacy.s.sharing.p2'];
+
+  it('is in the contract, and a member’s trips to other programs still are not', () => {
+    expect(ADMIN_CAN_SEE).toContain('visits_planned_at_their_own_program');
+    expect(ADMIN_CANNOT_SEE).toContain('member_activity_for_a_program');
+  });
+
+  it('is said on the transparency screen, before it ships, in the line about visits', () => {
+    expect(appointments?.en).toMatch(/\bA program sees the visits you plan there\b/);
+    // The guide's half of the line is unchanged.
+    expect(appointments?.en).toMatch(/^Your visits, and if you went or missed one/);
+    // The screen and the English bundle are one text (copy.test.ts holds this for every line; named here for the reader).
+    expect(EN['transparency.canSee.appointments']).toBe(appointments?.en);
+  });
+
+  it('is said on the Privacy page, with exactly what the program sees', () => {
+    expect(sharing).toMatch(/sign up with them or plan a visit there/);
+    expect(sharing).toMatch(/your first name, the day and time, the service you picked, and whether they marked you as there/);
+    // The program marks a member as there; the member does not check in, so the page does not say "you came".
+    expect(sharing).not.toMatch(/\byou (came|went|checked in)\b/i);
+  });
+
+  it('tells a member what they control: cancelling takes the visit away from the program', () => {
+    expect(sharing).toMatch(/If you cancel, they stop seeing it\./);
+  });
+
+  it('does not promise the program only sees a member after sign-up, which stopped being true', () => {
+    expect(sharing).not.toMatch(/only after you sign up with them,/);
+  });
+
+  it('gives a program no more than the first name: no last name, phone, address or photo is named as seen', () => {
+    for (const line of [sharing, appointments?.en ?? '']) {
+      expect(line).not.toMatch(/last name|phone number|address|photo/i);
+    }
+  });
+
+  it('says the same words in both places: the program marks the member as there', () => {
+    // The Privacy page says "marked you as there"; the transparency line says "visits you plan there".
+    // Neither may say a program sees whether the member "went or missed" it: part A returns the mark, not a miss.
+    expect(sharing).not.toMatch(/missed/i);
+    expect(appointments?.en.split('A program sees')[1] ?? '').not.toMatch(/missed|went/i);
+  });
+});

@@ -42,6 +42,17 @@ export const ADMIN_CAN_SEE = [
   'goals',
   'enrollments_and_statuses',
   'appointments_and_attendance',
+  /**
+   * D-526 (attendance part A, 11 October 2026): the program a member plans a visit with sees that visit.
+   * `my_program_visits()` returns, for the caller's OWN program only and for a program lead with an active
+   * account, each visit that is not cancelled with the member's first name, the day and time, the service
+   * they picked and whether the program marked them as there (`checked_in_at`) — no last name, phone,
+   * address or photo. The member does not have to have signed up: planning the visit is enough. Said to the
+   * member on `transparency.canSee.appointments` ("A program sees the visits you plan there too.") and on
+   * the Privacy page (`privacy.s.sharing.p2`); `program-visits-contract.test.ts` holds the three together.
+   * It does NOT widen `member_activity_for_a_program` below: a member's trips to OTHER programs stay hidden.
+   */
+  'visits_planned_at_their_own_program',
   'points_and_level',
   /**
    * Said on the screen since D-413 (Will, 9 October: "Case manager can see
@@ -146,7 +157,8 @@ export const ADMIN_CANNOT_SEE = [
    * (D-242): the intent was that a program sees the last day a member used
    * Pam; the database does not give it yet, so nothing member-facing says so
    * (D-465, `last_active_date` above). What this entry still covers: which places a member saved, their trips to other
-   * programs, and their points — none of it shown to a program.
+   * programs, and their points — none of it shown to a program. (D-526: a program does see the visits
+   * planned AT itself, `visits_planned_at_their_own_program` above; that is not a trip to another program.)
    */
   'member_activity_for_a_program',
 ] as const;
@@ -203,7 +215,7 @@ export const TRANSPARENCY_SCREEN: {
     },
     {
       key: 'transparency.canSee.appointments',
-      en: 'Your visits, and if you went or missed one',
+      en: 'Your visits, and if you went or missed one. A program sees the visits you plan there too.',
     },
     // D-413 — badges named, not left to "level": a case manager already reads them.
     { key: 'transparency.canSee.points', en: 'Your points, your level and your badges' },
