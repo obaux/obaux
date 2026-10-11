@@ -1,6 +1,10 @@
 'use client';
 
-import { BookIcon } from '@pam/ui';
+import * as stylex from '@stylexjs/stylex';
+import { Heading } from '@astryxdesign/core/Heading';
+import { Text } from '@astryxdesign/core/Text';
+import { VStack } from '@astryxdesign/core/VStack';
+import { BookIcon, TextLink } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
 import { MenuList } from '@pam/ui/MenuList';
 import { useI18n } from '@/lib/i18n';
@@ -12,6 +16,19 @@ import { useI18n } from '@/lib/i18n';
  * it that says who can see what (`#who-can-see`).
  */
 const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
+
+/**
+ * "Data sources" (D-540): the credit the neighborhood list's licence (CC BY 4.0) asks for — the creator, the licence with its
+ * link, a link to the source, and that it was changed. Not in Privacy or Terms: it is a licence notice, not a promise.
+ */
+const SOURCE_URL =
+  'https://github.com/azavea/geo-data/tree/5c4538b5f4d2a26a81b7fab2d0006d327a39e3d0/philadelphia-neighborhoods';
+const LICENCE_URL = 'https://creativecommons.org/licenses/by/4.0/';
+
+const styles = stylex.create({
+  title: { fontSize: '20px', lineHeight: 1.3 },
+  body: { fontSize: '17px', lineHeight: 1.5 },
+});
 
 export function LegalView() {
   const { t } = useI18n();
@@ -30,6 +47,14 @@ export function LegalView() {
           },
         ]}
       />
+      <VStack gap={2}>
+        <Heading level={2} xstyle={styles.title}>
+          {t('legal.sources.title')}
+        </Heading>
+        <Text xstyle={styles.body}>{t('legal.sources.neighborhoods')}</Text>
+        <TextLink label={t('legal.sources.link')} href={SOURCE_URL} />
+        <TextLink label={t('legal.sources.licence')} href={LICENCE_URL} />
+      </VStack>
     </SubPage>
   );
 }

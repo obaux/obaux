@@ -120,6 +120,8 @@ const HOSTS: Record<string, HostEntry> = {
   'play.google.com': { kind: 'link', why: 'Google Maps in the Play Store, opened by a tap (mapsLaunch.ts)' },
   'apps.apple.com': { kind: 'link', why: 'Google Maps in the App Store, opened by a tap (mapsLaunch.ts)' },
   'calendar.google.com': { kind: 'link', why: "Google Calendar's page for adding a calendar by its address, opened by a tap (CalendarLinkView.tsx, D-538)" },
+  'github.com': { kind: 'link', why: 'the neighborhood data’s source, linked under Legal › Data sources (LegalView.tsx, D-540)' },
+  'creativecommons.org': { kind: 'link', why: 'the CC BY 4.0 licence of that data, linked under Legal › Data sources (LegalView.tsx, D-540)' },
 
   // Example people only (a real account sees no examples: lib/examples.ts).
   'images.unsplash.com': { kind: 'example', why: 'stock photos of the example staff in dummy-connections.ts; shown only while examples are on' },

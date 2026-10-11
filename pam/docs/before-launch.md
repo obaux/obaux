@@ -19,6 +19,18 @@ STATUS row too.
   (3) Deploy `calendar-feed` with JWT verification off and fetch a made-up address: a bare 404. (4) A native reader for
   `calendar.others` in the six languages (it names buttons in Google Calendar and Outlook).
 
+- [ ] **Read the City of Philadelphia licence once** (Lena for Mira, 11 October 2026; Will, or anyone with open web access).
+  Pam copies four City of Philadelphia open-data layers (City Facilities, Parks & Recreation program sites and properties, DBHIDS
+  provider locations) and a ZIP-code centre computed from the City's property points, and Piper's street centerlines are next.
+  All are under the "City of Philadelphia License". Nobody on the team has read its text: the City's hosts are blocked from
+  the sessions' sandbox, and `docs/data-licences.md` is built from the standard notice on OpenDataPhilly's dataset pages, which
+  says the City keeps all its rights, gives no warranty and no claim of accuracy, **makes the user responsible and makes the user hold the
+  City harmless**, and no credit line was seen. The hold-harmless term is a legal commitment Pam makes by using the data, so
+  read the full licence on phila.gov (the City's Open Data Program page, or the licence link on any OpenDataPhilly dataset page) once,
+  and then: (1) tick this, with the date; (2) write in `docs/data-licences.md` what the licence really says (credit? a
+  commercial-use limit? who is "the user" if Pam passes places on to members?); (3) tell Mira if it asks for a credit line, which would go
+  on the About page. No Privacy line is needed: none of this data is about members.
+
 - [ ] **The native apps ask for location with Pam's own reason** (Lena, 11 October 2026; Mira asked for this to be listed). Pam
   asks the phone for where it is in two places: "Use my current location" in Explore's area picker, and "I'm here" on a visit
   (D-526 part B). In the web app the browser asks. In the iOS and Android apps the system asks, and each store wants one line
