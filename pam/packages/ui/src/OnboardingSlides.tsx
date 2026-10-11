@@ -250,12 +250,12 @@ const styles = stylex.create({
   },
   here: { opacity: 1, width: '20px', borderRadius: '4px' },
   // The pause/play button (D-501): a dark round button with a lighter rim and a white mark, the
-  // photo viewer's own (D-401), 48px so it is a full touch target. Bottom right, in the dots' row,
-  // clear of the sign-in card's overlap.
+  // photo viewer's own (D-401), 48px so it is a full touch target. Top corner, away from the words
+  // (bottom) and the locale switcher (top, other side); the corner follows the reading direction.
   control: {
     position: 'absolute',
-    insetInlineEnd: '16px',
-    bottom: '36px',
+    insetInlineStart: '16px',
+    top: 'calc(24px + env(safe-area-inset-top, 0px))',
     zIndex: 2,
     width: pam['--pam-touch-target-min'],
     height: pam['--pam-touch-target-min'],
@@ -267,7 +267,7 @@ const styles = stylex.create({
     backgroundColor: pam['--pam-viewer-control'],
     color: '#FFFFFF',
   },
-  controlInline: { bottom: '8px', insetInlineEnd: '8px' },
+  controlInline: { top: '8px', insetInlineStart: '8px' },
   // The inline frame (D-259): in line with the page, rounded, words centred.
   regionInline: { width: '100%', marginInline: 0 },
   trackInline: { borderRadius: '28px' },
