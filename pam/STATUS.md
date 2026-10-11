@@ -2147,3 +2147,7 @@ Sign in on the code step is off until all six digits are in (D-532). The Support
 ## Design system · names in headings keep their own direction (11 October 2026) — on `main`
 
 `@pam/ui/DataHeading` and `SubPageHeader isTitleData` mark a heading's text as data, so a Latin name on an Arabic page (and the reverse) reads in its own direction while Pam's own headings follow the page (D-534). On place pages, profile cards, staff person rows and the conversation bar. Log: `docs/sessions/` newest `data-headings-keep`.
+
+## Places & programs · no street-address call to the city (11 October 2026) — READY, own branch off main
+
+Branch `claude/places-programs-no-city-call` (D-536). The browser no longer asks the City of Philadelphia about a typed address; the picker says ZIP code or neighborhood; a member's first name is out of the policies address. No migration.
