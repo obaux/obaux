@@ -106,6 +106,12 @@ export const pamTheme = defineTheme({
     // is unchanged: a shadow cannot carry a card on a dark page, so the card's
     // own inset edge does it there.
     '--color-background-body': ['#FFFFFF', '#1B1B1B'],
+    // The grey ground of a thing apart from the page: a guide tile, the card behind the next trip, the round back and
+    // send buttons, the avatar. Light is the neutral theme's own. Dark was `#1B1B1B`, the page itself, so those
+    // had no shape at all (D-504: Foundations' rule is "muted sets a choice apart"; Will, 11 October: "yes go for it").
+    // `#262626` is the theme's own lifted ground (`--color-background-surface`), so no new colour. Text on it:
+    // 15.1:1 primary, 10.7 accent, 9+ status, 5.65 secondary.
+    '--color-background-muted': ['#F1F1F1', '#262626'],
   },
 
   components: {
