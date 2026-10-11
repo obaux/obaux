@@ -90,6 +90,8 @@ export interface MockOptions {
   readonly savedTrip?: boolean;
   /** Also a saved trip whose day has passed, so Trips shows its Past visits section. */
   readonly pastTrip?: boolean;
+  /** The calendar link is already on (D-538): the page shows the switch and "make a new link" / "turn it off". */
+  readonly calendarOn?: boolean;
 }
 
 /** A real place of the catalogue, to plan a trip to in a story (the examples' ids are not real). */
@@ -353,7 +355,9 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/my_trips', () => ({ body: savedTrips })),
     on('/rpc/my_trip_services', () => ({ body: [] })),
     // The calendar link (D-538): off, then a made-up address once made. Nothing leaves the story.
-    on('/rpc/calendar_link_status', () => ({ body: [{ is_on: false, show_details: false, made_at: null }] })),
+    on('/rpc/calendar_link_status', () => ({
+      body: [{ is_on: Boolean(options.calendarOn), show_details: false, made_at: options.calendarOn ? '2026-10-10T15:00:00Z' : null }],
+    })),
     on('/rpc/calendar_link_make', () => ({ body: 'storybook-example-address-not-a-real-secret' })),
     on('/rpc/calendar_link_set_details', () => ({ body: true })),
     on('/rpc/calendar_link_off', () => ({ body: null })),

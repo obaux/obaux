@@ -61,3 +61,10 @@ Also true and worth a line: the address is in the request, so the gateway log (1
 ## Not done
 
 The event text is English whatever the member's language (the function does not know it). A calendar sync that proves attendance is not this: a link only shows what Pam planned.
+
+## The fit audit sees the clicked states (11 October, Lena's finding)
+
+The Calendar story loads with the link off, so `audit:fit` never measured the long strings: the address with its Apple/Google/others lines,
+"Make a new link?" and "Turn off your calendar link?". `stories/roles/states/CalendarLink.stories.tsx` plays each tap in the language the
+story is shown in (labels read from that language's bundle; mock option `calendarOn`), so all three are measured in seven languages.
+Result: 3 stories × 7 languages, nothing new.
