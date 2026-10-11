@@ -1456,6 +1456,14 @@ Branch `claude/pam-design-wrong-code-alert` (D-510). `CompactNotice` in `@pam/ui
 
 Branch `claude/pam-design-legal-back-to-site` (D-508). The website's Privacy and Terms links carry `?from=site&return=<path>`; the app's pages show "Back to the website" and go to `https://joinpam.org` + the path, only if it is a plain path on the site (no `//`, no scheme; otherwise Back to Legal as before). Tabs and the other-document link keep it. New string `nav.back.website` (six drafts for Lena). Tests: `siteReturn.test.ts`, `apps/site/test/legal-links.test.ts`, `e2e/legal-site.spec.ts`.
 
+## Design system & Storybook · Profile's hero card loads as skeletons (11 October)
+
+Branch `claude/pam-design-real-accounts-no-examples` (D-520). `ProfileSummary isLoading` and `ProfileStat.value: null`: the photo, name, role and stats are pulses the size of the real card (measured), on `/account/` while the account loads and on the numbers while they arrive; a failed call ends the pulse in a 0. CLS under 0.01 in `profile-skeleton.spec.ts`.
+
+## Design system & Storybook · a real account sees no examples on Profile, Points, Connections (11 October)
+
+Branch `claude/pam-design-real-accounts-no-examples` (D-518). The code landed on `main` first via D-511 (`lib/examples.ts`, `examplesOn()`) and Piper's gate; what is left is `e2e/no-examples-profile.spec.ts`, holding Profile, Points and Connections to it.
+
 ## Design system & Storybook · Contact Pam replaces Call Pam (11 October)
 
 Branch `claude/pam-design-contact-pam` (D-512, A28). `Notice` offers Contact Pam (a link to Help); `useSupportPhone` and all `supportPhone` props are gone; the Help screen's first row opens the website's help desk; Privacy's data pages end in Contact Pam. `place.call` is untouched. About 33 English strings still say "call Pam": for Sage and Lena.

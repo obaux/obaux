@@ -15,7 +15,17 @@ import { useEffect, useState } from 'react';
  * say the number, we say nothing.
  */
 export function usePoints(memberId: string | null): number | null {
+  return usePointsState(memberId).points;
+}
+
+/**
+ * The same, and whether the answer is still on its way. A screen that draws a pulse in the number's place
+ * (Profile's hero card, D-518's skeletons) needs to tell "not here yet" from "could not be had": a pulse that
+ * never ends on a failed call is worse than the 0 it replaced, so `loading` ends either way.
+ */
+export function usePointsState(memberId: string | null): { points: number | null; loading: boolean } {
   const [points, setPoints] = useState<number | null>(null);
+  const [done, setDone] = useState(false);
 
   useEffect(() => {
     if (!memberId) return;
@@ -27,11 +37,12 @@ export function usePoints(memberId: string | null): number | null {
         const { data, error } = await createClient().rpc('member_points', {
           p_member_id: memberId,
         });
-        if (cancelled || error) return;
-        setPoints(typeof data === 'number' ? data : null);
+        if (cancelled) return;
+        if (!error) setPoints(typeof data === 'number' ? data : null);
       } catch {
         // Stays null. See above.
       }
+      if (!cancelled) setDone(true);
     })();
 
     return () => {
@@ -39,5 +50,5 @@ export function usePoints(memberId: string | null): number | null {
     };
   }, [memberId]);
 
-  return points;
+  return { points, loading: memberId !== null && !done };
 }
