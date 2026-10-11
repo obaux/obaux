@@ -21,8 +21,9 @@ export function PlaceTold() {
           time, the service you picked, and whether you were marked as there. If you marked it yourself, they see that, but not where you were. They do not see your last name or the rest of your profile.
         </P>
         <P>
-          If nobody marks you as there, the visit shows to them as missed a day after it ends. If you went and it says
-          missed, tell the program. They can fix it for 14 days.
+          If nobody marks you as there, the visit shows to them as missed a day after it ends. To mark it yourself, tap “I’m here”
+          when you arrive, or “I went” soon after. If you went and it says missed, tell the program. They can fix
+          it for 14 days.
         </P>
         <P>If you cancel the visit, they stop seeing it.</P>
       </Section>
