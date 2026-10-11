@@ -1572,5 +1572,13 @@
   "copy.done": "已复制",
   "copy.failed": "无法复制。请长按文字进行复制。",
   "carousel.pause": "暂停",
-  "carousel.play": "播放"
+  "carousel.play": "播放",
+  "supportReply.title": "用短信回复",
+  "supportReply.to": "发送至 {phone}",
+  "supportReply.label": "您的回复",
+  "supportReply.count": "已用 {used} / {max}",
+  "supportReply.send": "发送短信",
+  "supportReply.sent": "已排队，五分钟内发出。",
+  "supportReply.noNumber": "没有可发送的号码。",
+  "supportReply.failed": "没有发出。请重试。"
 }

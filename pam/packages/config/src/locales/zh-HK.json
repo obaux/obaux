@@ -1572,5 +1572,13 @@
   "copy.done": "已複製",
   "copy.failed": "無法複製。請長按文字進行複製。",
   "carousel.pause": "暫停",
-  "carousel.play": "播放"
+  "carousel.play": "播放",
+  "supportReply.title": "以短訊回覆",
+  "supportReply.to": "發送至 {phone}",
+  "supportReply.label": "你的回覆",
+  "supportReply.count": "已用 {used} / {max}",
+  "supportReply.send": "發送短訊",
+  "supportReply.sent": "已排隊，五分鐘內發出。",
+  "supportReply.noNumber": "沒有可發送的號碼。",
+  "supportReply.failed": "未能發出。請再試。"
 }

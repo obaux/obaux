@@ -18,9 +18,13 @@ D-521.
 
 Config tests (twice), the full DB suite, the new function against fake database and fake email service. No email was sent, and none will be before Will says "test it".
 
+## The text reply (later in the same session, D-524)
+
+Migration 20261011042645 and DB test 54: `phone_stops`, `support_texts_log`, `send_support_text`, `record_sms_stop/start` keep and clear a stop for a number with no profile, and `claim_outbound_messages` cancels a support text to a stopped number. Templates `support_reply` and `reply_no_read` (unsigned). Page `/reply/` (super admin; `SupportReplyScreen`), eight new strings in seven languages (Lena's to read; mine are drafts), `e2e/support-reply.spec.ts`. Samples file: sample 10 and the opt-in sentence.
+
 ## Left undone
 
-Mira: apply the migration, set the secrets (`HELP_REQUEST_SALT` is new), deploy with `verify_jwt: false`. Wren: build the form on the contract. The text reply (phone field, "Reply by text" link, super-admin page, STOP-respecting send, inbound forward to hello@) is not started.
+Mira: apply the migration, set the secrets (`HELP_REQUEST_SALT` is new), deploy with `verify_jwt: false`. Wren: build the form on the contract. Held for Will's card a61: the inbound forward to hello@, the auto-answer to replies (template written, unsigned, not wired), and the form's phone field plus the "Reply by text" link in the request email.
 
 ## Needs a human
 

@@ -275,7 +275,7 @@ STATUS row too.
   STOP cannot be cleared from the app once `20261010071947_…` is applied, but nothing stores a
   STOP: an Edge Function Twilio calls (STOP/START/HELP and the YES/NO replies) is not built —
   Will to say yes. `docs/sms-campaign-samples.md` has the nine texts and the description
-  (981 of 1,024 characters) for the one filing.
+  (1,015 of 1,024 characters) for the one filing.
 
 - [ ] **Review the SMS copy** still waiting for a name in `reviewedBy`
   (STATUS row 2).
@@ -459,7 +459,7 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   three reminders take two segments in Chinese, Russian and Arabic. A text that does
   not match what was registered is how an approved campaign gets filtered or
   suspended, so this goes first. **The filing is ready to paste:
-  `docs/sms-campaign-samples.md`** (its description is 1,018 of 1,024 characters).
+  `docs/sms-campaign-samples.md`** (its description is 1015 of 1,024 characters).
   Only Will can do the filing: the Twilio account and the brand (Oba) are his.
   1. **Open the Twilio console and find the A2P 10DLC campaign for the Oba brand**
      (Messaging → Regulatory Compliance → A2P 10DLC → Campaigns; Twilio moves its

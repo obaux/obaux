@@ -1572,5 +1572,13 @@
   "copy.done": "Copiado",
   "copy.failed": "Não foi possível copiar. Mantenha o texto pressionado para copiá-lo.",
   "carousel.pause": "Pausar",
-  "carousel.play": "Reproduzir"
+  "carousel.play": "Reproduzir",
+  "supportReply.title": "Responder por texto",
+  "supportReply.to": "Para {phone}",
+  "supportReply.label": "Sua resposta",
+  "supportReply.count": "{used} de {max}",
+  "supportReply.send": "Enviar texto",
+  "supportReply.sent": "Na fila. Sai em até cinco minutos.",
+  "supportReply.noNumber": "Não há número para enviar.",
+  "supportReply.failed": "Não foi. Tente de novo."
 }

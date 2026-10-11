@@ -1656,5 +1656,13 @@
   "copy.done": "Скопировано",
   "copy.failed": "Не удалось скопировать. Нажмите на текст и удерживайте, чтобы скопировать.",
   "carousel.pause": "Приостановить",
-  "carousel.play": "Воспроизвести"
+  "carousel.play": "Воспроизвести",
+  "supportReply.title": "Ответить сообщением",
+  "supportReply.to": "Кому: {phone}",
+  "supportReply.label": "Ваш ответ",
+  "supportReply.count": "{used} из {max}",
+  "supportReply.send": "Отправить сообщение",
+  "supportReply.sent": "В очереди. Уйдёт в течение пяти минут.",
+  "supportReply.noNumber": "Нет номера для сообщения.",
+  "supportReply.failed": "Не ушло. Попробуйте ещё раз."
 }
