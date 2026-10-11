@@ -6,6 +6,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { useI18n } from '@/lib/i18n';
+import { CITY, drawerNudge } from '@/lib/tripsMapView';
 import { navigate } from '@/lib/navigate';
 
 /**
@@ -58,7 +59,6 @@ const CLUSTER_X = 120;
 const CLUSTER_Y = 90;
 
 /** Philadelphia, where Pam is: the real map's view when there is no trip to fit (D-509). */
-const CITY = { lat: 39.9526, lng: -75.1652 };
 
 const styles = stylex.create({
   map: { position: 'absolute', inset: 0, overflow: 'hidden' },
@@ -211,8 +211,11 @@ function PreviewTripsMap({ pins: all }: { readonly pins: readonly TripPin[] }) {
 
 interface GoogleMapsGlobal {
   maps: {
-    Map: new (el: HTMLElement, opts: Record<string, unknown>) => { fitBounds: (b: unknown, pad?: number) => void };
-    LatLngBounds: new () => { extend: (p: { lat: number; lng: number }) => void };
+    Map: new (el: HTMLElement, opts: Record<string, unknown>) => {
+      setCenter: (p: { lat: number; lng: number }) => void;
+      setZoom: (z: number) => void;
+      panBy: (x: number, y: number) => void;
+    };
     Marker: new (opts: Record<string, unknown>) => { addListener: (ev: string, fn: () => void) => void };
   };
 }
@@ -283,10 +286,8 @@ function GoogleTripsMap({ pins, onFail }: { readonly pins: readonly TripPin[]; r
           clickableIcons: false,
           gestureHandling: 'greedy',
         });
-        const bounds = new google.maps.LatLngBounds();
         for (const pin of pins) {
           const position = { lat: pin.lat, lng: pin.lon };
-          bounds.extend(position);
           const marker = new google.maps.Marker({
             map,
             position,
@@ -296,14 +297,11 @@ function GoogleTripsMap({ pins, onFail }: { readonly pins: readonly TripPin[]; r
           });
           marker.addListener('click', () => navigate(pin.href));
         }
-        if (pins.length === 0) {
-          // Nothing to fit (D-509): the city, with no pins.
-          (map as unknown as { setCenter: (p: unknown) => void; setZoom: (z: number) => void }).setCenter(CITY);
-          (map as unknown as { setCenter: (p: unknown) => void; setZoom: (z: number) => void }).setZoom(12);
-          return;
-        }
-        // Room at the bottom for the half-open drawer.
-        map.fitBounds(bounds, 80);
+        // The whole city, never fitted to the trips (D-536): the tiles Google serves are the part of
+        // the map in view, and a view fitted to one trip says roughly where the member is going.
+        map.setCenter(CITY);
+        map.setZoom(12);
+        map.panBy(0, drawerNudge(window.innerHeight));
       })
       .catch(() => {
         if (!cancelled) fail.current();
