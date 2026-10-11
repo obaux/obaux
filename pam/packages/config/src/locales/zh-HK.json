@@ -1043,6 +1043,7 @@
   "schedule.kind.class": "課堂",
   "schedule.kind.checkin": "跟進",
   "schedule.kind.tour": "參觀",
+  "schedule.kind.visit": "到訪",
   "schedule.minutes": "{minutes}分鐘",
   "schedule.search.label": "搜尋人員，或日期、時間",
   "schedule.search.placeholder": "搜尋人員或時間",

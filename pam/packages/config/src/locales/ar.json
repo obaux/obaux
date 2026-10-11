@@ -1143,6 +1143,7 @@
   "schedule.kind.class": "درس",
   "schedule.kind.checkin": "متابعة",
   "schedule.kind.tour": "جولة",
+  "schedule.kind.visit": "زيارة",
   "schedule.minutes": "{minutes} د",
   "schedule.search.label": "البحث عن الأشخاص أو اليوم أو الوقت",
   "schedule.search.placeholder": "ابحث عن أشخاص أو أوقات",

@@ -1043,6 +1043,7 @@
   "schedule.kind.class": "Class",
   "schedule.kind.checkin": "Check-in",
   "schedule.kind.tour": "Tour",
+  "schedule.kind.visit": "Visit",
   "schedule.minutes": "{minutes} min",
   "schedule.search.label": "Search people, or a day or time",
   "schedule.search.placeholder": "Search people or times",

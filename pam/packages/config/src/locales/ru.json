@@ -1103,6 +1103,7 @@
   "schedule.kind.class": "Занятие",
   "schedule.kind.checkin": "Короткая встреча",
   "schedule.kind.tour": "Экскурсия",
+  "schedule.kind.visit": "Визит",
   "schedule.minutes": "{minutes} мин",
   "schedule.search.label": "Поиск людей, дня или времени",
   "schedule.search.placeholder": "Поиск людей или времени",

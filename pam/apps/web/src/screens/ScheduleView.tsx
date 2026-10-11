@@ -62,7 +62,8 @@ export interface Appointment {
   readonly minutes: number;
   /** Already in words — "First visit", "Class". */
   readonly kindLabel: string;
-  readonly href: string;
+  /** The person's page; none for a real visit, whose member's page a program cannot open (D-526). */
+  readonly href?: string;
 }
 
 export type View = 'day' | 'week' | 'month';
@@ -465,12 +466,12 @@ export function ScheduleView({
         key={a.id}
         // With a check-in circle, the name carries the link (a button cannot
         // sit inside one); otherwise the whole row does.
-        {...(canCheckIn ? {} : { href: a.href })}
+        {...(canCheckIn || !a.href ? {} : { href: a.href })}
         label={
           // A light-green signature for someone who has signed every policy
           // (D-316, D-261); which ones is on their page.
           <HStack gap={2} align="center" wrap="nowrap">
-            {canCheckIn ? (
+            {canCheckIn && a.href ? (
               <a href={a.href} {...stylex.props(styles.label, styles.nameLink)}>
                 {a.firstName}
               </a>

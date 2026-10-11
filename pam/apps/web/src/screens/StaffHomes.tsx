@@ -13,6 +13,7 @@ import { DashedRule } from '@pam/ui/DashedRule';
 import { SetupCard, type SetupCardProps } from '@pam/ui/SetupCard';
 import { SubPage } from '@pam/ui/SubPage';
 import { useProgramSetup, type ProgramSetup } from '@/lib/programSetup';
+import { useProgramVisits } from '@/lib/useProgramVisits';
 import { FloatingAction } from '@pam/ui/FloatingAction';
 import { openConversation } from '@/lib/openConversation';
 import { DUMMY_SELF_ID, dummyConversationIdBetween } from '@pam/config/dummy-conversations';
@@ -155,9 +156,19 @@ export function ProgramHome() {
   const { state: session } = useSession();
   const setup = useProgramSetup(session);
   const booked = useBookedForMembers();
+  const realVisits = useProgramVisits(Boolean(setup.program?.isLive));
   const appointments: Appointment[] = [
     ...(setup.isExample ? exampleAppointments(t) : []),
     // Visits the program booked for people (D-316), on its own schedule too.
+    // The visits members planned at the lead's own program (D-526): first names, from the database.
+    ...realVisits.map((v) => ({
+      id: v.id,
+      personId: v.memberId,
+      firstName: v.firstName,
+      startsAt: v.startsAt,
+      minutes: v.endsAt ? Math.max(15, Math.round((new Date(v.endsAt).getTime() - new Date(v.startsAt).getTime()) / 60000)) : 60,
+      kindLabel: v.serviceName ?? t('schedule.kind.visit'),
+    })),
     ...booked.map((b) => ({
       id: b.id,
       personId: b.forMemberId!,

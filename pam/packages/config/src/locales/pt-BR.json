@@ -1043,6 +1043,7 @@
   "schedule.kind.class": "Aula",
   "schedule.kind.checkin": "Acompanhamento",
   "schedule.kind.tour": "Visita guiada",
+  "schedule.kind.visit": "Visita",
   "schedule.minutes": "{minutes} min",
   "schedule.search.label": "Buscar pessoas, um dia ou um horário",
   "schedule.search.placeholder": "Buscar pessoas ou horários",

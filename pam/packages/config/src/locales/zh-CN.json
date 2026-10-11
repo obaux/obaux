@@ -1043,6 +1043,7 @@
   "schedule.kind.class": "课程",
   "schedule.kind.checkin": "跟进",
   "schedule.kind.tour": "参观",
+  "schedule.kind.visit": "到访",
   "schedule.minutes": "{minutes}分钟",
   "schedule.search.label": "搜索人员、日期或时间",
   "schedule.search.placeholder": "搜索人员或时间",

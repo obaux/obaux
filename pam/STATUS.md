@@ -2071,3 +2071,7 @@ Branch `claude/places-programs-trips-launch` (D-509). A real account sees only i
 ## Places & programs · places, Explore and Saved without examples (11 October 2026) — READY, not merged (on top of the Trips launch audit)
 
 Branch `claude/places-programs-no-examples-places` (D-509 extended). The example services, policies, places, reports, people and program are for a demo or Storybook only; a lead's Book for a member and Add a person use their own program. e2e `no-examples-for-real-accounts.spec.ts`; the example-walking specs opt in with `pam.examples`.
+
+## Places & programs · attendance part A: leads see real visits (11 October 2026) — READY, not merged
+
+Branch `claude/places-programs-attendance-a-visits` (D-526). `my_program_visits` (migration `20261011050637`): a program lead's own program's visits, first names only; the lead's Home lists them. Test `56_a_program_lead_reads_the_visits_at_their_own_test.sql`; e2e `program-visits.spec.ts`. Parts B–D follow.
