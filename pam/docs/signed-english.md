@@ -28,3 +28,6 @@ sentence.
 | `reminders.today.member` | Pam does not send any of these yet. They are coming. | Sage, 2026-10-11 04:09 | Lena's (claude/lena-a28-help). Was "Today Pam sends only one of these: a note when a place you saved closes or moves…"; that note is held with the other texts (D-481). Restore line in before-launch. |
 | `profile.promo.reminders.body` | Coming soon: texts about your visits and the places you saved. | Sage, 2026-10-11 04:09 | Lena's. Matches the other "Coming soon:" promo lines (D-474). |
 | `flag.done.body` | Somebody at Pam looks at every one of these. | Sage, 2026-10-11 04:09 | Lena's. Drops "anyone who saved it is told", which was a held text. |
+| Help desk form, "What's wrong?" left empty | Tell us what happened, in a few words. | Sage, 2026-10-11 04:52 | Wren (head 1a4acc9d). A red border alone does not say what to do, and colour alone fails people who can't see it. Shown under the field, linked to it for screen readers. |
+| Help desk form, "Your email" left empty | Add your email so we can write back. | Sage, 2026-10-11 04:52 | Wren. Repeats §3's "write back"; no new promise. |
+| Help desk form, "Your email" not an email | That email does not look right. Check it and try again. | Sage, 2026-10-11 04:52 | Wren. Same shape as the code error: what happened, what to do. |
