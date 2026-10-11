@@ -66,6 +66,8 @@ you, 03 What I'm doing, 04 The team.
   job from Mira (blue), question (amber), from Will (dark), update for Will (light
   green), between teammates (purple).
 - Tapping a teammate highlights their card below.
+- How to read the map is behind a small (i) next to its label, not under it (v12, 11 October; Will: "less is
+  more"). Hover or focus shows it, a tap pins it, and Esc or a tap elsewhere closes it.
 - At phone width the map turns vertical: Will, then Mira, then teammates in two columns.
 - With "reduce motion" on, nothing moves; colours and badges still say everything.
 
