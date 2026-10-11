@@ -11,6 +11,9 @@ import { PointsAndBadges } from './PointsAndBadges';
 import { SendingAnInvite } from './SendingAnInvite';
 import { SigningProgramRules } from './SigningProgramRules';
 import { StaffRequests } from './StaffRequests';
+import { StartHere } from './StartHere';
+import { TalkingToPam } from './TalkingToPam';
+import { YourLanguage } from './YourLanguage';
 import { TextsFromPam } from './TextsFromPam';
 import { WhatOthersCanSee } from './WhatOthersCanSee';
 import { WhoIsMyGuide } from './WhoIsMyGuide';
@@ -38,4 +41,7 @@ export const BODIES: Record<string, () => JSX.Element> = {
   'messages-in-pam': MessagesInPam,
   'points-and-badges': PointsAndBadges,
   'staff-requests': StaffRequests,
+  'start-here': StartHere,
+  'talking-to-pam': TalkingToPam,
+  'your-language': YourLanguage,
 };

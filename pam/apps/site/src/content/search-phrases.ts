@@ -114,28 +114,25 @@ export const SEARCH_PHRASES: readonly SearchPhrase[] = [
   {
     phrase: 'why is this happening',
     who: 'anyone',
-    answer: null,
-    gap: 'When something isn’t working, start here: the common reasons (a code, a link, a paused account, no connection), each with what to do, then how to call Pam.',
+    answer: 'start-here',
   },
-  { phrase: 'something went wrong', who: 'anyone', answer: null, gap: 'Same post as “why is this happening”.' },
-  { phrase: 'the page is blank', who: 'anyone', answer: null, gap: 'Same post as “why is this happening”.' },
-  { phrase: 'it wont load', who: 'anyone', answer: null, gap: 'Same post as “why is this happening”.' },
+  { phrase: 'something went wrong', who: 'anyone', answer: 'start-here' },
+  { phrase: 'the page is blank', who: 'anyone', answer: 'start-here' },
+  { phrase: 'it wont load', who: 'anyone', answer: 'start-here' },
 
   // Talking to a person, language, account
   {
     phrase: 'how do i talk to a real person',
     who: 'anyone',
-    answer: null,
-    gap: 'Talking to someone at Pam: the number, Monday to Friday 9am to 5pm, the call is free, and what to do when we are closed.',
+    answer: 'talking-to-pam',
   },
-  { phrase: 'pam phone number', who: 'anyone', answer: null, gap: 'Same post as “how do i talk to a real person”.' },
+  { phrase: 'pam phone number', who: 'anyone', answer: 'talking-to-pam' },
   {
     phrase: 'change my language',
     who: 'anyone',
-    answer: null,
-    gap: 'Using Pam in your language: the seven languages, how to switch, and that texts follow your choice.',
+    answer: 'your-language',
   },
-  { phrase: 'en español', who: 'anyone', answer: null, gap: 'Same post as “change my language”.' },
+  { phrase: 'en español', who: 'anyone', answer: 'your-language' },
   {
     phrase: 'delete my account',
     who: 'anyone',

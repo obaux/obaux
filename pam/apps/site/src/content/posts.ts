@@ -25,6 +25,33 @@ export interface SupportPost {
 
 const ALL: readonly SupportPost[] = [
   {
+    slug: 'start-here',
+    topic: 'members',
+    audience: 'everyone',
+    title: 'When something isn’t working, start here',
+    summary: 'The most common reasons Pam gets stuck, and what to do about each one.',
+    updated: '2026-10-11',
+    keywords: ['not working', 'problem', 'error', 'stuck', 'something went wrong', 'blank', 'empty', 'wont load', 'offline', 'no signal', 'code', 'invite', 'paused', 'missing place', 'broken', 'help'],
+  },
+  {
+    slug: 'talking-to-pam',
+    topic: 'members',
+    audience: 'everyone',
+    title: 'Talking to someone at Pam',
+    summary: 'How to call a real person at Pam, when we answer, and what to do when we are closed.',
+    updated: '2026-10-11',
+    keywords: ['call', 'phone', 'phone number', 'number', 'talk', 'real person', 'human', 'someone', 'hours', 'closed', 'free', '911', 'danger', 'unsafe', 'report', 'contact'],
+  },
+  {
+    slug: 'your-language',
+    topic: 'members',
+    audience: 'everyone',
+    title: 'Using Pam in your language',
+    summary: 'The seven languages Pam speaks, how to pick yours, and what changes when you do.',
+    updated: '2026-10-11',
+    keywords: ['language', 'languages', 'español', 'spanish', 'portuguese', 'chinese', 'mandarin', 'cantonese', 'russian', 'arabic', 'english', 'translate', 'translation', 'switch'],
+  },
+  {
     slug: 'who-is-my-guide',
     topic: 'members',
     audience: 'members',
