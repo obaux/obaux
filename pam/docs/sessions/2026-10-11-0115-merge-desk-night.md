@@ -102,6 +102,25 @@
   - Text size: "Leave as is. Make exceptions. Update rules." Dot writes A27 to replace A23's 15px floor.
   - Dark mode: "Yes go for it". Muted becomes #262626, with Dot doing it next.
 
+- **After b7 (02:58–03:12), nothing merged; routing only:**
+  - Will's phone screenshots. Wrong code: a small alert, stay on the code step, no Call (Dot, #26). Trips
+    not launch-ready: example trips on his real account, the example map over the real one, no empty state
+    (Piper, #27). Messages: no example messages, and no tab when there is nobody to message (Nico, #28).
+    A "Saved" tooltip, and the dark blue alert at 10% (Dot, #29). The rule behind all four, card a55: real
+    accounts see only real things, and an empty screen gets a short empty state. `useTrips.ts` mixes
+    `DUMMY_TRIPS` into every account; about 40 screens read `DUMMY_*`.
+  - a53, the help post "Is the place told?": Will approved, and the merge desk held it. Piper found a lead's
+    calendar shows only visits the lead booked, never a member's own plan, so "sees your visit on its
+    calendar" is not true yet. Her attendance plan (parts A–D) is card a56; the post ships with part A.
+  - a54 answered at 03:06: "Problem -> help desk -> email forward" to hello@joinpam.org, and "take off
+    phone number". Written as **A28** (`docs/amendments/A28-…`), which replaces A26's "Call Pam and the
+    support number stay". Sage writes the words first; then Dot (Contact Pam in `Notice` and `HelpBar`,
+    `useSupportPhone` out), Lena (Help screen, privacy, seven languages), Wren ("Still stuck?" on the help
+    desk, the address now and a form later), Nico (the forward, built off behind `HELP_REQUESTS_LIVE`),
+    Iris (the whole path on a preview).
+  - Wren's search with Sage's everyday words (D-507, 9ac76cbe) waits for Sage's call-free posts, since it
+    is stacked on them. They merge together.
+
 ## What was wrong, and what missed it
 
 - **Ava won't push on the merge desk's word, and that is right.** The merge desk passed on Will's "remove" at
@@ -160,12 +179,17 @@
 - **Dot:** A27, the text-size rule with its exceptions; then dark muted #262626 with a before-and-after story.
 - **Piper:** Iris's W3, on a fresh branch.
 - **Wren and Sage:** write the 21 gap posts in `docs/help-centre-gaps.md`. The words go to Will first.
+- **A28, the phone coming off:** in progress in six lanes; nothing merged yet. The interim "Still stuck?"
+  shows hello@joinpam.org until Nico's form is switched on.
+- **Launch cleanup (a55):** Piper Trips, Nico Messages, Dot wrong code and Profile; Ava's screens after her
+  push word.
 - **Lena, Friday:** two welcome slides promise example-only features (`onboarding.provider.3`,
   `onboarding.admin.2`; Sage's finding).
 
 ## Needs a human
 
-- Will: card a53 (help post "Is the place told about my visit?").
+- Will: card a56 (attendance plan A–D; advice: go after Trips, no missed text, no points yet).
+- Will: sign Sage's list of "call Pam" rewrites when it reaches him as a card (A28).
 - Will: the DMARC record at joinpam.org's DNS, then "test it" for Nico.
 - Will: in Ava's session (the Control Room's "Waiting for you to unblock" strip opens it), type "push the
   switcher branch".
