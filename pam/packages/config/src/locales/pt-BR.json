@@ -146,7 +146,7 @@
   "feature.points": "Pontos",
   "feature.provider_listing": "Lista de programas",
   "flag.action": "Enviar isto para Pam",
-  "flag.done.body": "Alguém de Pam analisa cada um destes avisos. Se o lugar sair da lista, avisamos quem o salvou.",
+  "flag.done.body": "Alguém de Pam analisa cada um destes avisos.",
   "flag.done.title": "Obrigado. Vamos verificar.",
   "flag.failed.body": "Sua conexão caiu ou o lugar já foi informado. Tente de novo ou ligue para Pam.",
   "flag.failed.title": "Isso não foi enviado",

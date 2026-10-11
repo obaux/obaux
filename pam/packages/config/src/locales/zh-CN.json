@@ -146,7 +146,7 @@
   "feature.points": "积分",
   "feature.provider_listing": "项目列表",
   "flag.action": "发送给Pam",
-  "flag.done.body": "Pam的工作人员会查看每一条反馈。如果这个地点从列表中移除，收藏过它的人都会收到通知。",
+  "flag.done.body": "Pam的工作人员会查看每一条反馈。",
   "flag.done.title": "谢谢您。我们会核实。",
   "flag.failed.body": "您的网络断开了，或者这个地点已经有人反馈过了。请再试一次，或给Pam打电话。",
   "flag.failed.title": "没有发送成功",

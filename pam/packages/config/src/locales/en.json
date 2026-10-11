@@ -146,7 +146,7 @@
   "feature.points": "Points",
   "feature.provider_listing": "Program listing",
   "flag.action": "Send this to Pam",
-  "flag.done.body": "Somebody at Pam looks at every one of these. If the place comes off the list, anyone who saved it is told.",
+  "flag.done.body": "Somebody at Pam looks at every one of these.",
   "flag.done.title": "Thank you. We will check it.",
   "flag.failed.body": "Your connection dropped, or the place is already reported. Try again, or call Pam.",
   "flag.failed.title": "That did not send",

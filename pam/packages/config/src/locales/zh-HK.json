@@ -146,7 +146,7 @@
   "feature.points": "積分",
   "feature.provider_listing": "計劃列表",
   "flag.action": "傳送給Pam",
-  "flag.done.body": "Pam的工作人員會查看每一則反映。如果該地點從列表中移除，所有收藏過它的人都會收到通知。",
+  "flag.done.body": "Pam的工作人員會查看每一則反映。",
   "flag.done.title": "謝謝您。我們會核實。",
   "flag.failed.body": "您的網絡連線中斷了，或者該地點已被反映過。請再試一次，或致電Pam。",
   "flag.failed.title": "未能傳送",

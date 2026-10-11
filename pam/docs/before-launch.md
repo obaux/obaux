@@ -29,6 +29,12 @@ STATUS row too.
      | `join.booked.body` | …It is on your Trips now. | {place}, {day} at {time}. Pam will remind you the day before if you said yes to texts. |
      | `trips.new.done.body` | It is on your map. | It is on your map. We will remind you the day before if text reminders are on. |
      | `profile.promo.reminders.body` | We can text you if a place you saved closes or moves. | We can text you the day before a visit, or if a place you saved closes or moves. |
+     | `flag.done.body` (A28 check, 11 October) | Somebody at Pam looks at every one of these. | Somebody at Pam looks at every one of these. If the place comes off the list, anyone who saved it and said yes to texts is told. |
+
+     `flag.done.body` lost its second sentence because the only way a person who saved a place hears that it was
+     removed is the held saved-place text (D-481; no bell row is made for them, only for super admins and the
+     savers' case managers). Put it back with the others, with "and said yes to texts" (the text goes only to
+     someone who did).
 
      The original `onboarding.3` and `onboarding.provider.2` said it for everybody; a reminder goes only to
      someone who said yes, so the English above says so. The other three lines wait on their own texts, not on
