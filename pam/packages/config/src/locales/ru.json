@@ -1596,6 +1596,7 @@
   "place.dropin.next": "Ближайшая дата: {date}",
   "place.dropin.body": "Выберите день в разделе «Запланировать визит», чтобы там знали, что вы придёте.",
   "place.noLead": "Это только помогает вам планировать. Pam не сообщает {place}, что вы придёте.",
+  "place.lead.sees": "{place} will see your visit: your first name, the day and time, the service you picked, and whether they marked you as there.",
   "place.dropin.body.self": "Выберите день в разделе «Запланировать визит», чтобы добавить его в Визиты.",
   "place.aboutService": "Об услуге",
   "place.address.service": "Адрес услуги",

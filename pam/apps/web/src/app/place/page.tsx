@@ -389,7 +389,10 @@ function PlaceScreen() {
   // plan one (D-273).
   const plansVisit = (demoRole ?? trueRole) === 'member' && !visit;
   // Said where a member plans or keeps a visit, only at a place with no lead (D-498).
-  const tellsNoLead = (demoRole ?? trueRole) === 'member' && !hasLead;
+  const isMemberView = (demoRole ?? trueRole) === 'member';
+  const tellsNoLead = isMemberView && !hasLead;
+  // A place with a lead on Pam sees the visit (D-526): said before the member plans one.
+  const tellsLeadSees = isMemberView && hasLead;
   const services = forPlace(place!.id);
   const staff = programStaffFor(place!.id);
   // How the program takes people (D-313): a visit to plan, or a schedule
@@ -513,7 +516,7 @@ function PlaceScreen() {
         addressFirst={visitWhen !== null}
         hoursHref={googleHref}
         notice={
-          visitWhen || policiesOnTop || tellsNoLead ? (
+          visitWhen || policiesOnTop || tellsNoLead || tellsLeadSees ? (
             <VStack gap={3}>
               {visitWhen ? (
                 // The visit, confirmed (D-273), as a small hero (D-281): only
@@ -538,6 +541,7 @@ function PlaceScreen() {
                 </>
               ) : null}
               {tellsNoLead ? <Banner status="info" title={t('place.noLead', { place: place!.name })} /> : null}
+              {tellsLeadSees ? <Banner status="info" title={t('place.lead.sees', { place: place!.name })} /> : null}
               {policiesOnTop ? (
                 <PolicyStatusCard
                   isDone={allSigned}

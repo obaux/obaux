@@ -1512,6 +1512,7 @@
   "place.dropin.next": "下次：{date}",
   "place.dropin.body": "請在「安排到訪」中選擇一天，讓他們知道您會來。",
   "place.noLead": "這只是幫您做計劃。Pam 不會通知{place}您會去。",
+  "place.lead.sees": "{place} will see your visit: your first name, the day and time, the service you picked, and whether they marked you as there.",
   "place.dropin.body.self": "請在「安排到訪」中選擇一天，加入您的到訪。",
   "place.aboutService": "關於服務",
   "place.address.service": "服務地址",

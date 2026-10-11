@@ -88,6 +88,8 @@ describe('every other language is actually translated', () => {
   MAY_MATCH_ENGLISH.add('messages.files.link');
   // A place, a day and a time and no word of its own: Chinese and Russian have nothing to translate in it (D-498).
   MAY_MATCH_ENGLISH.add('trips.moved.body.self');
+  // English in every language until Will signs the line (D-526); then it is translated.
+  MAY_MATCH_ENGLISH.add('place.lead.sees');
 
   it.each(OTHER_LOCALES)('%s differs from English except where a name or a symbol should not change', (locale) => {
     const same = Object.keys(EN).filter((k) => BUNDLES[locale][k] === EN[k] && /[A-Za-z]{3}/.test(EN[k]!));

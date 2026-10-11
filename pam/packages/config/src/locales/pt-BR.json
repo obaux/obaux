@@ -1512,6 +1512,7 @@
   "place.dropin.next": "Próximo: {date}",
   "place.dropin.body": "Escolha um dia em Planejar uma visita para avisar que você vai.",
   "place.noLead": "Isto serve só para ajudar você a planejar. Pam não avisa {place} de que você vai.",
+  "place.lead.sees": "{place} will see your visit: your first name, the day and time, the service you picked, and whether they marked you as there.",
   "place.dropin.body.self": "Escolha um dia em Planejar uma visita para adicioná-la às suas Visitas.",
   "place.aboutService": "Sobre o serviço",
   "place.address.service": "Endereço do serviço",
