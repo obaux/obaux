@@ -1166,6 +1166,12 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · alerts truth and two texts without the number (11 October 2026)
+
+Branch `claude/messages-honest-alerts-and-texts` (D-519). Text alerts switches wait for `texts_live`. The denied-request and
+limited-account texts say "Visit joinpam.org/support"; not deployed (live is version 23; refile first). Account texts go out
+whatever `texts_live` says.
+
 ## Messages & notifications · no examples on real accounts (11 October 2026)
 
 Branch `claude/messages-no-examples-real-accounts` (D-511). Examples show only in Storybook and on demo accounts
