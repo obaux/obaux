@@ -928,6 +928,16 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Merge desk & platform · deploys: only `main`, and checked (10–11 October)
+
+On 10 October the web project hit Vercel's daily deploy limit: 3f0bb5e and 00bde97 were refused ("Deployment rate
+limited", seen only as a commit status) while CI was green. About half the day's 100 deploys were branch previews
+nobody opened. **Preview deployments are off** for `web` and `pam-site` (project setting
+`previewDeploymentsDisabled`); `main` was redeployed by hand at 00:20 UTC on 11 October (00bde97, READY on
+app.joinpam.org). Checked live: `/programs/new/` carries its own title and `og:image` (D-496), and on the old
+vercel.app host `/signin/index.txt` answers 200 instead of redirecting (D-495). The merge desk now checks the
+Vercel status after every push (`docs/team.md`). Emails link to app.joinpam.org: Will changed `APP_URL`.
+
 ## Merge desk & platform · a failed in-app load opens the screen; texts link to app.joinpam.org (10 October)
 
 Will, from his phone: an invite link opened a page of raw code. Cause: Next 15.5.25, in static export,
@@ -936,8 +946,7 @@ patch to Next (`patches/next@15.5.25.patch`), the patches in the webpack cache k
 without it the cached, unpatched Next shipped), a Vercel redirect for document requests to `…/index.txt`
 (tabs on older builds), and `e2e/failed-load.spec.ts` (fails before the fix, passes after). Texts link to https://app.joinpam.org:
 `app_settings.app_url`, migration `20261010190831_texts_link_to_app_joinpam_org` (data only), **applied live**
-10 October. Emails still build their link from the Edge Function setting `APP_URL`, which Will changes
-in Supabase (card in the Control Room); until then they go through the old address's redirect.
+10 October. Emails build their link from the Edge Function setting `APP_URL`, which Will set to app.joinpam.org the same evening.
 
 ## Languages & legal · 10 October in one place; from now on, one batch a week (Friday)
 
@@ -1376,6 +1385,12 @@ state with a (+)) instead of the "Proposed (a22)" cards; the generator gets `dra
 "Trips with a past visit" shows the past visit. Found on the way: dragging the Trips drawer's handle with a
 mouse stepped it on again (D-494, fixed; phones were not affected). Figma: Case manager, Program lead and
 Overview redrawn, one image replaced on Member; drawn from the branch, so redraw from `main` only after it merges.
+
+## Design system & Storybook · legal tabs follow the reader (10 October)
+
+Branch `claude/pam-design-legal-tabs`. Privacy and Terms: the highlighted tab is the section whose heading has reached the
+line under the bars (the top one wins), a tapped tab is held until the reader scrolls, the row of tabs moves to keep it in
+view, and a tap moves focus to the section heading (D-497). Needs Will: try it on the phone; not seen in WebKit.
 
 ## Design system & Storybook · secondary button edge (10 October)
 

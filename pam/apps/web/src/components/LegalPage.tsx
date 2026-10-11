@@ -142,6 +142,10 @@ const SECTION_ICONS: Record<string, ReactNode> = {
 
 /** The two bars that stay on screen, and 16px of air: where a tapped section's heading lands (matches `section`'s scroll-margin). */
 const BARS_PX = 136;
+/** A heading counts as having reached that line a few pixels short of it (fractions of a pixel, the glide's last frames). */
+const LINE_PX = BARS_PX + 8;
+/** The row's `scroll-padding-inline`: where a tab's start edge sits when the row snaps to it, and the least air kept beside the highlighted tab. */
+const SNAP_PAD_PX = 4;
 
 /** Smooth, unless the phone asks for less movement. */
 function scrollBehavior(): ScrollBehavior {
@@ -152,6 +156,9 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
   const { t } = useI18n();
   const [here, setHere] = useState<string | null>(doc.sections[0]?.id ?? null);
   const endRef = useRef<HTMLDivElement | null>(null);
+  const tocRef = useRef<HTMLElement | null>(null);
+  /** The tab that was tapped, held until the reader scrolls for themselves. */
+  const lock = useRef<string | null>(null);
 
   useEffect(() => {
     if (typeof IntersectionObserver === 'undefined') return;
@@ -159,37 +166,43 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
     const ids = doc.sections.map((s) => s.id);
 
     /**
-     * The section being read is the last one whose heading has passed the
-     * middle of the screen. Measured rather than inferred from which elements
-     * are intersecting: a short section fully on screen and a long one filling
-     * it produce very different intersection ratios while a reader would call
-     * both "here", and picking by ratio makes the highlight jump backwards on
-     * the long ones.
+     * The section being read is the last one whose heading has reached the line the
+     * tabs land on, under the two bars (D-497; Will, 10 October: with two sections on
+     * screen "the what you can do won't always select, it gets confused"). Not "the
+     * most visible one", and not "the one in the middle of the screen": with two short
+     * sections in view the one at the top wins, which is also where a tapped tab puts it.
+     * Measured rather than inferred from intersections, so a long section filling the
+     * screen and a short one fully in view cannot disagree about which is "here".
+     *
+     * Two things override it:
+     * - **A tapped tab** (`lock`) stays highlighted until the reader scrolls for
+     *   themselves, so the page's own glide cannot pick a neighbour on the way, and a
+     *   short section the page cannot scroll far enough to bring to the top stays the
+     *   one that was tapped.
+     * - **The very bottom of the page**: the last section is short, so its heading can
+     *   never reach the line; at the bottom, the last one is what you are reading.
      */
     const recompute = () => {
-      // Halfway down, not near the top: a short section at the foot of the
-      // page can never push its heading into the top third — the page runs out
-      // of scroll first — and the mark would stick on the section above it.
-      const line = window.innerHeight * 0.5;
+      if (lock.current) {
+        setHere(lock.current);
+        return;
+      }
       let active = ids[0] ?? null;
       for (const id of ids) {
         const el = document.getElementById(id);
-        if (el && el.getBoundingClientRect().top <= line) active = id;
+        if (el && el.getBoundingClientRect().top <= LINE_PX) active = id;
       }
-
-      // The last section is short and sits at the foot of the page, so it can
-      // never reach that line — the page runs out of scroll first. At the
-      // bottom, the last section is what you are reading, whatever the maths
-      // says.
       const atBottom =
         window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 8;
-      // Or the end of the text is on screen: on a short phone the last section
-      // can be wholly in view, under the two bars, without the page being at its
-      // very bottom or the section's heading being above the middle line.
-      const endShown = (endRef.current?.getBoundingClientRect().top ?? Infinity) <= window.innerHeight;
-      if (atBottom || endShown) active = ids[ids.length - 1] ?? active;
-
+      if (atBottom) active = ids[ids.length - 1] ?? active;
       setHere(active);
+    };
+
+    // The reader taking over: a wheel, a finger, a key, a press anywhere but on the tabs
+    // (a second tab tap in the middle of the first one's glide must not let go).
+    const letGo = (event: Event) => {
+      if (event.target instanceof Node && tocRef.current?.contains(event.target)) return;
+      lock.current = null;
     };
 
     // Recomputed on scroll, coalesced to one measurement per frame, so a
@@ -209,6 +222,9 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
 
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll, { passive: true });
+    for (const type of ['wheel', 'touchstart', 'pointerdown', 'keydown'] as const) {
+      window.addEventListener(type, letGo, { passive: true });
+    }
     // Still worth observing: this is what catches the page settling after
     // images, fonts or a jump-to-anchor, without a timer.
     const observer = new IntersectionObserver(onScroll, { threshold: [0, 0.5, 1] });
@@ -223,8 +239,32 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
       observer.disconnect();
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
+      for (const type of ['wheel', 'touchstart', 'pointerdown', 'keydown'] as const) {
+        window.removeEventListener(type, letGo);
+      }
     };
   }, [doc]);
+
+  // The row of tabs glides so the highlighted one is always wholly in view, whether it
+  // changed by a tap or by reading on (Will, 10 October: "make sure the chips smoothly
+  // scroll so the selected section is always visible"). When it is not, the tab is brought
+  // to the start edge of the row, which is one of the row's own snap points: aimed anywhere
+  // else, the row's scroll-snap pulls a smooth scroll on to the next tab and leaves a wide one
+  // half hidden. Measured from rectangles, so it is the same right to left. It moves the row
+  // only, never the page.
+  useEffect(() => {
+    const row = tocRef.current?.querySelector('ul');
+    const tab = row?.querySelector<HTMLElement>('a[aria-current="true"]');
+    if (!row || !tab) return;
+    const rowBox = row.getBoundingClientRect();
+    const tabBox = tab.getBoundingClientRect();
+    const startEdge = Math.max(rowBox.left, 0) + SNAP_PAD_PX;
+    const endEdge = Math.min(rowBox.right, window.innerWidth) - SNAP_PAD_PX;
+    if (tabBox.left >= startEdge - 0.5 && tabBox.right <= endEdge + 0.5) return;
+    const rtl = getComputedStyle(row).direction === 'rtl';
+    const by = rtl ? tabBox.right - (rowBox.right - SNAP_PAD_PX) : tabBox.left - (rowBox.left + SNAP_PAD_PX);
+    if (by !== 0) row.scrollBy({ left: by, behavior: scrollBehavior() });
+  }, [here]);
 
   /**
    * A tab tap scrolls the section into place itself (D-492; Will, 10 October: Back did not
@@ -238,12 +278,17 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
     const el = document.getElementById(id);
     if (!el) return;
     event.preventDefault();
+    // Highlighted at once and held (see `recompute`), however the glide gets there.
+    lock.current = id;
     setHere(id);
     window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - BARS_PX, behavior: scrollBehavior() });
-    // The row of tabs follows along sideways on its own scroller, so the page's scroll above is not interrupted.
-    const tab = event.currentTarget;
-    const row = tab.closest('ul');
-    row?.scrollTo({ left: tab.offsetLeft - (row.clientWidth - tab.offsetWidth) / 2, behavior: scrollBehavior() });
+    // Where a reading position goes with a screen reader or a keyboard, as the old hash link did: to the
+    // section's heading, without scrolling (the glide above is the scroll).
+    const heading = el.querySelector<HTMLElement>('h2');
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    }
   };
 
   // One copy icon, top right of the page, for the whole document (Will, D-417):
@@ -284,7 +329,7 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
           <GuideCard title={t('guide.title')} body={t('guide.body')} icon={<PeopleIcon />} />
         ) : null}
 
-        <nav aria-label={t('legal.toc')} {...stylex.props(styles.tocWrap)}>
+        <nav ref={tocRef} aria-label={t('legal.toc')} {...stylex.props(styles.tocWrap)}>
           <ul {...stylex.props(styles.toc)}>
             {doc.sections.map((section) => {
               const isHere = section.id === here;
@@ -326,7 +371,10 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
         {/* Never dead-end (§0): back up the page, a way on, and a way to a person. */}
         <VStack gap={1}>
           {/* A button, not a `#top` link: the title is in the sticky bar, always "in view", so the browser had nowhere to scroll to. */}
-          <TextLink label={t('legal.backToTop')} onClick={() => window.scrollTo({ top: 0, behavior: scrollBehavior() })} />
+          <TextLink label={t('legal.backToTop')} onClick={() => {
+              lock.current = null;
+              window.scrollTo({ top: 0, behavior: scrollBehavior() });
+            }} />
           <Suspense fallback={<OtherDocument doc={doc} door={null} />}>
             <OtherDocumentFromUrl doc={doc} />
           </Suspense>
