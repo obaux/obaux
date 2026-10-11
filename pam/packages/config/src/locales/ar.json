@@ -329,7 +329,7 @@
   "messages.thread.failed.title": "لم يتم الإرسال",
   "messages.thread.notFound.body": "ربما تمت إزالتها، أو كان الرابط خاطئا. ارجع إلى الرسائل وابحث عنها هناك.",
   "messages.thread.notFound.title": "لا نجد هذه المحادثة",
-  "messages.program.note": "يرى هذا البرنامج اسمك الأول وما تكتبه فقط.",
+  "messages.program.note": "يرى هذا البرنامج اسمك الأول وما تكتبه.",
   "messages.program.unavailable.body": "ارجع إلى صفحة البرنامج. يمكنك الاتصال به أو زيارة موقعه من هناك.",
   "messages.program.unavailable.title": "لا يمكن مراسلة هذا البرنامج الآن",
   "messages.thread.placeholder": "اكتب رسالة",

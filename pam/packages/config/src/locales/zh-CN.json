@@ -309,7 +309,7 @@
   "messages.thread.failed.title": "没有发送成功",
   "messages.thread.notFound.body": "它可能已被删除，或者链接有误。请回到“消息”，在那里查找。",
   "messages.thread.notFound.title": "我们找不到这段对话",
-  "messages.program.note": "该项目只能看到您的名字和您写的内容。",
+  "messages.program.note": "这个项目能看到您的名字和您写的内容。",
   "messages.program.unavailable.body": "请返回该项目的页面，您可以在那里打电话或访问其网站。",
   "messages.program.unavailable.title": "现在无法给这个项目发消息",
   "messages.thread.placeholder": "写消息",

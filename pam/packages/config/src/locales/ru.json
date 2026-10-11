@@ -323,7 +323,7 @@
   "messages.thread.notFound.title": "Не удаётся найти этот разговор",
   "messages.program.note": "Эта программа видит ваше имя и то, что вы пишете.",
   "messages.program.unavailable.body": "Вернитесь на страницу программы. Там можно позвонить или открыть её сайт.",
-  "messages.program.unavailable.title": "Сейчас нельзя написать в эту программу",
+  "messages.program.unavailable.title": "Сейчас нельзя написать этой программе",
   "messages.thread.placeholder": "Напишите сообщение",
   "messages.thread.send": "Отправить",
   "messages.thread.sending": "Отправляем…",
