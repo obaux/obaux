@@ -200,7 +200,7 @@ Iris
 
 ---
 
-## b20 re-test: neighbourhoods (11 October, 21:55 UTC)
+## b20 re-test: neighbourhoods (11 October, 21:45 UTC)
 
 `main` at `e27afa24`. No sign-in, accounts or sends.
 
