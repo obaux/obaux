@@ -1019,6 +1019,7 @@
   "trips.booked.sms": "短信内容：“Pam：{place}已为您预约{day} {time}。点按在Pam中查看：{link}”",
   "trips.booked.example.title": "为 {name} 预约的示例",
   "trips.booked.example.body": "{place}，{day} {time}。这只是一个示例：没有向项目预约任何内容，也没有给任何人发短信。",
+  "trips.booked.noLead": "{place}不是 Pam 上的项目，所以不会收到这次预约的通知。",
   "join.booked.title": "您的预约已安排好",
   "join.booked.body": "{place}，{day} {time}。现在已在您的“预约”中。",
   "join.booked.action": "查看地点",

@@ -1019,6 +1019,7 @@
   "trips.booked.sms": "短訊內容：「Pam：{place}已為您預約{day} {time}。點按即可在Pam中查看：{link}」",
   "trips.booked.example.title": "為{name}預約的示範",
   "trips.booked.example.body": "{place}，{day} {time}。這只是示範：沒有向計劃預約任何時間，也沒有傳短訊給任何人。",
+  "trips.booked.noLead": "{place}不是 Pam 上的計劃，所以不會收到這次到訪的通知。",
   "join.booked.title": "您的到訪已預約",
   "join.booked.body": "{place}，{day} {time}。已加入您的到訪。",
   "join.booked.action": "查看該地點",

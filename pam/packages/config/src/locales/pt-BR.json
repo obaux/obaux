@@ -1019,6 +1019,7 @@
   "trips.booked.sms": "A mensagem (enviada em inglês por enquanto): “Pam: {place} booked you for {day} at {time}. Tap to see it in Pam: {link}”",
   "trips.booked.example.title": "Reserva de exemplo para {name}",
   "trips.booked.example.body": "{place}, {day} às {time}. Isto é só um exemplo: nada foi reservado com o programa e ninguém recebeu mensagem de texto.",
+  "trips.booked.noLead": "{place} não está no Pam como programa, então não é avisado desta visita.",
   "join.booked.title": "Sua visita está reservada",
   "join.booked.body": "{place}, {day} às {time}. Já está nas suas Visitas.",
   "join.booked.action": "Ver o lugar",

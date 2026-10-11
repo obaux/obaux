@@ -1019,6 +1019,7 @@
   "trips.booked.sms": "The text: “Pam: {place} booked you for {day} at {time}. Tap to see it in Pam: {link}”",
   "trips.booked.example.title": "Example booking for {name}",
   "trips.booked.example.body": "{place}, {day} at {time}. This is only an example: nothing was booked with the program, and nobody was texted.",
+  "trips.booked.noLead": "{place} is not on Pam as a program, so it is not told about this visit.",
   "join.booked.title": "Your visit is booked",
   "join.booked.body": "{place}, {day} at {time}. It is on your Trips now.",
   "join.booked.action": "See the place",

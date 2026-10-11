@@ -312,6 +312,8 @@ export function NewTripView({
         title={t('trips.booked.example.title', { name: forMember.name })}
         body={t('trips.booked.example.body', vars)}
         action={<Button label={t('trips.moved.home')} variant="secondary" href="/" xstyle={styles.home} />}
+        // A place with no program lead on Pam is not told either way (D-498).
+        {...(hasLead ? {} : { note: t('trips.booked.noLead', { place: place.name }) })}
       />
     );
   }
