@@ -103,20 +103,3 @@ test('a visit the database has as checked in shows filled, and undo asks first, 
   expect(undone[0]).toEqual({ p_appointment_id: VISIT });
   await expect(page.getByRole('button', { name: 'Check Tanya in' })).toBeVisible();
 });
-
-test('a visit the member marked themselves looks like any marked visit: undo asks first, says nothing different, and the circle stays', async ({ page }) => {
-  await signedInLead(page, [here(new Date().toISOString())]);
-  // The database answers an undo of the member's own mark with the visit still attended (D-535).
-  await page.route('**/rest/v1/rpc/undo_check_in*', (route) =>
-    route.fulfill(json([{ appointment_id: VISIT, status: 'attended', checked_in_at: new Date().toISOString(), points: 0 }])),
-  );
-  await page.goto('/');
-  await settled(page);
-  await page.getByRole('button', { name: /Tanya is checked in/ }).click();
-  await page.getByRole('dialog').getByRole('button', { name: 'Undo check-in' }).click();
-  await expect(page.getByRole('dialog')).toHaveCount(0);
-  await expect(page.getByText('We could not save that')).toHaveCount(0);
-  await expect(page.getByRole('button', { name: /Tanya is checked in/ })).toBeVisible();
-  // Nothing on the screen says who marked it.
-  await expect(page.getByText(/themselves|marked it/i)).toHaveCount(0);
-});

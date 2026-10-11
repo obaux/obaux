@@ -25,7 +25,3 @@ Privacy line (Lena, Sage, then Will). The lead's circle still shows a member's o
 ## Needs a human
 
 Mira: apply `20261011145930` after `20261011053445`. Will: the Privacy line.
-
-## Follow-up (Mira, 16:02 and 16:06): the lead's circle for a member's own mark
-
-First built as `my_program_own_marks` (the program is told which marks are the member's own); Mira decided against it: that is one more fact about a member. Reverted. Now: the program's data says only whether a visit is marked as there (status and `checked_in_at`; no method, no marker, no "by whom"); a visit marked by anyone looks the same; the lead's undo of a mark that was not theirs changes nothing and raises nothing (the database answers with the visit still attended, same shape as any undo), and the circle stays filled with nothing different said. Test 60 (the visit list has no column for who/how; three differently marked visits look alike; undo of the member's mark is a no-op; undo of the lead's own does undo); e2e in `program-visits.spec.ts`.

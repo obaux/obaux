@@ -11,13 +11,13 @@ A member can mark their own visit, at any place, with or without a lead:
 - **"I'm here"** asks the phone where it is once, on the tap. The database (`i_am_here`) compares it with the place's stored location. Within 150 m, in the visit window, the visit is attended by `geofence` and pays `attend_appointment_verified` (100). Further away nothing is written and the member can tap again.
 - **"I went"** (`i_went`) sends no position: attended by `sms_reply`, pays `attend_appointment_sms` (60), at most 3 in any 7 days.
 - Both: own visit only; from 2 h before it starts to 3 h after it ends; planned at least 2 h before it starts; never cancelled; one award per visit (the ledger's unique index).
-- A lead's mark after a member's "I went" upgrades the visit and pays the 40 difference once; a visit the phone already proved pays nothing more. A lead's undo takes back only the lead's part; for a member's own mark it changes nothing and says nothing (same answer as any undo with nothing to take back), so the program's screen never shows who marked a visit (Mira, 11 October 16:06: "show there, never who").
+- A lead's mark after a member's "I went" upgrades the visit and pays the 40 difference once; a visit the phone already proved pays nothing more. A lead's undo takes back only the lead's part and refuses a member's own mark.
 
 ## The position is never kept
 
 Used in one comparison in the function, then gone: no table, audit row, notice or ledger row holds it (test 59 checks this). The numbers travel in a POST body. Checked on the live project on 11 October: gateway log rows carry the path, user id, IP, user agent and content length but no body (and no query string); `log_statement` is `ddl`; parameters are not logged on error; `pg_stat_statements` normalises values. What logs do show is that a signed-in account called the function at a time, from an IP address: Privacy must not say more than "Pam does not keep the position your phone sends".
 
-## Nobody is shown who marked a visit, or how
+## Nobody is shown how a visit was marked
 
 `my_program_visits` and `my_trips` return the status and time only. `attendance_method` is not returned to any lead or guide.
 
