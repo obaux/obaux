@@ -151,6 +151,8 @@ export interface Prepared {
   readonly corrections: Readonly<Record<string, string>>;
   /** Other words for the same thing (`search-synonyms.ts`), weaker than what was typed. */
   readonly expansions: readonly string[];
+  /** The query said with a group's own word in place of the everyday one ("log in" -> "sign in"), for keywords said in order. */
+  readonly altQueries: readonly string[];
 }
 
 /** Read a query: its words, the typos corrected, and the everyday words that mean the same. */
@@ -173,12 +175,26 @@ export function prepare(posts: readonly SupportPost[], text: string): Prepared {
   }
   const known = [...typed, ...Object.values(corrections)];
   const expansions = new Set<string>();
-  SYN_STEMS.forEach((group) => {
+  const altQueries: string[] = [];
+  const raw = words(text).join(' ');
+  SYN_STEMS.forEach((group, gi) => {
     const hit = group.some((m) => m.length > 0 && m.every((s) => hasStem(known, s)));
     if (!hit) return;
-    for (const m of group) for (const s of m) if (!hasStem(known, s)) expansions.add(s);
+    // Pam's own word (the first) and the single everyday words widen the search; a longer phrase somebody typed
+    // ("text message") would only drag in a second meaning, and Pam's word already says what it means.
+    const members = SYNONYMS[gi]!;
+    group.forEach((m, mi) => {
+      if (mi !== 0 && members[mi]!.trim().includes(' ')) return;
+      for (const s of m) if (!hasStem(known, s)) expansions.add(s);
+    });
+    // "log in" is "sign in" to the post that has the keyword "sign in"
+    const pam = words(members[0]!).join(' ');
+    for (const member of members.slice(1)) {
+      const mw = words(member).join(' ');
+      if (mw && ` ${raw} `.includes(` ${mw} `)) altQueries.push(raw.replace(mw, pam));
+    }
   });
-  return { typed, corrections, expansions: [...expansions] };
+  return { typed, corrections, expansions: [...expansions], altQueries };
 }
 
 /** How much the query and the phrase say the same thing: the share of their words that are shared (1 = the same words). */
@@ -248,7 +264,9 @@ export function search(
     // ...and a keyword of two or more words said in that order, small words and all: "sign in" is joining, not signing
     for (const k of post.keywords) {
       const kw = words(k).join(' ');
-      if (kw.includes(' ') && ` ${rawQuery} `.includes(` ${kw} `)) score += 12;
+      if (!kw.includes(' ')) continue;
+      if (` ${rawQuery} `.includes(` ${kw} `)) score += 12;
+      else if (prep.altQueries.some((a) => ` ${a} `.includes(` ${kw} `))) score += 8;
     }
     return { post, score, order };
   });

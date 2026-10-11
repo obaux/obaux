@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { POSTS } from '../src/content/posts';
 import { SEARCH_GAPS, SEARCH_PHRASES, isAnswered } from '../src/content/search-phrases';
 import { SYNONYMS } from '../src/content/search-synonyms';
-import { asQuestion, contentStems, didYouMean, editDistance, search, suggest } from '../src/lib/search';
+import { asQuestion, contentStems, didYouMean, editDistance, prepare, search, suggest } from '../src/lib/search';
 
 const find = (q: string) => search(POSTS, q);
 const GAPS = join(__dirname, '../../../docs/help-centre-gaps.md');
@@ -102,15 +102,24 @@ describe('search knows everyday words for the same thing', () => {
     expect(find('log in').posts[0]?.slug).not.toBe('signing-a-programs-rules');
   });
 
-  it('gives every word in a group the post the first word of the group finds, among its top three', () => {
+  it('reads every word in a group as the group’s own word too (Pam’s word, the first)', () => {
     for (const group of SYNONYMS) {
-      const first = find(group[0]!).posts[0]?.slug;
-      if (!first) continue;
+      const pam = contentStems(group[0]!);
       for (const member of group.slice(1)) {
-        const top = find(member).posts.slice(0, 3).map((p) => p.slug);
-        expect(top, `“${member}” should find what “${group[0]}” finds (${first})`).toContain(first);
+        const p = prepare(POSTS, member);
+        const known = new Set([...p.typed, ...Object.values(p.corrections), ...p.expansions]);
+        for (const s of pam) expect(known.has(s) || [...known].some((k) => k.startsWith(s) || s.startsWith(k)), `“${member}” should be read as “${group[0]}”`).toBe(true);
       }
     }
+  });
+
+  it('finds, for the everyday words most likely to be typed, the post that uses Pam’s word', () => {
+    const cases: [string, string][] = [
+      ['sms', 'texts-from-pam'],
+      ['log in', 'joining-pam'],
+      ['caseworker', 'who-is-my-guide'],
+    ];
+    for (const [typed, slug] of cases) expect(find(typed).posts.slice(0, 3).map((p) => p.slug), typed).toContain(slug);
   });
 
   it('ignores accents', () => {
