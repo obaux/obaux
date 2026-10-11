@@ -445,6 +445,11 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   “从 Web 订阅”, 「從 Web 訂閱」, «Подписаться из Интернета», «الاشتراك من الويب»). And **"Pam visit"** stays English inside the quotes in
   `calendar.details.hint`, because the event's text is English whatever the member's language (D-538, "Not done"): if the event text
   is ever translated, change both together.
+  **`calendar.google.phone`** names a switch in the phone's browser, "Desktop site"; each translation uses Chrome's name for it in that
+  language, from memory (es "Sitio para computadoras"; pt-BR "Site para computador"; zh-CN “桌面版网站”; zh-HK 「電腦版網站」; ru «Версия для
+  компьютера»; ar «موقع سطح المكتب», where the Arabic says "choose" rather than "turn on" to avoid a vowel mark). Safari on an iPhone
+  calls it "Request Desktop Website" in its "aA" menu and other browsers differ, so a native reader should check the wording against
+  the browsers their members use.
 
 - [ ] **A native reader for what D-465 reworded (10 October).** The last-day line on the
   transparency screen (`transparency.canSee.lastActive`), the privacy page's "What you can do"
