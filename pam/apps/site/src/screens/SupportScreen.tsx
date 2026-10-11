@@ -79,7 +79,7 @@ function Topics() {
           {TOPICS.map((topic) => {
             const posts = POSTS.filter((p) => p.topic === topic.id);
             return (
-              <Card key={topic.id} padding={6} variant={posts.length ? 'default' : 'muted'}>
+              <Card key={topic.id} id={`topic-${topic.id}`} padding={6} variant={posts.length ? 'default' : 'muted'}>
                 <VStack gap={2}>
                   <Heading level={3}>{topic.title}</Heading>
                   <Text as="p">{topic.blurb}</Text>

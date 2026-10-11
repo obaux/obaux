@@ -79,4 +79,13 @@
   [tabindex='-1']:focus-visible {
     outline: none !important;
   }
+
+  /* Reveal on scroll (components/Reveal.tsx): hidden only after script has run, only below the fold, only for a reader who
+     has not asked for less motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-reveal='pending'] {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
 }

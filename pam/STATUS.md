@@ -1646,6 +1646,8 @@ fine and the fit audit was over-counting (D-448).
 
 ## Website · public site and help centre (10 October) — `apps/site`, on `main`
 
+**New website, stage 1 (11 October, D-529; branch).** Home, header and footer rebuilt from Will's Figma on Dot's Website tokens (D-528): hero with a tappable, flipping, floating picture stack (Pause/Play, reduced-motion safe), the Philadelphia band, three feature rows with real Pam screens, Privacy/Support callouts, deep-green footer. Words in `content/home-copy.ts`; untrue or promise lines are held with true fallbacks (`HELD`). Stages 2–4 (Support, post template, About, Still stuck) follow.
+
 **A28 on the help site (11 October, D-522; branch).** No phone on the site: "Still stuck?" says to write to hello@joinpam.org (Sage's signed words), at the end of every post and under an empty search; the form waits for Nico's switch (off). New posts `cant-sign-in` and `your-safety` (`/support/your-safety/`, the app's "Your safety" opens it). A site test fails on "call Pam" and on any `tel:` but 911 and 988. Section labels from Sage drive the menu. Iris's findings S1, S2, W1–W6 done (`scripts/usability.mjs`: focus rings, 48px targets, `?q=`, skip link, Esc, layout shift). The "Still stuck?" form is built to Nico's contract and shows only when `help-request` answers (off: the address). Held: the blocked-conversation picture (the app still says "Call Pam" there), Sage's line for the saved-place text.
 
 **On this page menu (11 October, D-517; branch).** Every help post has a scrollspy menu: a side column from 1180px, a bar at the top on a phone, built from the post's `Section` headings (`short` label optional; Sage writes them). `scripts/scrollspy.mjs` checks every link at 320, 390 and 1280px.
