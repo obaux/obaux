@@ -223,7 +223,7 @@ export function SubPageHeader({
       <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.bar}>
         {back}
         <HStack align="center" wrap="nowrap" xstyle={styles.middle}>
-          <Text xstyle={[styles.barTitle, styles.barTitleFade, isBarTitleShown && styles.shown]} aria-hidden="true">
+          <Text dir="auto" xstyle={[styles.barTitle, styles.barTitleFade, isBarTitleShown && styles.shown]} aria-hidden="true">
             {title}
           </Text>
         </HStack>
@@ -257,7 +257,7 @@ export function SubPageHeader({
       >
         {back}
         <HStack align="center" wrap="nowrap" xstyle={styles.middle}>
-          <Text xstyle={[styles.barTitle, collapsed && styles.shown]} aria-hidden="true">
+          <Text dir="auto" xstyle={[styles.barTitle, collapsed && styles.shown]} aria-hidden="true">
             {title}
           </Text>
         </HStack>
