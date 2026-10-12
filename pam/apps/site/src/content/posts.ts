@@ -179,7 +179,7 @@ const ALL: readonly SupportPost[] = [
     audience: 'members, case managers and program leads',
     title: 'Messages: who can write, and why nothing is texted',
     summary: 'Who can start a chat with whom, how to send and report a message, and why a message does not come by text.',
-    updated: '2026-10-10',
+    updated: '2026-10-12',
     keywords: ['message', 'chat', 'conversation', 'report', 'photo', 'document', 'new message', 'unsafe'],
   },
   {
