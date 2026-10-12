@@ -276,6 +276,9 @@ test.describe('the conversation list', () => {
     const sheet = page.getByRole('dialog', { name: 'New message' });
     await expect(sheet).toBeVisible();
     await expect(sheet.getByRole('button', { name: /Tanya/ })).toBeVisible();
+    // The field is named once: its label says "Search by name", so no placeholder repeats it (Iris, b20).
+    await expect(sheet.getByRole('textbox')).toHaveAccessibleName('Search by name');
+    await expect(sheet.getByRole('textbox')).not.toHaveAttribute('placeholder', /.+/);
     await sheet.getByRole('textbox').fill('mar');
     await expect(sheet.getByRole('button', { name: /Tanya/ })).toHaveCount(0);
     await sheet.getByRole('button', { name: /Marcus/ }).click();
