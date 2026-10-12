@@ -105,7 +105,6 @@ export function NewMessagePicker({
         <VStack xstyle={styles.search}>
           <SearchField
             label={t('messages.new.search')}
-            placeholder={t('messages.new.search')}
             value={query}
             onChange={setQuery}
             hasAutoFocus

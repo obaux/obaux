@@ -40,6 +40,7 @@ import { useRoleView } from '@/lib/useViewedRole';
 import { RoleSwitchControl } from '../RoleSwitchControl';
 import { DUMMY_SELF_ID, dummyConversationIdBetween, dummyConversationsFor } from '@pam/config/dummy-conversations';
 import { ProgramBadge } from '../ProgramBadge';
+import { ProgramMemberCardView } from '../../screens/ProgramMemberCardView';
 
 /**
  * One person, for a case manager or a program to look at.
@@ -250,6 +251,12 @@ function PersonScreen() {
         <PersonDetailSkeleton label={t('common.loading')} />
       </Page>
     );
+  }
+
+  // A program lead tapping a real member linked to their program gets the small card (D-542): first name, their own program's
+  // visits and a way to message. Anybody else, or a member not linked, gets "not found".
+  if (!person && viewedRole === 'provider') {
+    return <ProgramMemberCardView id={id} header={header} />;
   }
 
   if (!person) {

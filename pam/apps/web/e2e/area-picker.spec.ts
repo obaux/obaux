@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { settled } from './settled';
+import en from '@pam/config/locales/en.json';
+import ar from '@pam/config/locales/ar.json';
 
 /**
  * Choosing where the list is measured from.
@@ -155,3 +157,25 @@ test.describe('choosing an area', () => {
     expect(results.violations).toEqual([]);
   });
 });
+
+/**
+ * The search field's name is read once and its hint is tied to it (Iris, b20: a screen reader heard
+ * "ZIP code or neighborhood" twice, once from the label and once from the placeholder, and the hint
+ * "Like 19107, or Fishtown." was not linked to the field).
+ */
+for (const [locale, words] of [['en', en], ['ar', ar]] as const) {
+  test(`${locale}: the area field is named once and its hint describes it`, async ({ page }) => {
+    await page.addInitScript((code) => localStorage.setItem('pam.locale', code), locale);
+    await stub(page);
+    await page.goto('/places/');
+    await page.getByRole('button', { name: /City Hall/ }).first().click();
+
+    const field = page.getByRole('dialog').getByRole('textbox');
+    await expect(field).toHaveCount(1);
+    // Named by its label alone: no second copy of the words as a placeholder.
+    await expect(field).toHaveAccessibleName(words['places.areaLabel']);
+    await expect(field).not.toHaveAttribute('placeholder', /.+/);
+    // And the hint is its description.
+    await expect(field).toHaveAccessibleDescription(words['places.areaHint']);
+  });
+}

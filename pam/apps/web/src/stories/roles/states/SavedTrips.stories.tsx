@@ -25,7 +25,7 @@ function onRoute(
   name: string,
   pathname: string,
   query: Record<string, string>,
-  options: { readonly savedTrip?: boolean; readonly pastTrip?: boolean } = {},
+  options: { readonly savedTrip?: boolean; readonly pastTrip?: boolean; readonly tripNow?: boolean } = {},
 ): Story {
   const route = REDESIGN_ROUTES[pathname];
   if (!route) throw new Error(`No prototype route for ${pathname} — add it to src/stories/prototype/routes.tsx`);
@@ -45,6 +45,13 @@ export const TripsWithAPastVisit: Story = onRoute(
   '/trips/',
   {},
   { savedTrip: true, pastTrip: true },
+);
+// A visit that is on now: its page offers "I'm here" (and "I went" without a position), D-535.
+export const ImHere: Story = onRoute(
+  "I'm here, at a visit that is on now",
+  '/place/',
+  { id: SAVED_PLACE.id, from: 'trips', trip: '7a1f0f3c-2b11-4c0f-8b64-000000000003' },
+  { savedTrip: true, tripNow: true },
 );
 export const MoveASavedTrip: Story = onRoute(
   'Change the time of a saved trip',
