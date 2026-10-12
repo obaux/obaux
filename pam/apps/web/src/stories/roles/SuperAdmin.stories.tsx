@@ -20,6 +20,9 @@ export const ReportedPlacesFromTheBell: Story = screen('super-admin', 'Reported 
   from: 'notifications',
 });
 export const Everyone: Story = screen('super-admin', 'Everyone', '/directory/');
+// The page the "Reply by text" link in a help-request email opens (A28, D-524). The number is an invented one
+// (555-01xx is never assigned); the story never sends, as no journey writes.
+export const AnswerByText: Story = screen('super-admin', 'Answer a help request by text', '/reply/', { to: '+12155550142' });
 export const Requests: Story = screen('super-admin', 'Staff requests', '/requests/');
 export const RequestReview: Story = screen('super-admin', 'A request to review', '/requests/review/', { id: 'r-2' });
 // The programs leaders have sent for Pam to check (D-386, part 6).
