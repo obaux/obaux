@@ -130,11 +130,13 @@ test.describe("a place's own screen", () => {
     const directions = page.getByRole('link', { name: /^Get directions/ });
     await expect(directions).toHaveAttribute('href', /destination_place_id=ChIJexample123/);
     await expect(directions).toHaveAttribute('target', '_blank');
-    // Directions, then message, then call, then the website. Bring a friend
+    // Directions, then call, then the website: this place has no lead on Pam, so there is no
+    // message row (D-541; with one it comes after directions). Bring a friend
     // is not here: it waits for the booked screen (D-333).
     const rows = page.getByRole('list', { name: 'Ways to reach this place' }).getByRole('link');
     await expect(rows.nth(0)).toHaveAccessibleName(/^Get directions/);
-    await expect(rows.nth(1)).toHaveAccessibleName(/^Send a message/);
+    await expect(rows.nth(1)).toHaveAccessibleName(/^Call/);
+    await expect(page.getByRole('link', { name: /^Send a message/ })).toHaveCount(0);
     await expect(page.getByText('Bring a friend')).toHaveCount(0);
   });
 
