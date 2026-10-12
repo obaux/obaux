@@ -104,6 +104,16 @@ begin
   if visit.status = 'cancelled' then
     raise exception 'VISIT_CANCELLED';
   end if;
+  -- Attendance is for a program on Pam: at a place gathered from a public list nobody is there to mark anyone (D-498, D-545).
+  if not exists (
+    select 1
+    from public.services s
+    join public.profiles p on p.org_id = s.org_id
+    join public.profile_roles r on r.profile_id = p.id and r.role = 'provider'
+    where s.id = visit.service_id and s.org_id is not null and p.access_status = 'active'
+  ) then
+    raise exception 'NO_LEAD_HERE';
+  end if;
   if now() < visit.starts_at - interval '2 hours'
      or now() > coalesce(visit.ends_at, visit.starts_at + interval '1 hour') + interval '3 hours' then
     raise exception 'OUTSIDE_THE_VISIT_WINDOW';

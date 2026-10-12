@@ -15,6 +15,7 @@ set client_min_messages to notice;
 \set org1  'dddddddd-0000-0000-0000-000000005901'
 \set prog1 'eeeeeeee-0000-0000-0000-000000005901'
 \set prog2 'eeeeeeee-0000-0000-0000-000000005902'
+\set prog3 'eeeeeeee-0000-0000-0000-000000005903'
 
 create or replace function test.check_raises_like(label text, stmt text, pattern text)
 returns void
@@ -49,6 +50,10 @@ insert into public.services (id, org_id, name, category, address, source, needs_
    extensions.st_setsrid(extensions.st_makepoint(-75.16521, 39.95262), 4326)::extensions.geography);
 insert into public.services (id, org_id, name, category, address, source, needs_review, is_active) values
   (:'prog2', :'org1', 'Here Program Two (no location)', 'education', '2 Here St', 'manual', false, true);
+-- prog3 is a place gathered from a public list: no organisation, so no lead (D-498).
+insert into public.services (id, org_id, name, category, address, source, needs_review, is_active, geo) values
+  (:'prog3', null, 'Here Place Three (no lead)', 'education', '3 Here St', 'manual', false, true,
+   extensions.st_setsrid(extensions.st_makepoint(-75.16521, 39.95262), 4326)::extensions.geography);
 -- Visits, planned a day ago unless said: under way now.
 insert into public.appointments (id, member_id, service_id, starts_at, ends_at, status, created_at) values
   ('aaaaaaaa-0000-0000-0000-000000005901', :'mem1', :'prog1', now() - interval '30 minutes', now() + interval '30 minutes', 'scheduled', now() - interval '1 day'),
@@ -61,7 +66,8 @@ insert into public.appointments (id, member_id, service_id, starts_at, ends_at, 
   ('aaaaaaaa-0000-0000-0000-000000005908', :'mem2', :'prog1', now() - interval '30 minutes', now() + interval '30 minutes', 'scheduled', now() - interval '1 day'),
   ('aaaaaaaa-0000-0000-0000-000000005909', :'mem2', :'prog1', now() - interval '30 minutes', now() + interval '30 minutes', 'scheduled', now() - interval '1 day'),
   ('aaaaaaaa-0000-0000-0000-00000000590a', :'mem2', :'prog1', now() - interval '30 minutes', now() + interval '30 minutes', 'scheduled', now() - interval '1 day'),
-  ('aaaaaaaa-0000-0000-0000-00000000590b', :'mem2', :'prog1', now() - interval '6 hours', now() - interval '5 hours', 'scheduled', now() - interval '1 day');
+  ('aaaaaaaa-0000-0000-0000-00000000590b', :'mem2', :'prog1', now() - interval '6 hours', now() - interval '5 hours', 'scheduled', now() - interval '1 day'),
+  ('aaaaaaaa-0000-0000-0000-00000000590c', :'mem1', :'prog3', now() - interval '30 minutes', now() + interval '30 minutes', 'scheduled', now() - interval '1 day');
 create function pg_temp.pts(m uuid) returns bigint language sql as $$
   select coalesce(sum(delta), 0) from public.points_ledger where member_id = m and subject_id::text like 'aaaaaaaa-0000-0000-0000-0000000059%'
 $$;
@@ -117,6 +123,10 @@ select test.check_raises_like('a cancelled visit is refused',
   $f$select * from public.i_went('aaaaaaaa-0000-0000-0000-000000005905')$f$, '%VISIT_CANCELLED%');
 select test.check_raises_like('a place with no stored location cannot check a position',
   $f$select * from public.i_am_here('aaaaaaaa-0000-0000-0000-000000005906', 39.95262, -75.16521)$f$, '%NO_PLACE_LOCATION%');
+select test.check_raises_like('at a place with no lead on Pam, "I''m here" is refused: nobody is there to mark it',
+  $f$select * from public.i_am_here('aaaaaaaa-0000-0000-0000-00000000590c', 39.95262, -75.16521)$f$, '%NO_LEAD_HERE%');
+select test.check_raises_like('...and so is "I went"',
+  $f$select * from public.i_went('aaaaaaaa-0000-0000-0000-00000000590c')$f$, '%NO_LEAD_HERE%');
 select test.check_raises_like('a position that is not on Earth is refused',
   $f$select * from public.i_am_here('aaaaaaaa-0000-0000-0000-000000005902', 200, -75.16521)$f$, '%BAD_POSITION%');
 select test.check_raises_like('no position at all is refused',

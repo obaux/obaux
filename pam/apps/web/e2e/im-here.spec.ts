@@ -12,7 +12,7 @@ const VISIT = '7a1f0f3c-2b11-4c0f-8b64-000000000009';
 const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
 const hoursFromNow = (hours: number) => new Date(Date.now() + hours * 3_600_000).toISOString();
 
-async function signedIn(page: Page, startsAt: string) {
+async function signedIn(page: Page, startsAt: string, hasLead = true) {
   await page.addInitScript((userId: string) => {
     const session = {
       access_token: 't', refresh_token: 'r', token_type: 'bearer', expires_in: 3600,
@@ -34,7 +34,7 @@ async function signedIn(page: Page, startsAt: string) {
   await page.route('**/rest/v1/rpc/service_detail*', (route) =>
     route.fulfill(json([{ id: PLACE, name: 'Riverside Job Center', lookup_name: 'RIVERSIDE JOB CENTER', category: 'workforce', subcategory: null, address: '1234 Market St', phone: null, place_id: null, lat: 39.95, lon: -75.16, description_plain: 'Jobs.', website: null, audience: null, hours: null }])),
   );
-  await page.route('**/rest/v1/rpc/service_has_lead*', (route) => route.fulfill(json(false)));
+  await page.route('**/rest/v1/rpc/service_has_lead*', (route) => route.fulfill(json(hasLead)));
 }
 
 const open = async (page: Page) => {
@@ -113,4 +113,12 @@ test('a visit days away has no I\'m here', async ({ page }) => {
   await signedIn(page, hoursFromNow(72));
   await open(page);
   await expect(page.getByRole('button', { name: "I'm here" })).toHaveCount(0);
+});
+
+test('at a place with no lead on Pam there is no I\'m here and no I went: nobody is there to mark it (D-545)', async ({ page }) => {
+  await signedIn(page, hoursFromNow(-0.5), false);
+  await open(page);
+  await expect(page.getByRole('heading', { name: 'Riverside Job Center' }).first()).toBeVisible();
+  await expect(page.getByRole('button', { name: "I'm here" })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'I went' })).toHaveCount(0);
 });

@@ -541,8 +541,8 @@ function PlaceScreen() {
                   <TextLink label={t('place.visit.cancel')} onClick={() => setAskingCancel(true)} />
                 </>
               ) : null}
-              {/* "I'm here" (D-535): only a real visit, in its window, not yet marked. */}
-              {visit && isSavedPlace(visit.id) && isMemberView && !visit.attendance && inMarkWindow(visit.startsAt) ? (
+              {/* "I'm here" (D-535): only a real visit, in its window, not yet marked, at a program with a lead on Pam (D-545). */}
+              {visit && hasLead && isSavedPlace(visit.id) && isMemberView && !visit.attendance && inMarkWindow(visit.startsAt) ? (
                 <ImHereCard visitId={visit.id} placeName={place!.name} />
               ) : null}
               {tellsNoLead ? <Banner status="info" title={t('place.noLead', { place: place!.name })} /> : null}
