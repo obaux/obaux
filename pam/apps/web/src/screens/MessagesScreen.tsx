@@ -131,7 +131,9 @@ function MessagesScreenInner() {
           when: c.lastMessageAt ? whenHappened(c.lastMessageAt, locale, t) : null,
           unread: c.unread,
           href: `/messages/thread/?id=${encodeURIComponent(c.id)}`,
-          photoUrl: staffPhotoFor(c.otherName, c.otherProgramName),
+          // An example person's stock photo is for examples only: a real person who happens to share a name
+          // and program with one must not be shown a stranger's face, nor have their device sent to a photo host.
+          photoUrl: examplesOn ? staffPhotoFor(c.otherName, c.otherProgramName) : null,
         }))
       : [];
 

@@ -1,7 +1,8 @@
 'use client';
 
-import { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Text } from '@astryxdesign/core/Text';
 import { Loading, Notice, Page } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { NOTICES, speechLanguageFor } from '@pam/config';
@@ -19,6 +20,7 @@ import { ThreadFrame, ThreadHeader, ThreadIntro, ThreadTop } from '../ThreadFram
 import { DemoThreadLazy } from '../DemoThreadLazy';
 import { ThreadVisit } from '../ThreadVisit';
 import { threadLineFor } from '@/lib/threadLine';
+import { messageProgram } from '@/lib/openConversation';
 
 /**
  * One conversation — read what has been said, and send the next thing.
@@ -61,6 +63,11 @@ function ThreadScreen() {
   const { state: session } = useSession();
   const params = useSearchParams();
   const conversationId = params.get('id');
+  // A place's Message button (D-541): no conversation yet, only the place. This screen opens, or reuses, the
+  // member's conversation with one lead of its program and swaps this address for the conversation's.
+  const programId = conversationId ? null : params.get('program');
+  const router = useRouter();
+  const [programFailed, setProgramFailed] = useState(false);
   // Opened from a program's page (D-313): Back returns there, so a member
   // can ask a question and go straight back to booking.
   const fromPlaceId = params.get('from') === 'place' ? params.get('place') : null;
@@ -87,6 +94,23 @@ function ThreadScreen() {
   // A real thread runs as the real account (D-171); an example thread is
   // drawn for whichever role is being previewed and touches nothing real.
   const canMessage = demo ? viewedCanMessage : realCanMessage;
+
+  useEffect(() => {
+    if (!programId || !signedIn || trueRole !== 'member') return;
+    let cancelled = false;
+    void messageProgram(programId).then((id) => {
+      if (cancelled) return;
+      if (!id) {
+        setProgramFailed(true);
+        return;
+      }
+      const place = params.get('place') ?? programId;
+      router.replace(`/messages/thread/?id=${encodeURIComponent(id)}&from=place&place=${encodeURIComponent(place)}`);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [programId, signedIn, trueRole, router, params]);
 
   const { state, send, sending, sendFailed, limited } = useThread(signedIn && realCanMessage && !exampleId ? conversationId : null);
 
@@ -146,6 +170,29 @@ function ThreadScreen() {
     );
   }
 
+  if (programId) {
+    // Only a member writes to a program first; a place with nobody on Pam shows Call and Website, not this.
+    if (programFailed || trueRole !== 'member') {
+      return (
+        <Page gap={4}>
+          <SubPageHeader title={t('messages.title')} backHref={backHref} backLabel={backLabel} />
+          <Notice
+            notice="service_not_available"
+            title={t('messages.program.unavailable.title')}
+            body={t('messages.program.unavailable.body')}
+            contactLabel={t('help.contact.action')}
+          />
+        </Page>
+      );
+    }
+    return (
+      <Page gap={4}>
+        <SubPageHeader title={t('messages.title')} backHref={backHref} backLabel={backLabel} />
+        <Loading label={t('common.loading')} variant="inline" />
+      </Page>
+    );
+  }
+
   if (demo && conversationId) {
     // `DemoThreadLazy` draws its own `ThreadHeader` inside the pinned block
     // (it knows the pair) and the same `ThreadView` as a real thread.
@@ -187,6 +234,8 @@ function ThreadScreen() {
       : null;
 
   if (state.status === 'ready') {
+    // Only an example's photo is ever looked up by name (a real person sharing one must not get a stranger's face).
+    const examplePhoto = examplesOn ? staffPhotoFor(state.otherName, state.otherProgramName ?? null) : null;
     return (
       <ThreadFrame>
         <ThreadTop>
@@ -201,16 +250,22 @@ function ThreadScreen() {
           messages={state.messages}
           translations={translations}
           otherName={state.otherName}
-          otherPhotoUrl={staffPhotoFor(state.otherName, state.otherProgramName ?? null)}
+          otherPhotoUrl={examplePhoto}
           intro={
             <ThreadIntro
               name={title}
-              photoUrl={staffPhotoFor(state.otherName, state.otherProgramName ?? null)}
+              photoUrl={examplePhoto}
               context={context}
             >
               {/* A member's visit with this program, under the name (D-276). */}
               {trueRole === 'member' && state.otherRole === 'provider' ? (
                 <ThreadVisit programName={state.otherProgramName ?? null} threadId={conversationId ?? ''} />
+              ) : null}
+              {/* What the program sees, said where a member writes (D-541): a first name and these words. */}
+              {trueRole === 'member' && state.otherRole === 'provider' ? (
+                <Text type="supporting" dir="auto">
+                  {t('messages.program.note')}
+                </Text>
               ) : null}
             </ThreadIntro>
           }

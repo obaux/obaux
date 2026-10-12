@@ -47,11 +47,11 @@ export interface TripServiceRow {
   readonly service_name: string;
 }
 
-/** A saved trip, in the shape every trips screen already reads. Only scheduled ones. */
+/** A saved trip, in the shape every trips screen already reads. Cancelled ones are not sent; attended and missed ones say so (D-526). */
 export function tripsFromRows(rows: readonly TripRow[], services: readonly TripServiceRow[] = []): AddedTrip[] {
   const serviceOf = new Map(services.map((s) => [s.appointment_id, s]));
   return rows
-    .filter((row) => row.status === 'scheduled' && row.service_id !== null)
+    .filter((row) => ['scheduled', 'attended', 'missed'].includes(row.status) && row.service_id !== null)
     .map((row) => ({
       id: row.id,
       placeId: row.service_id as string,
@@ -61,6 +61,7 @@ export function tripsFromRows(rows: readonly TripRow[], services: readonly TripS
       lon: row.lon ?? 0,
       startsAt: row.starts_at,
       note: row.note ?? '',
+      ...(row.status === 'attended' || row.status === 'missed' ? { attendance: row.status } : {}),
       ...(serviceOf.has(row.id)
         ? { serviceId: serviceOf.get(row.id)!.program_service_id, serviceName: serviceOf.get(row.id)!.service_name }
         : {}),

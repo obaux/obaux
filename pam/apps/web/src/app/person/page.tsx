@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -12,6 +12,7 @@ import { Avatar } from '@astryxdesign/core/Avatar';
 import { BigButton, BookmarkIcon, ConnectionsIcon, Loading, MessagesIcon, Notice, Page, SignIcon, TripsIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { signedBy, usePolicies } from '@/lib/usePolicies';
+import { rememberPersonName } from '@/lib/personNames';
 import { ProfileSummary } from '@pam/ui/ProfileCards';
 import { TripCard } from '@pam/ui/TripCard';
 import { useRouter } from 'next/navigation';
@@ -39,6 +40,7 @@ import { useRoleView } from '@/lib/useViewedRole';
 import { RoleSwitchControl } from '../RoleSwitchControl';
 import { DUMMY_SELF_ID, dummyConversationIdBetween, dummyConversationsFor } from '@pam/config/dummy-conversations';
 import { ProgramBadge } from '../ProgramBadge';
+import { ProgramMemberCardView } from '../../screens/ProgramMemberCardView';
 
 /**
  * One person, for a case manager or a program to look at.
@@ -251,6 +253,12 @@ function PersonScreen() {
     );
   }
 
+  // A program lead tapping a real member linked to their program gets the small card (D-542): first name, their own program's
+  // visits and a way to message. Anybody else, or a member not linked, gets "not found".
+  if (!person && viewedRole === 'provider') {
+    return <ProgramMemberCardView id={id} header={header} />;
+  }
+
   if (!person) {
     return (
       <Page gap={4}>
@@ -331,6 +339,7 @@ function PersonScreen() {
 
   return (
     <Page gap={4}>
+      <RememberPersonName id={person.id} name={person.firstName ?? ''} />
       {header(t('person.profile'))}
 
       {/*
@@ -415,7 +424,7 @@ function PersonScreen() {
                       total: policies.length,
                     }),
                     icon: <SignIcon width={26} height={26} />,
-                    href: `/person/policies/?${new URLSearchParams({ id: person.id, name: person.firstName ?? '' }).toString()}`,
+                    href: `/person/policies/?${new URLSearchParams({ id: person.id }).toString()}`,
                   },
                 ]
               : []),
@@ -515,6 +524,12 @@ function PersonScreen() {
 }
 
 /** `useSearchParams` needs a Suspense boundary in an exported app (see `/place/`). */
+/** Leaves the first name in this tab for the pages about this person (D-536), so it need not ride in an address. */
+function RememberPersonName({ id, name }: { readonly id: string; readonly name: string }) {
+  useEffect(() => rememberPersonName(id, name), [id, name]);
+  return null;
+}
+
 export default function PersonPage() {
   const { t } = useI18n();
   return (

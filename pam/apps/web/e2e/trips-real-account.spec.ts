@@ -111,3 +111,16 @@ test('New trip offers the places a real account saved, never the example ones', 
   await expect(page.getByText(/Example /)).toHaveCount(0);
   await expect(page.getByText('View all places to visit')).toBeVisible();
 });
+
+test('past visits say what the program marked: checked in, or not marked as arrived; a past one nobody has marked yet says nothing', async ({ page }) => {
+  await signedIn(page, [
+    { ...row('11111111-0000-4000-8000-000000000001', daysFromNow(-3)), status: 'attended' },
+    { ...row('11111111-0000-4000-8000-000000000002', daysFromNow(-4)), status: 'missed' },
+    row('11111111-0000-4000-8000-000000000003', daysFromNow(-0.2)),
+  ]);
+  await page.goto('/trips/');
+  await settled(page);
+  await expect(page.getByText('Past visits')).toBeVisible();
+  await expect(page.getByText('Checked in')).toHaveCount(1);
+  await expect(page.getByText('Not marked as there')).toHaveCount(1);
+});

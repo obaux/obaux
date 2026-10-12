@@ -211,7 +211,16 @@ export function SearchPill<T extends SearchPillItem>({
  */
 export interface SearchFieldProps {
   readonly label: string;
-  readonly placeholder: string;
+  /**
+   * Words shown in the empty field. Leave it out when the label already says it: a screen reader would
+   * otherwise hear the same name twice, once from the label and once from the placeholder.
+   */
+  readonly placeholder?: string;
+  /**
+   * The id of a line that describes the field (a hint under it). An input inside an `InputGroup` cannot
+   * take Astryx's own `description`, so the link is made on the input itself.
+   */
+  readonly describedBy?: string;
   readonly value: string;
   readonly onChange: (value: string) => void;
   /** Focus it on arrival — Messages' search opens on a tap. */
@@ -223,17 +232,30 @@ export interface SearchFieldProps {
 export function SearchField({
   label,
   placeholder,
+  describedBy,
   value,
   onChange,
   hasAutoFocus = false,
   isSubtle = false,
 }: SearchFieldProps) {
+  const groupRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const input = groupRef.current?.querySelector('input');
+    if (!input) return;
+    if (describedBy) input.setAttribute('aria-describedby', describedBy);
+    else input.removeAttribute('aria-describedby');
+  }, [describedBy]);
   return (
-    <InputGroup label={label} isLabelHidden size="lg" xstyle={[styles.group, isSubtle && styles.subtle]}>
+    <InputGroup ref={groupRef} label={label} isLabelHidden size="lg" xstyle={[styles.group, isSubtle && styles.subtle]}>
+      {/*
+        Inside an InputGroup the field is named by the group's label AND its own, so the same words
+        twice read as "ZIP code or neighborhood ZIP code or neighborhood" (Iris, b20). The group's
+        label carries the name; the field's own is left empty.
+      */}
       <TextInput
-        label={label}
+        label=""
         isLabelHidden
-        placeholder={placeholder}
+        {...(placeholder ? { placeholder } : {})}
         value={value}
         onChange={onChange}
         startIcon="search"
