@@ -17,7 +17,7 @@ import {
   directionsHref,
   googlePlaceHref,
 } from '@pam/ui';
-import { usePlaceHasLead } from '@/lib/usePlaceHasLead';
+import { usePlaceLead } from '@/lib/usePlaceHasLead';
 import { PlaceBarActions, leadMessageFor, messageHrefFor, newMessageFrom } from '../../screens/PlaceBarActions';
 import { PlaceDetailSkeleton } from '@pam/ui/Skeletons';
 import { SubPageHeader } from '@pam/ui/SubPage';
@@ -234,7 +234,8 @@ function PlaceScreen() {
 
   const place = state.status === 'ready' ? state.place : null;
   // A place with no program lead on Pam is not told about a visit (D-498).
-  const hasLead = usePlaceHasLead(place?.id, place?.name);
+  const leadKnown = usePlaceLead(place?.id, place?.name);
+  const hasLead = leadKnown === true;
   const { forPlace: policiesAt } = usePlacePolicies();
   const { progress } = useMySignatures();
   const { forPlace } = useServices();
@@ -388,6 +389,9 @@ function PlaceScreen() {
   const plansVisit = (demoRole ?? trueRole) === 'member' && !visit;
   // Said where a member plans or keeps a visit, only at a place with no lead (D-498).
   const tellsNoLead = (demoRole ?? trueRole) === 'member' && !hasLead;
+  // A member can message a place only if somebody on Pam runs it (Will, 12 October: programs gathered from
+  // the internet have no one to answer). Until that is known the entry points wait, not flash in and out.
+  const hidesMessage = (demoRole ?? trueRole) === 'member' && leadKnown !== true;
   const services = forPlace(place!.id);
   const staff = programStaffFor(place!.id);
   // How the program takes people (D-313): a visit to plan, or a schedule
@@ -477,7 +481,7 @@ function PlaceScreen() {
           onSave={signedIn && (demoRole ?? trueRole) !== 'provider' ? toggleSave : undefined}
           onShare={() => void sharePlace(place!.name, place!.address)}
           flagHref={`/flag/?place=${encodeURIComponent(place!.id)}`}
-          messageHref={messageHrefFor(place!.name, place!.id)}
+          messageHref={hidesMessage ? undefined : messageHrefFor(place!.name, place!.id)}
         />,
         true,
       )}
@@ -600,8 +604,8 @@ function PlaceScreen() {
                 // A message from the program waiting (D-305): the row says so,
                 // with a pink dot and their newest words, and opens that
                 // conversation.
-                unread
-                  ? {
+                ...(unread
+                  ? [{
                       id: 'message',
                       label: t('place.quick.newMessage'),
                       description: unread.preview,
@@ -611,14 +615,16 @@ function PlaceScreen() {
                       // One line, then "…" (Will, D-306): the row says there is a
                       // message, the conversation says the rest.
                       isDescriptionOneLine: true,
-                    }
-                  : {
+                    }]
+                  : hidesMessage
+                    ? []
+                    : [{
                       id: 'message',
                       label: t('place.quick.message'),
                       description: t('place.quick.message.body'),
                       icon: <MessagesIcon {...QUICK} />,
                       href: messageHrefFor(place!.name, place!.id),
-                    },
+                    }]),
               ]),
           ...(phone
             ? [

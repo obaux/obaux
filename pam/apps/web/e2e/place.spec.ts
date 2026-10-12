@@ -130,11 +130,13 @@ test.describe("a place's own screen", () => {
     const directions = page.getByRole('link', { name: /^Get directions/ });
     await expect(directions).toHaveAttribute('href', /destination_place_id=ChIJexample123/);
     await expect(directions).toHaveAttribute('target', '_blank');
-    // Directions, then message, then call, then the website. Bring a friend
+    // Directions, then call, then the website: this place has no lead on Pam, so no message row
+    // (Will, 12 October). Bring a friend
     // is not here: it waits for the booked screen (D-333).
     const rows = page.getByRole('list', { name: 'Ways to reach this place' }).getByRole('link');
     await expect(rows.nth(0)).toHaveAccessibleName(/^Get directions/);
-    await expect(rows.nth(1)).toHaveAccessibleName(/^Send a message/);
+    await expect(rows.nth(1)).toHaveAccessibleName(/^Call/);
+    await expect(page.getByRole('link', { name: /^Send a message/ })).toHaveCount(0);
     await expect(page.getByText('Bring a friend')).toHaveCount(0);
   });
 
@@ -159,7 +161,7 @@ test.describe("a place's own screen", () => {
   });
 
   test('the actions are rows, directions first, and the rest is in the bar', async ({ page }) => {
-    // D-291: Get directions, Send a message, Call and Website under the name,
+    // D-291: Get directions, Call and Website under the name (a message row only where the place has a lead on Pam),
     // as rows with a line each (they were labelled circles, D-224); the hours a row too, the week in a drawer (D-309);
     // Save and the ⋯ menu (Flag something, Share, Message) in the bar.
     await signedIn(page);

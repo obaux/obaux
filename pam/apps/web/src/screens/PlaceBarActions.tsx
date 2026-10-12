@@ -80,7 +80,8 @@ export function PlaceBarActions({
   readonly onSave?: (() => void) | undefined;
   readonly onShare: () => void;
   readonly flagHref: string;
-  readonly messageHref: string;
+  /** Left out, there is no one to message at this place (no lead on Pam): the menu has no such item. */
+  readonly messageHref?: string | undefined;
 }) {
   const { t } = useI18n();
   const router = useRouter();
@@ -127,12 +128,16 @@ export function PlaceBarActions({
             onClick: () => router.push(flagHref),
           },
           { id: 'share', label: t('place.share'), icon: <ShareIcon {...ICON} />, onClick: onShare },
-          {
-            id: 'message',
-            label: t('place.messageProgram'),
-            icon: <MessagesIcon {...ICON} />,
-            onClick: () => router.push(messageHref),
-          },
+          ...(messageHref
+            ? [
+                {
+                  id: 'message',
+                  label: t('place.messageProgram'),
+                  icon: <MessagesIcon {...ICON} />,
+                  onClick: () => router.push(messageHref),
+                },
+              ]
+            : []),
         ]}
       />
     </>
