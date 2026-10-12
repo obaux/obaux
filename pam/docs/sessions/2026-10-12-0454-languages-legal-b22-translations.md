@@ -33,11 +33,11 @@ Config on b22: 1176 passed, 0 failed, 1 skipped (Mira's run, with Nico's and Pip
 
 ## Left undone
 
-- Will's signatures on a67, a68, a70 and the Google card (a71); six translations of a67, a68 and a71 follow.
+- Will's signatures on a67 and a68; six translations of each follow. a70 was signed at 06:00 (all seven languages already written; goes in b24). The Google sync lines (a71) wait until Will switches the sync on (06:03).
 - Native readers for all seven languages; pt-BR "registrada" for "marked" first (Brazilian "marcar uma visita" means to book one).
 - The retention figure in p11/p12 must change before the Supabase plan goes to Team; Twilio's retention (Nico); the City of Philadelphia licence read once (`docs/data-licences.md`).
 - Friday 16 October's batch (welcome slides, attendance promise, privacy guard, staff-request words).
 
 ## Needs a human
 
-Will: the four signatures above; the licence read; a native pt-BR reader (registrada) and the other readers.
+Will: the two signatures above (a67, a68), and a71 when the sync goes on; the licence read; a native pt-BR reader (registrada) and the other readers.

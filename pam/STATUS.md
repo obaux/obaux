@@ -988,9 +988,9 @@ and one short-version line on the transparency screen; `transparency.canSee.sign
 at 320px: no findings. Area picker wording (Iris, b20): "ZIP code" in pt-BR, no comma before o/ou, the Spanish picker in tú.
 **Lesson:** `copy:status` cannot see an English copy that was acknowledged as a translation, and `copy.test.ts` only notices keys not on its `MAY_MATCH_ENGLISH` list; eight `checkin.*` lines and `trips.notMarked` came within one merge of shipping as English
 copies behind that list. The desk now checks every batch for keys equal to the English.
-**Still held for Will:** a67 (`claude/lena-request-log-line`: `what-we-keep.p11` the request log, `sharing.p5` the Trips map), a68 (`claude/lena-calendar-privacy`: `sharing.p6`, `what-we-keep.p12`),
-a70 (`claude/lena-translation-retention`: `translation.p2` names Claude by Anthropic; all seven languages written), the Google card a71 (`claude/lena-google-sync-privacy`, with the Google switch). Six translations of
-a67, a68 and a71 follow his word.
+**Signed, going in b24:** a70 (`claude/lena-translation-retention`, signed 06:00 on 12 October: `translation.p2` names Claude by Anthropic; all seven languages written, so nothing for me to add).
+**Still held for Will:** a67 (`claude/lena-request-log-line`: `what-we-keep.p11` the request log, `sharing.p5` the Trips map) and a68 (`claude/lena-calendar-privacy`: `sharing.p6`, `what-we-keep.p12`); six translations of each
+follow his word. The Google sync lines (a71, `claude/lena-google-sync-privacy` and `-strings`) wait until he switches the sync on (Will, 06:03: "wait until we switch sync on. Not now."); they are not signed and are not in b24.
 **Open:** native readers for every translation (pt-BR "registrada" for "marked" first; "ZIP code"; the calendar screen's app-menu names); the retention in p11/p12 must change before the Supabase plan goes to Team
 (`docs/before-launch.md`); Twilio's retention (Nico); the Vercel plan; the City of Philadelphia licence read once (`docs/data-licences.md`).
 Logs: `docs/sessions/2026-10-11-2053-languages-legal-a63-line-1-program-card-test-68-and-the-city.md`, `docs/sessions/2026-10-12-*-languages-legal-b22-translations.md`.
