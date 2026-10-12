@@ -1469,13 +1469,12 @@
   "checkin.here": "I'm here",
   "checkin.went": "I went",
   "checkin.locating": "Checking where you are…",
-  "checkin.done": "You're checked in.",
-  "checkin.points": "{points} points earned.",
+  "checkin.done": "Your visit is marked.",
+  "checkin.points": "You earned {points} points.",
   "checkin.notYet": "You don't seem to be at {place} yet. Try again when you get there.",
-  "checkin.noLocation": "Pam can't see where you are. If you went to {place}, tap I went.",
-  "checkin.notNow": "Not now",
-  "checkin.limit": "You've used this week's limit for visits you say you went to. Tap I'm here when you are at the place.",
-  "checkin.tooLate": "A visit planned less than 2 hours ahead can't be marked.",
+  "checkin.noLocation": "Pam can't check where you are. If you went to {place}, tap I went.",
+  "checkin.limit": "You can tap I went 3 times in 7 days, and you have used them. Tap I'm here when you are at the place.",
+  "checkin.tooLate": "You can't mark a visit you planned less than 2 hours before it starts.",
   "trips.new.saveChange": "Save the new time",
   "trips.new.changeTitle": "Change your visit",
   "trips.moved.title": "Your visit is moved!",
@@ -1618,5 +1617,6 @@
   "legal.sources.title": "Data sources",
   "legal.sources.neighborhoods": "The neighborhood names in the area search come from “Philadelphia Neighborhoods”, made by Abaca Labs. Pam changed it to keep one point for each neighborhood instead of its boundaries.",
   "legal.sources.link": "See the source data",
-  "legal.sources.licence": "License: CC BY 4.0"
+  "legal.sources.licence": "License: CC BY 4.0",
+  "checkin.notNow": "Not now"
 }

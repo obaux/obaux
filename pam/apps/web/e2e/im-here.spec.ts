@@ -56,8 +56,8 @@ test('tapping I\'m here sends the position to the database once, and a yes says 
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
   expect(results.violations).toEqual([]);
   await page.getByRole('button', { name: "I'm here" }).click();
-  await expect(page.getByText("You're checked in.")).toBeVisible();
-  await expect(page.getByText('100 points earned.')).toBeVisible();
+  await expect(page.getByText("Your visit is marked.")).toBeVisible();
+  await expect(page.getByText('You earned 100 points.')).toBeVisible();
   expect(asked).toHaveLength(1);
   expect(asked[0]).toMatchObject({ p_appointment_id: VISIT, p_lat: 39.95, p_lon: -75.16 });
 });
@@ -94,7 +94,7 @@ test('no location given: nothing is sent, and I went earns 60 without a position
   await expect(page.getByText(/Pam can't see where you are/)).toBeVisible();
   expect(here).toBe(0);
   await page.getByRole('button', { name: 'I went' }).click();
-  await expect(page.getByText('60 points earned.')).toBeVisible();
+  await expect(page.getByText('You earned 60 points.')).toBeVisible();
   expect(went).toEqual([{ p_appointment_id: VISIT }]);
 });
 
@@ -106,7 +106,7 @@ test('a refusal for the weekly limit is said plainly', async ({ page, context })
   );
   await open(page);
   await page.getByRole('button', { name: 'I went' }).click();
-  await expect(page.getByText(/used this week's limit/)).toBeVisible();
+  await expect(page.getByText(/you have used them/)).toBeVisible();
 });
 
 test('a visit days away has no I\'m here', async ({ page }) => {
