@@ -11,6 +11,8 @@
  */
 export const SECTION_LABELS: Readonly<Record<string, Readonly<Record<string, string>>>> = {
   'is-the-place-told': {
+    'Places that see your visit': 'Who sees it',
+    'Places that are not told': 'Not told',
     'Before you go': 'Before you go',
     'If they didn’t know you were coming': 'They didn’t know',
     'If the place was wrong': 'The place was wrong',

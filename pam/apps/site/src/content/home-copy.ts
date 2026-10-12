@@ -33,7 +33,7 @@ export const HOME = {
       { label: 'Program Providers', href: '/support/#topic-programs' },
       { label: 'Case managers', href: '/support/#topic-case-managers' },
     ],
-    line: 'Find help in your city. Plan your visit. Keep going.',
+    line: 'Find help, plan your visit, and talk to a real person.',
     alt: 'An isometric picture of Philadelphia with City Hall at the centre and map pins on the buildings.',
   },
   rows: [
@@ -49,7 +49,7 @@ export const HOME = {
     {
       id: 'programs',
       head: 'Your services, built around people.',
-      body: 'Residents find your program and plan a visit. They sign your policies before they visit.',
+      body: 'Residents find your program and plan a visit. They sign your policies before they visit, and you see who’s coming on your calendar.',
       cta: { label: 'Add your program', href: '/support/cant-sign-in/' },
       image: 'calendar',
       alt: 'A program lead’s calendar in Pam: the week by day, with each person who is coming and a check-in button.',
@@ -86,22 +86,10 @@ export const HOME = {
 
 export const HELD: readonly HeldLine[] = [
   {
-    id: 'phone-real-person',
-    wanted: 'Find help, plan your visit, and talk to a real person.',
-    shown: HOME.band.line,
-    reason: 'Phone-frame only. A person at Pam reads email (A28); there is no live conversation.',
-  },
-  {
     id: '24-7',
     wanted: 'We’re here to help. Get 24/7 member support in English, Spanish, and five other languages',
     shown: HOME.callouts[1].text,
-    reason: 'Not true: the help desk is email with no hours. A new promise, a card for Will.',
-  },
-  {
-    id: 'see-whos-coming',
-    wanted: 'Residents find your program and plan a visit. They sign your policies before arriving, and you see who’s coming on your calendar.',
-    shown: HOME.rows[1].body,
-    reason: 'True only once card a63 is signed and attendance part A ships (programs are not told of a visit today).',
+    reason: 'Will, 12 October (a65): hold until launch, because the website has to be translated first. Today the help desk is email with no hours.',
   },
   {
     id: 'privacy-promise',
