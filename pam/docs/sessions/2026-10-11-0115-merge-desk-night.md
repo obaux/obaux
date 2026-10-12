@@ -332,6 +332,21 @@
   - `the_area_search_knows_philadelphia_s_neighborhoods` (20261011211225), 159 rows whose fingerprint matches the
     file;
   - `search_areas_by_every_word_typed` (body md5 matches the file; "east germantown" finds "Germantown, East").
+  Vercel and CI were green, and Iris's re-test passed both items.
+- **Batch b21 (small, no migrations):** fixes from Iris's notes:
+  - Dot: the area picker's field is named once and described by its hint. SearchField is shared, so all five
+    search fields now have a single accessible name.
+  - Lena: the es and pt-BR hint loses its comma; pt-BR keeps "ZIP code" (CEP is Brazil's code); the es picker
+    uses tú throughout.
+  - Lena: DB test 69, nobody writes an appointment row directly.
+- **Held for Will, all built:**
+  - messaging a program (D-541 part 2, Nico c891c50e);
+  - Piper's appointments read closed and the program's member card (e08c5c45, D-542; the card line is signed by
+    Sage, "Here you see their first name and the visits they plan at your program.");
+  - Lena's line-1 stack;
+  - Wren's post 0b374583.
+  None of the seven held migrations has a drop or a delete.
+  Street search waits on a74: the City's ArcGIS hosts are blocked here, and the only reachable copy is from 2012.
 
 ## What was wrong, and what missed it
 
@@ -490,6 +505,9 @@
 | Batch b19 + functions guard + User-Agent + guard cleanup: config | 1106 passed |
 | Batch b20 (e025446d): db / config / ui / web unit / site / e2e full / storybook / site checks | 1308 ok / 1129 / 124 / 135 / 94 / 1454 passed, 19 skipped, 2 area-picker failures on Sage's new hint (Piper's 1bbb75e2 fixed the test) / builds / 120 scans 0, clear, 300 links 0 |
 | Batch b20 head (034b0c13): db / config / area-picker e2e (app code unchanged since the full run) | 1327 ok, 0 not ok / 1129 / 24 passed |
+| Batch b21 (9aab8c69): db / config / ui / web unit / site / e2e full / storybook / site checks | 1327 ok / 1129 / 124 / 135 / 94 / 1463 passed, 19 skipped / builds / 120 scans 0, clear, 300 links 0 |
+| Batch b21 + test 69: db | 1345 ok, 0 not ok |
+| main CI on e27afa24 (b20); Iris's b20 re-test | all four green, READY; two of two pass |
 | Live: enrollments grants and policies after D-541 part 1 | no INSERT/UPDATE/DELETE for anon or authenticated; UPDATE (status, notes, updated_at); own check false; provider check own org |
 
 ## Left undone
