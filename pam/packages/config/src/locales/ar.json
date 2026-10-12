@@ -514,7 +514,7 @@
   "person.savedPlaces.title": "الأماكن التي حفظها هذا الشخص",
   "person.signedOut.body": "تتطلب هذه الصفحة تسجيل الدخول.",
   "person.signedOut.title": "سجل الدخول لعرض هذا",
-  "place.about": "عن البرنامج",
+  "place.about": "عن هذا المكان",
   "place.address": "العنوان",
   "place.audience.students": "داخل مدرسة · للطلاب فقط",
   "place.audience.youth": "من عمر 10 إلى 17 سنة",
@@ -1757,6 +1757,5 @@
   "legal.sources.title": "مصادر البيانات",
   "legal.sources.neighborhoods": "تأتي أسماء الأحياء في البحث عن المنطقة من مجموعة البيانات «Philadelphia Neighborhoods» التي أعدتها Abaca Labs. وقد عدل Pam هذه المجموعة ليحتفظ بنقطة واحدة لكل حي بدلا من حدودها.",
   "legal.sources.link": "عرض البيانات المصدر",
-  "legal.sources.licence": "الترخيص: CC BY 4.0",
-  "checkin.notNow": "ليس الآن"
+  "legal.sources.licence": "الترخيص: CC BY 4.0"
 }
