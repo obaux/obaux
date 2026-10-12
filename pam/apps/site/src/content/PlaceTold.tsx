@@ -21,9 +21,10 @@ export function PlaceTold() {
           time, the service you picked, and whether you were marked as there. They do not see your last name or the rest of your profile.
         </P>
         <P>
-          If nobody marks you as there, the visit shows to them as missed a day after it ends. To mark it yourself, tap “I’m here”
-          when you arrive, or “I went” soon after. If you went and it says missed, tell the program. They can fix
-          it for 14 days.
+          If nobody marks you as there, the visit shows to them as missed a day after it ends. You can mark it
+          yourself: tap “I’m here” when you get there, or “I went” up to 3 hours after the visit ends. This works only
+          for a visit you planned at least 2 hours before it starts, and “I went” works 3 times in any 7 days. If you
+          went and it says missed, tell the program. They can fix it for 14 days after the visit.
         </P>
         <P>If you cancel the visit, they stop seeing it.</P>
       </Section>
@@ -64,7 +65,8 @@ export function PlaceTold() {
       <Section title="For programs">
         <P>
           If you run a program on Pam, the visits people plan with you show on your Home: their first name, the day
-          and time, and the service. Cancelled visits drop off.
+          and time, and the service. Cancelled visits drop off. You can mark someone as there from 2 hours before the visit
+          until 14 days after it ends.
         </P>
       </Section>
     </Body>

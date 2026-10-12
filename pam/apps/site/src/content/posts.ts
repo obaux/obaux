@@ -77,7 +77,7 @@ const ALL: readonly SupportPost[] = [
     topic: 'members',
     audience: 'residents and programs',
     title: 'Does the place know I’m coming?',
-    summary: 'Some programs on Pam see your visit; most places are not told. How to call ahead, and what to do if they did not know you were coming.',
+    summary: 'Programs on Pam see your visit. Most places are not told. How to call ahead, and what to do if they didn’t know you were coming.',
     updated: '2026-10-12',
     keywords: ['told', 'know', 'expect', 'expecting', 'coming', 'showed up', 'turned away', 'appointment', 'call ahead', 'front desk', 'list', 'no clue'],
   },
