@@ -479,7 +479,7 @@
   "person.savedPlaces.title": "他们收藏的地点",
   "person.signedOut.body": "此页面需要您先登录。",
   "person.signedOut.title": "登录后查看",
-  "place.about": "关于项目",
+  "place.about": "关于这个地点",
   "place.address": "地址",
   "place.audience.students": "在学校内 · 仅限学生",
   "place.audience.youth": "10至17岁",
@@ -1617,6 +1617,5 @@
   "legal.sources.title": "数据来源",
   "legal.sources.neighborhoods": "区域搜索中的街区名称来自 Abaca Labs 制作的“Philadelphia Neighborhoods”。Pam对其做了修改：每个街区只保留一个点，而不是边界。",
   "legal.sources.link": "查看原始数据",
-  "legal.sources.licence": "许可协议：CC BY 4.0",
-  "checkin.notNow": "暂时不用"
+  "legal.sources.licence": "许可协议：CC BY 4.0"
 }

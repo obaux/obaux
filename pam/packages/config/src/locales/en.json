@@ -476,7 +476,7 @@
   "person.savedPlaces.title": "Places they saved",
   "person.signedOut.body": "This page needs you signed in.",
   "person.signedOut.title": "Sign in to see this",
-  "place.about": "About program",
+  "place.about": "About this place",
   "place.address": "Address",
   "place.audience.students": "In a school · students only",
   "place.audience.youth": "Ages 10 to 17",
@@ -1617,6 +1617,5 @@
   "legal.sources.title": "Data sources",
   "legal.sources.neighborhoods": "The neighborhood names in the area search come from “Philadelphia Neighborhoods”, made by Abaca Labs. Pam changed it to keep one point for each neighborhood instead of its boundaries.",
   "legal.sources.link": "See the source data",
-  "legal.sources.licence": "License: CC BY 4.0",
-  "checkin.notNow": "Not now"
+  "legal.sources.licence": "License: CC BY 4.0"
 }

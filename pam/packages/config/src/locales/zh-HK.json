@@ -479,7 +479,7 @@
   "person.savedPlaces.title": "他們收藏的地點",
   "person.signedOut.body": "此頁面需要您先登入。",
   "person.signedOut.title": "登入以查看此頁面",
-  "place.about": "關於計劃",
+  "place.about": "關於此地點",
   "place.address": "地址",
   "place.audience.students": "學校內 · 只限學生",
   "place.audience.youth": "10至17歲",
@@ -1617,6 +1617,5 @@
   "legal.sources.title": "資料來源",
   "legal.sources.neighborhoods": "地區搜尋中的社區名稱來自 Abaca Labs 製作的「Philadelphia Neighborhoods」。Pam已作修改：每個社區只保留一個點，而不是邊界。",
   "legal.sources.link": "查看原始資料",
-  "legal.sources.licence": "授權條款：CC BY 4.0",
-  "checkin.notNow": "暫時不用"
+  "legal.sources.licence": "授權條款：CC BY 4.0"
 }
