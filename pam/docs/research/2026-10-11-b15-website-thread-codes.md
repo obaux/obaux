@@ -263,3 +263,58 @@ Iris
 **3. Enrollments lockdown (D-541 part 1):** nothing to test on screen, as briefed.
 
 Iris
+
+---
+
+## b22 re-test (12 October, 05:20 UTC)
+
+`main` at `238135ec`: Storybook from Chromatic, and the site and web app built locally.
+No sign-in, accounts or sends; `joinpam.org` is blocked here, so the site is the local build.
+
+**1. Privacy, seven languages at 320: PASS.**
+
+- **The sharing paragraph** (`privacy.s.sharing.p2`) ends in every language with who can
+  start a chat: "A program can start a chat with you only if you are signed up with them or
+  have a visit planned there. Otherwise only you can start one, and they can answer." Each
+  translation reads as the same single thought.
+- **"A program can see"** is the card on join step 2 (`TransparencyReading`, D-541/543),
+  with five lines in all seven languages. It's drawn without the colon the string has.
+- **p9 ("I'm here") and p10 (search near you)** each read as one thought. The buttons p9
+  quotes match the app's `checkin.here` / `checkin.went` labels in es, pt-BR, zh-CN, zh-HK,
+  ru and ar. In English the words match, but p9 quotes “I’m here” with a curly apostrophe
+  and the button is "I'm here" with a straight one. A nit.
+- **Layout:** Privacy and "What others can see" are 320 wide in every language, Arabic is
+  rtl, and nothing is cut off. The section chips scroll sideways on purpose.
+
+**2. Messages in Pam (site, local build): PASS.**
+
+- **The lead:** "You can also write to a program that is on Pam, even before you plan a
+  visit… A program can start a chat with you only if you are signed up with them or have a
+  visit planned there."
+- **The table:**
+  - A member: "Your own case manager, or any program that is on Pam".
+  - A program lead: "Members who are signed up with your program or have a visit planned
+    there, and anyone who wrote to you (you can answer)".
+- **Mention:** the page still says "Updated October 10, 2026".
+
+**3. A place with no lead, and the I'm here card: PASS, with one story problem.**
+
+- **`member-created--place-no-lead`:** no "Send a message" row, a ⋯ menu of only Flag
+  something and Share this place, and no I'm here card. For comparison,
+  `member-created--place-with-lead` has "Message the program" in its ⋯ menu. **Mention:** it
+  has no "Send a message" row either.
+- **The I'm here card:** `ImHereCard.tsx` keeps the button label "I'm here" after "I went";
+  "Checking where you are…" appears only while an I'm here is locating. It ends with
+  `checkin.done` "Your visit is marked." and `checkin.points` "You earned {points} points."
+  - The app's `im-here.spec.ts` passes 6/6 at 320, including D-545: no I'm here or I went
+    at a no-lead place.
+  - An extra run of mine sampled the screen every 50ms after "I went": English never showed
+    "Checking where you are…", only "Your visit is marked." and "You earned 60 points."
+  - My Spanish and Arabic runs didn't reach the button, because the language came from my
+    setup, not the app. The code path is the same in every language.
+- **Story problem (W): `member-created-states-saved-trips--im-here` no longer shows the
+  card.** Its place, Riverside Job Center, is a no-lead place, so under D-545 the card is
+  hidden. The page says "Pam does not tell Riverside Job Center you are coming." Storybook
+  can't show I'm here until the story uses a place with a lead.
+
+Iris
