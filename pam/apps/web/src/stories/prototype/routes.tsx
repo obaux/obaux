@@ -10,6 +10,7 @@ import JoinPage from '../../app/join/page';
 import MessagesPage from '../../app/messages/page';
 import MessageThreadPage from '../../app/messages/thread/page';
 import NotificationsPage from '../../app/notifications/page';
+import ReplyPage from '../../app/reply/page';
 import PersonPage from '../../app/person/page';
 import ConnectPage from '../../app/person/connect/page';
 import PastTripsPage from '../../app/person/past/page';
@@ -112,6 +113,8 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/place/policies/view/': screen(() => <PlacePolicyPage />),
   '/saved/': screen(() => <SavedPage />),
   '/flag/': screen(() => <FlagPage />),
+  // The super admin's answer to a help request, opened from the email's link (A28, D-524).
+  '/reply/': screen(() => <ReplyPage />),
   '/points/': screen(() => <PointsPage />),
   '/notifications/': screen(() => <NotificationsPage />),
   '/messages/': screen(() => <MessagesPage />),
