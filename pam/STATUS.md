@@ -2179,3 +2179,7 @@ D-540, branch `claude/places-programs-neighborhoods`: 159 neighborhoods (a name 
 ## Design system · area search named once (11 October 2026) — READY, not merged
 
 A screen reader reads the Places area search field's name once and reads "Like 19107, or Fishtown." as its description (`SearchField`: empty inner label, optional placeholder, `describedBy`). Nothing looks different. Log: `docs/sessions/` newest `area-picker-screen-reader-fix`.
+
+## Design system · the map for a72 (12 October 2026) — READY, not merged
+
+"PAM — User flows" shows the b22 screens (a place on Pam and a place gathered from the internet, I'm here, a program's member card, the program-side New message). `flows.mjs` has them; the stories they need are in `docs/user-flows/a72-stories.patch`, to apply after b22. Log: `docs/sessions/` newest `map-for-a72`.
