@@ -213,7 +213,7 @@ export const flows = [
         path: '/place/ (nobody on Pam runs it)',
         actions: [{ scroll: 'page', by: 700 }, { wait: 500 }],
         changed: 'D-544',
-        note: "No Message row or menu item, because nobody on Pam can answer; they wait, not flash in and out, while Pam works it out (D-544). No I'm here or I went (D-545). The plan is only the member's, and says so (D-498). About this place, not About program",
+        note: "No Message row or menu item, because nobody on Pam can answer; they wait, not flash in and out, while Pam works it out (D-544). No I'm here or I went (D-545). The plan is only the member's, and says so (D-498)",
       },
       imHere: {
         title: "A visit that is on now: I'm here",

@@ -2206,7 +2206,7 @@ A screen reader reads the Places area search field's name once and reads "Like 1
 
 ## Design system · the map for a72 (12 October 2026) — READY, not merged
 
-"PAM — User flows" shows the b22 screens (a place on Pam and a place gathered from the internet, I'm here, a program's member card, the program-side New message). `flows.mjs` has them; the stories they need are in `docs/user-flows/a72-stories.patch`, to apply after b22. Log: `docs/sessions/` newest `map-for-a72`.
+"PAM — User flows" shows the b22 screens (a place on Pam and a place gathered from the internet, I'm here, a program's member card, the program-side New message). `flows.mjs` has them, and the stories they need (a member card, `hasLead`, `programMemberCard`) are in the code. Log: `docs/sessions/` newest `map-for-a72`.
 ## Design system · search fields heard once (11 October 2026) — READY, not merged
 
 The New message sheet's search field no longer repeats its label as a placeholder. The other three search fields (Messages, Schedule, Connect) keep placeholders that add or rephrase words; see the session log. Log: `docs/sessions/` newest `search-fields-heard-once`.
