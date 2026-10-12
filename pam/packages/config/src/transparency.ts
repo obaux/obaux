@@ -222,6 +222,15 @@ export const ADMIN_CANNOT_SEE = [
    * test 64) locks it. A program therefore sees "that you signed up" only for a sign-up that happened.
    */
   'a_sign_up_written_by_the_member_or_a_lead_directly',
+  /**
+   * Where a member is. The "I'm here" check-in (D-526 part B) asks the phone for its position once, when the
+   * member taps, and the server compares it with the place (within about 150 metres) in the same call: the
+   * position is used for that one comparison and written nowhere. What Pam keeps is that the member was there,
+   * the time and how it was marked — never the position. So there is nothing for a guide or a program to see,
+   * and this entry is here so a test can say so, and so a column that did keep a position would have to change
+   * the contract and the Privacy page first (`privacy.s.what-we-keep.p9`, `im-here-location.test.ts`).
+   */
+  'member_location',
 ] as const;
 
 export type AdminHiddenField = (typeof ADMIN_CANNOT_SEE)[number];

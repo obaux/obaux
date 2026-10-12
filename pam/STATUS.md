@@ -2148,6 +2148,18 @@ Branch `claude/places-programs-trips-launch` (D-509). A real account sees only i
 
 Branch `claude/places-programs-no-examples-places` (D-509 extended). The example services, policies, places, reports, people and program are for a demo or Storybook only; a lead's Book for a member and Add a person use their own program. e2e `no-examples-for-real-accounts.spec.ts`; the example-walking specs opt in with `pam.examples`.
 
+## Places & programs · attendance part A: leads see real visits (11 October 2026) — READY, not merged
+
+Branch `claude/places-programs-attendance-a-visits` (D-526). `my_program_visits` (migration `20261011050637`): a program lead's own program's visits, first names only; the lead's Home lists them. Test `56_a_program_lead_reads_the_visits_at_their_own_test.sql`; e2e `program-visits.spec.ts`. Parts B–D follow.
+
+## Places & programs · attendance part B: check-in and points (11 October 2026) — READY, not merged (on top of part A)
+
+Branch `claude/places-programs-attendance-b-checkin` (D-526). `check_in_visit` / `undo_check_in` (migration `20261011051257`): own-program lead only, 100 points once per visit, undo reverses once. The lead's circle asks the database for real visits. Test `57_a_program_lead_checks_in_a_visit_test.sql`; e2e in `program-visits.spec.ts`. No new strings. Parts C–D follow.
+
+## Places & programs · attendance part C: missed visits (11 October 2026) — READY, not merged (on top of part B)
+
+Branch `claude/places-programs-attendance-c-missed` (D-526). `sweep_missed_visits()` (migration `20261011053445`), nightly 04:20 UTC: a scheduled visit at a program with a lead, 24 h after it ended, becomes missed; pays and takes nothing, no text. Test `58_the_nightly_sweep_marks_unmarked_visits_missed_test.sql`. Part D follows.
+
 ## Places & programs · Add my program (11 October 2026) — on `main`
 
 Branch `claude/places-programs-add-my-program` (D-525). A member taps Add my program on Profile, answers the lead's questions, and the request goes to Pam's team (`request_staff_access`); being checked / not approved + ask again / approved (gains the provider role next to the member side, D-491). Migration `20261011044654`: no second ask while waiting or approved; a denied one reopens. Test `55_asking_again_to_add_a_program_test.sql`; e2e `add-my-program.spec.ts`.
@@ -2168,9 +2180,17 @@ Sign in on the code step is off until all six digits are in (D-532). The Support
 
 `@pam/ui/DataHeading` and `SubPageHeader isTitleData` mark a heading's text as data, so a Latin name on an Arabic page (and the reverse) reads in its own direction while Pam's own headings follow the page (D-534). On place pages, profile cards, staff person rows and the conversation bar. Log: `docs/sessions/` newest `data-headings-keep`.
 
+## Places & programs · "I'm here" check-in (11 October 2026) — READY soon, held off main (on top of attendance C)
+
+Branch `claude/places-programs-im-here` (D-535). `i_am_here` (150 m, 100 points) and `i_went` (60, 3 a week), own visit, window, planned 2 h ahead; the position is compared and never kept. Test `59_a_member_says_i_m_here_or_i_went_test.sql`; e2e `im-here.spec.ts`. Waits for the Privacy line.
+
 ## Places & programs · no street-address call to the city (11 October 2026) — on `main` (b18)
 
 Branch `claude/places-programs-no-city-call` (D-536). The browser no longer asks the City of Philadelphia about a typed address; the picker says ZIP code or neighborhood; a member's first name is out of the policies address; the Google map in Trips opens on the whole city, never fitted to the pins. No migration.
+
+## Places & programs · the program's small card for a member, and no direct read of a visit (11 October 2026)
+
+D-542, on `claude/places-programs-im-here` (held with "I'm here" and attendance until Will signs a63 line 1): a lead reads no appointment row directly (`…060000`, test 65), and opens a linked member (enrolled, a visit there, or a conversation with the program's staff) to a card of first name, this program's visits and Message (`program_member_card`, `…203852`, test 66). Log: `docs/sessions/2026-10-11-2045-places-programs-program-card.md`.
 
 ## Places & programs · neighborhoods in the area search (11 October 2026)
 

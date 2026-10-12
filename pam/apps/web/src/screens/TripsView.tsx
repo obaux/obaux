@@ -53,6 +53,8 @@ export interface Trip {
   readonly lat: number;
   readonly lon: number;
   readonly startsAt: string;
+  /** What the program marked after the visit (D-526). */
+  readonly attendance?: 'attended' | 'missed';
   readonly withName?: string | null;
   readonly withPhotoUrl?: string | null;
   /** The service the visit is for (D-313): its policies are the ones to sign. */
@@ -172,6 +174,8 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
               : { label: t('trips.policies.needed'), isDone: false }
             : null
         }
+        // After the visit, what the program marked (D-526): a mark is theirs to make; no mark says so, and costs nothing.
+        mark={isPast && trip.attendance ? t(trip.attendance === 'attended' ? 'schedule.checkedIn' : 'trips.notMarked') : null}
         label={tPlain('trips.card.label', {
           place: trip.placeName,
           when: when(trip.startsAt),
@@ -307,6 +311,7 @@ export function TripsScreen({ headerActions }: { readonly headerActions?: ReactN
     lon: trip.lon,
     startsAt: trip.startsAt,
     serviceId: trip.serviceId ?? null,
+    ...(trip.attendance ? { attendance: trip.attendance } : {}),
   }));
   // The example set (a demo or Storybook only, D-509): `exampleTrips` is empty for a real account,
   // and changes whenever a trip is cancelled, so this reads again then.
