@@ -194,7 +194,8 @@ describe('transparency screen (SOP §4.1)', () => {
     expect(bundle[TRANSPARENCY_SCREEN.titleKey]).toBe(TRANSPARENCY_SCREEN.title);
     expect(bundle[TRANSPARENCY_SCREEN.confirmKey]).toBe(TRANSPARENCY_SCREEN.confirm);
     expect(bundle[TRANSPARENCY_SCREEN.footerKey]).toBe(TRANSPARENCY_SCREEN.footer);
-    for (const line of [...TRANSPARENCY_SCREEN.canSee, ...TRANSPARENCY_SCREEN.cannotSee]) {
+    expect(bundle[TRANSPARENCY_SCREEN.programHeadingKey]).toBe(TRANSPARENCY_SCREEN.programHeading);
+    for (const line of [...TRANSPARENCY_SCREEN.canSee, ...TRANSPARENCY_SCREEN.program, ...TRANSPARENCY_SCREEN.cannotSee]) {
       expect(bundle[line.key], `drift on ${line.key}`).toBe(line.en);
     }
   });

@@ -42,6 +42,46 @@ export const ADMIN_CAN_SEE = [
   'goals',
   'enrollments_and_statuses',
   'appointments_and_attendance',
+  /**
+   * D-526 (attendance part A, 11 October 2026): the program a member plans a visit with sees that visit.
+   * `my_program_visits()` returns, for the caller's OWN program only and for a program lead with an active
+   * account, each visit that is not cancelled with the member's first name, the day and time, the service
+   * they picked and whether the visit is marked as there (`checked_in_at`) — no last name, phone,
+   * address or photo. Part C adds the label "missed": a visit still `scheduled` a day after it ends,
+   * at a program with a lead on Pam, is marked missed overnight (`sweep_missed_visits()`), and
+   * `my_program_visits()` returns that status; it pays and takes nothing, and nobody is texted.
+   * The member does not have to have signed up: planning the visit is enough. Said to the
+   * member on `transparency.canSee.appointments` ("A program sees the visits you plan there too.") and on
+   * the Privacy page (`privacy.s.sharing.p2`); `program-visits-contract.test.ts` holds the three together.
+   * It does NOT widen `member_activity_for_a_program` below: a member's trips to OTHER programs stay hidden.
+   */
+  'visits_planned_at_their_own_program',
+  /**
+   * D-541 (Will, 11 October, 20:22 and 20:24: "members must be able to message a program before booking" and
+   * "communicate what programs can see, even before the person books"): a member can write to a program from its
+   * page at any time, with no sign-up and no visit.
+   *
+   * The merge desk's rule (11 October, 20:43): messaging a program creates a CONVERSATION, not a link. A member who has
+   * only written to a program is not in its `messageable_people()` (its New message list), `people_activity()`,
+   * `provider_linked_members()` or `my_program_visits()`: so it learns no save times, no visits and no names list. It reads,
+   * in that conversation, the member's FIRST NAME (`conversation_partners()` returns a first name, a role and a program name,
+   * nothing else) and what they write, and may reply there; it reads nothing else of them: not their profile row, a last
+   * name, a phone number, a saved place, a trip to another program, points or the last day they used Pam. The small card a
+   * lead sees when they tap that member is the first name and the visits planned at their own program.
+   *
+   * Said to the member on `transparency.program.firstName` and `.messages` (the "A program can see:" card), on
+   * `transparency.summary.program` and on the Privacy page (`privacy.s.sharing.p2`);
+   * `program-sees-before-a-visit.test.ts` holds those together and `68_a_member_who_has_only_written_to_a_program_is_test.sql`
+   * holds the database to them.
+   */
+  'first_name_and_words_to_a_program_they_message',
+  /**
+   * D-485 (Will's card a25, 10 October): a program that has a member's signature on one of its policies reads their first
+   * name and the day they signed — never the picture (`program_policy_signers()`, part 3). The member does not have to
+   * have signed up: signing is enough. A case manager reads none of it. (`transparency.canSee.signed` used to say this
+   * under "Your guide can see"; it now stands in the "A program can see:" card as `transparency.program.signed`.)
+   */
+  'first_name_and_day_signed_on_a_programs_policy',
   'points_and_level',
   /**
    * Said on the screen since D-413 (Will, 9 October: "Case manager can see
@@ -146,9 +186,42 @@ export const ADMIN_CANNOT_SEE = [
    * (D-242): the intent was that a program sees the last day a member used
    * Pam; the database does not give it yet, so nothing member-facing says so
    * (D-465, `last_active_date` above). What this entry still covers: which places a member saved, their trips to other
-   * programs, and their points — none of it shown to a program.
+   * programs, and their points — none of it shown to a program. (D-526: a program does see the visits
+   * planned AT itself, `visits_planned_at_their_own_program` above; that is not a trip to another program.)
    */
   'member_activity_for_a_program',
+  /**
+   * D-526 / D-535 (Mira, 11 October): a program's lead sees a visit's status (booked, there, missed), never who marked it or how.
+   * A member can mark their own visit ("I’m here", "I went"), so a visit may show as there without the lead having marked it; the
+   * lead cannot tell the two apart (no label, no function that says; undoing a member's mark is a quiet no-op for the lead), and
+   * cannot tell by position or by word. `my_program_visits()` returns the status and not the method. Only the member sees how,
+   * and an admin's audit row says only that a check-in happened. (Privacy p9 says what Pam keeps; `privacy.s.sharing.p2` says
+   * what a program sees; this entry is why neither says who or how.)
+   */
+  'who_marked_a_visit_or_how',
+  /**
+   * 11 October (Mira, found the same day): the note a member keeps on their own trip (`appointments.note`, up to 200
+   * characters, 20261010074045) is for them. A program's lead sees a visit's four things (first name, day and time, service,
+   * marked as there) through `my_program_visits()` and should never read the row itself. Live today (20261010074241 replaced
+   * 0007's `appointments_provider`): select only, no write grant for a lead or a member, but the read is still of whole rows,
+   * `note`, `attendance_method` and `check_in_code` included. Piper narrows that read in a new migration on
+   * `claude/places-programs-im-here`, with a database test. That is a gap being closed, not a thing members are told is
+   * shared: nothing member-facing says a program sees the note.
+   *
+   * Closed by Piper's 20261011060000 (`appointments_provider_select` is `using (false)`: a lead reads NO appointment row
+   * directly, test 65); the write side is pinned by test 69 (no role but the owner writes a row, or the columns that say how a
+   * visit was marked or what the member wrote). The lead's door to a member's visits is `my_program_visits()` and, for the
+   * small card a lead sees when they tap a member, `program_member_card()` (20261011203852, D-542, test 66): exactly three
+   * keys (`member_id`, `first_name`, `visits`), each visit only `appointment_id`, `starts_at`, `ends_at`, `status`,
+   * `service_name`, `checked_in_at`. `program-sees-before-a-visit.test.ts` reads both migrations once they are on main.
+   */
+  'the_note_a_member_keeps_on_a_visit',
+  /**
+   * 11 October (Mira, found the same day): signing up is written by the provider path and the server, not by a member
+   * or by a lead on their own say-so. `enrollments` was writable by both; D-541 part 1 (migration 20261011203904, batch b20,
+   * test 64) locks it. A program therefore sees "that you signed up" only for a sign-up that happened.
+   */
+  'a_sign_up_written_by_the_member_or_a_lead_directly',
 ] as const;
 
 export type AdminHiddenField = (typeof ADMIN_CANNOT_SEE)[number];
@@ -182,6 +255,9 @@ export const TRANSPARENCY_SCREEN: {
   readonly canSeeHeadingKey: string;
   readonly canSeeHeading: string;
   readonly canSee: readonly TransparencyLine[];
+  readonly programHeadingKey: string;
+  readonly programHeading: string;
+  readonly program: readonly TransparencyLine[];
   readonly cannotSeeHeadingKey: string;
   readonly cannotSeeHeading: string;
   readonly cannotSee: readonly TransparencyLine[];
@@ -203,7 +279,7 @@ export const TRANSPARENCY_SCREEN: {
     },
     {
       key: 'transparency.canSee.appointments',
-      en: 'Your visits, and if you went or missed one',
+      en: 'Your visits, and if you went or missed one. A program sees the visits you plan there too.',
     },
     // D-413 — badges named, not left to "level": a case manager already reads them.
     { key: 'transparency.canSee.points', en: 'Your points, your level and your badges' },
@@ -236,13 +312,33 @@ export const TRANSPARENCY_SCREEN: {
       key: 'transparency.canSee.saves',
       en: 'When you save a new place — not which one. A program you joined sees this too.',
     },
-    /**
-     * D-485 (Will, a25, point 2) — a program keeps a record of the policies a
-     * member signs: their first name and the date, never the signature picture.
-     */
+  ],
+
+  programHeadingKey: 'transparency.program.heading',
+  programHeading: 'A program can see:',
+  /**
+   * What a PROGRAM reads of a member, in the order the member meets it (D-541). It is its own card because the list
+   * above is headed "Your guide can see": a fact only a program reads (a message to it, a signature on its rules) cannot
+   * stand under that heading without telling the member their guide reads it. Lines the guide also reads — visits,
+   * a saved place — keep their "A program … sees this too" on the guide's list above.
+   *
+   * The first line is the condition for all the others: a program sees nothing of a member who has done none of the four
+   * things. "Before any visit" is the first, second and third lines; the fifth is what a planned visit adds.
+   */
+  program: [
     {
-      key: 'transparency.canSee.signed',
-      en: 'The policies you sign for a program, and the day you signed. A program you joined sees this too.',
+      key: 'transparency.program.firstName',
+      en: 'Your first name, once you write to it, sign its rules, sign up or plan a visit there.',
+    },
+    { key: 'transparency.program.messages', en: 'What you write to it, even before you plan a visit.' },
+    {
+      key: 'transparency.program.signed',
+      en: 'The day you signed its rules. Never your signature.',
+    },
+    { key: 'transparency.program.signedUp', en: 'That you signed up, and how it is going.' },
+    {
+      key: 'transparency.program.visits',
+      en: 'The visits you plan there: the day and time, the service you picked, and whether you were marked as there.',
     },
   ],
 
@@ -270,6 +366,8 @@ export const TRANSPARENCY_I18N_KEYS: readonly string[] = [
   TRANSPARENCY_SCREEN.titleKey,
   TRANSPARENCY_SCREEN.canSeeHeadingKey,
   ...TRANSPARENCY_SCREEN.canSee.map((l) => l.key),
+  TRANSPARENCY_SCREEN.programHeadingKey,
+  ...TRANSPARENCY_SCREEN.program.map((l) => l.key),
   TRANSPARENCY_SCREEN.cannotSeeHeadingKey,
   ...TRANSPARENCY_SCREEN.cannotSee.map((l) => l.key),
   TRANSPARENCY_SCREEN.footerKey,
@@ -281,6 +379,7 @@ export const TRANSPARENCY_I18N_KEYS: readonly string[] = [
   'transparency.summary.see',
   'transparency.summary.cannot',
   'transparency.summary.reported',
+  'transparency.summary.program',
   ...['plans', 'progress', 'people'].map((g) => `transparency.group.${g}`),
   'copy.page',
   'copy.done',
@@ -309,7 +408,6 @@ export const TRANSPARENCY_GROUPS: readonly {
       'transparency.canSee.points',
       'transparency.canSee.lastActive',
       'transparency.canSee.saves',
-      'transparency.canSee.signed',
     ],
   },
   {
