@@ -54,7 +54,11 @@ export function exampleHasLead(placeName: string): boolean {
   return DUMMY_PROGRAM_LEADS.some((person) => person.orgName === placeName);
 }
 
-export function usePlaceHasLead(placeId: string | null | undefined, placeName: string | null | undefined): boolean {
+/**
+ * `true` / `false` once known, `null` while a catalogue place is still being asked about, so a button
+ * that depends on it can wait instead of showing and then going (D-541).
+ */
+export function usePlaceLead(placeId: string | null | undefined, placeName: string | null | undefined): boolean | null {
   const real = useSyncExternalStore(
     subscribe,
     () => known,
@@ -66,5 +70,9 @@ export function usePlaceHasLead(placeId: string | null | undefined, placeName: s
   }, [isReal, placeId]);
   if (placeId == null) return false;
   if (!isReal) return placeName != null && exampleHasLead(placeName);
-  return real[placeId] === true;
+  return placeId in real ? real[placeId] === true : null;
+}
+
+export function usePlaceHasLead(placeId: string | null | undefined, placeName: string | null | undefined): boolean {
+  return usePlaceLead(placeId, placeName) === true;
 }

@@ -4,9 +4,14 @@ import { HowTo, ShotCard } from '../components/HowTo';
 
 /**
  * Support post: Messages (everyone). Who can write to whom is a database rule (D-176,
- * migration 0063, and 0072 / D-262): a member may start a chat with their own case manager or a
- * program they joined, and staff with their own members; a super admin with case managers and
- * program leads, never a member; nobody else. A message never
+ * migration 0063, and 0072 / D-262, then D-541): a member may start a chat with their own case manager
+ * or with any program that has a lead on Pam, before and without signing up or planning a visit; a
+ * program may START a chat with a member only if the member is signed up with it or has a visit planned
+ * there that is not cancelled, and otherwise only answer a member who wrote to it; a case manager with
+ * their own members; a super admin with case managers and program leads, never a member; nobody else.
+ * Signed (Sage; Will, a72, 12 October 03:33). HELD only until Nico's D-541 part 2
+ * (claude/messages-program-before-booking) deploys. What a program sees when a member writes to it is said by
+ * "What others can see" and the Privacy page, not here. A message never
  * queues a text (migration 0064). Blocking is the ⋯ menu's "Block this person" (D-463, words from
  * en.json messages.block.* and messages.blocked.*). Left out on purpose: message translation
  * (switched off), voice notes.
@@ -15,8 +20,9 @@ export function MessagesInPam() {
   return (
     <Body>
       <Lead>
-        You can message your own case manager or a program you joined, and they can message you. Nobody else
-        can start a chat with you.
+        You can message your own case manager. You can also write to a program that is on Pam, even before you
+        plan a visit, and they can answer you. A program can start a chat with you only if you are signed up with
+        them or have a visit planned there. Otherwise only you can start one, and they can answer. Your own case manager can start a chat with you too. Nobody else can.
       </Lead>
 
       <Section title="Who can write to whom">
@@ -25,9 +31,9 @@ export function MessagesInPam() {
           rowHeading="You are"
           columns={['You can start a chat with']}
           rows={[
-            { label: 'A member', cells: ['Your own case manager, or a program you joined.'] },
+            { label: 'A member', cells: ['Your own case manager, or any program that is on Pam.'] },
             { label: 'A case manager', cells: ['The members who are assigned to you, and a super admin.'] },
-            { label: 'A program lead', cells: ['Members who joined your program, and a super admin.'] },
+            { label: 'A program lead', cells: ['Members who are signed up with your program or have a visit planned there, and anyone who wrote to you (you can answer). And a super admin.'] },
             { label: 'A super admin', cells: ['Case managers and program leads. Never a member.'] },
           ]}
         />
