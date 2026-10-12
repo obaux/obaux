@@ -2207,3 +2207,7 @@ A screen reader reads the Places area search field's name once and reads "Like 1
 ## Design system · search fields heard once (11 October 2026) — READY, not merged
 
 The New message sheet's search field no longer repeats its label as a placeholder. The other three search fields (Messages, Schedule, Connect) keep placeholders that add or rephrase words; see the session log. Log: `docs/sessions/` newest `search-fields-heard-once`.
+
+## Places & programs · a scraped place is not a program on Pam (12 October 2026)
+
+D-545, `claude/places-programs-scraped-vs-pam`: the audit table and `place-scraped-vs-pam.spec.ts`. Only the two message rows needed a change on `main` (Nico's D-541, merged into this branch); in the held I'm-here branch, "I'm here" and "I went" need a lead (hidden, and `NO_LEAD_HERE` in the database). Log: see `docs/sessions/`.
