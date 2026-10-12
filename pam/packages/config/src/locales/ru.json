@@ -500,7 +500,7 @@
   "person.savedPlaces.title": "Сохранённые места",
   "person.signedOut.body": "Для этой страницы нужно войти в аккаунт.",
   "person.signedOut.title": "Войдите, чтобы это увидеть",
-  "place.about": "О программе",
+  "place.about": "Об этом месте",
   "place.address": "Адрес",
   "place.audience.students": "В школе · только для учащихся",
   "place.audience.youth": "Возраст от 10 до 17 лет",
@@ -1701,6 +1701,5 @@
   "legal.sources.title": "Источники данных",
   "legal.sources.neighborhoods": "Названия районов в выборе местоположения взяты из набора данных «Philadelphia Neighborhoods», созданного Abaca Labs. В Pam набор изменён, чтобы хранить одну точку для каждого района вместо границ.",
   "legal.sources.link": "Посмотреть исходные данные",
-  "legal.sources.licence": "Лицензия: CC BY 4.0",
-  "checkin.notNow": "Не сейчас"
+  "legal.sources.licence": "Лицензия: CC BY 4.0"
 }

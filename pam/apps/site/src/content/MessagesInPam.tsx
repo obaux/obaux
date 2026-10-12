@@ -9,8 +9,7 @@ import { HowTo, ShotCard } from '../components/HowTo';
  * program may START a chat with a member only if the member is signed up with it or has a visit planned
  * there that is not cancelled, and otherwise only answer a member who wrote to it; a case manager with
  * their own members; a super admin with case managers and program leads, never a member; nobody else.
- * Signed (Sage; Will, a72, 12 October 03:33). HELD only until Nico's D-541 part 2
- * (claude/messages-program-before-booking) deploys. What a program sees when a member writes to it is said by
+ * Signed (Sage; Will, a72, 12 October 03:33); live with D-541 part 2 (b22, 12 October). What a program sees when a member writes to it is said by
  * "What others can see" and the Privacy page, not here. A message never
  * queues a text (migration 0064). Blocking is the ⋯ menu's "Block this person" (D-463, words from
  * en.json messages.block.* and messages.blocked.*). Left out on purpose: message translation
