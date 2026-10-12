@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
 import { sheet } from '@pam/ui/sheet';
@@ -98,6 +98,7 @@ export function AreaSearch({
   readonly onClose: () => void;
 }) {
   const { t } = useI18n();
+  const hintId = useId();
   const [query, setQuery] = useState('');
   const [picked, setPicked] = useState<AreaOption>(current);
   const [locating, setLocating] = useState<'idle' | 'busy' | 'failed'>('idle');
@@ -169,14 +170,14 @@ export function AreaSearch({
 
           <SearchField
             label={t('places.areaLabel')}
-            placeholder={t('places.areaLabel')}
+            describedBy={hintId}
             value={query}
             onChange={setQuery}
             hasAutoFocus
             isSubtle
           />
           {/* The search finds ZIP codes (and City Hall), so say what to type (D-536). */}
-          <Text type="supporting" xstyle={styles.hint}>
+          <Text id={hintId} type="supporting" xstyle={styles.hint}>
             {t('places.areaHint')}
           </Text>
 
