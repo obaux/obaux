@@ -17,7 +17,7 @@ import {
   directionsHref,
   googlePlaceHref,
 } from '@pam/ui';
-import { usePlaceHasLead } from '@/lib/usePlaceHasLead';
+import { usePlaceLead } from '@/lib/usePlaceHasLead';
 import { PlaceBarActions, leadMessageFor, messageHrefFor, newMessageFrom } from '../../screens/PlaceBarActions';
 import { PlaceDetailSkeleton } from '@pam/ui/Skeletons';
 import { SubPageHeader } from '@pam/ui/SubPage';
@@ -236,7 +236,8 @@ function PlaceScreen() {
 
   const place = state.status === 'ready' ? state.place : null;
   // A place with no program lead on Pam is not told about a visit (D-498).
-  const hasLead = usePlaceHasLead(place?.id, place?.name);
+  const leadKnown = usePlaceLead(place?.id, place?.name);
+  const hasLead = leadKnown === true;
   const { forPlace: policiesAt } = usePlacePolicies();
   const { progress } = useMySignatures();
   const { forPlace } = useServices();
@@ -393,6 +394,9 @@ function PlaceScreen() {
   const tellsNoLead = isMemberView && !hasLead;
   // A place with a lead on Pam sees the visit (D-526): said before the member plans one.
   const tellsLeadSees = isMemberView && hasLead;
+  // A member can message a place only if somebody on Pam runs it (Will, 12 October: programs gathered from
+  // the internet have no one to answer). Until that is known the entry points wait, not flash in and out (D-544).
+  const hidesMessage = isMemberView && leadKnown !== true;
   const services = forPlace(place!.id);
   const staff = programStaffFor(place!.id);
   // How the program takes people (D-313): a visit to plan, or a schedule
@@ -482,8 +486,8 @@ function PlaceScreen() {
           onSave={signedIn && (demoRole ?? trueRole) !== 'provider' ? toggleSave : undefined}
           onShare={() => void sharePlace(place!.name, place!.address)}
           flagHref={`/flag/?place=${encodeURIComponent(place!.id)}`}
-          // A member can write to a program before booking, if it has a lead on Pam (D-541); none, no item.
-          messageHref={(demoRole ?? trueRole) === 'member' && !hasLead ? undefined : messageHrefFor(place!.name, place!.id)}
+          // A member can write to a program before booking, if it has a lead on Pam (D-541); none, no item (D-544).
+          messageHref={hidesMessage ? undefined : messageHrefFor(place!.name, place!.id)}
         />,
         true,
       )}
@@ -623,7 +627,7 @@ function PlaceScreen() {
                       // message, the conversation says the rest.
                       isDescriptionOneLine: true,
                     }]
-                  : (demoRole ?? trueRole) === 'member' && !hasLead
+                  : hidesMessage
                     ? []
                     : [{
                       id: 'message',
