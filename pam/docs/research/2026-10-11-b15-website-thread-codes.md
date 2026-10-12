@@ -266,7 +266,7 @@ Iris
 
 ---
 
-## b22 re-test (12 October, 05:20 UTC)
+## b22 re-test (12 October, 05:05 UTC)
 
 `main` at `238135ec`: Storybook from Chromatic, and the site and web app built locally.
 No sign-in, accounts or sends; `joinpam.org` is blocked here, so the site is the local build.
