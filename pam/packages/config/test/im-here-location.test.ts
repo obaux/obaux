@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { EN } from './_bundles.js';
+import { BUNDLES, EN } from './_bundles.js';
 import { PRIVACY } from '../src/legal.js';
 import { ADMIN_CANNOT_SEE, ADMIN_CAN_SEE, TRANSPARENCY_SCREEN } from '../src/transparency.js';
 
@@ -65,11 +65,18 @@ describe('Privacy on “I’m here” and location (D-526 part B)', () => {
     expect(p9).not.toMatch(/\b\d+\b/); // a number of points or metres would be a promise that goes stale
   });
 
-  it('quotes the two buttons as the app’s own words', () => {
-    // The labels are Piper's strings; when they are in the bundle this reads them from it by key.
-    const labels = Object.entries(EN).filter(([k]) => /^checkin\./.test(k)).map(([, v]) => v);
-    if (labels.length) {
-      expect(labels).toEqual(expect.arrayContaining(['I’m here', 'I went']));
+  it('quotes the two buttons as the app’s own words, in every language', () => {
+    // The labels are Piper's strings (`checkin.here`, `checkin.went`). Privacy quotes them, so the two must read the same in
+    // every language; before the buttons are in the bundle this checks nothing. A curly and a straight apostrophe are one
+    // word (the signed English has the curly one in Privacy and the app's strings use both).
+    const plain = (text: string) => text.replace(/[’‘]/g, "'");
+    for (const [locale, bundle] of Object.entries(BUNDLES)) {
+      const here = bundle['checkin.here'];
+      const went = bundle['checkin.went'];
+      if (!here || !went) continue;
+      const p9 = plain(bundle['privacy.s.what-we-keep.p9'] ?? '');
+      expect(p9, `${locale}: p9 quotes “${here}”`).toContain(plain(here));
+      expect(p9, `${locale}: p9 quotes “${went}”`).toContain(plain(went));
     }
   });
 
