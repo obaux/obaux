@@ -14,13 +14,15 @@ import { loadSavedTrips } from '@/lib/savedTrips';
  * the database says whether that is the place; "I went" says so without sharing a
  * position, for fewer points. Nothing about where the person is stays in the app.
  */
-type Step = 'idle' | 'locating' | 'not-yet' | 'no-location' | 'limit' | 'too-late' | 'failed' | 'done';
+type Step = 'idle' | 'locating' | 'sending' | 'not-yet' | 'no-location' | 'limit' | 'too-late' | 'failed' | 'done';
 
 export function ImHereCard({ visitId, placeName }: { readonly visitId: string; readonly placeName: string }) {
   const { t } = useI18n();
   const [step, setStep] = useState<Step>('idle');
   const [points, setPoints] = useState(0);
-  const busy = step === 'locating';
+  const locating = step === 'locating';
+  // "I went" sends no position, so it never says it is checking where you are.
+  const busy = locating || step === 'sending';
 
   const done = (earned: number) => {
     setPoints(earned);
@@ -35,7 +37,7 @@ export function ImHereCard({ visitId, placeName }: { readonly visitId: string; r
     setStep(result.kind === 'error' ? 'failed' : result.kind);
   };
   const went = async () => {
-    setStep('locating');
+    setStep('sending');
     const result = await markWent(visitId);
     if (result.kind === 'went') return done(result.points);
     setStep(result.kind === 'error' ? 'failed' : result.kind);
@@ -52,11 +54,11 @@ export function ImHereCard({ visitId, placeName }: { readonly visitId: string; r
       {step === 'too-late' ? <Banner status="info" title={t('checkin.tooLate')} /> : null}
       {step === 'failed' ? <Banner status="error" title={t('join.failed.title')} /> : null}
       <BigButton
-        label={t(busy ? 'checkin.locating' : 'checkin.here')}
+        label={t(locating ? 'checkin.locating' : 'checkin.here')}
         isDisabled={busy}
         onPress={() => void here()}
       />
-      <TextLink label={t('checkin.went')} onClick={() => void went()} />
+      <TextLink label={t('checkin.went')} onClick={() => void went()} isDisabled={busy} />
     </VStack>
   );
 }
