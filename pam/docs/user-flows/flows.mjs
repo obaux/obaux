@@ -29,7 +29,7 @@
  *   changes  — the newest decisions this flow shows, newest first
  */
 
-export const UPDATED = '2026-10-10';
+export const UPDATED = '2026-10-12';
 
 /**
  * Where each screen opens live: Chromatic's build of `main`, `https://main--<app id>.chromatic.com`.
@@ -199,6 +199,29 @@ export const flows = [
         changed: 'D-440',
         note: 'One layout: the ways to reach it as rows, About, the address (tap it to open Google or Apple Maps; a small copy button); Plan a trip pinned to the foot. Pre-booking: grey service cards first; walk-ins say when they meet. Post-booking: the visit card names the service',
       },
+      placeOnPam: {
+        title: 'A place on Pam (a program runs it)',
+        story: 'member-created--place-with-lead',
+        path: '/place/ (a program on Pam)',
+        actions: [{ scroll: 'page', by: 700 }, { wait: 500 }],
+        changed: 'D-541',
+        note: 'Message is a row and a menu item: a member can write to the program before booking (D-541). Under Plan a trip, the program will see your visit: your first name, the day and time, the service you picked, and whether you were marked as there (D-526)',
+      },
+      placeGathered: {
+        title: 'A place gathered from the internet',
+        story: 'member-created--place-no-lead',
+        path: '/place/ (nobody on Pam runs it)',
+        actions: [{ scroll: 'page', by: 700 }, { wait: 500 }],
+        changed: 'D-544',
+        note: "No Message row or menu item, because nobody on Pam can answer; they wait, not flash in and out, while Pam works it out (D-544). No I'm here or I went (D-545). The plan is only the member's, and says so (D-498)",
+      },
+      imHere: {
+        title: "A visit that is on now: I'm here",
+        story: 'member-created-states-saved-trips--im-here',
+        path: '/place/ (a visit that is on now)',
+        changed: 'D-535',
+        note: "A card with I'm here (Pam checks where you are once and keeps no position) and I went (when it cannot tell; three times in seven days). Done: Your visit is marked, and the points. Only at a place with a program on Pam (D-545)",
+      },
       booked: {
         title: 'Your trip is booked',
         story: 'member-created--trip-booked',
@@ -327,6 +350,12 @@ export const flows = [
     },
     edges: [
       ['explore', 'place', 'Tap a place'],
+      ['explore', 'placeOnPam', 'Tap a place a program runs'],
+      ['explore', 'placeGathered', 'Tap a place gathered from the internet'],
+      ['placeOnPam', 'thread', 'Message (the program, before booking)'],
+      ['placeOnPam', 'newTrip', 'Plan a trip'],
+      ['placeGathered', 'newTrip', 'Plan a trip (only yours)'],
+      ['trips', 'imHere', 'A visit that is on now'],
       ['place', 'newTrip', 'Plan a trip · Change appointment'],
       ['place', 'report', 'Report'],
       ['place', 'policies', 'Policies to sign', { over: true }],
@@ -360,6 +389,7 @@ export const flows = [
       ['profile', 'points', 'Points'],
     ],
     changes: [
+      "D-541, D-544, D-545: a place a program runs lets a member message it before booking; a place nobody on Pam runs shows no Message and no I'm here; the visit card says the program sees the visit",
       'D-472 — Points: four ways to earn that Pam pays (plan a trip once per place, call a place once per place and five a day, save a place, finish setting up); badge names wrap, never cut',
       'New — a coming-up visit can be cancelled from its place page (asks first); a visit whose day has gone moves to Past visits on Trips',
       'D-474 — a line on screen promises only a text Pam sends: the visit-reminder promises are gone from the booked screens and Profile\'s cards',
@@ -582,6 +612,21 @@ export const flows = [
         changed: 'D-324',
         note: 'Green pen = signed every policy; "Policies signed · 3 of 4"',
       },
+      memberCard: {
+        title: "A member's card",
+        story: 'program-lead-screens--member-card',
+        path: '/person/ (a member linked to the program)',
+        changed: 'D-542',
+        note: 'What a program sees of a member who signed up with it or has a visit there: first name, the visits planned at THIS program, and Message (not shown if either has blocked the other). No last name, phone, photo, points or last active',
+      },
+      newMessage: {
+        title: 'New message: people who signed up or booked',
+        story: 'program-lead-screens--messages',
+        path: '/messages/ (New message)',
+        actions: [{ click: 'New message' }, { wait: 700 }],
+        changed: 'D-541',
+        note: 'A program starts a conversation only with a member signed up with it or with a visit there that is not cancelled; otherwise it can only answer someone who wrote first (Will, 12 October). Only the member can start with a program',
+      },
       memberPolicies: {
         title: 'Policies signed',
         story: 'program-lead-screens--member-policies',
@@ -643,6 +688,8 @@ export const flows = [
       ['getStarted', 'folded', 'Somebody books'],
       ['folded', 'home', 'Setup done'],
       ['home', 'member', 'A person'],
+      ['home', 'memberCard', "A real member's name (signed up or booked here)"],
+      ['messages', 'newMessage', 'New message'],
       ['member', 'memberPolicies', 'Policies signed'],
       ['home', 'book', '+ Book a visit for a member'],
       ['book', 'addPerson', 'Add a person'],
@@ -657,6 +704,7 @@ export const flows = [
       ['profile', 'alerts', 'Text alerts'],
     ],
     changes: [
+      "D-542: tapping a real member's name gives a small card (first name, this program's visits, Message); a program starts a conversation only with a member signed up or booked, and can answer anyone who wrote first",
       'D-486 — Home has the rings of people with something new above the calendar; with nobody on the list, faint circles and a (+) that opens the invite choice (Will, card a22)',
       'New — Edit and send again: a lead answers Pam\'s request for changes and sends the program back for review (D-386 part 5b); the super admin\'s side is Programs to check',
       'D-386 — Sent to Pam: Text me when it\'s live first, gone once texts are on',
