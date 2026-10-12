@@ -1617,6 +1617,5 @@
   "legal.sources.title": "資料來源",
   "legal.sources.neighborhoods": "地區搜尋中的社區名稱來自 Abaca Labs 製作的「Philadelphia Neighborhoods」。Pam已作修改：每個社區只保留一個點，而不是邊界。",
   "legal.sources.link": "查看原始資料",
-  "legal.sources.licence": "授權條款：CC BY 4.0",
-  "checkin.notNow": "暫時不用"
+  "legal.sources.licence": "授權條款：CC BY 4.0"
 }

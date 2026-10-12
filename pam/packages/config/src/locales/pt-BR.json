@@ -1617,6 +1617,5 @@
   "legal.sources.title": "Fontes de dados",
   "legal.sources.neighborhoods": "Os nomes dos bairros na busca por área vêm de “Philadelphia Neighborhoods”, criado pela Abaca Labs. Pam o modificou para guardar um ponto por bairro em vez dos limites.",
   "legal.sources.link": "Ver os dados de origem",
-  "legal.sources.licence": "Licença: CC BY 4.0",
-  "checkin.notNow": "Agora não"
+  "legal.sources.licence": "Licença: CC BY 4.0"
 }
