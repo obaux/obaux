@@ -1193,6 +1193,10 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · message a program before booking (11 October 2026)
+
+A member can message a program from its place page without a visit or enrolment: `message_program(service)` opens or reuses a conversation with one lead of the place's org (D-541). A place with no lead on Pam shows Call/Website, no Message. The lead sees a first name and the words only, can reply, and can open a new conversation only with a member who wrote, has a non-cancelled visit, or is enrolled (`can_start_conversation`; `can_message` unchanged). Enrollments are no longer writable by members; leads change status/notes on their own rows only. **Built, held for merge** until Will signs the reworded Privacy line (a63 line 1); the lockdown migration is tightening only and goes first. Proof: DB tests 64 and 67, e2e `place-message-program.spec.ts`.
+
 ## Messages & notifications · example photos stay with the examples (11 October 2026)
 
 Branch `claude/messages-example-photos-gated` (D-537). A name-matched example photo is looked up only under `examplesOn()`; a real person

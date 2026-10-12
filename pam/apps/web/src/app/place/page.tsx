@@ -482,7 +482,8 @@ function PlaceScreen() {
           onSave={signedIn && (demoRole ?? trueRole) !== 'provider' ? toggleSave : undefined}
           onShare={() => void sharePlace(place!.name, place!.address)}
           flagHref={`/flag/?place=${encodeURIComponent(place!.id)}`}
-          messageHref={messageHrefFor(place!.name, place!.id)}
+          // A member can write to a program before booking, if it has a lead on Pam (D-541); none, no item.
+          messageHref={(demoRole ?? trueRole) === 'member' && !hasLead ? undefined : messageHrefFor(place!.name, place!.id)}
         />,
         true,
       )}
@@ -610,8 +611,8 @@ function PlaceScreen() {
                 // A message from the program waiting (D-305): the row says so,
                 // with a pink dot and their newest words, and opens that
                 // conversation.
-                unread
-                  ? {
+                ...(unread
+                  ? [{
                       id: 'message',
                       label: t('place.quick.newMessage'),
                       description: unread.preview,
@@ -621,14 +622,16 @@ function PlaceScreen() {
                       // One line, then "…" (Will, D-306): the row says there is a
                       // message, the conversation says the rest.
                       isDescriptionOneLine: true,
-                    }
-                  : {
+                    }]
+                  : (demoRole ?? trueRole) === 'member' && !hasLead
+                    ? []
+                    : [{
                       id: 'message',
                       label: t('place.quick.message'),
                       description: t('place.quick.message.body'),
                       icon: <MessagesIcon {...QUICK} />,
                       href: messageHrefFor(place!.name, place!.id),
-                    },
+                    }]),
               ]),
           ...(phone
             ? [
