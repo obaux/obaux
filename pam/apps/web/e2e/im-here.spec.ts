@@ -91,7 +91,7 @@ test('no location given: nothing is sent, and I went earns 60 without a position
   });
   await open(page);
   await page.getByRole('button', { name: "I'm here" }).click();
-  await expect(page.getByText(/Pam can't see where you are/)).toBeVisible();
+  await expect(page.getByText(/Pam can't check where you are/)).toBeVisible();
   expect(here).toBe(0);
   await page.getByRole('button', { name: 'I went' }).click();
   await expect(page.getByText('You earned 60 points.')).toBeVisible();
