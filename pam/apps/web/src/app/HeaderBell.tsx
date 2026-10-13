@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import * as stylex from '@stylexjs/stylex';
 import type { Role } from '@pam/config';
 import { NotificationBell } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
@@ -51,6 +52,40 @@ import { useExamplesOn } from '@/lib/useExamplesOn';
  * `/notifications/` shows: the example set for the role, none for a fresh
  * account.
  */
+/**
+ * `hideWhenEmpty` and the page not moving (Iris's W3): where the answer to "any notifications?" is
+ * a second away, the bell arriving widens the header's corner and, on a narrow phone, the role chip
+ * drops under the logo and everything below moves down a thumb's width. So the phone keeps one
+ * note about itself, "the bell was there last time", and holds the bell's place (unseen, unreachable)
+ * until the answer comes: the bell then arrives without anything moving. A phone that has never had a
+ * bell, or whose last answer was none, holds nothing, so a member with no notifications has no empty
+ * slot. The first time a bell appears on a phone it still moves the page once. The note is a single
+ * `1` in this phone's storage, never sent.
+ */
+const HAD_BELL = 'pam.explore.bell';
+
+function readHadBell(): boolean {
+  try {
+    return window.localStorage.getItem(HAD_BELL) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function writeHadBell(had: boolean): void {
+  try {
+    if (had) window.localStorage.setItem(HAD_BELL, '1');
+    else window.localStorage.removeItem(HAD_BELL);
+  } catch {
+    // No storage: the page may move once more, which is all.
+  }
+}
+
+const styles = stylex.create({
+  // Takes the bell's room and nothing else: not seen, not tapped, not read out.
+  held: { display: 'inline-flex', visibility: 'hidden', pointerEvents: 'none' },
+});
+
 export function HeaderBell({
   enabled,
   role,
@@ -70,6 +105,11 @@ export function HeaderBell({
   const { state } = useNotifications(enabled);
   const [dummyUnread, setDummyUnread] = useState<number | null>(null);
   const [dummyTotal, setDummyTotal] = useState<number | null>(null);
+  // Read after the first render, so what the server drew and what the phone draws first are the same.
+  const [hadBell, setHadBell] = useState(false);
+  useEffect(() => {
+    if (hideWhenEmpty) setHadBell(readHadBell());
+  }, [hideWhenEmpty]);
 
   // Example alerts are for Storybook and demo accounts only; a real account's bell counts its real ones.
   const examples = useExamplesOn();
@@ -92,11 +132,24 @@ export function HeaderBell({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [needsDummy, role]);
 
-  if (state.status !== 'ready') return null;
+  // Whether there is anything to open, once that is known. With examples, the example set is waited for.
+  const known = state.status === 'ready' && !(needsDummy && dummyTotal === null && !isFreshAccount());
+  const hasAny = known ? (needsDummy ? (dummyTotal ?? 0) > 0 : state.status === 'ready' && state.items.length > 0) : null;
+
+  useEffect(() => {
+    if (hideWhenEmpty && hasAny !== null) writeHadBell(hasAny);
+  }, [hideWhenEmpty, hasAny]);
+
+  if (state.status !== 'ready') {
+    if (hideWhenEmpty && hadBell) return <HeldBell appearance={appearance} href="/notifications/" label={t('notify.title')} />;
+    return null;
+  }
 
   if (hideWhenEmpty) {
     // The example set stands in only where `/notifications/` shows it; a fresh account has none (D-361).
-    const hasAny = needsDummy ? (dummyTotal ?? 0) > 0 : state.items.length > 0;
+    if (hasAny === null) {
+      return hadBell ? <HeldBell appearance={appearance} href="/notifications/" label={t('notify.title')} /> : null;
+    }
     if (!hasAny) return null;
   }
 
@@ -110,5 +163,22 @@ export function HeaderBell({
       unreadCount={unread}
       unreadLabel={tPlain('notify.unread', { count: unread })}
     />
+  );
+}
+
+/** The bell's room, held until the answer comes (see `HAD_BELL`). */
+function HeldBell({
+  appearance,
+  href,
+  label,
+}: {
+  readonly appearance?: 'filled' | 'round' | undefined;
+  readonly href: string;
+  readonly label: string;
+}) {
+  return (
+    <span {...stylex.props(styles.held)} aria-hidden="true" inert>
+      <NotificationBell appearance={appearance} href={href} label={label} unreadCount={0} unreadLabel={label} />
+    </span>
   );
 }

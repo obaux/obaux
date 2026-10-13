@@ -1196,6 +1196,10 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · counting screen opens, and the bell not moving (13 October 2026)
+
+Built, not live: `count_screen_open('points'|'profile')` adds one to a per-day count (no person, device, time or place), called once a day per phone from Your points and Profile for a real member (a69/a76, D-555); `screen_opens_weekly()` is the service-role report, a total under 5 shown as "under 5". Needs the migration applied and Lena's Privacy line in the same batch. Separately, the Explore bell holds its place when the phone had it last time, so it no longer shifts the page (W3). Proof: DB test 70, unit and e2e (`screen-open-count`, `explore-bell-shift`).
+
 ## Messages & notifications · message a program before booking (11 October 2026)
 
 A member can message a program from its place page without a visit or enrolment: `message_program(service)` opens or reuses a conversation with one lead of the place's org (D-541). A place with no lead on Pam shows Call/Website, no Message. The lead sees a first name and the words only, can reply, and can open a new conversation only with a member who wrote, has a non-cancelled visit, or is enrolled (`can_start_conversation`; `can_message` unchanged). Enrollments are no longer writable by members; leads change status/notes on their own rows only. **Built, held for merge** until Will signs the reworded Privacy line (a63 line 1); the lockdown migration is tightening only and goes first. Proof: DB tests 64 and 67, e2e `place-message-program.spec.ts`.
