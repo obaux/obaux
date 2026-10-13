@@ -16,3 +16,5 @@
 **Waiting on words (Sage; Will signs promises).** "Your policies, signed before they arrive. Check-in and go!" (a promise), "Their plans, your guidance, in one place.", the alt texts of the two new pictures. The header says "Get help" (Figma "Support"), the row-2 and row-3 and privacy-callout words follow Will's a65.
 
 **What a later session might reverse.** The 48px tap boxes if Will accepts 32/36 targets; the carousel if he wants the hero to match Figma exactly; the ↗ on each name (Dot suggests asking Will).
+
+**The pill's words.** Will, 13 October 05:44, on a80: "revert back the tag button 'Play this card', even better just say 'Play Card' or 'Pause card' instead of 'Pause/Play who Pam is'. The new label live is not intuitive." The green card's pill reads "Pause card" and "Play card"; the visible label is also the spoken name (WCAG 2.5.3). It differs from the hero's "Pause pictures" / "Play pictures" so the two Pause buttons on Home can be told apart. Sage records the words in the ledger.

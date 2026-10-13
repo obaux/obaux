@@ -328,11 +328,11 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
     if (await page.locator('[data-band-fill]').count()) fail('green card: the fill keeps running after a tap');
     await page.waitForTimeout(6800);
     if ((await selected(page)).trim() !== 'Case managers') fail('green card: it kept moving after a tap');
-    await page.getByRole('button', { name: 'Play who Pam is for' }).click();
+    await page.getByRole('button', { name: 'Play card' }).click();
     await page.mouse.move(0, 0); // the pointer in the card holds the cycle, so take it away
     await page.waitForTimeout(6800);
     if ((await selected(page)).trim() !== 'Residents') fail(`green card: Play should start it again (Case managers goes round to Residents), it shows ${(await selected(page)).trim()}`);
-    await page.getByRole('button', { name: 'Pause who Pam is for' }).click();
+    await page.getByRole('button', { name: 'Pause card' }).click();
     await page.mouse.move(0, 0);
     await page.waitForTimeout(6800);
     if ((await selected(page)).trim() !== 'Residents') fail('green card: Pause did not stop it');
@@ -342,10 +342,10 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
     // A finger: tap Pause, then Play, without leaving the button. The button keeps focus, and that must not hold the cycle.
     const { ctx, page } = await open({ hasTouch: true });
     const before = (await selected(page)).trim();
-    await page.getByRole('button', { name: 'Pause who Pam is for' }).tap();
+    await page.getByRole('button', { name: 'Pause card' }).tap();
     await page.waitForTimeout(6800);
     if ((await selected(page)).trim() !== before) fail('green card: it moved on while paused (touch)');
-    await page.getByRole('button', { name: 'Play who Pam is for' }).tap();
+    await page.getByRole('button', { name: 'Play card' }).tap();
     await page.waitForTimeout(6800);
     if ((await selected(page)).trim() === before) fail('green card: after Pause then Play with a finger, the next name never arrived (a tapped button holds focus)');
     await ctx.close();
@@ -355,7 +355,7 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
     await page.waitForTimeout(6800);
     if ((await selected(page)).trim() !== 'Residents') fail('green card: it moves on under reduced motion');
     if (await page.locator('[data-band-fill]').count()) fail('green card: a fill under reduced motion');
-    if (await page.getByRole('button', { name: /who Pam is for/ }).count()) fail('green card: a Pause button under reduced motion (nothing moves)');
+    if (await page.getByRole('button', { name: /^(Pause|Play) card$/ }).count()) fail('green card: a Pause button under reduced motion (nothing moves)');
     await page.getByRole('tab', { name: 'Program Providers' }).focus();
     await page.keyboard.press('ArrowRight');
     if ((await selected(page)).trim() !== 'Case managers') fail('green card: the arrow keys should move between the names');
