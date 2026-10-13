@@ -320,7 +320,7 @@ in as they scroll into view; scrolling the page shows every row.
   October. Four full weeks end Sun 15 November, so **I read weeks 3–4 on Thursday 19
   November.**
 
-## b30 run-through (`8f0af8d1`, 07:55)
+## b30 run-through (`8f0af8d1`, 07:47)
 
 This is the run-through planned in Part 2, plus Mira's items 2–5. I used a local build of
 `8f0af8d1` with pretend data, at 320px unless I say otherwise, and Storybook (built 07:30).
