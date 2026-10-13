@@ -36,9 +36,11 @@ rows must not be purged, because `useProgramRequest` (D-525) reads the row to kn
   reads the sign-in's own request (`staff_requests_own`) and, for a case manager request, goes to `/join/case-manager/`
   (waiting, or refused with "Ask again"). The read has a 3-second limit; no answer reads as no request, so a slow
   network cannot leave Join on Loading.
-- **No text is promised.** The page does not reuse `join.staff.*` ("We will text you the answer"): texts are off
-  (`texts_live`), so the sent and waiting screens say to come back and sign in to see the answer, as Sage signed for
-  the new number. Whether `join.staff.*` itself should still promise a text is for Sage and the merge desk.
+- **The answer is texted.** The decision is an account text (`staff_request_approved` / `staff_request_denied`), which
+  goes out whatever `texts_live` says (D-481, migration 20261010141859). Sage signed the waiting screen as "We will
+  text you the answer. You can also sign in with this phone to see it." (A29, ledger `claude/sage-signs` @ 6ced4a4d).
+  My first draft promised no text, on the wrong reading that texts are off for this too; `join.staff.*` is true and
+  stays.
 
 ## Forgetting (`purge_staff_requests`, nightly at 03:55 where pg_cron is installed)
 

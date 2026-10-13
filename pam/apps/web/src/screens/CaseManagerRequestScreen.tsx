@@ -29,7 +29,8 @@ import { PhoneSignInCard } from '../app/signin/PhoneSignInCard';
  *      is the rate limit, and there is no public form for a bot to fill.
  *   2. **The few facts the super admin needs**: name, city (one Pam serves), where they work and
  *      their work email (staff need one, D-441). Nothing else: no ID, no caseload.
- *   3. **Where it stands**: sent and waiting (no text is promised: texts are off), or not this time —
+ *   3. **Where it stands**: sent and waiting (the answer is texted: a staff-request decision is an account
+ *      text, sent whatever texts_live says, D-481), or not this time —
  *      they may ask again (D-525), and Contact Pam is there.
  *
  * The request is a staff request like any other, so the super admin's bell, Requests and the
@@ -236,7 +237,7 @@ export function CaseManagerRequestScreen() {
     );
   }
 
-  // Sent, or still waiting. Not "We will text you" (join.staff.*): texts are off, so nothing is promised by text.
+  // Sent, or still waiting. The answer is texted (an account text, D-481) and can also be seen here.
   return (
     <SubPage title={t(fresh ? 'caseManager.sent.title' : 'caseManager.waiting.title')} {...back}>
       <VStack gap={4}>

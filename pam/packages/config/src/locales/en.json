@@ -267,7 +267,7 @@
   "caseManager.problem.other": "That did not send. Try again, or contact Pam.",
   "caseManager.sent.title": "We got your request",
   "caseManager.waiting.title": "Someone on the Pam team is still checking",
-  "caseManager.waiting.body": "A person on the Pam team checks every request by hand. Come back and sign in with this phone to see the answer.",
+  "caseManager.waiting.body": "A person on the Pam team checks every request by hand. We will text you the answer. You can also sign in with this phone to see it.",
   "caseManager.denied.title": "We could not say yes this time",
   "caseManager.denied.body": "You can ask again, or contact Pam.",
   "caseManager.askAgain": "Ask again",
