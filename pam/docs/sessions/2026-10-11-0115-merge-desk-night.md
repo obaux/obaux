@@ -374,6 +374,39 @@
   Stop, Speed and Voice (the phone's English voices, most natural first; Apple's Premium voices sound closest to a
   person). A web page cannot keep talking with the screen locked; a recorded voice (Google) is offered to Will if
   he wants that.
+- **Batch b24, live at 0a36ada1 (12 October, 06:19).** No app code, no migrations. Wren: "Does the place know
+  I'm coming?" now says a program on Pam sees the visit (it had said programs are never told, untrue since b22:
+  my miss, it was held at e06fab16 and didn't ride b22), with Sage's signed paragraphs and summary; Home takes
+  Will's a65 lines 1 and 3. Sage: the a65 lines 4 and 5 and the place-told update in the ledger. Dot: the website
+  text colours side by side for Will (D-546, the story Website / Text colours) and the nightly user-flow map. Nico:
+  a story for the super admin's Answer by text page.
+- **Will's messages, 05:43 to 06:17:**
+  - **The website's words (a65, 05:43 and 05:47).** Line 1 stays in Will's words ("talk to a real person" means
+    messaging a program in the app; live in b24). Line 2 keeps his words too (the help desk is open 24/7) but
+    waits until the website is translated, before launch. Line 3 is back (attendance shipped in b22; live in b24).
+    Line 4 keeps "history"; line 5 is about messaging, guiding and points, not literal cheering (Wren's next SHA). The Home buttons in the middle go to Sign in. New feature, "case
+    manager request from website": a page where a case manager asks to use Pam with their people, and the super
+    admin approves (Ava plans it, Wren builds the page). Fix the footer typo. Colours: examples first (a75).
+  - **A new phone number (a73, 05:51).** A "New number?" link on Sign in next to Privacy, a page to ask for the
+    change, the super admin decides; for someone on a caseload the case manager is asked first, and after 24 to
+    48 hours with no answer it goes to the super admin. Ava plans it, build first.
+  - **Texting people back (a61, 05:58):** not now, a nice-to-have. **Translation paragraph (a70, 06:00):** signed.
+    **Reading calendars (a69, 06:02):** not yet; Iris sets up a count of how many members open the rewards screen
+    (one daily number, no account in it), which needs a Privacy line first. **Google Calendar sync (a71, 06:03):**
+    waits until the sync is switched on.
+  - **The help form (a62).** Will pasted the check and added the salt (06:14). Live: security definer,
+    search_path public, extensions; only service_role can run it; the body is the file's logic without its comment
+    and indentation; the table has RLS forced and no client grants. Recorded in schema_migrations as
+    20261011041940 under its file name. The help-request edge function has been deployed, off, since 11 October 04:49 (the code on
+    main). The card is now step 3 only: HELP_REQUESTS_LIVE = on and one test from Will.
+  - **a67 and a68 signed** (06:06, 06:05). Lena sends both Privacy texts in seven languages and Piper the calendar
+    link brought up to main, for b25.
+  - **Street search (a74).** Will: "Isn't it better to use Google Maps api for this? City data hub sucks." Agreed:
+    Google through a Pam server function (the typed words go from Pam's server, not the phone; Philadelphia only;
+    nothing logged), its own key with a daily cap, off until Will enters the key, and one Privacy line for him to
+    sign. The City-file plan and its network setting are dropped. Piper plans it after the calendar link.
+  - **Explore's bell** (06:17): a member's Explore shows the bell only when they have notifications. Nico.
+  - **Colours:** card a75 with Dot's examples and the scores.
 
 ## What was wrong, and what missed it
 
@@ -557,6 +590,9 @@
 | Batch b23 (fe7aea7b): db / config / ui / web unit / site / e2e full / storybook / site checks | 1498 ok / 1176 / 124 / 139 / 94 / 1532 passed, 19 skipped / builds / 120 scans 0, clear, 300 links 0 |
 | b23 + Wren b4d0e66d: site tsc / tests / build / a11y / usability / scrollspy | 0 / 94 / 0 / 120 scans 0 / clear / 300 links 0 |
 | b23 new or changed English keys (place.about) and removed (checkin.notNow) | translated in six languages, signed by Sage 02:25; removed from all seven |
+| Batch b24 (0a36ada1): web/site tsc / web unit / site tests / config / site build / a11y / usability / scrollspy / storybook | 0 / 0 / 139 / 94 / 1176 / 0 / 120 scans 0 / clear / 306 links 0 / builds (no app code: e2e not rerun) |
+| Live help_request_allowed after Will's paste (a62) | definer; search_path public, extensions; anon and authenticated cannot execute, service_role can; same logic as the file (md5 differs: indentation and one comment); help_request_attempts RLS forced, no client grants, 0 rows |
+| help-request edge function | v2, deployed 11 October 04:49, after the last code change (821e6526, 04:48); off without HELP_REQUESTS_LIVE |
 
 ## Left undone
 
@@ -576,13 +612,10 @@
 
 ## Needs a human
 
-- Will: card a56 (attendance plan A–D; advice: go after Trips, no missed text, no points yet).
-- Will: card a62. The table is live. Paste the one short function block on the card, add HELP_REQUEST_SALT, then
-  HELP_REQUESTS_LIVE = on and one test request. Record 041940 in schema_migrations after his paste.
-- Will: card a61 (texting people back). The pitch deck is linked there, with its questions and Nico's
-  recommendations.
-- Will: card a73 (a new phone number), a74 (street search data), a65, a67, a68, a69, a71; a70 (the translation
-  paragraph, not urgent). a63, a66 and a72 are signed and live in b22.
+- Will: card a62, step 3 only: HELP_REQUESTS_LIVE = on in Supabase's secrets, then one test from "Still stuck?"
+  (his paste and the salt are in and checked; 041940 is recorded).
+- Will: card a75 (website text colours, Dot's examples linked). Later cards: the Google street search (a key and a
+  Privacy line), the new number flow and the case manager request (Ava), the rewards-screen count (Iris).
 - Will: if he wants the Control Room read with the screen off, "Google voice" (a Google Cloud key he enters).
 - Will: delete the stand-in Figma file o9axtp3IwICQixuJVoSlpg (Dot).
 - A native Brazilian Portuguese reader for "registrada" (Lena's choice for "marked", since "marcada" reads as
