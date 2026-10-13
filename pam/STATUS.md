@@ -928,6 +928,14 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Accounts & invites · Join Pam (W6), language dropdown, code behind a question (13 October) — in progress
+
+`claude/pam-join-first-time-wording` (D-563). From an invite, Sign in says "Join Pam" with Will's signed
+lines; Join › About you has a language dropdown instead of chips, and the code field opens from "Did
+someone invite you via code?". Waiting on: Lena (six keys, six languages), Sage (records Will's words;
+the held wording fixes), Dot (the dropdown's and link's look), Will (screenshots; the 320×568 overflow
+of the long member line).
+
 ## Voice & UX copy · marketing may reach, help stays true; help-post drafts (11 October)
 
 Will: the marketing pages may say what Pam is working towards; help posts, the app and anything legal say only what's

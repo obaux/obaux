@@ -91,7 +91,7 @@ export function InviteExpiredScreen({ invite }: { readonly invite: Invite | null
     <>
       {state === 'expired' || state === 'valid' ? (
         <Text role="note" xstyle={styles.invited}>
-          {t(`signin.invited.${role}`)}
+          {t(`invite.expired.invited.${role}`)}
         </Text>
       ) : null}
       <Page gap={4} footer={<LegalLinks from="signin" />} isFooterInFlow>

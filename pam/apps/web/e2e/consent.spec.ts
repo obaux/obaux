@@ -215,6 +215,9 @@ test.describe('arriving by an invite link (D-254)', () => {
   test('says what they were invited to be, and the pictures speak to that work', async ({ page }) => {
     await page.goto('/signin/?invite=PAM7Q4KX&as=case-manager');
     await expect(page.getByRole('note')).toHaveText(en['signin.invited.admin']);
+    // W6 (Will, 13 October): a newcomer from an invite is joining, not signing in again.
+    await expect(page.getByRole('heading', { name: 'Join Pam', level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Sign in', level: 1 })).toHaveCount(0);
     await expect(page.getByText(en['onboarding.admin.1'])).toBeVisible();
     // Still the one sign in: the number, the consent line, the button.
     await expect(page.getByText(en['signin.phone.consent'])).toBeVisible();
@@ -246,6 +249,8 @@ test.describe('arriving by an invite link (D-254)', () => {
     await page.goto('/signin/?invite=PAM7Q4KX&as=program');
     await expect(page).toHaveURL(/\/invite\/expired\/\?invite=PAM7Q4KX&as=program/);
     await expect(page.getByRole('heading', { name: en['invite.expired.title'], level: 1 })).toBeVisible();
+    // Its line keeps its own words: "Start with your phone number" would be wrong here.
+    await expect(page.getByRole('note')).toHaveText(en['invite.expired.invited.provider']);
     await expect(page.getByText('Dana invited you to be a program partner in the Pam network.', { exact: false })).toBeVisible();
 
     // Not an address: said so, and nothing is asked for.

@@ -342,6 +342,7 @@ export function SignInScreen({
         code={code}
         onCodeChange={setCode}
         hasTitle={onFirstStep}
+        isInvited={invite !== null}
         isFlat
       />
     );

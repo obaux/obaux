@@ -41,6 +41,8 @@ export interface PhoneSignInCardProps {
    * template above the card already says "Sign in" (D-217).
    */
   readonly hasTitle?: boolean;
+  /** Opened from an invite: the title is "Join Pam", not "Sign in" (W6, Will, 13 October). */
+  readonly isInvited?: boolean;
   /** 1 on the sign-in screen, 2 inside a flow that already has a title. */
   readonly headingLevel?: 1 | 2;
   /** The code step's button — "Sign in", or "Next" inside joining. */
@@ -79,6 +81,7 @@ export function PhoneSignInCard({
   onCodeChange,
   headingLevel = 1,
   hasTitle = true,
+  isInvited = false,
   codeAction,
   isFlat = false,
 }: PhoneSignInCardProps) {
@@ -169,7 +172,7 @@ export function PhoneSignInCard({
           task is one block rather than a title floating above a box.
         */}
         <Heading level={headingLevel} xstyle={titleStyle}>
-          {t('signin.title')}
+          {t(isInvited ? 'signin.title.invited' : 'signin.title')}
         </Heading>
         <TextField
           id={phoneId}
