@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { MIN_CHARS, PAUSE_MS, askChoose, askSuggest, newToken, wantsGoogle, type Suggestion } from './streetSearch';
-import type { AreaOption } from './useAreaSearch';
+import { GOOGLE_PICK, type AreaOption } from './useAreaSearch';
 
 /**
  * Street addresses and corners in the area search, from Google through Pam's `places-search` function (D-552). The phone never calls
@@ -63,7 +63,7 @@ export function useStreetSearch(
       // The pick ends Google's session; the next search is a new one.
       token.current = newToken();
       if (!place) return null;
-      return { id: `google:${suggestion.placeId}`, kind: 'address', label: place.label || suggestion.label, lat: place.lat, lon: place.lon };
+      return { id: `${GOOGLE_PICK}${suggestion.placeId}`, kind: 'address', label: place.label || suggestion.label, lat: place.lat, lon: place.lon };
     } catch {
       return null;
     }

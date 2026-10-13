@@ -29,6 +29,14 @@ below Pam's, with Google's required mark ("powered by Google", a text placeholde
 - **Off until the key exists.** No `GOOGLE_MAPS_SERVER_KEY` → `{ enabled: false }`; the app stops asking for the session; Explore and
   Places keep ZIP and neighborhood search, with no error.
 
+## A picked address is never kept (Mira, 13 October, on Lena's question)
+
+A place picked from Google's suggestions is used for that search only, exactly like "Use my current location" (D-536): `saveOrigin` writes nothing for it
+(`google:` ids), so it is not in the phone's storage (`pam.origin`), not on Pam's server, and not in a URL; the next visit starts from the last Pam area
+or City Hall. A typed street address is often someone's home, the most sensitive thing a member can type here. Pam's own areas (ZIP, neighborhood, City
+Hall) are remembered as before. Pinned by `areaOrigin.test.ts` and the street-search e2e (reload goes back to City Hall). What is typed reaches
+`places-search` as a POST body, never in a URL or query string. So Privacy can say: Pam does not keep what you type or what Google answers; what Google keeps is up to Google.
+
 ## Cost (from Google's pages as search results showed them; Google's own hosts are blocked here, so Will checks the live list on his card)
 
 Since 1 March 2025 each SKU has its own free monthly amount: 10,000 Autocomplete requests and 10,000 Place Details (Essentials). A

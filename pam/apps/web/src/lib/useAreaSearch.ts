@@ -72,6 +72,9 @@ export function useAreaSearch(query: string): { options: AreaOption[]; isSearchi
   return { options, isSearching, answered };
 }
 
+/** The id prefix of a place picked from Google's street suggestions (D-552). It is for this search only and never kept, like the phone's position. */
+export const GOOGLE_PICK = 'google:';
+
 /** The starting point, remembered on this device only. */
 const STORAGE_KEY = 'pam.origin';
 
@@ -89,8 +92,8 @@ export function loadOrigin(): AreaOption {
     if (!raw) return CITY_HALL;
     const parsed = JSON.parse(raw) as AreaOption;
     // A phone's own position kept by an earlier version is thrown away, and the next visit
-    // starts from City Hall (D-536).
-    if (parsed?.id === 'here') {
+    // starts from City Hall (D-536); so is a street address picked from Google's suggestions (D-552).
+    if (parsed?.id === 'here' || String(parsed?.id).startsWith(GOOGLE_PICK)) {
       window.localStorage.removeItem(STORAGE_KEY);
       return CITY_HALL;
     }
@@ -106,7 +109,9 @@ export function loadOrigin(): AreaOption {
 export function saveOrigin(origin: AreaOption): void {
   // "Use my current location" is for this search only (D-536): the phone's position is never
   // written down, so the next visit starts from the last area chosen, or City Hall.
-  if (origin.id === 'here') return;
+  // A street address picked from Google's suggestions is the same (D-552): it is often somebody's home, so it is used for this search only,
+  // not written to this phone, not sent to Pam's server, and not put in a URL. The next visit starts from the last Pam area, or City Hall.
+  if (origin.id === 'here' || origin.id.startsWith(GOOGLE_PICK)) return;
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(origin));
   } catch {

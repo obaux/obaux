@@ -68,6 +68,11 @@ test.describe('street search', () => {
     expect(asked.at(-1)).toEqual({ action: 'choose', placeId: 'ChIJ1500marketstreet', token: (asked[0] as { token: string }).token });
     await page.getByRole('button', { name: 'Done' }).click();
     await expect(page.getByRole('button', { name: 'Near 1500 Market St, Philadelphia, PA 19102' })).toBeVisible();
+    // Used for this search only (Mira, 13 October): nothing about it is written to the phone, and the next visit starts from City Hall.
+    expect(await page.evaluate(() => JSON.stringify([window.localStorage, window.sessionStorage]) + String(window.localStorage.getItem('pam.origin')))).not.toMatch(/Market|39\.95|google:/);
+    expect(page.url()).not.toMatch(/Market|39\.95|-75\.16/);
+    await page.reload();
+    await expect(page.getByRole('button', { name: 'Near City Hall' })).toBeVisible();
   });
 
   test('a corner and a place by name are asked of Google; a ZIP, a neighborhood and a bare number are not', async ({ page }) => {

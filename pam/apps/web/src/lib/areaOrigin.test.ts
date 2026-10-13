@@ -37,4 +37,24 @@ describe('the remembered starting point', () => {
     expect(loadOrigin()).toEqual(CITY_HALL);
     expect(store.has('pam.origin')).toBe(false);
   });
+
+  // A street address picked from Google's suggestions is used for that search only (D-552; Mira, 13 October): never kept on the phone.
+  it('writes nothing for a street address picked from Google, and the next visit starts from City Hall', () => {
+    saveOrigin({ id: 'google:ChIJabcdefghijk123', kind: 'address', label: '1500 Market St, Philadelphia, PA 19102', lat: 39.9526, lon: -75.1664 });
+    expect(store.size).toBe(0);
+    expect(loadOrigin()).toEqual(CITY_HALL);
+  });
+
+  it('leaves the last Pam area standing when a Google address is used after it', () => {
+    saveOrigin({ id: 'a2', kind: 'zip', label: '19122', lat: 39.977653, lon: -75.143016 });
+    saveOrigin({ id: 'google:ChIJabcdefghijk123', kind: 'address', label: '1500 Market St, Philadelphia, PA 19102', lat: 39.9526, lon: -75.1664 });
+    expect(loadOrigin().label).toBe('19122');
+    expect(JSON.stringify([...store.values()])).not.toMatch(/Market|39\.9526|google:/);
+  });
+
+  it('throws away a Google address a stored value somehow holds', () => {
+    store.set('pam.origin', JSON.stringify({ id: 'google:ChIJabcdefghijk123', kind: 'address', label: '1500 Market St', lat: 39.95, lon: -75.16 }));
+    expect(loadOrigin()).toEqual(CITY_HALL);
+    expect(store.has('pam.origin')).toBe(false);
+  });
 });

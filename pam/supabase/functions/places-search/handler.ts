@@ -132,7 +132,7 @@ export async function handle(request: Request, deps: Deps): Promise<Response> {
         }),
       });
       if (!response.ok) {
-        console.error('places autocomplete answered', response.status);
+        console.error('places autocomplete did not answer ok');
         return reply(200, { enabled: true, suggestions: [], unavailable: true });
       }
       const data = (await response.json()) as { suggestions?: { placePrediction?: { placeId?: string; text?: { text?: string } } }[] };
@@ -149,7 +149,7 @@ export async function handle(request: Request, deps: Deps): Promise<Response> {
       { headers: { 'X-Goog-Api-Key': key, 'X-Goog-FieldMask': 'location,formattedAddress' } },
     );
     if (!response.ok) {
-      console.error('places details answered', response.status);
+      console.error('places details did not answer ok');
       return reply(200, { enabled: true, place: null, unavailable: true });
     }
     const data = (await response.json()) as { formattedAddress?: string; location?: { latitude?: number; longitude?: number } };
@@ -157,8 +157,8 @@ export async function handle(request: Request, deps: Deps): Promise<Response> {
     const lon = data.location?.longitude;
     if (typeof lat !== 'number' || typeof lon !== 'number' || !inBox(lat, lon)) return reply(200, { enabled: true, place: null });
     return reply(200, { enabled: true, place: { label: shorten(data.formattedAddress ?? ''), lat, lon } });
-  } catch (error) {
-    console.error('places-search failed', error instanceof Error ? error.name : 'unknown');
+  } catch {
+    console.error('places-search failed');
     return reply(200, { enabled: true, ...(wanted.action === 'suggest' ? { suggestions: [] } : { place: null }), unavailable: true });
   }
 }

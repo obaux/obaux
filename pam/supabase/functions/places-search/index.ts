@@ -12,8 +12,8 @@ Deno.serve((request) => {
     get: (name) => Deno.env.get(name),
     fetch: (input, init) => fetch(input, init),
   };
-  return handle(request, deps).catch((error) => {
-    console.error('places-search failed', error instanceof Error ? error.name : 'unknown');
+  return handle(request, deps).catch(() => {
+    console.error('places-search failed');
     return reply(500, { error: 'something went wrong' });
   });
 });
