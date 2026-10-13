@@ -198,6 +198,8 @@
   "join.code.hint": "8個字母和數字。如果沒有人給您，可以留空。",
   "join.code.more": "關於邀請碼",
   "join.code.label": "邀請您的人給您的邀請碼",
+  "join.code.question": "有人用邀請碼邀請過您嗎？",
+  "join.code.reveal": "點按這裏",
   "join.details.city": "您居住的城市",
   "join.details.city.note": "Pam目前只在這些城市提供服務。",
   "join.details.first": "名字",
