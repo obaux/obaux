@@ -50,12 +50,13 @@ const styles = stylex.create({
   invited: {
     display: 'block',
     width: '100%',
-    paddingBlock: '10px',
+    // A little tighter on a short screen, where the line can run to four lines (D-564).
+    paddingBlock: { default: '10px', '@media (max-height: 640px)': '6px' },
     paddingInline: '16px',
     boxSizing: 'border-box',
     textAlign: 'center',
     fontSize: '15px',
-    lineHeight: 1.4,
+    lineHeight: { default: 1.4, '@media (max-height: 640px)': 1.3 },
     fontWeight: 600,
     color: '#FFFFFF',
     backgroundColor: '#000000',
@@ -88,7 +89,7 @@ const styles = stylex.create({
   pinBarShown: { opacity: 1, visibility: 'visible' },
   heroGroup: { width: '100%', marginBlockStart: '-24px' },
   heroHeader: { position: 'relative', width: '100%' },
-  heroBrand: { width: 'fit-content', marginInline: 'auto' },
+  heroBrand: { width: 'fit-content', marginInline: 'auto', rowGap: { default: null, '@media (max-height: 640px)': '8px' } },
   // Larger and always white (Will, 16 September) — the themed mark
   // `AppHeader` renders elsewhere picks dark or light ink to sit on the
   // page's own background, which is the wrong call directly over art, in
