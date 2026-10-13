@@ -1711,5 +1711,6 @@
   "newNumber.review.notMoved.title": "Approved, but the number has not moved yet",
   "newNumber.review.notMoved.body": "Tap Move it now to try again.",
   "newNumber.review.denied.title": "Denied",
-  "newNumber.review.denied.body": "Nothing changed on the account."
+  "newNumber.review.denied.body": "Nothing changed on the account.",
+  "newNumber.card.title": "Prove it's your new phone"
 }

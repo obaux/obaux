@@ -41,6 +41,8 @@ export interface PhoneSignInCardProps {
    * template above the card already says "Sign in" (D-217).
    */
   readonly hasTitle?: boolean;
+  /** The phone step's heading, where it is not signing in: "Prove it's your new phone" (D-567). */
+  readonly title?: string;
   /** 1 on the sign-in screen, 2 inside a flow that already has a title. */
   readonly headingLevel?: 1 | 2;
   /** The code step's button — "Sign in", or "Next" inside joining. */
@@ -79,6 +81,7 @@ export function PhoneSignInCard({
   onCodeChange,
   headingLevel = 1,
   hasTitle = true,
+  title,
   codeAction,
   isFlat = false,
 }: PhoneSignInCardProps) {
@@ -169,7 +172,7 @@ export function PhoneSignInCard({
           task is one block rather than a title floating above a box.
         */}
         <Heading level={headingLevel} xstyle={titleStyle}>
-          {t('signin.title')}
+          {title ?? t('signin.title')}
         </Heading>
         <TextField
           id={phoneId}

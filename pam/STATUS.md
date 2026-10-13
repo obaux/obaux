@@ -937,6 +937,14 @@ cleared and lands as super admin. "Use Pam as" (two-role accounts, D-374) stays;
 change. Also Iris's W2: sign-up step 2 has a Contact Pam row (help desk; no phone line, D-512).
 Open with Will: W2's back arrow (recommended: none).
 
+## Accounts & invites · a new phone number moves an account (13 October) — READY, waiting on Lena
+
+`claude/pam-new-number` (D-567, card a73; Will's defaults a84). "New number?" on Sign in; the new number proves itself
+with a code; the old account is described; a case manager (or, after 24 hours or for anyone else, the super admin)
+checks it beside the account, the super admin ticking "I spoke to this person"; `move-number` moves the sign-in. A super
+admin's account never moves. One expand migration (`20261013192951`) and one Edge Function for the merge desk. Waiting
+on: Lena (64 keys), Sage (words), Will (pictures, Privacy line), Nico (alerts and the old-number text, later).
+
 ## Voice & UX copy · marketing may reach, help stays true; help-post drafts (11 October)
 
 Will: the marketing pages may say what Pam is working towards; help posts, the app and anything legal say only what's

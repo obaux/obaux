@@ -129,7 +129,7 @@ export function NewNumberScreen() {
               onPhoneChange={setPhone}
               code={code}
               onCodeChange={setCode}
-              hasTitle={false}
+              title={t('newNumber.card.title')}
               headingLevel={2}
               codeAction={t('action.next')}
               isFlat
