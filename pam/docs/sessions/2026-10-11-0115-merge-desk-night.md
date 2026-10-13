@@ -662,9 +662,20 @@
   yes (a84 h; Sage signed the short version). a84 gains (i): tell the person someone may call (Sage). Lena folds
   "add a program" requests into p15, since the D-568 purge covers them and Privacy says nothing about them today.
   Live finding (Ava, 21:24): join.staff.title / body promise "We will text you the answer" while texts are off;
-  Sage rewrites, Lena translates, and it ships next without waiting for a84.
+  Sage rewrites, Lena translates, and it ships next without waiting for a84. **Withdrawn at 21:31:** Sage showed
+  the staff-request decision texts are account texts, exempt from texts_live (D-481; claim_outbound_messages lists
+  staff_request_approved and staff_request_denied), and live confirms it (dispatch-sms every 5 minutes; one approved
+  text sent 10 October, one denied 17 September). join.staff.* and addProgram.ask.* stay; Sage's D-568 waiting line
+  says the answer is texted. a84 is final at 21:51: p15 widened to add-a-program requests (Sage d8c9db1e) and (j),
+  "If we add a program you asked for, its name, type, address, phone number, website and description are shown on
+  Pam." (Lena: a lead's first name is shown to members who write, so "Your name is not" stays out).
 
 ## What was wrong, and what missed it
+
+- **A live finding went out to three people before it was checked.** Ava reported join.staff.* promising an unsent
+  text; I sent Sage, Lena and Ava to fix it without reading claim_outbound_messages or outbound_messages. Sage
+  checked the code and was right: those texts are exempt. Check a reported live fault against the live system (one
+  read-only query) before dispatching a fix.
 
 - **b33's first full run failed while I reported it as passing.** The e2e summary's "1832 passed" sat under
   "e2e=1"; I read the count, not the exit code, and told Will's channel it passed. Read every `name=N` line before
@@ -904,6 +915,8 @@
 | Batch b33, second full run (a7445521): db / config / ui / web unit / site / site a11y / usability / scrollspy / e2e full / storybook | 1579 ok / 1311 / 124 / 173 / 100 / 120 scans 0 / clear / 306 links 0 / 1835 passed, 19 skipped, e2e exit 0 / builds; tsc 0; 12.0 kB spare |
 | b33 English | 2 changed keys (nav.back.reported, place.notFound.body), none missing or equal to English in six languages |
 | Live checks for a84 (read-only, 20:30 to 20:34) | postgres has DELETE on auth.users (not superuser; owner supabase_auth_admin); pg_cron installed, five jobs; auth.audit_log_entries 0 rows; organization plan free |
+| b33 main CI (448d5790) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (21:59); Vercel web and pam-site READY (21:33) |
+| Staff-request texts (read-only, 21:30) | texts_live 'off'; live claim_outbound_messages exempts staff_request_approved and _denied; dispatch-sms */5 active; outbound_messages: one approved sent 10 October, one denied sent 17 September |
 
 ## Left undone
 
