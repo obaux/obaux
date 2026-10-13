@@ -339,6 +339,18 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
     await ctx.close();
   }
   {
+    // A finger: tap Pause, then Play, without leaving the button. The button keeps focus, and that must not hold the cycle.
+    const { ctx, page } = await open({ hasTouch: true });
+    const before = (await selected(page)).trim();
+    await page.getByRole('button', { name: 'Pause who Pam is for' }).tap();
+    await page.waitForTimeout(6800);
+    if ((await selected(page)).trim() !== before) fail('green card: it moved on while paused (touch)');
+    await page.getByRole('button', { name: 'Play who Pam is for' }).tap();
+    await page.waitForTimeout(6800);
+    if ((await selected(page)).trim() === before) fail('green card: after Pause then Play with a finger, the next name never arrived (a tapped button holds focus)');
+    await ctx.close();
+  }
+  {
     const { ctx, page } = await open({ reducedMotion: 'reduce' });
     await page.waitForTimeout(6800);
     if ((await selected(page)).trim() !== 'Residents') fail('green card: it moves on under reduced motion');
