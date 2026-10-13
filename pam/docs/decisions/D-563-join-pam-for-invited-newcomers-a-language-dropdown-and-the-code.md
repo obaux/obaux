@@ -31,9 +31,25 @@ to type code. otherwise let's hide it so it doesn't take up real estate."
    starts its line). Sage's, on Will's card: "Did someone invite you with a code?" and "Enter your
    code", since "click here" says nothing read out of context.
 
+5. **The link is underlined** (Dot, D-564: `TextLink isUnderlined`), since it sits among words and reveals a field.
+6. **Sage's signed fixes (13 October, 06:58)**, held since D-446:
+   - `join.staff.body`: "A person at Pam checks every request by hand before we open an account. We will
+     text you the answer." (no time promised; approval texts the link, 0054, and a denial queues a text, 0055).
+   - `admin.caseload.empty.body`: "When someone joins with an invite from you, they show up here. To invite
+     someone, open Profile and choose Invite someone." ("invite", true of a link or a code).
+   - `invite.expired.sent.body`: "We'll email a new link to {email}. Open it on this phone. It works for 30 days."
+7. **The expired-link page offers an email only while invite emails go out.** Sage: "while invite emails are
+   switched off, the whole 'Email me a new link' offer is untrue. Please hide that offer, plus the sent state,
+   behind the same switch rather than rewording them." There was no switch the app could read: the sender's
+   is the `INVITE_EMAILS` secret on `send-invite-emails`. Migration `20261013070505` adds
+   `app_settings.invite_emails_live` = 'off' (readable signed out, 0009), read by `useSettingOn` (the
+   `useTextsLive` pattern; unknown counts as off). Off: the page says the link ran out and offers Contact Pam
+   (the help desk, `help.contact.action`, no new words), so it does not dead-end. On: the form and "Check your
+   email" as before. The merge desk turns the row and the secret on together, on Will's word.
+
 ## What a later session might reverse
 
 - The link's words (Sage).
-- The member line is four sentences; at 320×568 it pins three lines over the hero and pushes "Send me
-  a code" 12px below the first screen (`e2e/signin-short.spec.ts`, red on this branch). Shorter words
-  or a smaller hero is a choice for Sage, Dot and Will, not made here.
+- The member line is four sentences. At 320×568 it pushed "Send me a code" 12px below the first screen
+  until Dot's smaller hero on short screens (D-564, merged in); the words stay Will's.
+- One switch rather than two: `send-invite-emails` could read `invite_emails_live` instead of its secret.

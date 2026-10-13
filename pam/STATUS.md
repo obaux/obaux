@@ -928,13 +928,14 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Accounts & invites · Join Pam (W6), language dropdown, code behind a question (13 October) — in progress
+## Accounts & invites · Join Pam (W6), language dropdown, code behind a question (13 October) — waiting on Lena and Will
 
-`claude/pam-join-first-time-wording` (D-563). From an invite, Sign in says "Join Pam" with Will's signed
-lines; Join › About you has a language dropdown instead of chips, and the code field opens from "Did
-someone invite you via code?". Dot's LanguageField (D-561) is merged in. Waiting on: Will (pictures; his words or Sage's for the code;
-the 320×568 overflow of the long member line), Lena (six keys), Sage (records Will's words; the held
-wording fixes), Dot (the link's look).
+`claude/pam-join-first-time-wording` (D-563, with Dot's D-561 and D-564 merged in). From an invite, Sign in
+says "Join Pam" with Will's signed lines; Join › About you has Dot's LanguageField and the code behind a
+question with an underlined link; Sage's signed fixes to the staff sign-up, the empty caseload and the
+expired link. The expired link offers an email only when `app_settings.invite_emails_live` is 'on'
+(migration 20261013070505, 'off'; turn on with the INVITE_EMAILS secret). Waiting on: Lena (nine keys),
+Will (card a82: his words or Sage's for the code; the last commit is Sage's, droppable).
 
 ## Voice & UX copy · marketing may reach, help stays true; help-post drafts (11 October)
 

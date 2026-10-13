@@ -682,7 +682,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 ) : (
                   <VStack gap={1} align="start">
                     <Text xstyle={styles.body}>{t('join.code.question')}</Text>
-                    <TextLink label={t('join.code.reveal')} onClick={revealCode} />
+                    <TextLink label={t('join.code.reveal')} onClick={revealCode} isUnderlined />
                   </VStack>
                 )}
                 </>

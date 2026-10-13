@@ -59,6 +59,15 @@ asks (06:00 UTC, with screenshots): bring back the language dropdown, and hide t
   six keys waiting for Lena (14 tests, every one naming them); Playwright join, account, consent,
   signin-short, a11y: 258 passed, 6 failed (320×568, waiting for Dot).
 
+- **07:05:** Sage's signed fixes (`join.staff.body`, `admin.caseload.empty.body`, `invite.expired.sent.body`) and
+  the expired page's email offer behind a new switch, `app_settings.invite_emails_live` (migration
+  `20261013070505`, 'off'); off shows Contact Pam. Dot's `claude/pam-design-signin-fit` (f319ae54, D-564) merged:
+  the short-screen hero, and `TextLink isUnderlined` for the reveal link. Sage's code words reverted and
+  re-applied as the last commit, so it stays droppable.
+- Checks then: `pnpm --filter @pam/db test` all pass; tsc clean; web build and build-storybook; Playwright join,
+  account, consent, signin-short, a11y, admin on 3 projects: 330 passed (the 320×568 case is green). Pictures
+  retaken with the underlined link.
+
 ## Left undone
 
 - Lena: the six languages for the six keys above.
@@ -66,7 +75,6 @@ asks (06:00 UTC, with screenshots): bring back the language dropdown, and hide t
   (`join.staff.body` without "a day or two", `admin.caseload.empty.body` with an invite link and a next
   step, the expired-link "Check your email" while email may be off). Not built until she signs.
 - Dot: the reveal link's look (today it is `TextLink`, with no underline, and reads as plain text).
-- The 320×568 overflow.
 
 ## Needs a human
 
