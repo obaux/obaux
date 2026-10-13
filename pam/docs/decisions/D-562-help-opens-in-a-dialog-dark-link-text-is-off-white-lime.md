@@ -6,7 +6,7 @@ Will (13 October, via Mira): the help form leaves the page and a call-out opens 
 
 ## 1. The call-out and its dialog
 
-**A modal dialog, full screen on a phone** (not a page of its own). The reader keeps their place in the post; the form is two fields; a native `<dialog>` + `showModal()` gives focus inside the form, Esc, a backdrop, and focus back on the button. A page would need a route, a Back and the post's scroll to be put back.
+**A modal dialog, full screen on a phone** (not a page of its own). The reader keeps their place in the post; the form is two fields; a native `<dialog>` + `showModal()` gives focus inside the form, Esc, a backdrop, and focus back on the button (the backdrop dims the page; clicking it does not close the dialog, see Behaviour). A page would need a route, a Back and the post's scroll to be put back.
 
 - **Call-out** (replaces the form in the "Still stuck?" card): the card as now (`surface-muted`, radius 24, hairline; 24px inside on a phone, 32 from 900px), `heading_title24` "Still stuck?", one line in `lead_17` in `text-secondary`, and the one action: a primary pill, min-height 54, `label_strong17`, brand fill, full width on a phone, "Write to us" (Sage signs the line and the label). With the form off, the address as now, no button.
 - **Dialog, phone (under 900px):** 100% wide, `100dvh` tall, no radius, 24px padding all round (the top clear of the notch: `env(safe-area-inset-top)`), the content scrolls inside it. **From 900px:** centred, 560 wide, at most `100dvh − 64px`, radius 24, 32px padding, hairline `border-subtle`, `surface-page`; backdrop black at 50% (60% in dark).
@@ -16,7 +16,7 @@ Will (13 October, via Mira): the help form leaves the page and a call-out opens 
 - **Errors:** under the field, 8px, `lead_17`, with the words Sage has signed; the colour from the theme's error text token (AA on the page in both themes); the field's border takes the same colour. Never colour alone: the line is words.
 - **Send:** a primary pill, min-height 54, `label_strong17`, full width, 32px below the last field. While sending, the label stays and the button is disabled (as now).
 - **Sent / failed:** in the same dialog: `heading_title24` "Sent. Thank you.", `lead_large17` "A person at Pam will read it and write back.", and a 48px soft "Close". Failed keeps the form and its text, and says so above Send.
-- **Behaviour:** `autofocus` on the message; Esc and the backdrop close it (not while sending); the page behind does not scroll (`overflow: hidden` on `body` while it is open: iOS ignores the dialog's own lock); the dialog fades in over 160ms on (0.2, 0, 0, 1) with `prefers-reduced-motion: no-preference`, instantly otherwise; focus returns to "Write to us".
+- **Behaviour:** `autofocus` on the message; Close or Esc closes it (not while sending). Clicking outside it, on the backdrop, does not: Astryx's `purpose="form"` ignores the backdrop on purpose, so a stray click never loses what someone has typed. Will's card a83 said tapping outside closes it; the merge desk decided on 13 October (Iris, help form walk-through, P1) to keep what it does and correct this record; the page behind does not scroll (`overflow: hidden` on `body` while it is open: iOS ignores the dialog's own lock); the dialog fades in over 160ms on (0.2, 0, 0, 1) with `prefers-reduced-motion: no-preference`, instantly otherwise; focus returns to "Write to us".
 - All type styles used exist in `website-type.stylex.ts`. New English words (the call-out line, the button, the intro, the Close label) go to Sage (A29).
 
 ## 2. Dark-mode link text
@@ -30,3 +30,7 @@ Contrast, dark: **14.76:1 on the page** (#1B1B1B), 12.97 on `surface-muted`, 11.
 **Where else the token applies** (every text link now drawn in the theme's lime accent): `PostRow` titles (Support index, topics, search results); the "More: …" link at the end of a post's section; the breadcrumb "Support"; the header's "Get help"; the "On this page" menu's links; the address link in `HelpAddress` and any `TextLink`/`LegalLink` quiet link. **Not**: icons, chevrons, the lime Sign in button, the hero's lime words (display type, decorative), the footer links (white on the deep green).
 
 Pictures (390px, dark, the real built pages with the colours applied in the browser): `docs/design/review/2026-10-13-help-desk/`.
+
+## Correction, 13 October
+
+The sentence above first said "Esc and the backdrop close it". The built dialog closes with Close or Esc only; clicking outside does not close it, so nothing typed is lost to a stray click. Kept on purpose (merge desk, relaying Iris's P1). Docs only; no code or story changed.
