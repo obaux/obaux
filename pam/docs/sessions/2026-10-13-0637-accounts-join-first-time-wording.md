@@ -75,6 +75,13 @@ asks (06:00 UTC, with screenshots): bring back the language dropdown, and hide t
   a11y, admin: 329 of 330 passed, and the one timeout (account "picks a side on Profile", iPhone SE) passed
   9 of 9 on a re-run. Sage's code-words commit is ce18f5ff, no longer the tip: revert it if Will keeps his.
 
+- **07:45, READY:** `invite_emails_live` seeded 'on' (Mira: the sender is live since 10 October; file renamed
+  to `20261013070505_invite_emails_have_a_live_switch_the_app_reads.sql`). `main` 8f0af8d1 already in.
+  `pnpm --filter @pam/db test` all pass; `pnpm -r typecheck` clean; ui 124, web 170, site 95; config 1298
+  pass, 12 fail on `join.code.question` / `join.code.reveal` only (Will's pick on a82); web build, bundle
+  10.9 kB to spare; build-storybook; Playwright join, account, consent, signin-short, a11y, admin, directory
+  on 3 projects: 360 passed.
+
 ## Left undone
 
 - Lena: the six languages for the six keys above.
