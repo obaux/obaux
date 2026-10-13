@@ -9,7 +9,7 @@ export const APP_URL = (
 ).replace(/\/$/, '');
 
 export const SIGN_IN_URL = `${APP_URL}/signin/`;
-/** Sign in, then straight to Add my program (the app keeps `next` to one listed screen, used once, never for a program lead: D-554/S1). */
+/** Sign in, then straight to Add my program (the app keeps `next` to one listed screen, used once, never for a program lead: S1). */
 export const ADD_PROGRAM_URL = `${APP_URL}/signin/?next=/profile/add-program/`;
 export const PRIVACY_URL = `${APP_URL}/privacy/`;
 export const TERMS_URL = `${APP_URL}/terms/`;
