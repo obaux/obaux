@@ -12,6 +12,7 @@ import { Text } from '@astryxdesign/core/Text';
  * - The "Google Maps" logo, unaltered: **16dp at least, 19dp at most** in height; clear space of **10 left, right and top, 5 bottom**.
  * - Its accessible name is "Google Maps", not "Powered by Google". A brand name, never translated (the wordmark's alt "Pam" is the same).
  * - A plain version for flat backgrounds (this is one: the drawer's surface) and an outlined one for busy pictures.
+ * - Centred in the row, with the sheet's footer line centred under it (Will, 13 October).
  * - Only where the logo cannot fit, the words "Google Maps" instead: same capitalisation, no wrapping, `translate="no"`.
  *
  * The files are Google's own, kept as downloaded (`apps/web/public/google/README.md` says where from), served by Pam and never loaded from
@@ -31,7 +32,7 @@ const styles = stylex.create({
 export function PoweredByGoogle() {
   const [failed, setFailed] = useState(false);
   return (
-    <HStack justify="end" xstyle={[styles.row, styles.space]} data-google-attribution="">
+    <HStack justify="center" xstyle={[styles.row, styles.space]} data-google-attribution="">
       {failed ? (
         <span translate="no" lang="en" dir="ltr">
           <Text type="supporting" xstyle={styles.words}>
