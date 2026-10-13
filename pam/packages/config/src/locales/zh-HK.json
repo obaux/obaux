@@ -561,7 +561,7 @@
   "privacy.s.texts.p3": "您的電訊商可能會就短訊向您收費。這是您與電訊商之間的事。",
   "privacy.s.texts.title": "短訊",
   "privacy.s.translation.p1": "如果一則訊息是用您看不懂的語言寫的，Pam會用您的語言顯示。訊息下方會標示「已翻譯」，您可以點按查看對方寫的原文。",
-  "privacy.s.translation.p2": "為此，Pam會將該則訊息的文字傳送給一家翻譯公司。對方只會收到文字，不會收到您的姓名、電話號碼，也不會知道您在和誰傾談。對方不會保留這些文字，也不會從中學習。",
+  "privacy.s.translation.p2": "為此，Pam會將該則訊息的文字傳送給Claude，這是Anthropic開發的一款AI。它只會收到文字，不會收到您的姓名、電話號碼，也不會知道您在和誰傾談。Anthropic會在30天內刪除這些文字，並且不會用它們來訓練自己的AI。如果Anthropic的安全檢查標記了某則訊息，Anthropic最多可能保留該則訊息兩年。法律要求時，Anthropic也可能保留訊息。",
   "privacy.s.translation.p3": "Pam會保存譯文，以免再次要求翻譯。只有該對話中的人才看得到譯文，訊息被刪除時譯文也會一併刪除。譯文可能有誤。如果訊息很重要，請向對方確認。",
   "privacy.s.translation.title": "以您的語言查看訊息",
   "privacy.s.what-we-keep.p1": "您的名字、手機號碼，以及您選擇的語言。",

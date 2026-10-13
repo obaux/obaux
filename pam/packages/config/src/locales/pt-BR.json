@@ -561,7 +561,7 @@
   "privacy.s.texts.p3": "Sua operadora de telefonia pode cobrar pelas mensagens de texto. Isso é entre você e ela.",
   "privacy.s.texts.title": "Mensagens de texto",
   "privacy.s.translation.p1": "Se uma mensagem foi escrita em um idioma que você não lê, Pam pode mostrá-la no seu. Embaixo aparece “Traduzido”, e você pode tocar para ver o que a pessoa escreveu.",
-  "privacy.s.translation.p2": "Para isso, Pam envia as palavras dessa mensagem a uma empresa que traduz. Ela recebe as palavras e mais nada. Não recebe o seu nome, o seu número de telefone nem com quem você está falando. Não guarda nada e não aprende com elas.",
+  "privacy.s.translation.p2": "Para isso, Pam envia as palavras dessa mensagem ao Claude, uma IA feita pela Anthropic. Ele recebe as palavras e mais nada. Não recebe o seu nome, o seu número de telefone nem com quem você está falando. A Anthropic apaga as palavras em até 30 dias e não as usa para treinar a IA dela. Se as verificações de segurança da Anthropic marcarem uma mensagem, ela pode guardá-la por até dois anos. Ela também pode guardar uma mensagem se a lei exigir.",
   "privacy.s.translation.p3": "Pam guarda a tradução para não precisar pedir de novo. Só as pessoas dessa conversa podem vê-la, e ela é apagada quando a mensagem é apagada. Uma tradução pode estar errada. Se uma mensagem for importante, pergunte à pessoa.",
   "privacy.s.translation.title": "Mensagens no seu idioma",
   "privacy.s.what-we-keep.p1": "Seu primeiro nome, seu número de telefone e o idioma que você escolhe.",

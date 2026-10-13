@@ -644,9 +644,16 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   1. 0084 is live (9 October); deploy `translate-messages` (`supabase functions deploy
      translate-messages`), and read `get_advisors`.
   2. Set `ANTHROPIC_API_KEY` as a function secret — never in this repo — on an
-     account whose terms say what is sent is **not kept and not used to
-     train**. Get that in writing; the privacy page says it ("It keeps
-     nothing and does not learn from them").
+     account whose terms Will has read against the privacy page. The page says
+     what Anthropic's published terms say (card a70): the words are deleted within
+     30 days and not used to train; a message its safety checks flag may be kept
+     up to two years; a message may also be kept if the law requires it. It no
+     longer says "keeps nothing", which is not true of any model Pam can call.
+     Re-read Anthropic's data-retention page (platform.claude.com › Manage
+     Claude › API and data retention) the day the switch goes on, and change the
+     page if it changed. Pam calls `claude-haiku-5-5`; the Covered Models (Fable
+     5/5.1, Mythos 5/5.1) are held 30 days for everyone, so a change of model in
+     `supabase/functions/translate-messages/anthropic.ts` needs the page re-read too.
   3. A native speaker reads `privacy.s.translation.*` in all seven languages
      (it appears on the privacy page the moment the switch is on).
   4. **Tell members first** (the transparency promise): translation sends the

@@ -90,7 +90,7 @@ const HOSTS: Record<string, HostEntry> = {
   'api.anthropic.com': {
     kind: 'server',
     why: 'translating a message: the words of that message and nothing else (translate-messages)',
-    privacy: { key: 'privacy.s.translation.p2', names: /a company that translates/ },
+    privacy: { key: 'privacy.s.translation.p2', names: /Claude, an AI made by Anthropic/ },
   },
   'accounts.google.com': {
     kind: 'server',
