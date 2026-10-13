@@ -11,6 +11,8 @@ STATUS row too.
 
 ## Open
 
+- [ ] **Google Calendar sync: waiting until Will wants it on** (a71, 12 October 2026: "wait until we switch sync on. Not now."). It is built and held on the branch `claude/places-programs-google-sync` (head 5f1e70ae; D-539): not merged, not deployed, no migration applied. When Will asks for it, its two Privacy lines come back on a card with the Google Cloud checklist (the full checklist is in that branch's `docs/before-launch.md`). The calendar link (D-538) is separate and does not need it.
+
 - [ ] **Calendar link: someone taps it on a real phone** (Piper, 11 October 2026, D-538). (1) On an Android phone, make a link on
   Profile > Calendar and tap "Open Google Calendar on the web": it should reach Google Calendar's "add by URL" page in the
   phone's browser; if Google sends the phone to its app or a sign-in that loses the page, the line above the button
