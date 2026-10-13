@@ -28,6 +28,12 @@ export interface TextLinkProps {
    * D-564, after D-562 on the website.
    */
   readonly isUnderlined?: boolean;
+  /**
+   * The id of the words this link belongs to, read with it as its description (`aria-describedby`). For a link whose own
+   * words only make sense beside a question, such as Join's "Click here" under "Did someone invite you via code?": a
+   * screen reader listing links would otherwise say "Click here" alone (Iris, b32, P2). Nothing changes on screen.
+   */
+  readonly describedBy?: string;
 }
 
 /*
@@ -61,7 +67,7 @@ const styles = stylex.create({
  */
 export const textLinkLook = stylex.create({ link: linkLook });
 
-export function TextLink({ label, href, onClick, isDisabled, size = 'default', isUnderlined = false }: TextLinkProps) {
+export function TextLink({ label, href, onClick, isDisabled, size = 'default', isUnderlined = false, describedBy }: TextLinkProps) {
   return (
     <Button
       label={label}
@@ -69,6 +75,7 @@ export function TextLink({ label, href, onClick, isDisabled, size = 'default', i
       href={href}
       onClick={onClick}
       isDisabled={isDisabled}
+      aria-describedby={describedBy}
       xstyle={[size === 'quiet' ? styles.quiet : styles.link, isUnderlined ? styles.underlined : null]}
     />
   );
