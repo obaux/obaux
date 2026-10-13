@@ -16,6 +16,7 @@ import { LANGUAGE_TAGS, SUPPORTED_LOCALES, TRANSPARENCY_SCREEN, badgeForPoints, 
 import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/navigate';
 import { forgetInvite, recallInvite, type Invite } from '@/lib/appUrl';
+import { takeNext } from '@/lib/signinNext';
 import { readAddedTrips, withMoves } from '@/lib/addedTrips';
 import { exampleTrips } from '@/lib/exampleTrips';
 import { Confetti } from '@pam/ui/SuccessScreen';
@@ -368,7 +369,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
     // was a tap that did nothing. Home opens on getting started (D-352).
     markFreshAccount();
     if (preview) navigate('/');
-    else router.replace('/');
+    else router.replace(recallInvite() ? '/' : (takeNext() ?? '/'));
   };
 
   const answerTexts = async (wants: boolean) => {
@@ -834,7 +835,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
               */}
               <PointsBadge points={points ?? 0} label={t('points.title')} />
               <Text xstyle={styles.body}>{t('join.done.body', { name: firstName.trim() || t('app.name') })}</Text>
-              <BigButton label={t('join.done.action')} onPress={() => (preview ? navigate('/') : router.replace('/'))} />
+              <BigButton label={t('join.done.action')} onPress={() => (preview ? navigate('/') : router.replace(recallInvite() ? '/' : (takeNext() ?? '/')))} />
             </VStack>
           </>
         ) : null}
