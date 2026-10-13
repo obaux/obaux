@@ -585,6 +585,12 @@
   check ran before the build regenerated them. Rerun after the build: clean. CI checks out fresh and is not affected.
 - **Branch deletion is refused by the git proxy** (Nico, then Mira, 06:54): `claude/messages-block` and
   `claude/messages-staff-text-list` hold only merges of main. Left for Will to delete on GitHub if he wants.
+- **Batch b31 (13 October).** No migration, no function change. Piper (f748c465, D-552, street search still off
+  until Will's key): a Google address picked in the area search shows only its five-digit ZIP on the Explore chip
+  (Will, a81, 05:45; "Philadelphia" when there is none; the picked point still orders the places; nothing saved);
+  "Pam remembers the area you pick on this phone only." is centred only while Google's mark shows; and nothing typed
+  goes to `places-search` until its status says a key exists (Iris's b30 notes). After b31 the street search waits
+  only on Will: Google's logo files (a81 step 2), then the key.
 
 ## What was wrong, and what missed it
 
@@ -807,6 +813,7 @@
 | Invite emails before the W6 switch (07:35) | staff_invite_emails: 2 sent (10 October 19:16–19:20 UTC), 0 waiting; invite_emails: 0 rows; counts and times only read |
 | `list_migrations` before 20261013070505 | live ended at 20261013051051; applied as 20261013075601; row invite_emails_live = 'on'; app_settings RLS on, read-all and admin-write policies unchanged |
 | Iris's b30 run-through | a78 (ten super admin screens, stale view-as, Connect, Contact Pam), W5, W6 and street search off (four ways, p7 in seven languages): PASS, 29/29 scripted; Dot's sign-in test edit: FAIL (bar never shows at 72px scroll in ar, zh-CN) |
+| Batch b31 (Piper f748c465): db / config / ui / web unit / site / site a11y / usability / e2e full / storybook | 1579 ok / 1310 / 124 / 173 / 95 / 120 scans 0 / clear / 1775 passed, 19 skipped / builds; scrollspy 306 links 0; web tsc 0; 11.0 kB spare |
 
 ## Left undone
 
