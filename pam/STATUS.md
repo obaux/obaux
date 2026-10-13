@@ -2223,3 +2223,7 @@ D-545, `claude/places-programs-scraped-vs-pam`: the audit table and `place-scrap
 ## Design system & Storybook · text colour examples for Will (12 October)
 
 Will (a65) wants to see two website text colours before choosing. Story **Website / Text colours (Will to choose)** shows #666666 vs #595959 on the tinted cards and #0B991F vs #087A18 on white, at phone width, with live ratios. #666666 fails AA on Gray, Green and Purple; #0B991F fails on white. Site tokens are unchanged until Will decides (D-546).
+
+## Places & programs · street search through Google, off until the key (13 October 2026)
+
+D-552, `claude/places-programs-street-search`: the area search asks Google (Places New, from Pam's `places-search` function only) for an address, a corner or a place by name, below Pam's own ZIP and neighborhood rows, with Google's mark. Off until Will enters `GOOGLE_MAPS_SERVER_KEY`; no key, no change. Waiting: the key and quota (Will), the Privacy line (Lena, Sage, Will), Google's own mark (Dot). Log: see `docs/sessions/`.

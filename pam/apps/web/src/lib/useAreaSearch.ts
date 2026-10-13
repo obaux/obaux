@@ -27,8 +27,10 @@ export interface AreaOption {
   lon: number;
 }
 
-export function useAreaSearch(query: string): { options: AreaOption[]; isSearching: boolean } {
+export function useAreaSearch(query: string): { options: AreaOption[]; isSearching: boolean; answered: string | null } {
   const [options, setOptions] = useState<AreaOption[]>([]);
+  // The text the options below answer, so a caller can tell a fresh answer from one left over from the letters before (D-552).
+  const [answered, setAnswered] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
@@ -45,9 +47,15 @@ export function useAreaSearch(query: string): { options: AreaOption[]; isSearchi
           const { data } = await supabase.rpc('search_areas', { p_query: query, p_limit: 8 });
           const areas = ((data ?? []) as AreaOption[]).map((row) => ({ ...row, id: String(row.id) }));
 
-          if (!cancelled) setOptions(areas);
+          if (!cancelled) {
+            setOptions(areas);
+            setAnswered(query);
+          }
         } catch {
-          if (!cancelled) setOptions([]);
+          if (!cancelled) {
+            setOptions([]);
+            setAnswered(query);
+          }
         } finally {
           if (!cancelled) setIsSearching(false);
         }
@@ -61,7 +69,7 @@ export function useAreaSearch(query: string): { options: AreaOption[]; isSearchi
     };
   }, [query]);
 
-  return { options, isSearching };
+  return { options, isSearching, answered };
 }
 
 /** The starting point, remembered on this device only. */

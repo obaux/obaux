@@ -92,6 +92,13 @@ const HOSTS: Record<string, HostEntry> = {
     why: 'translating a message: the words of that message and nothing else (translate-messages)',
     privacy: { key: 'privacy.s.translation.p2', names: /a company that translates/ },
   },
+  'places.googleapis.com': {
+    kind: 'server',
+    why: 'street addresses and corners in the area search: the typed words, or a chosen place’s id, and nothing about the member (places-search, D-552)',
+    privacy: { key: 'privacy.s.sharing.p8', names: /Google/ },
+    pending: 'the street search card (Lena writes the line, Sage edits, Will signs; the function is off until the key exists)',
+    arriving: 'D-552',
+  },
   'accounts.google.com': {
     kind: 'server',
     why: 'Google sign-in for the calendar sync: the member is sent there to allow it (google-calendar, D-539)',
@@ -160,6 +167,11 @@ const FUNCTIONS: Record<string, FunctionEntry> = {
     reaches: [],
     why: 'opens the page of a link a member sent, once, for its title and picture',
     dynamic: { privacy: { key: 'privacy.s.what-we-keep.p6', names: /server opens the page once/ } },
+  },
+  'places-search': {
+    reaches: ['places.googleapis.com'],
+    why: 'asks Google for street addresses and corners while a member types in the area search; off until the key exists',
+    arriving: 'D-552',
   },
   'calendar-feed': { reaches: [], why: 'serves the calendar link; asks only Pam’s own database', arriving: 'D-538' },
   'google-calendar': {

@@ -348,6 +348,8 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     // Pam's server, which is never asked for real from a story.
     on('/rest/v1/message_link_previews', () => ({ body: linkPreviewsFor(role) })),
     on('/functions/v1/link-preview', () => ({ body: { made: 0 } })),
+    // Street addresses from Google (D-552): off in a story, as with no key; the area search is Pam's own list.
+    on('/functions/v1/places-search', () => ({ body: { enabled: false } })),
     on('/rpc/report_photos_for_review', () => ({ body: [] })),
     on('/rpc/report_files_for_review', () => ({ body: [] })),
     // The programs a super admin has still to check (D-386, part 6): a decision takes one off the list.
