@@ -28,13 +28,27 @@ export const HOME = {
   },
   band: {
     label: 'Who is Pam for?',
-    chips: [
-      { label: 'Residents', href: '/support/#topic-members' },
-      { label: 'Program Providers', href: '/support/#topic-programs' },
-      { label: 'Case managers', href: '/support/#topic-case-managers' },
+    // The green card is a switcher (Will, 12 October, Figma "Callout card" 18:517): each name shows its own picture and line.
+    views: [
+      {
+        id: 'residents',
+        label: 'Residents',
+        line: 'Find help, plan your visit, and talk to a real person.',
+        alt: 'An isometric picture of Philadelphia with City Hall at the centre and map pins on the buildings.',
+      },
+      {
+        id: 'providers',
+        label: 'Program Providers',
+        line: 'Your policies, signed before they arrive. Check-in and go!',
+        alt: 'An isometric picture of a person walking through the warm, lit doorway of a city building.',
+      },
+      {
+        id: 'managers',
+        label: 'Case managers',
+        line: 'Their plans, your guidance, in one place.',
+        alt: 'An isometric picture of a smiling person with a duffel bag, looking at a phone in a bright community room.',
+      },
     ],
-    line: 'Find help, plan your visit, and talk to a real person.',
-    alt: 'An isometric picture of Philadelphia with City Hall at the centre and map pins on the buildings.',
   },
   rows: [
     {
