@@ -486,7 +486,7 @@
   authenticated only `count_screen_open`, the service role `screen_opens_weekly`. Nothing counts until the app ships in
   b29 with Lena's Privacy line.
 - **Will's decisions, 13 October** (his words, the time in UTC, who builds it, and where it ends up recorded; written
-  down the same hour from now on, not at batch time; Will, 06:03: "ensure all these decisions are being documented"):
+  down the same hour from now on, not at batch time; Will, about 06:02: "ensure all these decisions are being documented"):
   - **03:21, a77 (website on phones):** "take off the arrows but let's add a progress translucent effect behind chips
     because they should automatically switch from one to the next. If the user taps on one, it pauses the progress.
     Everything else looks good." Wren built it with Dot's fill (D-553); held on card a80.
@@ -516,7 +516,7 @@
     on Join go back to a dropdown (Ava builds, Dot the look); (3) the invite code hidden behind "Did someone invite you
     via code?" with a link that shows the field (Ava; Sage records his words and proposes link text that says what it
     does instead of "click here"). Pictures go to Will before any of it ships (the D-499 lesson).
-  - **06:03 (terminal):** every decision documented in the repository's records. This list; the rule is now in
+  - **About 06:02 (terminal):** every decision documented in the repository's records. This list; the rule is now in
     `docs/control-room.md` ("How Mira keeps it current").
 
 ## What was wrong, and what missed it
