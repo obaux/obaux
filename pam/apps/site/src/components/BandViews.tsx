@@ -27,7 +27,7 @@ import { tap } from '../lib/tap';
  *   stops the cycle for good (until Play). It also waits while the pointer or focus is in the card or it is off screen.
  *   A Pause / Play pill on the picture stops it (WCAG 2.2.2). Reduced motion: no cycle, no fill, no pill.
  * - A screen reader hears a view only when a person chose it, never on the timer.
- * - The fill's colour is a first pass (the brand deep green at 22%); Dot draws the final look.
+ * - The fill's look is Dot's (D-553): see `fill` below. It grows from the inline start, so Arabic runs right to left.
  */
 const DWELL_MS = 6000;
 
@@ -38,8 +38,8 @@ const IMAGES: Readonly<Record<string, { src: string; srcSet?: string; width: num
 };
 
 const keyframesFill = stylex.keyframes({
-  from: { transform: 'scaleX(0)' },
-  to: { transform: 'scaleX(1)' },
+  from: { width: '0%' },
+  to: { width: '100%' },
 });
 
 const styles = stylex.create({
@@ -105,8 +105,9 @@ const styles = stylex.create({
     color: website['--website-text-on-brand-deep'],
     fontSize: { default: '14px', '@media (min-width: 900px)': '20px' },
     lineHeight: { default: '20px', '@media (min-width: 900px)': '28px' },
-    transitionProperty: { default: 'none', '@media (prefers-reduced-motion: no-preference)': 'background-color, color, transform' },
-    transitionDuration: '125ms',
+    // The name that lets go eases out over 240ms (Dot).
+    transitionProperty: { default: 'none', '@media (prefers-reduced-motion: no-preference)': 'background-color, color' },
+    transitionDuration: '240ms',
     transitionTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)',
   },
   chipOn: { backgroundColor: website['--website-surface-green'], color: website['--website-text-primary'] },
@@ -114,14 +115,16 @@ const styles = stylex.create({
   // The progress: a translucent shade that grows from the start edge across the active name (transform only).
   fill: {
     position: 'absolute',
-    inset: 0,
-    backgroundColor: `color-mix(in srgb, ${website['--website-surface-brand-deep']} 22%, transparent)`,
-    transformOrigin: 'left center',
-    transform: 'scaleX(0)',
+    insetBlock: 0,
+    insetInlineStart: 0,
+    width: '0%',
+    // Dot's look (D-553): the brand deep green at 28% on light, white at 22% on dark; a hard leading edge; the label above it.
+    backgroundColor: `light-dark(color-mix(in srgb, ${website['--website-surface-brand-deep']} 28%, transparent), color-mix(in srgb, ${website['--website-text-on-brand-deep']} 22%, transparent))`,
     animationName: keyframesFill,
     animationDuration: `${DWELL_MS}ms`,
     animationTimingFunction: 'linear',
     animationFillMode: 'forwards',
+    willChange: 'width',
     pointerEvents: 'none',
   },
   fillHeld: { animationPlayState: 'paused' },
@@ -193,7 +196,9 @@ function usePrefersReducedMotion(): boolean {
 export function BandViews({ pauseLabel = 'Pause this card', playLabel = 'Play this card' }: { readonly pauseLabel?: string; readonly playLabel?: string } = {}) {
   const views = HOME.band.views;
   const [active, setActive] = useState(0);
-  const [paused, setPaused] = useState(false); // the reader's choice: a tap on a name, or the Pause button
+  // The reader's choice: `false`, `control` (the Pause button: the fill freezes where it is) or `tap` (a name was chosen: no fill).
+  const [paused, setPaused] = useState<false | 'control' | 'tap'>(false);
+  const [run, setRun] = useState(0); // a new run restarts the 6 seconds
   const [inside, setInside] = useState(false); // pointer or focus in the card
   const [visible, setVisible] = useState(true);
   const [heard, setHeard] = useState('');
@@ -213,13 +218,13 @@ export function BandViews({ pauseLabel = 'Pause this card', playLabel = 'Play th
   const choose = (to: number, focus = false) => {
     const next = (to + views.length) % views.length;
     setActive(next);
-    setPaused(true);
+    setPaused('tap');
     setHeard(`${views[next]!.label}: ${views[next]!.line}`);
     if (focus) tabRefs.current[next]?.focus();
   };
 
-  const cycling = !paused && !reduced;
-  const held = inside || !visible; // the fill waits, and so does the cycle
+  const showFill = !reduced && paused !== 'tap';
+  const held = inside || !visible || paused === 'control'; // the fill waits, and so does the cycle
 
   return (
     <div
@@ -262,7 +267,14 @@ export function BandViews({ pauseLabel = 'Pause this card', playLabel = 'Play th
             size="sm"
             hasEdge={false}
             icon={paused ? <PlayMark /> : <PauseMark />}
-            onClick={() => setPaused((p) => !p)}
+            onClick={() => {
+              if (paused) {
+                setPaused(false);
+                setRun((r) => r + 1); // Play starts the active name's 6 seconds again
+              } else {
+                setPaused('control');
+              }
+            }}
             xstyle={[type.label_14, styles.pause, tap.target]}
           />
         )}
@@ -309,9 +321,9 @@ export function BandViews({ pauseLabel = 'Pause this card', playLabel = 'Play th
                 {...stylex.props(styles.tab)}
               >
                 <span {...stylex.props(styles.chip, styles.chipClip, i === active && styles.chipOn)}>
-                  {i === active && cycling ? (
+                  {i === active && showFill ? (
                     <span
-                      key={active}
+                      key={`${active}-${run}`}
                       aria-hidden="true"
                       data-band-fill=""
                       onAnimationEnd={() => setActive((a) => (a + 1) % views.length)}
