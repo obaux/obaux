@@ -52,6 +52,9 @@ rows must not be purged, because `useProgramRequest` (D-525) reads the row to kn
 - **Approved requests are never purged.** They stay with the account and go with it (`user_id` cascades).
 - It covers every staff request, program-lead ones included, and any refused row that exists when it ships (live had
   one row, approved, on 13 October).
+  Confirmed by the merge desk, 13 October 21:28, option (a): both purges cover every staff request, a member's "add
+  a program" request (D-525) included — "one rule, and nothing kept forever". Lena widens Privacy p15 to name program
+  requests before Will signs a84.
 - The audit log keeps what it already had: `staff_request.deny` with the role and no name. Nothing here writes a name,
   a phone, an organization or an email into it (D-443); the DB test checks the approval rows.
 
