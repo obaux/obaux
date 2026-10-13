@@ -103,3 +103,20 @@ export const Spanish: Story = {
   args: { roleLabel: 'role.super_admin', trailing: <Bell unread={3} /> },
   globals: { locale: 'es' },
 };
+
+/**
+ * Every role's chip, with the bell and without, in a 320px phone (b26). A chip never breaks inside a word ("Membe / r"):
+ * when it does not fit beside the mark it moves under it, whole. Switch the language in the toolbar: Russian and Spanish
+ * are the long ones.
+ */
+export const NarrowRows: Story = {
+  parameters: { layout: 'fullscreen' },
+  render: () => (
+    <div style={{ width: '320px', display: 'flex', flexDirection: 'column', gap: '16px', padding: '0 16px', boxSizing: 'border-box' }}>
+      {(['role.member', 'role.admin', 'role.provider'] as const).flatMap((role) => [
+        <LocalisedHeader key={`${role}-bell`} roleLabel={role} accountLabel="account.open" trailing={<Bell unread={1} />} />,
+        <LocalisedHeader key={`${role}-none`} roleLabel={role} accountLabel="account.open" />,
+      ])}
+    </div>
+  ),
+};
