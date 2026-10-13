@@ -143,6 +143,7 @@ export const Points: Story = screen('member', 'Points', '/points/');
 export const Reminders: Story = screen('member', 'Text reminders', '/reminders/');
 export const TextAlerts: Story = screen('member', 'Text alerts', '/alerts/');
 export const Language: Story = screen('member', 'Language', '/language/');
+export const Calendar: Story = screen('member', 'Calendar link', '/calendar/');
 export const GetHelp: Story = screen('member', 'Get help', '/help/');
 export const HelpTopics: Story = screen('member', 'What we can help with', '/help/topics/');
 export const HelpSafety: Story = screen('member', 'Your safety', '/help/safety/');

@@ -90,6 +90,9 @@ export interface MockOptions {
   readonly savedTrip?: boolean;
   /** Also a saved trip whose day has passed, so Trips shows its Past visits section. */
   readonly pastTrip?: boolean;
+  /** The calendar link is already on (D-538): the page shows the switch and "make a new link" / "turn it off". */
+  readonly calendarOn?: boolean;
+
   /** Also a saved trip that is on now, so its page offers "I'm here" (D-535). */
   readonly tripNow?: boolean;
   /** A program lead's small card for a member linked to their program (D-542), so the story can show it. */
@@ -360,6 +363,14 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/log_call', () => ({ body: true })),
     on('/rpc/my_trips', () => ({ body: savedTrips })),
     on('/rpc/my_trip_services', () => ({ body: [] })),
+    // The calendar link (D-538): off, then a made-up address once made. Nothing leaves the story.
+    on('/rpc/calendar_link_status', () => ({
+      body: [{ is_on: Boolean(options.calendarOn), show_details: false, made_at: options.calendarOn ? '2026-10-10T15:00:00Z' : null }],
+    })),
+    on('/rpc/calendar_link_make', () => ({ body: 'storybook-example-address-not-a-real-secret' })),
+    on('/rpc/calendar_link_set_details', () => ({ body: true })),
+    on('/rpc/calendar_link_off', () => ({ body: null })),
+
     // A program lead's own visits (D-526): none in a story.
     on('/rpc/my_program_visits', () => ({ body: [] })),
     on('/rpc/service_has_lead', () => ({ body: options.hasLead === true })),

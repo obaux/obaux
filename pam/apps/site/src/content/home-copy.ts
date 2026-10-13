@@ -50,14 +50,14 @@ export const HOME = {
       id: 'programs',
       head: 'Your services, built around people.',
       body: 'Residents find your program and plan a visit. They sign your policies before they visit, and you see who’s coming on your calendar.',
-      cta: { label: 'Add your program', href: '/support/cant-sign-in/' },
+      cta: { label: 'Add your program', href: 'add-program' },
       image: 'calendar',
       alt: 'A program lead’s calendar in Pam: the week by day, with each person who is coming and a check-in button.',
     },
     {
       id: 'case-managers',
       head: 'Walk with them, one visit at a time.',
-      body: 'Invite the people you work with, and message them in Pam along the way.',
+      body: 'Invite the people you work with, cheer on every step, and message them in Pam along the way.',
       cta: { label: 'Join as a case manager', href: '/support/cant-sign-in/' },
       image: 'conversation',
       alt: 'A conversation in Pam between a case manager and the person they work with, with documents shared in the chat.',
@@ -67,7 +67,7 @@ export const HOME = {
   callouts: [
     {
       eyebrow: 'Privacy first',
-      text: 'Before you join, Pam shows you who can see what. A text from Pam never says anything about your past.',
+      text: 'Pam was designed for privacy, so anyone, regardless of background or history can feel safe using it.',
       cta: { label: 'Read Privacy & Terms', href: 'privacy' },
     },
     {
@@ -92,15 +92,9 @@ export const HELD: readonly HeldLine[] = [
     reason: 'Will, 12 October (a65): hold until launch, because the website has to be translated first. Today the help desk is email with no hours.',
   },
   {
-    id: 'privacy-promise',
-    wanted: 'Pam was designed for privacy, so anyone, regardless of background or history can feel safe using it.',
-    shown: HOME.callouts[0].text,
-    reason: 'A promise, and it names “history”. Needs Will; Sage signs the replacement.',
-  },
-  {
-    id: 'cheer',
-    wanted: 'Invite the people you work with, cheer on every step, and message them in Pam along the way.',
-    shown: HOME.rows[2].body,
-    reason: '“cheer on every step” promises something Pam does not do for a case manager today.',
+    id: 'case-manager-link',
+    wanted: 'Join as a case manager, sending the person to sign in.',
+    shown: HOME.rows[2].cta.label,
+    reason: 'Will, 12 October (a65): the middle buttons go to sign in. Not this one yet: signing in would make a case manager a member account. It stays on the help post until Ava’s case-manager request page exists, then points there.',
   },
 ];

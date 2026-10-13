@@ -11,6 +11,16 @@ STATUS row too.
 
 ## Open
 
+- [ ] **Google Calendar sync: waiting until Will wants it on** (a71, 12 October 2026: "wait until we switch sync on. Not now."). It is built and held on the branch `claude/places-programs-google-sync` (head 5f1e70ae; D-539): not merged, not deployed, no migration applied. When Will asks for it, its two Privacy lines come back on a card with the Google Cloud checklist (the full checklist is in that branch's `docs/before-launch.md`). The calendar link (D-538) is separate and does not need it.
+
+- [ ] **Calendar link: someone taps it on a real phone** (Piper, 11 October 2026, D-538). (1) On an Android phone, make a link on
+  Profile > Calendar and tap "Open Google Calendar on the web": it should reach Google Calendar's "add by URL" page in the
+  phone's browser; if Google sends the phone to its app or a sign-in that loses the page, the line above the button
+  ("ask for the desktop site") is the only way, so say so on the page more plainly. (2) Paste the link into Apple Calendar,
+  Google Calendar (on a computer) and Outlook, and check a visit shows, moves and goes, with the place's name off and on.
+  (3) Deploy `calendar-feed` with JWT verification off and fetch a made-up address: a bare 404. (4) A native reader for
+  `calendar.others` in the six languages (it names buttons in Google Calendar and Outlook).
+
 - [ ] **Read the City of Philadelphia licence once** (Lena for Mira, 11 October 2026; Will, or anyone with open web access).
   Pam copies four City of Philadelphia open-data layers (City Facilities, Parks & Recreation program sites and properties, DBHIDS
   provider locations) and a ZIP-code centre computed from the City's property points, and Piper's street centerlines are next.
@@ -22,6 +32,15 @@ STATUS row too.
   and then: (1) tick this, with the date; (2) write in `docs/data-licences.md` what the licence really says (credit? a
   commercial-use limit? who is "the user" if Pam passes places on to members?); (3) tell Mira if it asks for a credit line, which would go
   on the About page. No Privacy line is needed: none of this data is about members.
+
+- [ ] **Street-address search: the line is signed before the key is set, and the Google Maps terms are read once** (Lena for Mira, 13 October 2026; Will).
+  Piper's `places-search` function (a74) sends what a member typed (an address, a corner, anything Pam's own list of areas lacks) from Pam's
+  server to Google Places, and the place they pick. It is off until Will adds the secret `GOOGLE_MAPS_SERVER_KEY`. (1) **Do not add the key until
+  `privacy.s.sharing.p7` is signed by Will and live in seven languages**: the host guard lets the function reach `main` with that line still
+  pending (it is off), so the key is the gate; the Privacy page must say it before the first word goes to Google. (2) **Read Google's Maps Platform
+  terms for Places once** (what may be stored beyond a place id, the required "powered by Google" mark, which Dot draws): nobody on the team has read
+  them (not reachable from the sessions' sandbox), and the Privacy line says Pam keeps neither the words nor the answer, so the day anyone wants to
+  save a picked address the terms and the line both have to be looked at first. Then tick this with the date.
 
 - [ ] **The native apps ask for location with Pam's own reason** (Lena, 11 October 2026; Mira asked for this to be listed). Pam
   asks the phone for where it is in two places: "Use my current location" in Explore's area picker, and "I'm here" on a visit
@@ -41,6 +60,21 @@ STATUS row too.
      item: write it from Piper's answer.
   4. Seven languages: the system shows the string in the phone's language, so each of the six translations goes in the
      native project's per-language strings the day those exist (signed by Will with the Privacy page, as it repeats it).
+
+- [ ] **The request log: keep `privacy.s.what-we-keep.p11` true** (Lena, 11 October 2026, a66; facts from Piper's read-only check).
+  Privacy says the servers that run Pam write down, for each request, when, what was asked for, which account, the IP
+  address and the kind of phone or browser, plus the phone number at sign-in; that messages and searches are not written
+  down; and that the record "is deleted within a week". True today because: Supabase is on the **Free** plan (logs kept 1
+  day; the oldest row was 25 hours old), Vercel's plan could not be read from the API (the deploy limit the team hit is
+  Hobby's, whose request logs last about an hour; Pro a day). Will can read Vercel's plan in Settings › Billing.
+  1. **Before the Supabase plan goes to Team (28 days) or Enterprise (90), or Vercel to Enterprise,** change p11 and
+     `privacy.s.what-we-keep.p12` (the calendar link's request record, which has the same "within a week") and their six
+     translations first. Pro (7 days) is still "within a week". Moving to Pro before launch is likely (the Free plan has
+     no backups to restore from); nothing to change for it.
+  2. **Do not add a log drain or an error tracker** (Sentry, an analytics tool, a Vercel Speed Insights switch) without
+     reading p11 first: a copy elsewhere has its own retention. None exists today (Piper searched the code and package.json).
+  3. `no-typed-text-in-urls.test.ts` keeps "what you search for" out of the logged URL: a new GET filter must be on an id,
+     a state or a setting, and typed words go in a POST body (an rpc).
 
 - [ ] **Read Twilio's own record of every text before texts go on** (Lena for Nico, 11 October 2026, from Piper's log check; Mira).
   Twilio keeps, for each text Pam sends, the number, the text, the time and the status. Nobody has read its retention
@@ -443,6 +477,21 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   forwarding, a test and Will's go, D-450). Six translations each by Claude, with no native reader: promises, so the same
   native readers as below. The English says "rules" where the app says "policy"; the translations follow the app's word.
 
+- [ ] **A native reader for the calendar link screen (D-538, 11 October 2026).** The 27 `calendar.*` strings are six translations by
+  Claude with no native reader. Two things a reader must check against the real apps, in their own language, because the apps can
+  rename them: **`calendar.others`** names buttons in Google Calendar ("Other calendars" › "From URL") and Outlook ("Add calendar" ›
+  "Subscribe from web"); each translation uses what the app shows in that language, written from memory (es "Otros calendarios" ›
+  "Desde URL"; pt-BR Google Agenda "Outras agendas" › "Do URL"; ru "Другие календари" › "По URL"; ar «تقاويم أخرى» › «من عنوان URL»;
+  zh-CN “其他日历” › “通过网址”; zh-HK 「其他日曆」›「透過網址」; Outlook "Subscribe from web" is "Suscribirse desde la web", "Assinar da Web",
+  “从 Web 订阅”, 「從 Web 訂閱」, «Подписаться из Интернета», «الاشتراك من الويب»). And **"Pam visit"** stays English inside the quotes in
+  `calendar.details.hint`, because the event's text is English whatever the member's language (D-538, "Not done"): if the event text
+  is ever translated, change both together.
+  **`calendar.google.phone`** names a switch in the phone's browser, "Desktop site"; each translation uses Chrome's name for it in that
+  language, from memory (es "Sitio para computadoras"; pt-BR "Site para computador"; zh-CN “桌面版网站”; zh-HK 「電腦版網站」; ru «Версия для
+  компьютера»; ar «موقع سطح المكتب», where the Arabic says "choose" rather than "turn on" to avoid a vowel mark). Safari on an iPhone
+  calls it "Request Desktop Website" in its "aA" menu and other browsers differ, so a native reader should check the wording against
+  the browsers their members use.
+
 - [ ] **A native reader for what D-465 reworded (10 October).** The last-day line on the
   transparency screen (`transparency.canSee.lastActive`), the privacy page's "What you can do"
   blocking sentence and the terms' blocking sentence now say only what is true (a guide, not a
@@ -629,9 +678,16 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   1. 0084 is live (9 October); deploy `translate-messages` (`supabase functions deploy
      translate-messages`), and read `get_advisors`.
   2. Set `ANTHROPIC_API_KEY` as a function secret — never in this repo — on an
-     account whose terms say what is sent is **not kept and not used to
-     train**. Get that in writing; the privacy page says it ("It keeps
-     nothing and does not learn from them").
+     account whose terms Will has read against the privacy page. The page says
+     what Anthropic's published terms say (card a70): the words are deleted within
+     30 days and not used to train; a message its safety checks flag may be kept
+     up to two years; a message may also be kept if the law requires it. It no
+     longer says "keeps nothing", which is not true of any model Pam can call.
+     Re-read Anthropic's data-retention page (platform.claude.com › Manage
+     Claude › API and data retention) the day the switch goes on, and change the
+     page if it changed. Pam calls `claude-haiku-5-5`; the Covered Models (Fable
+     5/5.1, Mythos 5/5.1) are held 30 days for everyone, so a change of model in
+     `supabase/functions/translate-messages/anthropic.ts` needs the page re-read too.
   3. A native speaker reads `privacy.s.translation.*` in all seven languages
      (it appears on the privacy page the moment the switch is on).
   4. **Tell members first** (the transparency promise): translation sends the

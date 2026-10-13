@@ -166,7 +166,7 @@ export function FlipCarousel({
   const [index, setIndex] = useState(0);
   const [left, setLeft] = useState<number | null>(null); // the picture that just left the front
   const [paused, setPaused] = useState(false); // the reader's choice
-  const [touching, setTouching] = useState(false); // pointer or finger on it, or focus inside it
+  const [touching, setTouching] = useState(false); // a pointer over it, or keyboard focus inside it (not the focus a tap leaves)
   const [visible, setVisible] = useState(true);
   const [heard, setHeard] = useState('');
   const reduced = usePrefersReducedMotion();
@@ -211,7 +211,17 @@ export function FlipCarousel({
       aria-label={label}
       onPointerEnter={() => setTouching(true)}
       onPointerLeave={() => setTouching(false)}
-      onFocus={() => setTouching(true)}
+      onFocus={(e: React.FocusEvent) => {
+        // Only focus a keyboard put there holds it: a tap leaves focus on the button it touched, and holding on that
+        // kept Play from restarting the pictures on a phone (Iris W1, 13 October).
+        let byKeyboard = true;
+        try {
+          byKeyboard = (e.target as Element).matches(':focus-visible');
+        } catch {
+          /* a browser without :focus-visible: hold, as before */
+        }
+        if (byKeyboard) setTouching(true);
+      }}
       onBlur={() => setTouching(false)}
       onKeyDown={(e: React.KeyboardEvent) => {
         if (e.key === 'ArrowRight') {
@@ -256,7 +266,11 @@ export function FlipCarousel({
             size="sm"
             hasEdge={false}
             icon={paused ? <PlayMark /> : <PauseMark />}
-            onClick={() => setPaused((p) => !p)}
+            onClick={() => {
+              // Play means play: the pointer or the focus still on the button does not hold it.
+              if (paused) setTouching(false);
+              setPaused((p) => !p);
+            }}
             xstyle={[type.label_14, styles.pause, tap.target]}
           />
         )}
