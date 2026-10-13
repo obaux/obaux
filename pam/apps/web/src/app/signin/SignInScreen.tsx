@@ -396,7 +396,8 @@ export function SignInScreen({
     const watch = () => {
       io?.disconnect();
       const top = Math.round(pinnedRef.current?.getBoundingClientRect().height ?? 0);
-      io = new IntersectionObserver(([entry]) => setPinBarShown(entry ? !entry.isIntersecting : false), { rootMargin: `-${top}px 0px 0px 0px`, threshold: 0 });
+      // Half the mark gone is the hand-over: at 0 the last sliver of it showed for a few pixels before the bar did (Iris, b32).
+      io = new IntersectionObserver(([entry]) => setPinBarShown(entry ? entry.intersectionRatio < 0.5 : false), { rootMargin: `-${top}px 0px 0px 0px`, threshold: [0, 0.5, 1] });
       io.observe(mark);
     };
     watch();

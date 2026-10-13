@@ -1513,6 +1513,10 @@ connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merge
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
 
+## Design system & Storybook · sign-in hand-over and name commas (13 October)
+
+The compact Sign in bar takes over when half the hero mark is gone, not all of it (D-566, Iris b32 P1); `BigButton`'s name joins label and count with the language's own comma via `nameJoinerOf` (P5). On `claude/pam-design-signin-polish`, off `mira/batch-b32`; not on `main`.
+
 ## Design system & Storybook · Contact Pam replaces Call Pam (11 October)
 
 Branch `claude/pam-design-contact-pam` (D-512, A28). `Notice` offers Contact Pam (a link to Help); `useSupportPhone` and all `supportPhone` props are gone; the Help screen's first row opens the website's help desk; Privacy's data pages end in Contact Pam. `place.call` is untouched. About 33 English strings still say "call Pam": for Sage and Lena.
