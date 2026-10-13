@@ -2254,3 +2254,6 @@ Crossfade 650ms, line out 160ms then in 320ms, no scale (D-556). Story: Website 
 ## Design system & Storybook · the step count in the button is quiet text (13 October)
 
 No pill, 12px, level with the label, the label always centred (D-560).
+## Design system & Storybook · Sign in fits a short screen (13 October)
+
+Below 640px tall the hero slide is shorter; `TextLink` can be always underlined (D-564).
