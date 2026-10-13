@@ -29,7 +29,7 @@ import { EN } from './_bundles.js';
 const ROOTS = [
   { dir: '../../../apps/web', skip: ['node_modules', '.next', 'out', 'storybook-static', 'test-results', 'user-flows-out', 'e2e', 'stories', 'public', 'scripts'] },
   { dir: '../../ui/src', skip: ['stories'] },
-  // The public website, joinpam.org: "the only part of Pam that loads anything from Google" (sharing.p5) covers it too.
+  // The public website, joinpam.org: "the only part of Pam that your phone loads from Google" (sharing.p5) covers it too.
   { dir: '../../../apps/site', skip: ['node_modules', '.next', 'out', 'public', 'scripts', 'social', 'test', 'screenshots.json'] },
   { dir: '../src', skip: ['locales'] },
   // What Pam's server sends on a member's behalf (texts, email, translation, link previews; later Google).
@@ -90,26 +90,33 @@ const HOSTS: Record<string, HostEntry> = {
   'api.anthropic.com': {
     kind: 'server',
     why: 'translating a message: the words of that message and nothing else (translate-messages)',
-    privacy: { key: 'privacy.s.translation.p2', names: /a company that translates/ },
+    privacy: { key: 'privacy.s.translation.p2', names: /Claude, an AI made by Anthropic/ },
+  },
+  'places.googleapis.com': {
+    kind: 'server',
+    why: 'street-address search: the words typed, the place picked and a one-search code, asked by Pam’s server and never by the phone (places-search, a74; off until GOOGLE_MAPS_SERVER_KEY is set)',
+    privacy: { key: 'privacy.s.sharing.p7', names: /Google/ },
+    pending: 'a74, the street-address search line (Sage signs, then Will)',
+    arriving: 'a74',
   },
   'accounts.google.com': {
     kind: 'server',
     why: 'Google sign-in for the calendar sync: the member is sent there to allow it (google-calendar, D-539)',
-    privacy: { key: 'privacy.s.sharing.p7', names: /Google/ },
+    privacy: { key: 'privacy.s.sharing.p8', names: /Google/ },
     pending: 'the Google sync card (merged with GOOGLE_SYNC_LIVE)',
     arriving: 'D-539',
   },
   'oauth2.googleapis.com': {
     kind: 'server',
     why: 'the sealed key to the “Pam visits” calendar: exchange, refresh and revoke (google-calendar, D-539)',
-    privacy: { key: 'privacy.s.sharing.p7', names: /Google/ },
+    privacy: { key: 'privacy.s.sharing.p8', names: /Google/ },
     pending: 'the Google sync card (merged with GOOGLE_SYNC_LIVE)',
     arriving: 'D-539',
   },
   'www.googleapis.com': {
     kind: 'server',
     why: 'the “Pam visits” calendar and its events: the visits (google-calendar, D-539)',
-    privacy: { key: 'privacy.s.sharing.p7', names: /Google/ },
+    privacy: { key: 'privacy.s.sharing.p8', names: /Google/ },
     pending: 'the Google sync card (merged with GOOGLE_SYNC_LIVE)',
     arriving: 'D-539',
   },
@@ -119,6 +126,7 @@ const HOSTS: Record<string, HostEntry> = {
   'maps.apple.com': { kind: 'link', why: 'directions in Apple Maps, opened by a tap (PlaceCard.tsx)' },
   'play.google.com': { kind: 'link', why: 'Google Maps in the Play Store, opened by a tap (mapsLaunch.ts)' },
   'apps.apple.com': { kind: 'link', why: 'Google Maps in the App Store, opened by a tap (mapsLaunch.ts)' },
+  'calendar.google.com': { kind: 'link', why: "Google Calendar's page for adding a calendar by its address, opened by a tap (CalendarLinkView.tsx, D-538)" },
   'github.com': { kind: 'link', why: 'the neighborhood data’s source, linked under Legal › Data sources (LegalView.tsx, D-540)' },
   'creativecommons.org': { kind: 'link', why: 'the CC BY 4.0 licence of that data, linked under Legal › Data sources (LegalView.tsx, D-540)' },
 
@@ -162,6 +170,11 @@ const FUNCTIONS: Record<string, FunctionEntry> = {
     dynamic: { privacy: { key: 'privacy.s.what-we-keep.p6', names: /server opens the page once/ } },
   },
   'calendar-feed': { reaches: [], why: 'serves the calendar link; asks only Pam’s own database', arriving: 'D-538' },
+  'places-search': {
+    reaches: ['places.googleapis.com'],
+    why: 'suggests places for an address or a corner a member typed; the words, the place picked and a one-search code go to Google, nothing about the member (street-search-line.test.ts holds the code to that)',
+    arriving: 'a74',
+  },
   'google-calendar': {
     reaches: ['accounts.google.com', 'oauth2.googleapis.com', 'www.googleapis.com'],
     why: 'keeps the “Pam visits” calendar in the member’s Google account',
@@ -219,14 +232,14 @@ describe('who else the app talks to (a67)', () => {
   });
 
   it('keeps the Maps script the only thing Pam loads from Google', () => {
-    // privacy.s.sharing.p5 (a67): “The map is the only part of Pam that loads anything from Google.” A Google font, a
+    // privacy.s.sharing.p5 (a67): “The map is the only part of Pam that your phone loads from Google.” A Google font, a
     // sign-in, an analytics tag or a second Maps host would make that false: tell Privacy first.
     const google = Object.entries(HOSTS)
       .filter(([host, entry]) => /google|gstatic|googleusercontent|doubleclick/.test(host) && entry.kind === 'loaded')
       .map(([host]) => host);
     expect(google).toEqual(['maps.googleapis.com']);
     const sayingIt = EN['privacy.s.sharing.p5'];
-    if (sayingIt) expect(sayingIt).toMatch(/only part of Pam that loads anything from Google/);
+    if (sayingIt) expect(sayingIt).toMatch(/only part of Pam that your phone loads from Google/);
   });
 
   it('lists every file that makes requests of its own', () => {

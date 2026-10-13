@@ -12,9 +12,10 @@
  * **Off.** This switch is the app's half of the promise; the function's own
  * (`MESSAGE_TRANSLATION=on`, a secret on the project) is the other. Both must
  * be on for a word to leave Pam. They stay off until what is owed has been
- * done (docs/before-launch.md): the service's terms say it keeps nothing and
- * learns nothing from what it is sent, its key is set, and members have been
- * told first.
+ * done (docs/before-launch.md): the privacy page says what the service's
+ * published terms say (the words are deleted within 30 days and not used to
+ * train; a flagged message may be kept up to two years), its key is set, and
+ * members have been told first.
  *
  * **Tied to the privacy page.** Sending somebody's message to another company
  * is something the privacy page has to say, and while this is off, the page
