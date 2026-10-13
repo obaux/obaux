@@ -11,8 +11,6 @@ STATUS row too.
 
 ## Open
 
-- [ ] **Street search: Will makes the Google key, then it goes on** (Piper, 13 October 2026, D-552). The function `places-search` is built and OFF: with no `GOOGLE_MAPS_SERVER_KEY` the area search is just ZIP codes and neighborhoods. To turn it on: (1) in Google Cloud Console, on the same project as the Trips map or a new one, enable **Places API (New)**; (2) make an API key for the server only, restrict it to the Places API (New) and set a **daily quota cap** (check Google's live price list: each SKU has a free monthly amount, and Autocomplete requests are billed per call); (3) enter it as the function secret `GOOGLE_MAPS_SERVER_KEY`; (4) deploy `places-search` with JWT verification ON; (5) once the Privacy line is signed (Lena, Sage, Will), Dot adds Google's own mark, and Sage words the hint under the field. No value goes in the repository.
-
 - [ ] **Google Calendar sync: waiting until Will wants it on** (a71, 12 October 2026: "wait until we switch sync on. Not now."). It is built and held on the branch `claude/places-programs-google-sync` (head 5f1e70ae; D-539): not merged, not deployed, no migration applied. When Will asks for it, its two Privacy lines come back on a card with the Google Cloud checklist (the full checklist is in that branch's `docs/before-launch.md`). The calendar link (D-538) is separate and does not need it.
 
 - [ ] **Calendar link: someone taps it on a real phone** (Piper, 11 October 2026, D-538). (1) On an Android phone, make a link on
@@ -22,6 +20,8 @@ STATUS row too.
   Google Calendar (on a computer) and Outlook, and check a visit shows, moves and goes, with the place's name off and on.
   (3) Deploy `calendar-feed` with JWT verification off and fetch a made-up address: a bare 404. (4) A native reader for
   `calendar.others` in the six languages (it names buttons in Google Calendar and Outlook).
+
+- [ ] **Street search: Will makes the Google key, then it goes on** (Piper, 13 October 2026, D-552). The function `places-search` is built and OFF: with no `GOOGLE_MAPS_SERVER_KEY` the area search is just ZIP codes and neighborhoods. To turn it on: (1) in Google Cloud Console, on the same project as the Trips map or a new one, enable **Places API (New)**; (2) make an API key for the server only, restrict it to the Places API (New) and set a **daily quota cap** (check Google's live price list: each SKU has a free monthly amount, and Autocomplete requests are billed per call); (3) enter it as the function secret `GOOGLE_MAPS_SERVER_KEY`; (4) deploy `places-search` with JWT verification ON; (5) once the Privacy line is signed (Lena, Sage, Will), Dot adds Google's own mark, and Sage words the hint under the field. No value goes in the repository.
 
 - [ ] **Read the City of Philadelphia licence once** (Lena for Mira, 11 October 2026; Will, or anyone with open web access).
   Pam copies four City of Philadelphia open-data layers (City Facilities, Parks & Recreation program sites and properties, DBHIDS

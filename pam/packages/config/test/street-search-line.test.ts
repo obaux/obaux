@@ -218,7 +218,8 @@ describe.skipIf(!existsSync(AREA) || !/GOOGLE_PICK/.test(existsSync(AREA) ? read
 });
 
 describe.skipIf(EN['privacy.s.sharing.p7'] === undefined)('the Privacy line about the street-address search (a74)', () => {
-  const p7 = EN['privacy.s.sharing.p7'] ?? '';
+  // The signed English uses straight apostrophes and the rest of the page curly ones: one word to this test.
+  const p7 = (EN['privacy.s.sharing.p7'] ?? '').replace(/’/g, "'");
   const sharing = PRIVACY.sections.find((s) => s.id === 'sharing');
 
   it('is in “Who else gets your information”', () => {
@@ -227,8 +228,8 @@ describe.skipIf(EN['privacy.s.sharing.p7'] === undefined)('the Privacy line abou
 
   it('names Google, says Pam’s server asks and says what Google gets and does not get', () => {
     expect(p7).toMatch(/Google/);
-    expect(p7).toMatch(/Pam’s server/);
-    expect(p7).toMatch(/your name, your phone number or your phone’s IP address/);
+    expect(p7).toMatch(/Pam's server/);
+    expect(p7).toMatch(/your name, your phone number or your phone's IP address/);
   });
 
   it('leaves the map line true: the phone talks only to Pam for this', () => {
@@ -236,7 +237,15 @@ describe.skipIf(EN['privacy.s.sharing.p7'] === undefined)('the Privacy line abou
     expect(p7).toMatch(/your phone does not talk to Google/);
   });
 
-  it('does not promise what Google does with the words', () => {
+  it('does not promise what Google does with the words, and says it is up to Google', () => {
     expect(p7).not.toMatch(/Google (deletes|will not|may not|does not keep)/i);
+    expect(p7).toMatch(/What Google keeps is up to Google\.$/);
+  });
+
+  it('says Pam keeps neither what was typed nor what Google answers (option A, Mira 13 October: a Google pick is for that search only, like “use my current location”, D-536)', () => {
+    // True only while a picked address is never saved on the phone either (`saveOrigin`) and the function writes nothing:
+    // the second half is `problemsIn` above, on the real function; the first is pinned beside it once Piper's change is on the branch.
+    expect(p7).toMatch(/Pam does not keep what you type or what Google answers\./);
+    expect(p7).not.toMatch(/Pam's servers do not keep|remembers the place you picked/);
   });
 });

@@ -24,8 +24,8 @@ import { useCountScreenOpen } from '@/lib/screenOpens';
 /**
  * Profile, wired (D-217): whoever is signed in, as the role they are looking
  * at. A super admin previewing a role sees that role's example name, as the
- * old home did (D-173), and keeps "See the app as" so the preview can be
- * undone from where it was set.
+ * old home did (D-173). "See the app as" is gone (D-558): each role's journey is
+ * checked in Storybook.
  */
 export function ProfileScreen() {
   const router = useRouter();
@@ -87,7 +87,6 @@ export function ProfileScreen() {
       // There is no real list of people who offered help yet: a real account has none to count.
       connectionsCount={role === 'member' && examplesOn ? DUMMY_CONNECTIONS.length : 0}
       remindersOn={remindersOn}
-      canViewAs={trueRole === 'super_admin'}
       addProgram={
         signedIn && !demoRole && role === 'member' && !session.session.roles.includes('provider') &&
         (request.status === 'none' || request.status === 'waiting' || request.status === 'denied')

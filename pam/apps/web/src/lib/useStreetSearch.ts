@@ -66,7 +66,9 @@ export function useStreetSearch(
     const text = query.trim();
     // A new search starts when the box is emptied: Google bills a session from its first letter to the pick.
     if (text === '') token.current = newToken();
-    if (off || !pam.settled || !wantsGoogle(text, pam.matches)) {
+    // Nothing about what was typed is sent to the function until it has said there is a key (status), so with the status unreadable or off
+    // the area search is exactly Pam's own.
+    if (off || !enabled || !pam.settled || !wantsGoogle(text, pam.matches)) {
       latest.current += 1;
       setSuggestions([]);
       setIsSearching(false);
@@ -89,7 +91,7 @@ export function useStreetSearch(
       })();
     }, PAUSE_MS);
     return () => clearTimeout(timer);
-  }, [query, pam.matches, pam.settled]);
+  }, [query, pam.matches, pam.settled, enabled]);
 
   const choose = useCallback(async (suggestion: Suggestion): Promise<AreaOption | null> => {
     try {

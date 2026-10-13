@@ -543,6 +543,38 @@
 - **Pushing records to main right after a batch cancelled the batch's accessibility run** (b28, 05:59): CI runs one
   at a time per branch and a newer push cancels the older run. The newer run passed on the same code, but from now on
   records wait until a batch's checks have finished.
+- **Merge desk decisions after b29 (13 October; none needed Will):**
+  - **06:47, the help form's "who are you":** Sage's fourth answer "I don't use Pam yet" stays (Will sees it on card
+    a83 and can drop it). The form sends it as `not_yet` in `roles`; Nico's 637f72b6 makes the email say "not using
+    Pam yet" (the roles win if it is ticked beside one) and shows the Role row only when `role` was sent. Sage's short
+    "Role:" values are not used.
+  - **06:47, street search goes to main switched off before Will's ZIP-only chip** (his 05:45 rule, missing from
+    Piper's first READY). Will is not asked for the Google key until the ZIP chip is on main.
+  - **06:52, Sign in at 320×568:** Will's W6 invite line pushed "Send me a code" off a short phone. Fixed by layout
+    (Dot, D-564: a shorter hero below 640px tall), never by changing his words. Dot re-measures with Lena's longer
+    translations (629171de) before it ships.
+  - **06:52, Join's language dropdown** is Dot's LanguageField (D-561), with the English tag in the open list.
+  - **Sage, 06:56 (A29, no Will needed):** join.staff.body drops "a day or two"; admin.caseload.empty.body says
+    invites and where to make one; the expired-link page says "We'll email…", and its "Email me a new link" offer is
+    hidden while invite emails are off (Ava builds).
+- **Batch b30 (13 October).** No migration. Ava (a78; Will's yes at 03:23 and 05:40): the super admin has no view-as
+  switcher (D-558; a stale preview left in a tab is cleared), the Connect row shows only on example walks, and sign-up
+  step 2 has a Contact Pam row. Lena: the street-search Privacy line `privacy.s.sharing.p7` in seven languages (Will
+  signed on a81 at 05:02), dated 13 October. Piper: street search through Google from Pam's server (D-552, D-557),
+  off until Will's key; `places-search` is deployed with JWT verification on and answers "off" without
+  GOOGLE_MAPS_SERVER_KEY. Piper: "Programs attended in the past" lists only visits marked attended (W5, wrong live
+  since b27); Sign in's way on wins over the reminders question, is forgotten once used and is for members only (W6).
+  Nico: the help email's not_yet and Role row (`help-request` redeployed after the push). Records: Iris's b29
+  re-test (all pass), Sage's ledger, Nico's D-547 (texting back not on). Held for Will's pictures: the help form
+  (a83: Wren fc9a447d with Dot f703f4d7) and sign-up (a82: Dot eccfec15 and f319ae54, Ava's W6, Lena's 629171de).
+  Next batch: Piper's ZIP-only chip.
+- **The Control Room hides answered cards**, so the a80 clip promised "on the card" was invisible once a80 was
+  answered. It went into a chat message instead (messages carry pictures). A promised picture goes where Will will
+  look: a new message, not an answered card.
+- **A local web typecheck can fail on a stale `.next/types`** after a route is removed (b30: `view-as`), because the
+  check ran before the build regenerated them. Rerun after the build: clean. CI checks out fresh and is not affected.
+- **Branch deletion is refused by the git proxy** (Nico, then Mira, 06:54): `claude/messages-block` and
+  `claude/messages-staff-text-list` hold only merges of main. Left for Will to delete on GitHub if he wants.
 
 ## What was wrong, and what missed it
 
@@ -753,9 +785,19 @@
 | Batch b24 (0a36ada1): web/site tsc / web unit / site tests / config / site build / a11y / usability / scrollspy / storybook | 0 / 0 / 139 / 94 / 1176 / 0 / 120 scans 0 / clear / 306 links 0 / builds (no app code: e2e not rerun) |
 | Live help_request_allowed after Will's paste (a62) | definer; search_path public, extensions; anon and authenticated cannot execute, service_role can; same logic as the file (md5 differs: indentation and one comment); help_request_attempts RLS forced, no client grants, 0 rows |
 | help-request edge function | v2, deployed 11 October 04:49, after the last code change (821e6526, 04:48); off without HELP_REQUESTS_LIVE |
+| b29 main CI (96f27a77) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (07:04); Vercel web and pam-site READY (06:45) |
+| help-request v4 (06:40) | deployed from main's three files, byte for byte; JWT verification off as before; the email gains "Says they are" |
+| Iris's b29 re-test | a77 phone layout, a80 green card (6 s cycle, crossfade, Pause card / Play card, a tap pauses, reduced motion still) and W3 (layout shift 0.000): all PASS |
+| Batch b30 (a6dbc10e): db / config / ui / web unit / site / site a11y / usability / scrollspy / e2e full / storybook | 1579 ok / 1307 / 124 / 169 / 95 / 120 scans 0 / clear / 306 links 0 / 1757 passed, 19 skipped / builds; 11.1 kB spare; web tsc 0 after the build (stale `.next/types` before it) |
+| b30 English | three changed keys (sharing.p7, places.areaHint.street, places.areaLabel.street), none equal to English in six languages; three removed view-as keys used nowhere |
+| b30 + Piper W5 and W6, Nico 637f72b6, records (2abdbde6) | web tsc 0 / web unit 170 / config 1310 / build 0, 11.1 kB spare / e2e person-real-trips, signin-next, signin-short, join, account, directory, admin, places, street-search on 3 projects: 279 passed |
 
 ## Left undone
 
+- **As of b30 (13 October, about 07:30):** with Will: a82 (the sign-up look, and his words or Sage's for the code
+  line), a83 (the help form), a81 step 2 (Google's logo files; the key comes after Piper's ZIP chip). Piper: the
+  ZIP-only chip. Ava: W6 READY once Lena's 629171de and Dot's signin-fit are in and green. Nico: free until Ava's
+  plans for a73 and the case manager request. The items below are from 11 and 12 October; most have shipped since.
 - **Ava:** the switcher removal is committed at 90c6d306 and not pushed. D-503 is now Sage's, so Ava claims
   online when Will gives the word. Next, the Join Pam wording (W6) as a question for Will.
 - **Dot:** A27, the text-size rule with its exceptions; then dark muted #262626 with a before-and-after story.
