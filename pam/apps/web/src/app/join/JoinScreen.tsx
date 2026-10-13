@@ -207,6 +207,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
   const lastId = useId();
   const cityId = useId();
   const codeFieldId = useId();
+  const codeQuestionId = useId();
   const codeShown = codeOpen || inviteCode !== '' || inviteProblem !== null;
   useEffect(() => {
     if (inviteCode !== '' || inviteProblem !== null) setCodeOpen(true);
@@ -686,8 +687,11 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                   </VStack>
                 ) : (
                   <VStack gap={1} align="start">
-                    <Text xstyle={styles.body}>{t('join.code.question')}</Text>
-                    <TextLink label={t('join.code.reveal')} onClick={revealCode} isUnderlined />
+                    <Text id={codeQuestionId} xstyle={styles.body}>
+                      {t('join.code.question')}
+                    </Text>
+                    {/* Read with its question, so "Click here" is never heard alone (Iris, b32, P2). */}
+                    <TextLink label={t('join.code.reveal')} onClick={revealCode} isUnderlined describedBy={codeQuestionId} />
                   </VStack>
                 )}
                 </>
