@@ -13,7 +13,7 @@ import { SoftButton } from '../components/SoftButton';
 import { WebFrame } from '../components/WebFrame';
 import { VISIT_REMINDERS_LIVE } from '../content/flags';
 import { HOME } from '../content/home-copy';
-import { APP_URL } from '../lib/links';
+import { ADD_PROGRAM_URL, APP_URL } from '../lib/links';
 import { website } from '../lib/website.stylex';
 import { type } from '../lib/website-type.stylex';
 
@@ -188,7 +188,7 @@ export function HomeScreen(_props: { readonly showAbout?: boolean } = {}) {
                   {row.body}
                 </Text>
                 <HStack>
-                  <SoftButton label={row.cta.label} href={row.cta.href === 'app' ? `${APP_URL}/` : row.cta.href} pill />
+                  <SoftButton label={row.cta.label} href={row.cta.href === 'app' ? `${APP_URL}/` : row.cta.href === 'add-program' ? ADD_PROGRAM_URL : row.cta.href} pill />
                 </HStack>
               </VStack>
               <div {...stylex.props(i % 2 === 0 ? undefined : styles.rowFlip)}>
