@@ -40,9 +40,16 @@ describe('remembering it for the length of the sign-up', () => {
     rememberNext('/admin/');
     expect(takeNext()).toBeNull();
   });
-  it('is ignored, and forgotten, for a program lead', () => {
+  it('is taken only by a member, and forgotten for anybody else: a lead, a case manager, a super admin', () => {
+    for (const role of ['provider', 'admin', 'super_admin']) {
+      rememberNext('/profile/add-program/');
+      expect(takeNext(role), role).toBeNull();
+      expect(takeNext('member'), role).toBeNull();
+    }
+  });
+
+  it('is a brand-new account\'s too, which is a member (no role yet)', () => {
     rememberNext('/profile/add-program/');
-    expect(takeNext('provider')).toBeNull();
-    expect(takeNext('member')).toBeNull();
+    expect(takeNext()).toBe('/profile/add-program/');
   });
 });
