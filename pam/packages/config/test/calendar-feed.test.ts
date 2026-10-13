@@ -69,7 +69,7 @@ describe('the pieces', () => {
     expect(text.match(/BEGIN:VEVENT/g)).toHaveLength(1);
   });
   it('escapes backslashes, semicolons, commas and line breaks', () => {
-    expect(escapeText('a;b,c\\d\ne')).toBe('a\;b\\,c\\\\d\\ne');
+    expect(escapeText('a;b,c\\d\ne')).toBe('a\\;b\\,c\\\\d\\ne');
   });
   it('folds a long line at 75 octets without cutting a character', () => {
     const folded = fold('SUMMARY:' + 'é'.repeat(80));
