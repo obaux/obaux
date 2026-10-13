@@ -55,8 +55,8 @@ const styles = stylex.create({
     backgroundImage: { default: 'none', ':hover': 'none', ':active': 'none' },
   },
   hint: { fontSize: '15px', lineHeight: 1.5 },
-  // Centred under Google's mark, which is centred (Will, 13 October).
-  privacy: { fontSize: '14px', lineHeight: 1.5, textAlign: 'center', width: '100%' },
+    privacy: { fontSize: '14px', lineHeight: 1.5 },
+  privacyCentered: { textAlign: 'center', width: '100%' },
   list: { width: '100%' },
 });
 
@@ -250,7 +250,7 @@ export function AreaSearch({
             ) : null}
           </div>
 
-          <Text type="supporting" xstyle={styles.privacy}>
+          <Text type="supporting" xstyle={[styles.privacy, street.suggestions.length > 0 && styles.privacyCentered]}>
             {t('places.areaPrivacy')}
           </Text>
         </VStack>
