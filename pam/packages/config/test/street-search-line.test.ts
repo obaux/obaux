@@ -159,7 +159,8 @@ describe('the street-address search keeps what Privacy says it keeps (a74)', () 
 });
 
 describe.skipIf(EN['privacy.s.sharing.p7'] === undefined)('the Privacy line about the street-address search (a74)', () => {
-  const p7 = EN['privacy.s.sharing.p7'] ?? '';
+  // The signed English uses straight apostrophes and the rest of the page curly ones: one word to this test.
+  const p7 = (EN['privacy.s.sharing.p7'] ?? '').replace(/’/g, "'");
   const sharing = PRIVACY.sections.find((s) => s.id === 'sharing');
 
   it('is in “Who else gets your information”', () => {
@@ -168,8 +169,8 @@ describe.skipIf(EN['privacy.s.sharing.p7'] === undefined)('the Privacy line abou
 
   it('names Google, says Pam’s server asks and says what Google gets and does not get', () => {
     expect(p7).toMatch(/Google/);
-    expect(p7).toMatch(/Pam’s server/);
-    expect(p7).toMatch(/your name, your phone number or your phone’s IP address/);
+    expect(p7).toMatch(/Pam's server/);
+    expect(p7).toMatch(/your name, your phone number or your phone's IP address/);
   });
 
   it('leaves the map line true: the phone talks only to Pam for this', () => {
