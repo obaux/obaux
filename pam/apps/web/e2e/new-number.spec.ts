@@ -110,7 +110,7 @@ test.describe('the temporary sign-in (the new number only, no profile)', () => {
     await page.route('**/rest/v1/rpc/my_number_change*', (route) => route.fulfill(json([{ status: 'waiting', created_at: new Date().toISOString() }])));
     await page.goto('/signin/');
     await expect(page).toHaveURL(/\/signin\/new-number\/$/);
-    await expect(page.getByRole('heading', { name: 'A person at Pam is still checking', level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Someone on the Pam team is still checking', level: 1 })).toBeVisible();
     await page.goto('/join/');
     await expect(page).toHaveURL(/\/signin\/new-number\/$/);
     await expect(page.getByLabel('First name')).toHaveCount(0);

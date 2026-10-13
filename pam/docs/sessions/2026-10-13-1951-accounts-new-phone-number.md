@@ -63,3 +63,5 @@ The merge desk read the plan at 19:21 and said build it, with Will's a84 default
 
 - Will: the pictures (card a73/a84); the Privacy line.
 - The merge desk: apply the migration after `list_migrations`; deploy `move-number` with JWT verification on.
+
+- 20:33: Sage signed `newNumber.*` under A29 with seven changes (ledger `claude/sage-signs` @ a6783695): card.title, form.intro, problem.tooMany, received.body, waiting.title, waiting.body and review.protected.body now read as signed. The e2e spec has the new waiting heading. The six other languages are still Lena's.

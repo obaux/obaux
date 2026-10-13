@@ -43,7 +43,7 @@ export interface PhoneSignInCardProps {
   readonly hasTitle?: boolean;
   /** Opened from an invite: the title is "Join Pam", not "Sign in" (W6, Will, 13 October). */
   readonly isInvited?: boolean;
-  /** The phone step's heading, where it is not signing in: "Prove it's your new phone" (D-567). */
+  /** The phone step's heading, where it is not signing in: "Check your new number" (D-567). */
   readonly title?: string;
   /** 1 on the sign-in screen, 2 inside a flow that already has a title. */
   readonly headingLevel?: 1 | 2;
