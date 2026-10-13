@@ -2223,3 +2223,7 @@ D-545, `claude/places-programs-scraped-vs-pam`: the audit table and `place-scrap
 ## Design system & Storybook · text colour examples for Will (12 October)
 
 Will (a65) wants to see two website text colours before choosing. Story **Website / Text colours (Will to choose)** shows #666666 vs #595959 on the tinted cards and #0B991F vs #087A18 on white, at phone width, with live ratios. #666666 fails AA on Gray, Green and Purple; #0B991F fails on white. Site tokens are unchanged until Will decides (D-546).
+
+## Design system & Storybook · website phone spec from Figma (13 October)
+
+Will (a75): the phone layout is too large and the green card should switch views, not link. Spec for Wren is in `docs/design/review/2026-10-13-website-phone/`, with the live "before" shot. The Figma pictures could not be downloaded (proxy 403).
