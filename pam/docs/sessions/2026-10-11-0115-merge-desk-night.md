@@ -533,6 +533,16 @@
     Nico for it at 06:10, cancelled at 06:13 when Wren found the free-text field, and took it back at 06:15 when his
     finished build arrived: three messages in five minutes, the same mistake as the 11 October "I'm here" turns.
     The rule stands: once a decision is sent, wait for the builder's next message before changing it.
+- **Batch b29 (13 October).** No migration in the batch (the counter's went live at 05:10 as 20261013051051).
+  Nico: a member's phone counts opening Your points and Profile once a day (a76, D-555), with Lena's pins (DB test 71
+  and the phone's half) and her signed Privacy line `privacy.s.what-we-keep.p13` in seven languages, shipped together
+  (Ava reviewed the Profile call: right); Explore's bell holds its place, so the page no longer moves when it arrives
+  (W3). Wren: the website on phones from Will's Figma and the moving green card (a77, a80; D-550, D-553, D-556), the
+  pill reading "Pause card" / "Play card" (Will's words). Nico: the help email says who wrote in (`roles`, D-559);
+  `help-request` is redeployed after the push. Dot's nightly flow map. Not in it: Piper's W5 fix (next batch).
+- **Pushing records to main right after a batch cancelled the batch's accessibility run** (b28, 05:59): CI runs one
+  at a time per branch and a newer push cancels the older run. The newer run passed on the same code, but from now on
+  records wait until a batch's checks have finished.
 
 ## What was wrong, and what missed it
 
@@ -735,6 +745,10 @@
 | calendar-feed escape fix (08b37d81) | calendar-feed.test.ts 15 passed with the corrected expectation; the old code returns 'a;b' |
 | calendar-feed edge function | v1 ACTIVE, verify_jwt false; get_edge_function returns the three merged files unchanged (live probe blocked: the sandbox cannot reach supabase.co) |
 | Counter migration 20261013051051 | table, RLS forced, 0 rows, columns day/screen/count, select-false policy, no client grants; bodies md5-equal; grants as designed |
+| b28 on main: 07cfaa71 run / 6d4697d5 run (same code plus records) | accessibility cancelled by the newer push / 4 of 4 green (06:30); Vercel READY |
+| Batch b29 (746951c1): db / config / ui / web unit / site / e2e full / storybook / site checks | 1579 ok (tests 70, 71) / 1277 / 124 / 156 / 95 / 1739 passed, 19 skipped, 0 flaky / builds, 12.6 kB spare / 120 scans 0, clear, 306 links 0 |
+| b29 + Wren 6bdea176 + Nico e11fd110 (9ef51cc8): site tsc / tests / build / a11y / usability / scrollspy / config / web tsc | 0 / 95 / 0 / 120 scans 0 / clear / 306 links 0 / 1285 / 0 |
+| b29 English: privacy.s.what-we-keep.p13 | Will's a76 words (straight quotes made curly); six translations, none equal to English; ledger row a76 |
 | Calendar migration 20261011161548 via the connector | timed out; table, functions and record all absent afterwards; no locks or running queries |
 | Batch b24 (0a36ada1): web/site tsc / web unit / site tests / config / site build / a11y / usability / scrollspy / storybook | 0 / 0 / 139 / 94 / 1176 / 0 / 120 scans 0 / clear / 306 links 0 / builds (no app code: e2e not rerun) |
 | Live help_request_allowed after Will's paste (a62) | definer; search_path public, extensions; anon and authenticated cannot execute, service_role can; same logic as the file (md5 differs: indentation and one comment); help_request_attempts RLS forced, no client grants, 0 rows |
