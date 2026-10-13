@@ -928,6 +928,13 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Accounts & invites · Join Pam (W6), language dropdown, code behind a question (13 October) — waiting on Lena and Will
+
+`claude/pam-join-first-time-wording` (D-563, with Dot's D-561 and D-564 merged in). From an invite, Sign in
+says "Join Pam" with Will's signed lines; Join › About you has Dot's LanguageField and the code behind a
+question with an underlined link; Sage's signed fixes to the staff sign-up, the empty caseload and the
+expired link. The expired link offers an email only when `app_settings.invite_emails_live` is 'on'
+(migration 20261013070505, seeded 'on' to match the live sender; switched with the INVITE_EMAILS secret). Will signed a82 (13 October) with his own code words. Waiting only on Lena's two code keys (her branch).
 ## Accounts & invites · no role switcher or "See the app as" for the super admin; sign-up Contact Pam (10–13 October) — READY
 
 `claude/pam-super-admin-no-switcher` (D-558). Will: the super admin no longer needs the role
@@ -2263,6 +2270,12 @@ The role chip beside the mark no longer breaks inside a word, and the header giv
 
 Crossfade 650ms, line out 160ms then in 320ms, no scale (D-556). Story: Website / Green card transition.
 
+## Design system & Storybook · the step count in the button is quiet text (13 October)
+
+No pill, 12px, level with the label, the label always centred (D-560).
+## Design system & Storybook · Sign in fits a short screen (13 October)
+
+Below 640px tall the hero slide is shorter; `TextLink` can be always underlined (D-564).
 ## Design system & Storybook · Google logo under street suggestions: prepared (13 October)
 
 Component ready for Google's own logo files (18px, clear space, "Google Maps", light/dark, words as fallback); waiting for Will to download the files (D-557).

@@ -41,6 +41,8 @@ export interface PhoneSignInCardProps {
    * template above the card already says "Sign in" (D-217).
    */
   readonly hasTitle?: boolean;
+  /** Opened from an invite: the title is "Join Pam", not "Sign in" (W6, Will, 13 October). */
+  readonly isInvited?: boolean;
   /** 1 on the sign-in screen, 2 inside a flow that already has a title. */
   readonly headingLevel?: 1 | 2;
   /** The code step's button — "Sign in", or "Next" inside joining. */
@@ -53,11 +55,13 @@ export interface PhoneSignInCardProps {
 const CODE_LENGTH = 6;
 
 const styles = stylex.create({
-  title: { fontSize: '28px', lineHeight: 1.2 },
+  title: { fontSize: '28px', lineHeight: { default: 1.2, '@media (max-height: 640px)': 1.1 } },
   stepTitle: { fontSize: '20px', lineHeight: 1.3 },
   hint: { fontSize: '17px', lineHeight: 1.5 },
   consent: { fontSize: '14px', lineHeight: 1.35 },
-  card: { width: '100%' },
+  // Tighter on a short screen (D-564): less above the title and between the title, the field and the button.
+  card: { width: '100%', paddingBlockStart: { default: null, '@media (max-height: 640px)': '8px' }, paddingBlockEnd: { default: null, '@media (max-height: 640px)': '12px' } },
+  stack: { rowGap: { default: null, '@media (max-height: 640px)': '8px' } },
   // Sign in's card sits on the white under the pictures and reads as part of
   // it (Will, 5 October, D-266): no lift, no outline.
   flat: { boxShadow: 'none', borderWidth: 0 },
@@ -79,6 +83,7 @@ export function PhoneSignInCard({
   onCodeChange,
   headingLevel = 1,
   hasTitle = true,
+  isInvited = false,
   codeAction,
   isFlat = false,
 }: PhoneSignInCardProps) {
@@ -163,13 +168,13 @@ export function PhoneSignInCard({
     // the rest of the app's cards, since this is the one screen where the
     // card is the entire job rather than one of several things on the page.
     <Card padding={5} xstyle={[styles.card, isFlat && styles.flat]}>
-      <VStack gap={3}>
+      <VStack gap={3} xstyle={styles.stack}>
         {/*
           The heading sits inside the card with the field it names, so the
           task is one block rather than a title floating above a box.
         */}
         <Heading level={headingLevel} xstyle={titleStyle}>
-          {t('signin.title')}
+          {t(isInvited ? 'signin.title.invited' : 'signin.title')}
         </Heading>
         <TextField
           id={phoneId}
