@@ -22,9 +22,8 @@ Targeted Playwright set in all three projects; web and config unit tests; tsc; b
 
 ## Left undone
 
-Street search still off (key). `nav.back.reported` needs Sage's signature and Lena's translations (copies of English until then).
+Street search still off (key). `nav.back.reported` was signed by Sage and translated by Lena (911312da), merged.
 Checks that only made sense on the old list: the Reported chip `aria-pressed` check (messages); the Contact Pam link inside the failed-load alert (places; Explore is a looking-around screen, A26); the full-width search box and "bell only when notifications exist" with its remembered note (explore-bell, explore-bell-shift; no screen uses `hideWhenEmpty` now); the header role chip (role-badge-fit, retargeted to Profile's role label); the search box "in the header" (area-picker).
 
 ## Needs a human
 
-Sage: sign `nav.back.reported`. Lena: translate it.
