@@ -977,7 +977,7 @@ without it the cached, unpatched Next shipped), a Vercel redirect for document r
 `app_settings.app_url`, migration `20261010190831_texts_link_to_app_joinpam_org` (data only), **applied live**
 10 October. Emails build their link from the Edge Function setting `APP_URL`, which Will set to app.joinpam.org the same evening.
 
-## Languages & legal · b22 is live: what a program sees, "I'm here", who starts a chat; what still waits for Will (12 October)
+## Languages & legal · b22 is live: what a program sees, "I'm here", who starts a chat; b25 carries the rest (13 October)
 
 **Live since b22 (main 8b20e7a8), all in seven languages:** a63 (`privacy.s.sharing.p2`: the four ways a program comes to see a member and what it sees before a visit; the new "A program can see:" card
 and one short-version line on the transparency screen; `transparency.canSee.signed` moved into the card, D-543), a66 (`what-we-keep.p9`/`p10`: "I'm here" asks the phone once and keeps no position), a72 (the last sentence of
@@ -988,12 +988,11 @@ and one short-version line on the transparency screen; `transparency.canSee.sign
 at 320px: no findings. Area picker wording (Iris, b20): "ZIP code" in pt-BR, no comma before o/ou, the Spanish picker in tú.
 **Lesson:** `copy:status` cannot see an English copy that was acknowledged as a translation, and `copy.test.ts` only notices keys not on its `MAY_MATCH_ENGLISH` list; eight `checkin.*` lines and `trips.notMarked` came within one merge of shipping as English
 copies behind that list. The desk now checks every batch for keys equal to the English.
-**Still held for Will:** a67 (`claude/lena-request-log-line`: `what-we-keep.p11` the request log, `sharing.p5` the Trips map), a68 (`claude/lena-calendar-privacy`: `sharing.p6`, `what-we-keep.p12`),
-a70 (`claude/lena-translation-retention`: `translation.p2` names Claude by Anthropic; all seven languages written), the Google card a71 (`claude/lena-google-sync-privacy`, with the Google switch). Six translations of
-a67, a68 and a71 follow his word.
+**In b25, per the merge desk (13 October):** a67, a68 and a70 as one SHA (`92f81ff9`: the request log, the Trips map, the calendar link, Claude named by Anthropic), `about.intro` with `about.how.*` removed, and the carousel lines `onboarding.admin.2` and `onboarding.provider.3` (`ff2206ee`), all in seven languages. `claude/lena-staff-carousel-stories` adds stories that draw the staff welcome lines on Sign in and About Pam (the 320px audit only ever saw slide 1 of a carousel; the member's own slides 2 and 3 are still unaudited).
+**Still held:** the Google card a71 (`claude/lena-google-sync-privacy` and `-strings`) until Will switches sync on; the street-address search line (Piper's function name and data flow first, Sage's sentence, Will's signature).
 **Open:** native readers for every translation (pt-BR "registrada" for "marked" first; "ZIP code"; the calendar screen's app-menu names); the retention in p11/p12 must change before the Supabase plan goes to Team
 (`docs/before-launch.md`); Twilio's retention (Nico); the Vercel plan; the City of Philadelphia licence read once (`docs/data-licences.md`).
-Logs: `docs/sessions/2026-10-11-2053-languages-legal-a63-line-1-program-card-test-68-and-the-city.md`, `docs/sessions/2026-10-12-*-languages-legal-b22-translations.md`.
+Logs: `docs/sessions/2026-10-11-2053-languages-legal-a63-line-1-program-card-test-68-and-the-city.md`, `docs/sessions/2026-10-12-0454-languages-legal-b22-translations.md`, `docs/sessions/2026-10-13-0229-languages-legal-b25-privacy-text-about-intro-carousel-lines-and.md`.
 
 ## Languages & legal · A28: no phone line in the Help screen, the privacy page or the terms (11 October)
 
