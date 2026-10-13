@@ -78,7 +78,8 @@ test('a sign-in with no account asks once, and no member setup starts', async ({
   await page.getByRole('button', { name: 'Send' }).click();
   await expect(page.getByRole('heading', { name: 'We got your request', level: 1 })).toBeVisible();
   await expect(page.getByText(/checks every request by hand/)).toBeVisible();
-  await expect(page.getByText(/We will text you/)).toHaveCount(0);
+  // The decision is an account text, sent whatever texts_live says (D-481), so the page says so (Sage, A29).
+  await expect(page.getByText(/We will text you the answer/)).toBeVisible();
   expect(sent[0]).toMatchObject({
     p_first_name: 'Priya',
     p_last_name: 'Nair',

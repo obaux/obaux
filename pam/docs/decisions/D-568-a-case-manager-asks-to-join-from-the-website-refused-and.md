@@ -36,9 +36,11 @@ rows must not be purged, because `useProgramRequest` (D-525) reads the row to kn
   reads the sign-in's own request (`staff_requests_own`) and, for a case manager request, goes to `/join/case-manager/`
   (waiting, or refused with "Ask again"). The read has a 3-second limit; no answer reads as no request, so a slow
   network cannot leave Join on Loading.
-- **No text is promised.** The page does not reuse `join.staff.*` ("We will text you the answer"): texts are off
-  (`texts_live`), so the sent and waiting screens say to come back and sign in to see the answer, as Sage signed for
-  the new number. Whether `join.staff.*` itself should still promise a text is for Sage and the merge desk.
+- **The answer is texted.** The decision is an account text (`staff_request_approved` / `staff_request_denied`), which
+  goes out whatever `texts_live` says (D-481, migration 20261010141859). Sage signed the waiting screen as "We will
+  text you the answer. You can also sign in with this phone to see it." (A29, ledger `claude/sage-signs` @ 6ced4a4d).
+  My first draft promised no text, on the wrong reading that texts are off for this too; `join.staff.*` is true and
+  stays.
 
 ## Forgetting (`purge_staff_requests`, nightly at 03:55 where pg_cron is installed)
 
@@ -52,6 +54,9 @@ rows must not be purged, because `useProgramRequest` (D-525) reads the row to kn
 - **Approved requests are never purged.** They stay with the account and go with it (`user_id` cascades).
 - It covers every staff request, program-lead ones included, and any refused row that exists when it ships (live had
   one row, approved, on 13 October).
+  Confirmed by the merge desk, 13 October 21:28, option (a): both purges cover every staff request, a member's "add
+  a program" request (D-525) included — "one rule, and nothing kept forever". Lena widens Privacy p15 to name program
+  requests before Will signs a84.
 - The audit log keeps what it already had: `staff_request.deny` with the role and no name. Nothing here writes a name,
   a phone, an organization or an email into it (D-443); the DB test checks the approval rows.
 

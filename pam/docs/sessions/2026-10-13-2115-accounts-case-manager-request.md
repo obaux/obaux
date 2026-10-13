@@ -31,9 +31,10 @@ Plan 2 from the merge desk's order (13 October 19:21: the new number first, then
   spec passed because it stubs that call. It now reads the id from the session the browser holds and gives the row
   read a 3-second limit (no answer reads as no request). The join spec (and 13 others, 462 tests on three projects)
   now pass. Lesson: a check that gates a screen everyone passes through needs a limit, not just a stub.
-- **`join.staff.*` promises a text** ("We will text you the answer") while texts are off. Sage removed the same
-  promise from the new-number strings today. This page uses its own words instead; `join.staff.*` itself is
-  unchanged and flagged.
+- **I read "texts are off" too widely.** The first draft avoided "We will text you" because texts_live is off, and
+  flagged `join.staff.*` as untrue. Sage corrected it: a staff-request decision is an account text, sent whatever
+  texts_live says (D-481). The waiting body now says the answer is texted (Sage's signed wording), and the e2e test
+  checks for it. Lesson: read the text's own rule (migration 20261010141859) before assuming the switch covers it.
 
 ## Decisions made
 
@@ -61,3 +62,5 @@ Plan 2 from the merge desk's order (13 October 19:21: the new number first, then
 - The merge desk: confirm postgres may `delete from auth.users` on live (the same question as D-567), then apply
   after `list_migrations`. Nothing to deploy beyond the migration and the app.
 - Will: the 30 / 90 days and "super admin alone" are his card a84 defaults; a change is one line.
+
+- 21:35: Sage signed the 23 strings (22 as written; `caseManager.waiting.body` changed). Mira chose (a): the purge covers every staff request.

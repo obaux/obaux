@@ -7,7 +7,7 @@
 | 01-phone-first | `/join/case-manager/` signed out: what it is, then the phone and the code |
 | 02-about-you | Signed in, no account: name, city (the served list), where you work, work email |
 | 03-email-problem | An email that does not look like one, caught before sending |
-| 04-sent | Sent: a person on the Pam team checks it; come back and sign in to see the answer (no text promised) |
+| 04-sent | Sent: a person on the Pam team checks it; we will text you the answer, or sign in to see it |
 | 05-still-checking-from-join | A sign-in that asked, opening `/join/`, is sent here, not into member setup |
 | 06-refused | Refused: Ask again, or Contact Pam |
 | 07-ask-again | Ask again fills in what they sent before (not the email) |
