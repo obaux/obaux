@@ -2245,6 +2245,11 @@ D-545, `claude/places-programs-scraped-vs-pam`: the audit table and `place-scrap
 
 Will (a65) wants to see two website text colours before choosing. Story **Website / Text colours (Will to choose)** shows #666666 vs #595959 on the tinted cards and #0B991F vs #087A18 on white, at phone width, with live ratios. #666666 fails AA on Gray, Green and Purple; #0B991F fails on white. Site tokens are unchanged until Will decides (D-546).
 
+## Places & programs · street search through Google, off until the key (13 October 2026)
+
+D-552, `claude/places-programs-street-search`: the area search asks Google (Places New, from Pam's `places-search` function only) for an address, a corner or a place by name, below Pam's own ZIP and neighborhood rows, with Google's mark. Off until Will enters `GOOGLE_MAPS_SERVER_KEY`; no key, no change. Waiting: the key and quota (Will), the Privacy line (Lena, Sage, Will), Google's own mark (Dot). Log: see `docs/sessions/`.
+
+## Design system & Storybook · role chip keeps its words whole (13 October)
 ## Design system & Storybook · Play restarts the carousels; the role chip keeps its words whole (13 October)
 
 Only keyboard focus holds a carousel; an explicit Play lets go, so Pause then Play works with a tap on a phone (D-554, Iris W1, b27).
@@ -2253,3 +2258,7 @@ The role chip beside the mark no longer breaks inside a word, and the header giv
 ## Design system & Storybook · the green card transition (13 October)
 
 Crossfade 650ms, line out 160ms then in 320ms, no scale (D-556). Story: Website / Green card transition.
+
+## Design system & Storybook · Google logo under street suggestions: prepared (13 October)
+
+Component ready for Google's own logo files (18px, clear space, "Google Maps", light/dark, words as fallback); waiting for Will to download the files (D-557).

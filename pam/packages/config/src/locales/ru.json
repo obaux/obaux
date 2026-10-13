@@ -1730,5 +1730,7 @@
   "legal.sources.title": "Источники данных",
   "legal.sources.neighborhoods": "Названия районов в выборе местоположения взяты из набора данных «Philadelphia Neighborhoods», созданного Abaca Labs. В Pam набор изменён, чтобы хранить одну точку для каждого района вместо границ.",
   "legal.sources.link": "Посмотреть исходные данные",
-  "legal.sources.licence": "Лицензия: CC BY 4.0"
+  "legal.sources.licence": "Лицензия: CC BY 4.0",
+  "places.areaHint.street": "Например, 19107, Fishtown или Broad и Girard.",
+  "places.areaLabel.street": "Почтовый индекс (ZIP), район или адрес"
 }

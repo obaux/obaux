@@ -1646,5 +1646,7 @@
   "legal.sources.title": "Data sources",
   "legal.sources.neighborhoods": "The neighborhood names in the area search come from “Philadelphia Neighborhoods”, made by Abaca Labs. Pam changed it to keep one point for each neighborhood instead of its boundaries.",
   "legal.sources.link": "See the source data",
-  "legal.sources.licence": "License: CC BY 4.0"
+  "legal.sources.licence": "License: CC BY 4.0",
+  "places.areaHint.street": "Like 19107, Fishtown, or Broad and Girard.",
+  "places.areaLabel.street": "ZIP code, neighborhood or address"
 }

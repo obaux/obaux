@@ -1786,5 +1786,7 @@
   "legal.sources.title": "مصادر البيانات",
   "legal.sources.neighborhoods": "تأتي أسماء الأحياء في البحث عن المنطقة من مجموعة البيانات «Philadelphia Neighborhoods» التي أعدتها Abaca Labs. وقد عدل Pam هذه المجموعة ليحتفظ بنقطة واحدة لكل حي بدلا من حدودها.",
   "legal.sources.link": "عرض البيانات المصدر",
-  "legal.sources.licence": "الترخيص: CC BY 4.0"
+  "legal.sources.licence": "الترخيص: CC BY 4.0",
+  "places.areaHint.street": "مثل 19107 أو Fishtown أو تقاطع Broad و Girard.",
+  "places.areaLabel.street": "الرمز البريدي (ZIP) أو الحي أو العنوان"
 }

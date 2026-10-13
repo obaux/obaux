@@ -15,6 +15,8 @@ import { MenuList } from '@pam/ui/MenuList';
 import { SearchField } from '@pam/ui/SearchPill';
 import { useI18n } from '@/lib/i18n';
 import { useAreaSearch, type AreaOption } from '@/lib/useAreaSearch';
+import { useStreetSearch } from '@/lib/useStreetSearch';
+import { PoweredByGoogle } from '@/screens/PoweredByGoogle';
 
 /**
  * Where the list is measured from, and how a member changes it.
@@ -53,7 +55,8 @@ const styles = stylex.create({
     backgroundImage: { default: 'none', ':hover': 'none', ':active': 'none' },
   },
   hint: { fontSize: '15px', lineHeight: 1.5 },
-  privacy: { fontSize: '14px', lineHeight: 1.5 },
+  // Centred under Google's mark, which is centred (Will, 13 October).
+  privacy: { fontSize: '14px', lineHeight: 1.5, textAlign: 'center', width: '100%' },
   list: { width: '100%' },
 });
 
@@ -102,7 +105,10 @@ export function AreaSearch({
   const [query, setQuery] = useState('');
   const [picked, setPicked] = useState<AreaOption>(current);
   const [locating, setLocating] = useState<'idle' | 'busy' | 'failed'>('idle');
-  const { options, isSearching } = useAreaSearch(query);
+  const { options, isSearching, answered } = useAreaSearch(query);
+  // Street addresses and corners from Google, through Pam's server, once Pam's own list has answered (D-552).
+  const street = useStreetSearch(query, { matches: options.length, settled: !isSearching && answered === query }, isOpen);
+  const [choosing, setChoosing] = useState(false);
 
   const body = useRef<HTMLDivElement | null>(null);
 
@@ -169,7 +175,7 @@ export function AreaSearch({
           </HStack>
 
           <SearchField
-            label={t('places.areaLabel')}
+            label={t(street.enabled ? 'places.areaLabel.street' : 'places.areaLabel')}
             describedBy={hintId}
             value={query}
             onChange={setQuery}
@@ -178,7 +184,7 @@ export function AreaSearch({
           />
           {/* The search finds ZIP codes (and City Hall), so say what to type (D-536). */}
           <Text id={hintId} type="supporting" xstyle={styles.hint}>
-            {t('places.areaHint')}
+            {t(street.enabled ? 'places.areaHint.street' : 'places.areaHint')}
           </Text>
 
           <MenuList
@@ -205,20 +211,39 @@ export function AreaSearch({
                 onSelect: () => setPicked(option),
                 isSelected: option.id === picked.id,
               })),
+              // What Google found, below Pam's own: tapping one asks for where it is, then it is picked like any other.
+              ...street.suggestions.map((suggestion) => ({
+                id: `suggest:${suggestion.placeId}`,
+                label: suggestion.label,
+                // Used for this search only, as "Use my current location" says (Sage, 13 October): a Google pick is never kept.
+                description: t('places.area.hereNote'),
+                icon: <PlacesIcon {...ICON} />,
+                onSelect: () => {
+                  if (choosing) return;
+                  setChoosing(true);
+                  void street.choose(suggestion).then((option) => {
+                    setChoosing(false);
+                    if (option) setPicked(option);
+                  });
+                },
+              })),
             ]}
           />
+
+          {/* Google's required mark, shown whenever its suggestions are (D-552). */}
+          {street.suggestions.length > 0 ? <PoweredByGoogle /> : null}
 
           {/*
             A live region, so a screen reader hears that results changed
             without the focus leaving the search somebody is still typing in.
           */}
           <div role="status" aria-live="polite">
-            {isSearching && options.length === 0 ? (
+            {(isSearching || street.isSearching) && options.length === 0 && street.suggestions.length === 0 ? (
               <Text type="supporting" xstyle={styles.hint}>
                 {t('places.areaSearching')}
               </Text>
             ) : null}
-            {!isSearching && query.trim() !== '' && options.length === 0 ? (
+            {!isSearching && !street.isSearching && query.trim() !== '' && options.length === 0 && street.suggestions.length === 0 ? (
               <Text type="supporting" xstyle={styles.hint}>
                 {t('places.areaNone')}
               </Text>
