@@ -19,6 +19,7 @@ No login and no key are needed (the function is deployed with JWT verification o
 | `page` | no | 300 | The path or title of the page they came from (e.g. `/support/posts/where-is-my-program`) |
 | `lang` | no | 16 | The language they read in (e.g. `es`, `zh-HK`) |
 | `role` | no | 40 | Their role if the site knows it (the site usually does not) |
+| `roles` | no | an array of up to 10 | Who they say they are, from the form's "choose all that apply": any of `member`, `program`, `case_manager` ("Case manager" with a space is read the same). Repeats and anything else are dropped, not refused; a value that is not an array is refused (`field: "roles"`). It is shown in the email as "Says they are: a member and a case manager" and goes nowhere else: not stored, not logged, not in the subject or the duplicate check |
 | `website` | **honeypot** | – | A field no person sees: hide it with CSS (not `type=hidden`), `tabindex=-1`, `autocomplete=off`. Send it empty. A filled one is treated as a bot: the reply says `ok` and nothing is sent |
 
 Unknown fields are ignored. The whole body may be at most 12,000 characters. Control characters are stripped.
@@ -28,7 +29,7 @@ Unknown fields are ignored. The whole body may be at most 12,000 characters. Con
 | Status | Body | What the form does |
 |---|---|---|
 | 200 | `{"ok": true}` | Say it was sent |
-| 400 | `{"error": "invalid", "field": "message" \| "email" \| "name" \| "page" \| "lang" \| "role" \| "body"}` | Point at that field |
+| 400 | `{"error": "invalid", "field": "message" \| "email" \| "name" \| "page" \| "lang" \| "role" \| "roles" \| "body"}` | Point at that field |
 | 403 | `{"error": "not allowed from here"}` | Only from joinpam.org; show the address |
 | 413 | `{"error": "too_large"}` | Show the address |
 | 429 | `{"error": "rate_limited"}` (`Retry-After: 3600`) | Three a person an hour, thirty in all. Show the address |
@@ -50,4 +51,4 @@ function will accept an optional `phone` field then; today it ignores it.
 ## What lands in Will's inbox
 
 One email, from Pam's address to `hello@joinpam.org`, reply-to the person: what they typed, how to answer them, the page,
-the language, the role if known. Nothing from the database: the function reads no member records.
+who they say they are (member, program, case manager), the language, the role if known. Nothing from the database: the function reads no member records.
