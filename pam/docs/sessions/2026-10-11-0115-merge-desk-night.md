@@ -447,6 +447,17 @@
   merges. Ava's Connect fix (56f5ec16) is in her session unpushed until Will answers a78. Wren's phone layout
   (c4ef13c4, D-550) waits for Will on a77. Lena's member slide stories (7af31084) and Sage's green-card rows
   (b8067c7e) go in b26.
+- **Batch b26 (13 October, `d8b7d37f`).** No migrations. Dot: the header's role chip never splits a word, and
+  the header's corner takes its own row when it can't fit (D-551; Iris's W3). Lena: stories for the member's welcome
+  slides 2 and 3 (a carousel needs one story per slide, or the 320px audit never sees it); a host guard and a test
+  that hold Piper's coming street-search function to Privacy's promises (no copy, off until Will signs p7 and adds
+  the key); the "Last updated" date follows the words (Privacy 13 October 2026, Terms 11 October 2026, seven
+  languages, Iris's W2), with `legal-updated.json` and a test that turns red when either document's English
+  changes without a new date (`pnpm --filter @pam/config legal:date <privacy|terms> <day>`). Sage: the ledger rows
+  for the date pattern, Will's a77 lines, the green card's Pause/Play labels and p7 option A.
+- **Held from b26:** Wren's phone layout and the moving green card (D-550, `345fc148`, card a80; Dot tap-checked
+  Play at 390px), Dot's Play-restarts fix for the app and website carousels (D-554, `b82aeca6`, for b27), Ava's two
+  branches (card a78), the calendar link (card a79).
 
 ## What was wrong, and what missed it
 
@@ -637,6 +648,9 @@
 | b23 new or changed English keys (place.about) and removed (checkin.notNow) | translated in six languages, signed by Sage 02:25; removed from all seven |
 | Batch b25 (0fd87df1): db / config / ui / web unit / site / e2e full / storybook / site checks | 1498 ok, 0 not ok / 1211 / 124 / 139 / 94 / 1541 passed, 19 skipped / builds, 13.9 kB spare / 120 scans 0, clear, 306 links 0 |
 | b25 new or changed English keys (privacy p5, p6, p11, p12, translation.p2, about.intro, onboarding.admin.2, onboarding.provider.3) | translated in six languages, none equal to English; all in the signed ledger |
+| Batch b26 (6a6ca551): db / config / ui / web unit / site / e2e full / storybook / site checks | 1498 ok / 1224 / 124 / 139 / 94 / 1666 passed, 1 flaky (places.spec:118 at 320, passed on retry), 19 skipped / builds, 13.8 kB spare / 120 scans 0, clear, 306 links 0 |
+| b26 + Lena 5bed032e + Sage caab3bee (d8b7d37f): config / copy:status / web and site tsc | 1246 / in step / 0 / 0 |
+| b26 new or changed English keys (privacy.updated, terms.updated) | translated in six languages, none equal to English; signed as a pattern |
 | Calendar migration 20261011161548 via the connector | timed out; table, functions and record all absent afterwards; no locks or running queries |
 | Batch b24 (0a36ada1): web/site tsc / web unit / site tests / config / site build / a11y / usability / scrollspy / storybook | 0 / 0 / 139 / 94 / 1176 / 0 / 120 scans 0 / clear / 306 links 0 / builds (no app code: e2e not rerun) |
 | Live help_request_allowed after Will's paste (a62) | definer; search_path public, extensions; anon and authenticated cannot execute, service_role can; same logic as the file (md5 differs: indentation and one comment); help_request_attempts RLS forced, no client grants, 0 rows |
