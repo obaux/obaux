@@ -246,9 +246,10 @@ describe('what the privacy page says about email and signatures, as Will approve
     );
   });
 
-  it('is the last paragraph of "Who else gets your information", in every language', () => {
+  it('is the paragraph before the Google map in "Who else gets your information", in every language', () => {
     const sharing = PRIVACY.sections.find((s) => s.id === 'sharing');
-    expect(sharing?.bodyKeys.at(-1)).toBe('privacy.s.sharing.p4');
+    expect(sharing?.bodyKeys[3]).toBe('privacy.s.sharing.p4');
+    expect(sharing?.bodyKeys[4]).toBe('privacy.s.sharing.p5'); // google-map-line.test.ts (a67)
     for (const [locale, bundle] of Object.entries(bundles)) {
       const text = bundle['privacy.s.sharing.p4'];
       expect(text, `${locale} has it`).toBeTruthy();
