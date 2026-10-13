@@ -26,3 +26,7 @@ Iris's run-through failed the relaxed test precondition. Two changes:
 - **Page.** `SignInScreen` shows the compact bar when the hero's Pam mark has actually left view (an `IntersectionObserver` on the mark, its top margin set to the pinned note's height and re-read on resize), not at a fixed 72px of scroll. Where `IntersectionObserver` is missing it falls back to the old scroll test.
 - **Test.** `signin-short.spec.ts` ("header stays on top") has no precondition: after scrolling to the end, a Pam mark and the language button are within the top 140px, and the invite line is at 0 when invited. It covers en, es, ar and zh-CN at 320×568. On 90533a90 it failed for ar and zh-CN (not invited); with the fix it passes.
 - **Fit.** The 42 cases (7 languages × 320×568, 360×640, 390×844 × invited or not), on a throwaway merge with Lena's lines, all fit (ru 553, pt-BR 542, en 503 of 568 at 320×568). The look is unchanged, so no new pictures.
+
+### Second follow-up: the test measures against the note, not 140px
+
+Ava's W6 run (3e46b2bc) failed "invited, es" at 320×568: Lena's final Spanish invited line (629171de) wraps to four lines, so the note spans 0–90px and the language button sits at 94–142px, past a fixed 140. The page was right (the bar showed). The test now takes the limit as the note's bottom (0 when not invited) plus 56px for the bar. Still fails on 90533a90 for ar and zh-CN (not invited); passes on a merge with 629171de (17/17 signin-short at narrow-320); the 42 fit cases still all fit.
