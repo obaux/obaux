@@ -407,9 +407,39 @@
     sign. The City-file plan and its network setting are dropped. Piper plans it after the calendar link.
   - **Explore's bell** (06:17): a member's Explore shows the bell only when they have notifications. Nico.
   - **Colours:** card a75 with Dot's examples and the scores.
+- **A 20-hour pause (12 October 06:30 to 13 October 02:05 UTC).** My session stopped after b24's CI went green
+  (06:45) and picked up again at 02:05. Nico, Piper and Lena got my 06:22 messages only at 02:06. Will's five
+  messages from 06:20 to 06:58 waited about 20 hours; I told him so plainly when answering.
+- **Will's messages, 06:20 to 06:58 (answered 02:08, 13 October):**
+  - **About Pam (06:20).** We misread him on 10 October (D-499): he wanted the line between the tabs and the
+    carousel removed, not the carousel's words. Wren's D-548 puts the words back (Pause stays) and removes the
+    about.how.* line. Sage found two carousel lines that aren't true (admin.2 "Send someone to a program in one
+    tap", provider.3 "Case managers nearby send people your way": recommend is a placeholder) and replaced them;
+    Lena translates.
+  - **"Coming home" (06:22).** Off About Pam: the line under the tabs went with D-548, and about.intro is now
+    "Pam connects people with the programs, mentors and case managers who can help: ..." (Sage signed 02:15, Lena
+    seven languages). The invite button "Someone coming home" stays unless Will says otherwise.
+  - **Pictures and colour samples (06:27).** Control Room v17: a sample beside every hex code (chat and cards),
+    pictures on cards and messages (the page's own img/ files, /_blob/ or data: images only), tap for full size,
+    and Listen spells a colour ("colour 0 8 7 A 1 8"). Tested at 320/390/1280, light and dark.
+  - **"Is Nico stuck?" (06:28).** No: he was building the Explore bell; the pause held everyone.
+  - **Colours and the phone layout (06:58, a75).** The colours stay. The website's phone layout follows his Figma
+    (7:3), and the green card shows three views (18:517: Residents, Program providers, Case managers) instead of
+    linking to the help desk. Dot wrote the spec (Figma read fine; PNG export is blocked by the proxy, and Will
+    drew the frames, so his card links to them). Wren builds it and holds it off main until Will sees pictures.
+- **Card a76:** Sage's line for counting interest in points (a69), with Iris's plan.
+- **Street search:** Piper's plan is in (edge function places-search, Autocomplete + Place Details Essentials,
+  Philadelphia only, off until GOOGLE_MAPS_SERVER_KEY). Changed: Google is also asked for corners and names when
+  Pam's own areas have no match. Cost from Google's pages: 10,000 free a month per kind, about 2,500 to 3,000
+  searches a month free at 3 to 4 autocomplete calls each.
 
 ## What was wrong, and what missed it
 
+- **D-499 removed the wrong words.** Will (10 October): "That page should not have text over the carousel image. Only
+  tab and image. It's redundant text." We took the words off the pictures; he meant the separate line between the
+  tabs and the carousel. Nobody showed him the result before it shipped. Now: a design change Will asked for goes
+  back to him as a picture on his card before it ships (the Control Room shows pictures since v17), and an
+  ambiguous "remove the text" gets a one-line "this one?" with a screenshot.
 - **I ran part of a migration through execute_sql after apply_migration timed out.** Will had asked whether I could
   do the help form's SQL without him. I applied the table piecewise, then the function (the part with a `delete`)
   timed out the same way. A safety check then refused my reply about it. The connector holds statements like that
