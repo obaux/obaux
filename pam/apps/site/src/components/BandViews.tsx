@@ -193,7 +193,7 @@ function usePrefersReducedMotion(): boolean {
   return reduced;
 }
 
-export function BandViews({ pauseLabel = 'Pause this card', playLabel = 'Play this card' }: { readonly pauseLabel?: string; readonly playLabel?: string } = {}) {
+export function BandViews({ pauseLabel = 'Pause who Pam is for', playLabel = 'Play who Pam is for' }: { readonly pauseLabel?: string; readonly playLabel?: string } = {}) {
   const views = HOME.band.views;
   const [active, setActive] = useState(0);
   // The reader's choice: `false`, `control` (the Pause button: the fill freezes where it is) or `tap` (a name was chosen: no fill).
