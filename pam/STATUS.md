@@ -947,10 +947,10 @@ Open with Will: W2's back arrow (recommended: none).
 ## Accounts & invites · a new phone number moves an account (13 October) — READY, waiting on Lena
 
 `claude/pam-new-number` (D-567, card a73; Will's defaults a84). "New number?" on Sign in; the new number proves itself
-with a code; the old account is described; a case manager (or, after 24 hours or for anyone else, the super admin)
-checks it beside the account, the super admin ticking "I spoke to this person"; `move-number` moves the sign-in. A super
-admin's account never moves. One expand migration (`20261013192951`) and one Edge Function for the merge desk. Waiting
-on: Lena (64 keys), Sage (words), Will (pictures, Privacy line), Nico (alerts and the old-number text, later).
+with a code; the old account is described; the super admin (every request, for now) checks it beside the account and
+ticks "I spoke to this person"; `move-number` moves the sign-in; a no deletes the new number's sign-in. A super admin's
+account never moves. One expand migration (`20261013192951`) and one Edge Function for the merge desk. Waiting on: Lena
+(60 keys), Sage (words), Will (pictures, Privacy line p14), Nico (an alert and the old-number text, later).
 ## Voice & UX copy · English signed for b22, W6, the help form and street search (13 October)
 
 Ledger: `docs/signed-english.md` on `claude/sage-signs` (732e6650). Signed and checked against the code: the b22 visit lines, the website help form, street-search labels, the W6 Join lines and `nav.back.reported`. Will's a72, a77, a80, a81 and a82 are recorded as his. Still waiting: Will on the a65 24/7 line (until launch). Session log: `docs/sessions/2026-10-13-1925-voice-signing-a29-b22-w6-help-form.md`.

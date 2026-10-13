@@ -16,7 +16,7 @@ The merge desk read the plan at 19:21 and said build it, with Will's a84 default
   number?" link (Sign in only), "New number" rows on Requests, a row on a case manager's member page; Sign in and Join
   send a sign-in that asked to its request. `PhoneSignInCard` takes a `title`; `@pam/ui` `TextField` gains the
   `oldPhone` purpose (no autofill of the phone's own number).
-- 64 English strings (`newNumber.*`); stories (Member › Sign in — a new phone number; Super admin › Requests — a new
+- 60 English strings (`newNumber.*`); stories (Member › Sign in — a new phone number; Super admin › Requests — a new
   phone number), prototype routes, fixtures; `e2e/new-number.spec.ts`.
 - Pictures: `docs/design/review/2026-10-13-new-number/`.
 
@@ -45,10 +45,16 @@ The merge desk read the plan at 19:21 and said build it, with Will's a84 default
 | build-storybook | builds |
 | Playwright new-number, signin-short, consent, join, account, staff-request-approve, invite, admin, a11y, connect-examples-only (320, dark-320, iPhone SE) | 372 passed |
 
+- **20:10, after Lena's check (Mira 19:48):** the super admin decides every request (no case manager step, no 24
+  hours; the member's case manager sees nothing, transparency.ts); the tick on every Approve; a no deletes the new
+  number's sign-in (`remove_temporary_signin`, `delete from auth.users` for a sign-in with no profile: the merge desk
+  confirms postgres may do that live); the undecided purge takes the sign-in too; Sage's signed label "Who on Pam knows
+  you? Like your guide."; 60 strings. DB test 72 rewritten (45 checks). Playwright 402 passed. Pictures retaken.
+
 ## Left undone
 
-- Lena: 64 keys in six languages. Sage: signs the new sentences (A29).
-- Nico: the case manager's alert and the 24-hour alert; the text to the old number once texts are live.
+- Lena: 60 keys in six languages. Sage: signs the new sentences (A29).
+- Nico: an alert to the super admin when a request arrives; the text to the old number once texts are live.
 - The Privacy line (Lena checks, Will signs).
 - W6 (b32) is not on `main` yet; it touches `SignInScreen`, `JoinScreen`, `PhoneSignInCard` and the footer, so its merge
   into this branch is expected to need care.
