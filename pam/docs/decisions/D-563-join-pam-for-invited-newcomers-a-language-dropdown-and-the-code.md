@@ -26,10 +26,11 @@ to type code. otherwise let's hide it so it doesn't take up real estate."
    and moves focus into it. The field is open from the start when a code is already there (an invite
    link) or when a code needs fixing (`inviteProblem`), and once open it stays open. It keeps its
    label, `join.code.label`. The words are two keys only, so the versions differ in nothing else:
-   Will's, built now (Mira, 06:47: "use Will's until he answers"): `join.code.question` "Did someone
-   invite you via code?" and `join.code.reveal` "Click here" (his "click here", capitalised as it
-   starts its line). Sage's, on Will's card: "Did someone invite you with a code?" and "Enter your
-   code", since "click here" says nothing read out of context.
+   Will's, kept: `join.code.question` "Did someone invite you via code?" and `join.code.reveal` "Click
+   here" (his "click here", capitalised as it starts its line). Sage proposed "Did someone invite you
+   with a code?" and "Enter your code", since "click here" says nothing read out of context; Will
+   signed card a82 on 13 October, 18:40 ("signed on all") without taking them, so her commit was
+   reverted.
 
 5. **The link is underlined** (Dot, D-564: `TextLink isUnderlined`), since it sits among words and reveals a field.
 6. **Sage's signed fixes (13 October, 06:58)**, held since D-446:

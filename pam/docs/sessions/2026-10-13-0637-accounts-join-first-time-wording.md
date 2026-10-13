@@ -88,6 +88,11 @@ asks (06:00 UTC, with screenshots): bring back the language dropdown, and hide t
   checked): the Spanish invite line is four lines (90px), so the language button sits at 94–142px, and the test
   looks only within the top 140px. A test window, not a missing bar; Dot's test, so it's hers to change.
 
+- **18:45:** Will signed a82 ("signed on all. Great work team.") with his own code words; Sage's commit
+  ce18f5ff reverted with `git revert`. Web tsc clean; web build; Playwright account, join, consent,
+  signin-short on 3 projects: 225 passed. Config: 1298 pass, 12 fail, all on `join.code.question` /
+  `join.code.reveal`, which Lena is translating on her own branch.
+
 ## Left undone
 
 - Lena: the six languages for the six keys above.
