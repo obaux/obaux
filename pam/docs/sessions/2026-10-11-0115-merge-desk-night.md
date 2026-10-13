@@ -591,6 +591,16 @@
   "Pam remembers the area you pick on this phone only." is centred only while Google's mark shows; and nothing typed
   goes to `places-search` until its status says a key exists (Iris's b30 notes). After b31 the street search waits
   only on Will: Google's logo files (a81 step 2), then the key.
+- **Batch b32 (13 October).** No new migration (W6's 20261013070505 is live as 20261013075601), no function
+  change. W6 sign-up, signed by Will on a82 at 18:40 (Ava 8417d724, D-563, D-564): Join's quiet "1 of 3", the
+  language dropdown, the invite code behind Will's "Did someone invite you via code?" / "Click here" (Sage's
+  version reverted), Sign in from an invite titled "Join Pam", the short-phone fit; Lena's six languages for the two
+  code lines (18035878, each language's word for a tap) and one register on the Spanish Join screen (5e2770f8).
+  The help form, signed by Will on a83 at 18:45 (Wren ee49f7cf with Dot's f703f4d7, D-562): Still stuck? opens
+  the form, 17px text, "How do you use Pam?" with "I don't use Pam yet", the line about what is sent, softer night
+  links, and 60px / 120px between the last block and the footer on every help page. Records: Sage's ledger (a82
+  as Will's words, nav.back.reported signed), Iris's pre-ship walk-through (all three items pass). Two STATUS
+  conflicts kept both sides; a duplicated Google-logo section dropped.
 - **Will, 18:18 (a81, chat w20261013181806g6qz): the old Places list is retired.** Picture 3 of the street
   search (v2) showed the old `/places/` list, with its old header and layout. Will: that page is "no longer an
   active page that we support". The ZIP shows on the member's Explore page (`/`); a case manager or program searching
@@ -616,6 +626,21 @@
   adds it on top of fc9a447d with the site's existing breakpoint and named spacing tokens, covers both PostScreen and
   SupportScreen, reports any other page whose last card touches the footer without changing it, and re-shoots the
   bottoms at 390 and 1280 in both themes (v3). Will sees the pictures, then it ships with the next website release.
+- **Merge desk, 19:05 to 19:48 (none needed Will):** "Your safety", the one help post without Still stuck?, gets
+  the same 60 / 120 from one shared style (Wren ee49f7cf), so every help page ends the same way. Picture 3 of the
+  street search was re-shot with example places (an empty list would have read as search finding nothing). Iris's
+  b32 polish: Dot P1 and P5 (D-566), Ava P2 (the reveal button described by its question), Lena P4 (one register
+  on the Spanish Join screen; staff Join screens to usted next); P3 ("Click" in English) stays, as it is Will's word.
+  Ava's two plans (a new number, a73; case managers from the website) go to Will as a84. Ava builds the new number
+  first, with every choice a setting. Guards: a super admin's account is never moved this way; every approval
+  needs "I spoke to this person and I'm sure it's them"; the new number's temporary sign-in makes no profile; a
+  denial deletes it at once; decided requests are purged 90 days after the decision and undecided ones 90 days
+  after asking. The audit row has no number, name or city. Case managers: refused requests are purged after 30
+  days (with the sign-in when the person has no other account), unanswered ones after 90, approved ones never
+  (the app reads them, D-525). Lena found the plan would let a member's case manager read a move request, which
+  ADMIN_CAN_SEE does not allow, so the super admin decides every move request until Will signs a contract line.
+  She also found that Privacy does not yet say staff keep a last name and a city: p7 is rewritten in the same
+  signature. Live, counts only: staff_requests has one row, approved on 16 September. Nothing refused is kept.
 
 ## What was wrong, and what missed it
 
@@ -840,9 +865,19 @@
 | Iris's b30 run-through | a78 (ten super admin screens, stale view-as, Connect, Contact Pam), W5, W6 and street search off (four ways, p7 in seven languages): PASS, 29/29 scripted; Dot's sign-in test edit: FAIL (bar never shows at 72px scroll in ar, zh-CN) |
 | Batch b31 (Piper f748c465): db / config / ui / web unit / site / site a11y / usability / e2e full / storybook | 1579 ok / 1310 / 124 / 173 / 95 / 120 scans 0 / clear / 1775 passed, 19 skipped / builds; scrollspy 306 links 0; web tsc 0; 11.0 kB spare |
 | b31 main CI (d14dab33) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (09:43); Vercel web and pam-site READY (09:22) |
+| Batch b32 on 72562dba (W6 + Lena): db / config / ui / web unit / site / site a11y / usability / scrollspy / e2e full / storybook | 1579 ok / 1310 / 124 / 173 / 95 / 120 scans 0 / clear / 306 links 0 / 1808 passed, 19 skipped / builds; web tsc 0; 10.7 kB spare |
+| b32 English | 12 changed or added keys, none missing and none equal to English in the six languages |
+| Iris's b32 walk-through (local stub build only) | Join step count, dropdown, hidden code, Join Pam, short-phone fit (56/56), keyboard and screen reader, the b30 zh-CN and ar bar: PASS, 506 checks; five polish notes |
+| b32 recheck on 334fe0eb (+ help form, Lena P4, records) | config 1310, copy:status in step / site tsc, 100 tests, build / site a11y 120 scans 0 / usability clear (gap checks) / scrollspy 306 links 0 / web build, tsc 0, 10.7 kB spare / e2e account, join, consent, signin-short, signin-next (and the specs those names match): 269 passed, 1 skipped |
+| staff_requests (counts only, 19:26) | one row ever, approved, 16 September; none refused or waiting |
 
 ## Left undone
 
+- **As of b32 (13 October, about 20:00):** b33 is ready to merge: Piper's D-565 (9aade728, the old Places list
+  retired, with Lena's 911312da for "Back to Reported places"), Dot's D-566 (5737dfae), Ava's P2 (3dfb043c). With
+  Will: a84 (choices (b) to (g); Lena's Privacy words after Sage's edit), a81 (Google's logo files, then the key).
+  Building: Ava's new-number flow (super admin decides every request for now). Lena: staff Join screens in Spanish
+  to usted. Iris: a walk-through of the help form once b32 is live.
 - **As of b30 (13 October, about 07:30):** with Will: a82 (the sign-up look, and his words or Sage's for the code
   line), a83 (the help form), a81 step 2 (Google's logo files; the key comes after Piper's ZIP chip). Piper: the
   ZIP-only chip. Ava: W6 READY once Lena's 629171de and Dot's signin-fit are in and green. Nico: free until Ava's
