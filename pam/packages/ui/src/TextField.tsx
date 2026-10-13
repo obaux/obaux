@@ -34,6 +34,7 @@ import { pam } from './tokens.stylex.js';
  */
 export type FieldPurpose =
   | 'phone'
+  | 'oldPhone'
   | 'code'
   | 'inviteCode'
   | 'address'
@@ -58,6 +59,11 @@ const PURPOSES: Record<FieldPurpose, Record<string, string>> = {
    * printed on their bill, with or without the country code.
    */
   phone: { type: 'tel', autoComplete: 'tel', inputMode: 'tel', htmlName: 'phone', name: 'phone' },
+  /**
+   * A number that is not this phone's: the one somebody had before (D-567, moving an account to a new
+   * number). The phone keypad, but no offer of the phone's own number, which is the wrong answer here.
+   */
+  oldPhone: { type: 'tel', autoComplete: 'off', inputMode: 'tel', htmlName: 'oldPhone', name: 'oldPhone' },
   /**
    * The sign-in code. `one-time-code` is what makes iOS offer the code from the
    * Messages app above the keyboard and Android autofill it — the difference

@@ -15,6 +15,10 @@ type Story = StoryObj;
 export const Home: Story = screen('super-admin', 'Home — Requests', '/');
 export const Messages: Story = screen('super-admin', 'Messages', '/messages/');
 export const Profile: Story = screen('super-admin', 'Profile', '/profile/');
+/** Somebody asked to move their account to a new number (D-567): what they typed beside the account. */
+export const NewNumber: Story = screen('super-admin', 'Requests — a new phone number', '/requests/number/', {
+  id: '7a1f0000-0000-4000-8000-000000000567',
+});
 export const ReportedPlaces: Story = screen('super-admin', 'Reported places — Keep it or take it off', '/places/reported/');
 export const ReportedPlacesFromTheBell: Story = screen('super-admin', 'Reported places, from the bell', '/places/reported/', {
   from: 'notifications',

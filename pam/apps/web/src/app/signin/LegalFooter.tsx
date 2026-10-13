@@ -30,6 +30,8 @@ export function LegalLinks({ from }: { readonly from: 'signin' | 'join' }) {
     <HStack justify="center" wrap="wrap" xstyle={styles.rows}>
       {/* What Pam is, for somebody deciding whether to sign in (D-259). */}
       <TextLink label={t('legal.about')} href="/about/" size="quiet" />
+      {/* Somebody whose old number is gone moves their account to the new one (D-567). Sign in only. */}
+      {from === 'signin' ? <TextLink label={t('newNumber.link')} href="/signin/new-number/" size="quiet" /> : null}
       <TextLink label={t('legal.privacy')} href={`/privacy/?from=${from}`} size="quiet" />
       <TextLink label={t('legal.terms')} href={`/terms/?from=${from}`} size="quiet" />
     </HStack>

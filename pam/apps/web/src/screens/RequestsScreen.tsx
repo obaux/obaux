@@ -1,6 +1,6 @@
 'use client';
 
-import { Loading, Notice, Page, PeopleIcon, PlacesIcon, ShieldIcon } from '@pam/ui';
+import { Loading, Notice, Page, PeopleIcon, PhoneIcon, PlacesIcon, ShieldIcon } from '@pam/ui';
 import { FloatingAction } from '@pam/ui/FloatingAction';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPageHeader } from '@pam/ui/SubPage';
@@ -12,6 +12,7 @@ import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../app/NotIn';
 import { useSession } from '@/lib/useSession';
 import { useStaffRequests } from '@/lib/useStaffRequests';
+import { useNumberChangesToDecide } from '@/lib/useNumberChange';
 import { useRoleView } from '@/lib/useViewedRole';
 
 /**
@@ -53,6 +54,7 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
   const isSuperAdmin = viewedRole === 'super_admin';
 
   const { state: requests } = useStaffRequests(isSuperAdmin);
+  const { state: numberChanges } = useNumberChangesToDecide(isSuperAdmin);
 
   const tools = (
     <>
@@ -125,7 +127,7 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
         />
       ) : null}
 
-      {requests.status === 'ready' && requests.requests.length === 0 ? (
+      {requests.status === 'ready' && requests.requests.length === 0 && !(numberChanges.status === 'ready' && numberChanges.rows.length > 0) ? (
         <Notice
           notice="no_caseload_members"
           title={t('requests.empty.title')}
@@ -148,6 +150,29 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
             ].join(' · '),
             href: `/requests/review/?id=${encodeURIComponent(row.userId)}`,
             icon: row.wantsRole === 'provider' ? <PlacesIcon {...ICON} /> : <ShieldIcon {...ICON} />,
+          }))}
+        />
+      ) : null}
+      {/*
+        Somebody asking to move an account to a new phone number (D-567): the ones routed to the super
+        admin, and a case manager's once 24 hours have passed undecided. Each row says it is a new
+        number, and a super admin's own account (which never moves) is marked.
+      */}
+      {numberChanges.status === 'ready' && numberChanges.rows.length > 0 ? (
+        <MenuList
+          label={t('newNumber.list.title')}
+          hasDividers
+          items={numberChanges.rows.map((row) => ({
+            id: `number-${row.id}`,
+            label: `${row.firstName} ${row.lastName}`.trim(),
+            description: [
+              t('newNumber.list.kind'),
+              t('requests.city', { city: row.city }),
+              t('requests.requestedOn', { when: requestedWhen(row.createdAt, locale) }),
+              ...(row.isProtected ? [t('newNumber.list.protected')] : row.escalated ? [t('newNumber.list.escalated')] : []),
+            ].join(' · '),
+            href: `/requests/number/?id=${encodeURIComponent(row.id)}`,
+            icon: <PhoneIcon {...ICON} />,
           }))}
         />
       ) : null}

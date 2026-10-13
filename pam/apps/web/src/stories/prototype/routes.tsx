@@ -39,6 +39,8 @@ import PlacePolicyPage from '../../app/place/policies/view/page';
 import ProgramServicePage from '../../app/program/service/page';
 import { PrototypeRequestProgram } from './PrototypeRequestProgram';
 import { PrototypeRequestReview } from './PrototypeRequestReview';
+import { PrototypeNumberChangeReview } from './PrototypeNumberChangeReview';
+import { NewNumberScreen } from '../../screens/NewNumberScreen';
 import { PrototypeProgramReview } from './PrototypeProgramReview';
 import { ProgramsToCheckScreen } from '../../screens/ProgramsToCheckScreen';
 import { InvitesLogScreen } from '../../screens/InvitesLogScreen';
@@ -89,6 +91,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   // /signin/ — About Pam's "Sign in as…", Back from a policy, an expired
   // link's "Sign in" — lands on a Sign in that works here (D-259).
   '/signin/': screen(() => <PrototypeSignIn />),
+  '/signin/new-number/': screen(() => <NewNumberScreen />),
   // Where each role's prototype starts (D-253): Sign in, the code, Home.
   // Joining is the Onboarding stories' own route.
   '/prototype/signin/': screen(() => <PrototypeSignIn />),
@@ -124,6 +127,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/requests/': screen(() => <RequestsPage />),
   '/requests/program/': screen(() => <PrototypeRequestProgram />),
   '/requests/review/': screen(() => <PrototypeRequestReview />),
+  '/requests/number/': screen(() => <PrototypeNumberChangeReview />),
   '/programs/review/': screen(() => <ProgramsToCheckScreen />),
   '/programs/review/item/': screen(() => <PrototypeProgramReview />),
   '/invites/': screen(() => <InvitesLogScreen />),

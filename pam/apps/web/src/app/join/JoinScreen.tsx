@@ -16,6 +16,7 @@ import { SubPageHeader } from '@pam/ui/SubPage';
 import { LANGUAGE_TAGS, SUPPORTED_LOCALES, TRANSPARENCY_SCREEN, badgeForPoints, type Locale, intlLocale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { HELP_DESK_URL } from '@/lib/helpDesk';
+import { myNumberChange } from '@/lib/useNumberChange';
 import { navigate } from '@/lib/navigate';
 import { forgetInvite, recallInvite, type Invite } from '@/lib/appUrl';
 import { takeNext } from '@/lib/signinNext';
@@ -256,7 +257,14 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
     // No verified phone yet: that is Sign in's job (D-359), and it comes
     // back here once the code works. Any ?code= goes with it.
     if (session.status === 'signed-out') router.replace(`/signin/${window.location.search}`);
-    else if (session.status === 'no-profile') setPhase('details');
+    else if (session.status === 'no-profile') {
+      // A sign-in that asked to move an account to this number is not a new member (D-567): it never
+      // starts setting one up, and is sent to where its request stands.
+      void myNumberChange().then((asked) => {
+        if (asked) router.replace('/signin/new-number/');
+        else setPhase('details');
+      });
+    }
     else if (session.status === 'signed-in') {
       // Finished already: there is nothing here for them. Otherwise pick up at
       // step 3, as whatever the account says they are.

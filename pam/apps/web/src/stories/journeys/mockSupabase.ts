@@ -630,6 +630,50 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/add_role_from_invite', () => ({ body: {} })),
     on('/rpc/flagged_services', () => ({ body: [] })),
     on('/rpc/served_cities', () => ({ body: [{ city: 'Philadelphia' }] })),
+    // Moving an account to a new number (D-567): one request waiting for the super admin, beside the
+    // account it would move. Nothing moves in a story.
+    on('/rpc/number_changes_to_decide', () => ({
+      body: [
+        {
+          id: NUMBER_CHANGE_ID,
+          first_name: 'Rosa',
+          last_name: 'Diaz',
+          city: 'Philadelphia',
+          created_at: new Date(Date.now() - 3 * 3_600_000).toISOString(),
+          member_id: null,
+          is_protected: false,
+          escalated: false,
+        },
+      ],
+    })),
+    on('/rpc/number_change_detail', () => ({
+      body: [
+        {
+          id: NUMBER_CHANGE_ID,
+          status: 'waiting',
+          created_at: new Date(Date.now() - 3 * 3_600_000).toISOString(),
+          first_name: 'Rosa',
+          last_name: 'Diaz',
+          city: 'Philadelphia',
+          who_knows: 'Tanya at the library',
+          new_phone: '+12155550188',
+          old_phone_last4: '0142',
+          has_account: true,
+          is_protected: false,
+          is_staff: false,
+          account_first: 'Rosa',
+          account_last: 'Díaz',
+          account_city: 'Philadelphia',
+          invited_by_name: 'Tanya',
+          last_active_at: new Date(Date.now() - 20 * 86_400_000).toISOString(),
+          must_speak: true,
+        },
+      ],
+    })),
+    on('/rpc/my_number_change', () => ({ body: [] })),
+    on('/rpc/submit_number_change', () => ({ body: 'received' })),
+    on('/rpc/decide_number_change', (_url, _method, body) => ({ body: (body as { p_decision?: string } | null)?.p_decision ?? 'denied' })),
+    on('/functions/v1/move-number', () => ({ body: { moved: true } })),
     on('/rest/v1/conversation_members', (url, method) => {
       if (method === 'PATCH') return { body: [] };
       if (url.includes('conversation_id=eq.')) {
@@ -729,6 +773,9 @@ function urlOf(input: RequestInfo | URL): string {
   if (input instanceof URL) return input.href;
   return input.url;
 }
+
+/** The one request to move an account to a new number in the stories (D-567). */
+export const NUMBER_CHANGE_ID = '7a1f0000-0000-4000-8000-000000000567';
 
 export function installSupabaseMock(journeyRole: JourneyRole, options: MockOptions = {}): void {
   const profile = ROLES[journeyRole].profile;

@@ -20,6 +20,7 @@ import { rememberNext, takeNext } from '@/lib/signinNext';
 import { recallInvite, rememberInvite, type Invite, type InviteRole } from '@/lib/appUrl';
 import { pendingInviteForMe, previewInvite } from '@/lib/useInviteLinks';
 import { navigate } from '@/lib/navigate';
+import { myNumberChange } from '@/lib/useNumberChange';
 
 /**
  * The only way into Pam, and the same door for everybody: a member, a program
@@ -188,7 +189,8 @@ export function SignInScreen({
     if (session.status === 'signed-in') {
       router.replace(session.session.isOnboarded ? (takeNext(session.session.role) ?? '/') : '/join/');
     } else if (session.status === 'no-profile') {
-      router.replace('/join/');
+      // A sign-in that asked to move an account to this number is not a new account (D-567).
+      void myNumberChange().then((asked) => router.replace(asked ? '/signin/new-number/' : '/join/'));
     }
   }, [session, state.step, router, preview]);
 
@@ -276,6 +278,13 @@ export function SignInScreen({
 
         // No record, or a record whose setup was never finished: both belong
         // in the flow, which picks up at whichever step is outstanding.
+        // Signed in with a number that asked to take over an account (D-567): where that stands, never Join.
+        if (!profile && (await myNumberChange()) !== null) {
+          if (cancelled) return;
+          router.replace('/signin/new-number/');
+          return;
+        }
+
         if (!profile || profile.onboarded_at === null) {
           if (waiting && !waiting.hasAccount && !recallInvite()) {
             rememberInvite({ code: waiting.code, role: waiting.role, firstName: waiting.firstName });
