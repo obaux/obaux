@@ -28,8 +28,8 @@ import { PhoneSignInCard } from '../app/signin/PhoneSignInCard';
  *      who decides to know, nobody else.
  *   3. **Where it stands**: still being checked, moved (sign in again), or not moved — and Contact Pam.
  *
- * Nothing is texted while texts are off (texts_live). A case manager, or the super admin who spoke to
- * them, decides; the move itself is `move-number`'s.
+ * Nothing is texted while texts are off (texts_live). The super admin, who speaks to them first,
+ * decides; a no deletes this sign-in, and the move itself is `move-number`'s.
  */
 const styles = stylex.create({
   body: { fontSize: '17px', lineHeight: 1.5 },
@@ -186,7 +186,6 @@ export function NewNumberScreen() {
           )}
           <TextField
             label={t('newNumber.who.label')}
-            description={t('newNumber.who.hint')}
             isOptional
             value={whoKnows}
             onChange={setWhoKnows}

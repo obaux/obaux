@@ -8,14 +8,12 @@ import { settled } from './settled';
  *   - The way in is "New number?" beside Privacy on Sign in (and not on Join).
  *   - A sign-in made only with the new number (no profile) is never sent to Join, and asking makes no
  *     profile: it sees only its request — sent, still checking, moved or not moved.
- *   - The person deciding sees what was typed beside the account, a mismatch marked, and the super admin
- *     cannot approve without "I spoke to this person"; a yes then moves the sign-in.
+ *   - The super admin (who decides every request, for now) sees what was typed beside the account, a
+ *     mismatch marked, and cannot approve without "I spoke to this person"; a yes then moves the sign-in.
  *   - A super admin's account never moves: only Deny.
  */
 const TEMP = '7e000000-0000-4000-8000-000000000567';
 const BOSS = '7b000000-0000-4000-8000-000000000567';
-const CM = '7c000000-0000-4000-8000-000000000567';
-const MEMBER = '7d000000-0000-4000-8000-000000000567';
 const REQUEST = '7a1f0000-0000-4000-8000-000000000567';
 const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
 
@@ -99,7 +97,7 @@ test.describe('the temporary sign-in (the new number only, no profile)', () => {
     await page.getByLabel('Your old phone number').fill('(215) 555-0142');
     await page.getByLabel('First name').fill('Rosa');
     await page.getByLabel('Last name').fill('Diaz');
-    await page.getByLabel(/Who at Pam knows you/).fill('Tanya');
+    await page.getByLabel(/Who on Pam knows you/).fill('Tanya');
     await page.getByRole('button', { name: 'Send' }).click();
     await expect(page.getByRole('heading', { name: 'We got your request', level: 1 })).toBeVisible();
     expect(sent[0]).toMatchObject({ p_old_phone: '(215) 555-0142', p_first_name: 'Rosa', p_last_name: 'Diaz', p_city: 'Philadelphia', p_who_knows: 'Tanya' });
@@ -137,7 +135,7 @@ test.describe('the person who decides', () => {
     await signedInAs(page, BOSS, { role: 'super_admin', first_name: 'Will' });
     await page.route('**/rest/v1/rpc/number_changes_to_decide*', (route) =>
       route.fulfill(
-        json([{ id: REQUEST, first_name: 'Rosa', last_name: 'Diaz', city: 'Philadelphia', created_at: new Date().toISOString(), member_id: null, is_protected: false, escalated: false }]),
+        json([{ id: REQUEST, first_name: 'Rosa', last_name: 'Diaz', city: 'Philadelphia', created_at: new Date().toISOString(), is_protected: false }]),
       ),
     );
     await page.goto('/requests/');
@@ -184,19 +182,4 @@ test.describe('the person who decides', () => {
     await expect(page.getByRole('button', { name: 'Deny' })).toBeEnabled();
   });
 
-  test('a case manager approves without the tick (knowing them is the vouch), from their member’s page', async ({ page }) => {
-    await signedInAs(page, CM, { role: 'admin', first_name: 'Dana' });
-    await page.route('**/rest/v1/rpc/number_changes_to_decide*', (route) =>
-      route.fulfill(
-        json([{ id: REQUEST, first_name: 'Rosa', last_name: 'Diaz', city: 'Philadelphia', created_at: new Date().toISOString(), member_id: MEMBER, is_protected: false, escalated: false }]),
-      ),
-    );
-    await page.route('**/rest/v1/rpc/number_change_detail*', (route) => route.fulfill(json(detail({ must_speak: false }))));
-    await page.route('**/rest/v1/rpc/decide_number_change*', (route) => route.fulfill(json('approved')));
-    await page.route('**/functions/v1/move-number*', (route) => route.fulfill(json({ moved: true })));
-    await page.goto(`/requests/number/?id=${REQUEST}`);
-    await expect(page.getByRole('checkbox')).toHaveCount(0);
-    await page.getByRole('button', { name: 'Approve' }).click();
-    await expect(page.getByText('They can sign in with the new number now.')).toBeVisible();
-  });
 });

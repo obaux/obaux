@@ -154,9 +154,8 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
         />
       ) : null}
       {/*
-        Somebody asking to move an account to a new phone number (D-567): the ones routed to the super
-        admin, and a case manager's once 24 hours have passed undecided. Each row says it is a new
-        number, and a super admin's own account (which never moves) is marked.
+        Somebody asking to move an account to a new phone number (D-567). The super admin decides every
+        one. Each row says it is a new number, and a super admin's own account (which never moves) is marked.
       */}
       {numberChanges.status === 'ready' && numberChanges.rows.length > 0 ? (
         <MenuList
@@ -169,7 +168,7 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
               t('newNumber.list.kind'),
               t('requests.city', { city: row.city }),
               t('requests.requestedOn', { when: requestedWhen(row.createdAt, locale) }),
-              ...(row.isProtected ? [t('newNumber.list.protected')] : row.escalated ? [t('newNumber.list.escalated')] : []),
+              ...(row.isProtected ? [t('newNumber.list.protected')] : []),
             ].join(' · '),
             href: `/requests/number/?id=${encodeURIComponent(row.id)}`,
             icon: <PhoneIcon {...ICON} />,

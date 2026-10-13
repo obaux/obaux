@@ -13,18 +13,26 @@
 --   2. That sign-in sends the old number, a name, a city and who at Pam knows them
 --      (`submit_number_change`). The reply is the same whatever was typed: whether the old number
 --      belongs to an account is known only to the server and the person who decides.
---   3. A member with a case manager: the case manager decides first. After `escalate_hours`
---      undecided, or straight away for anybody else, the super admin decides. A staff account
---      (program or case manager) goes straight to the super admin. A super admin's account can
---      never be moved this way: the request stays "still checking" for the person, and only the
---      super admin sees it, with Deny and no Approve.
---   4. The super admin approving a request nobody vouched for must tick "I spoke to this person and
---      I'm sure it's them" (`super_admin_must_speak`); the tick is kept on the request and in the
---      audit row.
+--   3. The super admin decides every request (merge desk, 13 October 19:48: showing the account's
+--      case manager the typed details and the new number would widen what a case manager can see,
+--      which transparency.ts forbids without Will's signature and members being told first). The
+--      `routed_to` / `case_manager_id` columns stay, always 'super_admin' / null, so a case manager
+--      step can be added if Will signs that line. A super admin's account can never be moved this
+--      way: the request stays "still checking" for the person, and the super admin sees it marked,
+--      with Deny and no Approve.
+--   4. Every Approve needs the tick "I spoke to this person and I'm sure it's them"
+--      (`super_admin_must_speak`); the tick is kept on the request and in the audit row. A Deny
+--      deletes the temporary sign-in at once (it has no profile).
 --   5. On yes, the `move-number` Edge Function (deployed by the merge desk) removes the temporary
 --      sign-in and moves the account's sign-in to the new number, then calls `number_change_moved`.
 --   6. Every request is deleted `keep_days` after it is decided, or after it was made if nobody
---      decided it (nightly, where the project has pg_cron).
+--      decided it, and an undecided one takes its temporary sign-in with it (nightly, where the
+--      project has pg_cron).
+--
+-- Deleting a temporary sign-in is `delete from auth.users` for a sign-in with no profile, from a
+-- security definer function owned by postgres. Auth's own rows for it (identities, sessions) go with
+-- it by their foreign keys. The merge desk confirms on the live project that postgres may delete
+-- from auth.users before applying.
 --
 -- Nothing here sends a text or calls anything outside the database (texts_live stays off; the text
 -- to the old number is a later job). The audit rows carry no name and no phone (D-443).
@@ -39,9 +47,7 @@ immutable
 set search_path = public, extensions
 as $$
   select jsonb_build_object(
-    -- A request routed to a case manager goes to the super admin after this long undecided.
-    'escalate_hours', 24,
-    -- With no case manager vouching, the super admin speaks to the person before saying yes.
+    -- The super admin speaks to the person before saying yes (every request, for now).
     'super_admin_must_speak', true,
     -- A request is deleted this long after it is decided (or made, if nobody decided it).
     'keep_days', 90,
@@ -137,7 +143,7 @@ declare
   v_profile   public.profiles;
   v_protected boolean := false;
   v_route     text := 'super_admin';
-  v_manager   uuid;
+  v_manager   uuid := null;
 begin
   if caller is null then
     raise exception 'NOT_SIGNED_IN';
@@ -178,20 +184,10 @@ begin
 
   select * into v_profile from public.profiles where phone = v_old;
 
-  if v_profile.id is not null then
-    if v_profile.role = 'super_admin' or public.has_role(v_profile.id, 'super_admin') then
-      v_protected := true;
-    elsif v_profile.role = 'member'
-          and not public.has_role(v_profile.id, 'provider')
-          and not public.has_role(v_profile.id, 'admin') then
-      select a.admin_id into v_manager
-      from public.admin_assignments a
-      where a.member_id = v_profile.id and a.ended_at is null
-      limit 1;
-      if v_manager is not null then
-        v_route := 'case_manager';
-      end if;
-    end if;
+  -- The super admin decides every request (v_route stays 'super_admin'); a super admin's own account
+  -- is protected and never moves.
+  if v_profile.id is not null and (v_profile.role = 'super_admin' or public.has_role(v_profile.id, 'super_admin')) then
+    v_protected := true;
   end if;
 
   insert into public.number_change_requests
@@ -237,18 +233,9 @@ stable
 security definer
 set search_path = public, extensions
 as $$
-  select
-    -- The super admin may decide any request (and sees them on Requests once they are theirs).
-    (select public.is_super_admin())
-    or (
-      -- The case manager it was routed to, while they are still that member's case manager.
-      r.routed_to = 'case_manager'
-      and r.case_manager_id = p_caller
-      and exists (
-        select 1 from public.admin_assignments a
-        where a.member_id = r.profile_id and a.admin_id = p_caller and a.ended_at is null
-      )
-    );
+  -- The super admin, for now. A case manager arm (r.routed_to = 'case_manager' and their active
+  -- assignment) waits on Will's signature to widen what a case manager can see.
+  select (select public.is_super_admin()) and r.id is not null and p_caller is not null;
 $$;
 
 revoke all on function public.number_change_decider(public.number_change_requests, uuid) from public, anon, authenticated;
@@ -260,29 +247,17 @@ returns table (
   last_name    text,
   city         text,
   created_at   timestamptz,
-  member_id    uuid,
-  is_protected boolean,
-  escalated    boolean
+  is_protected boolean
 )
 language sql
 stable
 security definer
 set search_path = public, extensions
 as $$
-  with rules as (select (public.number_change_rules() ->> 'escalate_hours')::int as hours)
-  select r.id, r.first_name, r.last_name, r.city, r.created_at,
-         -- The case manager gets the member, so the request can sit on that member's page.
-         case when public.is_super_admin() then null else r.profile_id end,
-         r.is_protected,
-         r.routed_to = 'case_manager' and r.created_at <= now() - make_interval(hours => (select hours from rules))
+  select r.id, r.first_name, r.last_name, r.city, r.created_at, r.is_protected
   from public.number_change_requests r
   where r.status = 'waiting'
-    and (
-      (public.is_super_admin()
-        and (r.routed_to = 'super_admin'
-             or r.created_at <= now() - make_interval(hours => (select hours from rules))))
-      or (not public.is_super_admin() and public.number_change_decider(r, auth.uid()))
-    )
+    and public.number_change_decider(r, auth.uid())
   order by r.created_at;
 $$;
 
@@ -338,8 +313,7 @@ begin
     p.first_name, p.last_name, p.home_city,
     (select i.first_name from public.profiles i where i.id = p.invited_by),
     p.last_active_at,
-    -- The super admin must speak to them when nobody vouched (a case manager deciding is the vouch).
-    public.is_super_admin() and (public.number_change_rules() ->> 'super_admin_must_speak')::boolean;
+    (public.number_change_rules() ->> 'super_admin_must_speak')::boolean;
 end;
 $$;
 
@@ -348,6 +322,20 @@ grant execute on function public.number_change_detail(uuid) to authenticated;
 
 -- ---------------------------------------------------------------------------
 -- 4. Deciding.
+
+-- A sign-in that only ever proved a new number: removed, never one that has an account.
+create or replace function public.remove_temporary_signin(p_user uuid)
+returns void
+language sql
+security definer
+set search_path = public, extensions
+as $$
+  delete from auth.users u
+   where u.id = p_user
+     and not exists (select 1 from public.profiles p where p.id = u.id);
+$$;
+
+revoke all on function public.remove_temporary_signin(uuid) from public, anon, authenticated;
 
 create or replace function public.decide_number_change(
   p_id       uuid,
@@ -383,12 +371,10 @@ begin
     if r.profile_id is null then
       raise exception 'NO_ACCOUNT';
     end if;
-    if public.is_super_admin() then
-      if (public.number_change_rules() ->> 'super_admin_must_speak')::boolean and not coalesce(p_spoke, false) then
-        raise exception 'MUST_SPEAK';
-      end if;
-      v_spoke := coalesce(p_spoke, false);
+    if (public.number_change_rules() ->> 'super_admin_must_speak')::boolean and not coalesce(p_spoke, false) then
+      raise exception 'MUST_SPEAK';
     end if;
+    v_spoke := coalesce(p_spoke, false);
     -- The new number must not have become somebody's account in the meantime.
     if exists (select 1 from public.profiles where phone = r.new_phone) then
       raise exception 'NEW_NUMBER_IN_USE';
@@ -399,13 +385,17 @@ begin
      set status = p_decision, decided_by = caller, decided_at = now(), spoke_to_them = v_spoke
    where id = r.id;
 
+  -- A no: the temporary sign-in goes at once (it never had a profile; Lena's Privacy line p14).
+  if p_decision = 'denied' then
+    perform public.remove_temporary_signin(r.requester_id);
+  end if;
+
   -- No name and no phone in the audit log (D-443).
   insert into public.audit_log (actor_id, action, target_type, target_id, meta)
   values (caller,
           case p_decision when 'approved' then 'number_change.approve' else 'number_change.deny' end,
           'profile', r.profile_id,
-          jsonb_build_object('request_id', r.id, 'spoke_to_them', v_spoke,
-                             'as', case when public.is_super_admin() then 'super_admin' else 'case_manager' end));
+          jsonb_build_object('request_id', r.id, 'spoke_to_them', v_spoke));
 
   return p_decision;
 end;
@@ -468,7 +458,8 @@ revoke all on function public.number_change_moved(uuid) from public, anon, authe
 grant execute on function public.number_change_moved(uuid) to service_role;
 
 -- ---------------------------------------------------------------------------
--- 6. Forgetting: keep_days after the decision, or after the request if nobody decided it.
+-- 6. Forgetting: keep_days after the decision, or after the request if nobody decided it (with its
+--    temporary sign-in).
 
 create or replace function public.purge_number_change_requests()
 returns integer
@@ -480,6 +471,13 @@ declare
   n integer;
   days int := (public.number_change_rules() ->> 'keep_days')::int;
 begin
+  -- Undecided ones take their temporary sign-in with them (the request row follows by set null, so
+  -- remove the sign-ins first, then the rows).
+  perform public.remove_temporary_signin(r.requester_id)
+     from public.number_change_requests r
+    where r.status = 'waiting' and r.created_at < now() - make_interval(days => days)
+      and r.requester_id is not null;
+
   delete from public.number_change_requests
    where coalesce(decided_at, created_at) < now() - make_interval(days => days);
   get diagnostics n = row_count;

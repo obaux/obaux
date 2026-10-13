@@ -23,17 +23,16 @@ import {
 import { HelpButton } from './HelpButton';
 
 /**
- * One request to move an account to a new phone number, for the person who decides it (D-567): the
- * member's case manager, or the super admin. What they typed sits beside what the account says, and any
- * line that differs is marked, so a takeover has to get past a person who can see the difference.
+ * One request to move an account to a new phone number, for the super admin (D-567; for now the super
+ * admin decides every one: a case manager seeing these would widen transparency.ts, which needs Will's
+ * signature first). What they typed sits beside what the account says, and any line that differs is
+ * marked, so a takeover has to get past a person who can see the difference.
  *
- * - A **case manager** knows the person: their Approve is the vouch.
- * - The **super admin** ticks "I spoke to this person and I'm sure it's them" first (Will's default,
- *   card a84); the tick is kept on the request and in the audit row. The new number is a tap away, to
- *   call it.
+ * - Approve needs the tick "I spoke to this person and I'm sure it's them" (card a84); the tick is kept
+ *   on the request and in the audit row. The new number is shown in full, to call it.
  * - A **super admin's account** is never moved: only Deny. **No account** with that number: only Deny.
  *
- * On a yes the sign-in moves (`move-number`). If that step fails the request stays approved, and "Move
+ * A no deletes the new number's sign-in at once (the database does it). On a yes the sign-in moves (`move-number`). If that step fails the request stays approved, and "Move
  * it now" tries again.
  */
 const styles = stylex.create({
@@ -56,8 +55,7 @@ const same = (a: string | null | undefined, b: string | null | undefined) =>
 export function NumberChangeReviewScreen({ id }: { readonly id: string | null }) {
   const { t, locale } = useI18n();
   const { state: session } = useSession();
-  const isSuperAdmin = session.status === 'signed-in' && session.session.role === 'super_admin';
-  const fallback = isSuperAdmin ? '/requests/' : '/';
+  const fallback = '/requests/';
 
   const [detail, setDetail] = useState<NumberChangeDetail | null | 'loading'>('loading');
   const [spoke, setSpoke] = useState(false);

@@ -8,8 +8,8 @@ import { useCallback, useEffect, useState } from 'react';
  *
  * The person who asks is signed in with the new number only (a "temporary sign-in": no profile, and
  * none is ever made for it). They send the old number and a few facts, and are told the same thing
- * whatever they typed. A case manager or the super admin decides; on a yes, `move-number` moves the
- * account's sign-in.
+ * whatever they typed. The super admin decides (for now: a case manager seeing these would widen
+ * transparency.ts, which needs Will's signature first); on a yes, `move-number` moves the account's sign-in.
  */
 
 export type NumberChangeStatus = 'waiting' | 'approved' | 'denied';
@@ -60,16 +60,14 @@ export async function submitNumberChange(ask: NumberChangeAsk): Promise<{ ok: tr
   }
 }
 
-/** One row in a decider's list. `memberId` is set for a case manager (the member it is about). */
+/** One row in the super admin's list. */
 export interface NumberChangeRow {
   readonly id: string;
   readonly firstName: string;
   readonly lastName: string;
   readonly city: string;
   readonly createdAt: string;
-  readonly memberId: string | null;
   readonly isProtected: boolean;
-  readonly escalated: boolean;
 }
 
 export type NumberChangeList =
@@ -77,7 +75,7 @@ export type NumberChangeList =
   | { status: 'ready'; rows: readonly NumberChangeRow[] }
   | { status: 'error' };
 
-/** The requests this person may decide: the super admin's on Requests, a case manager's on a member's page. */
+/** The requests the super admin decides, for Requests (the super admin decides every one for now). */
 export function useNumberChangesToDecide(enabled: boolean): { state: NumberChangeList; refresh: () => void } {
   const [state, setState] = useState<NumberChangeList>({ status: 'loading' });
   const [tick, setTick] = useState(0);
@@ -101,18 +99,14 @@ export function useNumberChangesToDecide(enabled: boolean): { state: NumberChang
           last_name: string;
           city: string;
           created_at: string;
-          member_id: string | null;
           is_protected: boolean;
-          escalated: boolean;
         }[]).map((r) => ({
           id: r.id,
           firstName: r.first_name,
           lastName: r.last_name,
           city: r.city,
           createdAt: r.created_at,
-          memberId: r.member_id,
           isProtected: r.is_protected,
-          escalated: r.escalated,
         }));
         setState({ status: 'ready', rows });
       } catch {
@@ -145,7 +139,7 @@ export interface NumberChangeDetail {
     readonly invitedBy: string | null;
     readonly lastActiveAt: string | null;
   };
-  /** The super admin ticks "I spoke to this person" before Approve (card a84). */
+  /** Approve needs the tick "I spoke to this person" (card a84). */
   readonly mustSpeak: boolean;
 }
 

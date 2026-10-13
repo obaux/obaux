@@ -9,8 +9,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@pam/ui/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
-import { BigButton, BookmarkIcon, ConnectionsIcon, Loading, MessagesIcon, Notice, Page, PhoneIcon, SignIcon, TripsIcon } from '@pam/ui';
-import { useNumberChangesToDecide } from '@/lib/useNumberChange';
+import { BigButton, BookmarkIcon, ConnectionsIcon, Loading, MessagesIcon, Notice, Page, SignIcon, TripsIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { signedBy, usePolicies } from '@/lib/usePolicies';
 import { rememberPersonName } from '@/lib/personNames';
@@ -165,10 +164,6 @@ function PersonScreen() {
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { viewedRole } = useRoleView(trueRole);
   // A real member's planned visits, as their case manager (D-509): never made-up ones.
-  // A request from this member to move to a new number, if it is this case manager's to decide (D-567).
-  const { state: numberChanges } = useNumberChangesToDecide(viewedRole === 'admin');
-  const numberChange =
-    numberChanges.status === 'ready' ? numberChanges.rows.find((r) => r.memberId !== null && r.memberId === params.get('id')) : undefined;
   const realTrips = useMemberTrips(params.get('id'), viewedRole === 'admin' && !DUMMY_EVERYONE.some((p) => p.id === params.get('id')));
   // The same audience the three lists that link here already gate on.
   const canView = viewedRole === 'admin' || viewedRole === 'provider' || viewedRole === 'super_admin';
@@ -420,19 +415,6 @@ function PersonScreen() {
         <MenuList
           label={tPlain('person.actions.label', { name: person.firstName })}
           items={[
-            // This member asked to move their account to a new number, and it is this case manager's to
-            // check first (D-567): the request, beside what the account says.
-            ...(numberChange
-              ? [
-                  {
-                    id: 'new-number',
-                    label: t('newNumber.person.row', { name: person.firstName ?? '' }),
-                    description: t('newNumber.person.hint'),
-                    icon: <PhoneIcon width={26} height={26} />,
-                    href: `/requests/number/?id=${encodeURIComponent(numberChange.id)}`,
-                  },
-                ]
-              : []),
             // Which policies they have signed, in plain sight (Will, D-324):
             // the badge by the name says all or not; this says which.
             ...(isProgramView && isMember
