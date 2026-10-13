@@ -527,6 +527,12 @@
     token, contrast checked). Pictures to Will before it ships.
   - **06:06, Sage's proposal for the Join code question** (put to Will in the terminal): "Did someone invite you with a
     code?" and a link "Enter your code" instead of "click here"; his own words stand unless he picks hers.
+  - **Who they are, in the help email (decided 06:16, final):** Nico's `roles` (e11fd110, D-559): only member,
+    program and case manager, a fixed order, "Says they are: …" under From, nothing kept. It ships in the next batch
+    and the merge desk redeploys `help-request`. The site sends `roles`, not the free-text `role`. **Lesson:** I asked
+    Nico for it at 06:10, cancelled at 06:13 when Wren found the free-text field, and took it back at 06:15 when his
+    finished build arrived: three messages in five minutes, the same mistake as the 11 October "I'm here" turns.
+    The rule stands: once a decision is sent, wait for the builder's next message before changing it.
 
 ## What was wrong, and what missed it
 
