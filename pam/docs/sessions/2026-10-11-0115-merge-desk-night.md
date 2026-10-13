@@ -602,6 +602,20 @@
   there; the e2e specs move to the screens they test; the three street pictures are re-shot on `/` and `/programs/`
   (v3) and shown to Will before they ship. If the old list's Reported chip was a super admin's only way in to
   Reported places, Piper stops and asks rather than adding an entry point. Will is preparing Google's logo files.
+- **Will, 18:40 (a82, chat w20261013184025uked): sign-up "signed on all".** The quiet step count, the language
+  dropdown, the hidden code, the short-phone fit and "Join Pam" from an invite are all signed. He did not pick Sage's
+  words, so his stand (the card said his stand unless he picked hers): `join.code.question` "Did someone invite you
+  via code?" and `join.code.reveal` "Click here", underlined. Merge desk, 18:41: Ava reverts ce18f5ff (Sage's words)
+  on `claude/pam-join-first-time-wording` with `git revert`; Lena translates the two lines into the six languages on
+  a branch that touches only those six files, using the natural word for a link where "click" reads oddly on a phone
+  (Sage's point, without changing Will's English). Then full checks, Iris's walk-through, and W6 ships whole.
+- **Will, 18:45 (a83, chat w2026101318454476d0): the help form "all looks good", plus space under Still stuck.**
+  The call-out, the form on its own screen, 17px text, the four answers (with "I don't use Pam yet"), the line about
+  what is sent and the night links (#EEF1C2) are signed. One change: 60px between the Still stuck card and the footer
+  on phones, 120px on desktop (in Wren's own 390 picture the card's edge touches the footer). Merge desk, 18:46: Wren
+  adds it on top of fc9a447d with the site's existing breakpoint and named spacing tokens, covers both PostScreen and
+  SupportScreen, reports any other page whose last card touches the footer without changing it, and re-shoots the
+  bottoms at 390 and 1280 in both themes (v3). Will sees the pictures, then it ships with the next website release.
 
 ## What was wrong, and what missed it
 
