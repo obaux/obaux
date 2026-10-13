@@ -2231,3 +2231,7 @@ D-552, `claude/places-programs-street-search`: the area search asks Google (Plac
 ## Design system & Storybook · role chip keeps its words whole (13 October)
 
 The role chip beside the mark no longer breaks inside a word, and the header gives way (corner on its own row) when it is too crowded, e.g. Spanish at 320 (D-551, b26).
+
+## Design system & Storybook · Google logo under street suggestions: prepared (13 October)
+
+Component ready for Google's own logo files (18px, clear space, "Google Maps", light/dark, words as fallback); waiting for Will to download the files (D-557).
