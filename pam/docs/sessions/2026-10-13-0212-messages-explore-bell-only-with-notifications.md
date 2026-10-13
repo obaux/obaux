@@ -4,7 +4,7 @@
 
 ## What changed
 
-`HeaderBell` gets `hideWhenEmpty`; a member's Explore uses it (D-548). Starts hidden, shows when the real list is non-empty; follows /notifications/ for examples. D-549 is a duplicate claim, unused. e2e `explore-bell.spec.ts` (hidden when empty, shown with one, case manager keeps it).
+`HeaderBell` gets `hideWhenEmpty`; a member's Explore uses it (D-549; first claimed as D-548, renumbered at merge). Starts hidden, shows when the real list is non-empty; follows /notifications/ for examples. e2e `explore-bell.spec.ts` (hidden when empty, shown with one, case manager keeps it).
 
 ## What was wrong, and what missed it
 
