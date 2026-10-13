@@ -7,6 +7,8 @@ import { Page } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { TripCard } from '@pam/ui/TripCard';
 import { dummyTripsFor } from '@pam/config/dummy-trips';
+import { DUMMY_EVERYONE } from '@pam/config/dummy-people';
+import { useMemberTrips } from '@/lib/useMemberTrips';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
@@ -33,8 +35,11 @@ export function PastTripsView({ personId, name }: { readonly personId: string; r
   // A member's past trips are the case manager's to see, not a program's
   // (D-242): a program lead who reaches this page by its address sees none.
   const isProgramView = viewedRole === 'provider';
+  // Example people have made-up trips; a real member's are read as their case manager (D-509).
+  const isExample = DUMMY_EVERYONE.some((person) => person.id === personId);
+  const realTrips = useMemberTrips(personId, !isExample && viewedRole === 'admin');
   const now = Date.now();
-  const past = (isProgramView ? [] : dummyTripsFor(personId))
+  const past = (isProgramView ? [] : isExample ? dummyTripsFor(personId) : realTrips)
     .filter((trip) => new Date(trip.startsAt).getTime() < now)
     .reverse();
   const when = (iso: string) =>
@@ -66,9 +71,11 @@ export function PastTripsView({ personId, name }: { readonly personId: string; r
           {t('person.trips.none')}
         </Text>
       )}
-      <Text type="supporting" xstyle={styles.note}>
-        {t('person.trips.example')}
-      </Text>
+      {isExample ? (
+        <Text type="supporting" xstyle={styles.note}>
+          {t('person.trips.example')}
+        </Text>
+      ) : null}
     </Page>
   );
 }
