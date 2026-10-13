@@ -2189,6 +2189,10 @@ Sign in on the code step is off until all six digits are in (D-532). The Support
 
 `@pam/ui/DataHeading` and `SubPageHeader isTitleData` mark a heading's text as data, so a Latin name on an Arabic page (and the reverse) reads in its own direction while Pam's own headings follow the page (D-534). On place pages, profile cards, staff person rows and the conversation bar. Log: `docs/sessions/` newest `data-headings-keep`.
 
+## Places & programs · calendar link (11 October 2026) — READY soon, own branch off main
+
+Branch `claude/places-programs-calendar-link` (D-538). A member makes a secret calendar address (Profile > Calendar); Apple, Google or Outlook follow it. Discreet by default ("Pam visit" and the time), one switch for the place's name and address, no read time kept. Migration `20261011161548`, edge function `calendar-feed` (public), test 61, e2e `calendar-link.spec.ts`. Needs Will's Privacy line.
+
 ## Places & programs · "I'm here" check-in (11 October 2026) — READY soon, held off main (on top of attendance C)
 
 Branch `claude/places-programs-im-here` (D-535). `i_am_here` (150 m, 100 points) and `i_went` (60, 3 a week), own visit, window, planned 2 h ahead; the position is compared and never kept. Test `59_a_member_says_i_m_here_or_i_went_test.sql`; e2e `im-here.spec.ts`. Waits for the Privacy line.

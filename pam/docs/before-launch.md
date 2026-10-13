@@ -11,6 +11,16 @@ STATUS row too.
 
 ## Open
 
+- [ ] **Google Calendar sync: waiting until Will wants it on** (a71, 12 October 2026: "wait until we switch sync on. Not now."). It is built and held on the branch `claude/places-programs-google-sync` (head 5f1e70ae; D-539): not merged, not deployed, no migration applied. When Will asks for it, its two Privacy lines come back on a card with the Google Cloud checklist (the full checklist is in that branch's `docs/before-launch.md`). The calendar link (D-538) is separate and does not need it.
+
+- [ ] **Calendar link: someone taps it on a real phone** (Piper, 11 October 2026, D-538). (1) On an Android phone, make a link on
+  Profile > Calendar and tap "Open Google Calendar on the web": it should reach Google Calendar's "add by URL" page in the
+  phone's browser; if Google sends the phone to its app or a sign-in that loses the page, the line above the button
+  ("ask for the desktop site") is the only way, so say so on the page more plainly. (2) Paste the link into Apple Calendar,
+  Google Calendar (on a computer) and Outlook, and check a visit shows, moves and goes, with the place's name off and on.
+  (3) Deploy `calendar-feed` with JWT verification off and fetch a made-up address: a bare 404. (4) A native reader for
+  `calendar.others` in the six languages (it names buttons in Google Calendar and Outlook).
+
 - [ ] **Read the City of Philadelphia licence once** (Lena for Mira, 11 October 2026; Will, or anyone with open web access).
   Pam copies four City of Philadelphia open-data layers (City Facilities, Parks & Recreation program sites and properties, DBHIDS
   provider locations) and a ZIP-code centre computed from the City's property points, and Piper's street centerlines are next.
@@ -466,6 +476,21 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   name and the date."). **Must be on the live page before the first email goes out** (the email sender stays off until
   forwarding, a test and Will's go, D-450). Six translations each by Claude, with no native reader: promises, so the same
   native readers as below. The English says "rules" where the app says "policy"; the translations follow the app's word.
+
+- [ ] **A native reader for the calendar link screen (D-538, 11 October 2026).** The 27 `calendar.*` strings are six translations by
+  Claude with no native reader. Two things a reader must check against the real apps, in their own language, because the apps can
+  rename them: **`calendar.others`** names buttons in Google Calendar ("Other calendars" › "From URL") and Outlook ("Add calendar" ›
+  "Subscribe from web"); each translation uses what the app shows in that language, written from memory (es "Otros calendarios" ›
+  "Desde URL"; pt-BR Google Agenda "Outras agendas" › "Do URL"; ru "Другие календари" › "По URL"; ar «تقاويم أخرى» › «من عنوان URL»;
+  zh-CN “其他日历” › “通过网址”; zh-HK 「其他日曆」›「透過網址」; Outlook "Subscribe from web" is "Suscribirse desde la web", "Assinar da Web",
+  “从 Web 订阅”, 「從 Web 訂閱」, «Подписаться из Интернета», «الاشتراك من الويب»). And **"Pam visit"** stays English inside the quotes in
+  `calendar.details.hint`, because the event's text is English whatever the member's language (D-538, "Not done"): if the event text
+  is ever translated, change both together.
+  **`calendar.google.phone`** names a switch in the phone's browser, "Desktop site"; each translation uses Chrome's name for it in that
+  language, from memory (es "Sitio para computadoras"; pt-BR "Site para computador"; zh-CN “桌面版网站”; zh-HK 「電腦版網站」; ru «Версия для
+  компьютера»; ar «موقع سطح المكتب», where the Arabic says "choose" rather than "turn on" to avoid a vowel mark). Safari on an iPhone
+  calls it "Request Desktop Website" in its "aA" menu and other browsers differ, so a native reader should check the wording against
+  the browsers their members use.
 
 - [ ] **A native reader for what D-465 reworded (10 October).** The last-day line on the
   transparency screen (`transparency.canSee.lastActive`), the privacy page's "What you can do"
