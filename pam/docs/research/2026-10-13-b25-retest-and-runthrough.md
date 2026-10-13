@@ -265,7 +265,7 @@ program leads, so a signed-in case manager or super admin is sent to Add a progr
 ([shot](shots/b27-s1-case-manager-lands.png)). Profile offers that screen only to members
 (`ProfileScreen.tsx:88`). The same member-only rule would fit here.
 
-## b29 re-test (`96f27a77`, 07:05)
+## b29 re-test (`96f27a77`, 07:00)
 
 joinpam.org is blocked from this environment, so I tested a local build of the website at
 `96f27a77` (the same code Vercel built). For the app, I used a local build with pretend data
