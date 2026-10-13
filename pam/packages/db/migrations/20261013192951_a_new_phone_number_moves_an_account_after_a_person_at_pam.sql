@@ -26,8 +26,8 @@
 --   5. On yes, the `move-number` Edge Function (deployed by the merge desk) removes the temporary
 --      sign-in and moves the account's sign-in to the new number, then calls `number_change_moved`.
 --   6. Every request is deleted `keep_days` after it is decided, or after it was made if nobody
---      decided it, and an undecided one takes its temporary sign-in with it (nightly, where the
---      project has pg_cron).
+--      decided it, and takes any temporary sign-in it still has with it (nightly, where the project
+--      has pg_cron).
 --
 -- Deleting a temporary sign-in is `delete from auth.users` for a sign-in with no profile, from a
 -- security definer function owned by postgres. Auth's own rows for it (identities, sessions) go with
@@ -471,11 +471,12 @@ declare
   n integer;
   days int := (public.number_change_rules() ->> 'keep_days')::int;
 begin
-  -- Undecided ones take their temporary sign-in with them (the request row follows by set null, so
-  -- remove the sign-ins first, then the rows).
+  -- Every request purged takes its temporary sign-in with it, whatever its status: a waiting one, and
+  -- an approved one whose move never ran (the sign-in still carries the new number; Lena, 20:32). The
+  -- helper never removes a sign-in that has a profile. Sign-ins first, then the rows (set null).
   perform public.remove_temporary_signin(r.requester_id)
      from public.number_change_requests r
-    where r.status = 'waiting' and r.created_at < now() - make_interval(days => days)
+    where coalesce(r.decided_at, r.created_at) < now() - make_interval(days => days)
       and r.requester_id is not null;
 
   delete from public.number_change_requests

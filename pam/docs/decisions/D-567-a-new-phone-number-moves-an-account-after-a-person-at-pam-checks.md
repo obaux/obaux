@@ -37,8 +37,9 @@ request is purged 90 days after it was made, sign-in included.
   the new number (Supabase Auth admin) and calls `number_change_moved` (the profile's number, the request, the audit
   row). It moves only what `number_change_to_move` offers that caller. If it fails, "Move it now" tries again.
 - **Forgetting:** a nightly job deletes a request (both numbers, the typed name, city and answer) 90 days after it is
-  decided, or 90 days after it was made if nobody decided it, then with its sign-in. Deleting the account deletes its
-  requests. After a yes the old number is on no account; it lives only in the request row.
+  decided, or 90 days after it was made if nobody decided it, with any temporary sign-in it still has, whatever its
+  status (an approved request whose move never ran included: Lena, 20:32). A sign-in with a profile is never
+  removed. Deleting the account deletes its requests. After a yes the old number is on no account; it lives only in the request row.
 - **Where a number can land:** the request row; `auth.users` (the temporary sign-in, deleted on a yes, a no or the
   purge; the account's own, which becomes the new number); `profiles.phone` (the new number). Not in `audit_log`,
   `notifications`, `outbound_messages` or the function's logs. Supabase Auth's own log of sign-ins may hold the number

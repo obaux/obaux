@@ -65,3 +65,5 @@ The merge desk read the plan at 19:21 and said build it, with Will's a84 default
 - The merge desk: apply the migration after `list_migrations`; deploy `move-number` with JWT verification on.
 
 - 20:33: Sage signed `newNumber.*` under A29 with seven changes (ledger `claude/sage-signs` @ a6783695): card.title, form.intro, problem.tooMany, received.body, waiting.title, waiting.body and review.protected.body now read as signed. The e2e spec has the new waiting heading. The six other languages are still Lena's.
+
+- 21:25: Mira confirmed postgres may delete from auth.users on live. `remove_temporary_signin` keeps its revoke (public, anon, authenticated) and fixed search path; test 72 adds anon cannot call it and it refuses a sign-in with a profile. Lena caught that the purge left the temporary sign-in of an approved request whose move never ran: the purge now removes the sign-in of every request it deletes (test 72: approved-not-moved row). Re-shot 02, 03, 04, 05, 13 in light and dark with Sage's words.

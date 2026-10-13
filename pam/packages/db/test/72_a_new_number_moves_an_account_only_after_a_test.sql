@@ -193,6 +193,13 @@ select test.check_raises_like('the move functions are not for signed-in people',
   format($f$select public.number_change_moved(%L)$f$, :'r_mem'), '%permission denied%');
 select test.check_raises_like('nor is removing a sign-in',
   format($f$select public.remove_temporary_signin(%L)$f$, :'tmp5'), '%permission denied%');
+set role anon;
+select test.check_raises_like('nor for anon',
+  format($f$select public.remove_temporary_signin(%L)$f$, :'tmp5'), '%permission denied%');
+reset role;
+select public.remove_temporary_signin(:'lone');
+select test.check('it refuses a sign-in that has a profile',
+  (select count(*) from auth.users where id = :'lone'::uuid), 1::bigint);
 
 \echo ''
 \echo '--- Limits ---'
@@ -219,6 +226,10 @@ delete from public.number_change_requests where old_phone = '+12675557205' and r
 -- Decided 91 days ago (the no above), made 91 days ago and never decided (Lu's), and a recent yes.
 update public.number_change_requests set decided_at = now() - interval '91 days' where id = :'r_boss';
 update public.number_change_requests set created_at = now() - interval '91 days' where id = :'r_lone';
+-- Approved 91 days ago, but the move never ran: its temporary sign-in still holds the new number.
+insert into public.number_change_requests (requester_id, new_phone, old_phone, first_name, last_name, city, routed_to, status, decided_at, created_at)
+values (:'tmp6', '+12675557216', '+12675557204', 'X', 'Y', 'Z', 'super_admin', 'approved', now() - interval '91 days', now() - interval '92 days')
+returning id as r_stuck \gset
 select public.purge_number_change_requests();
 select test.check('a request decided more than 90 days ago is gone, with both numbers',
   (select count(*) from public.number_change_requests where id = :'r_boss'), 0::bigint);
@@ -226,6 +237,10 @@ select test.check('one nobody decided in 90 days is gone',
   (select count(*) from public.number_change_requests where id = :'r_lone'), 0::bigint);
 select test.check('...and took its temporary sign-in with it',
   (select count(*) from auth.users where id = :'tmp5'::uuid), 0::bigint);
+select test.check('an approved request whose move never ran is gone',
+  (select count(*) from public.number_change_requests where id = :'r_stuck'), 0::bigint);
+select test.check('...with its temporary sign-in (the new number goes with the request)',
+  (select count(*) from auth.users where id = :'tmp6'::uuid), 0::bigint);
 select test.check('...but never the account its old number belongs to',
   (select count(*) from auth.users where id = :'lone'::uuid), 1::bigint);
 select test.check('a recent one stays',
