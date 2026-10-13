@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import en from '@pam/config/locales/en.json';
 import es from '@pam/config/locales/es.json';
 import ar from '@pam/config/locales/ar.json';
+import zhCN from '@pam/config/locales/zh-CN.json';
 
 /**
  * Sign in on a short phone (Iris's member flow pass, S1; D-500). On a 320×568 screen (an iPhone SE, or a
@@ -12,7 +13,7 @@ import ar from '@pam/config/locales/ar.json';
  * Supabase is stubbed at the network. The tap is a raw mouse click on the button's centre, so whatever is on top
  * of the button receives it, as it does under a thumb.
  */
-const LOCALES = { en, es, ar } as const;
+const LOCALES = { en, es, ar, 'zh-CN': zhCN } as const;
 const NUMBER = '2155550100';
 
 async function open(page: Page, locale: keyof typeof LOCALES, invited: boolean) {
@@ -68,7 +69,7 @@ for (const locale of ['en', 'es', 'ar'] as const) {
  * switch once the hero has scrolled away. The bar is drawn over the content, not in the flow, so the tap test above
  * (the button whole and tappable at 320×568 with the bar in the page) is the proof it takes no room.
  */
-for (const locale of ['en', 'es', 'ar'] as const) {
+for (const locale of ['en', 'es', 'ar', 'zh-CN'] as const) {
   for (const invited of [true, false]) {
     test(`320×568, ${invited ? 'invited' : 'not invited'}, ${locale}: the header stays on top as the page scrolls`, async ({ page }) => {
       await open(page, locale, invited);
@@ -80,19 +81,20 @@ for (const locale of ['en', 'es', 'ar'] as const) {
             .map((img) => Math.round(img.getBoundingClientRect().top))
             .filter((top) => top >= 0 && top < 130).length,
         );
-      await page.evaluate(() => window.scrollTo({ top: 300, behavior: 'instant' }));
-      await page.waitForTimeout(400);
+      // As far as the page goes (D-564): on a short phone the page is only a little taller than the screen, so there is no
+      // fixed distance to scroll. At the end of it, whatever the language, the mark and the language button are in view at
+      // the top (the hero's own have gone by then), and an invite line is still pinned at 0.
+      await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
+      await page.waitForTimeout(500);
 
       const pinned = await page.evaluate(() => {
         const note = document.querySelector('[role="note"]');
-        const marks = [...document.querySelectorAll('img[alt="Pam"]')].filter((img) => {
-          const r = img.getBoundingClientRect();
-          return r.top >= 0 && r.bottom <= 130 && getComputedStyle(img.parentElement!).visibility !== 'hidden';
-        });
-        const buttons = [...document.querySelectorAll('button')].filter((b) => {
-          const r = b.getBoundingClientRect();
-          return r.top >= 0 && r.bottom <= 140 && getComputedStyle(b).visibility !== 'hidden';
-        });
+        const inTop = (el: Element) => {
+          const r = el.getBoundingClientRect();
+          return r.top >= 0 && r.bottom <= 140 && r.width > 0 && getComputedStyle(el.parentElement!).visibility !== 'hidden' && getComputedStyle(el).visibility !== 'hidden';
+        };
+        const marks = [...document.querySelectorAll('img[alt="Pam"]')].filter(inTop);
+        const buttons = [...document.querySelectorAll('button')].filter(inTop);
         return {
           scrolled: window.scrollY,
           noteTop: note ? Math.round(note.getBoundingClientRect().top) : null,
@@ -100,16 +102,10 @@ for (const locale of ['en', 'es', 'ar'] as const) {
           buttons: buttons.length,
         };
       });
+      expect(pinned.scrolled).toBeGreaterThan(0);
       if (invited) expect(pinned.noteTop).toBe(0);
-      // On a short phone the page is only a little taller than the screen (D-564: the hero and the card are tighter), so
-      // the hero may not scroll away at all and the compact bar has nothing to do. The bar is checked where the page
-      // scrolls far enough to need it.
-      if (pinned.scrolled >= 250) {
-        expect(pinned.marks).toBeGreaterThanOrEqual(1);
-        expect(pinned.buttons).toBeGreaterThanOrEqual(1);
-      } else {
-        expect(pinned.scrolled).toBeGreaterThan(40);
-      }
+      expect(pinned.marks, 'a Pam mark in view at the top').toBeGreaterThanOrEqual(1);
+      expect(pinned.buttons, 'the language button in view at the top').toBeGreaterThanOrEqual(1);
       void barMarks;
 
       // Back at the top the bar is gone again and the button is where it was, whole.
