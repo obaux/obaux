@@ -106,7 +106,8 @@ const styles = stylex.create({
   divided: {
     borderBlockStartWidth: { default: '1px', '@media (min-width: 900px)': '0px' },
     borderInlineStartWidth: { default: '0px', '@media (min-width: 900px)': '1px' },
-    borderStyle: 'dashed',
+    // A plain 1px rule on a phone (Figma), dashed beside the other half from 900px.
+    borderStyle: { default: 'solid', '@media (min-width: 900px)': 'dashed' },
     borderColor: website['--website-border-strong'],
     paddingBlockStart: { default: '32px', '@media (min-width: 900px)': '0px' },
     paddingInlineStart: { default: '0px', '@media (min-width: 900px)': '32px' },
@@ -187,7 +188,7 @@ export function HomeScreen(_props: { readonly showAbout?: boolean } = {}) {
                   {row.body}
                 </Text>
                 <HStack>
-                  <SoftButton label={row.cta.label} href={row.cta.href === 'app' ? `${APP_URL}/` : row.cta.href} />
+                  <SoftButton label={row.cta.label} href={row.cta.href === 'app' ? `${APP_URL}/` : row.cta.href} pill />
                 </HStack>
               </VStack>
               <div {...stylex.props(i % 2 === 0 ? undefined : styles.rowFlip)}>

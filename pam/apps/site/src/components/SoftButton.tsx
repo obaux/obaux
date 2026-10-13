@@ -21,7 +21,17 @@ const styles = stylex.create({
 type Props = Omit<ComponentProps<typeof Button>, 'variant'> & {
   /** The small one under a callout (Figma: 36px high, 14px label, radius 10). Its tap box is still 48px high. */
   readonly compact?: boolean;
+  /** A feature row's button on a phone: a full pill, 54px high (Figma "Home — Phone 390"). */
+  readonly pill?: boolean;
 };
+
+const pillStyles = stylex.create({
+  pill: {
+    borderRadius: { default: '9999px', '@media (min-width: 900px)': '15px' },
+    minHeight: { default: '54px', '@media (min-width: 900px)': '48px' },
+    paddingInline: '18px',
+  },
+});
 
 const compactStyles = stylex.create({
   box: { display: 'inline-flex', alignItems: 'center', minHeight: '48px', textDecorationLine: 'none', borderRadius: '12px' },
@@ -46,7 +56,7 @@ const compactStyles = stylex.create({
 });
 
 /** The new site's secondary button (Figma "Button / Secondary"), on the design system's Button so press, focus and keyboard are the app's. */
-export function SoftButton({ xstyle, compact = false, ...props }: Props) {
+export function SoftButton({ xstyle, compact = false, pill = false, ...props }: Props) {
   if (compact && props.href) {
     return (
       <a href={props.href} {...stylex.props(compactStyles.box)}>
@@ -54,5 +64,5 @@ export function SoftButton({ xstyle, compact = false, ...props }: Props) {
       </a>
     );
   }
-  return <Button {...props} variant="secondary" hasEdge={false} xstyle={[type.label_strong17, styles.soft, tap.target, xstyle]} />;
+  return <Button {...props} variant="secondary" hasEdge={false} xstyle={[type.label_strong17, styles.soft, tap.target, pill && pillStyles.pill, xstyle]} />;
 }
