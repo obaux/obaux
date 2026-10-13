@@ -934,8 +934,8 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 says "Join Pam" with Will's signed lines; Join › About you has Dot's LanguageField and the code behind a
 question with an underlined link; Sage's signed fixes to the staff sign-up, the empty caseload and the
 expired link. The expired link offers an email only when `app_settings.invite_emails_live` is 'on'
-(migration 20261013070505, 'off'; turn on with the INVITE_EMAILS secret). Waiting on: Lena (nine keys),
-Will (card a82: his words or Sage's for the code; the last commit is Sage's, droppable).
+(migration 20261013070505, 'off'; turn on with the INVITE_EMAILS secret). Lena's six languages are in, except the two code keys. Waiting on: Will (card a82: his words or
+Sage's for the code; Sage's are commit ce18f5ff, revert it if he keeps his), then Lena for those two.
 ## Accounts & invites · no role switcher or "See the app as" for the super admin; sign-up Contact Pam (10–13 October) — READY
 
 `claude/pam-super-admin-no-switcher` (D-558). Will: the super admin no longer needs the role

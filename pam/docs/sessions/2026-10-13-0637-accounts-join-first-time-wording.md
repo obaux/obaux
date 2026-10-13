@@ -68,6 +68,13 @@ asks (06:00 UTC, with screenshots): bring back the language dropdown, and hide t
   account, consent, signin-short, a11y, admin on 3 projects: 330 passed (the 320×568 case is green). Pictures
   retaken with the underlined link.
 
+- **07:30:** merged Dot's tighter fit (90533a90; Lena's longer pt-BR and Russian needed it) and Lena's
+  `claude/lena-w6-invited-words` (629171de: the W6 lines and Sage's three fixes in six languages). Only
+  `join.code.question` and `join.code.reveal` remain untranslated, waiting for Will's pick on a82; the
+  config tests fail on those two keys alone (12 tests). Playwright join, account, consent, signin-short,
+  a11y, admin: 329 of 330 passed, and the one timeout (account "picks a side on Profile", iPhone SE) passed
+  9 of 9 on a re-run. Sage's code-words commit is ce18f5ff, no longer the tip: revert it if Will keeps his.
+
 ## Left undone
 
 - Lena: the six languages for the six keys above.
