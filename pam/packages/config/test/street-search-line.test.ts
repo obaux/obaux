@@ -25,6 +25,8 @@ import { PRIVACY } from '../src/legal.js';
  * The line itself is checked here too, from the day Will signs it and it is in the bundles.
  */
 const FUNCTION = fileURLToPath(new URL('../../../supabase/functions/places-search/index.ts', import.meta.url));
+// The function is its wiring (index.ts) and its handler (handler.ts, with everything it touches passed in): the promises are held to both together.
+const HANDLER = fileURLToPath(new URL('../../../supabase/functions/places-search/handler.ts', import.meta.url));
 
 /** The text between a bracket at `open` and its partner, brackets and quotes balanced; '' if it never closes. */
 function between(source: string, open: number): string {
@@ -58,7 +60,7 @@ function problemsIn(source: string): string[] {
   const problems: string[] = [];
 
   // 1. Typed text arrives in a POST body, never in the URL.
-  if (!/\.json\(\)/.test(source)) problems.push('the function never reads a JSON body: what is typed must come in a POST body');
+  if (!/\.json\(\)|JSON\.parse\(/.test(source)) problems.push('the function never reads a JSON body: what is typed must come in a POST body');
   // The member's own request, not the POST the function makes to Google: `req.method` is compared with POST.
   if (!/\breq(uest)?\.method\s*[!=]==?\s*['"]POST['"]/.test(source)) problems.push('the function does not insist on POST');
   if (/\breq(uest)?\.url\b|\bsearchParams\b|new URL\(\s*req/.test(source)) problems.push('the function reads the request URL or its query string: typed text must not travel in a URL');
@@ -77,6 +79,8 @@ function problemsIn(source: string): string[] {
   }
   for (const m of source.matchAll(/\bfetch\s*\(/g)) {
     const call = between(source, m.index! + m[0].length - 1);
+    // Only the calls that go to Google: the function also asks Pam's own database who is signed in, with the member's own sign-in.
+    if (!call.includes(GOOGLE_HOST)) continue;
     const at = call.search(/\bheaders\s*:/);
     if (at < 0) continue;
     const open = call.indexOf('{', at);
@@ -88,7 +92,7 @@ function problemsIn(source: string): string[] {
   }
 
   // 4. Signed in only, and nothing is stored.
-  if (!/\.getUser\s*\(/.test(source) || !/\b401\b/.test(source)) problems.push('the function does not turn away a request with no signed-in member (getUser and a 401)');
+  if (!(/\.getUser\s*\(/.test(source) || /\/auth\/v1\/user/.test(source)) || !/\b401\b/.test(source)) problems.push('the function does not turn away a request with no signed-in member (getUser and a 401)');
   if (/\.(insert|upsert|update|delete)\s*\(|\.rpc\s*\(|Deno\.(openKv|writeFile|writeTextFile)|\bcaches\s*\./.test(source)) {
     problems.push('the function writes something somewhere: it must store neither the words nor the answer');
   }
@@ -153,7 +157,7 @@ describe('the street-address search keeps what Privacy says it keeps (a74)', () 
 
   describe.skipIf(!existsSync(FUNCTION))('the real function (supabase/functions/places-search)', () => {
     it('is held to the same four promises', () => {
-      expect(problemsIn(readFileSync(FUNCTION, 'utf8'))).toEqual([]);
+      expect(problemsIn(`${readFileSync(FUNCTION, 'utf8')}\n${existsSync(HANDLER) ? readFileSync(HANDLER, 'utf8') : ''}`)).toEqual([]);
     });
   });
 });

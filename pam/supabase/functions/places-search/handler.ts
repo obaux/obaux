@@ -87,7 +87,8 @@ function tooOften(user: string, now: number): boolean {
   const times = (recent.get(user) ?? []).filter((t) => t > since);
   times.push(now);
   recent.set(user, times);
-  if (recent.size > 5000) for (const [key, list] of recent) if (list.every((t) => t <= since)) recent.delete(key);
+  // A busy isolate forgets everybody at once rather than grow without end.
+  if (recent.size > 5000) recent.clear();
   return times.length > LIMITS.perMinute;
 }
 
