@@ -458,6 +458,18 @@
 - **Held from b26:** Wren's phone layout and the moving green card (D-550, `345fc148`, card a80; Dot tap-checked
   Play at 390px), Dot's Play-restarts fix for the app and website carousels (D-554, `b82aeca6`, for b27), Ava's two
   branches (card a78), the calendar link (card a79).
+- **Batch b27 (13 October).** No migrations. Piper: a real member's page and their past trips show the visits really
+  planned, read as the case manager (appointments_select_admin decides), never made-up ones; the "examples" note only
+  on example people (W4, D-509). Sign in takes `?next=/profile/add-program/` to Add my program, one listed screen,
+  once, never for a program lead (S1); the website link follows in b28, after the app understands it. Dot: only
+  keyboard focus holds a carousel and Play lets go, so Pause then Play works with a tap (D-554, Iris W1). Sage: the
+  street hint, label and Google attribution ("Google Maps", per Google's Places policy), Will's a76 signature. Iris:
+  the b25 run-through and b26 re-check (W2 and D-551 pass).
+- **Will pasted the calendar migration (a79, about 04:50).** Supabase's SQL editor warned "destructive operations" (it reacts
+  to `delete` and `revoke`); the card now says so. Verified live: table, RLS forced, 0 rows, select-false policy, no
+  client grants; the five functions are definer with search_path public, extensions, and match the file line for line
+  (only the indentation was lost in the paste); anon executes none, authenticated the four member ones,
+  calendar_feed_read the service role only; 20261011161548 recorded. The link ships in b28.
 
 ## What was wrong, and what missed it
 
@@ -651,6 +663,9 @@
 | Batch b26 (6a6ca551): db / config / ui / web unit / site / e2e full / storybook / site checks | 1498 ok / 1224 / 124 / 139 / 94 / 1666 passed, 1 flaky (places.spec:118 at 320, passed on retry), 19 skipped / builds, 13.8 kB spare / 120 scans 0, clear, 306 links 0 |
 | b26 + Lena 5bed032e + Sage caab3bee (d8b7d37f): config / copy:status / web and site tsc | 1246 / in step / 0 / 0 |
 | b26 new or changed English keys (privacy.updated, terms.updated) | translated in six languages, none equal to English; signed as a pattern |
+| b26 on main (d8b7d37f): GitHub checks / Vercel | 4 of 4 green (accessibility 04:45) / web and pam-site READY |
+| Batch b27 (9025244b): db / config / ui / web unit / site / e2e full / storybook / site checks | 1498 ok / 1246 / 124 / 144 / 94 / 1694 passed, 19 skipped, 0 flaky / builds, 13.8 kB spare / 120 scans 0, clear, 306 links 0 |
+| Calendar migration 20261011161548 after Will's paste | table + RLS forced + 0 rows + select-false policy + no client grants; 5 bodies equal to the file ignoring indentation; grants as designed; recorded |
 | Calendar migration 20261011161548 via the connector | timed out; table, functions and record all absent afterwards; no locks or running queries |
 | Batch b24 (0a36ada1): web/site tsc / web unit / site tests / config / site build / a11y / usability / scrollspy / storybook | 0 / 0 / 139 / 94 / 1176 / 0 / 120 scans 0 / clear / 306 links 0 / builds (no app code: e2e not rerun) |
 | Live help_request_allowed after Will's paste (a62) | definer; search_path public, extensions; anon and authenticated cannot execute, service_role can; same logic as the file (md5 differs: indentation and one comment); help_request_attempts RLS forced, no client grants, 0 rows |
