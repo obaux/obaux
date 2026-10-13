@@ -235,7 +235,11 @@ export function BandViews({ pauseLabel = 'Pause who Pam is for', playLabel = 'Pl
       onPointerLeave={() => setInside(false)}
       // Keyboard focus holds the cycle; a tap that merely leaves focus on a button does not.
       onFocus={(e) => {
-        if ((e.target as HTMLElement).matches(':focus-visible')) setInside(true);
+        try {
+          if ((e.target as HTMLElement).matches(':focus-visible')) setInside(true);
+        } catch {
+          setInside(true); // an old browser that cannot tell: hold, as before
+        }
       }}
       onBlur={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setInside(false);
@@ -269,6 +273,7 @@ export function BandViews({ pauseLabel = 'Pause who Pam is for', playLabel = 'Pl
             icon={paused ? <PlayMark /> : <PauseMark />}
             onClick={() => {
               if (paused) {
+                setInside(false); // Play lets go of any hold, so a tap that left the pointer or focus here cannot keep it still
                 setPaused(false);
                 setRun((r) => r + 1); // Play starts the active name's 6 seconds again
               } else {
