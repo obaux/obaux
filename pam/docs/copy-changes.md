@@ -42,6 +42,13 @@ wrong silently. (Why each piece exists: D-424, D-425.)
    the pseudo-language on a pull request that touches copy or UI.
    Text should wrap and grow (`@pam/ui` `Button`, `Badge`, `Segment`), never be
    trimmed; only a page title steps down in size (D-422).
+   **The check measures what a story shows, on screen, and nothing else.** A carousel,
+   a tab or anything that shows its text after a tap needs **one story per slide or
+   tab**: a story that opens on the first slide audits the first slide and the other
+   two stay "clean" because nobody looked (13 October: two changed welcome lines, on
+   Sign in and About Pam, had never been measured). `src/stories/support/showSlide.ts`
+   scrolls to a slide and chooses an About tab in a story's `play`; see the
+   `Onboarding` stories for the pattern.
    **If the check names a defect:** look at it in Storybook in that language at 320px
    first. A text that is really cut off or covered is fixed (let it wrap, or shorten
    the string). A line that is one line with an ellipsis *by design*, a list that

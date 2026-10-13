@@ -62,6 +62,32 @@ export const ProgramLeadThirdSlide: StoryObj = {
 };
 
 /**
+ * The member's own welcome lines, `onboarding.2` and `onboarding.3`, on Sign in and in About Pam (the
+ * member tab is the one About opens on). Same reason as the staff ones above: the audit measures the
+ * slide on screen and no other, so a carousel needs one story per slide.
+ */
+export const MemberSignInSecondSlide: StoryObj = {
+  ...screen('signed-out', 'Sign in', '/signin/'),
+  name: 'Member, second slide',
+  play: ({ canvasElement }) => showSlide(canvasElement, 1),
+};
+export const MemberSignInThirdSlide: StoryObj = {
+  ...screen('signed-out', 'Sign in', '/signin/'),
+  name: 'Member, third slide',
+  play: ({ canvasElement }) => showSlide(canvasElement, 2),
+};
+export const AboutMembersSecondSlide: StoryObj = {
+  ...screen('member', 'About Pam', '/about/'),
+  name: 'About Pam, Members tab, second slide',
+  play: ({ canvasElement }) => showSlide(canvasElement, 1),
+};
+export const AboutMembersThirdSlide: StoryObj = {
+  ...screen('member', 'About Pam', '/about/'),
+  name: 'About Pam, Members tab, third slide',
+  play: ({ canvasElement }) => showSlide(canvasElement, 2),
+};
+
+/**
  * An invite link that has run out (D-258): Sign in sees it has expired and
  * opens its own page — who sent it, and a way to ask for it to be renewed,
  * which reaches the super admin's Requests.
