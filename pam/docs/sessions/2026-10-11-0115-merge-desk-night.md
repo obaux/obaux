@@ -432,6 +432,21 @@
   Philadelphia only, off until GOOGLE_MAPS_SERVER_KEY). Changed: Google is also asked for corners and names when
   Pam's own areas have no match. Cost from Google's pages: 10,000 free a month per kind, about 2,500 to 3,000
   searches a month free at 3 to 4 autocomplete calls each.
+- **Batch b25 (13 October).** No migrations. Wren: Home takes Will's a65 lines 4 and 5, and "Add your program" goes to
+  Sign in; About Pam's carousel words back, the line under the tabs gone (D-548). Lena: Privacy a67 (servers'
+  records, the Trips map from Google), a68 (the calendar link, both paragraphs) and a70 (translation by Claude, shown
+  only while translation is on) in seven languages; about.intro without "coming home"; the two true carousel lines;
+  stories that draw every staff slide, so the fit audit measures them. Sage: ledger rows for all of it. Nico: a
+  member's Explore shows the bell only when there are notifications (D-549; first claimed as D-548, renumbered at
+  merge because Wren's About decision holds D-548).
+- **Held from b25:** Piper's calendar link (D-538, 2a2ecf7a). Its migration (20261011161548) timed out at the
+  connector, as the help form's did, because calendar_link_off() deletes a row; nothing was applied, no locks. It
+  is one paste for Will (card a79, guarded schema_migrations insert, one transaction). The link and the
+  calendar-feed function (JWT off) ship after his paste. Its copy test also carried a stale allow-list for every
+  calendar.* key ("English until Will signs"): all 29 are translated and signed, so the line comes out when it
+  merges. Ava's Connect fix (56f5ec16) is in her session unpushed until Will answers a78. Wren's phone layout
+  (c4ef13c4, D-550) waits for Will on a77. Lena's member slide stories (7af31084) and Sage's green-card rows
+  (b8067c7e) go in b26.
 
 ## What was wrong, and what missed it
 
@@ -620,6 +635,9 @@
 | Batch b23 (fe7aea7b): db / config / ui / web unit / site / e2e full / storybook / site checks | 1498 ok / 1176 / 124 / 139 / 94 / 1532 passed, 19 skipped / builds / 120 scans 0, clear, 300 links 0 |
 | b23 + Wren b4d0e66d: site tsc / tests / build / a11y / usability / scrollspy | 0 / 94 / 0 / 120 scans 0 / clear / 300 links 0 |
 | b23 new or changed English keys (place.about) and removed (checkin.notNow) | translated in six languages, signed by Sage 02:25; removed from all seven |
+| Batch b25 (0fd87df1): db / config / ui / web unit / site / e2e full / storybook / site checks | 1498 ok, 0 not ok / 1211 / 124 / 139 / 94 / 1541 passed, 19 skipped / builds, 13.9 kB spare / 120 scans 0, clear, 306 links 0 |
+| b25 new or changed English keys (privacy p5, p6, p11, p12, translation.p2, about.intro, onboarding.admin.2, onboarding.provider.3) | translated in six languages, none equal to English; all in the signed ledger |
+| Calendar migration 20261011161548 via the connector | timed out; table, functions and record all absent afterwards; no locks or running queries |
 | Batch b24 (0a36ada1): web/site tsc / web unit / site tests / config / site build / a11y / usability / scrollspy / storybook | 0 / 0 / 139 / 94 / 1176 / 0 / 120 scans 0 / clear / 306 links 0 / builds (no app code: e2e not rerun) |
 | Live help_request_allowed after Will's paste (a62) | definer; search_path public, extensions; anon and authenticated cannot execute, service_role can; same logic as the file (md5 differs: indentation and one comment); help_request_attempts RLS forced, no client grants, 0 rows |
 | help-request edge function | v2, deployed 11 October 04:49, after the last code change (821e6526, 04:48); off without HELP_REQUESTS_LIVE |
