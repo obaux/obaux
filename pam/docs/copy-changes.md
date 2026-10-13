@@ -57,6 +57,19 @@ wrong silently. (Why each piece exists: D-424, D-425.)
    not looked at twice (D-434). `node scripts/audit-language-fit.mjs --write-known
    out.json` writes the entries for you to give reasons to.
 
+## The "Last updated" date on Privacy and Terms
+
+The page says when it last changed, and that has to be true. `packages/config/src/legal-updated.json` holds, for each document, the
+day its newest paragraph went live and a fingerprint of its English words (title, introduction, section titles and paragraphs, as the
+page shows them: the section about translating messages counts only while `MESSAGE_TRANSLATION.enabled`). `legal-updated.test.ts` is red when the
+English of Privacy or the Terms changes and the fingerprint does not, and when `privacy.updated` / `terms.updated` in any of the seven
+languages is not that date (13 October 2026, the day the b25 text went live, was found to be on a page that still said 10 October: Iris, W2).
+**When you change a Privacy or Terms paragraph,** in the same change run
+`pnpm --filter @pam/config legal:date <privacy|terms> <YYYY-MM-DD>` with the day it goes live (merged to `main`, in UTC), then `copy:ack`
+and the tests. It writes the date, the fingerprint and the sentence in seven languages; do not edit the date line by hand. The date is
+a fact, not a promise, but it is English text, so Sage signs the sentence (A29). A translation corrected without changing the meaning
+does not move the date. A date never goes backwards (the script refuses).
+
 ## In a text message
 
 Texts are written in `packages/config/src/sms-templates.ts`, one template at a
