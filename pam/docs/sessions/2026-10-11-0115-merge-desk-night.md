@@ -486,7 +486,7 @@
   authenticated only `count_screen_open`, the service role `screen_opens_weekly`. Nothing counts until the app ships in
   b29 with Lena's Privacy line.
 - **Will's decisions, 13 October** (his words, the time in UTC, who builds it, and where it ends up recorded; written
-  down the same hour from now on, not at batch time; Will, 06:03: "ensure all these decisions are being documented"):
+  down the same hour from now on, not at batch time; Will, about 06:02: "ensure all these decisions are being documented"):
   - **03:21, a77 (website on phones):** "take off the arrows but let's add a progress translucent effect behind chips
     because they should automatically switch from one to the next. If the user taps on one, it pauses the progress.
     Everything else looks good." Wren built it with Dot's fill (D-553); held on card a80.
