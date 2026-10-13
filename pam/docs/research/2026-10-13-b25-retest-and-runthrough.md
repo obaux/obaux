@@ -170,3 +170,22 @@ I report back to Mira with before-and-after screenshots for Will, and S / W / po
 usual.
 
 Iris
+
+## b26 re-check (`d8b7d37f`, 04:40)
+
+- **W2: pass.** Privacy says "Last updated 13 October 2026" and Terms says "11 October 2026", on
+  screen in all seven languages (Storybook, built 04:19). The new `legal-updated.test.ts`
+  ties the date to the paragraphs.
+- **D-551, the role chip: pass.**
+  - **Local build:** 56 of 56. The member's Places screen with one notification (the case
+    that broke in b25), for member, case manager, program and super admin, in seven
+    languages, at 320px and 390px. No chip word is split across lines, and nothing scrolls
+    sideways.
+  - **Longest labels:** "Кейс-менеджер" and "Gestor de casos" stay on one line. The area and
+    the bell move to a second row instead
+    ([ru, 320](shots/b26-chip-case-manager-ru-320.png)).
+  - **Storybook:** 126 of 126 on the AppHeader stories and the role Home screens. Those Home
+    screens have no chip, so they had nothing to break.
+- **W3** is Nico's to measure in e2e, as Mira asked. With the area and bell now on their own
+  row, the header is taller whenever the bell shows, so the jump when it appears is worth
+  his measuring.
