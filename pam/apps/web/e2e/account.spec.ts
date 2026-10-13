@@ -290,8 +290,8 @@ test.describe('a code from the person who invited you', () => {
     // The field is hidden until asked for (Will, 13 October); the link opens it and moves
     // the person into it.
     await expect(page.getByLabel('Code from the person who invited you')).toHaveCount(0);
-    await expect(page.getByText('Did someone invite you via code?')).toBeVisible();
-    await page.getByRole('button', { name: 'Click here' }).click();
+    await expect(page.getByText('Did someone invite you with a code?')).toBeVisible();
+    await page.getByRole('button', { name: 'Enter your code' }).click();
     await expect(page.getByLabel('Code from the person who invited you')).toBeFocused();
     await page.getByLabel('Code from the person who invited you').fill('QQQQQQQQ');
     await page.getByRole('button', { name: 'Next' }).click();
