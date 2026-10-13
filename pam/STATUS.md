@@ -1688,6 +1688,8 @@ fine and the fit audit was over-counting (D-448).
 
 ## Website · public site and help centre (10 October) — `apps/site`, on `main`
 
+**13 October (held for Will, D-548/D-550).** About Pam shows its carousel words again and loses the line above its tabs (bd6d016a). The Home phone layout follows Figma 7:3 and the green card switches between three views; pictures to look at are in `docs/design/review/2026-10-13-website-phone/`. Not for `main` until Will says yes.
+
 **12 October (b25).** "Does the place know I'm coming?" now says programs on Pam see your visit and other places are not told (Sage's words, the day attendance went live). Home takes Will's a65 lines ("talk to a real person"; "you see who's coming on your calendar"); the 24/7 line stays held until launch and translation.
 
 **New website, stage 1 (11 October, D-531; branch).** Home, header and footer rebuilt from Will's Figma on Dot's Website tokens (D-528): hero with a tappable, flipping, floating picture stack (Pause/Play, reduced-motion safe), the Philadelphia band, three feature rows with real Pam screens, Privacy/Support callouts, deep-green footer. Words in `content/home-copy.ts`; untrue or promise lines are held with true fallbacks (`HELD`). Stages 2–4 (Support, post template, About, Still stuck) follow.
