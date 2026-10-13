@@ -250,6 +250,16 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
         await page.getByRole('button', { name: 'Send to Pam' }).click();
         await page.waitForTimeout(200);
         if (!(await page.getByText('Tell us what happened, in a few words.').count())) fail('help form: an empty message says nothing about what to do');
+        // Iris W1: an empty Send puts focus in the first field in error, and the field's description is its error
+        const described = (name) =>
+          page.evaluate((n) => {
+            const el = document.activeElement;
+            const label = el?.getAttribute('aria-label') ?? el?.labels?.[0]?.textContent ?? '';
+            const text = (el?.getAttribute('aria-describedby') ?? '').split(/\s+/).map((id) => document.getElementById(id)?.textContent ?? '').join(' ');
+            return { tag: el?.tagName, invalid: el?.getAttribute('aria-invalid'), label, text, n };
+          }, name);
+        const w1 = await described('message');
+        if (w1.tag !== 'TEXTAREA' || w1.invalid !== 'true' || !/Tell us what happened, in a few words\./.test(w1.text)) fail(`help form (W1): an empty Send should focus the message box and describe it with its error, focus is on ${JSON.stringify(w1)}`);
         await box.fill('x y z');
         await page.getByRole('textbox', { name: /How should we answer you/ }).fill('nope');
         await page.getByRole('button', { name: 'Send to Pam' }).click();
@@ -257,6 +267,8 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
         const wrong = await page.getByText('That email does not look right. Check it and try again.').count();
         const empty = await page.getByText('Add your email so we can write back.').count();
         if (!wrong && !empty) fail('help form: a wrong email says nothing about what to do');
+        const w1b = await described('email');
+        if (w1b.tag !== 'INPUT' || w1b.invalid !== 'true' || !/email/i.test(w1b.text)) fail(`help form (W1): a wrong email should focus the email box and describe it with its error, focus is on ${JSON.stringify(w1b)}`);
       }
       await box.fill('I cannot get the code');
       await page.getByRole('checkbox', { name: 'I run a program' }).check();
@@ -265,6 +277,11 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
       await page.getByRole('button', { name: 'Send to Pam' }).click();
       await page.waitForTimeout(400);
       if (!(await page.getByText(expected).count())) fail(`help form (${label}): did not say “${expected}”`);
+      if (label === 'on, sends') {
+        // Iris P2: after a successful Send focus goes to the thank-you, not the page
+        const onThanks = await page.evaluate(() => document.activeElement?.id === 'help-sent' && /Sent\. Thank you\./.test(document.activeElement.textContent ?? ''));
+        if (!onThanks) fail('help form (P2): after Send, focus should be on the thank-you block');
+      }
       const sent = calls.find((c) => c !== '{}');
       if (!sent || JSON.parse(sent).website !== '' || JSON.parse(sent).page !== '/support/start-here/') fail(`help form (${label}): the request is wrong: ${sent}`);
       if (sent && (JSON.stringify(JSON.parse(sent).roles) !== '["program","case_manager"]' || 'role' in JSON.parse(sent))) fail(`help form (${label}): how-you-use-Pam did not go as roles: ${sent}`);
