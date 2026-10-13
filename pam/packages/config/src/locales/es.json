@@ -495,7 +495,7 @@
   "place.hours.today": "Hoy",
   "place.hours.sample": "Este horario es de muestra mientras Pam confirma el real. Llama antes de ir.",
   "place.hoursOnGoogle": "Ver el horario en Google",
-  "place.notFound.body": "Puede que ya no esté en Pam. Vuelve a Lugares y prueba con otro.",
+  "place.notFound.body": "It may have been taken off Pam. Go back to Explore and try another one.",
   "place.notFound.title": "No encontramos ese lugar",
   "place.openUntil": "Abierto hasta las {time}",
   "place.save": "Guardar este lugar",

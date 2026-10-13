@@ -11,3 +11,5 @@
 **Ways back:** `from=places` is now `from=reported` on the Reported places links; `place/page.tsx` has a `reported` back entry ("Back to Reported places", new English, `nav.back.reported`, awaiting Sage and Lena); `places` still resolves, to Explore, for old links.
 
 **Reverse if:** a role turns out to need a list view Explore does not give it.
+
+**Follow-up (13 October, b33's place.spec):** the not-found place screen still said "Go back to Places" and headed itself "Places". It now says "Go back to Explore" (`place.notFound.body`, new English for Sage and Lena) and its title is `tab.explore`, the screen its round back goes to. `nav.back.places` and `tab.places` are no longer drawn by the app; only stories used them, and the place stories now use Explore.
