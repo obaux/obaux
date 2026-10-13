@@ -20,7 +20,7 @@ import { tap } from '../lib/tap';
  * - Each name keeps a 48px tap box; the chip drawn inside is the size of the design (34px high on a phone).
  * - All three lines sit in one grid cell, the hidden ones `visibility: hidden`, so the card is as tall as the longest and
  *   does not jump when you switch.
- * - The picture fades in 240ms on the app's easing; none under reduced motion.
+ * - The picture cross-fades over 650ms and the line swaps in 160 + 320ms (Dot, D-556); none under reduced motion.
  * - It moves on by itself (Will, 13 October, a77): Residents, Program Providers, Case managers, round again, every 6
  *   seconds, shown by a translucent fill growing across the active name. The fill's `animationend` is the timer, so the
  *   picture and the clock cannot drift apart, and pausing the animation pauses the cycle. Choosing a name shows it and
@@ -57,6 +57,9 @@ const styles = stylex.create({
     height: { default: '229px', '@media (min-width: 900px)': '100%' },
     minHeight: { default: '229px', '@media (min-width: 900px)': '400px' },
   },
+  // The pictures cross-fade (Will, a80; Dot, D-556): the one coming in fades up over 650ms while the one leaving stays fully
+  // visible under it for those 650ms and then drops to 0, so the card's green never shows through in the middle. No scale
+  // or drift: every picture has the same white frame in the same place.
   picture: {
     position: 'absolute',
     inset: 0,
@@ -65,11 +68,19 @@ const styles = stylex.create({
     height: '100%',
     objectFit: 'cover',
     opacity: 0,
+    zIndex: 1,
     transitionProperty: { default: 'none', '@media (prefers-reduced-motion: no-preference)': 'opacity' },
-    transitionDuration: '240ms',
-    transitionTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)',
+    transitionDuration: { default: '0s', '@media (prefers-reduced-motion: no-preference)': '0ms' },
+    transitionTimingFunction: { default: 'linear', '@media (prefers-reduced-motion: no-preference)': 'linear' },
+    transitionDelay: { default: '0s', '@media (prefers-reduced-motion: no-preference)': '650ms' },
   },
-  pictureOn: { opacity: 1 },
+  pictureOn: {
+    opacity: 1,
+    zIndex: 2,
+    transitionDuration: { default: '0s', '@media (prefers-reduced-motion: no-preference)': '650ms' },
+    transitionTimingFunction: { default: 'linear', '@media (prefers-reduced-motion: no-preference)': 'cubic-bezier(0.4, 0, 0.2, 1)' },
+    transitionDelay: { default: '0s', '@media (prefers-reduced-motion: no-preference)': '0s' },
+  },
   text: {
     justifyContent: 'space-between',
     gap: { default: '20px', '@media (min-width: 900px)': '32px' },
@@ -156,11 +167,19 @@ const styles = stylex.create({
     letterSpacing: { default: '0px', '@media (min-width: 900px)': '-1px' },
     visibility: 'hidden',
     opacity: 0,
-    transitionProperty: { default: 'none', '@media (prefers-reduced-motion: no-preference)': 'opacity' },
-    transitionDuration: '240ms',
-    transitionTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)',
+    // Out 160ms, hidden at its end; in 320ms after a 160ms wait, visible from the start: two lines are never on screen together.
+    transitionProperty: { default: 'none', '@media (prefers-reduced-motion: no-preference)': 'opacity, visibility' },
+    transitionDuration: { default: '0s', '@media (prefers-reduced-motion: no-preference)': '160ms, 0s' },
+    transitionTimingFunction: { default: 'linear', '@media (prefers-reduced-motion: no-preference)': 'cubic-bezier(0.4, 0, 1, 1), linear' },
+    transitionDelay: { default: '0s', '@media (prefers-reduced-motion: no-preference)': '0s, 160ms' },
   },
-  lineOn: { visibility: 'visible', opacity: 1 },
+  lineOn: {
+    visibility: 'visible',
+    opacity: 1,
+    transitionDuration: { default: '0s', '@media (prefers-reduced-motion: no-preference)': '320ms, 0s' },
+    transitionTimingFunction: { default: 'linear', '@media (prefers-reduced-motion: no-preference)': 'cubic-bezier(0, 0, 0.2, 1), linear' },
+    transitionDelay: { default: '0s', '@media (prefers-reduced-motion: no-preference)': '160ms, 0s' },
+  },
 });
 
 
