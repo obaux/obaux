@@ -44,18 +44,27 @@ justify building something to spend them on?
   "1" on a quiet day could point at someone.
 - **I see only weekly totals,** read by the merge desk or Will from a summary function. No
   row-level access for me; my rule holds.
+- **The call itself is signed in.** A member's phone calls the counter while signed in, so
+  Pam's request log sees who made the call, as it does for every request. That log is
+  deleted within a week (Privacy, "What we keep", p11, a67). The count table never has it,
+  and nothing joins the two. (Sage, 12 Oct.)
 
 ## 4. What it needs
 
 - **A Privacy line, signed by Will.** The Privacy page lists everything Pam keeps, so the
-  count is new. Draft for Sage to refine, under "What we keep":
+  count is new. My draft went to Sage, and her final is with Mira for Will's card. It goes
+  under "What we keep":
 
-  > "Pam counts how many phones open some screens each day, like Your points, as one number
-  > for everyone. The count has no name, phone number or account in it, and no one can tell
-  > from it who opened what."
+  > "Each day, we count how many phones opened Your points and your Profile. It is one
+  > number for each screen, for everyone together. It has no name, phone number or account
+  > in it, so it can't show who opened what. To count each phone only once a day, your
+  > phone keeps a note that stays on it. In our reports, a number under 5 shows only as
+  > "under 5"."
 
-  It needs all seven languages (Lena), and a matching line on the transparency screen if
-  Will wants one.
+  It names the two screens, so **counting any other screen means changing this line**
+  (tell Sage). It says "shows as under 5", not "hidden", because the table keeps the exact
+  number. It needs all seven languages (Lena), and a matching line on the transparency
+  screen if Will wants one.
 - **Who builds it:** Piper (Places & programs), who owns `app/points` and Home. The work:
   - a migration: a `screen_counts` table and an `increment_screen_count(screen)` function
     any member may call, that takes no id and returns nothing;
