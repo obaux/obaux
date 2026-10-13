@@ -157,7 +157,7 @@ test.describe('everyone, for the person running Pam', () => {
     await expect(
       page.getByRole('heading', { name: 'This screen is for the Pam team' }),
     ).toBeVisible();
-    await expect(page.getByRole('link', { name: /Call Pam/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Contact Pam/ })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Back' })).toBeVisible();
   });
 

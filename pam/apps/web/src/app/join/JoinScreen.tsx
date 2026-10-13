@@ -10,17 +10,18 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BellIcon, BigButton, Loading, Notice, Page, PhoneIcon, PointsBadge, StarIcon, TextField, TextLink, TripsIcon } from '@pam/ui';
+import { BellIcon, BigButton, Loading, Notice, Page, HelpIcon, PointsBadge, StarIcon, TextField, TextLink, TripsIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { LANGUAGE_TAGS, SUPPORTED_LOCALES, TRANSPARENCY_SCREEN, badgeForPoints, type Locale, intlLocale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
+import { HELP_DESK_URL } from '@/lib/helpDesk';
 import { navigate } from '@/lib/navigate';
 import { forgetInvite, recallInvite, type Invite } from '@/lib/appUrl';
+import { takeNext } from '@/lib/signinNext';
 import { readAddedTrips, withMoves } from '@/lib/addedTrips';
-import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
+import { exampleTrips } from '@/lib/exampleTrips';
 import { Confetti } from '@pam/ui/SuccessScreen';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { TransparencyReading } from '@/screens/TransparencyReading';
 import { signOut, useSession } from '@/lib/useSession';
 import { usePoints } from '@/lib/usePoints';
@@ -153,7 +154,6 @@ export interface JoinPreview {
 export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview | null } = {}) {
   const { t, locale, pendingLocale, setLocale } = useI18n();
   const router = useRouter();
-  const supportPhone = useSupportPhone();
   const { state: session } = useSession();
 
   const [phase, setPhase] = useState<Phase | null>(null);
@@ -371,7 +371,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
     // was a tap that did nothing. Home opens on getting started (D-352).
     markFreshAccount();
     if (preview) navigate('/');
-    else router.replace('/');
+    else router.replace(recallInvite() ? '/' : (takeNext() ?? '/'));
   };
 
   const answerTexts = async (wants: boolean) => {
@@ -413,7 +413,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
   // The booked visit itself, from the example trips or the ones a program
   // added this session (D-322); null when the link carried none.
   const booked = bookedTrip
-    ? (withMoves([...DUMMY_TRIPS, ...readAddedTrips()]).find((trip) => trip.id === bookedTrip) ?? null)
+    ? (withMoves([...exampleTrips(), ...readAddedTrips()]).find((trip) => trip.id === bookedTrip) ?? null)
     : null;
   const bookedDay = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long', month: 'long', day: 'numeric' });
   const bookedTime = new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' });
@@ -513,8 +513,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
             notice="something_went_wrong"
             title={t('join.failed.title')}
             body={t('join.failed.body')}
-            supportPhone={supportPhone}
-            callLabel={t('help.callSupport')}
+            contactLabel={t('help.contact.action')}
           />
         ) : null}
 
@@ -662,8 +661,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                   notice={inviteProblem}
                   title={t(NOTICES[inviteProblem].titleKey)}
                   body={t(NOTICES[inviteProblem].bodyKey)}
-                  supportPhone={supportPhone}
-                  callLabel={t('help.callSupport')}
+                  contactLabel={t('help.contact.action')}
                 />
               ) : null}
 
@@ -723,19 +721,19 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
             <TransparencyReading />
             {/*
               The reading says "If something here worries you, call us. A person
-              answers." Here, before the account is set up, that has to be a
-              number they can tap (Iris, member flow W2, 10 October): the same
-              Call Pam row as Help, with the hours under it.
+              answers." Here, before the account is set up, that has to be
+              somewhere they can tap (Iris, member flow W2, 10 October). Pam has
+              no phone line (D-512), so it is Contact Pam, opening the help desk
+              on the website: they are not signed in to the app's Help yet.
             */}
             <MenuList
-              label={t('help.menu.call')}
+              label={t('help.contact.action')}
               items={[
                 {
-                  id: 'call',
-                  label: t('help.menu.call'),
-                  description: t('help.call.body'),
-                  href: `tel:${supportPhone}`,
-                  icon: <PhoneIcon width={26} height={26} />,
+                  id: 'contact',
+                  label: t('help.contact.action'),
+                  href: HELP_DESK_URL,
+                  icon: <HelpIcon width={26} height={26} />,
                 },
               ]}
             />
@@ -780,8 +778,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                   notice="service_not_available"
                   title={t('join.staff.title')}
                   body={t('join.staff.body')}
-                  supportPhone={supportPhone}
-                  callLabel={t('help.callSupport')}
+                  contactLabel={t('help.contact.action')}
                 />
               </>
             )}
@@ -862,7 +859,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
               */}
               <PointsBadge points={points ?? 0} label={t('points.title')} />
               <Text xstyle={styles.body}>{t('join.done.body', { name: firstName.trim() || t('app.name') })}</Text>
-              <BigButton label={t('join.done.action')} onPress={() => (preview ? navigate('/') : router.replace('/'))} />
+              <BigButton label={t('join.done.action')} onPress={() => (preview ? navigate('/') : router.replace(recallInvite() ? '/' : (takeNext() ?? '/')))} />
             </VStack>
           </>
         ) : null}

@@ -35,7 +35,8 @@
     "test": "vitest run",
     "copy:status": "node scripts/copy-sync.mjs status",
     "copy:draft": "node scripts/copy-sync.mjs draft",
-    "copy:ack": "node scripts/copy-sync.mjs ack"
+    "copy:ack": "node scripts/copy-sync.mjs ack",
+    "legal:date": "node scripts/legal-date.mjs"
   },
   "devDependencies": {
     "typescript": "^5.7.2",

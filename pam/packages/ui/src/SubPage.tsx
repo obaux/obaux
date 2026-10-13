@@ -39,6 +39,11 @@ import { useFitTitle } from './fitTitle.js';
 export interface SubPageHeaderProps {
   readonly title: string;
   /**
+   * The title is data — a place's or person's name — not Pam's words: it reads in the direction of its own
+   * text, in the bar and the large title both (D-534). Leave it off for Pam's own titles.
+   */
+  readonly isTitleData?: boolean;
+  /**
    * Where back goes. Leave out both this and `onBack` only on a step that
    * cannot be undone — the end of joining, once the account exists (D-251).
    */
@@ -84,6 +89,19 @@ export interface SubPageHeaderProps {
    * the title says what the page is.
    */
   readonly hero?: ReactNode;
+  /**
+   * `large` (the default): back in the bar, the title large beneath it.
+   * `bar`: the bar alone, with the title in it from the start — a conversation, whose name and who
+   * they are scroll with the messages under it (Will, 11 October, D-526). The bar is the same bar, so
+   * back and the actions sit exactly where they do on every other page (D-411).
+   */
+  readonly variant?: 'large' | 'bar';
+  /**
+   * With `variant="bar"`: whether the name in the bar is showing. A conversation hides it while its own
+   * name is on screen below and fades it in as that name scrolls under the bar (D-526). Only opacity
+   * changes, so nothing moves; the name is out of the accessibility tree either way.
+   */
+  readonly isBarTitleShown?: boolean;
 }
 
 const COLLAPSE_AT = 48;
@@ -130,6 +148,12 @@ const styles = stylex.create({
     transitionDuration: '150ms',
   },
   shown: { opacity: 1 },
+  // The conversation's bar name arrives with Pam's own tempo (PAM_MOTION.enter: 240ms, ease-out) and
+  // at once under reduced motion.
+  barTitleFade: {
+    transitionDuration: { default: '240ms', '@media (prefers-reduced-motion: reduce)': '0ms' },
+    transitionTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)',
+  },
   // 34px, stepping down for a word that will not fit (D-422, `useFitTitle`).
   // While it is being measured a word may not break, so one that is too wide
   // overflows and says so; only past the smallest step is it allowed to.
@@ -164,6 +188,7 @@ const styles = stylex.create({
 
 export function SubPageHeader({
   title,
+  isTitleData = false,
   backHref,
   backLabel,
   subtitle,
@@ -175,9 +200,12 @@ export function SubPageHeader({
   backIcon = 'back',
   isBackFixed = false,
   hero,
+  variant = 'large',
+  isBarTitleShown = true,
 }: SubPageHeaderProps) {
   const [collapsed, setCollapsed] = useState(false);
   const fit = useFitTitle<HTMLHeadingElement>(title);
+  const dataDir = isTitleData ? 'auto' : undefined;
 
   useEffect(() => {
     const onScroll = () => setCollapsed(window.scrollY > COLLAPSE_AT);
@@ -196,6 +224,24 @@ export function SubPageHeader({
   // 240px; the bar is pulled back up over it to 12px from the top; the title
   // starts 16px under the picture.
   const isHero = hero !== undefined && hero !== null && hero !== false;
+
+  if (variant === 'bar') {
+    return (
+      <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.bar}>
+        {back}
+        <HStack align="center" wrap="nowrap" xstyle={styles.middle}>
+          <Text dir={dataDir} xstyle={[styles.barTitle, styles.barTitleFade, isBarTitleShown && styles.shown]} aria-hidden="true">
+            {title}
+          </Text>
+        </HStack>
+        {actions ? (
+          <HStack gap={1} align="center" wrap="nowrap" xstyle={styles.actions}>
+            {actions}
+          </HStack>
+        ) : null}
+      </HStack>
+    );
+  }
 
   return (
     <>
@@ -218,7 +264,7 @@ export function SubPageHeader({
       >
         {back}
         <HStack align="center" wrap="nowrap" xstyle={styles.middle}>
-          <Text xstyle={[styles.barTitle, collapsed && styles.shown]} aria-hidden="true">
+          <Text dir={dataDir} xstyle={[styles.barTitle, collapsed && styles.shown]} aria-hidden="true">
             {title}
           </Text>
         </HStack>
@@ -232,13 +278,13 @@ export function SubPageHeader({
         {titleAddon ? (
           // Something beside the title — an info tip (D-376).
           <HStack gap={1} align="center" wrap="nowrap" xstyle={styles.titleRow}>
-            <Heading level={1} id={titleId} ref={fit.ref} xstyle={[styles.large, sizes.title(fit.size), fit.mustBreak && styles.largeBreaks]}>
+            <Heading level={1} dir={dataDir} id={titleId} ref={fit.ref} xstyle={[styles.large, sizes.title(fit.size), fit.mustBreak && styles.largeBreaks]}>
               {title}
             </Heading>
             {titleAddon}
           </HStack>
         ) : (
-          <Heading level={1} id={titleId} ref={fit.ref} xstyle={[styles.large, sizes.title(fit.size), fit.mustBreak && styles.largeBreaks]}>
+          <Heading level={1} dir={dataDir} id={titleId} ref={fit.ref} xstyle={[styles.large, sizes.title(fit.size), fit.mustBreak && styles.largeBreaks]}>
             {title}
           </Heading>
         )}

@@ -34,7 +34,7 @@ export function JoiningAsStaff() {
       <Section title="If you do not have a link">
         <P>
           Ask the person at Pam who works with you to send you one. A case manager or a Pam super admin can send
-          one. If you do not know who to ask, call Pam.
+          one. If you do not know who to ask, contact Pam.
         </P>
         <Needs title="A link works once, for one person.">
           It only works on the phone number it was made for, and it lasts 30 days. If it has expired, ask for a

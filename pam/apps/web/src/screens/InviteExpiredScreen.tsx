@@ -10,7 +10,7 @@ import { SubPageHeader } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import type { Invite } from '@/lib/appUrl';
 import { isEmailAddress, previewInvite, requestInviteLink, type InvitePreview } from '@/lib/useInviteLinks';
-import { LegalFooter } from '../app/signin/LegalFooter';
+import { LegalLinks } from '../app/signin/LegalFooter';
 
 /**
  * An expired invite link (Will, 4 October, D-258; reworked by D-263).
@@ -94,7 +94,7 @@ export function InviteExpiredScreen({ invite }: { readonly invite: Invite | null
           {t(`signin.invited.${role}`)}
         </Text>
       ) : null}
-      <Page gap={4}>
+      <Page gap={4} footer={<LegalLinks from="signin" />} isFooterInFlow>
         <SubPageHeader title={title} backHref="/signin/" backLabel={t('nav.back.signInScreen')} />
         {state === 'loading' ? <Loading label={t('common.loading')} variant="inline" /> : null}
 
@@ -145,7 +145,6 @@ export function InviteExpiredScreen({ invite }: { readonly invite: Invite | null
 
         <TextLink label={t('invite.expired.signin')} href="/signin/" />
       </Page>
-      <LegalFooter from="signin" />
     </>
   );
 }

@@ -56,6 +56,8 @@ async function signedInAs(
   role: 'admin' | 'member' | 'super_admin',
   /** Read at each request, so a test can limit the account part-way through. */
   accessStatus: () => 'active' | 'limited' = () => 'active',
+  /** A demo account (0057) may see example data; a real one never does (lib/examples.ts). */
+  demo = false,
 ) {
   await seedSession(page);
   await page.route(NOTIFICATIONS, (route) => route.fulfill(json([])));
@@ -69,6 +71,7 @@ async function signedInAs(
         role,
         first_name: 'Will',
         access_status: accessStatus(),
+        is_demo: demo,
         region_id: '0195b1c0-0000-4000-8000-000000000001',
         regions: { name: 'Philadelphia' },
       }),
@@ -112,7 +115,8 @@ async function withOneConversation(page: import('@playwright/test').Page) {
       ]),
     );
   });
-  await page.route(PEOPLE, (route) => route.fulfill(json([])));
+  // Marcus is also someone this person may message: with nobody, there is no New message (and no Messages tab).
+  await page.route(PEOPLE, (route) => route.fulfill(json([{ profile_id: OTHER, first_name: 'Marcus', role: 'member' }])));
 }
 
 test.describe('the conversation list', () => {
@@ -165,7 +169,7 @@ test.describe('the conversation list', () => {
     await expect(page.getByRole('link', { name: /Marcus/ })).toBeVisible();
     await expect(page.getByRole('button', { name: 'New message' })).toHaveCount(0);
     await expect(page.getByRole('alert').getByText('Some things are turned off')).toBeVisible();
-    await expect(page.getByRole('alert').getByRole('link', { name: /Call/ })).toHaveAttribute('href', /^tel:/);
+    await expect(page.getByRole('alert').getByRole('link', { name: /Contact Pam/ })).toHaveAttribute('href', '/help/');
 
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
     expect(results.violations).toEqual([]);
@@ -272,15 +276,18 @@ test.describe('the conversation list', () => {
     const sheet = page.getByRole('dialog', { name: 'New message' });
     await expect(sheet).toBeVisible();
     await expect(sheet.getByRole('button', { name: /Tanya/ })).toBeVisible();
+    // The field is named once: its label says "Search by name", so no placeholder repeats it (Iris, b20).
+    await expect(sheet.getByRole('textbox')).toHaveAccessibleName('Search by name');
+    await expect(sheet.getByRole('textbox')).not.toHaveAttribute('placeholder', /.+/);
     await sheet.getByRole('textbox').fill('mar');
     await expect(sheet.getByRole('button', { name: /Tanya/ })).toHaveCount(0);
     await sheet.getByRole('button', { name: /Marcus/ }).click();
     await expect(page).toHaveURL(new RegExp(`/messages/thread/\\?id=${CONVO}`));
   });
 
-  test('a member previewing sees example conversations and who they can message', async ({ page }) => {
+  test('a demo account previewing a member sees example conversations and who they can message', async ({ page }) => {
     await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'member'));
-    await signedInAs(page, 'super_admin');
+    await signedInAs(page, 'super_admin', () => 'active', true);
     // No real conversations, so the example ones stand in.
     await page.route(MEMBERS, (route) => route.fulfill(json([])));
     await page.goto('/messages/');
@@ -631,8 +638,8 @@ test.describe('a conversation', () => {
     await expect(notice.getByText(/^You cannot send messages right now\./)).toBeVisible();
     await expect(notice.getByText(/Your guide turned this off for your account\./)).toBeVisible();
     await expect(notice.getByText(/your plan/i)).toHaveCount(0);
-    const call = notice.getByRole('link', { name: /Call/ });
-    await expect(call).toHaveAttribute('href', /^tel:/);
+    const call = notice.getByRole('link', { name: /Contact Pam/ });
+    await expect(call).toHaveAttribute('href', '/help/');
     // The quiet card: body text at the smallest size (16px), and the call is a
     // link, not a filled primary button — still a 48px target.
     expect(await notice.getByText(/^You cannot send messages/).evaluate((el) => getComputedStyle(el).fontSize)).toBe('16px');
@@ -784,7 +791,7 @@ test.describe('a conversation', () => {
 
   test('an example conversation renders through the same chat log, and sends nowhere', async ({ page }) => {
     await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'member'));
-    await signedInAs(page, 'super_admin');
+    await signedInAs(page, 'super_admin', () => 'active', true);
     let realWrites = 0;
     await page.route(MESSAGES, (route) => {
       realWrites += 1;
@@ -794,17 +801,17 @@ test.describe('a conversation', () => {
     await settled(page);
 
     await expect(page.getByRole('heading', { name: 'Teresa', level: 1 })).toBeVisible();
-    // Who they are to you sits on the line under the name (D-395, was a tag
-    // beside it — D-193, D-187): just below it, starting where it starts.
+    // Who they are to you sits on the line under the name (D-395, D-526: centred, in the info that
+    // scrolls with the messages): just below it, on the same centre line.
     const heading = await page.getByRole('heading', { name: 'Teresa', level: 1 }).boundingBox();
     const line = await page
       .getByRole('heading', { name: 'Teresa', level: 1 })
-      .locator('xpath=../..')
+      .locator('xpath=..')
       .getByText('Case manager', { exact: true })
       .boundingBox();
     expect(line!.y).toBeGreaterThanOrEqual(heading!.y + heading!.height - 2);
-    expect(line!.y - (heading!.y + heading!.height)).toBeLessThan(8);
-    expect(Math.abs(line!.x - heading!.x)).toBeLessThan(2);
+    expect(line!.y - (heading!.y + heading!.height)).toBeLessThan(10);
+    expect(Math.abs(line!.x + line!.width / 2 - (heading!.x + heading!.width / 2))).toBeLessThan(2);
     await expect(page.getByRole('log')).toBeVisible();
     // The same thread Teresa's own preview reads, from Jordan's side (D-183).
     await expect(page.getByRole('log').getByText(/room 12/)).toBeVisible();
@@ -1271,7 +1278,7 @@ test.describe('the conversation, drawn closer (D-400, D-401)', () => {
     );
   };
 
-  test('who they are stays on one line under the name, however long the program', async ({ page }) => {
+  test('who they are is never cut, however long the program (D-526: the info has the room; it wraps)', async ({ page }) => {
     await signedInAs(page, 'member');
     await withOneConversation(page);
     await page.route(PARTNERS, (route) =>
@@ -1289,29 +1296,31 @@ test.describe('the conversation, drawn closer (D-400, D-401)', () => {
     );
     await page.goto(`/messages/thread/?id=${CONVO}`);
     await settled(page);
-    const line = page.getByText(/^Program lead at Example Food Pantry/);
-    const box = await line.boundingBox();
-    expect(box!.height).toBeLessThan(24);
-    expect(await line.evaluate((el) => getComputedStyle(el).textOverflow)).toBe('ellipsis');
+    const line = page.getByText(/^Program lead at Example Food Pantry of North Philadelphia and the Neighborhoods Around It$/);
+    await expect(line).toBeVisible();
+    const box = (await line.boundingBox())!;
+    // Inside the screen, and nothing clipped: it grows to a second line rather than being cut.
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+    expect(await line.evaluate((el) => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
+    expect(await line.evaluate((el) => getComputedStyle(el).textOverflow)).not.toBe('ellipsis');
   });
 
-  test('the header is the one every nested screen has: back and ⋯ in the same places, the name large, no fade (D-411)', async ({ page }) => {
+  test('the bar is the one every nested screen has: back and ⋯ in the same places, the name once, no fade (D-411, D-526)', async ({ page }) => {
     await signedInAs(page, 'admin');
     await withOneConversation(page);
     await page.goto('/legal/');
     await settled(page);
     const legalBack = (await page.getByRole('link', { name: /^Back/ }).first().boundingBox())!;
-    const legalTitle = (await page.getByRole('heading', { level: 1 }).boundingBox())!;
 
     await page.goto(`/messages/thread/?id=${CONVO}`);
     await settled(page);
     const back = (await page.getByRole('link', { name: /^Back/ }).first().boundingBox())!;
     expect(back).toEqual(legalBack);
-    const title = page.getByRole('heading', { level: 1 });
-    const titleBox = (await title.boundingBox())!;
-    expect(titleBox.x).toBe(legalTitle.x);
-    expect(titleBox.y).toBe(legalTitle.y);
-    expect(await title.evaluate((el) => getComputedStyle(el).fontSize)).toBe('34px');
+
+    // One heading: the name in the info that scrolls with the messages. The bar's copy of it is for the eye only.
+    await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+    expect(await page.getByRole('heading', { level: 1 }).evaluate((el) => getComputedStyle(el).fontSize)).toBe('22px');
 
     // ⋯ at the bar's right edge, as on a place: outlined in a grey you can see, and lifted.
     const more = page.getByRole('link', { name: 'More options' });
@@ -1326,7 +1335,7 @@ test.describe('the conversation, drawn closer (D-400, D-401)', () => {
     expect(look.colour).not.toMatch(/rgba\(0, 0, 0, 0\.0\d+\)/);
     expect(look.shadow).not.toBe('none');
 
-    // No blur or fade laid over the messages under the header.
+    // No blur or fade laid over the messages under the bar.
     const faded = await page.evaluate(() => {
       const top = document.querySelector('main')!.firstElementChild!;
       return [...top.querySelectorAll('*')].some((el) => {
@@ -1335,6 +1344,221 @@ test.describe('the conversation, drawn closer (D-400, D-401)', () => {
       });
     });
     expect(faded).toBe(false);
+  });
+
+  test.describe('the name in the bar (D-526)', () => {
+    const manyMessages = async (page: import('@playwright/test').Page) => {
+      await page.route(MESSAGES, (route) =>
+        route.fulfill(
+          json(
+            Array.from({ length: 40 }, (_, i) => ({
+              id: `bulk-${i}`,
+              conversation_id: CONVO,
+              sender_id: i % 2 ? ME : OTHER,
+              body: `Message number ${i + 1}, long enough to take a line or two on a narrow phone screen.`,
+              created_at: new Date(Date.now() - (40 - i) * 60_000).toISOString(),
+            })),
+          ),
+        ),
+      );
+    };
+    // The bar's copy of the name: the `aria-hidden` text inside the pinned bar, which is the only name there.
+    const barName = (page: import('@playwright/test').Page) => page.locator('main > :first-child [aria-hidden="true"]', { hasText: 'Marcus' });
+
+    test('it is not there while the info shows the name, and fades in as the name goes under the bar', async ({ page }) => {
+      await signedInAs(page, 'admin');
+      await withOneConversation(page);
+      await manyMessages(page);
+      await page.goto(`/messages/thread/?id=${CONVO}`);
+      await settled(page);
+
+      const log = page.getByRole('log');
+      await expect(log).toBeVisible();
+      // Scroll to the top: the name is in the info, the bar's copy is clear.
+      await page.evaluate(() => {
+        for (const el of document.querySelectorAll('*')) {
+          if (el.scrollHeight > el.clientHeight + 4 && /auto|scroll/.test(getComputedStyle(el).overflowY)) el.scrollTop = 0;
+        }
+      });
+      await expect.poll(async () => Number(await barName(page).evaluate((el) => getComputedStyle(el).opacity))).toBe(0);
+      const before = (await barName(page).boundingBox())!;
+
+      // Scroll the conversation to its end: the name is under the bar, so the bar says it.
+      await page.evaluate(() => {
+        for (const el of document.querySelectorAll('*')) {
+          if (el.scrollHeight > el.clientHeight + 4 && /auto|scroll/.test(getComputedStyle(el).overflowY)) el.scrollTop = el.scrollHeight;
+        }
+      });
+      await expect.poll(async () => Number(await barName(page).evaluate((el) => getComputedStyle(el).opacity))).toBe(1);
+      // Only opacity changed: the name did not move.
+      expect(await barName(page).boundingBox()).toEqual(before);
+      // And the page still says it once to a screen reader.
+      await expect(page.getByRole('heading', { level: 1, name: 'Marcus' })).toHaveCount(1);
+      await expect(page.getByText('Marcus', { exact: true })).not.toHaveCount(0);
+    });
+
+    test('with reduced motion it changes at once', async ({ page }) => {
+      await signedInAs(page, 'admin');
+      await withOneConversation(page);
+      await manyMessages(page);
+      await page.goto(`/messages/thread/?id=${CONVO}`);
+      await settled(page);
+      await expect(page.getByRole('log')).toBeVisible();
+      // 0s, or the 0.00001s that a global reduced-motion rule leaves.
+      expect(parseFloat(await barName(page).evaluate((el) => getComputedStyle(el).transitionDuration))).toBeLessThan(0.001);
+    });
+  });
+
+  test.describe('in Arabic, what people wrote keeps its own direction (Iris, 11 October: T1, T2)', () => {
+    test.beforeEach(async ({ page }) => {
+      await page.addInitScript(() => localStorage.setItem('pam.locale', 'ar'));
+    });
+    const LATIN_NAME = 'Maria Guadalupe Hernández-Villanueva de la Cruz';
+    const ARABIC_NAME = 'محمد عبد الرحمن الحسيني بن عبد العزيز آل سعيد الكبير';
+    const withNameAndWords = async (page: import('@playwright/test').Page, name: string) => {
+      // The account's own language wins over the device's, so the account says Arabic too.
+      await page.route(PROFILES, (route) =>
+        route.fulfill(
+          json({
+            id: ME,
+            role: 'admin',
+            first_name: 'Will',
+            access_status: 'active',
+            preferred_language: 'ar',
+            region_id: '0195b1c0-0000-4000-8000-000000000001',
+            regions: { name: 'Philadelphia' },
+          }),
+        ),
+      );
+      await withOneConversation(page);
+      await page.route(PARTNERS, (route) =>
+        route.fulfill(json([{ conversation_id: CONVO, profile_id: OTHER, first_name: name, role: 'member' }])),
+      );
+      await page.route(MESSAGES, (route) =>
+        route.fulfill(
+          json([
+            ...Array.from({ length: 30 }, (_, i) => ({
+              id: `fill-${i}`,
+              conversation_id: CONVO,
+              sender_id: OTHER,
+              body: `Message ${i + 1}, long enough to take a line or two on a narrow phone screen.`,
+              created_at: new Date(Date.now() - (40 - i) * 60_000).toISOString(),
+            })),
+            { id: 'en-1', conversation_id: CONVO, sender_id: OTHER, body: 'Thank you. Which bus goes there?', created_at: new Date(Date.now() - 5 * 60_000).toISOString() },
+            { id: 'ar-1', conversation_id: CONVO, sender_id: OTHER, body: 'شكرا لك. أي حافلة تذهب إلى هناك؟', created_at: new Date(Date.now() - 4 * 60_000).toISOString() },
+          ]),
+        ),
+      );
+    };
+    const direction = (locator: import('@playwright/test').Locator) => locator.evaluate((el) => getComputedStyle(el).direction);
+    const scrollMessages = (page: import('@playwright/test').Page, to: 'top' | 'bottom') =>
+      page.evaluate((where) => {
+        for (const el of document.querySelectorAll('*')) {
+          if (el.scrollHeight > el.clientHeight + 4 && /auto|scroll/.test(getComputedStyle(el).overflowY)) {
+            el.scrollTop = where === 'top' ? 0 : el.scrollHeight;
+          }
+        }
+      }, to);
+
+    test('T1: an English message in an Arabic thread reads left to right, an Arabic one right to left', async ({ page }) => {
+      await signedInAs(page, 'admin');
+      await withNameAndWords(page, 'Marcus');
+      await page.goto(`/messages/thread/?id=${CONVO}`);
+      await settled(page);
+      await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+      await scrollMessages(page, 'bottom');
+      const english = page.getByText('Thank you. Which bus goes there?');
+      const arabic = page.getByText('شكرا لك. أي حافلة تذهب إلى هناك؟');
+      await expect(english).toBeVisible();
+      expect(await direction(english)).toBe('ltr');
+      expect(await direction(arabic)).toBe('rtl');
+    });
+
+    test('T1: the last message in the list keeps its own direction too', async ({ page }) => {
+      await signedInAs(page, 'admin');
+      await withNameAndWords(page, 'Marcus');
+      await page.route(MESSAGES, (route) =>
+        route.fulfill(
+          json([{ id: 'en-2', conversation_id: CONVO, sender_id: OTHER, body: 'Class starts Monday at 10.', created_at: new Date().toISOString() }]),
+        ),
+      );
+      await page.goto('/messages/');
+      await settled(page);
+      await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+      const preview = page.getByText('Class starts Monday at 10.');
+      await expect(preview).toBeVisible();
+      expect(await direction(preview)).toBe('ltr');
+    });
+
+    test('T2: a long Latin name keeps its start in the bar and the info, an Arabic name its own end', async ({ page }) => {
+      await signedInAs(page, 'admin');
+      await withNameAndWords(page, LATIN_NAME);
+      await page.goto(`/messages/thread/?id=${CONVO}`);
+      await settled(page);
+      const barName = page.locator('main > :first-child [aria-hidden="true"]', { hasText: 'Maria' });
+      await scrollMessages(page, 'bottom');
+      await expect.poll(async () => Number(await barName.evaluate((el) => getComputedStyle(el).opacity))).toBe(1);
+      // Left to right, so what does not fit is cut at its end, with the ellipsis: "Maria Guadalupe H…".
+      expect(await direction(barName)).toBe('ltr');
+      expect(await barName.evaluate((el) => getComputedStyle(el).textOverflow)).toBe('ellipsis');
+      expect(await barName.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true);
+      await scrollMessages(page, 'top');
+      expect(await direction(page.getByRole('heading', { level: 1 }))).toBe('ltr');
+    });
+
+    test('T2: an Arabic name is cut at its own end', async ({ page }) => {
+      await signedInAs(page, 'admin');
+      await withNameAndWords(page, ARABIC_NAME);
+      await page.goto(`/messages/thread/?id=${CONVO}`);
+      await settled(page);
+      const barName = page.locator('main > :first-child [aria-hidden="true"]', { hasText: 'محمد' });
+      await scrollMessages(page, 'bottom');
+      await expect.poll(async () => Number(await barName.evaluate((el) => getComputedStyle(el).opacity))).toBe(1);
+      expect(await direction(barName)).toBe('rtl');
+      expect(await barName.evaluate((el) => getComputedStyle(el).textOverflow)).toBe('ellipsis');
+      expect(await direction(page.getByRole('heading', { level: 1 }).first())).toBe('rtl');
+    });
+  });
+
+  test.describe('example people\'s stock photos stay with the examples (Will, a55)', () => {
+    // A real case manager who happens to be called Teresa, with no program, matches an example person.
+    const withTeresa = async (page: import('@playwright/test').Page, hosts: string[]) => {
+      await withOneConversation(page);
+      await page.route(PARTNERS, (route) =>
+        route.fulfill(json([{ conversation_id: CONVO, profile_id: OTHER, first_name: 'Teresa', role: 'admin' }])),
+      );
+      await page.route('**/*', (route) => {
+        const url = route.request().url();
+        if (url.includes('images.unsplash.com')) {
+          hosts.push(url);
+          return route.fulfill({ status: 200, contentType: 'image/png', body: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64') });
+        }
+        return route.fallback();
+      });
+    };
+
+    test('a real account with an example-matching name gets no photo and no request to the photo host', async ({ page }) => {
+      const requests: string[] = [];
+      await signedInAs(page, 'member');
+      await withTeresa(page, requests);
+      for (const path of ['/messages/', `/messages/thread/?id=${CONVO}`]) {
+        await page.goto(path);
+        await settled(page);
+        await expect(page.getByText('Teresa').first()).toBeVisible();
+        await expect(page.locator('img[src*="unsplash"]')).toHaveCount(0);
+      }
+      expect(requests).toEqual([]);
+    });
+
+    test('a demo account still sees the example photo', async ({ page }) => {
+      const requests: string[] = [];
+      await signedInAs(page, 'member', () => 'active', true);
+      await withTeresa(page, requests);
+      await page.goto('/messages/');
+      await settled(page);
+      await expect(page.getByText('Teresa').first()).toBeVisible();
+      await expect.poll(() => requests.length).toBeGreaterThan(0);
+    });
   });
 
   test('the send button hugs the box\'s rounder bottom corner; the mic sits nearer its own', async ({ page }) => {
@@ -1370,6 +1594,36 @@ test.describe('the conversation, drawn closer (D-400, D-401)', () => {
     expect(Math.round(p.x - bubble.x)).toBe(8);
     expect(Math.round(words.y - (p.y + p.height))).toBeGreaterThanOrEqual(12);
   });
+
+  for (const byKeyboard of [false, true]) {
+    test(`the photo viewer shows no ring on what it focuses (${byKeyboard ? 'keyboard' : 'mouse'}); Tab rings the close button (D-523)`, async ({ page }) => {
+      await signedInAs(page, 'admin');
+      await withOneConversation(page);
+      await withAPhoto(page);
+      await page.goto(`/messages/thread/?id=${CONVO}`);
+      await settled(page);
+      const photo = page.getByRole('button', { name: 'A photo from Marcus' });
+      if (byKeyboard) {
+        await photo.focus();
+        await page.keyboard.press('Enter');
+      } else {
+        await photo.click();
+      }
+      const dialog = page.locator('dialog.astryx-lightbox');
+      await expect(dialog).toBeVisible();
+      await expect.poll(() => dialog.evaluate((el) => document.activeElement === el)).toBe(true);
+      // Focus is put on the viewer so a screen reader lands in it; it is not a control and shows no ring.
+      expect(await dialog.evaluate((el) => getComputedStyle(el).outlineStyle)).toBe('none');
+      await page.keyboard.press('Tab');
+      const ring = await page.evaluate(() => {
+        const s = getComputedStyle(document.activeElement!);
+        return { tag: document.activeElement!.tagName.toLowerCase(), style: s.outlineStyle, width: parseFloat(s.outlineWidth) };
+      });
+      expect(ring.tag).toBe('button');
+      expect(ring.style).not.toBe('none');
+      expect(ring.width).toBeGreaterThan(0);
+    });
+  }
 
   test('a photo opens on near-black, with a round close button you can see', async ({ page }) => {
     await signedInAs(page, 'admin');
@@ -1670,7 +1924,7 @@ test.describe('the jump-to-newest button, with motion on (D-398)', () => {
 test.describe('an example person', () => {
   test('a case manager preview can message a member from their profile, into an example chat', async ({ page }) => {
     await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));
-    await signedInAs(page, 'super_admin');
+    await signedInAs(page, 'super_admin', () => 'active', true);
     await page.goto('/person/?id=dummy-m4');
     await settled(page);
 
@@ -1685,7 +1939,7 @@ test.describe('an example person', () => {
 
   test('the staff side of a conversation is the member side, flipped', async ({ page }) => {
     await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));
-    await signedInAs(page, 'super_admin');
+    await signedInAs(page, 'super_admin', () => 'active', true);
     await page.route(MEMBERS, (route) => route.fulfill(json([])));
     await page.goto('/messages/');
     await settled(page);
@@ -1736,7 +1990,7 @@ test.describe('reported messages', () => {
   });
 
   test('a super admin has Conversations and Reported, nothing to send under Reported, and a preview sees the example set', async ({ page }) => {
-    await signedInAs(page, 'super_admin');
+    await signedInAs(page, 'super_admin', () => 'active', true);
     await page.route(REPORTS, (route) => route.fulfill(json([])));
     await page.goto('/messages/');
     await settled(page);
@@ -1780,6 +2034,10 @@ test.describe('reported messages', () => {
 });
 
 test.describe('reported places (D-189)', () => {
+  // The example reports are a demo's; a real account has none (D-509).
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => window.sessionStorage.setItem('pam.examples', '1'));
+  });
   test('a case manager preview sees the example reported places and cannot decide', async ({ page }) => {
     await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));
     await signedInAs(page, 'super_admin');
@@ -1817,6 +2075,10 @@ test.describe('reported places (D-189)', () => {
 });
 
 test.describe("the bell's rows land on real screens in the new layout", () => {
+  // The example reports are a demo's; a real account has none (D-509).
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => window.sessionStorage.setItem('pam.examples', '1'));
+  });
   async function bellRow(
     page: import('@playwright/test').Page,
     row: { kind: string; subject_type: string; subject_id: string; body_vars?: Record<string, string> },
@@ -1872,5 +2134,112 @@ test.describe("the bell's rows land on real screens in the new layout", () => {
     await bellRow(page, { kind: 'staff_request_pending', subject_type: 'staff_request', subject_id: 'q1', body_vars: { name: 'Andre' } }, /Andre/);
     await expect(page).toHaveURL(/\/requests\//);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  });
+});
+
+test.describe('a real account sees only its real things (Will, 11 October 2026)', () => {
+  const EXAMPLES = /Teresa|Sandra|Renee|Example people|People who offered help/;
+
+  test('a member with no one to message has no Messages tab, no examples, a short empty state, and the bell is on Home', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await page.route(MEMBERS, (route) => route.fulfill(json([])));
+    await page.route(PEOPLE, (route) => route.fulfill(json([])));
+    await page.goto('/messages/');
+    await settled(page);
+
+    await expect(page.getByRole('heading', { level: 2, name: 'No messages yet' })).toBeVisible();
+    await expect(page.getByText(EXAMPLES)).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'People who offered help' })).toHaveCount(0);
+    // Nobody to pick, so no New message (a picker with no one in it is a dead end).
+    await expect(page.getByRole('button', { name: 'New message' })).toHaveCount(0);
+    // The Messages tab is not drawn.
+    const bar = page.getByRole('navigation', { name: 'Main' });
+    await expect(bar.getByRole('link', { name: 'Profile' })).toBeVisible();
+    await expect(bar.getByRole('link', { name: /Messages/ })).toHaveCount(0);
+
+    // Notifications are still reachable: the bell is in Home's header.
+    await page.goto('/');
+    await settled(page);
+    await expect(page.getByRole('link', { name: /Notifications/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Notifications/ })).toHaveAttribute('href', '/notifications/');
+  });
+
+  test('the bell shows no example alerts and the list says there is nothing', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await page.route(MEMBERS, (route) => route.fulfill(json([])));
+    await page.route(PEOPLE, (route) => route.fulfill(json([])));
+    await page.goto('/notifications/');
+    await settled(page);
+    await expect(page.getByRole('link', { name: 'Notifications' })).toHaveCount(0); // the page's own header has no bell link to itself
+    await expect(page.getByText(/Place reported|saved place|points/i)).toHaveCount(0);
+    await expect(page.getByText('Example people', { exact: false })).toHaveCount(0);
+  });
+
+  test('with someone to message the tab shows, and the empty state offers New message', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await page.route(MEMBERS, (route) => route.fulfill(json([])));
+    await page.route(PEOPLE, (route) => route.fulfill(json([{ profile_id: OTHER, first_name: 'Marcus', role: 'member' }])));
+    await page.goto('/messages/');
+    await settled(page);
+    const bar = page.getByRole('navigation', { name: 'Main' });
+    await expect(bar.getByRole('link', { name: /Messages/ })).toBeVisible();
+    await expect(page.getByText(EXAMPLES)).toHaveCount(0);
+    await expect(page.getByRole('heading', { level: 2, name: 'No messages yet' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'New message' }).first()).toBeVisible();
+  });
+
+  test('with one conversation the tab shows and the list is that conversation only', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await withOneConversation(page);
+    await page.goto('/messages/');
+    await settled(page);
+    const bar = page.getByRole('navigation', { name: 'Main' });
+    await expect(bar.getByRole('link', { name: /Messages/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Marcus/ })).toBeVisible();
+    await expect(page.getByText(EXAMPLES)).toHaveCount(0);
+    await expect(page.getByRole('list').first().getByRole('listitem')).toHaveCount(1);
+  });
+
+  test('a super admin on a real account, previewing a member, sees no examples either', async ({ page }) => {
+    await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'member'));
+    await signedInAs(page, 'super_admin');
+    await page.route(MEMBERS, (route) => route.fulfill(json([])));
+    await page.route(PEOPLE, (route) => route.fulfill(json([])));
+    await page.goto('/messages/');
+    await settled(page);
+    await expect(page.getByText(EXAMPLES)).toHaveCount(0);
+    await expect(page.getByRole('heading', { level: 2, name: 'No messages yet' })).toBeVisible();
+  });
+
+  test('a case manager with no members keeps the Messages tab: the messages people reported are reviewed there', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await page.route(MEMBERS, (route) => route.fulfill(json([])));
+    await page.route(PEOPLE, (route) => route.fulfill(json([])));
+    await page.route(REPORTS, (route) => route.fulfill(json([])));
+    await page.goto('/messages/');
+    await settled(page);
+    const bar = page.getByRole('navigation', { name: 'Main' });
+    await expect(bar.getByRole('link', { name: /Messages/ })).toBeVisible();
+    await expect(page.getByRole('radio', { name: 'Reported' })).toBeVisible();
+    await expect(page.getByText(EXAMPLES)).toHaveCount(0);
+  });
+
+  test('an example conversation address on a real account is a conversation that does not exist', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await page.route(MEMBERS, (route) => route.fulfill(json([])));
+    await page.goto('/messages/thread/?id=dummy-conv-dummy-m1-dummy-p1');
+    await settled(page);
+    await expect(page.getByText(/Teresa|Sandra|Example/)).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /Back/ }).first()).toBeVisible();
+  });
+
+  test('a demo account still sees the examples, and keeps the Messages tab', async ({ page }) => {
+    await signedInAs(page, 'member', () => 'active', true);
+    await page.route(MEMBERS, (route) => route.fulfill(json([])));
+    await page.route(PEOPLE, (route) => route.fulfill(json([])));
+    await page.goto('/messages/');
+    await settled(page);
+    await expect(page.getByText('Example people', { exact: false })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Teresa/ })).toBeVisible();
   });
 });

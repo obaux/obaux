@@ -4,14 +4,43 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 # Writing
 
+How Pam sounds, in one page. The full guide, with examples from Pam's own strings, word
+lists and a checklist, is **[Pam's voice](https://github.com/obaux/obaux/blob/main/pam/docs/voice.md)**
+(`docs/voice.md`).
+
+## Who we write for
+
+Someone who hasn't used a phone in 8 years, reading on a cracked screen in the sun. If they can
+follow it, so can a busy case manager and a program lead.
+
+## Four traits
+
+- **Plain.** Say it the way you'd say it out loud. "That code is too old", not "Invite expired".
+- **Warm.** A person, not a system. "Someone at Pam can help you. You do not need to know what to ask for."
+- **Steady.** Honest and never alarming. "This is not your fault. Try again. If it keeps happening, contact Pam."
+- **Respectful.** People are *members*. Nothing on a screen says why someone needs help.
+
+## The tone moves with the moment
+
+Most personality on the website and in moments of welcome. Calmer in tasks. Plainest in errors and
+anything about privacy, terms or what others can see.
+
+## Patterns
+
+- **Buttons:** a verb, then the thing. "Send me a code", "Contact Pam".
+- **Titles:** a task asks the question ("Where is it?"); a result says the outcome ("Your visit is booked").
+- **Confirmations say what happens next.** "We check every request by hand. It takes a day or two."
+- **Errors:** what happened, not your fault, what to do, how to reach a person (Contact Pam; Pam has no phone line, A28).
+- **Empty states:** what will appear here, and the one way to fill it.
+
+## Rules that don't bend
+
 - **The name is "Pam"**, not "PAM". Invite codes keep their `PAM-XXXX` form.
-- **Plain language, short lines.** Write for someone reading on a cracked phone in the sun.
-- **Say what happens next.** "Your visit is booked. We'll text you the day before."
-- **Never justice terms.** No "prisoner", "ex-offender", "inmate", "parole violation", or anything
-  about a conviction — not in UI, texts, notifications or exports. People are *members*.
-- **People, not users.** Members, case managers, program leads, programs.
-- **Every string in English and Spanish**, key for key, through i18n.
-- **Texts (SMS)** start with "Pam:", stay under 160 characters, carry no emoji, never reveal
-  justice involvement, and need a human sign-off before they send.
-- **Example data** uses "Example …" program names and 555 phone numbers. Never a real person's
-  contact details.
+- **Never justice terms** — not in the app, texts, notifications or exports (CI checks this).
+- **Seven languages, in step.** Short sentences, no idioms, `{placeholders}` kept whole. How to change
+  words: `docs/copy-changes.md`.
+- **Texts** start with "Pam:", stay inside their length, carry no emoji, and need a human sign-off.
+  A text or email goes out in the person's own language once that language is signed for it, and in
+  English until then (A25).
+- **Example data** uses "Example …" names and 555 phone numbers. Never a real person's details.
+- **Nothing ships unsigned.** Sage signs new sentences; Will signs texts, emails, Privacy and Terms, and new promises (A29).

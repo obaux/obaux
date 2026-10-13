@@ -10,7 +10,6 @@ import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { NOTICES, intlLocale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../app/NotIn';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useStaffRequests } from '@/lib/useStaffRequests';
 import { useRoleView } from '@/lib/useViewedRole';
@@ -47,7 +46,6 @@ function requestedWhen(iso: string, locale: string): string {
  */
 export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean } = {}) {
   const { t, locale } = useI18n();
-  const supportPhone = useSupportPhone();
   const { state: session } = useSession();
 
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
@@ -100,8 +98,7 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
           notice="service_not_available"
           title={t('directory.notSuper.title')}
           body={t('directory.notSuper.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       </Page>
     );
@@ -124,8 +121,7 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
           notice={requests.offline ? 'offline' : 'something_went_wrong'}
           title={t(NOTICES[requests.offline ? 'offline' : 'something_went_wrong'].titleKey)}
           body={t(NOTICES[requests.offline ? 'offline' : 'something_went_wrong'].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 
@@ -134,8 +130,7 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
           notice="no_caseload_members"
           title={t('requests.empty.title')}
           body={t('requests.empty.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 

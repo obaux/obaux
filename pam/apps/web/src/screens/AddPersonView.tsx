@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
 import { Text } from '@astryxdesign/core/Text';
@@ -8,7 +8,10 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { DUMMY_PLACES_BY_ID } from '@pam/config/dummy-places';
 import { BigButton, TextField } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
+import { examplesOn } from '@/lib/examples';
 import { useI18n } from '@/lib/i18n';
+import { useProgramSetup } from '@/lib/programSetup';
+import { useSession } from '@/lib/useSession';
 import { navigate } from '@/lib/navigate';
 import { HelpButton } from './HelpButton';
 
@@ -28,13 +31,23 @@ const styles = stylex.create({
   note: { fontSize: '15px', lineHeight: 1.5 },
 });
 
-const PROGRAM_PLACE_ID = 'dummy-place-learning';
+const EXAMPLE_PROGRAM_ID = 'dummy-place-learning';
 
 export function AddPersonView() {
   const { t } = useI18n();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const place = DUMMY_PLACES_BY_ID[PROGRAM_PLACE_ID];
+  // The lead's own program (D-509); the example one only in a demo or Storybook.
+  const { state: session } = useSession();
+  const own = useProgramSetup(session).program;
+  const [examples, setExamples] = useState(false);
+  useEffect(() => setExamples(examplesOn()), []);
+  const programId = own ? own.id : EXAMPLE_PROGRAM_ID;
+  const place = own
+    ? { name: own.details.name, category: own.details.category, address: own.details.address }
+    : examples
+      ? DUMMY_PLACES_BY_ID[EXAMPLE_PROGRAM_ID]
+      : undefined;
   const digits = phone.replace(/[^\d]/g, '');
   const canGo = name.trim().length > 0 && digits.length >= 10;
 
@@ -75,7 +88,7 @@ export function AddPersonView() {
         onPress={() =>
           navigate(
             `/trips/new/?${new URLSearchParams({
-              place: PROGRAM_PLACE_ID,
+              place: programId,
               ...(place ? { name: place.name, category: place.category, address: place.address } : {}),
               for: `new-${Date.now()}`,
               forName: name.trim(),

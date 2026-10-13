@@ -11,6 +11,99 @@ STATUS row too.
 
 ## Open
 
+- [ ] **Google Calendar sync: waiting until Will wants it on** (a71, 12 October 2026: "wait until we switch sync on. Not now."). It is built and held on the branch `claude/places-programs-google-sync` (head 5f1e70ae; D-539): not merged, not deployed, no migration applied. When Will asks for it, its two Privacy lines come back on a card with the Google Cloud checklist (the full checklist is in that branch's `docs/before-launch.md`). The calendar link (D-538) is separate and does not need it.
+
+- [ ] **Calendar link: someone taps it on a real phone** (Piper, 11 October 2026, D-538). (1) On an Android phone, make a link on
+  Profile > Calendar and tap "Open Google Calendar on the web": it should reach Google Calendar's "add by URL" page in the
+  phone's browser; if Google sends the phone to its app or a sign-in that loses the page, the line above the button
+  ("ask for the desktop site") is the only way, so say so on the page more plainly. (2) Paste the link into Apple Calendar,
+  Google Calendar (on a computer) and Outlook, and check a visit shows, moves and goes, with the place's name off and on.
+  (3) Deploy `calendar-feed` with JWT verification off and fetch a made-up address: a bare 404. (4) A native reader for
+  `calendar.others` in the six languages (it names buttons in Google Calendar and Outlook).
+
+- [ ] **Read the City of Philadelphia licence once** (Lena for Mira, 11 October 2026; Will, or anyone with open web access).
+  Pam copies four City of Philadelphia open-data layers (City Facilities, Parks & Recreation program sites and properties, DBHIDS
+  provider locations) and a ZIP-code centre computed from the City's property points, and Piper's street centerlines are next.
+  All are under the "City of Philadelphia License". Nobody on the team has read its text: the City's hosts are blocked from
+  the sessions' sandbox, and `docs/data-licences.md` is built from the standard notice on OpenDataPhilly's dataset pages, which
+  says the City keeps all its rights, gives no warranty and no claim of accuracy, **makes the user responsible and makes the user hold the
+  City harmless**, and no credit line was seen. The hold-harmless term is a legal commitment Pam makes by using the data, so
+  read the full licence on phila.gov (the City's Open Data Program page, or the licence link on any OpenDataPhilly dataset page) once,
+  and then: (1) tick this, with the date; (2) write in `docs/data-licences.md` what the licence really says (credit? a
+  commercial-use limit? who is "the user" if Pam passes places on to members?); (3) tell Mira if it asks for a credit line, which would go
+  on the About page. No Privacy line is needed: none of this data is about members.
+
+- [ ] **Street-address search: the line is signed before the key is set, and the Google Maps terms are read once** (Lena for Mira, 13 October 2026; Will).
+  Piper's `places-search` function (a74) sends what a member typed (an address, a corner, anything Pam's own list of areas lacks) from Pam's
+  server to Google Places, and the place they pick. It is off until Will adds the secret `GOOGLE_MAPS_SERVER_KEY`. (1) **Do not add the key until
+  `privacy.s.sharing.p7` is signed by Will and live in seven languages**: the host guard lets the function reach `main` with that line still
+  pending (it is off), so the key is the gate; the Privacy page must say it before the first word goes to Google. (2) **Read Google's Maps Platform
+  terms for Places once** (what may be stored beyond a place id, the required "powered by Google" mark, which Dot draws): nobody on the team has read
+  them (not reachable from the sessions' sandbox), and the Privacy line says Pam keeps neither the words nor the answer, so the day anyone wants to
+  save a picked address the terms and the line both have to be looked at first. Then tick this with the date.
+
+- [ ] **The native apps ask for location with Pam's own reason** (Lena, 11 October 2026; Mira asked for this to be listed). Pam
+  asks the phone for where it is in two places: "Use my current location" in Explore's area picker, and "I'm here" on a visit
+  (D-526 part B). In the web app the browser asks. In the iOS and Android apps the system asks, and each store wants one line
+  saying why, shown in the person's language. `apps/native` has none yet, so write them when the shell gets its location
+  permission. The English, so the two places say one thing and say what Privacy says (`privacy.s.what-we-keep.p9`):
+  1. iOS `NSLocationWhenInUseUsageDescription` (when-in-use only; never ask for "always"):
+     *"Pam uses where you are to check you are at a place when you tap “I’m here”, and to find places near you when you
+     search. It does not keep the location your phone sends."*
+  2. Android: ask for precise location only at the moment of the tap (`ACCESS_FINE_LOCATION`, the check is within about
+     150 metres), with the same sentence on Pam's own screen before the system prompt. Never in the background.
+  3. Store privacy labels (App Store "Data used to track you / collected", Google Play "Data safety"). Piper's log check is in
+     (11 October): the position goes in the body of a POST (`services_near`, `services_search`, later `i_am_here`), so it is in
+     no URL and no log, and "the position is not stored" is true. But the gateway log does keep that this account made the call,
+     with its IP address, user agent and time, and an IP address is a rough location: answer the IP-address and usage rows from
+     that and from the request-log line on the Privacy page (card a66), not from "not stored". Do not write the label from this
+     item: write it from Piper's answer.
+  4. Seven languages: the system shows the string in the phone's language, so each of the six translations goes in the
+     native project's per-language strings the day those exist (signed by Will with the Privacy page, as it repeats it).
+
+- [ ] **The request log: keep `privacy.s.what-we-keep.p11` true** (Lena, 11 October 2026, a66; facts from Piper's read-only check).
+  Privacy says the servers that run Pam write down, for each request, when, what was asked for, which account, the IP
+  address and the kind of phone or browser, plus the phone number at sign-in; that messages and searches are not written
+  down; and that the record "is deleted within a week". True today because: Supabase is on the **Free** plan (logs kept 1
+  day; the oldest row was 25 hours old), Vercel's plan could not be read from the API (the deploy limit the team hit is
+  Hobby's, whose request logs last about an hour; Pro a day). Will can read Vercel's plan in Settings › Billing.
+  1. **Before the Supabase plan goes to Team (28 days) or Enterprise (90), or Vercel to Enterprise,** change p11 and
+     `privacy.s.what-we-keep.p12` (the calendar link's request record, which has the same "within a week") and their six
+     translations first. Pro (7 days) is still "within a week". Moving to Pro before launch is likely (the Free plan has
+     no backups to restore from); nothing to change for it.
+  2. **Do not add a log drain or an error tracker** (Sentry, an analytics tool, a Vercel Speed Insights switch) without
+     reading p11 first: a copy elsewhere has its own retention. None exists today (Piper searched the code and package.json).
+  3. `no-typed-text-in-urls.test.ts` keeps "what you search for" out of the logged URL: a new GET filter must be on an id,
+     a state or a setting, and typed words go in a POST body (an rpc).
+
+- [ ] **Read Twilio's own record of every text before texts go on** (Lena for Nico, 11 October 2026, from Piper's log check; Mira).
+  Twilio keeps, for each text Pam sends, the number, the text, the time and the status. Nobody has read its retention
+  setting (Console › Messaging › Settings, or the account's data-retention page). Privacy says only that "the one that sends
+  our texts" handles the information for Pam and may not use it for anything else (`privacy.s.sharing.p3`), and nothing says
+  how long it keeps it. Do it before the first real text: if Twilio keeps them longer than a person would expect, either shorten
+  it there or say so in `privacy.s.how-long` (Sage edits, Will signs). Texts are off today (`texts_live`), so it is not urgent.
+
+- [ ] **A28: finish taking Pam's number off every place a person reads it** (Lena, 11 October 2026, D-514, D-515).
+  The app, the privacy page and the terms are done and signed (card a59). What is still open, each with an owner:
+  1. **The live texts still carry the number.** `staff_request_denied` and `access_limited_notice` say
+     "Questions? Visit joinpam.org/support" in the repo, in seven languages (Nico's D-519 for the English, signed on card a59;
+     Lena's six translations, one message each, on `claude/lena-a28-texts`). The **live `dispatch-sms` is still the old
+     function**, which fills `{supportPhone}`: until Nico redeploys it, those two account texts (they go today) still give
+     the number. The redeploy waits on the carrier re-filing (see *File the updated text-message registration*): decide
+     which comes first. Nico also updates `docs/sms-campaign-samples.md` and Will pastes Sage's HELP auto-reply into
+     Twilio ("Get help at joinpam.org/support or write to hello@joinpam.org. Reply STOP to stop.").
+  2. **"Reply HELP to reach a person"** (`reminders.how`, `alerts.how`, the screens the carrier reviewed) now promises more
+     than the new HELP reply gives (an address). Sage to word it; it touches the registration.
+  3. **Ava's in-app copy and delete** (a fresh sign-in code to the account's phone). The day it ships,
+     `privacy.copy.body` and `privacy.delete.body` change from "Contact Pam and ask…" to the in-app steps, and
+     the Privacy › Copy / Delete pages lose their Contact Pam button (Lena carries the words).
+  4. **The help-request line on the privacy page** (what a request sends: what the person typed, how to answer them, the
+     page and the language, no records) is written the day Nico's form works, not before.
+  5. **"Talk to someone now"** opens `/support/` until Wren's "Your safety" post exists; then it opens the post.
+  6. **The public site** still says "call Pam" in `StillStuck.tsx`, `CaseManagerAssignments`, `JoiningAsStaff`,
+     `JoiningPam`, `MessagesInPam` (it quotes the blocked-notice text and the old link), `TextsFromPam` (three places, and
+     it lists the held saved-place text as sent today), `WhoIsMyGuide` and `search-phrases.ts` (Wren).
+
 - [ ] **Visit reminders go live: put back the lines the app stopped saying** (Lena, 10 October 2026, D-474).
   Will's rule (a12): a line says only what Pam does. Until `dispatch-sms` really sends the day-before visit
   reminder, ten lines in the app say what Pam does today. The day it does (check the *live* function and
@@ -28,7 +121,14 @@ STATUS row too.
      | `onboarding.provider.2` | Members find your program and plan a visit. | Fewer no-shows. Pam can remind people for you. |
      | `join.booked.body` | …It is on your Trips now. | {place}, {day} at {time}. Pam will remind you the day before if you said yes to texts. |
      | `trips.new.done.body` | It is on your map. | It is on your map. We will remind you the day before if text reminders are on. |
-     | `profile.promo.reminders.body` | We can text you if a place you saved closes or moves. | We can text you the day before a visit, or if a place you saved closes or moves. |
+     | `profile.promo.reminders.body` | Coming soon: texts about your visits and the places you saved. (A28 check, 11 October: was "We can text you if a place you saved closes or moves."; the saved-place text is held with the rest, D-481) | We can text you the day before a visit, or if a place you saved closes or moves. |
+     | `reminders.today.member` (the Text reminders screen) | Pam does not send any of these yet. They are coming. (was "Today Pam sends only one of these: a note when a place you saved closes or moves. The others are coming.") | Say which of the three are sent that day: Pam sends these. |
+     | `flag.done.body` (A28 check, 11 October) | Somebody at Pam looks at every one of these. | Somebody at Pam looks at every one of these. If the place comes off the list, anyone who saved it and said yes to texts is told. |
+
+     `flag.done.body` lost its second sentence because the only way a person who saved a place hears that it was
+     removed is the held saved-place text (D-481; no bell row is made for them, only for super admins and the
+     savers' case managers). Put it back with the others, with "and said yes to texts" (the text goes only to
+     someone who did).
 
      The original `onboarding.3` and `onboarding.provider.2` said it for everybody; a reminder goes only to
      someone who said yes, so the English above says so. The other three lines wait on their own texts, not on
@@ -275,7 +375,7 @@ STATUS row too.
   STOP cannot be cleared from the app once `20261010071947_…` is applied, but nothing stores a
   STOP: an Edge Function Twilio calls (STOP/START/HELP and the YES/NO replies) is not built —
   Will to say yes. `docs/sms-campaign-samples.md` has the nine texts and the description
-  (981 of 1,024 characters) for the one filing.
+  (1,015 of 1,024 characters) for the one filing.
 
 - [ ] **Review the SMS copy** still waiting for a name in `reviewedBy`
   (STATUS row 2).
@@ -377,6 +477,21 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   forwarding, a test and Will's go, D-450). Six translations each by Claude, with no native reader: promises, so the same
   native readers as below. The English says "rules" where the app says "policy"; the translations follow the app's word.
 
+- [ ] **A native reader for the calendar link screen (D-538, 11 October 2026).** The 27 `calendar.*` strings are six translations by
+  Claude with no native reader. Two things a reader must check against the real apps, in their own language, because the apps can
+  rename them: **`calendar.others`** names buttons in Google Calendar ("Other calendars" › "From URL") and Outlook ("Add calendar" ›
+  "Subscribe from web"); each translation uses what the app shows in that language, written from memory (es "Otros calendarios" ›
+  "Desde URL"; pt-BR Google Agenda "Outras agendas" › "Do URL"; ru "Другие календари" › "По URL"; ar «تقاويم أخرى» › «من عنوان URL»;
+  zh-CN “其他日历” › “通过网址”; zh-HK 「其他日曆」›「透過網址」; Outlook "Subscribe from web" is "Suscribirse desde la web", "Assinar da Web",
+  “从 Web 订阅”, 「從 Web 訂閱」, «Подписаться из Интернета», «الاشتراك من الويب»). And **"Pam visit"** stays English inside the quotes in
+  `calendar.details.hint`, because the event's text is English whatever the member's language (D-538, "Not done"): if the event text
+  is ever translated, change both together.
+  **`calendar.google.phone`** names a switch in the phone's browser, "Desktop site"; each translation uses Chrome's name for it in that
+  language, from memory (es "Sitio para computadoras"; pt-BR "Site para computador"; zh-CN “桌面版网站”; zh-HK 「電腦版網站」; ru «Версия для
+  компьютера»; ar «موقع سطح المكتب», where the Arabic says "choose" rather than "turn on" to avoid a vowel mark). Safari on an iPhone
+  calls it "Request Desktop Website" in its "aA" menu and other browsers differ, so a native reader should check the wording against
+  the browsers their members use.
+
 - [ ] **A native reader for what D-465 reworded (10 October).** The last-day line on the
   transparency screen (`transparency.canSee.lastActive`), the privacy page's "What you can do"
   blocking sentence and the terms' blocking sentence now say only what is true (a guide, not a
@@ -397,6 +512,8 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   its own `lang`, so "Русский" should be spoken in a Russian voice and the tag not at
   all. Nothing has been heard yet: try the Language screen and the sign-in menu with
   VoiceOver and TalkBack, in English and in Arabic.
+  Also the carousel's round button on Sign in and About Pam (D-501): its name says "Pause" or "Play" (`carousel.pause`, `carousel.play`, six translations by Claude, 11 October) beside the
+  carousel's own name; hear it in each language.
 
 - [ ] **Run an Arabic screen reader pass** (VoiceOver and TalkBack on a phone, and
   NVDA if it can be had): that the labels on icon buttons, cards, photos and the
@@ -431,10 +548,18 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   languages; a text always goes out (English if the person's language cannot be sent
   safely); pull a language by emptying its `reviewedBy`. Left:
   1. **Deploy `dispatch-sms`** (`supabase functions deploy dispatch-sms`, or the
-     connector). The live one is v15 from 17 September: it sends **"PAM:"** and only
+     connector). The live one is version 23 from 17 September (checked 11 October; this note used to say v15): it sends **"PAM:"** and only
      English and Spanish; the repo says **"Pam:"** and has the new languages. Deploying
      switches both on at once. Nothing is queued today, so it can go any time — but
      do it together with the next item, because the prefix changes on the live number.
+     **The order is: refile → approval → deploy the repo's `dispatch-sms` → only then
+     `texts_live` on.** And the honest line: account texts go out whatever `texts_live`
+     says (the sign-in code, a decision on a staff request, "parts of Pam are turned
+     off", the two invitations; migration 20261010141859), so until this deploy a denied
+     request or a limited account is still told "Call" and a phone number that Pam no
+     longer has (A28). The repo already says "Visit joinpam.org/support" (Will signed it,
+     a59, 11 October); the live function says it only after this deploy. Turning
+     `texts_live` on first would add reminders and alerts on top of the old prefix.
   2. **Re-file the campaign** with the carrier — its own item, just below, with the
      steps. This is the "fail" to watch: a text in an unregistered language may be
      filtered.
@@ -457,7 +582,7 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   three reminders take two segments in Chinese, Russian and Arabic. A text that does
   not match what was registered is how an approved campaign gets filtered or
   suspended, so this goes first. **The filing is ready to paste:
-  `docs/sms-campaign-samples.md`** (its description is 1,018 of 1,024 characters).
+  `docs/sms-campaign-samples.md`** (its description is 1015 of 1,024 characters).
   Only Will can do the filing: the Twilio account and the brand (Oba) are his.
   1. **Open the Twilio console and find the A2P 10DLC campaign for the Oba brand**
      (Messaging → Regulatory Compliance → A2P 10DLC → Campaigns; Twilio moves its
@@ -478,6 +603,13 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
      - **Opt-in description:** paste the answer under "How do end-users consent…" and
        attach the **Text reminders** screenshot, not the sign-in one.
      - **Embedded links: Yes.** Rejected before when it said No.
+     - **Embedded phone numbers: No** (A28: no text carries Pam's number any more).
+     - **Help message:** the carrier's HELP auto-reply is set in the Twilio console
+       (Advanced Opt-Out), not in Pam. Paste the new one from the samples file, "Help
+       message" (*Pam: Get help at joinpam.org/support or write to hello@joinpam.org.
+       Reply STOP to stop.*), so people texting HELP are not given a number that no
+       longer answers. The sign-in screen's "Reply HELP for help" wording still holds:
+       HELP still returns support contact, now a web address and an email.
   3. **Open the privacy and terms URLs in a private window** first (listed in the
      checklist). A reviewer fetches them signed out; a page behind a login or a
      moved deployment is rejection 30921 or 30933 and costs another round.
@@ -490,7 +622,7 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
      `dispatch-sms` puts the "Pam:" prefix and the new languages on the live number
      at once.
   6. **Tell Claude "registered".** Claude then checks the live function
-     (`list_edge_functions`: it is v15 now), deploys the repo's `dispatch-sms`
+     (`list_edge_functions`: it is version 23 now), deploys the repo's `dispatch-sms`
      (only on your say-so; the repo's `templates.json` is generated by the tests and
      already carries the seven languages and the two-segment reminders), and reads
      the function's log for lines starting "sent in English", which name a template
@@ -546,9 +678,16 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   1. 0084 is live (9 October); deploy `translate-messages` (`supabase functions deploy
      translate-messages`), and read `get_advisors`.
   2. Set `ANTHROPIC_API_KEY` as a function secret — never in this repo — on an
-     account whose terms say what is sent is **not kept and not used to
-     train**. Get that in writing; the privacy page says it ("It keeps
-     nothing and does not learn from them").
+     account whose terms Will has read against the privacy page. The page says
+     what Anthropic's published terms say (card a70): the words are deleted within
+     30 days and not used to train; a message its safety checks flag may be kept
+     up to two years; a message may also be kept if the law requires it. It no
+     longer says "keeps nothing", which is not true of any model Pam can call.
+     Re-read Anthropic's data-retention page (platform.claude.com › Manage
+     Claude › API and data retention) the day the switch goes on, and change the
+     page if it changed. Pam calls `claude-haiku-5-5`; the Covered Models (Fable
+     5/5.1, Mythos 5/5.1) are held 30 days for everyone, so a change of model in
+     `supabase/functions/translate-messages/anthropic.ts` needs the page re-read too.
   3. A native speaker reads `privacy.s.translation.*` in all seven languages
      (it appears on the privacy page the moment the switch is on).
   4. **Tell members first** (the transparency promise): translation sends the

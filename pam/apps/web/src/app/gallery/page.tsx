@@ -8,6 +8,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import {
   AppHeader,
+  DataHeading,
   AreaChip,
   BellIcon,
   BigButton,
@@ -110,6 +111,23 @@ export default function GalleryPage() {
         way to. Change one here and it changes on every screen.
       </Text>
 
+      <Section
+        title="Data headings"
+        note="A heading whose text is a name (a place, a program, a person) reads in its own direction; Pam's own headings keep the page's (D-534)."
+      >
+        <VStack gap={2}>
+          <Heading level={2} data-testid="pam-heading">
+            Your trips
+          </Heading>
+          <DataHeading level={2} data-testid="latin-name">
+            Second Chance Café (Main St.)
+          </DataHeading>
+          <DataHeading level={2} data-testid="arabic-name">
+            مركز الأمل للتوظيف
+          </DataHeading>
+        </VStack>
+      </Section>
+
       <Section title="Header" note="The mark, and who you are signed in as.">
         <VStack gap={2}>
           <AppHeader />
@@ -176,6 +194,8 @@ export default function GalleryPage() {
       >
         <OnboardingSlides
           label="How Pam works"
+          pauseLabel="Pause"
+          playLabel="Play"
           header={<img src="/pam-wordmark-white.svg" alt="Pam" {...stylex.props(styles.heroMark)} />}
           slides={[
             {
@@ -366,15 +386,13 @@ export default function GalleryPage() {
             notice="offline"
             title="You are not connected"
             body="Pam needs the internet for this. Try again when you have signal."
-            supportPhone="+12673095265"
-            callLabel="Call Pam for help"
+            contactLabel="Contact Pam"
           />
           <Notice
             notice="something_went_wrong"
             title="Something went wrong"
-            body="This is not your fault. Try again, or call Pam and we will help."
-            supportPhone="+12673095265"
-            callLabel="Call Pam for help"
+            body="This is not your fault. Try again, or contact Pam and we will help."
+            contactLabel="Contact Pam"
           />
         </VStack>
       </Section>

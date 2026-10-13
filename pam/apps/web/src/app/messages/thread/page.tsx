@@ -1,13 +1,13 @@
 'use client';
 
-import { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Text } from '@astryxdesign/core/Text';
 import { Loading, Notice, Page } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { NOTICES, speechLanguageFor } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../../NotIn';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useThread } from '@/lib/useThread';
@@ -15,10 +15,12 @@ import { useBlockState } from '@/lib/blocking';
 import { useMessageTranslations } from '@/lib/useMessageTranslations';
 import { ThreadViewLazy } from '../ThreadViewLazy';
 import { staffPhotoFor } from '@pam/config/dummy-connections';
-import { ThreadFrame, ThreadHeader, ThreadTop } from '../ThreadFrame';
+import { useExamplesOn } from '@/lib/useExamplesOn';
+import { ThreadFrame, ThreadHeader, ThreadIntro, ThreadTop } from '../ThreadFrame';
 import { DemoThreadLazy } from '../DemoThreadLazy';
 import { ThreadVisit } from '../ThreadVisit';
 import { threadLineFor } from '@/lib/threadLine';
+import { messageProgram } from '@/lib/openConversation';
 
 /**
  * One conversation — read what has been said, and send the next thing.
@@ -58,16 +60,23 @@ const NO_MESSAGES: readonly never[] = [];
 
 function ThreadScreen() {
   const { t, locale } = useI18n();
-  const supportPhone = useSupportPhone();
   const { state: session } = useSession();
   const params = useSearchParams();
   const conversationId = params.get('id');
+  // A place's Message button (D-541): no conversation yet, only the place. This screen opens, or reuses, the
+  // member's conversation with one lead of its program and swaps this address for the conversation's.
+  const programId = conversationId ? null : params.get('program');
+  const router = useRouter();
+  const [programFailed, setProgramFailed] = useState(false);
   // Opened from a program's page (D-313): Back returns there, so a member
   // can ask a question and go straight back to booking.
   const fromPlaceId = params.get('from') === 'place' ? params.get('place') : null;
   const backHref = fromPlaceId ? `/place/?id=${encodeURIComponent(fromPlaceId)}` : '/messages/';
   const backLabel = fromPlaceId ? t('nav.back.program') : t('nav.back.messages');
-  const demo = isDummyId(conversationId);
+  // An example conversation opens only where examples are allowed (Storybook, a demo account).
+  const examplesOn = useExamplesOn();
+  const exampleId = isDummyId(conversationId);
+  const demo = exampleId && examplesOn;
 
   const signedIn = session.status === 'signed-in';
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
@@ -86,10 +95,27 @@ function ThreadScreen() {
   // drawn for whichever role is being previewed and touches nothing real.
   const canMessage = demo ? viewedCanMessage : realCanMessage;
 
-  const { state, send, sending, sendFailed, limited } = useThread(signedIn && realCanMessage && !demo ? conversationId : null);
+  useEffect(() => {
+    if (!programId || !signedIn || trueRole !== 'member') return;
+    let cancelled = false;
+    void messageProgram(programId).then((id) => {
+      if (cancelled) return;
+      if (!id) {
+        setProgramFailed(true);
+        return;
+      }
+      const place = params.get('place') ?? programId;
+      router.replace(`/messages/thread/?id=${encodeURIComponent(id)}&from=place&place=${encodeURIComponent(place)}`);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [programId, signedIn, trueRole, router, params]);
+
+  const { state, send, sending, sendFailed, limited } = useThread(signedIn && realCanMessage && !exampleId ? conversationId : null);
 
   // Somebody blocked in this conversation (0076, D-463): the composer says so.
-  const { state: blockState } = useBlockState(signedIn && realCanMessage && !demo ? conversationId : null);
+  const { state: blockState } = useBlockState(signedIn && realCanMessage && !exampleId ? conversationId : null);
   const blocked = blockState?.iBlocked ? 'mine' : blockState?.blockedMe ? 'theirs' : null;
 
   const speechLanguage = speechLanguageFor(locale);
@@ -124,8 +150,7 @@ function ThreadScreen() {
           notice={key}
           title={t(NOTICES[key].titleKey)}
           body={t(NOTICES[key].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       </Page>
     );
@@ -139,9 +164,31 @@ function ThreadScreen() {
           notice="no_mentors_found"
           title={t('messages.notForRole.title')}
           body={t('messages.notForRole.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
+      </Page>
+    );
+  }
+
+  if (programId) {
+    // Only a member writes to a program first; a place with nobody on Pam shows Call and Website, not this.
+    if (programFailed || trueRole !== 'member') {
+      return (
+        <Page gap={4}>
+          <SubPageHeader title={t('messages.title')} backHref={backHref} backLabel={backLabel} />
+          <Notice
+            notice="service_not_available"
+            title={t('messages.program.unavailable.title')}
+            body={t('messages.program.unavailable.body')}
+            contactLabel={t('help.contact.action')}
+          />
+        </Page>
+      );
+    }
+    return (
+      <Page gap={4}>
+        <SubPageHeader title={t('messages.title')} backHref={backHref} backLabel={backLabel} />
+        <Loading label={t('common.loading')} variant="inline" />
       </Page>
     );
   }
@@ -155,11 +202,25 @@ function ThreadScreen() {
           conversationId={conversationId}
           role={viewedRole ?? 'member'}
           speechLanguage={speechLanguage}
-          supportPhone={supportPhone}
           backHref={backHref}
           backLabel={backLabel}
         />
       </ThreadFrame>
+    );
+  }
+
+  // An example id on a real account is a conversation that does not exist.
+  if (exampleId && !demo) {
+    return (
+      <Page gap={4}>
+        <SubPageHeader title={t('messages.title')} backHref={backHref} backLabel={backLabel} />
+        <Notice
+          notice="service_not_available"
+          title={t('messages.thread.notFound.title')}
+          body={t('messages.thread.notFound.body')}
+          contactLabel={t('help.contact.action')}
+        />
+      </Page>
     );
   }
 
@@ -173,33 +234,47 @@ function ThreadScreen() {
       : null;
 
   if (state.status === 'ready') {
+    // Only an example's photo is ever looked up by name (a real person sharing one must not get a stranger's face).
+    const examplePhoto = examplesOn ? staffPhotoFor(state.otherName, state.otherProgramName ?? null) : null;
     return (
       <ThreadFrame>
         <ThreadTop>
           <ThreadHeader
             name={title}
-            context={context}
             backHref={backHref}
             backLabel={backLabel}
             menuHref={`/messages/thread/options/?id=${encodeURIComponent(conversationId ?? '')}`}
           />
-          {/* A member's visit with this program, under the name (D-276). */}
-          {trueRole === 'member' && state.otherRole === 'provider' ? (
-            <ThreadVisit programName={state.otherProgramName ?? null} threadId={conversationId ?? ''} />
-          ) : null}
         </ThreadTop>
         <ThreadViewLazy
           messages={state.messages}
           translations={translations}
           otherName={state.otherName}
-          otherPhotoUrl={staffPhotoFor(state.otherName, state.otherProgramName ?? null)}
+          otherPhotoUrl={examplePhoto}
+          intro={
+            <ThreadIntro
+              name={title}
+              photoUrl={examplePhoto}
+              context={context}
+            >
+              {/* A member's visit with this program, under the name (D-276). */}
+              {trueRole === 'member' && state.otherRole === 'provider' ? (
+                <ThreadVisit programName={state.otherProgramName ?? null} threadId={conversationId ?? ''} />
+              ) : null}
+              {/* What the program sees, said where a member writes (D-541): a first name and these words. */}
+              {trueRole === 'member' && state.otherRole === 'provider' ? (
+                <Text type="supporting" dir="auto">
+                  {t('messages.program.note')}
+                </Text>
+              ) : null}
+            </ThreadIntro>
+          }
           onSend={send}
           sending={sending}
           sendFailed={sendFailed}
           limited={limited || accountLimited}
           blocked={blocked}
           speechLanguage={speechLanguage}
-          supportPhone={supportPhone}
         />
       </ThreadFrame>
     );
@@ -216,8 +291,7 @@ function ThreadScreen() {
           notice="service_not_available"
           title={t('messages.thread.notFound.title')}
           body={t('messages.thread.notFound.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 
@@ -226,8 +300,7 @@ function ThreadScreen() {
           notice={state.offline ? 'offline' : 'something_went_wrong'}
           title={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].titleKey)}
           body={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
     </Page>

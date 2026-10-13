@@ -35,7 +35,7 @@ import {
   type BadgeDefinition,
   type PointsReason,
 } from '@pam/config';
-import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
+import { useExamplesOn } from '@/lib/useExamplesOn';
 import { DUMMY_EARNED_BADGES } from '@pam/config/dummy-badges';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
@@ -194,7 +194,7 @@ export default function PointsPage() {
   const points = usePoints(session.status === 'signed-in' ? session.session.userId : null);
   // Nothing awards a badge yet; the example member has earned Scholar
   // (D-307), shown where the rest of the example data is.
-  const earned: readonly string[] = USE_DUMMY_PEOPLE && (demoRole ?? trueRole) === 'member' ? DUMMY_EARNED_BADGES : [];
+  const earned: readonly string[] = useExamplesOn() && (demoRole ?? trueRole) === 'member' ? DUMMY_EARNED_BADGES : [];
   const [celebrate, setCelebrate] = useState(false);
 
   const current = points !== null ? badgeForPoints(points) : null;

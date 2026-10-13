@@ -28,6 +28,8 @@ export interface AddedTrip {
   /** Which of the program's services the visit is for (D-313). */
   readonly serviceId?: string;
   readonly serviceName?: string;
+  /** What the program marked after the visit (D-526): there, or nobody marked it. Absent while it is still planned. */
+  readonly attendance?: 'attended' | 'missed';
 }
 
 const KEY = 'pam.trips.added';

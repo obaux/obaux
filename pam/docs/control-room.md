@@ -33,6 +33,17 @@ minute), *Board connected* (my updates arrive, live status off), or *Offline cop
 live status needs Will's one-time permission, the chip carries a **Show live status**
 button.
 
+**Waiting for you to unblock** (Will, 11 October: "When you're paused on a permission prompt please push
+that allow button onto the control room"). A strip under the intro that appears only when a teammate's
+session, or Mira's, is stopped waiting on Will: a permission prompt or a question in its own chat
+(`status_bucket` BLOCKED in the session list). Each entry says who, what the session says it needs, and
+has a button that opens that session at `https://claude.ai/code/<sessionId>`, where Will presses Allow
+or answers. A page cannot approve a prompt itself; it can only take Will to it. The data is the
+`Claude Code Remote` connector's `list_sessions` (read only, the page's only connector), watched every
+minute and matched to `team/<key>.sessionId`. The first time, Will taps **Turn on** for the page to read
+it. The "Waiting on you" number counts these too. A session can't announce it is stuck once it is, so
+the merge desk also posts an `asks/` card *before* a step it knows will wait on Will.
+
 **At a glance.** Four numbers: waiting on you, ready for you, messages today, building now.
 Each is a button that takes you to its section (Will, 10 October: "I want to click on these
 and go to section"). The sections run in that order too: 01 Waiting on you, 02 Ready for
@@ -55,6 +66,8 @@ you, 03 What I'm doing, 04 The team.
   job from Mira (blue), question (amber), from Will (dark), update for Will (light
   green), between teammates (purple).
 - Tapping a teammate highlights their card below.
+- How to read the map is behind a small (i) next to its label, not under it (v12, 11 October; Will: "less is
+  more"). Hover or focus shows it, a tap pins it, and Esc or a tap elsewhere closes it.
 - At phone width the map turns vertical: Will, then Mira, then teammates in two columns.
 - With "reduce motion" on, nothing moves; colours and badges still say everything.
 
@@ -73,6 +86,8 @@ Reply puts the card's question at the start of the message box.
   marked `answered`.
 - The message shows "sending…", "sent to Mira", or "not sent" with Try again. While
   Mira hasn't answered, a line says Mira is working on it.
+- A round button with a down arrow appears on the conversation whenever it is scrolled up,
+  with a dot when something new arrived; it goes to the newest message.
 
 **What I'm doing.** Mira's one-line "Right now", then the message feed: time, coloured
 dot, who → who, and the message in plain words.
@@ -109,9 +124,10 @@ writes as Will with the artifact data tool.
 | `chat/<id>` | chat message | `from` (`will` or `mira`), `text`, `at`, `state` (Will's: `sending`, `delivered`, `failed`), `re` (Mira's: the message answered) |
 
 **Live layer (optional).** With Will's permission the page reads the Claude Code
-session list every minute (`list_sessions`, read only) and matches it to `sessionId`,
-only to light up "working right now". If that is off or unavailable, everything else
-still works from Mira's updates. Sessions that are not on the team are ignored.
+session list every minute (`list_sessions`, read only, declared as the page's one
+`mcp` tool) and matches it to `sessionId`, for "Waiting for you to unblock". If that is
+off or unavailable, everything else still works from Mira's updates. Sessions that are
+not on the team are ignored.
 
 **Privacy.** No phone numbers, email addresses, keys or member data, ever. The page is
 private to Will unless he shares it.

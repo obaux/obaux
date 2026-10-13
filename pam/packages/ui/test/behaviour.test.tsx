@@ -139,8 +139,8 @@ describe('HelpBar (§0 never dead-end)', () => {
   });
 
   it('can still go full width on a screen with room', () => {
-    render(<HelpBar label="Need help? Call Pam" variant="block" />);
-    expect(screen.getByRole('link', { name: 'Need help? Call Pam' })).toBeInTheDocument();
+    render(<HelpBar label="Need help? Contact Pam" variant="block" />);
+    expect(screen.getByRole('link', { name: 'Need help? Contact Pam' })).toBeInTheDocument();
   });
 });
 
@@ -425,13 +425,38 @@ describe('the way in explains itself first', () => {
     // A carousel that only reveals its content to a swipe hides two thirds of
     // the explanation from a keyboard, a screen reader, and anybody whose
     // finger does not drag cleanly on a cracked screen.
-    render(<OnboardingSlides slides={slides} label="How Pam works" />);
+    render(<OnboardingSlides slides={slides} label="How Pam works" pauseLabel="Pause" playLabel="Play" />);
     for (const slide of slides) expect(screen.getByText(slide.text)).toBeInTheDocument();
   });
 
   it('names itself, so it can be skipped rather than waded through', () => {
-    render(<OnboardingSlides slides={slides} label="How Pam works" />);
+    render(<OnboardingSlides slides={slides} label="How Pam works" pauseLabel="Pause" playLabel="Play" />);
     expect(screen.getByRole('region', { name: 'How Pam works' })).toBeInTheDocument();
+  });
+
+  it('can be stopped and started again, by name (pictures that move by themselves must be stoppable)', async () => {
+    render(<OnboardingSlides slides={slides} label="How Pam works" pauseLabel="Pause" playLabel="Play" />);
+    const stop = await screen.findByRole('button', { name: 'Pause' });
+    fireEvent.click(stop);
+    expect(screen.getByRole('button', { name: 'Play' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Pause' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Play' }));
+    expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument();
+  });
+
+  it('has no stop button when nothing moves (one slide, or reduced motion)', () => {
+    render(<OnboardingSlides slides={slides.slice(0, 1)} label="One" pauseLabel="Pause" playLabel="Play" />);
+    expect(screen.queryByRole('button', { name: 'Pause' })).not.toBeInTheDocument();
+  });
+
+  it('with the lines not drawn (About Pam), shows no words but names every picture by its line', () => {
+    // Will, 10 October: only the tabs and the pictures. The words are not
+    // lost: each picture carries its line as its accessible name.
+    render(<OnboardingSlides slides={slides} label="How Pam works" variant="inline" showLines={false} pauseLabel="Pause" playLabel="Play" />);
+    for (const slide of slides) {
+      expect(screen.queryByText(slide.text)).not.toBeInTheDocument();
+      expect(screen.getByRole('img', { name: slide.text })).toBeInTheDocument();
+    }
   });
 });
 

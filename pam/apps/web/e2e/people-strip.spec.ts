@@ -54,7 +54,7 @@ async function seedSession(page: import('@playwright/test').Page) {
   }, ME);
 }
 
-async function signedInAs(page: import('@playwright/test').Page, role: 'admin' | 'provider' | 'super_admin') {
+async function signedInAs(page: import('@playwright/test').Page, role: 'admin' | 'provider' | 'super_admin', demo = false) {
   await seedSession(page);
   await page.route(NOTIFICATIONS, (route) => route.fulfill(json([])));
   await page.route(CONTROLS, (route) => route.fulfill(json([])));
@@ -67,6 +67,7 @@ async function signedInAs(page: import('@playwright/test').Page, role: 'admin' |
         id: ME,
         role,
         first_name: 'Dana',
+        is_demo: demo,
         region_id: '0195b1c0-0000-4000-8000-000000000001',
         regions: { name: 'Philadelphia' },
       }),
@@ -179,7 +180,7 @@ test.describe('the people strip on Home', () => {
     // Aaliyah's example record carries a save two hours ago. Both lit, the
     // newer first; the other four in their written order.
     await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));
-    await signedInAs(page, 'super_admin');
+    await signedInAs(page, 'super_admin', true);
     // Nobody on the list: the demo shows the example people (D-172).
     await page.route(PEOPLE, (route) => route.fulfill(json([])));
     await page.route(ACTIVITY, (route) => route.fulfill(json([])));

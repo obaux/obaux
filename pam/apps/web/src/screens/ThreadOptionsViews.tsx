@@ -16,7 +16,6 @@ import { useI18n } from '@/lib/i18n';
 import { useConversations } from '@/lib/useConversations';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useSession } from '@/lib/useSession';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useThread } from '@/lib/useThread';
 import { reportMessage } from '@/lib/reportMessage';
 import { blockInConversation, unblockInConversation, useBlockState } from '@/lib/blocking';
@@ -70,7 +69,6 @@ function ThreadOptions() {
   const iBlocked = pair ? exampleBlocked : blockState?.iBlocked === true;
   const [phase, setPhase] = useState<'menu' | 'confirm' | 'done' | 'failed'>('menu');
   const [busy, setBusy] = useState(false);
-  const supportPhone = useSupportPhone();
   // What the screen said when it was asked: the state flips once it is done, the words must not.
   const [wasUnblock, setWasUnblock] = useState(false);
 
@@ -117,8 +115,7 @@ function ThreadOptions() {
                 notice="something_went_wrong"
                 title={t('notice.something_went_wrong.title')}
                 body={t('notice.something_went_wrong.body')}
-                supportPhone={supportPhone}
-                callLabel={t('help.callSupport')}
+                contactLabel={t('help.contact.action')}
               />
             ) : null}
             <BigButton
@@ -183,7 +180,6 @@ export function ThreadOptionsView() {
  */
 function ThreadReport() {
   const { t } = useI18n();
-  const supportPhone = useSupportPhone();
   const id = useSearchParams().get('id') ?? '';
   const example = isExample(id);
   const { state: session } = useSession();
@@ -240,8 +236,7 @@ function ThreadReport() {
               notice="something_went_wrong"
               title={t('messages.report.failed.title')}
               body={t('messages.report.failed.body')}
-              supportPhone={supportPhone}
-              callLabel={t('help.callSupport')}
+              contactLabel={t('help.contact.action')}
             />
           ) : null}
           <BigButton

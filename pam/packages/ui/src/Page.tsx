@@ -58,6 +58,13 @@ export interface PageProps {
    * page fading out above it.
    */
   readonly footer?: ReactNode;
+  /**
+   * The footer is the last thing in the page, in the flow, and nothing is stuck to the screen: on a tall
+   * screen it sits at the bottom edge, on a short one it follows the content and is reached by scrolling. For
+   * a footer that is not the screen's action: Sign in's Privacy and Terms, which stood over "Send me a code" on
+   * a 568px-tall phone when they were pinned (D-500).
+   */
+  readonly isFooterInFlow?: boolean;
 }
 
 const styles = stylex.create({
@@ -99,6 +106,12 @@ const styles = stylex.create({
     // A tap on the faded part lands on what is under it, not on the strip.
     pointerEvents: 'none',
   },
+  // The footer that is not stuck to anything (D-500): pushed to the end of a short page, otherwise just after the content.
+  footerInFlow: {
+    marginBlockStart: 'auto',
+    paddingBlockStart: '16px',
+    paddingBlockEnd: 'calc(8px + env(safe-area-inset-bottom, 0px))',
+  },
   footerInner: {
     width: '100%',
     maxWidth: pam['--pam-page-width'],
@@ -108,7 +121,7 @@ const styles = stylex.create({
   },
 });
 
-export function Page({ children, width = 'app', align = 'start', gap = 4, footer }: PageProps) {
+export function Page({ children, width = 'app', align = 'start', gap = 4, footer, isFooterInFlow = false }: PageProps) {
   return (
     <main
       {...stylex.props(styles.page, styles[width], align === 'center' && styles.centred, footer ? styles.withFooter : null)}
@@ -119,7 +132,7 @@ export function Page({ children, width = 'app', align = 'start', gap = 4, footer
         </VStack>
       </PageEnter>
       {footer ? (
-        <VStack xstyle={styles.footer}>
+        <VStack xstyle={isFooterInFlow ? styles.footerInFlow : styles.footer}>
           <VStack xstyle={styles.footerInner}>{footer}</VStack>
         </VStack>
       ) : null}

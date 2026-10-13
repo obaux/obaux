@@ -13,7 +13,6 @@ import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/navigate';
 import { addRoleFromInvite } from '@/lib/useRoles';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 
 /**
  * A member's number, invited to a program in their city (D-374): add the
@@ -55,7 +54,6 @@ export function InviteAddScreen({
   readonly preview?: boolean;
 }) {
   const { t } = useI18n();
-  const supportPhone = useSupportPhone();
   const name = from ?? t('invite.inUse.someone');
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -101,8 +99,7 @@ export function InviteAddScreen({
           notice="something_went_wrong"
           title={t('invite.add.failed')}
           body={t('admin.invite.failed.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
     </SubPage>

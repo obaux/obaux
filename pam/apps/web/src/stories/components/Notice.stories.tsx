@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import { Notice, Page, type NoticeProps } from '@pam/ui';
+import { VStack } from '@astryxdesign/core/VStack';
+import { CompactNotice, Notice, Page, type NoticeProps } from '@pam/ui';
 import { NOTICES, type NoticeKey } from '@pam/config';
 import { useStoryText } from '../support/useStoryText';
 
@@ -7,21 +8,19 @@ import { useStoryText } from '../support/useStoryText';
  * How Pam says something went wrong, or that there is nothing here (§0: never
  * dead-end). A problem the reader must act on is a status card with
  * `role="alert"`; an empty area is Astryx's EmptyState. Which one, and whether
- * it offers a call, is decided by `@pam/config/notices` — not by the screen.
+ * it offers Contact Pam, is decided by `@pam/config/notices` — not by the screen.
  *
  * Every story takes its title and body from the same i18n keys the app uses
  * (`notice.<key>.title` / `.body`, or the screen's own key where it has one).
  */
-const SUPPORT_PHONE = '+12673095265';
-
-function LocalisedNotice({ title, body, callLabel, retry, userFacingNote, ...rest }: NoticeProps) {
+function LocalisedNotice({ title, body, contactLabel, retry, userFacingNote, ...rest }: NoticeProps) {
   const tr = useStoryText();
   return (
     <Notice
       {...rest}
       title={tr(title)}
       body={tr(body)}
-      callLabel={tr(callLabel ?? 'help.callSupport')}
+      {...(contactLabel ? { contactLabel: tr(contactLabel) } : {})}
       userFacingNote={userFacingNote}
       {...(retry ? { retry: { label: tr(retry.label), onPress: retry.onPress } } : {})}
     />
@@ -47,8 +46,7 @@ const meta = {
   render: (args) => <LocalisedNotice {...args} />,
   args: {
     ...forKey('something_went_wrong'),
-    supportPhone: SUPPORT_PHONE,
-    callLabel: 'help.callSupport',
+    contactLabel: 'help.contact.action',
   },
   argTypes: {
     notice: { control: 'select', options: Object.keys(NOTICES) },
@@ -61,7 +59,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
 
 /**
- * With the optional extra action, drawn before the call. No screen passes one
+ * With the optional extra action, drawn before Contact Pam. No screen passes one
  * yet, and the locale files have no "Try again" key, so this borrows "Go back".
  */
 export const WithExtraAction: Story = {
@@ -76,7 +74,7 @@ export const SomeThingsTurnedOff: Story = { args: forKey('account_limited') };
 
 /**
  * The calm card (D-432): what a limited member meets on Messages and in a
- * conversation. More room, the smallest body text (16px), and the call as a
+ * conversation. More room, the smallest body text (16px), and Contact Pam as a
  * link rather than a primary button.
  */
 export const SomeThingsTurnedOffQuiet: Story = { args: { ...forKey('account_limited'), quiet: true } };
@@ -94,8 +92,8 @@ export const WithNoteFromCaseManager: Story = {
   },
 };
 
-/** No support line known: the call action is left out rather than drawn dead. */
-export const WithoutSupportPhone: Story = { args: { supportPhone: null } };
+/** No label given: the Contact Pam action is left out rather than drawn unlabelled. */
+export const WithoutContact: Story = { args: { contactLabel: undefined } };
 
 /** As `/place/` shows it when the id is not in the catalogue. */
 export const PlaceNotFound: Story = {
@@ -124,3 +122,26 @@ export const InviteCodeExpired: Story = { args: forKey('invite_expired') };
 export const OutOfRegion: Story = { args: forKey('admin_out_of_region') };
 
 export const Spanish: Story = { args: forKey('account_limited'), globals: { locale: 'es' } };
+
+/**
+ * The small alert (D-510), for a mistake the person fixes where they are: one row,
+ * a small icon and one line, no button. The full `Notice` above is for a state they
+ * are stuck in. Same three tones. Below: the same wrong-code moment drawn both ways,
+ * which is why the sign-in code step uses the small one.
+ */
+function CompactAll() {
+  const tr = useStoryText();
+  return (
+    <VStack gap={3}>
+      <CompactNotice status="error" text={tr('signin.code.wrong') ?? ''} />
+      <CompactNotice status="warning" text={tr('signin.code.wrong') ?? ''} />
+      <CompactNotice status="info" text={tr('signin.code.wrong') ?? ''} />
+    </VStack>
+  );
+}
+
+export const Compact: StoryObj = { render: () => <CompactAll /> };
+
+export const CompactSpanish: StoryObj = { render: () => <CompactAll />, globals: { locale: 'es' } };
+
+export const CompactArabic: StoryObj = { render: () => <CompactAll />, globals: { locale: 'ar' } };

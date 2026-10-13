@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { useRouter } from 'next/navigation';
 import { DropdownMenu } from '@astryxdesign/core/DropdownMenu';
@@ -9,8 +10,11 @@ import { IconButton } from '@astryxdesign/core/IconButton';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BookmarkIcon, FlagIcon, MessagesIcon, ShareIcon } from '@pam/ui';
 import { roundAction } from '@pam/ui/roundAction';
+import { ConfirmTip } from '@pam/ui/ConfirmTip';
 import { DUMMY_PROGRAM_LEADS } from '@pam/config/dummy-people';
 import { DUMMY_SELF_ID, dummyConversationIdBetween } from '@pam/config/dummy-conversations';
+import { examplesOn } from '@/lib/examples';
+import { isSavedPlace } from '@/lib/savedTrips';
 import { useI18n } from '@/lib/i18n';
 
 // The bar's round buttons — save and ⋯ — are `roundAction.plain`: white, with no outline and no
@@ -34,10 +38,16 @@ export { newMessageFrom } from '@/lib/placeMessages';
  * back to the program — text, then return to book (Will, 6 October, D-313).
  */
 export function messageHrefFor(placeName: string, placeId?: string): string {
-  const lead = DUMMY_PROGRAM_LEADS.find((person) => person.orgName === placeName);
+  // Examples only where they are allowed.
+  const lead = examplesOn() ? DUMMY_PROGRAM_LEADS.find((person) => person.orgName === placeName) : undefined;
   const fromPlace = placeId ? `&from=place&place=${encodeURIComponent(placeId)}` : '';
-  return lead
-    ? `/messages/thread/?id=${encodeURIComponent(dummyConversationIdBetween(DUMMY_SELF_ID.member, lead.id))}${fromPlace}`
+  if (lead) {
+    return `/messages/thread/?id=${encodeURIComponent(dummyConversationIdBetween(DUMMY_SELF_ID.member, lead.id))}${fromPlace}`;
+  }
+  // A real place: the thread screen opens the conversation itself (`message_program()`, D-541) and
+  // replaces this address with the conversation's. No lead on Pam, no link: the caller does not ask.
+  return placeId && isSavedPlace(placeId)
+    ? `/messages/thread/?program=${encodeURIComponent(placeId)}${fromPlace}`
     : '/messages/';
 }
 
@@ -51,7 +61,7 @@ export function leadMessageFor(
   placeName: string,
   placeId?: string,
 ): { readonly firstName: string; readonly href: string } | null {
-  const lead = DUMMY_PROGRAM_LEADS.find((person) => person.orgName === placeName);
+  const lead = examplesOn() ? DUMMY_PROGRAM_LEADS.find((person) => person.orgName === placeName) : undefined;
   if (!lead) return null;
   const fromPlace = placeId ? `&from=place&place=${encodeURIComponent(placeId)}` : '';
   return {
@@ -76,18 +86,25 @@ export function PlaceBarActions({
   readonly onSave?: (() => void) | undefined;
   readonly onShare: () => void;
   readonly flagHref: string;
-  readonly messageHref: string;
+  /** Left out, there is no one to message at this place (no lead on Pam): the menu has no such item. */
+  readonly messageHref?: string | undefined;
 }) {
   const { t } = useI18n();
   const router = useRouter();
+  // Each tap that saves says "Saved" by the button for about two seconds (Will, 11 October); taking it off says nothing.
+  const [savedTaps, setSavedTaps] = useState(0);
   return (
     <>
       {onSave ? (
+        <ConfirmTip text={t('places.saved')} trigger={savedTaps}>
         <IconButton
           label={isSaved ? t('places.saved') : t('place.save')}
           variant="ghost"
           aria-pressed={isSaved}
-          onClick={onSave}
+          onClick={() => {
+            if (!isSaved) setSavedTaps((n) => n + 1);
+            onSave();
+          }}
           icon={
             <HStack>
               <BookmarkIcon {...ICON} isFilled={isSaved} />
@@ -95,6 +112,7 @@ export function PlaceBarActions({
           }
           xstyle={[roundAction.plain, isSaved && styles.saved]}
         />
+        </ConfirmTip>
       ) : null}
       <DropdownMenu
         button={{
@@ -116,12 +134,16 @@ export function PlaceBarActions({
             onClick: () => router.push(flagHref),
           },
           { id: 'share', label: t('place.share'), icon: <ShareIcon {...ICON} />, onClick: onShare },
-          {
-            id: 'message',
-            label: t('place.messageProgram'),
-            icon: <MessagesIcon {...ICON} />,
-            onClick: () => router.push(messageHref),
-          },
+          ...(messageHref
+            ? [
+                {
+                  id: 'message',
+                  label: t('place.messageProgram'),
+                  icon: <MessagesIcon {...ICON} />,
+                  onClick: () => router.push(messageHref),
+                },
+              ]
+            : []),
         ]}
       />
     </>

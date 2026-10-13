@@ -6,7 +6,7 @@ import { Card } from '@astryxdesign/core/Card';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
-import { Heading } from '@astryxdesign/core/Heading';
+import { DataHeading } from '@pam/ui/DataHeading';
 import { Badge } from '@pam/ui/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { ProgramBadge } from './ProgramBadge';
@@ -84,7 +84,7 @@ export function PersonRow({ firstName, href, chip, meta, programBadge, trailing,
         <HStack gap={3} align="center" wrap="nowrap">
           <Avatar size="md" name={firstName ?? '?'} />
           <VStack gap={0.5} xstyle={styles.compactText}>
-            <Heading level={3} xstyle={styles.compactName}>
+            <DataHeading level={3} xstyle={styles.compactName}>
               {href ? (
                 <a href={href} {...stylex.props(styles.link)}>
                   {firstName ?? '—'}
@@ -92,7 +92,7 @@ export function PersonRow({ firstName, href, chip, meta, programBadge, trailing,
               ) : (
                 (firstName ?? '—')
               )}
-            </Heading>
+            </DataHeading>
             {meta.length > 0 ? (
               <Text type="supporting" xstyle={styles.compactMeta}>
                 {meta.join(' · ')}
@@ -116,7 +116,7 @@ export function PersonRow({ firstName, href, chip, meta, programBadge, trailing,
         <HStack gap={3} align="center" justify="between">
           <HStack gap={3} align="center">
             <Avatar size="lg" name={firstName ?? '?'} />
-            <Heading level={3} xstyle={styles.name}>
+            <DataHeading level={3} xstyle={styles.name}>
               {href ? (
                 <a href={href} {...stylex.props(styles.link)}>
                   {firstName ?? '—'}
@@ -124,7 +124,7 @@ export function PersonRow({ firstName, href, chip, meta, programBadge, trailing,
               ) : (
                 (firstName ?? '—')
               )}
-            </Heading>
+            </DataHeading>
           </HStack>
           {trailing ? <HStack xstyle={styles.trailing}>{trailing}</HStack> : null}
         </HStack>
