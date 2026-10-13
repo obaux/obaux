@@ -218,6 +218,8 @@
   "join.code.hint": "8 أحرف وأرقام. اتركه فارغا إذا لم يعطك أحد رمزا.",
   "join.code.more": "عن الرمز",
   "join.code.label": "الرمز من الشخص الذي دعاك",
+  "join.code.question": "هل دعاك أحد برمز؟",
+  "join.code.reveal": "اضغط هنا",
   "join.details.city": "مدينة سكنك",
   "join.details.city.note": "لا يتوفر Pam حاليا إلا في هذه المدن.",
   "join.details.first": "الاسم الأول",

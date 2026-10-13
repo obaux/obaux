@@ -198,6 +198,8 @@
   "join.code.hint": "8 letras e números. Deixe em branco se ninguém deu um código a você.",
   "join.code.more": "Sobre o código",
   "join.code.label": "Código de quem convidou você",
+  "join.code.question": "Alguém convidou você com um código?",
+  "join.code.reveal": "Toque aqui",
   "join.details.city": "Cidade onde você mora",
   "join.details.city.note": "Por enquanto, Pam só está nestas cidades.",
   "join.details.first": "Nome",

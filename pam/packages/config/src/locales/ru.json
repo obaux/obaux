@@ -210,6 +210,8 @@
   "join.code.hint": "8 букв и цифр. Если вам никто не дал код, оставьте поле пустым.",
   "join.code.more": "О коде",
   "join.code.label": "Код от того, кто вас пригласил",
+  "join.code.question": "Вас кто-то пригласил по коду?",
+  "join.code.reveal": "Нажмите здесь",
   "join.details.city": "Город, в котором вы живёте",
   "join.details.city.note": "Пока Pam работает только в этих городах.",
   "join.details.first": "Имя",

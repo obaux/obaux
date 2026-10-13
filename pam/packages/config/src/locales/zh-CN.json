@@ -198,6 +198,8 @@
   "join.code.hint": "8位字母和数字。如果没人给您邀请码，请留空。",
   "join.code.more": "关于邀请码",
   "join.code.label": "邀请您的人给您的邀请码",
+  "join.code.question": "有人用邀请码邀请过您吗？",
+  "join.code.reveal": "点按这里",
   "join.details.city": "您居住的城市",
   "join.details.city.note": "目前Pam只在这些城市开通。",
   "join.details.first": "名字",
