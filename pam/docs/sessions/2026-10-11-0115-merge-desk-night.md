@@ -601,6 +601,15 @@
   links, and 60px / 120px between the last block and the footer on every help page. Records: Sage's ledger (a82
   as Will's words, nav.back.reported signed), Iris's pre-ship walk-through (all three items pass). Two STATUS
   conflicts kept both sides; a duplicated Google-logo section dropped.
+- **Batch b33 (13 October).** No migration, no function change. Piper's D-565 (b8319ec2): the old Places list
+  is retired; /places/ sends members to Explore and staff to All programs, ?filter=reported sends a super admin to
+  Reported places, Back from a reported place returns there ("Back to Reported places", signed and in seven
+  languages), and a place Pam cannot find says "Go back to Explore" under an Explore title (Sage signed, Lena's six
+  languages). Dot's D-566 (the compact Sign in bar takes over at half the hero mark; Next's name uses each
+  language's comma), Ava's reveal link described by its question, Wren's help form focus (an empty Send lands on the
+  first field in error; a sent form focuses its thank-you), Dot's D-562 correction, Iris's two walk-throughs, Sage's
+  ledger. The first full run failed 3 of 1854 (place.spec's not-found screen still said Places); held, fixed, and
+  the second full run passed.
 - **Will, 18:18 (a81, chat w20261013181806g6qz): the old Places list is retired.** Picture 3 of the street
   search (v2) showed the old `/places/` list, with its old header and layout. Will: that page is "no longer an
   active page that we support". The ZIP shows on the member's Explore page (`/`); a case manager or program searching
@@ -641,8 +650,27 @@
   ADMIN_CAN_SEE does not allow, so the super admin decides every move request until Will signs a contract line.
   She also found that Privacy does not yet say staff keep a last name and a city: p7 is rewritten in the same
   signature. Live, counts only: staff_requests has one row, approved on 16 September. Nothing refused is kept.
+- **Merge desk, 19:48 to 21:27 (none needed Will):** a new-number request is read and decided by the super admin
+  only, so nothing is added to ADMIN_CAN_SEE (Lena's catch: the plan let a member's own case manager read it); no
+  24h escalation; every Approve needs the tick. A denial deletes the new number's sign-in at once; every purged
+  request takes its sign-in (Lena: also an approved request whose move never ran). An unanswered case manager
+  request is purged 90 days after asking, sign-in too. postgres can delete from auth.users on live (read-only
+  privilege check, 20:30), so remove_temporary_signin stays a definer function, revoked from every client role.
+  pg_cron is live (five jobs); auth.audit_log_entries has 0 rows; the organization is on the free plan, so platform
+  logs last 1 day and p11's "within a week" holds. The help dialog does not close on an outside click, so nothing
+  typed is lost (kept; Will told; D-562 corrected). p7's staff part may go live ahead of the features if Will says
+  yes (a84 h; Sage signed the short version). a84 gains (i): tell the person someone may call (Sage). Lena folds
+  "add a program" requests into p15, since the D-568 purge covers them and Privacy says nothing about them today.
+  Live finding (Ava, 21:24): join.staff.title / body promise "We will text you the answer" while texts are off;
+  Sage rewrites, Lena translates, and it ships next without waiting for a84.
 
 ## What was wrong, and what missed it
+
+- **b33's first full run failed while I reported it as passing.** The e2e summary's "1832 passed" sat under
+  "e2e=1"; I read the count, not the exit code, and told Will's channel it passed. Read every `name=N` line before
+  calling a run green; a count of passes says nothing about failures. Caught before the push. The cause: D-565
+  changed the not-found Back without running place.spec, which draws it. Piper now runs every spec that names the
+  screens a change touches.
 
 - **D-499 removed the wrong words.** Will (10 October): "That page should not have text over the carousel image. Only
   tab and image. It's redundant text." We took the words off the pictures; he meant the separate line between the
@@ -870,6 +898,12 @@
 | Iris's b32 walk-through (local stub build only) | Join step count, dropdown, hidden code, Join Pam, short-phone fit (56/56), keyboard and screen reader, the b30 zh-CN and ar bar: PASS, 506 checks; five polish notes |
 | b32 recheck on 334fe0eb (+ help form, Lena P4, records) | config 1310, copy:status in step / site tsc, 100 tests, build / site a11y 120 scans 0 / usability clear (gap checks) / scrollspy 306 links 0 / web build, tsc 0, 10.7 kB spare / e2e account, join, consent, signin-short, signin-next (and the specs those names match): 269 passed, 1 skipped |
 | staff_requests (counts only, 19:26) | one row ever, approved, 16 September; none refused or waiting |
+| b32 main CI (4d41d542) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (20:19); Vercel web and pam-site READY (19:56) |
+| Iris's help form walk-through (local build of main, nothing sent) | call-out, form, night links, 60/120 gap, keyboard and screen reader: all PASS; W1, P1, P2 |
+| Batch b33, first full run (cf5cab3c) | e2e 1832 passed, 3 failed (place.spec:257 on three projects), 19 skipped: held |
+| Batch b33, second full run (a7445521): db / config / ui / web unit / site / site a11y / usability / scrollspy / e2e full / storybook | 1579 ok / 1311 / 124 / 173 / 100 / 120 scans 0 / clear / 306 links 0 / 1835 passed, 19 skipped, e2e exit 0 / builds; tsc 0; 12.0 kB spare |
+| b33 English | 2 changed keys (nav.back.reported, place.notFound.body), none missing or equal to English in six languages |
+| Live checks for a84 (read-only, 20:30 to 20:34) | postgres has DELETE on auth.users (not superuser; owner supabase_auth_admin); pg_cron installed, five jobs; auth.audit_log_entries 0 rows; organization plan free |
 
 ## Left undone
 
