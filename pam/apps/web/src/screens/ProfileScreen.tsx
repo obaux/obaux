@@ -19,6 +19,7 @@ import { ProfileSummary } from '@pam/ui/ProfileCards';
 import { previewOf, uploadStaffPhoto } from '@/lib/staffPhoto';
 import { markSetupDone } from '@/lib/programSetup';
 import { useI18n } from '@/lib/i18n';
+import { useCountScreenOpen } from '@/lib/screenOpens';
 
 /**
  * Profile, wired (D-217): whoever is signed in, as the role they are looking
@@ -29,6 +30,8 @@ import { useI18n } from '@/lib/i18n';
 export function ProfileScreen() {
   const router = useRouter();
   const { state: session } = useSession();
+  // One more phone opened Profile today, counted once a day (a76, D-555).
+  useCountScreenOpen('profile');
   const signedIn = session.status === 'signed-in';
   const trueRole = signedIn ? session.session.role : null;
   const { viewedRole, demoRole } = useRoleView(trueRole);
