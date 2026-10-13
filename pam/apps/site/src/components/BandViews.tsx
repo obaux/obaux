@@ -1,13 +1,16 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
+import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
 import { VStack } from '@astryxdesign/core/VStack';
+import { Button } from '@pam/ui/Button';
 import { HOME } from '../content/home-copy';
 import { website } from '../lib/website.stylex';
 import { type } from '../lib/website-type.stylex';
+import { tap } from '../lib/tap';
 
 /*
  * The deep green card, "Who is Pam for?" (Figma "Callout card" 18:517; Will, 12 October: the names do not go to the help
@@ -18,12 +21,26 @@ import { type } from '../lib/website-type.stylex';
  * - All three lines sit in one grid cell, the hidden ones `visibility: hidden`, so the card is as tall as the longest and
  *   does not jump when you switch.
  * - The picture fades in 240ms on the app's easing; none under reduced motion.
+ * - It moves on by itself (Will, 13 October, a77): Residents, Program Providers, Case managers, round again, every 6
+ *   seconds, shown by a translucent fill growing across the active name. The fill's `animationend` is the timer, so the
+ *   picture and the clock cannot drift apart, and pausing the animation pauses the cycle. Choosing a name shows it and
+ *   stops the cycle for good (until Play). It also waits while the pointer or focus is in the card or it is off screen.
+ *   A Pause / Play pill on the picture stops it (WCAG 2.2.2). Reduced motion: no cycle, no fill, no pill.
+ * - A screen reader hears a view only when a person chose it, never on the timer.
+ * - The fill's colour is a first pass (the brand deep green at 22%); Dot draws the final look.
  */
+const DWELL_MS = 6000;
+
 const IMAGES: Readonly<Record<string, { src: string; srcSet?: string; width: number; height: number }>> = {
   residents: { src: '/home/philly-1600.webp', srcSet: '/home/philly-900.webp 900w, /home/philly-1600.webp 1600w', width: 2048, height: 1494 },
   providers: { src: '/home/band-providers-630.webp', width: 630, height: 500 },
   managers: { src: '/home/band-managers-630.webp', width: 630, height: 500 },
 };
+
+const keyframesFill = stylex.keyframes({
+  from: { transform: 'scaleX(0)' },
+  to: { transform: 'scaleX(1)' },
+});
 
 const styles = stylex.create({
   band: {
@@ -93,7 +110,35 @@ const styles = stylex.create({
     transitionTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)',
   },
   chipOn: { backgroundColor: website['--website-surface-green'], color: website['--website-text-primary'] },
-  arrow: { width: { default: '12px', '@media (min-width: 900px)': '17px' }, height: { default: '12px', '@media (min-width: 900px)': '17px' }, flexShrink: 0 },
+  chipText: { position: 'relative', display: 'inline-flex', alignItems: 'center', gap: 'inherit' },
+  // The progress: a translucent shade that grows from the start edge across the active name (transform only).
+  fill: {
+    position: 'absolute',
+    inset: 0,
+    backgroundColor: `color-mix(in srgb, ${website['--website-surface-brand-deep']} 22%, transparent)`,
+    transformOrigin: 'left center',
+    transform: 'scaleX(0)',
+    animationName: keyframesFill,
+    animationDuration: `${DWELL_MS}ms`,
+    animationTimingFunction: 'linear',
+    animationFillMode: 'forwards',
+    pointerEvents: 'none',
+  },
+  fillHeld: { animationPlayState: 'paused' },
+  chipClip: { position: 'relative', overflow: 'hidden' },
+  pause: {
+    position: 'absolute',
+    insetBlockStart: '8px',
+    insetInlineEnd: '8px',
+    zIndex: 10,
+    borderRadius: '24px',
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: website['--website-border-strong'],
+    backgroundColor: website['--website-surface-veil'],
+    color: website['--website-text-primary'],
+    paddingInline: '14px',
+  },
   lines: { display: 'grid' },
   line: {
     gridArea: '1 / 1',
@@ -115,27 +160,82 @@ const styles = stylex.create({
   lineOn: { visibility: 'visible', opacity: 1 },
 });
 
-function Arrow() {
+
+function PauseMark() {
   return (
-    <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false" {...stylex.props(styles.arrow)}>
-      <path d="M3 9 9 3M4 3h5v5" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <rect x="6" y="4" width="4.5" height="16" rx="1.2" fill="currentColor" />
+      <rect x="13.5" y="4" width="4.5" height="16" rx="1.2" fill="currentColor" />
     </svg>
   );
 }
 
-export function BandViews() {
+function PlayMark() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function usePrefersReducedMotion(): boolean {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setReduced(query.matches);
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
+  return reduced;
+}
+
+export function BandViews({ pauseLabel = 'Pause this card', playLabel = 'Play this card' }: { readonly pauseLabel?: string; readonly playLabel?: string } = {}) {
   const views = HOME.band.views;
   const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false); // the reader's choice: a tap on a name, or the Pause button
+  const [inside, setInside] = useState(false); // pointer or focus in the card
+  const [visible, setVisible] = useState(true);
+  const [heard, setHeard] = useState('');
+  const reduced = usePrefersReducedMotion();
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const bandRef = useRef<HTMLDivElement>(null);
 
-  const go = (to: number) => {
+  useEffect(() => {
+    const el = bandRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(([entry]) => setVisible(entry?.isIntersecting ?? true), { threshold: 0.2 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  // A person chose a view: show it, say it, and stop the cycle.
+  const choose = (to: number, focus = false) => {
     const next = (to + views.length) % views.length;
     setActive(next);
-    tabRefs.current[next]?.focus();
+    setPaused(true);
+    setHeard(`${views[next]!.label}: ${views[next]!.line}`);
+    if (focus) tabRefs.current[next]?.focus();
   };
 
+  const cycling = !paused && !reduced;
+  const held = inside || !visible; // the fill waits, and so does the cycle
+
   return (
-    <div data-band="" {...stylex.props(styles.band)}>
+    <div
+      ref={bandRef}
+      data-band=""
+      {...stylex.props(styles.band)}
+      onPointerEnter={() => setInside(true)}
+      onPointerLeave={() => setInside(false)}
+      // Keyboard focus holds the cycle; a tap that merely leaves focus on a button does not.
+      onFocus={(e) => {
+        if ((e.target as HTMLElement).matches(':focus-visible')) setInside(true);
+      }}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setInside(false);
+      }}
+    >
       <div {...stylex.props(styles.pictures)}>
         {views.map((view, i) => {
           const image = IMAGES[view.id]!;
@@ -155,6 +255,17 @@ export function BandViews() {
             />
           );
         })}
+        {reduced ? null : (
+          <Button
+            label={paused ? playLabel : pauseLabel}
+            variant="secondary"
+            size="sm"
+            hasEdge={false}
+            icon={paused ? <PlayMark /> : <PauseMark />}
+            onClick={() => setPaused((p) => !p)}
+            xstyle={[type.label_14, styles.pause, tap.target]}
+          />
+        )}
       </div>
       <VStack xstyle={styles.text}>
         <VStack gap={4}>
@@ -166,18 +277,19 @@ export function BandViews() {
             aria-labelledby="band-label"
             {...stylex.props(styles.tabs)}
             onKeyDown={(e) => {
+              const here = Math.max(0, tabRefs.current.indexOf(document.activeElement as HTMLButtonElement));
               if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
                 e.preventDefault();
-                go(active + 1);
+                choose(here + 1, true);
               } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
                 e.preventDefault();
-                go(active - 1);
+                choose(here - 1, true);
               } else if (e.key === 'Home') {
                 e.preventDefault();
-                go(0);
+                choose(0, true);
               } else if (e.key === 'End') {
                 e.preventDefault();
-                go(views.length - 1);
+                choose(views.length - 1, true);
               }
             }}
           >
@@ -193,12 +305,20 @@ export function BandViews() {
                 aria-selected={i === active}
                 aria-controls="band-panel"
                 tabIndex={i === active ? 0 : -1}
-                onClick={() => setActive(i)}
+                onClick={() => choose(i)}
                 {...stylex.props(styles.tab)}
               >
-                <span {...stylex.props(styles.chip, i === active && styles.chipOn)}>
-                  {view.label}
-                  <Arrow />
+                <span {...stylex.props(styles.chip, styles.chipClip, i === active && styles.chipOn)}>
+                  {i === active && cycling ? (
+                    <span
+                      key={active}
+                      aria-hidden="true"
+                      data-band-fill=""
+                      onAnimationEnd={() => setActive((a) => (a + 1) % views.length)}
+                      {...stylex.props(styles.fill, held && styles.fillHeld)}
+                    />
+                  ) : null}
+                  <span {...stylex.props(styles.chipText)}>{view.label}</span>
                 </span>
               </button>
             ))}
@@ -212,6 +332,9 @@ export function BandViews() {
           ))}
         </div>
       </VStack>
+      <VisuallyHidden role="status" aria-live="polite">
+        {heard}
+      </VisuallyHidden>
     </div>
   );
 }

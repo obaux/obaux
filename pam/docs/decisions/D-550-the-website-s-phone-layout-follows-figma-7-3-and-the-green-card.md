@@ -11,6 +11,8 @@
 
 **Why not the Figma carousel-less hero.** Figma hides the hero picture block. Will asked for the flipping carousel on 11 October and has not withdrawn it, so it stays.
 
+**Will's answers to card a77 (13 October, 03:21).** "Okay we can take off the arrows but let's add a progress translucent effect behind chips because they should automatically switch from one to the next. If the user taps on one, it pauses the progress. Everything else looks good." So: the ↗ is gone from the three names; the card moves on by itself every 6 seconds (Residents, Program Providers, Case managers, round again), a translucent fill growing across the active name shows the time left (the fill's own `animationend` is the timer, so the two cannot drift); a tap, an arrow key or the Pause pill stops the cycle until Play. It also waits while the pointer or keyboard focus is in the card and while it is off screen. Reduced motion: no cycle, no fill, no pill. A screen reader is told only what a person chose. The header says "Support"; Sage's signed words are in (b8067c7e), including "Check in and go!".
+
 **Waiting on words (Sage; Will signs promises).** "Your policies, signed before they arrive. Check-in and go!" (a promise), "Their plans, your guidance, in one place.", the alt texts of the two new pictures. The header says "Get help" (Figma "Support"), the row-2 and row-3 and privacy-callout words follow Will's a65.
 
 **What a later session might reverse.** The 48px tap boxes if Will accepts 32/36 targets; the carousel if he wants the hero to match Figma exactly; the ↗ on each name (Dot suggests asking Will).
