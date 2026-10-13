@@ -170,6 +170,7 @@ const FUNCTIONS: Record<string, FunctionEntry> = {
     dynamic: { privacy: { key: 'privacy.s.what-we-keep.p6', names: /server opens the page once/ } },
   },
   'calendar-feed': { reaches: [], why: 'serves the calendar link; asks only Pam’s own database', arriving: 'D-538' },
+  'move-number': { reaches: [], why: 'moves an approved account to its new number; asks only Pam’s own Auth and database (D-567)' },
   'places-search': {
     reaches: ['places.googleapis.com'],
     why: 'suggests places for an address or a corner a member typed; the words, the place picked and a one-search code go to Google, nothing about the member (street-search-line.test.ts holds the code to that)',
