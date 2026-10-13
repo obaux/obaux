@@ -72,8 +72,8 @@ Shows at the end of a post and when a search finds nothing, never first.
 - On an empty search, above it: **We do not have an article for that yet.**
 
 **Later (the form, built off until Will says so):**
-- Call-out (opens the form; Will, 13 October): heading **Still need help?** · body **Write to us. A person at Pam reads every message.** · button **Write to us**
-- Form heading: **Still need help?**
+- Call-out (opens the form; Will, 13 October): heading **Still stuck?** (kept) · body **Write to us. A person at Pam reads every message.** · button **Write to us**
+- Form heading: **Still stuck?**
 - Lead: **Tell us what happened. A person at Pam reads every message.**
 - Question (optional, choose all that fit; a fieldset): **How do you use Pam? Choose all that fit.** · **I’m a member** · **I run a program** · **I’m a case manager** · **I don’t use Pam yet** (sends no role)
 - Field: **What's wrong?** · hint: **In your own words. You don't need to know what to ask for.**

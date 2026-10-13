@@ -16,13 +16,22 @@ const styles = stylex.create({
     borderBlockEndStyle: 'solid',
     borderBlockEndColor: website['--website-border-subtle'],
     color: website['--website-brand-primary'],
-    textDecorationLine: 'none',
+    textDecorationLine: { default: 'none', ':hover': 'underline', ':focus-visible': 'underline' },
+    textDecorationThickness: '1.5px',
+    textUnderlineOffset: '4px',
     backgroundColor: { default: 'transparent', ':hover': website['--website-surface-brand-soft'] },
     transitionProperty: 'background-color',
     transitionDuration: '125ms',
     transitionTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)',
   },
-  title: { flex: 1, minWidth: 0, overflowWrap: 'anywhere' },
+  // The title's words are the link colour (very light lime in dark: D-562); the icon and chevron keep the lime. Colour alone
+  // does not say "link" there, so the title is underlined on hover and on keyboard focus.
+  title: {
+    flex: 1,
+    minWidth: 0,
+    overflowWrap: 'anywhere',
+    color: website['--website-text-link'],
+  },
   icon: { flexShrink: 0, width: '20px', height: '20px' },
 });
 

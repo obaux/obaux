@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
-import { Dialog, DialogHeader } from '@astryxdesign/core/Dialog';
+import { Dialog } from '@astryxdesign/core/Dialog';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { TextArea } from '@astryxdesign/core/TextArea';
@@ -32,6 +32,24 @@ const styles = stylex.create({
   intro: { color: website['--website-text-primary'], margin: 0 },
   note: { color: website['--website-text-secondary'], margin: 0 },
   title: { color: website['--website-text-primary'], margin: 0 },
+  // The dialog (Dot, D-562): full screen on a phone, a 560px card from 900px, backdrop black at 50% (60% in dark).
+  dialog: {
+    borderRadius: { default: '0px', '@media (min-width: 900px)': '24px' },
+    borderWidth: { default: '0px', '@media (min-width: 900px)': '1px' },
+    borderStyle: 'solid',
+    borderColor: website['--website-border-subtle'],
+    backgroundColor: website['--website-surface-page'],
+    color: website['--website-text-primary'],
+    '::backdrop': { backgroundColor: 'light-dark(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.6))' },
+  },
+  inside: {
+    boxSizing: 'border-box',
+    paddingTop: { default: 'calc(24px + env(safe-area-inset-top, 0px))', '@media (min-width: 900px)': '32px' },
+    paddingBottom: { default: 'calc(24px + env(safe-area-inset-bottom, 0px))', '@media (min-width: 900px)': '32px' },
+    paddingInline: { default: '24px', '@media (min-width: 900px)': '32px' },
+  },
+  head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: '56px', gap: '8px' },
+  close: { width: '48px', height: '48px', minWidth: '48px', flexShrink: 0 },
   // The who-are-you question is a real fieldset with a legend, so a reader hears the question before each choice.
   fieldset: { border: 'none', margin: 0, padding: 0, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '4px' },
   legend: { padding: 0, marginBlockEnd: '4px', color: website['--website-text-primary'] },
@@ -58,6 +76,14 @@ const WHO = [
 ] as const;
 const WHO_WORDS = { question: 'How do you use Pam?', hint: 'Choose all that fit.' } as const;
 
+function CloseMark() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 type Phase = 'address' | 'form' | 'sending' | 'sent' | 'failed';
 
 /**
@@ -77,6 +103,13 @@ export function HelpRequest() {
   const [email, setEmail] = useState('');
   const [who, setWho] = useState<readonly string[]>([]);
   const [bad, setBad] = useState<{ message?: string; email?: string }>({});
+
+  // The page behind does not scroll while the form is open (iOS ignores the dialog's own lock): globals.css reads this.
+  useEffect(() => {
+    if (!open) return;
+    document.documentElement.setAttribute('data-dialog-open', '');
+    return () => document.documentElement.removeAttribute('data-dialog-open');
+  }, [open]);
 
   // The probe costs the function an invocation (and the free plan counts them), so it is made rarely: only from the real
   // site's origin (CI, local builds and previews never call it), only when this box comes near the screen, and once a
@@ -143,7 +176,7 @@ export function HelpRequest() {
     return (
       <VStack gap={1} role="status">
         <Heading level={2} xstyle={[type.heading_title24, styles.title]}>
-          Still need help?
+          Still stuck?
         </Heading>
         <Text as="p" xstyle={tap.target}>
           <strong>Sent. Thank you.</strong>
@@ -199,7 +232,7 @@ export function HelpRequest() {
   return (
     <VStack gap={3}>
       <Heading level={2} xstyle={[type.heading_title24, styles.title]}>
-        Still need help?
+        Still stuck?
       </Heading>
       <Text as="p" xstyle={styles.intro}>
         Write to us. A person at Pam reads every message.
@@ -207,20 +240,30 @@ export function HelpRequest() {
       <SoftButton
         label="Write to us"
         onClick={() => {
-          setPhone(window.matchMedia('(max-width: 599px)').matches);
+          setPhone(window.matchMedia('(max-width: 899px)').matches);
           setOpen(true);
         }}
       />
       <Dialog
         isOpen={open}
-        onOpenChange={setOpen}
+        onOpenChange={(next) => {
+          if (!next && phase === 'sending') return; // not while it is sending
+          setOpen(next);
+        }}
         variant={phone ? 'fullscreen' : 'standard'}
         width={phone ? undefined : 560}
-        padding={6}
+        padding={0}
         purpose="form"
         aria-labelledby="help-title"
+        xstyle={styles.dialog}
       >
-        <DialogHeader title="Still need help?" onOpenChange={setOpen} />
+        <VStack gap={6} xstyle={styles.inside}>
+        <VStack xstyle={styles.head}>
+          <Heading level={2} id="help-title" xstyle={[type.heading_title24, styles.title]}>
+            Still stuck?
+          </Heading>
+          <Button label="Close" isIconOnly variant="ghost" icon={<CloseMark />} onClick={() => setOpen(false)} xstyle={styles.close} />
+        </VStack>
         <VStack
           as="form"
           gap={6}
@@ -288,6 +331,7 @@ export function HelpRequest() {
             We send what you write, how you use Pam if you tell us, this page and the language you read in. Nothing else from your account.
           </Text>
           <Button label={phase === 'sending' ? 'Sending' : 'Send to Pam'} variant="primary" type="submit" isDisabled={phase === 'sending'} xstyle={tap.target} />
+        </VStack>
         </VStack>
       </Dialog>
     </VStack>

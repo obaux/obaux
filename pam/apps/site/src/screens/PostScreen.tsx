@@ -15,6 +15,8 @@ import { STILL_STUCK, collectSections } from '../lib/sections';
 import { BODIES } from '../content/bodies';
 import { anyPostBySlug, formatDate, postBySlug } from '../content/posts';
 
+const crumbLink = stylex.create({ text: { color: website['--website-text-link'] } });
+
 const styles = stylex.create({
   // The post and, from 1180px, its "On this page" column beside it.
   layout: {
@@ -109,7 +111,7 @@ export function PostScreen({ slug, allowDraft = false }: { readonly slug: string
         <VStack gap={6} paddingBlockStart={8}>
           <VStack gap={4} xstyle={styles.header}>
             <HStack as="nav" gap={2} xstyle={styles.crumbs} aria-label="Breadcrumb">
-              <Link href="/support/" xstyle={tap.link}>Support</Link>
+              <Link href="/support/" hasUnderline xstyle={[tap.link, crumbLink.text]}>Support</Link>
               <Text type="supporting" aria-hidden xstyle={styles.arrow}>
                 →
               </Text>

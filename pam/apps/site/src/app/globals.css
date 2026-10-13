@@ -94,3 +94,8 @@
     margin-block-start: 0;
   }
 }
+
+/* The help form's dialog is open: the page behind does not scroll (iOS ignores the dialog's own lock). */
+html[data-dialog-open] body {
+  overflow: hidden;
+}
