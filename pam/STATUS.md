@@ -1209,7 +1209,11 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ## Messages & notifications · counting screen opens, and the bell not moving (13 October 2026)
 
-Built, not live: `count_screen_open('points'|'profile')` adds one to a per-day count (no person, device, time or place), called once a day per phone from Your points and Profile for a real member (a69/a76, D-555); `screen_opens_weekly()` is the service-role report, a total under 5 shown as "under 5". Needs the migration applied and Lena's Privacy line in the same batch. Separately, the Explore bell holds its place when the phone had it last time, so it no longer shifts the page (W3). Proof: DB test 70, unit and e2e (`screen-open-count`, `explore-bell-shift`).
+Live since b29 (13 October): `count_screen_open('points'|'profile')` adds one to a per-day count (no person, device, time or place), called once a day per phone from Your points and Profile for a real member (a69/a76, D-555); `screen_opens_weekly()` is the service-role report, a total under 5 shown as "under 5". The migration is live (20261013051051) and Lena's Privacy line `privacy.s.what-we-keep.p13` shipped with it. Separately, the Explore bell holds its place when the phone had it last time, so it no longer shifts the page (W3). Proof: DB test 70, unit and e2e (`screen-open-count`, `explore-bell-shift`).
+
+## Messages & notifications · texting people back is off for now (12 October 2026)
+
+Will (12 October, a61): "let's not turn on this for now. It's a nice to have not a must." Nothing is built or switched on for Pam answering people by text; the help form answers by email only (D-547). The pitch deck outline and example images are kept on `claude/messages-pitch-deck` (`docs/proposals/texting-pitch/`), not for merging. Not built: forwarding replies to hello@, the auto-answer, the form's phone field, the email's "Reply by text" link, a cap per number per day, a non-Latin length check; `sms-inbound` is still not deployed. `/reply/` (D-524) is unchanged.
 
 ## Messages & notifications · message a program before booking (11 October 2026)
 
