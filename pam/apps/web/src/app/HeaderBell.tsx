@@ -41,22 +41,35 @@ import { useExamplesOn } from '@/lib/useExamplesOn';
  * empty. Optional and only threaded through the screens that already read
  * `useDemoView` themselves — everywhere else still reads `role` alone, the
  * same as before this existed.
+ *
+ * `hideWhenEmpty` (Will, 12 October: "only show Notifications bell for members
+ * Explore page, when notifications exist") draws nothing while the list the
+ * bell opens has nothing in it. "Exist" means the list is non-empty, read or
+ * not; a list whose every row was read still has its bell, without a dot. It
+ * starts hidden and stays hidden until the list arrives non-empty, so the slot
+ * never flashes in and out. Where examples are on, it follows what
+ * `/notifications/` shows: the example set for the role, none for a fresh
+ * account.
  */
 export function HeaderBell({
   enabled,
   role,
   isDemo = false,
   appearance,
+  hideWhenEmpty = false,
 }: {
   readonly enabled: boolean;
   readonly role?: Role | null;
   readonly isDemo?: boolean;
   /** `round` for the redesigned headers (D-210). */
   readonly appearance?: 'filled' | 'round';
+  /** Nothing is drawn while there is nothing in the list the bell opens. */
+  readonly hideWhenEmpty?: boolean;
 }) {
   const { t, tPlain } = useI18n();
   const { state } = useNotifications(enabled);
   const [dummyUnread, setDummyUnread] = useState<number | null>(null);
+  const [dummyTotal, setDummyTotal] = useState<number | null>(null);
 
   // Example alerts are for Storybook and demo accounts only; a real account's bell counts its real ones.
   const examples = useExamplesOn();
@@ -71,6 +84,7 @@ export function HeaderBell({
       const { DUMMY_NOTIFICATIONS } = await import('@pam/config/dummy-notifications');
       if (cancelled) return;
       setDummyUnread(DUMMY_NOTIFICATIONS[role as Role].filter((item) => item.isNew).length);
+      setDummyTotal(DUMMY_NOTIFICATIONS[role as Role].length);
     })();
     return () => {
       cancelled = true;
@@ -79,6 +93,12 @@ export function HeaderBell({
   }, [needsDummy, role]);
 
   if (state.status !== 'ready') return null;
+
+  if (hideWhenEmpty) {
+    // The example set stands in only where `/notifications/` shows it; a fresh account has none (D-361).
+    const hasAny = needsDummy ? (dummyTotal ?? 0) > 0 : state.items.length > 0;
+    if (!hasAny) return null;
+  }
 
   const unread = needsDummy && dummyUnread !== null ? dummyUnread : unreadCount(state);
 
