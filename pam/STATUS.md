@@ -944,6 +944,10 @@ cleared and lands as super admin. "Use Pam as" (two-role accounts, D-374) stays;
 change. Also Iris's W2: sign-up step 2 has a Contact Pam row (help desk; no phone line, D-512).
 Open with Will: W2's back arrow (recommended: none).
 
+## Voice & UX copy · English signed for b22, W6, the help form and street search (13 October)
+
+Ledger: `docs/signed-english.md` on `claude/sage-signs` (732e6650). Signed and checked against the code: the b22 visit lines, the website help form, street-search labels, the W6 Join lines and `nav.back.reported`. Will's a72, a77, a80, a81 and a82 are recorded as his. Still waiting: Will on the a65 24/7 line (until launch). Session log: `docs/sessions/2026-10-13-1925-voice-signing-a29-b22-w6-help-form.md`.
+
 ## Voice & UX copy · marketing may reach, help stays true; help-post drafts (11 October)
 
 Will: the marketing pages may say what Pam is working towards; help posts, the app and anything legal say only what's
