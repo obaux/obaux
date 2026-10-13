@@ -2227,3 +2227,7 @@ Will (a65) wants to see two website text colours before choosing. Story **Websit
 ## Design system & Storybook · role chip keeps its words whole (13 October)
 
 The role chip beside the mark no longer breaks inside a word, and the header gives way (corner on its own row) when it is too crowded, e.g. Spanish at 320 (D-551, b26).
+
+## Design system & Storybook · the green card transition (13 October)
+
+Crossfade 650ms, line out 160ms then in 320ms, no scale (D-556). Story: Website / Green card transition.
