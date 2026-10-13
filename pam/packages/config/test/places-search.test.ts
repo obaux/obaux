@@ -47,6 +47,16 @@ describe('places-search', () => {
     expect(w.calls).toEqual([]);
   });
 
+  it('answers "is it on?" without asking Google anything, for a signed-in member only', async () => {
+    const w = world();
+    expect(await (await w.ask({ action: 'status' })).json()).toEqual({ enabled: true });
+    expect(googleCalls(w.calls)).toEqual([]);
+    expect((await world().ask({ action: 'status' }, {})).status).toBe(401);
+    const off = world({ env: { GOOGLE_MAPS_SERVER_KEY: undefined } });
+    expect(await (await off.ask({ action: 'status' })).json()).toEqual({ enabled: false });
+    expect(off.calls).toEqual([]);
+  });
+
   it('wants a signed-in member', async () => {
     expect((await world().ask({ action: 'suggest', q: '1500 Market', token: TOKEN }, {})).status).toBe(401);
     const w = world({ signedIn: false });

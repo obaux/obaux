@@ -1618,5 +1618,7 @@
   "legal.sources.title": "数据来源",
   "legal.sources.neighborhoods": "区域搜索中的街区名称来自 Abaca Labs 制作的“Philadelphia Neighborhoods”。Pam对其做了修改：每个街区只保留一个点，而不是边界。",
   "legal.sources.link": "查看原始数据",
-  "legal.sources.licence": "许可协议：CC BY 4.0"
+  "legal.sources.licence": "许可协议：CC BY 4.0",
+  "places.areaHint.street": "例如：19107、Fishtown，或 Broad 和 Girard 路口。",
+  "places.areaLabel.street": "邮政编码、街区或地址"
 }

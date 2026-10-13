@@ -109,8 +109,8 @@ export function loadOrigin(): AreaOption {
 export function saveOrigin(origin: AreaOption): void {
   // "Use my current location" is for this search only (D-536): the phone's position is never
   // written down, so the next visit starts from the last area chosen, or City Hall.
-  // A street address picked from Google's suggestions is the same (D-552): it is often somebody's home, so it is used for this search only,
-  // not written to this phone, not sent to Pam's server, and not put in a URL. The next visit starts from the last Pam area, or City Hall.
+  // A street address picked from Google's suggestions is the same (D-552): it is often somebody's home, so it is used for this search only:
+  // not kept on this phone, not kept on Pam's server (the point is sent for the search itself, as a POST body that is not logged, like "near you"), and not put in a URL. The next visit starts from the last Pam area, or City Hall.
   if (origin.id === 'here' || origin.id.startsWith(GOOGLE_PICK)) return;
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(origin));

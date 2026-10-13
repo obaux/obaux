@@ -31,6 +31,8 @@ async function open(page: Page, { enabled = true } = {}) {
   await page.route('**/rest/v1/rpc/services_near*', (route) => route.fulfill(json([])));
   await page.route(FUNCTION, (route) => {
     const body = route.request().postDataJSON() as Record<string, unknown>;
+    // "Is it on?" asks Google nothing and is not counted with the questions about what was typed.
+    if (body['action'] === 'status') return route.fulfill(json({ enabled }));
     asked.push(body);
     if (!enabled) return route.fulfill(json({ enabled: false }));
     if (body['action'] === 'choose') {
@@ -55,9 +57,18 @@ async function open(page: Page, { enabled = true } = {}) {
 test.describe('street search', () => {
   test('an address: Pam’s list first, Google’s rows below with its mark; picking one sets the area', async ({ page }) => {
     const { asked, outside, box } = await open(page);
+    // With a key, the field says an address works (Sage, 13 October): the street label and hint, not the old ones.
+    await expect(page.getByRole('textbox', { name: 'ZIP code, neighborhood or address' })).toBeVisible();
+    await expect(page.getByText('Like 19107, Fishtown, or Broad and Girard.')).toBeVisible();
     await box.fill('1500 Market');
     await expect(page.getByRole('button', { name: /^1500 Market St, Philadelphia, PA/ })).toBeVisible();
+    // Under option A a pick is never kept, and the row says so where it is picked, like "Use my current location".
+    await expect(page.getByRole('button', { name: /^1500 Market St, Philadelphia, PA.*Used for this search only\./ }).first()).toBeVisible();
     await expect(page.locator('[data-google-attribution]')).toBeVisible();
+    // The mark and the footer line under it are centred on one line (Will, 13 October).
+    const mark = await page.locator('[data-google-attribution]').boundingBox();
+    const footer = await page.getByText('Pam remembers the area you pick on this phone only.').boundingBox();
+    expect(Math.abs(mark!.x + mark!.width / 2 - (footer!.x + footer!.width / 2))).toBeLessThan(2);
     // The function got the words and a session token, and nothing else; the phone itself never spoke to Google.
     expect(asked[0]).toEqual({ action: 'suggest', q: '1500 Market', token: expect.stringMatching(/^[0-9a-f]{32}$/) });
     expect(outside).toEqual([]);
@@ -97,14 +108,18 @@ test.describe('street search', () => {
     expect(asked.at(-1)).toMatchObject({ q: '1500 Market St' });
   });
 
-  test('with no key the search is exactly what it was: no Google rows, no mark, no error, and it stops asking', async ({ page }) => {
+  test('with no key the search is exactly what it was: the old label and hint, no question about what was typed, no Google rows, no mark, no error', async ({ page }) => {
     const { asked, box } = await open(page, { enabled: false });
+    // No key: the old label and hint stay, with nothing about an address.
+    await expect(page.getByText('Like 19107, or Fishtown.')).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'ZIP code, neighborhood or address' })).toHaveCount(0);
     await box.fill('1500 Market');
-    await expect.poll(() => asked.length).toBe(1);
-    await expect(page.locator('[data-google-attribution]')).toHaveCount(0);
+    await page.waitForTimeout(900);
     await box.fill('Broad and Erie');
     await page.waitForTimeout(900);
-    expect(asked.length).toBe(1);
+    // "Is it on?" said no once; nothing typed was ever sent anywhere.
+    expect(asked).toEqual([]);
+    await expect(page.locator('[data-google-attribution]')).toHaveCount(0);
     await expect(page.getByText('Something went wrong')).toHaveCount(0);
   });
 

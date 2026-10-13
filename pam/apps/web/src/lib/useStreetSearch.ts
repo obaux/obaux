@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { MIN_CHARS, PAUSE_MS, askChoose, askSuggest, newToken, wantsGoogle, type Suggestion } from './streetSearch';
+import { MIN_CHARS, PAUSE_MS, askChoose, askStatus, askSuggest, newToken, wantsGoogle, type Suggestion } from './streetSearch';
 import { GOOGLE_PICK, type AreaOption } from './useAreaSearch';
 
 /**
@@ -9,6 +9,9 @@ import { GOOGLE_PICK, type AreaOption } from './useAreaSearch';
  * Google. Off until the function says it has a key; then the area search is exactly what it was.
  */
 let off = false;
+/** What the function said about having a key, once this session (null: not asked, or could not be told). */
+let known: boolean | null = null;
+let asking: Promise<void> | null = null;
 
 async function invoke(name: string, options: { body: Record<string, unknown> }) {
   const { createClient } = await import('./supabase');
@@ -18,15 +21,46 @@ async function invoke(name: string, options: { body: Record<string, unknown> }) 
 export function useStreetSearch(
   query: string,
   pam: { readonly matches: number; readonly settled: boolean },
+  isOpen = true,
 ): {
+  /** The function has a key: the field's label and hint can say an address works. False until it says so. */
+  enabled: boolean;
   suggestions: Suggestion[];
   isSearching: boolean;
   choose: (suggestion: Suggestion) => Promise<AreaOption | null>;
 } {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [enabled, setEnabled] = useState(known === true);
   const token = useRef(newToken());
   const latest = useRef(0);
+
+  // Asked once when the area sheet opens, and not again this session: no Google call is made to find out.
+  useEffect(() => {
+    if (!isOpen || off) return;
+    if (known !== null) {
+      setEnabled(known);
+      return;
+    }
+    asking ??= (async () => {
+      try {
+        const answer = await askStatus(invoke);
+        if (answer !== null) known = answer;
+        if (answer === false) off = true;
+      } catch {
+        // Could not be told: the old wording stays, and the next opening asks again.
+      } finally {
+        asking = null;
+      }
+    })();
+    let cancelled = false;
+    void asking.then(() => {
+      if (!cancelled) setEnabled(known === true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     const text = query.trim();
@@ -69,7 +103,7 @@ export function useStreetSearch(
     }
   }, []);
 
-  return { suggestions, isSearching, choose };
+  return { enabled, suggestions, isSearching, choose };
 }
 
 export { MIN_CHARS };

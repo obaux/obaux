@@ -56,3 +56,11 @@ export async function askChoose(invoke: Invoke, placeId: string, token: string):
   const place = (data as { place?: Chosen | null } | null)?.place;
   return place && typeof place.lat === 'number' && typeof place.lon === 'number' ? place : null;
 }
+
+/** Whether the function has a key, without asking Google anything: `null` when it could not be told (signed out, offline). */
+export async function askStatus(invoke: Invoke): Promise<boolean | null> {
+  const { data, error } = await invoke('places-search', { body: { action: 'status' } });
+  if (error) return null;
+  const enabled = (data as { enabled?: boolean } | null)?.enabled;
+  return typeof enabled === 'boolean' ? enabled : null;
+}

@@ -96,6 +96,8 @@ export interface MockOptions {
   readonly programMemberCard?: boolean;
   /** The catalogue place in the story has a program on Pam (D-498), so its page offers Message and I'm here (D-541, D-545). */
   readonly hasLead?: boolean;
+  /** Street search is on (D-552): the pretend function has a key and answers two suggestions, so the area sheet draws its street label, hint and Google row. */
+  readonly streetSearch?: boolean;
 }
 
 /** A real place of the catalogue, to plan a trip to in a story (the examples' ids are not real). */
@@ -349,7 +351,23 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rest/v1/message_link_previews', () => ({ body: linkPreviewsFor(role) })),
     on('/functions/v1/link-preview', () => ({ body: { made: 0 } })),
     // Street addresses from Google (D-552): off in a story, as with no key; the area search is Pam's own list.
-    on('/functions/v1/places-search', () => ({ body: { enabled: false } })),
+    on('/functions/v1/places-search', (_url, _method, body) => {
+      if (!options.streetSearch) return { body: { enabled: false } };
+      const action = ((body ?? {}) as { action?: string }).action;
+      if (action === 'suggest') {
+        return {
+          body: {
+            enabled: true,
+            suggestions: [
+              { placeId: 'ChIJstorybook1500market', label: '1500 Market St, Philadelphia, PA' },
+              { placeId: 'ChIJstorybook1500marketb', label: '1500 Market St Unit B, Philadelphia, PA' },
+            ],
+          },
+        };
+      }
+      if (action === 'choose') return { body: { enabled: true, place: { label: '1500 Market St, Philadelphia, PA 19102', lat: 39.9526, lon: -75.1664 } } };
+      return { body: { enabled: true } };
+    }),
     on('/rpc/report_photos_for_review', () => ({ body: [] })),
     on('/rpc/report_files_for_review', () => ({ body: [] })),
     // The programs a super admin has still to check (D-386, part 6): a decision takes one off the list.

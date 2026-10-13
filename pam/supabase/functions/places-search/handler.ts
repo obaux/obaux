@@ -45,6 +45,7 @@ export interface Deps {
 }
 
 export type Wanted =
+  | { readonly action: 'status' }
   | { readonly action: 'suggest'; readonly q: string; readonly token: string }
   | { readonly action: 'choose'; readonly placeId: string; readonly token: string };
 
@@ -58,6 +59,8 @@ const CONTROL = new RegExp(`[${Array.from({ length: 32 }, (_, code) => String.fr
 export function parseRequest(raw: unknown): Wanted {
   if (!raw || typeof raw !== 'object') throw new BadRequest('a JSON object is expected');
   const body = raw as Record<string, unknown>;
+  // "Is it on?": asked when the area sheet opens, so its label and hint can say an address works. It asks Google nothing.
+  if (body['action'] === 'status') return { action: 'status' };
   const token = body['token'];
   if (typeof token !== 'string' || !TOKEN.test(token)) throw new BadRequest('a session token is needed');
   if (body['action'] === 'suggest') {
@@ -119,6 +122,8 @@ export async function handle(request: Request, deps: Deps): Promise<Response> {
   const user = ((await who.json()) as { id?: string }).id;
   if (!user) return reply(401, { error: 'sign in first' });
   if (tooOften(user, (deps.now ?? Date.now)())) return reply(429, { error: 'slow down' });
+
+  if (wanted.action === 'status') return reply(200, { enabled: true });
 
   try {
     if (wanted.action === 'suggest') {

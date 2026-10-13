@@ -55,7 +55,8 @@ const styles = stylex.create({
     backgroundImage: { default: 'none', ':hover': 'none', ':active': 'none' },
   },
   hint: { fontSize: '15px', lineHeight: 1.5 },
-  privacy: { fontSize: '14px', lineHeight: 1.5 },
+  // Centred under Google's mark, which is centred (Will, 13 October).
+  privacy: { fontSize: '14px', lineHeight: 1.5, textAlign: 'center', width: '100%' },
   list: { width: '100%' },
 });
 
@@ -106,7 +107,7 @@ export function AreaSearch({
   const [locating, setLocating] = useState<'idle' | 'busy' | 'failed'>('idle');
   const { options, isSearching, answered } = useAreaSearch(query);
   // Street addresses and corners from Google, through Pam's server, once Pam's own list has answered (D-552).
-  const street = useStreetSearch(query, { matches: options.length, settled: !isSearching && answered === query });
+  const street = useStreetSearch(query, { matches: options.length, settled: !isSearching && answered === query }, isOpen);
   const [choosing, setChoosing] = useState(false);
 
   const body = useRef<HTMLDivElement | null>(null);
@@ -174,7 +175,7 @@ export function AreaSearch({
           </HStack>
 
           <SearchField
-            label={t('places.areaLabel')}
+            label={t(street.enabled ? 'places.areaLabel.street' : 'places.areaLabel')}
             describedBy={hintId}
             value={query}
             onChange={setQuery}
@@ -183,7 +184,7 @@ export function AreaSearch({
           />
           {/* The search finds ZIP codes (and City Hall), so say what to type (D-536). */}
           <Text id={hintId} type="supporting" xstyle={styles.hint}>
-            {t('places.areaHint')}
+            {t(street.enabled ? 'places.areaHint.street' : 'places.areaHint')}
           </Text>
 
           <MenuList
@@ -214,7 +215,8 @@ export function AreaSearch({
               ...street.suggestions.map((suggestion) => ({
                 id: `suggest:${suggestion.placeId}`,
                 label: suggestion.label,
-                description: t('places.kind.address'),
+                // Used for this search only, as "Use my current location" says (Sage, 13 October): a Google pick is never kept.
+                description: t('places.area.hereNote'),
                 icon: <PlacesIcon {...ICON} />,
                 onSelect: () => {
                   if (choosing) return;

@@ -55,3 +55,10 @@ none (the chosen area stays on the phone, as before).
 Will makes the key (restricted to the Places API (New), a daily quota cap) and enters it as `GOOGLE_MAPS_SERVER_KEY`; Lena writes the
 Privacy line (what is typed goes from Pam's server to Google), Sage edits, Will signs; Dot adds Google's mark. The hint under the field
 ("Like 19107, or Fishtown.") should then also say an address can be typed: Sage's words. The function is deployed with JWT verification ON.
+
+## Words, mark and a status question (13 October, after Sage, Lena, Dot and Will)
+
+- With a key, the field says an address works: `places.areaLabel.street` "ZIP code, neighborhood or address" and `places.areaHint.street` "Like 19107, Fishtown, or Broad and Girard." (a corner, never a house number). Without one, the old label and hint stay. The sheet learns whether there is a key from a third function action, `status`, asked once when it opens (it asks Google nothing and is not counted as a search).
+- Google rows say "Used for this search only." (`places.area.hereNote`, as "Use my current location" does), because a Google pick is never kept. The footer "Pam remembers the area you pick on this phone only." stays: it is true for Pam's own areas.
+- The mark is Google's "Google Maps" logo (Dot, D-557: files from Will, served by Pam, 18px, Google's clear space), the words "Google Maps" until the files arrive; the mark and the footer line are centred (Will, 13 October).
+- Lena's `street-search-line.test.ts` holds the function and the phone's storage to the p7 line (a pick never reaches `pam.origin`).

@@ -1618,5 +1618,7 @@
   "legal.sources.title": "Fontes de dados",
   "legal.sources.neighborhoods": "Os nomes dos bairros na busca por área vêm de “Philadelphia Neighborhoods”, criado pela Abaca Labs. Pam o modificou para guardar um ponto por bairro em vez dos limites.",
   "legal.sources.link": "Ver os dados de origem",
-  "legal.sources.licence": "Licença: CC BY 4.0"
+  "legal.sources.licence": "Licença: CC BY 4.0",
+  "places.areaHint.street": "Como 19107, Fishtown ou Broad e Girard.",
+  "places.areaLabel.street": "ZIP code, bairro ou endereço"
 }
