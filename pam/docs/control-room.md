@@ -76,6 +76,15 @@ in a sentence or two, Mira's advice, who asked, and a **Reply** button. Under th
 **Talk to Mira**: a chat, so Will can run the team from this page alone (Will, 10
 October: "Add a chat in … 'Waiting on you' so I can use that alone to manage you").
 Reply puts the card's question at the start of the message box.
+- **Pictures and colours on a card** (Will, 12 October: "It's difficult to approve design decisions without
+  seeing it"): `images` show as a grid (a video plays in place; a picture opens full screen), and a hex colour in
+  any text shows a sample of itself. A design change Will asked for goes back to him as a picture before it ships.
+- **A tick box in front of every title** (Will, 13 October: "add a checkmark for me to cross off items already
+  reviewed"), in Waiting on you and Ready for you: a ticked card folds into "Reviewed" at the bottom of its
+  section, crossed out, and leaves the counts. Kept on the card (`reviewed`, `reviewedAt`), so it holds on every
+  device; a card asked again (`askedAt`) or re-dated (`at`) after the tick comes back.
+- **The title opens and closes its card** (same day: "clicking on header … should expand or minimize the item"),
+  for every card; an answered card starts closed. **Reply is an outlined button** ("make Reply more prominent").
 - Sending: the page keeps the message on the board (`chat/<id>`, `from: "will"`) and
   sends it to Mira with Claude's own **Send to Claude** (`comments.sendToClaude`, a
   comment anchored on the chat). That wakes the merge-desk session, which is subscribed
@@ -144,6 +153,12 @@ private to Will unless he shares it.
   The page shows only `chat/`; on 10 October, answers given only in comment threads left
   his afternoon's messages looking unanswered until they were filled in at 18:00.
 - `desk/now` whenever Mira's own work changes.
+- **Every decision Will gives, anywhere** (this page, the terminal, a teammate's session) goes into the merge
+  desk's session log within the hour: his words, the time, who builds it, and where it will be recorded (a
+  decision file, a row in `docs/signed-english.md`, a card). Until it is built, the log is its record (Will,
+  13 October: "ensure all these decisions are being documented").
+- **Times come from the clock** (`date -u`), never estimated: a chat message stamped ahead of time sorts after
+  Will's next message (13 October).
 
 ## Checks before it ships (the double pass)
 

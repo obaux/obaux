@@ -485,6 +485,39 @@
   forced; select-false policy; no client grants; both function bodies md5-equal to the file; anon executes neither,
   authenticated only `count_screen_open`, the service role `screen_opens_weekly`. Nothing counts until the app ships in
   b29 with Lena's Privacy line.
+- **Will's decisions, 13 October** (his words, the time in UTC, who builds it, and where it ends up recorded; written
+  down the same hour from now on, not at batch time; Will, 06:03: "ensure all these decisions are being documented"):
+  - **03:21, a77 (website on phones):** "take off the arrows but let's add a progress translucent effect behind chips
+    because they should automatically switch from one to the next. If the user taps on one, it pauses the progress.
+    Everything else looks good." Wren built it with Dot's fill (D-553); held on card a80.
+  - **03:23, a78:** "go ahead and push it live and have our UX testing team do a run-through". Ava's rule needs his
+    words in her own session; he typed there at 05:40 ("Ask Mira if you can push this branch. w6 is approved by
+    me"). Mira said yes to both branches (Connect only on examples; super admin without the switcher) and to W6.
+  - **04:22, a80:** smoother transitions between the green card's slides; is the card shaking? Measured: the real card
+    does not move (840 frames, no layout shift); the jumps were stills taken during the recording. Dot's motion
+    (D-556), built by Wren.
+  - **04:24, a76:** "signed": the screen-count Privacy line (Sage's ledger, bfa5dcd3). Nico built the counter (D-555);
+    the Privacy line ships with it in b29, never before.
+  - **04:48 (terminal) and 04:58, a79:** the calendar migration pasted and "Done". The editor's "destructive
+    operations" warning was explained and is on the card for next time.
+  - **04:59, Control Room:** a tick box to cross off reviewed items. Built (Control Room v22): ticked cards fold into
+    "Reviewed", leave the counts, and come back if the card changes; saved on the card, so on every device.
+  - **05:02, a81:** "Signed" (street search Privacy line p7; Sage's ledger), and "center align powered by google text,
+    and text under it 'Pam remembers...'". Dot centred the mark (D-557, 167b0998); Piper folds it in.
+  - **05:44, a80:** "Approve the transition, but … just say 'Play Card' or 'Pause card' instead of 'Pause/Play who
+    Pam is'. The new label live is not intuitive." The pill becomes "Pause card" / "Play card" (sentence case; the
+    spoken name the same). Wren builds; Sage records his words. The phone layout and green card then ship.
+  - **05:45, a81:** "when the new address is selected, we only show the zipcode in the button to save space on main
+    screen (Explore)". Piper: the ZIP comes from the address Google already returns; nothing new goes to Google; the
+    pick is still never saved.
+  - **05:47, Control Room:** tapping a card's title opens or closes it; Reply a secondary button. Built (v23).
+  - **06:00 (terminal, with screenshots), sign-up:** (1) the step counter inside the footer button ("1 of 3"): no darker
+    background, smaller and more subtle, centred with the button text (Dot, BigButton `badge`); (2) the language chips
+    on Join go back to a dropdown (Ava builds, Dot the look); (3) the invite code hidden behind "Did someone invite you
+    via code?" with a link that shows the field (Ava; Sage records his words and proposes link text that says what it
+    does instead of "click here"). Pictures go to Will before any of it ships (the D-499 lesson).
+  - **06:03 (terminal):** every decision documented in the repository's records. This list; the rule is now in
+    `docs/control-room.md` ("How Mira keeps it current").
 
 ## What was wrong, and what missed it
 
