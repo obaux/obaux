@@ -116,6 +116,22 @@ export function HelpRequest() {
   const [email, setEmail] = useState('');
   const [who, setWho] = useState<readonly string[]>([]);
   const [bad, setBad] = useState<{ message?: string; email?: string }>({});
+  const [focusError, setFocusError] = useState(0); // bumped when Send finds a problem: focus goes to the first field in error
+  const formBox = useRef<HTMLDivElement>(null);
+  const sentBox = useRef<HTMLDivElement>(null);
+
+  // An empty or wrong Send says nothing to a screen reader unless focus moves: it goes to the first field in error, which
+  // carries `aria-invalid` and `aria-describedby`, so its error is read (Iris W1).
+  useEffect(() => {
+    if (!focusError) return;
+    const id = window.requestAnimationFrame(() => formBox.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus());
+    return () => window.cancelAnimationFrame(id);
+  }, [focusError]);
+
+  // After a successful Send "Write to us" is replaced by the thank-you: focus goes to it, so a person keeps their place (Iris P2).
+  useEffect(() => {
+    if (phase === 'sent') sentBox.current?.focus();
+  }, [phase]);
 
   // The page behind does not scroll while the form is open (iOS ignores the dialog's own lock): globals.css reads this.
   useEffect(() => {
@@ -187,7 +203,7 @@ export function HelpRequest() {
 
   if (phase === 'sent') {
     return (
-      <VStack gap={1} role="status">
+      <VStack gap={1} role="status" ref={sentBox} tabIndex={-1} id="help-sent">
         <Heading level={2} xstyle={[type.heading_title24, styles.title]}>
           Still stuck?
         </Heading>
@@ -205,7 +221,11 @@ export function HelpRequest() {
       ...(message.trim().length < 3 ? { message: WORDS.message } : {}),
       ...(!email.trim() ? { email: WORDS.emailEmpty } : !/^\S+@\S+\.\S+$/.test(email.trim()) ? { email: WORDS.emailWrong } : {}),
     };
-    if (problems.message || problems.email) return setBad(problems);
+    if (problems.message || problems.email) {
+      setBad(problems);
+      setFocusError((n) => n + 1);
+      return;
+    }
     setBad({});
     setPhase('sending');
     const roles = WHO.filter((w) => who.includes(w.id) && w.role).map((w) => w.role);
@@ -270,7 +290,7 @@ export function HelpRequest() {
         aria-labelledby="help-title"
         xstyle={styles.dialog}
       >
-        <VStack gap={6} xstyle={styles.inside}>
+        <VStack gap={6} xstyle={styles.inside} ref={formBox}>
         <VStack xstyle={styles.head}>
           <Heading level={2} id="help-title" xstyle={[type.heading_title24, styles.title]}>
             Still stuck?
