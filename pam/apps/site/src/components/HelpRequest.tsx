@@ -17,6 +17,11 @@ import { tap } from '../lib/tap';
 import { type } from '../lib/website-type.stylex';
 import { website } from '../lib/website.stylex';
 
+const fadeIn = stylex.keyframes({
+  from: { opacity: 0 },
+  to: { opacity: 1 },
+});
+
 const styles = stylex.create({
   // The honeypot: a field no person sees or reaches. Hidden by position, not `type=hidden`, so a bot still fills it.
   trap: { position: 'absolute', insetInlineStart: '-10000px', width: '1px', height: '1px', overflow: 'hidden' },
@@ -41,7 +46,15 @@ const styles = stylex.create({
     backgroundColor: website['--website-surface-page'],
     color: website['--website-text-primary'],
     '::backdrop': { backgroundColor: 'light-dark(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.6))' },
+    // It fades in over 160ms on the app's easing, nothing else moves (Dot, D-562); instant under reduced motion.
+    animationName: { default: 'none', '@media (prefers-reduced-motion: no-preference)': fadeIn },
+    animationDuration: '160ms',
+    animationTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)',
+    animationFillMode: 'both',
   },
+  // The fields: 56px tall, radius 12, a 1.5px border (Dot, D-562). Astryx applies `xstyle` to the field's own box.
+  areaBox: { borderRadius: '12px', borderWidth: '1.5px', minHeight: '160px' },
+  field: { height: '56px', borderRadius: '12px', borderWidth: '1.5px' },
   inside: {
     boxSizing: 'border-box',
     paddingTop: { default: 'calc(24px + env(safe-area-inset-top, 0px))', '@media (min-width: 900px)': '32px' },
@@ -66,13 +79,13 @@ const WORDS = {
 /**
  * How they use Pam, choose all that fit (Sage, signed 13 October; Will: "I didn't know whether the user was a member,
  * program, both, or case manager"). Optional, so nobody is blocked. What goes to the help-request function is `roles`,
- * an array of `member`, `program`, `case_manager` (Nico, D-559); "I don't use Pam yet" sends nothing.
+ * an array of `member`, `program`, `case_manager` (Nico, D-559); "I don't use Pam yet" sends `not_yet`.
  */
 const WHO = [
   { id: 'member', label: 'I’m a member', role: 'member' },
   { id: 'program', label: 'I run a program', role: 'program' },
   { id: 'case-manager', label: 'I’m a case manager', role: 'case_manager' },
-  { id: 'not-yet', label: 'I don’t use Pam yet', role: null },
+  { id: 'not-yet', label: 'I don’t use Pam yet', role: 'not_yet' },
 ] as const;
 const WHO_WORDS = { question: 'How do you use Pam?', hint: 'Choose all that fit.' } as const;
 
@@ -296,6 +309,7 @@ export function HelpRequest() {
             maxLength={3000}
             isRequired
             hasAutoFocus
+            xstyle={styles.areaBox}
             {...(bad.message ? { status: { type: 'error' as const, message: bad.message } } : {})}
           />
           <fieldset {...stylex.props(styles.fieldset)}>
@@ -319,6 +333,7 @@ export function HelpRequest() {
             description="Your email"
             type="email"
             autoComplete="email"
+            xstyle={styles.field}
             value={email}
             onChange={setEmail}
             isRequired
