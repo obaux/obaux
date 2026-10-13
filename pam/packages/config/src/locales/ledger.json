@@ -2,7 +2,7 @@
   "version": 1,
   "locales": {
     "ar": {
-      "about.intro": "394795.c41105",
+      "about.intro": "9e3441.2b05f7",
       "about.logo": "e133da.e133da",
       "about.signin.admin": "7c27ba.0ee9ab",
       "about.signin.member": "84edab.e4bffb",
@@ -1764,7 +1764,7 @@
       "when.yesterday": "566181.ba2318"
     },
     "es": {
-      "about.intro": "394795.3b4e71",
+      "about.intro": "9e3441.0c5d9f",
       "about.logo": "e133da.e133da",
       "about.signin.admin": "7c27ba.8b2a5a",
       "about.signin.member": "84edab.26288f",
@@ -3386,7 +3386,7 @@
       "when.yesterday": "566181.90d325"
     },
     "pt-BR": {
-      "about.intro": "394795.a48a0a",
+      "about.intro": "9e3441.70c9d2",
       "about.logo": "e133da.e133da",
       "about.signin.admin": "7c27ba.8b2a5a",
       "about.signin.member": "84edab.5bbf2f",
@@ -5008,7 +5008,7 @@
       "when.yesterday": "566181.358ce4"
     },
     "ru": {
-      "about.intro": "394795.7b997a",
+      "about.intro": "9e3441.ca33cb",
       "about.logo": "e133da.e133da",
       "about.signin.admin": "7c27ba.08283c",
       "about.signin.member": "84edab.f46574",
@@ -6714,7 +6714,7 @@
       "when.yesterday": "566181.6bc621"
     },
     "zh-CN": {
-      "about.intro": "394795.3c37b8",
+      "about.intro": "9e3441.71139a",
       "about.logo": "e133da.e133da",
       "about.signin.admin": "7c27ba.4c49ce",
       "about.signin.member": "84edab.7341c8",
@@ -8336,7 +8336,7 @@
       "when.yesterday": "566181.0c1848"
     },
     "zh-HK": {
-      "about.intro": "394795.c20374",
+      "about.intro": "9e3441.ecc3dc",
       "about.logo": "e133da.e133da",
       "about.signin.admin": "7c27ba.0e872e",
       "about.signin.member": "84edab.df05cb",
