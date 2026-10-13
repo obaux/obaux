@@ -44,7 +44,7 @@ describe('Privacy on the Google map in Trips (a67)', () => {
   });
 
   it('says the map is the only part of Pam that the phone loads from Google, and makes no promise about what Google does with it', () => {
-    // “your phone loads”, not “loads anything”: the Google Calendar sync (D-539) has Pam's SERVER talk to Google, which p7 covers.
+    // “your phone loads”, not “loads anything”: the Google Calendar sync (D-539) has Pam's SERVER talk to Google, which p7 (the street-address search, a74) and p8 (the calendar sync) cover.
     expect(p5).toMatch(/The map is the only part of Pam that your phone loads from Google\.$/);
     expect(p5).not.toMatch(/may not use|will not use|does not keep|deletes/i);
   });

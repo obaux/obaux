@@ -25,6 +25,15 @@ STATUS row too.
   commercial-use limit? who is "the user" if Pam passes places on to members?); (3) tell Mira if it asks for a credit line, which would go
   on the About page. No Privacy line is needed: none of this data is about members.
 
+- [ ] **Street-address search: the line is signed before the key is set, and the Google Maps terms are read once** (Lena for Mira, 13 October 2026; Will).
+  Piper's `places-search` function (a74) sends what a member typed (an address, a corner, anything Pam's own list of areas lacks) from Pam's
+  server to Google Places, and the place they pick. It is off until Will adds the secret `GOOGLE_MAPS_SERVER_KEY`. (1) **Do not add the key until
+  `privacy.s.sharing.p7` is signed by Will and live in seven languages**: the host guard lets the function reach `main` with that line still
+  pending (it is off), so the key is the gate; the Privacy page must say it before the first word goes to Google. (2) **Read Google's Maps Platform
+  terms for Places once** (what may be stored beyond a place id, the required "powered by Google" mark, which Dot draws): nobody on the team has read
+  them (not reachable from the sessions' sandbox), and the Privacy line says Pam keeps neither the words nor the answer, so the day anyone wants to
+  save a picked address the terms and the line both have to be looked at first. Then tick this with the date.
+
 - [ ] **The native apps ask for location with Pam's own reason** (Lena, 11 October 2026; Mira asked for this to be listed). Pam
   asks the phone for where it is in two places: "Use my current location" in Explore's area picker, and "I'm here" on a visit
   (D-526 part B). In the web app the browser asks. In the iOS and Android apps the system asks, and each store wants one line
