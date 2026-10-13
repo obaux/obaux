@@ -39,7 +39,6 @@ import { NotIn } from '../NotIn';
 import { useSession } from '@/lib/useSession';
 import { useExamplesOn } from '@/lib/useExamplesOn';
 import { useRoleView } from '@/lib/useViewedRole';
-import { RoleSwitchControl } from '../RoleSwitchControl';
 import { DUMMY_SELF_ID, dummyConversationIdBetween, dummyConversationsFor } from '@pam/config/dummy-conversations';
 import { ProgramBadge } from '../ProgramBadge';
 import { ProgramMemberCardView } from '../../screens/ProgramMemberCardView';
@@ -163,7 +162,7 @@ function PersonScreen() {
   const examples = useExamplesOn();
 
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const { viewedRole, setViewAs } = useRoleView(trueRole);
+  const { viewedRole } = useRoleView(trueRole);
   // A real member's planned visits, as their case manager (D-509): never made-up ones.
   const realTrips = useMemberTrips(params.get('id'), viewedRole === 'admin' && !DUMMY_EVERYONE.some((p) => p.id === params.get('id')));
   // The same audience the three lists that link here already gate on.
@@ -184,9 +183,6 @@ function PersonScreen() {
       backLabel={t('nav.back.home')}
       actions={
         <>
-          {trueRole === 'super_admin' ? (
-            <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-          ) : null}
           {/* Only the bell here (Will, 3 October): no Help on a member's page. */}
           <HeaderActions role={viewedRole} hasHelp={false} />
         </>

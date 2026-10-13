@@ -928,6 +928,15 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Accounts & invites · no role switcher or "See the app as" for the super admin; sign-up Contact Pam (10–13 October) — READY
+
+`claude/pam-super-admin-no-switcher` (D-558). Will: the super admin no longer needs the role
+switcher icon (Storybook has a prototype for each journey), and "remove" for "See the app as".
+Both are gone, and the stored preview behind them is retired: a tab still holding one is
+cleared and lands as super admin. "Use Pam as" (two-role accounts, D-374) stays; no database
+change. Also Iris's W2: sign-up step 2 has a Contact Pam row (help desk; no phone line, D-512).
+Open with Will: W2's back arrow (recommended: none).
+
 ## Voice & UX copy · marketing may reach, help stays true; help-post drafts (11 October)
 
 Will: the marketing pages may say what Pam is working towards; help posts, the app and anything legal say only what's

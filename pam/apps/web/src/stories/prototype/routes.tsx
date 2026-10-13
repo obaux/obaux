@@ -45,7 +45,6 @@ import { InvitesLogScreen } from '../../screens/InvitesLogScreen';
 import TermsPage from '../../app/terms/page';
 import { AddMyProgramScreen } from '../../screens/AddMyProgramScreen';
 import { ProfileScreen } from '../../screens/ProfileScreen';
-import { ViewAsView } from '../../screens/ViewAsView';
 import { InviteView } from '../../screens/InviteView';
 import { PrototypeInviteNew } from './PrototypeInviteNew';
 import { BookForMemberView } from '../../screens/BookForMemberView';
@@ -151,7 +150,6 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/messages/thread/options/': screen(() => <ThreadOptionsView />),
   '/messages/thread/report/': screen(() => <ThreadReportView />),
   '/messages/thread/files/': screen(() => <ThreadFilesView />),
-  '/view-as/': screen(() => <ViewAsView />),
   // D-218: Invite someone, All programs and Add a program, and a program
   // lead's own Program tab.
   '/invite/': screen(() => <InviteView />),

@@ -103,12 +103,4 @@ test.describe('examples stay where they are asked for', () => {
     await settled(page);
     await expect(page.getByText('Teresa').first()).toBeVisible();
   });
-
-  test('a super admin previewing a member sees none (D-511: a preview is not a demo)', async ({ page }) => {
-    await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'member'));
-    await signedIn(page, { role: 'super_admin' });
-    await page.goto('/points/');
-    await settled(page);
-    await expect(scholarTile(page)).not.toContainText('Earned');
-  });
 });

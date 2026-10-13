@@ -30,7 +30,6 @@ import { useSession } from '@/lib/useSession';
 import { useNotifications, unreadCount } from '@/lib/useNotifications';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useDemoView } from '@/lib/useDemoView';
-import { RoleSwitchControl } from '../RoleSwitchControl';
 import { whenHappened } from '@/lib/when';
 
 /**
@@ -127,7 +126,7 @@ export default function NotificationsPage() {
 
   const signedIn = session.status === 'signed-in';
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const { viewedRole, setViewAs } = useRoleView(trueRole);
+  const { viewedRole } = useRoleView(trueRole);
   const { state, markAllSeen } = useNotifications(signedIn);
   const unread = unreadCount(state);
   const isDemo = useDemoView(session);
@@ -165,11 +164,6 @@ export default function NotificationsPage() {
           subtitle={shownUnread > 0 ? t('notify.unread', { count: shownUnread }) : undefined}
           backHref="/"
           backLabel={t('nav.back.home')}
-          actions={
-            trueRole === 'super_admin' ? (
-              <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-            ) : undefined
-          }
         />
 
         {session.status === 'signed-out' || session.status === 'no-profile' || session.status === 'suspended' ? (
