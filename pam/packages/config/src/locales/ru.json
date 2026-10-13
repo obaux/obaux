@@ -1738,5 +1738,6 @@
   "legal.sources.link": "Посмотреть исходные данные",
   "legal.sources.licence": "Лицензия: CC BY 4.0",
   "places.areaHint.street": "Например, 19107, Fishtown или Broad и Girard.",
-  "places.areaLabel.street": "Почтовый индекс (ZIP), район или адрес"
+  "places.areaLabel.street": "Почтовый индекс (ZIP), район или адрес",
+  "nav.back.reported": "Назад: Места с жалобами"
 }

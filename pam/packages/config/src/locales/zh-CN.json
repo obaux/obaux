@@ -1654,5 +1654,6 @@
   "legal.sources.link": "查看原始数据",
   "legal.sources.licence": "许可协议：CC BY 4.0",
   "places.areaHint.street": "例如：19107、Fishtown，或 Broad 和 Girard 路口。",
-  "places.areaLabel.street": "邮政编码、街区或地址"
+  "places.areaLabel.street": "邮政编码、街区或地址",
+  "nav.back.reported": "返回“有反馈的地点”"
 }

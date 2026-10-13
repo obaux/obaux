@@ -1654,5 +1654,6 @@
   "legal.sources.link": "Ver los datos de origen",
   "legal.sources.licence": "Licencia: CC BY 4.0",
   "places.areaHint.street": "Como 19107, Fishtown o Broad y Girard.",
-  "places.areaLabel.street": "Código postal, barrio o dirección"
+  "places.areaLabel.street": "Código postal, barrio o dirección",
+  "nav.back.reported": "Volver a Lugares reportados"
 }

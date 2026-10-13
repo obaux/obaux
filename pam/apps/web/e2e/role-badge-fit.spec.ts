@@ -10,6 +10,8 @@ import ar from '@pam/config/locales/ar.json';
 import { settled } from './settled';
 
 /**
+ * (Retargeted 13 October 2026: no screen draws the role chip beside the mark any more, so this checks the role label
+ * on Profile's summary, the one place the role is still said.)
  * The role chip beside the mark never breaks inside a word (b26: at 320px, with the bell, "Member" came out as
  * "Membe / r"). In every language, for every role that shows a chip, at 320 and 390: each word of the chip is on one
  * line, the chip is inside the screen, and the page does not scroll sideways. When the chip does not fit beside the
@@ -58,11 +60,11 @@ for (const width of [320, 390]) {
       for (const [role, key] of ROLES) {
         test(`${locale} · ${role}: the role chip keeps its words whole and on screen`, async ({ page }) => {
           await signedIn(page, role, locale);
-          await page.goto('/places/');
+          await page.goto('/profile/');
           await expect(page.locator('html')).toHaveAttribute('lang', locale);
           await settled(page);
           const label = BUNDLES[locale][key]!;
-          const chip = page.locator('header').getByText(label, { exact: true }).first();
+          const chip = page.getByText(label, { exact: true }).first();
           await expect(chip).toBeVisible();
           const result = await chip.evaluate((el) => {
             const range = document.createRange();
