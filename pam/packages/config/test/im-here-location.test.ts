@@ -18,10 +18,10 @@ describe('Privacy on “I’m here” and location (D-526 part B)', () => {
   const p9 = EN['privacy.s.what-we-keep.p9'] ?? '';
   const keep = PRIVACY.sections.find((s) => s.id === 'what-we-keep');
 
-  it('is a paragraph of “What we keep”, after the ones already approved, and the search has its own after it', () => {
-    expect(keep?.bodyKeys.at(-2)).toBe('privacy.s.what-we-keep.p9');
-    expect(keep?.bodyKeys.at(-1)).toBe('privacy.s.what-we-keep.p10');
-    expect(keep?.bodyKeys).toHaveLength(10);
+  it('is a paragraph of “What we keep”, after the ones already approved, and the search has its own after it, then the request log', () => {
+    expect(keep?.bodyKeys[8]).toBe('privacy.s.what-we-keep.p9');
+    expect(keep?.bodyKeys[9]).toBe('privacy.s.what-we-keep.p10');
+    expect(keep?.bodyKeys[10]).toBe('privacy.s.what-we-keep.p11'); // the request log, request-log-line.test.ts
   });
 
   it('says the same of “Use my current location” in a search: used for the search, not kept', () => {

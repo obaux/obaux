@@ -44,6 +44,21 @@ STATUS row too.
   4. Seven languages: the system shows the string in the phone's language, so each of the six translations goes in the
      native project's per-language strings the day those exist (signed by Will with the Privacy page, as it repeats it).
 
+- [ ] **The request log: keep `privacy.s.what-we-keep.p11` true** (Lena, 11 October 2026, a66; facts from Piper's read-only check).
+  Privacy says the servers that run Pam write down, for each request, when, what was asked for, which account, the IP
+  address and the kind of phone or browser, plus the phone number at sign-in; that messages and searches are not written
+  down; and that the record "is deleted within a week". True today because: Supabase is on the **Free** plan (logs kept 1
+  day; the oldest row was 25 hours old), Vercel's plan could not be read from the API (the deploy limit the team hit is
+  Hobby's, whose request logs last about an hour; Pro a day). Will can read Vercel's plan in Settings › Billing.
+  1. **Before the Supabase plan goes to Team (28 days) or Enterprise (90), or Vercel to Enterprise,** change p11 and
+     `privacy.s.what-we-keep.p12` (the calendar link's request record, which has the same "within a week") and their six
+     translations first. Pro (7 days) is still "within a week". Moving to Pro before launch is likely (the Free plan has
+     no backups to restore from); nothing to change for it.
+  2. **Do not add a log drain or an error tracker** (Sentry, an analytics tool, a Vercel Speed Insights switch) without
+     reading p11 first: a copy elsewhere has its own retention. None exists today (Piper searched the code and package.json).
+  3. `no-typed-text-in-urls.test.ts` keeps "what you search for" out of the logged URL: a new GET filter must be on an id,
+     a state or a setting, and typed words go in a POST body (an rpc).
+
 - [ ] **Read Twilio's own record of every text before texts go on** (Lena for Nico, 11 October 2026, from Piper's log check; Mira).
   Twilio keeps, for each text Pam sends, the number, the text, the time and the status. Nobody has read its retention
   setting (Console › Messaging › Settings, or the account's data-retention page). Privacy says only that "the one that sends
@@ -631,9 +646,16 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   1. 0084 is live (9 October); deploy `translate-messages` (`supabase functions deploy
      translate-messages`), and read `get_advisors`.
   2. Set `ANTHROPIC_API_KEY` as a function secret — never in this repo — on an
-     account whose terms say what is sent is **not kept and not used to
-     train**. Get that in writing; the privacy page says it ("It keeps
-     nothing and does not learn from them").
+     account whose terms Will has read against the privacy page. The page says
+     what Anthropic's published terms say (card a70): the words are deleted within
+     30 days and not used to train; a message its safety checks flag may be kept
+     up to two years; a message may also be kept if the law requires it. It no
+     longer says "keeps nothing", which is not true of any model Pam can call.
+     Re-read Anthropic's data-retention page (platform.claude.com › Manage
+     Claude › API and data retention) the day the switch goes on, and change the
+     page if it changed. Pam calls `claude-haiku-5-5`; the Covered Models (Fable
+     5/5.1, Mythos 5/5.1) are held 30 days for everyone, so a change of model in
+     `supabase/functions/translate-messages/anthropic.ts` needs the page re-read too.
   3. A native speaker reads `privacy.s.translation.*` in all seven languages
      (it appears on the privacy page the moment the switch is on).
   4. **Tell members first** (the transparency promise): translation sends the

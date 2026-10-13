@@ -215,7 +215,12 @@ function PlacesScreen() {
         trailing={
           <HStack gap={1} align="center" wrap="nowrap">
             <AreaTrigger area={area} onOpen={() => setIsPickingArea(true)} />
-            <HeaderBell enabled={session.status === 'signed-in'} role={demoRole ?? trueRole} />
+            {/* A member's Explore shows the bell only once there is something in it (Will, 12 October). */}
+            <HeaderBell
+              enabled={session.status === 'signed-in'}
+              role={demoRole ?? trueRole}
+              hideWhenEmpty={(demoRole ?? trueRole) === 'member'}
+            />
           </HStack>
         }
       />

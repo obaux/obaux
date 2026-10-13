@@ -179,11 +179,12 @@ describe('messages read in the reader’s language (D-423)', () => {
     }
   });
 
-  it('tells people what is sent, what is not, and what is kept', () => {
+  it('tells people what is sent, what is not, and what is kept (a70, the supplier’s own terms)', () => {
     const text = TRANSLATION_KEYS.map((k) => en[k as keyof typeof en] as string).join(' ');
     expect(text).toMatch(/sends the words/i);
     expect(text).toMatch(/not get your name, your phone number/i);
-    expect(text).toMatch(/keeps nothing/i);
+    expect(text).toMatch(/deletes the words within 30 days/i);
+    expect(text).toMatch(/up to two years/i);
     expect(text).toMatch(/Only the people in that chat/i);
     expect(text).toMatch(/can be wrong/i);
   });
@@ -246,9 +247,10 @@ describe('what the privacy page says about email and signatures, as Will approve
     );
   });
 
-  it('is the last paragraph of "Who else gets your information", in every language', () => {
+  it('is the paragraph before the Google map in "Who else gets your information", in every language', () => {
     const sharing = PRIVACY.sections.find((s) => s.id === 'sharing');
-    expect(sharing?.bodyKeys.at(-1)).toBe('privacy.s.sharing.p4');
+    expect(sharing?.bodyKeys[3]).toBe('privacy.s.sharing.p4');
+    expect(sharing?.bodyKeys[4]).toBe('privacy.s.sharing.p5'); // google-map-line.test.ts (a67)
     for (const [locale, bundle] of Object.entries(bundles)) {
       const text = bundle['privacy.s.sharing.p4'];
       expect(text, `${locale} has it`).toBeTruthy();
