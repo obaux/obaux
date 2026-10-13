@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { Dialog, DialogHeader } from '@astryxdesign/core/Dialog';
+import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { TextArea } from '@astryxdesign/core/TextArea';
 import { TextInput } from '@astryxdesign/core/TextInput';
@@ -30,9 +31,11 @@ const styles = stylex.create({
   // The words in the form: the site's reading size (17px) and an even 24px between questions (Will, 13 October: "text is small").
   intro: { color: website['--website-text-primary'], margin: 0 },
   note: { color: website['--website-text-secondary'], margin: 0 },
-  group: { gap: '4px' },
-  groupLabel: { color: website['--website-text-primary'], margin: 0 },
-  groupHint: { color: website['--website-text-secondary'], margin: 0 },
+  title: { color: website['--website-text-primary'], margin: 0 },
+  // The who-are-you question is a real fieldset with a legend, so a reader hears the question before each choice.
+  fieldset: { border: 'none', margin: 0, padding: 0, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '4px' },
+  legend: { padding: 0, marginBlockEnd: '4px', color: website['--website-text-primary'] },
+  legendHint: { color: website['--website-text-secondary'], fontWeight: 400 },
 });
 
 /** What a field says when it is empty or wrong (Sage, signed, 11 October). */
@@ -43,15 +46,17 @@ const WORDS = {
 } as const;
 
 /**
- * Who is writing, choose all that apply. The words are placeholders until Sage signs them (A29). `role` is what the
- * help-request function already takes (an optional text of up to 40 characters, printed in the email as "Role").
+ * How they use Pam, choose all that fit (Sage, signed 13 October; Will: "I didn't know whether the user was a member,
+ * program, both, or case manager"). Optional, so nobody is blocked. What goes to the help-request function is `roles`,
+ * an array of `member`, `program`, `case_manager` (Nico, D-559); "I don't use Pam yet" sends nothing.
  */
 const WHO = [
-  { id: 'member', label: 'A member', role: 'member' },
-  { id: 'program', label: 'A program', role: 'program' },
-  { id: 'case-manager', label: 'A case manager', role: 'case manager' },
+  { id: 'member', label: 'I’m a member', role: 'member' },
+  { id: 'program', label: 'I run a program', role: 'program' },
+  { id: 'case-manager', label: 'I’m a case manager', role: 'case_manager' },
+  { id: 'not-yet', label: 'I don’t use Pam yet', role: null },
 ] as const;
-const WHO_WORDS = { label: 'Who are you?', hint: 'Choose all that apply.' } as const;
+const WHO_WORDS = { question: 'How do you use Pam?', hint: 'Choose all that fit.' } as const;
 
 type Phase = 'address' | 'form' | 'sending' | 'sent' | 'failed';
 
@@ -121,17 +126,25 @@ export function HelpRequest() {
 
   if (phase === 'address') {
     return (
-      <Text as="p">
-        <span ref={sentinel} aria-hidden="true" />
-        Write to us at <HelpAddress />. Tell us what happened and what you see on the screen. A person at Pam reads
-        every message.
-      </Text>
+      <>
+        <Heading level={2} xstyle={[type.heading_title24, styles.title]}>
+          Still stuck?
+        </Heading>
+        <Text as="p">
+          <span ref={sentinel} aria-hidden="true" />
+          Write to us at <HelpAddress />. Tell us what happened and what you see on the screen. A person at Pam reads
+          every message.
+        </Text>
+      </>
     );
   }
 
   if (phase === 'sent') {
     return (
       <VStack gap={1} role="status">
+        <Heading level={2} xstyle={[type.heading_title24, styles.title]}>
+          Still need help?
+        </Heading>
         <Text as="p" xstyle={tap.target}>
           <strong>Sent. Thank you.</strong>
         </Text>
@@ -149,9 +162,7 @@ export function HelpRequest() {
     if (problems.message || problems.email) return setBad(problems);
     setBad({});
     setPhase('sending');
-    const role = WHO.filter((w) => who.includes(w.id))
-      .map((w) => w.role)
-      .join(', ');
+    const roles = WHO.filter((w) => who.includes(w.id) && w.role).map((w) => w.role);
     try {
       const r = await fetch(HELP_REQUEST_URL, {
         method: 'POST',
@@ -161,7 +172,7 @@ export function HelpRequest() {
           email: email.trim(),
           page: window.location.pathname,
           lang: document.documentElement.lang || 'en',
-          ...(role ? { role } : {}),
+          ...(roles.length ? { roles } : {}),
           website: trap,
         }),
       });
@@ -186,9 +197,12 @@ export function HelpRequest() {
   };
 
   return (
-    <VStack gap={4}>
+    <VStack gap={3}>
+      <Heading level={2} xstyle={[type.heading_title24, styles.title]}>
+        Still need help?
+      </Heading>
       <Text as="p" xstyle={styles.intro}>
-        Tell us what happened. A person at Pam reads every message.
+        Write to us. A person at Pam reads every message.
       </Text>
       <SoftButton
         label="Write to us"
@@ -206,7 +220,7 @@ export function HelpRequest() {
         purpose="form"
         aria-labelledby="help-title"
       >
-        <DialogHeader title="Still stuck?" onOpenChange={setOpen} />
+        <DialogHeader title="Still need help?" onOpenChange={setOpen} />
         <VStack
           as="form"
           gap={6}
@@ -241,11 +255,10 @@ export function HelpRequest() {
             hasAutoFocus
             {...(bad.message ? { status: { type: 'error' as const, message: bad.message } } : {})}
           />
-          <VStack role="group" aria-labelledby="who-label" xstyle={styles.group}>
-            <Text id="who-label" xstyle={[type.label_strong17, styles.groupLabel]}>
-              {WHO_WORDS.label}
-            </Text>
-            <Text xstyle={[type.body_15, styles.groupHint]}>{WHO_WORDS.hint}</Text>
+          <fieldset {...stylex.props(styles.fieldset)}>
+            <legend {...stylex.props(type.label_strong17, styles.legend)}>
+              {WHO_WORDS.question} <span {...stylex.props(styles.legendHint)}>{WHO_WORDS.hint}</span>
+            </legend>
             <VStack gap={1}>
               {WHO.map((w) => (
                 <CheckboxInput
@@ -257,7 +270,7 @@ export function HelpRequest() {
                 />
               ))}
             </VStack>
-          </VStack>
+          </fieldset>
           <TextInput
             label="How should we answer you?"
             description="Your email"
@@ -272,7 +285,7 @@ export function HelpRequest() {
             <input type="text" name="website" tabIndex={-1} autoComplete="off" defaultValue="" />
           </span>
           <Text as="p" xstyle={[type.body_15, styles.note]}>
-            We send what you write, this page and the language you read in. Nothing else from your account.
+            We send what you write, how you use Pam if you tell us, this page and the language you read in. Nothing else from your account.
           </Text>
           <Button label={phase === 'sending' ? 'Sending' : 'Send to Pam'} variant="primary" type="submit" isDisabled={phase === 'sending'} xstyle={tap.target} />
         </VStack>

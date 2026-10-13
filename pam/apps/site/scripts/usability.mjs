@@ -259,15 +259,15 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
         if (!wrong && !empty) fail('help form: a wrong email says nothing about what to do');
       }
       await box.fill('I cannot get the code');
-      await page.getByRole('checkbox', { name: 'A program' }).check();
-      await page.getByRole('checkbox', { name: 'A case manager' }).check();
+      await page.getByRole('checkbox', { name: 'I run a program' }).check();
+      await page.getByRole('checkbox', { name: 'I’m a case manager' }).check();
       await page.getByRole('textbox', { name: /How should we answer you/ }).fill('a@example.org');
       await page.getByRole('button', { name: 'Send to Pam' }).click();
       await page.waitForTimeout(400);
       if (!(await page.getByText(expected).count())) fail(`help form (${label}): did not say “${expected}”`);
       const sent = calls.find((c) => c !== '{}');
       if (!sent || JSON.parse(sent).website !== '' || JSON.parse(sent).page !== '/support/start-here/') fail(`help form (${label}): the request is wrong: ${sent}`);
-      if (sent && JSON.parse(sent).role !== 'program, case manager') fail(`help form (${label}): who-are-you did not go in role: ${sent}`);
+      if (sent && (JSON.stringify(JSON.parse(sent).roles) !== '["program","case_manager"]' || 'role' in JSON.parse(sent))) fail(`help form (${label}): how-you-use-Pam did not go as roles: ${sent}`);
       if (expected.startsWith('That') && !(await page.getByRole('link', { name: 'hello@joinpam.org' }).count())) fail('help form: a failed send does not show the address');
     }
     await ctx.close();

@@ -72,11 +72,13 @@ Shows at the end of a post and when a search finds nothing, never first.
 - On an empty search, above it: **We do not have an article for that yet.**
 
 **Later (the form, built off until Will says so):**
-- Heading: **Still stuck?**
+- Call-out (opens the form; Will, 13 October): heading **Still need help?** · body **Write to us. A person at Pam reads every message.** · button **Write to us**
+- Form heading: **Still need help?**
 - Lead: **Tell us what happened. A person at Pam reads every message.**
+- Question (optional, choose all that fit; a fieldset): **How do you use Pam? Choose all that fit.** · **I’m a member** · **I run a program** · **I’m a case manager** · **I don’t use Pam yet** (sends no role)
 - Field: **What's wrong?** · hint: **In your own words. You don't need to know what to ask for.**
 - Field: **How should we answer you?** · **Your email** · and, **only once texts are on** (Will, 03:37): **Or a phone number we can text**
-- Line under the button: **We send what you write, this page and the language you read in. Nothing else from your account.**
+- Line under the button: **We send what you write, how you use Pam if you tell us, this page and the language you read in. Nothing else from your account.** (Sage and Lena, 13 October, with the how-you-use-Pam question)
 - Button: **Send to Pam**
 - Sent: **Sent. Thank you.** / **A person at Pam will read it and write back.**
 - Failed: **That did not send.** / **Check your connection and try again, or write to hello@joinpam.org.**
