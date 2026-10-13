@@ -46,7 +46,7 @@ async function signedIn(page: Page, role: string, locale: Locale) {
   await page.route('**/auth/v1/user*', (route) => route.fulfill(json({ id: ME })));
   await page.route('**/rest/v1/profiles*', (route) =>
     route.fulfill(
-      json({ id: ME, role, first_name: 'Pia', region_id: null, regions: null, access_status: 'active', onboarded_at: '2026-09-14T00:00:00Z', org_id: null }),
+      json({ id: ME, role, preferred_language: locale, first_name: 'Pia', region_id: null, regions: null, access_status: 'active', onboarded_at: '2026-09-14T00:00:00Z', org_id: null }),
     ),
   );
 }
@@ -59,6 +59,7 @@ for (const width of [320, 390]) {
         test(`${locale} · ${role}: the role chip keeps its words whole and on screen`, async ({ page }) => {
           await signedIn(page, role, locale);
           await page.goto('/places/');
+          await expect(page.locator('html')).toHaveAttribute('lang', locale);
           await settled(page);
           const label = BUNDLES[locale][key]!;
           const chip = page.locator('header').getByText(label, { exact: true }).first();

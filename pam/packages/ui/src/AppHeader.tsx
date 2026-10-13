@@ -151,6 +151,16 @@ const styles = stylex.create({
     flexShrink: 0,
     maxWidth: '100%',
   },
+  /*
+   * The mark and the chip are one group that gives way before the corner does:
+   * it may shrink to its narrowest (the mark, with the chip under it), and only
+   * when the corner — the area, the bell, the account — still does not fit
+   * beside even that does the corner take a row of its own, at the end. In
+   * Spanish at 320px the area chip, the bell and the account button together
+   * were wider than the screen and the account button ran off its edge (b26).
+   */
+  lead: { flexGrow: 1, flexShrink: 1, flexBasis: 0, minWidth: 'min-content' },
+  corner: { marginInlineStart: 'auto' },
   mark: {
     // Sized by height so the aspect ratio comes from the artwork, and set in px
     // because this is a piece of art at a fixed size, not text that should grow
@@ -176,6 +186,8 @@ export function AppHeader({
   // (`justify: 'between'`); the way in centres the mark, and there is never
   // an account button there to also need balancing — see `trailingFloating`.
   const centeredWithTrailing = align === 'center' && !showAccount && Boolean(trailing);
+  // The corner (bell, account) beside the mark, as opposed to the way in, where the mark stands alone or is centred.
+  const hasCorner = !centeredWithTrailing && Boolean(trailing || showAccount);
   const account = showAccount ? (
     <IconButton
       label={accountLabel}
@@ -199,9 +211,9 @@ export function AppHeader({
         gap={2}
         align="center"
         justify={centeredWithTrailing ? align : trailing || account ? 'between' : align}
-        wrap="nowrap"
+        wrap={hasCorner ? 'wrap' : 'nowrap'}
       >
-        <HStack gap={2} align="center" wrap="wrap">
+        <HStack gap={2} align="center" wrap="wrap" xstyle={hasCorner ? styles.lead : undefined}>
           {/*
             A real anchor, so it works with no JavaScript and middle-clicks the
             way every other logo on the web does. The `alt` is already "Pam", so
@@ -217,7 +229,7 @@ export function AppHeader({
           {roleControl ?? (roleLabel ? <Badge variant="neutral" label={roleLabel} xstyle={styles.role} /> : null)}
         </HStack>
         {!centeredWithTrailing && (trailing || account) ? (
-          <HStack gap={1} align="center" wrap="nowrap">
+          <HStack gap={1} align="center" wrap="nowrap" xstyle={styles.corner}>
             {trailing}
             {account}
           </HStack>
