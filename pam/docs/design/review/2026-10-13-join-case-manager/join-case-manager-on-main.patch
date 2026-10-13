@@ -1,4 +1,4 @@
-From ea2de91e3bc58f6bc00488a944903ab0754a4165 Mon Sep 17 00:00:00 2001
+From f005bde364005d965cac4abbdd7174f07f15acc1 Mon Sep 17 00:00:00 2001
 From: Claude <noreply@anthropic.com>
 Date: Tue, 13 Oct 2026 21:29:15 +0000
 Subject: [PATCH] Site: Join as a case manager goes to the app's request page;
@@ -7,12 +7,13 @@ Subject: [PATCH] Site: Join as a case manager goes to the app's request page;
 Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_012vS6F7CMTwFn3u5UG66JWz
 ---
- pam/apps/site/src/content/CantSignIn.tsx |  3 +++
- pam/apps/site/src/content/home-copy.ts   |  8 +-------
- pam/apps/site/src/lib/links.ts           |  2 ++
- pam/apps/site/src/screens/HomeScreen.tsx |  7 +++++--
- pam/apps/site/test/home-copy.test.ts     | 10 +++++++---
- 5 files changed, 18 insertions(+), 12 deletions(-)
+ pam/apps/site/src/content/CantSignIn.tsx     |  3 +++
+ pam/apps/site/src/content/JoiningAsStaff.tsx |  5 ++++-
+ pam/apps/site/src/content/home-copy.ts       |  8 +-------
+ pam/apps/site/src/lib/links.ts               |  2 ++
+ pam/apps/site/src/screens/HomeScreen.tsx     |  7 +++++--
+ pam/apps/site/test/home-copy.test.ts         | 10 +++++++---
+ 6 files changed, 22 insertions(+), 13 deletions(-)
 
 diff --git a/pam/apps/site/src/content/CantSignIn.tsx b/pam/apps/site/src/content/CantSignIn.tsx
 index 2316e812..99774276 100644
@@ -35,6 +36,27 @@ index 2316e812..99774276 100644
          <HowTo
            steps={[
              'Ask a case manager you work with, or the Pam team, for an invite link. (Contact Pam, below.)',
+diff --git a/pam/apps/site/src/content/JoiningAsStaff.tsx b/pam/apps/site/src/content/JoiningAsStaff.tsx
+index a6aeaf86..7a4a8839 100644
+--- a/pam/apps/site/src/content/JoiningAsStaff.tsx
++++ b/pam/apps/site/src/content/JoiningAsStaff.tsx
+@@ -1,5 +1,6 @@
+ import { Needs } from '../components/Needs';
+-import { Body, Lead, P, Section } from '../components/Prose';
++import { Body, Lead, P, ReadMore, Section } from '../components/Prose';
++import { CASE_MANAGER_JOIN_URL } from '../lib/links';
+ import { HowTo } from '../components/HowTo';
+ 
+ /**
+@@ -36,6 +37,8 @@ export function JoiningAsStaff() {
+           Ask the person at Pam who works with you to send you one. A case manager or a Pam super admin can send
+           one. If you do not know who to ask, contact Pam.
+         </P>
++        <P>If you are a case manager, you can also ask to join yourself, without an invite.</P>
++        <ReadMore label="Join as a case manager" href={CASE_MANAGER_JOIN_URL} />
+         <Needs title="A link works once, for one person.">
+           It only works on the phone number it was made for, and it lasts 30 days. If it has expired, ask for a
+           new one.
 diff --git a/pam/apps/site/src/content/home-copy.ts b/pam/apps/site/src/content/home-copy.ts
 index b7da1b70..98f7f167 100644
 --- a/pam/apps/site/src/content/home-copy.ts
