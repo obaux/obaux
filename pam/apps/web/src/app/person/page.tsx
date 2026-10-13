@@ -17,6 +17,7 @@ import { ProfileSummary } from '@pam/ui/ProfileCards';
 import { TripCard } from '@pam/ui/TripCard';
 import { useRouter } from 'next/navigation';
 import { dummyTripsFor } from '@pam/config/dummy-trips';
+import { useMemberTrips } from '@/lib/useMemberTrips';
 import { useCaseload, type CaseloadMember } from '@/lib/useCaseload';
 import { openConversation } from '@/lib/openConversation';
 import { CategoryPicture } from '../../screens/SavedView';
@@ -159,6 +160,8 @@ function PersonScreen() {
 
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { viewedRole, setViewAs } = useRoleView(trueRole);
+  // A real member's planned visits, as their case manager (D-509): never made-up ones.
+  const realTrips = useMemberTrips(params.get('id'), viewedRole === 'admin' && !DUMMY_EVERYONE.some((p) => p.id === params.get('id')));
   // The same audience the three lists that link here already gate on.
   const canView = viewedRole === 'admin' || viewedRole === 'provider' || viewedRole === 'super_admin';
 
@@ -281,7 +284,7 @@ function PersonScreen() {
   // Trips (D-227): the visits they planned, coming up first, then the ones
   // already made. Example trips until something books one (D-172).
   const now = Date.now();
-  const trips = isMember ? dummyTripsFor(person.id) : [];
+  const trips = !isMember ? [] : person.isExample ? dummyTripsFor(person.id) : realTrips;
   const upcoming = trips.filter((trip) => new Date(trip.startsAt).getTime() >= now);
   const past = trips.filter((trip) => new Date(trip.startsAt).getTime() < now).reverse();
   // A program lead sees only their own program's visits with this person
@@ -516,9 +519,12 @@ function PersonScreen() {
         </VStack>
       ) : null}
 
-      <Text type="supporting" xstyle={styles.note}>
-        {t(person.isExample ? 'example.people.note' : 'person.trips.example')}
-      </Text>
+      {/* Said only of the made-up people; a real member's page shows real things and no note (D-509). */}
+      {person.isExample ? (
+        <Text type="supporting" xstyle={styles.note}>
+          {t('example.people.note')}
+        </Text>
+      ) : null}
     </Page>
   );
 }
