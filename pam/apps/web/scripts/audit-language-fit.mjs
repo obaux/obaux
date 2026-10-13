@@ -10,6 +10,7 @@
  *
  *   pnpm --filter @pam/web build-storybook
  *   node apps/web/scripts/audit-language-fit.mjs [--locales ru,ar] [--match Cards/] [--out file.json]
+ *     [--width 320] [--height 760]   the window (320 by 568 is the shortest phone: heroes are a share of the height)
  *     [--from earlier.json]   re-check only the stories that run found defects in
  *     [--known scripts/fit-known.json]   defects somebody has looked at and accepted; only others fail the run
  *     [--write-known file.json]          write what this run found as that list (then say why each is accepted)
@@ -58,6 +59,8 @@ const opt = (name, fallback) => {
 const LOCALES = opt('locales', 'en,es,pt-BR,zh-CN,zh-HK,ru,ar').split(',');
 const MATCH = opt('match', '');
 const WIDTH = Number(opt('width', '320'));
+/** The window's height: 760 by default; 568 is the shortest phone Pam supports (an iPhone SE), where a hero that is half the window is shorter. */
+const HEIGHT = Number(opt('height', '760'));
 const WORKERS = Number(opt('workers', '4'));
 const OUT = opt('out', '');
 const FROM = opt('from', '');
@@ -94,7 +97,7 @@ if (FROM) {
   const again = new Set(JSON.parse(fs.readFileSync(FROM, 'utf8')).fresh.map((f) => f.id));
   for (let i = stories.length - 1; i >= 0; i--) if (!again.has(stories[i].id)) stories.splice(i, 1);
 }
-console.error(`${stories.length} stories × ${LOCALES.length} languages at ${WIDTH}px`);
+console.error(`${stories.length} stories × ${LOCALES.length} languages at ${WIDTH}×${HEIGHT}px`);
 
 /** Runs in the page. Returns [{kind, key, text, detail}]. */
 function measure() {
@@ -314,7 +317,7 @@ async function run() {
   const failures = [];
   await Promise.all(
     Array.from({ length: WORKERS }, async () => {
-      const ctx = await browser.newContext({ viewport: { width: WIDTH, height: 760 }, reducedMotion: 'reduce' });
+      const ctx = await browser.newContext({ viewport: { width: WIDTH, height: HEIGHT }, reducedMotion: 'reduce' });
       // The example visits are "in 2 days", "in 5 days": their dates move with the calendar, and so
       // did the text a defect is recorded under — the accepted list went stale overnight (10 October,
       // "Wednesday, Oct 14" became "Thursday, Oct 15"). Every story sees the same day, which then

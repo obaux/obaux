@@ -229,9 +229,23 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
   ]) {
     const { page, ctx, calls } = await run([400, { error: 'invalid', field: 'body' }], submit);
     const box = page.getByRole('textbox', { name: /What’s wrong/ });
-    if (!(await box.count())) {
-      fail(`help form (${label}): not shown when the function is on`);
+    const opener = page.getByRole('button', { name: 'Write to us' });
+    if (!(await opener.count())) {
+      fail(`help form (${label}): no call-out button when the function is on`);
+    } else if (await box.isVisible()) {
+      fail(`help form (${label}): the form is on the page itself, it should only open from the call-out (Will, 13 October)`);
     } else {
+      await opener.click();
+      await page.waitForTimeout(500);
+      if (!(await box.isVisible())) fail(`help form (${label}): the call-out did not open the form`);
+      if (!(await page.evaluate(() => !!document.activeElement?.closest('dialog')))) fail(`help form (${label}): focus did not go into the form`);
+      // Esc closes it and focus goes back to the button; then open it again to fill it in.
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(400);
+      if (await box.isVisible()) fail(`help form (${label}): Esc did not close the form`);
+      if (!(await page.evaluate(() => document.activeElement?.textContent?.includes('Write to us')))) fail(`help form (${label}): focus did not return to the call-out button after Esc`);
+      await opener.click();
+      await page.waitForTimeout(500);
       if (label === 'on, sends') {
         await page.getByRole('button', { name: 'Send to Pam' }).click();
         await page.waitForTimeout(200);
@@ -245,12 +259,15 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
         if (!wrong && !empty) fail('help form: a wrong email says nothing about what to do');
       }
       await box.fill('I cannot get the code');
+      await page.getByRole('checkbox', { name: 'I run a program' }).check();
+      await page.getByRole('checkbox', { name: 'I’m a case manager' }).check();
       await page.getByRole('textbox', { name: /How should we answer you/ }).fill('a@example.org');
       await page.getByRole('button', { name: 'Send to Pam' }).click();
       await page.waitForTimeout(400);
       if (!(await page.getByText(expected).count())) fail(`help form (${label}): did not say “${expected}”`);
       const sent = calls.find((c) => c !== '{}');
       if (!sent || JSON.parse(sent).website !== '' || JSON.parse(sent).page !== '/support/start-here/') fail(`help form (${label}): the request is wrong: ${sent}`);
+      if (sent && (JSON.stringify(JSON.parse(sent).roles) !== '["program","case_manager"]' || 'role' in JSON.parse(sent))) fail(`help form (${label}): how-you-use-Pam did not go as roles: ${sent}`);
       if (expected.startsWith('That') && !(await page.getByRole('link', { name: 'hello@joinpam.org' }).count())) fail('help form: a failed send does not show the address');
     }
     await ctx.close();
@@ -359,6 +376,25 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
     await page.getByRole('tab', { name: 'Program Providers' }).focus();
     await page.keyboard.press('ArrowRight');
     if ((await selected(page)).trim() !== 'Case managers') fail('green card: the arrow keys should move between the names');
+    await ctx.close();
+  }
+}
+
+// a83 (Will, 13 October): the grey Still stuck? card is 60px above the footer on a phone and 120px from 900px.
+{
+  for (const [width, want] of [[390, 60], [1280, 120]]) {
+    const ctx = await browser.newContext({ viewport: { width, height: 800 } });
+    const page = await ctx.newPage();
+    for (const path of ['/support/', '/support/cant-sign-in/', '/support/start-here/', '/support/your-safety/']) {
+      await page.goto(base + path, { waitUntil: 'load' });
+      const gap = await page.evaluate(() => {
+        // a post that ends without the Still stuck? card (Your safety) ends the same way, measured from its article
+        const card = document.querySelector('#still-stuck') ?? document.querySelector('article[data-page="post"]');
+        const foot = document.querySelector('footer');
+        return Math.round(foot.getBoundingClientRect().top - card.getBoundingClientRect().bottom);
+      });
+      if (Math.abs(gap - want) > 1) fail(`${path} at ${width}px: ${gap}px between the Still stuck? card and the footer, expected ${want}`);
+    }
     await ctx.close();
   }
 }

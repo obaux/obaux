@@ -177,6 +177,13 @@ const styles = stylex.create({
     // whatever's left, unscrolled, on the shortest supported viewport.
     // Verified against that spec at 50vh rather than assumed.
     height: 'clamp(280px, 50vh, 520px)',
+    // On a short screen the pictures give way, by height (13 October, D-564): at 320×568 the 280px floor left Will's longer
+    // invited line (three lines) with "Send me a code" 12px below the screen. Below 640px tall the slide is 42.5% of the
+    // window (it was 50%), down to 224px, and 32px under the words (it was 40); nothing taller than 640 changes.
+    '@media (max-height: 640px)': {
+      height: 'clamp(224px, 42.5vh, 520px)',
+      paddingBlockEnd: '32px',
+    },
     position: 'relative',
     display: 'flex',
     flexDirection: 'column',
