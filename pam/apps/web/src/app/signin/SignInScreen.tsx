@@ -50,12 +50,13 @@ const styles = stylex.create({
   invited: {
     display: 'block',
     width: '100%',
-    paddingBlock: '10px',
+    // A little tighter on a short screen, where the line can run to four lines (D-564).
+    paddingBlock: { default: '10px', '@media (max-height: 640px)': '6px' },
     paddingInline: '16px',
     boxSizing: 'border-box',
     textAlign: 'center',
     fontSize: '15px',
-    lineHeight: 1.4,
+    lineHeight: { default: 1.4, '@media (max-height: 640px)': 1.3 },
     fontWeight: 600,
     color: '#FFFFFF',
     backgroundColor: '#000000',
@@ -88,7 +89,7 @@ const styles = stylex.create({
   pinBarShown: { opacity: 1, visibility: 'visible' },
   heroGroup: { width: '100%', marginBlockStart: '-24px' },
   heroHeader: { position: 'relative', width: '100%' },
-  heroBrand: { width: 'fit-content', marginInline: 'auto' },
+  heroBrand: { width: 'fit-content', marginInline: 'auto', rowGap: { default: null, '@media (max-height: 640px)': '8px' } },
   // Larger and always white (Will, 16 September) — the themed mark
   // `AppHeader` renders elsewhere picks dark or light ink to sit on the
   // page's own background, which is the wrong call directly over art, in
@@ -284,6 +285,10 @@ export function SignInScreen({
           return;
         }
 
+        // An account that exists decides about the way on (S1) now, and the stored one is forgotten either way: it is taken only if
+        // nothing below needs the person first (an invite to add), and never left to fire on a later visit to Sign in (W6).
+        const next = takeNext((profile as { role?: string | null }).role ?? null);
+
         // Already a member, with a program invite for this number and city:
         // ask whether to add the program to their account (D-374).
         if (waiting?.canAdd) {
@@ -305,9 +310,8 @@ export function SignInScreen({
         const asked = await getReminderConsent(auth.user.id);
         if (cancelled) return;
 
-        // A listed way on (S1) goes first for somebody who is not a program lead; the reminders question waits for next time.
-        const next = asked === null ? null : takeNext((profile as { role?: string | null }).role ?? null);
-        router.replace(asked === null ? '/reminders/' : (next ?? '/'));
+        // A listed way on (S1) goes first, ahead of the reminders question, which waits for next time (W6).
+        router.replace(next ?? (asked === null ? '/reminders/' : '/'));
       } catch {
         // A redirect that cannot decide still has to go somewhere.
         if (!cancelled) router.replace('/');

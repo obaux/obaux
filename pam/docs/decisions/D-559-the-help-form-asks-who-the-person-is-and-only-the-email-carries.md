@@ -11,3 +11,7 @@
 - **The old `role` field** (a single string, usually not sent) is unchanged.
 
 Tests: `packages/config/test/help-request.test.ts` (roles block). Contract: `docs/help-request-contract.md`. The function is redeployed by the merge desk after the merge; the site can send `roles` before then (an old function ignores unknown fields).
+
+## Addendum, 13 October (Mira, after Sage's fourth choice)
+
+Wren's form has a fourth choice, "I don't use Pam yet", sent as `not_yet` in `roles`. The email says "Says they are: not using Pam yet". If `not_yet` is ticked beside a role, the roles are kept and `not_yet` is dropped (the role says more). The email's "Role:" row now appears only when the free-text `role` was actually sent; the site no longer sends it, and "Role: not known" beside "Says they are" would only confuse. Still in the email to Pam's inbox only: nothing stored or logged.

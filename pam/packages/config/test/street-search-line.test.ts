@@ -1,5 +1,6 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { EN } from './_bundles.js';
 import { PRIVACY } from '../src/legal.js';
@@ -25,6 +26,8 @@ import { PRIVACY } from '../src/legal.js';
  * The line itself is checked here too, from the day Will signs it and it is in the bundles.
  */
 const FUNCTION = fileURLToPath(new URL('../../../supabase/functions/places-search/index.ts', import.meta.url));
+// The function is its wiring (index.ts) and its handler (handler.ts, with everything it touches passed in): the promises are held to both together.
+const HANDLER = fileURLToPath(new URL('../../../supabase/functions/places-search/handler.ts', import.meta.url));
 
 /** The text between a bracket at `open` and its partner, brackets and quotes balanced; '' if it never closes. */
 function between(source: string, open: number): string {
@@ -58,7 +61,7 @@ function problemsIn(source: string): string[] {
   const problems: string[] = [];
 
   // 1. Typed text arrives in a POST body, never in the URL.
-  if (!/\.json\(\)/.test(source)) problems.push('the function never reads a JSON body: what is typed must come in a POST body');
+  if (!/\.json\(\)|JSON\.parse\(/.test(source)) problems.push('the function never reads a JSON body: what is typed must come in a POST body');
   // The member's own request, not the POST the function makes to Google: `req.method` is compared with POST.
   if (!/\breq(uest)?\.method\s*[!=]==?\s*['"]POST['"]/.test(source)) problems.push('the function does not insist on POST');
   if (/\breq(uest)?\.url\b|\bsearchParams\b|new URL\(\s*req/.test(source)) problems.push('the function reads the request URL or its query string: typed text must not travel in a URL');
@@ -77,6 +80,10 @@ function problemsIn(source: string): string[] {
   }
   for (const m of source.matchAll(/\bfetch\s*\(/g)) {
     const call = between(source, m.index! + m[0].length - 1);
+    // Every call but one is held to the rules below: the exception is the function asking Pam's own database who is signed in, with
+    // the member's own sign-in (`/auth/v1/user`). Naming the exception, not "the calls that go to Google", means a Google call whose
+    // address sits in a variable is inspected too.
+    if (/\/auth\/v1\/user/.test(call)) continue;
     const at = call.search(/\bheaders\s*:/);
     if (at < 0) continue;
     const open = call.indexOf('{', at);
@@ -88,7 +95,7 @@ function problemsIn(source: string): string[] {
   }
 
   // 4. Signed in only, and nothing is stored.
-  if (!/\.getUser\s*\(/.test(source) || !/\b401\b/.test(source)) problems.push('the function does not turn away a request with no signed-in member (getUser and a 401)');
+  if (!(/\.getUser\s*\(/.test(source) || /\/auth\/v1\/user/.test(source)) || !/\b401\b/.test(source)) problems.push('the function does not turn away a request with no signed-in member (getUser and a 401)');
   if (/\.(insert|upsert|update|delete)\s*\(|\.rpc\s*\(|Deno\.(openKv|writeFile|writeTextFile)|\bcaches\s*\./.test(source)) {
     problems.push('the function writes something somewhere: it must store neither the words nor the answer');
   }
@@ -135,6 +142,10 @@ const WRONG: Record<string, [string, RegExp]> = {
   'answers a request with no one signed in': [RIGHT.replace("if (!data.user) return new Response('Sign in first', { status: 401 });", ''), /signed-in/],
   'stores what it was asked': [RIGHT.replace("if (!res.ok)", "await supabase.from('searches').insert({ text }); if (!res.ok)"), /writes something/],
   'stores the answer in a cache': [RIGHT.replace("if (!res.ok)", "await (await caches.open('p')).put(text, res.clone()); if (!res.ok)"), /writes something/],
+  'sends Google the member’s sign-in through an address held in a variable': [
+    RIGHT.replace("const res = placeId", "const target = 'https://places.googleapis.com/v1/places:autocomplete'; await fetch(target, { headers: { 'X-Goog-Api-Key': key, Authorization: req.headers.get('Authorization') ?? '' } });\n  const res = placeId"),
+    /header it should not|something about the member/,
+  ],
   'does not insist on POST': [RIGHT.replace("if (req.method !== 'POST') return new Response('POST only', { status: 405 });", ''), /insist on POST/],
 };
 
@@ -153,13 +164,62 @@ describe('the street-address search keeps what Privacy says it keeps (a74)', () 
 
   describe.skipIf(!existsSync(FUNCTION))('the real function (supabase/functions/places-search)', () => {
     it('is held to the same four promises', () => {
-      expect(problemsIn(readFileSync(FUNCTION, 'utf8'))).toEqual([]);
+      expect(problemsIn(`${readFileSync(FUNCTION, 'utf8')}\n${existsSync(HANDLER) ? readFileSync(HANDLER, 'utf8') : ''}`)).toEqual([]);
     });
   });
 });
 
+/**
+ * “Pam does not keep what you type or what Google answers” (option A, Mira 13 October; D-552): a place picked from Google's suggestions
+ * is for that one search. The function writes nothing (above); the phone must write nothing either. `saveOrigin` is the only thing that
+ * keeps a picked area (`pam.origin`, on the phone), and it skips an id that starts with GOOGLE_PICK, like the phone's own position;
+ * `loadOrigin` throws away one an earlier build might have kept. Behaviour is tested in `areaOrigin.test.ts` (web); this holds the source
+ * so Privacy's sentence cannot become untrue by another route: no storage API in the street-search code, and nobody else writes `pam.origin`.
+ */
+const WEB = fileURLToPath(new URL('../../../apps/web/src', import.meta.url));
+const AREA = join(WEB, 'lib/useAreaSearch.ts');
+const STREET_FILES = [join(WEB, 'lib/streetSearch.ts'), join(WEB, 'lib/useStreetSearch.ts')];
+
+describe.skipIf(!existsSync(AREA) || !/GOOGLE_PICK/.test(existsSync(AREA) ? readFileSync(AREA, 'utf8') : ''))('a picked street address is kept nowhere on the phone (option A, D-552)', () => {
+  const area = readFileSync(AREA, 'utf8');
+  const save = area.slice(area.indexOf('export function saveOrigin'));
+
+  it('has saveOrigin skip a Google pick before it writes anything', () => {
+    const skip = save.search(/origin\.id\.startsWith\(GOOGLE_PICK\)/);
+    const write = save.search(/setItem\(/);
+    expect(skip, 'saveOrigin must return early for a Google pick').toBeGreaterThan(-1);
+    expect(write).toBeGreaterThan(skip);
+  });
+
+  it('has loadOrigin throw away a Google pick an earlier build kept', () => {
+    const load = area.slice(area.indexOf('export function loadOrigin'), area.indexOf('export function saveOrigin'));
+    expect(load).toMatch(/startsWith\(GOOGLE_PICK\)[\s\S]*removeItem\(/);
+  });
+
+  it('uses no storage, cookie or beacon in the street-search code', () => {
+    for (const file of STREET_FILES.filter(existsSync)) {
+      expect(readFileSync(file, 'utf8'), file).not.toMatch(/localStorage|sessionStorage|indexedDB|document\.cookie|sendBeacon|caches\./);
+    }
+  });
+
+  it('has nothing but useAreaSearch.ts write the saved area', () => {
+    const others: string[] = [];
+    const walk = (dir: string): void => {
+      for (const name of readdirSync(dir)) {
+        const path = join(dir, name);
+        if (statSync(path).isDirectory()) {
+          if (name !== 'stories' && name !== 'node_modules') walk(path);
+        } else if (/\.tsx?$/.test(name) && !/\.test\./.test(name) && path !== AREA && /pam\.origin/.test(readFileSync(path, 'utf8'))) others.push(path);
+      }
+    };
+    walk(WEB);
+    expect(others, 'Only useAreaSearch.ts may read or write pam.origin').toEqual([]);
+  });
+});
+
 describe.skipIf(EN['privacy.s.sharing.p7'] === undefined)('the Privacy line about the street-address search (a74)', () => {
-  const p7 = EN['privacy.s.sharing.p7'] ?? '';
+  // The signed English uses straight apostrophes and the rest of the page curly ones: one word to this test.
+  const p7 = (EN['privacy.s.sharing.p7'] ?? '').replace(/’/g, "'");
   const sharing = PRIVACY.sections.find((s) => s.id === 'sharing');
 
   it('is in “Who else gets your information”', () => {
@@ -168,8 +228,8 @@ describe.skipIf(EN['privacy.s.sharing.p7'] === undefined)('the Privacy line abou
 
   it('names Google, says Pam’s server asks and says what Google gets and does not get', () => {
     expect(p7).toMatch(/Google/);
-    expect(p7).toMatch(/Pam’s server/);
-    expect(p7).toMatch(/your name, your phone number or your phone’s IP address/);
+    expect(p7).toMatch(/Pam's server/);
+    expect(p7).toMatch(/your name, your phone number or your phone's IP address/);
   });
 
   it('leaves the map line true: the phone talks only to Pam for this', () => {
@@ -177,7 +237,15 @@ describe.skipIf(EN['privacy.s.sharing.p7'] === undefined)('the Privacy line abou
     expect(p7).toMatch(/your phone does not talk to Google/);
   });
 
-  it('does not promise what Google does with the words', () => {
+  it('does not promise what Google does with the words, and says it is up to Google', () => {
     expect(p7).not.toMatch(/Google (deletes|will not|may not|does not keep)/i);
+    expect(p7).toMatch(/What Google keeps is up to Google\.$/);
+  });
+
+  it('says Pam keeps neither what was typed nor what Google answers (option A, Mira 13 October: a Google pick is for that search only, like “use my current location”, D-536)', () => {
+    // True only while a picked address is never saved on the phone either (`saveOrigin`) and the function writes nothing:
+    // the second half is `problemsIn` above, on the real function; the first is pinned beside it once Piper's change is on the branch.
+    expect(p7).toMatch(/Pam does not keep what you type or what Google answers\./);
+    expect(p7).not.toMatch(/Pam's servers do not keep|remembers the place you picked/);
   });
 });

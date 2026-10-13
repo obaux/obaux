@@ -119,7 +119,9 @@ test.describe('the places screen', () => {
     await page.route(RPC, (route) => route.fulfill({ status: 500, body: '{}' }));
     await page.goto('/places/');
 
-    const alert = page.getByRole('alert');
+    // The alert that carries the way out. Anything else that announces itself in a role="alert" at the same moment (a banner, the
+    // sign-in check) is not what this is about, and a bare getByRole('alert') is a strict-mode failure when there are two.
+    const alert = page.getByRole('alert').filter({ has: page.getByRole('link') }).first();
     await expect(alert).toBeVisible();
     // §0: never dead-end. Whatever the message says, there is a way out of it.
     // Signed out here, so Contact Pam opens the help desk on the website directly (A28).

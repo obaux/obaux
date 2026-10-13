@@ -554,6 +554,7 @@
   "privacy.s.sharing.p4": "Cuando Pam envía un correo electrónico, una empresa que envía correos para nosotros recibe la dirección y el mensaje. No puede usarlos para otra cosa.",
   "privacy.s.sharing.p5": "El mapa de Visitas viene de Google. Google recibe la dirección IP de su teléfono y la parte del mapa que usted mira. El mapa es la única parte de Pam que su teléfono carga desde Google.",
   "privacy.s.sharing.p6": "Si crea un enlace de calendario, sus visitas van a la empresa que está detrás del calendario donde lo agregue, como Apple, Google o Microsoft. Pam no sabe cuál es. Cada visita dice solo “Pam visit” y su hora, a menos que usted active el nombre y la dirección del lugar. Cualquiera que tenga el enlace puede ver sus visitas, así que guárdelo para usted. Si crea un enlace nuevo, el anterior deja de funcionar. Si lo desactiva, Pam deja de enviar sus visitas de inmediato, pero su calendario puede conservar las que ya tiene.",
+  "privacy.s.sharing.p7": "Cuando escribe una dirección de calle, una esquina o un lugar que la lista de zonas de Pam no tiene, el servidor de Pam envía a Google las palabras que escribió para que Google pueda sugerir lugares. Si elige uno, el servidor de Pam le pregunta a Google dónde está. Google recibe solo esas palabras, el lugar que eligió y un código nuevo para cada búsqueda. No recibe su nombre, su número de teléfono ni la dirección IP de su teléfono, porque su teléfono no se comunica con Google para esto. Pam no guarda lo que escribe ni lo que Google responde. Lo que Google guarda depende de Google.",
   "privacy.s.sharing.title": "Quién más recibe su información",
   "privacy.s.texts.p1": "Le enviamos un código cuando entra. Después podemos enviarle recordatorios y avisos de su cuenta.",
   "privacy.s.texts.p2": "Responda STOP cuando quiera y los mensajes paran. Nada en la app los vuelve a encender.",
@@ -945,9 +946,6 @@
   "profile.menu.invite": "Invitar a alguien",
   "profile.menu.everyone": "Todos",
   "profile.menu.requests": "Solicitudes del personal",
-  "profile.menu.viewAs": "Ver la app como",
-  "viewAs.title": "Ver la app como",
-  "viewAs.intro": "Mira Pam como lo ve cada tipo de cuenta. Solo cambia lo que se muestra: cada lista sigue viniendo de tu propia cuenta.",
   "nav.back.viewAs": "Volver a Ver la app como",
   "nav.back.signin": "Volver a tu número de teléfono",
   "nav.back.signInScreen": "Volver a Entrar",
@@ -1651,5 +1649,7 @@
   "legal.sources.title": "Fuentes de datos",
   "legal.sources.neighborhoods": "Los nombres de los barrios en la búsqueda de zona vienen de “Philadelphia Neighborhoods”, creado por Abaca Labs. Pam lo modificó para conservar un punto por cada barrio en lugar de sus límites.",
   "legal.sources.link": "Ver los datos de origen",
-  "legal.sources.licence": "Licencia: CC BY 4.0"
+  "legal.sources.licence": "Licencia: CC BY 4.0",
+  "places.areaHint.street": "Como 19107, Fishtown o Broad y Girard.",
+  "places.areaLabel.street": "Código postal, barrio o dirección"
 }

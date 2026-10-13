@@ -285,9 +285,8 @@ test.describe('the conversation list', () => {
     await expect(page).toHaveURL(new RegExp(`/messages/thread/\\?id=${CONVO}`));
   });
 
-  test('a demo account previewing a member sees example conversations and who they can message', async ({ page }) => {
-    await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'member'));
-    await signedInAs(page, 'super_admin', () => 'active', true);
+  test('a demo member sees example conversations and who they can message', async ({ page }) => {
+    await signedInAs(page, 'member', () => 'active', true);
     // No real conversations, so the example ones stand in.
     await page.route(MEMBERS, (route) => route.fulfill(json([])));
     await page.goto('/messages/');
@@ -790,8 +789,7 @@ test.describe('a conversation', () => {
   });
 
   test('an example conversation renders through the same chat log, and sends nowhere', async ({ page }) => {
-    await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'member'));
-    await signedInAs(page, 'super_admin', () => 'active', true);
+    await signedInAs(page, 'member', () => 'active', true);
     let realWrites = 0;
     await page.route(MESSAGES, (route) => {
       realWrites += 1;
@@ -1922,9 +1920,8 @@ test.describe('the jump-to-newest button, with motion on (D-398)', () => {
 });
 
 test.describe('an example person', () => {
-  test('a case manager preview can message a member from their profile, into an example chat', async ({ page }) => {
-    await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));
-    await signedInAs(page, 'super_admin', () => 'active', true);
+  test('a demo case manager can message a member from their profile, into an example chat', async ({ page }) => {
+    await signedInAs(page, 'admin', () => 'active', true);
     await page.goto('/person/?id=dummy-m4');
     await settled(page);
 
@@ -1938,8 +1935,7 @@ test.describe('an example person', () => {
   });
 
   test('the staff side of a conversation is the member side, flipped', async ({ page }) => {
-    await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));
-    await signedInAs(page, 'super_admin', () => 'active', true);
+    await signedInAs(page, 'admin', () => 'active', true);
     await page.route(MEMBERS, (route) => route.fulfill(json([])));
     await page.goto('/messages/');
     await settled(page);
@@ -1989,7 +1985,7 @@ test.describe('reported messages', () => {
     expect(results.violations).toEqual([]);
   });
 
-  test('a super admin has Conversations and Reported, nothing to send under Reported, and a preview sees the example set', async ({ page }) => {
+  test('a super admin has Conversations and Reported, nothing to send under Reported, and a demo account sees the example set', async ({ page }) => {
     await signedInAs(page, 'super_admin', () => 'active', true);
     await page.route(REPORTS, (route) => route.fulfill(json([])));
     await page.goto('/messages/');
@@ -2038,9 +2034,8 @@ test.describe('reported places (D-189)', () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => window.sessionStorage.setItem('pam.examples', '1'));
   });
-  test('a case manager preview sees the example reported places and cannot decide', async ({ page }) => {
-    await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));
-    await signedInAs(page, 'super_admin');
+  test('a case manager on an example walk sees the example reported places and cannot decide', async ({ page }) => {
+    await signedInAs(page, 'admin');
     await page.route('**/rest/v1/rpc/services_near*', (route) => route.fulfill(json([])));
     await page.route('**/rest/v1/rpc/flagged_services*', (route) => route.fulfill(json([])));
     await page.goto('/places/?filter=reported');
@@ -2057,7 +2052,7 @@ test.describe('reported places (D-189)', () => {
     expect(results.violations).toEqual([]);
   });
 
-  test('a super admin, not previewing, sees the buttons, and a decision clears one', async ({ page }) => {
+  test('a super admin sees the buttons, and a decision clears one', async ({ page }) => {
     await signedInAs(page, 'super_admin');
     await page.route('**/rest/v1/rpc/flagged_services*', (route) => route.fulfill(json([])));
     await page.goto('/places/reported/');
@@ -2198,17 +2193,6 @@ test.describe('a real account sees only its real things (Will, 11 October 2026)'
     await expect(page.getByRole('link', { name: /Marcus/ })).toBeVisible();
     await expect(page.getByText(EXAMPLES)).toHaveCount(0);
     await expect(page.getByRole('list').first().getByRole('listitem')).toHaveCount(1);
-  });
-
-  test('a super admin on a real account, previewing a member, sees no examples either', async ({ page }) => {
-    await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'member'));
-    await signedInAs(page, 'super_admin');
-    await page.route(MEMBERS, (route) => route.fulfill(json([])));
-    await page.route(PEOPLE, (route) => route.fulfill(json([])));
-    await page.goto('/messages/');
-    await settled(page);
-    await expect(page.getByText(EXAMPLES)).toHaveCount(0);
-    await expect(page.getByRole('heading', { level: 2, name: 'No messages yet' })).toBeVisible();
   });
 
   test('a case manager with no members keeps the Messages tab: the messages people reported are reviewed there', async ({ page }) => {

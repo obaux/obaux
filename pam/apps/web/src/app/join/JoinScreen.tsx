@@ -10,11 +10,13 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BellIcon, BigButton, Loading, Notice, Page, PointsBadge, StarIcon, TextField, TextLink, TripsIcon } from '@pam/ui';
+import { BellIcon, BigButton, Loading, Notice, Page, HelpIcon, PointsBadge, StarIcon, TextField, TextLink, TripsIcon } from '@pam/ui';
+import { MenuList } from '@pam/ui/MenuList';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { LANGUAGE_TAGS, SUPPORTED_LOCALES, TRANSPARENCY_SCREEN, badgeForPoints, type Locale, intlLocale } from '@pam/config';
 import { LanguageField } from '@pam/ui/LanguageField';
 import { useI18n } from '@/lib/i18n';
+import { HELP_DESK_URL } from '@/lib/helpDesk';
 import { navigate } from '@/lib/navigate';
 import { forgetInvite, recallInvite, type Invite } from '@/lib/appUrl';
 import { takeNext } from '@/lib/signinNext';
@@ -748,7 +750,29 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
           three different people are reading it and only one of them is being
           asked to trust us with their life (Will, 14 September).
         */}
-        {phase === 'privacy' && !isStaff ? <TransparencyReading /> : null}
+        {phase === 'privacy' && !isStaff ? (
+          <>
+            <TransparencyReading />
+            {/*
+              The reading says "If something here worries you, call us. A person
+              answers." Here, before the account is set up, that has to be
+              somewhere they can tap (Iris, member flow W2, 10 October). Pam has
+              no phone line (D-512), so it is Contact Pam, opening the help desk
+              on the website: they are not signed in to the app's Help yet.
+            */}
+            <MenuList
+              label={t('help.contact.action')}
+              items={[
+                {
+                  id: 'contact',
+                  label: t('help.contact.action'),
+                  href: HELP_DESK_URL,
+                  icon: <HelpIcon width={26} height={26} />,
+                },
+              ]}
+            />
+          </>
+        ) : null}
 
         {phase === 'privacy' && isStaff ? (
           <>
