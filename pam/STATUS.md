@@ -2244,3 +2244,7 @@ The role chip beside the mark no longer breaks inside a word, and the header giv
 ## Design system & Storybook · the green card transition (13 October)
 
 Crossfade 650ms, line out 160ms then in 320ms, no scale (D-556). Story: Website / Green card transition.
+
+## Design system & Storybook · the step count in the button is quiet text (13 October)
+
+No pill, 12px, level with the label, the label always centred (D-560).

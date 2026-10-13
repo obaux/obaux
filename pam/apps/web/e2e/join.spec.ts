@@ -143,6 +143,45 @@ test.describe('signing up', () => {
     await expect(page.getByRole('progressbar')).toHaveCount(0);
   });
 
+  // Will, 13 October (D-560): the count in the button is quiet text, no pill, level with the label, and the label stays centred.
+  for (const locale of SUPPORTED_LOCALES) {
+    test(`${locale}: the step count is plain 12px text level with the label, and the label stays centred in the button`, async ({ page }) => {
+      await page.addInitScript((code) => localStorage.setItem('pam.locale', code), locale);
+      await newcomer(page);
+      await page.goto('/join/');
+      await expect(page.locator('html')).toHaveAttribute('lang', locale);
+      await settled(page);
+      const button = page.locator('button:has([data-count])').first();
+      await expect(button).toBeVisible();
+      const m = await button.evaluate((btn) => {
+        const box = btn.getBoundingClientRect();
+        const ghost = btn.querySelector('[data-count]') as HTMLElement;
+        const leaves = [...btn.querySelectorAll('*')].filter((e) => e.children.length === 0 && (e.textContent ?? '').trim() !== '' && e !== ghost);
+        const [count, label] = leaves as HTMLElement[];
+        const c = count!.getBoundingClientRect();
+        const l = label!.getBoundingClientRect();
+        const cs = getComputedStyle(count!);
+        const rtl = getComputedStyle(btn).direction === 'rtl';
+        return {
+          buttonCentre: box.left + box.width / 2,
+          labelCentre: l.left + l.width / 2,
+          countMid: c.top + c.height / 2,
+          labelMid: l.top + l.height / 2,
+          size: parseFloat(cs.fontSize),
+          fill: cs.backgroundColor,
+          overlap: rtl ? c.left < l.right : c.right > l.left,
+          inside: c.left >= box.left && c.right <= box.right,
+        };
+      });
+      expect(Math.abs(m.labelCentre - m.buttonCentre), 'label centred').toBeLessThanOrEqual(1.5);
+      expect(Math.abs(m.countMid - m.labelMid), 'count level with the label').toBeLessThanOrEqual(1.5);
+      expect(m.size).toBeLessThanOrEqual(12);
+      expect(m.fill, 'no pill').toBe('rgba(0, 0, 0, 0)');
+      expect(m.overlap, 'the count does not run into the label').toBe(false);
+      expect(m.inside, 'inside the button').toBe(true);
+    });
+  }
+
   for (const locale of ['en', 'ar'] as const) {
     test(`${locale}: the language is a dropdown that lists all seven, each named in itself`, async ({ page }) => {
       // Will, 13 October 2026: "with all these languages, let's bring back the dropdown, the chips are taking
