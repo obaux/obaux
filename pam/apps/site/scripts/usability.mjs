@@ -302,6 +302,67 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
   }
 }
 
+// The green card on Home (Will, 13 October, a77): no arrows, it moves on by itself with a fill behind the active name, a tap
+// stops it, Pause / Play works, reduced motion stops it all, and a screen reader is not told about the timer's changes.
+{
+  const selected = (page) => page.locator('[data-band] [role="tab"][aria-selected="true"]').innerText();
+  const open = async (opts) => {
+    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, ...opts });
+    const page = await ctx.newPage();
+    await page.goto(base + '/', { waitUntil: 'networkidle' });
+    await page.locator('[data-band]').scrollIntoViewIfNeeded();
+    return { ctx, page };
+  };
+  {
+    const { ctx, page } = await open({});
+    if (await page.locator('[data-band] [role="tab"] svg').count()) fail('green card: the names still carry an arrow');
+    if (!(await page.locator('[data-band-fill]').count())) fail('green card: no fill behind the active name');
+    if ((await selected(page)).trim() !== 'Residents') fail('green card: it should start on Residents');
+    await page.waitForTimeout(6800);
+    if ((await selected(page)).trim() !== 'Program Providers') fail(`green card: it should move on to Program Providers by itself, it shows ${(await selected(page)).trim()}`);
+    if ((await page.locator('[data-band] [role="status"]').first().innerText()).trim()) fail('green card: the timer’s change was spoken to a screen reader');
+    await page.getByRole('tab', { name: 'Case managers' }).click();
+    await page.mouse.move(0, 0);
+    if ((await selected(page)).trim() !== 'Case managers') fail('green card: a tap should show that name');
+    if (!(await page.locator('[data-band] [role="status"]').allInnerTexts()).join(' ').includes('Their plans')) fail('green card: a person’s choice should be spoken');
+    if (await page.locator('[data-band-fill]').count()) fail('green card: the fill keeps running after a tap');
+    await page.waitForTimeout(6800);
+    if ((await selected(page)).trim() !== 'Case managers') fail('green card: it kept moving after a tap');
+    await page.getByRole('button', { name: 'Play card' }).click();
+    await page.mouse.move(0, 0); // the pointer in the card holds the cycle, so take it away
+    await page.waitForTimeout(6800);
+    if ((await selected(page)).trim() !== 'Residents') fail(`green card: Play should start it again (Case managers goes round to Residents), it shows ${(await selected(page)).trim()}`);
+    await page.getByRole('button', { name: 'Pause card' }).click();
+    await page.mouse.move(0, 0);
+    await page.waitForTimeout(6800);
+    if ((await selected(page)).trim() !== 'Residents') fail('green card: Pause did not stop it');
+    await ctx.close();
+  }
+  {
+    // A finger: tap Pause, then Play, without leaving the button. The button keeps focus, and that must not hold the cycle.
+    const { ctx, page } = await open({ hasTouch: true });
+    const before = (await selected(page)).trim();
+    await page.getByRole('button', { name: 'Pause card' }).tap();
+    await page.waitForTimeout(6800);
+    if ((await selected(page)).trim() !== before) fail('green card: it moved on while paused (touch)');
+    await page.getByRole('button', { name: 'Play card' }).tap();
+    await page.waitForTimeout(6800);
+    if ((await selected(page)).trim() === before) fail('green card: after Pause then Play with a finger, the next name never arrived (a tapped button holds focus)');
+    await ctx.close();
+  }
+  {
+    const { ctx, page } = await open({ reducedMotion: 'reduce' });
+    await page.waitForTimeout(6800);
+    if ((await selected(page)).trim() !== 'Residents') fail('green card: it moves on under reduced motion');
+    if (await page.locator('[data-band-fill]').count()) fail('green card: a fill under reduced motion');
+    if (await page.getByRole('button', { name: /^(Pause|Play) card$/ }).count()) fail('green card: a Pause button under reduced motion (nothing moves)');
+    await page.getByRole('tab', { name: 'Program Providers' }).focus();
+    await page.keyboard.press('ArrowRight');
+    if ((await selected(page)).trim() !== 'Case managers') fail('green card: the arrow keys should move between the names');
+    await ctx.close();
+  }
+}
+
 await browser.close();
 server.close();
 console.log(failures ? `\n${failures} problem(s).` : 'usability: all clear');

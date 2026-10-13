@@ -1,0 +1,76 @@
+diff --git a/pam/apps/site/src/content/home-copy.ts b/pam/apps/site/src/content/home-copy.ts
+index bf91fe14..825f5a3a 100644
+--- a/pam/apps/site/src/content/home-copy.ts
++++ b/pam/apps/site/src/content/home-copy.ts
+@@ -50,7 +50,7 @@ export const HOME = {
+       id: 'programs',
+       head: 'Your services, built around people.',
+       body: 'Residents find your program and plan a visit. They sign your policies before they visit, and you see who’s coming on your calendar.',
+-      cta: { label: 'Add your program', href: 'app' },
++      cta: { label: 'Add your program', href: 'add-program' },
+       image: 'calendar',
+       alt: 'A program lead’s calendar in Pam: the week by day, with each person who is coming and a check-in button.',
+     },
+diff --git a/pam/apps/site/src/lib/links.ts b/pam/apps/site/src/lib/links.ts
+index 12298691..cc85996b 100644
+--- a/pam/apps/site/src/lib/links.ts
++++ b/pam/apps/site/src/lib/links.ts
+@@ -9,6 +9,8 @@ export const APP_URL = (
+ ).replace(/\/$/, '');
+ 
+ export const SIGN_IN_URL = `${APP_URL}/signin/`;
++/** Sign in, then straight to Add my program (the app keeps `next` to one listed screen, used once, never for a program lead: D-554/S1). */
++export const ADD_PROGRAM_URL = `${APP_URL}/signin/?next=/profile/add-program/`;
+ export const PRIVACY_URL = `${APP_URL}/privacy/`;
+ export const TERMS_URL = `${APP_URL}/terms/`;
+ 
+diff --git a/pam/apps/site/src/screens/HomeScreen.tsx b/pam/apps/site/src/screens/HomeScreen.tsx
+index 8871cf62..a2211867 100644
+--- a/pam/apps/site/src/screens/HomeScreen.tsx
++++ b/pam/apps/site/src/screens/HomeScreen.tsx
+@@ -12,7 +12,7 @@ import { SoftButton } from '../components/SoftButton';
+ import { WebFrame } from '../components/WebFrame';
+ import { VISIT_REMINDERS_LIVE } from '../content/flags';
+ import { HOME } from '../content/home-copy';
+-import { APP_URL } from '../lib/links';
++import { ADD_PROGRAM_URL, APP_URL } from '../lib/links';
+ import { website } from '../lib/website.stylex';
+ import { type } from '../lib/website-type.stylex';
+ 
+@@ -248,7 +248,7 @@ export function HomeScreen(_props: { readonly showAbout?: boolean } = {}) {
+                   {row.body}
+                 </Text>
+                 <HStack>
+-                  <SoftButton label={row.cta.label} href={row.cta.href === 'app' ? `${APP_URL}/` : row.cta.href} />
++                  <SoftButton label={row.cta.label} href={row.cta.href === 'app' ? `${APP_URL}/` : row.cta.href === 'add-program' ? ADD_PROGRAM_URL : row.cta.href} />
+                 </HStack>
+               </VStack>
+               <div {...stylex.props(i % 2 === 0 ? undefined : styles.rowFlip)}>
+diff --git a/pam/apps/site/test/home-copy.test.ts b/pam/apps/site/test/home-copy.test.ts
+index 7da47647..fd6d3331 100644
+--- a/pam/apps/site/test/home-copy.test.ts
++++ b/pam/apps/site/test/home-copy.test.ts
+@@ -1,5 +1,6 @@
+ import { describe, expect, it } from 'vitest';
+ import { HELD, HOME } from '../src/content/home-copy';
++import { ADD_PROGRAM_URL, SIGN_IN_URL } from '../src/lib/links';
+ 
+ const shown = JSON.stringify(HOME);
+ 
+@@ -15,10 +16,14 @@ describe('Home words (Mira, 11 October: hold what is untrue today or a new promi
+     expect(shown).not.toMatch(/24\/7|call pam|monday to friday/i);
+   });
+ 
+-  it('sends “Add your program” to sign in (Will, a65) and “Join as a case manager” to the help post until the request page exists', () => {
++  it('sends “Add your program” to sign in and on to Add my program (Will, a65; S1) and “Join as a case manager” to the help post until the request page exists', () => {
+     const programs = HOME.rows.find((r) => r.id === 'programs')!;
+     const managers = HOME.rows.find((r) => r.id === 'case-managers')!;
+-    expect(programs.cta.href).toBe('app');
++    expect(programs.cta.href).toBe('add-program');
+     expect(managers.cta.href).toBe('/support/cant-sign-in/');
+   });
++
++  it('points “Add your program” at Sign in with only the one listed screen to go on to', () => {
++    expect(ADD_PROGRAM_URL).toBe(`${SIGN_IN_URL}?next=/profile/add-program/`);
++  });
+ });

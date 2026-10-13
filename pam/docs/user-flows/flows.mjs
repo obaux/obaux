@@ -29,7 +29,7 @@
  *   changes  — the newest decisions this flow shows, newest first
  */
 
-export const UPDATED = '2026-10-12';
+export const UPDATED = '2026-10-13';
 
 /**
  * Where each screen opens live: Chromatic's build of `main`, `https://main--<app id>.chromatic.com`.
@@ -174,6 +174,7 @@ export const flows = [
       ['sent', 'email', 'Arrives by email', { dashed: true }],
     ],
     changes: [
+      "13 October (S1) — the website's Add your program arrives at Sign in and, once signed in, goes on to Add my program for a member or a case manager (a program lead goes Home); the reminders question waits for next time",
       "D-510, D-527: a code that did not work keeps you on the code step with a small alert, and Need help? Contact Pam goes to the help desk; Sign in waits for all six digits (D-532)",
       'D-474 — the third slide says "Pam keeps your planned visits in one place" (it promised a reminder text); a program lead\'s second slide says "Members find your program and plan a visit"',
       'D-375 — a member can add their program to the same account; Use Pam as on Profile',
