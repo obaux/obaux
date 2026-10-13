@@ -312,6 +312,6 @@ test.describe('a code from the person who invited you', () => {
     await expect(language).toContainText('English');
     await language.click();
     await page.getByRole('option', { name: 'Español' }).click();
-    await expect(page.getByRole('combobox', { name: 'Escoja un idioma' })).toContainText('Español');
+    await expect(page.getByRole('combobox', { name: 'Elegir un idioma' })).toContainText('Español');
   });
 });
