@@ -42,10 +42,12 @@ to type code. otherwise let's hide it so it doesn't take up real estate."
    switched off, the whole 'Email me a new link' offer is untrue. Please hide that offer, plus the sent state,
    behind the same switch rather than rewording them." There was no switch the app could read: the sender's
    is the `INVITE_EMAILS` secret on `send-invite-emails`. Migration `20261013070505` adds
-   `app_settings.invite_emails_live` = 'off' (readable signed out, 0009), read by `useSettingOn` (the
-   `useTextsLive` pattern; unknown counts as off). Off: the page says the link ran out and offers Contact Pam
-   (the help desk, `help.contact.action`, no new words), so it does not dead-end. On: the form and "Check your
-   email" as before. The merge desk turns the row and the secret on together, on Will's word.
+   `app_settings.invite_emails_live` (readable signed out, 0009), read by `useSettingOn` (the
+   `useTextsLive` pattern; unknown counts as off). Seeded **'on'**: invite emails already go out
+   (`INVITE_EMAILS` on since 10 October; the merge desk saw two staff invites sent), so 'off' would hide
+   an offer that works (Mira, 13 October, 07:36). On: the form and "Check your email" as before. Off: the
+   page says the link ran out and offers Contact Pam (the help desk, `help.contact.action`, no new words),
+   so it does not dead-end. The row and the `INVITE_EMAILS` secret are switched together, both ways.
 
 ## What a later session might reverse
 

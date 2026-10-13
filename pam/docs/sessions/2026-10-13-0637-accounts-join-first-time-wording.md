@@ -61,7 +61,7 @@ asks (06:00 UTC, with screenshots): bring back the language dropdown, and hide t
 
 - **07:05:** Sage's signed fixes (`join.staff.body`, `admin.caseload.empty.body`, `invite.expired.sent.body`) and
   the expired page's email offer behind a new switch, `app_settings.invite_emails_live` (migration
-  `20261013070505`, 'off'); off shows Contact Pam. Dot's `claude/pam-design-signin-fit` (f319ae54, D-564) merged:
+  `20261013070505`, seeded 'on' at 07:36: emails already go out); off shows Contact Pam. Dot's `claude/pam-design-signin-fit` (f319ae54, D-564) merged:
   the short-screen hero, and `TextLink isUnderlined` for the reveal link. Sage's code words reverted and
   re-applied as the last commit, so it stays droppable.
 - Checks then: `pnpm --filter @pam/db test` all pass; tsc clean; web build and build-storybook; Playwright join,
