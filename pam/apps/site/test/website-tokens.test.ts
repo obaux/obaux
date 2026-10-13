@@ -135,12 +135,18 @@ describe('website spacing: the space under the Still stuck? card', () => {
     expect(s).toMatch(/footerGapDesktop: '64px'/);
   });
   it('is used by the card and the footer, from the one place, at the one breakpoint', () => {
+    const gap = source('../src/lib/last-block-gap.ts');
     const card = source('../src/components/StillStuck.tsx');
+    const post = source('../src/screens/PostScreen.tsx');
     const foot = source('../src/components/SiteFooter.tsx');
-    expect(card).toMatch(/space\.stillStuckGapPhone/);
-    expect(card).toMatch(/space\.stillStuckGapDesktop/);
-    expect(card).toMatch(/min-width: 900px/);
+    expect(gap).toMatch(/space\.stillStuckGapPhone/);
+    expect(gap).toMatch(/space\.stillStuckGapDesktop/);
+    expect(gap).toMatch(/space\.footerGapDesktop/);
+    expect(gap).toMatch(/min-width: 900px/);
     expect(foot).toMatch(/space\.footerGapDesktop/);
-    expect(card + foot).not.toMatch(/!important/);
+    // the card, and a post that ends without it (Your safety), end the same way: from the one pair
+    expect(card).toMatch(/lastBlockGap\.end/);
+    expect(post).toMatch(/!withStuck && lastBlockGap\.end/);
+    expect(gap + card + post + foot).not.toMatch(/!important/);
   });
 });

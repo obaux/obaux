@@ -385,10 +385,11 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
   for (const [width, want] of [[390, 60], [1280, 120]]) {
     const ctx = await browser.newContext({ viewport: { width, height: 800 } });
     const page = await ctx.newPage();
-    for (const path of ['/support/', '/support/cant-sign-in/', '/support/start-here/']) {
+    for (const path of ['/support/', '/support/cant-sign-in/', '/support/start-here/', '/support/your-safety/']) {
       await page.goto(base + path, { waitUntil: 'load' });
       const gap = await page.evaluate(() => {
-        const card = document.querySelector('#still-stuck');
+        // a post that ends without the Still stuck? card (Your safety) ends the same way, measured from its article
+        const card = document.querySelector('#still-stuck') ?? document.querySelector('article[data-page="post"]');
         const foot = document.querySelector('footer');
         return Math.round(foot.getBoundingClientRect().top - card.getBoundingClientRect().bottom);
       });

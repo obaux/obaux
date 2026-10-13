@@ -11,6 +11,7 @@ import { type } from '../lib/website-type.stylex';
 import { Frame } from '../components/Frame';
 import { PostNav } from '../components/PostNav';
 import { StillStuck } from '../components/StillStuck';
+import { lastBlockGap } from '../lib/last-block-gap';
 import { STILL_STUCK, collectSections } from '../lib/sections';
 import { BODIES } from '../content/bodies';
 import { anyPostBySlug, formatDate, postBySlug } from '../content/posts';
@@ -104,7 +105,7 @@ export function PostScreen({ slug, allowDraft = false }: { readonly slug: string
       <div {...stylex.props(styles.menuCell)}>
         <PostNav sections={sections} variant="side" />
       </div>
-      <VStack as="article" gap={10} xstyle={styles.column} data-page="post">
+      <VStack as="article" gap={10} xstyle={[styles.column, !withStuck && lastBlockGap.end]} data-page="post">
         {post.status === 'draft' ? (
           <Banner status="warning" title="Draft, not published: held until the feature ships. Not on the site, in Support or in search." />
         ) : null}
