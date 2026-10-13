@@ -286,7 +286,9 @@ function PersonScreen() {
   const now = Date.now();
   const trips = !isMember ? [] : person.isExample ? dummyTripsFor(person.id) : realTrips;
   const upcoming = trips.filter((trip) => new Date(trip.startsAt).getTime() >= now);
-  const past = trips.filter((trip) => new Date(trip.startsAt).getTime() < now).reverse();
+  // "Programs attended in the past" lists only visits the program marked them as there for: a missed or not-yet-marked visit is not one (W5).
+  // The example trips have no marks and keep their made-up past.
+  const past = trips.filter((trip) => new Date(trip.startsAt).getTime() < now && ('attended' in trip ? trip.attended : true)).reverse();
   // A program lead sees only their own program's visits with this person
   // (Will, 3 October, D-242): never trips to other programs, places already
   // gone, saved places or points — those are the case manager's (§4.1).
