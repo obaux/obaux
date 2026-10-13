@@ -50,7 +50,7 @@ export const HOME = {
       id: 'programs',
       head: 'Your services, built around people.',
       body: 'Residents find your program and plan a visit. They sign your policies before they visit, and you see who’s coming on your calendar.',
-      cta: { label: 'Add your program', href: 'app' },
+      cta: { label: 'Add your program', href: 'add-program' },
       image: 'calendar',
       alt: 'A program lead’s calendar in Pam: the week by day, with each person who is coming and a check-in button.',
     },

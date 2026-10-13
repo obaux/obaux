@@ -470,6 +470,21 @@
   client grants; the five functions are definer with search_path public, extensions, and match the file line for line
   (only the indentation was lost in the paste); anon executes none, authenticated the four member ones,
   calendar_feed_read the service role only; 20261011161548 recorded. The link ships in b28.
+- **Batch b28 (13 October).** Piper's calendar link (D-538): a member makes a private link in Profile > Calendar, adds
+  it to Apple, Google or Outlook, and their Pam visits appear there (discreet by default: "Pam visit" and a time). The
+  "English until Will signs" allow-list for the 29 calendar lines is gone (all translated and signed; b22 lesson). The
+  merge desk fixed one bug before deploy: `escapeText` wrote `'\;'`, which in JavaScript is just `;`, so semicolons in a
+  place name or address reached calendar apps unescaped; the test had the same slip and passed. Both now say `'\\;'`.
+  The `calendar-feed` function is live as v1 with JWT verification off (the address is the key); the deployed files
+  equal the merged ones. The website's "Add your program" goes to Sign in and then straight to Add my program (S1),
+  from Wren's patch with its comment corrected (it cited D-554, Dot's carousel decision). Dot's motion story and
+  decision for the green card (D-556; the card itself waits for Will on a80). Iris's b27 re-test: W1, W4 and S1 pass;
+  she found W5 (a missed or unmarked visit listed under "Programs attended in the past", live) and W6 (a stored
+  `next` fires later for a member never asked about reminders), both with Piper, W5 first.
+- **The a76 counter's migration is live** as 20261013051051 (Nico's file 20261013042956): table day, screen, count; RLS
+  forced; select-false policy; no client grants; both function bodies md5-equal to the file; anon executes neither,
+  authenticated only `count_screen_open`, the service role `screen_opens_weekly`. Nothing counts until the app ships in
+  b29 with Lena's Privacy line.
 
 ## What was wrong, and what missed it
 
@@ -666,6 +681,12 @@
 | b26 on main (d8b7d37f): GitHub checks / Vercel | 4 of 4 green (accessibility 04:45) / web and pam-site READY |
 | Batch b27 (9025244b): db / config / ui / web unit / site / e2e full / storybook / site checks | 1498 ok / 1246 / 124 / 144 / 94 / 1694 passed, 19 skipped, 0 flaky / builds, 13.8 kB spare / 120 scans 0, clear, 306 links 0 |
 | Calendar migration 20261011161548 after Will's paste | table + RLS forced + 0 rows + select-false policy + no client grants; 5 bodies equal to the file ignoring indentation; grants as designed; recorded |
+| b27 on main (2991f703): GitHub checks / Vercel | 4 of 4 green (accessibility 05:34) / web and pam-site READY |
+| Batch b28 (7fb4853b): db / config / ui / web unit / site / e2e full / storybook / site checks | 1524 ok / 1261 / 124 / 148 / 95 / 1712 passed, 19 skipped, 0 flaky / builds, 13.2 kB spare / 120 scans 0, clear, 306 links 0 |
+| b28 calendar lines (29 keys) without the allow-list | copy test passes; translated in six languages, none equal to English; signed (ledger row 55 short names) |
+| calendar-feed escape fix (08b37d81) | calendar-feed.test.ts 15 passed with the corrected expectation; the old code returns 'a;b' |
+| calendar-feed edge function | v1 ACTIVE, verify_jwt false; get_edge_function returns the three merged files unchanged (live probe blocked: the sandbox cannot reach supabase.co) |
+| Counter migration 20261013051051 | table, RLS forced, 0 rows, columns day/screen/count, select-false policy, no client grants; bodies md5-equal; grants as designed |
 | Calendar migration 20261011161548 via the connector | timed out; table, functions and record all absent afterwards; no locks or running queries |
 | Batch b24 (0a36ada1): web/site tsc / web unit / site tests / config / site build / a11y / usability / scrollspy / storybook | 0 / 0 / 139 / 94 / 1176 / 0 / 120 scans 0 / clear / 306 links 0 / builds (no app code: e2e not rerun) |
 | Live help_request_allowed after Will's paste (a62) | definer; search_path public, extensions; anon and authenticated cannot execute, service_role can; same logic as the file (md5 differs: indentation and one comment); help_request_attempts RLS forced, no client grants, 0 rows |

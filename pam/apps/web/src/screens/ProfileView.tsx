@@ -15,6 +15,7 @@ import {
   PlacesIcon,
   ShieldIcon,
   SignOutIcon,
+  TripsIcon,
 } from '@pam/ui';
 import { Banner } from '@astryxdesign/core/Banner';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
@@ -267,6 +268,10 @@ export function ProfileView({
               href: '/language/',
               icon: <GlobeIcon {...ICON} />,
             },
+            // A member's visits in the calendar app they use, by a secret address (D-538).
+            ...(isMember
+              ? [{ id: 'calendar', label: t('profile.menu.calendar'), href: '/calendar/', icon: <TripsIcon {...ICON} /> }]
+              : []),
             ...(remindersOn
               ? [
                   {

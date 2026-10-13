@@ -189,3 +189,78 @@ Iris
 - **W3** is Nico's to measure in e2e, as Mira asked. With the area and bell now on their own
   row, the header is taller whenever the bell shows, so the jump when it appears is worth
   his measuring.
+
+## b27 re-test (`2991f703`, 05:33)
+
+Storybook (built 05:09) and a local build of `2991f703` with pretend data. I tested sign-in
+with pretend replies: no code was sent, and no number or account is real. b27's three new e2e
+tests pass 27/27.
+
+### W1: pass
+
+Tested with a real touch tap at Android size (412×915, Android Chrome):
+
+- Pause holds the slides.
+- After Play, the slides move on within 6 seconds without tapping anywhere else, though focus
+  stays on the button.
+- Keyboard: reaching Pause with Tab holds the slides (10 seconds, no move). Enter pauses;
+  Enter again plays, and they move on.
+
+This holds on About Pam and Sign in, in Storybook and the local build (4/4 surfaces).
+
+### W4: pass, and one new W (W5)
+
+A real case manager on a real member:
+
+- With no visits, "None yet." shows, along with "0 Trips coming up", no example trips and no
+  examples note ([shot](shots/b27-w4-real-member-none.png)).
+- With visits, it shows only the place, picture, day and time, and the count matches
+  ([shot](shots/b27-w4-real-member-visits.png)).
+- The app asks only for `id, starts_at, service_id, services(name, category)`, leaving out
+  cancelled visits.
+- An example person (Storybook "Member", Jordan) still shows example trips.
+
+**W5: a missed visit is listed as attended.** "Programs attended in the past" and its count
+take every past visit that isn't cancelled (`useMemberTrips`: `status <> cancelled`, and
+`status` isn't read). The database also has `scheduled` and `missed`
+(`appointment_status`). So a visit the member missed, or one nobody marked, shows the case
+manager a program the member "attended". That's live and untrue, the same kind of problem as
+W4.
+
+Either:
+- show only `attended` under that heading; or
+- rename the heading to something like "Past visits" and say on each one how it went, if the
+  case manager may see that. Privacy `who-can-see.p1` says the guide sees "your visits".
+
+Owner: Piper, with Sage for the words.
+
+### S1: partly passes, one W (W6)
+
+**What passes:**
+- A signed-in member who opens `/signin/?next=/profile/add-program/` lands on Add a program,
+  once. Opening Sign in again goes Home.
+- `/profile/add-program` without the trailing slash works too.
+- Every other value is ignored, lands Home, and leaves nothing stored: an outside address,
+  `//…`, `/\…`, `%2F%2F…`, `/admin/`, `/profile/`, upper case, a query, `../`,
+  `javascript:`, a leading space, a double slash.
+- A program lead is never sent.
+- **Brand-new person:** after the code, they go through Join's three steps ("What others can
+  see", "Text messages", "You are in" → Start) and land on Add a program.
+- **Member who has already answered the reminders question:** after the code, they go
+  straight to Add a program.
+
+**W6: a member who has never been asked about reminders loses the link, and it fires later.**
+After the code, Sign in sends them to the reminders question first (`SignInScreen.tsx:309`).
+"Not now" goes Home, not to Add a program
+([shot](shots/b27-s1-never-asked-1-home.png)). The link stays in session storage. The next
+time they open Sign in in that tab, they're taken to Add a program out of nowhere
+([shot](shots/b27-s1-never-asked-2-later.png)).
+
+The comment above that line says the opposite: "A listed way on (S1) goes first … the
+reminders question waits for next time". The fix is to do what the comment says, or have
+Reminders hand on to the link when it finishes. Owner: Piper.
+
+**Polish: Add a program is offered to everyone but a program lead.** `takeNext` skips only
+program leads, so a signed-in case manager or super admin is sent to Add a program
+([shot](shots/b27-s1-case-manager-lands.png)). Profile offers that screen only to members
+(`ProfileScreen.tsx:88`). The same member-only rule would fit here.

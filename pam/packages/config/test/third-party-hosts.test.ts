@@ -126,6 +126,7 @@ const HOSTS: Record<string, HostEntry> = {
   'maps.apple.com': { kind: 'link', why: 'directions in Apple Maps, opened by a tap (PlaceCard.tsx)' },
   'play.google.com': { kind: 'link', why: 'Google Maps in the Play Store, opened by a tap (mapsLaunch.ts)' },
   'apps.apple.com': { kind: 'link', why: 'Google Maps in the App Store, opened by a tap (mapsLaunch.ts)' },
+  'calendar.google.com': { kind: 'link', why: "Google Calendar's page for adding a calendar by its address, opened by a tap (CalendarLinkView.tsx, D-538)" },
   'github.com': { kind: 'link', why: 'the neighborhood data’s source, linked under Legal › Data sources (LegalView.tsx, D-540)' },
   'creativecommons.org': { kind: 'link', why: 'the CC BY 4.0 licence of that data, linked under Legal › Data sources (LegalView.tsx, D-540)' },
 

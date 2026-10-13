@@ -60,6 +60,7 @@ import { ExploreScreen } from '../../screens/ExploreScreen';
 import { TripsScreen } from '../../screens/TripsView';
 import { HomeScreen } from '../../screens/HomeScreen';
 import { LegalView } from '../../screens/LegalView';
+import { CalendarLinkView } from '../../screens/CalendarLinkView';
 import { LanguageView } from '../../screens/LanguageView';
 import { DataCopyView, DeleteAccountView, PrivacyControlsView } from '../../screens/PrivacyViews';
 import { HelpReportPlaceView, HelpSafetyView, HelpTopicsView } from '../../screens/HelpViews';
@@ -139,6 +140,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   // Added with the nested-page template (D-213) — real routes in the app.
   '/legal/': screen(() => <LegalView />),
   '/language/': screen(() => <LanguageView />),
+  '/calendar/': screen(() => <CalendarLinkView />),
   '/legal/privacy/': screen(() => <PrivacyControlsView />),
   '/legal/privacy/copy/': screen(() => <DataCopyView />),
   '/legal/privacy/delete/': screen(() => <DeleteAccountView />),
