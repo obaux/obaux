@@ -82,6 +82,12 @@ asks (06:00 UTC, with screenshots): bring back the language dropdown, and hide t
   10.9 kB to spare; build-storybook; Playwright join, account, consent, signin-short, a11y, admin, directory
   on 3 projects: 360 passed.
 
+- **08:10:** merged Dot's d39fa6ed (the compact bar follows the hero mark). tsc clean; web 170; build; Playwright
+  join, account, consent, signin-short, a11y, admin, directory: 363 of 366. The three failures are one case,
+  signin-short "320×568, invited, es: the header stays on top", on every project. The bar does show (picture
+  checked): the Spanish invite line is four lines (90px), so the language button sits at 94–142px, and the test
+  looks only within the top 140px. A test window, not a missing bar; Dot's test, so it's hers to change.
+
 ## Left undone
 
 - Lena: the six languages for the six keys above.
