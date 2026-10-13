@@ -22,6 +22,9 @@ const pause = (page: Page) => page.getByRole('button', { name: en['carousel.paus
 const play = (page: Page) => page.getByRole('button', { name: en['carousel.play']! });
 
 test.describe('the sign-in carousel after Pause and Play', () => {
+  // The rest of the suite runs with reduced motion (playwright.config), which hides the carousel's Pause control.
+  test.use({ reducedMotion: 'no-preference' });
+
   test('a click on Play moves on without leaving the button first', async ({ page }) => {
     await page.goto('/signin/');
     await settled(page);
