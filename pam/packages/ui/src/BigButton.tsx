@@ -37,6 +37,8 @@ export interface BigButtonProps {
    * D-357), as quiet text and no pill (13 October, D-560). Drawn inside the button; part of its name.
    */
   badge?: string;
+  /** What joins the label and the count in the button's name: the language's own comma (`nameJoinerOf(locale)`). */
+  nameJoiner?: string;
   /** Escape hatch for layout only (margins). Never for colour or type. */
   xstyle?: stylex.StyleXStyles;
 }
@@ -90,6 +92,7 @@ export function BigButton({
   isDisabled = false,
   isLoading = false,
   badge,
+  nameJoiner = ', ',
   xstyle,
 }: BigButtonProps) {
   // The count is drawn inside the button, never over its target (D-357), and never in the icon slot, where it pushed the
@@ -97,7 +100,7 @@ export function BigButton({
   return (
     <Press>
       <Button
-        label={badge ? `${label}, ${badge}` : label}
+        label={badge ? `${label}${nameJoiner}${badge}` : label}
         variant={variant}
         size="lg"
         width="100%"

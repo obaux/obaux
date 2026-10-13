@@ -127,26 +127,31 @@ interface LocaleInfo {
   readonly intl: string;
   /** The language a phone's speech recogniser is asked to listen for. */
   readonly speech: string;
+  /** What joins two parts of one spoken name ("Next" and "1 of 3"): the language's own comma, with its space if it has one. */
+  readonly joiner: string;
 }
 
 const LOCALE_INFO: Readonly<Record<Locale, LocaleInfo>> = {
-  en: { dir: 'ltr', intl: 'en', speech: 'en-US' },
+  en: { dir: 'ltr', intl: 'en', speech: 'en-US', joiner: ', ' },
   // A recogniser needs one regional variety of each language; these are the
   // ones for people living in the US. Which language a person gets is their
   // own choice, never worked out from where they are.
-  es: { dir: 'ltr', intl: 'es', speech: 'es-US' },
-  'pt-BR': { dir: 'ltr', intl: 'pt-BR', speech: 'pt-BR' },
-  'zh-CN': { dir: 'ltr', intl: 'zh-CN', speech: 'zh-CN' },
+  es: { dir: 'ltr', intl: 'es', speech: 'es-US', joiner: ', ' },
+  'pt-BR': { dir: 'ltr', intl: 'pt-BR', speech: 'pt-BR', joiner: ', ' },
+  'zh-CN': { dir: 'ltr', intl: 'zh-CN', speech: 'zh-CN', joiner: '，' },
   // Phones take 'zh-HK' as Cantonese (Chrome also calls it 'yue-Hant-HK').
-  'zh-HK': { dir: 'ltr', intl: 'zh-HK', speech: 'zh-HK' },
-  ru: { dir: 'ltr', intl: 'ru', speech: 'ru-RU' },
-  ar: { dir: 'rtl', intl: 'ar-u-nu-latn', speech: 'ar-SA' },
+  'zh-HK': { dir: 'ltr', intl: 'zh-HK', speech: 'zh-HK', joiner: '，' },
+  ru: { dir: 'ltr', intl: 'ru', speech: 'ru-RU', joiner: ', ' },
+  ar: { dir: 'rtl', intl: 'ar-u-nu-latn', speech: 'ar-SA', joiner: '، ' },
 };
 
 export const directionOf = (locale: Locale): TextDirection => LOCALE_INFO[locale].dir;
 /** Takes any string: helpers that were handed the active locale as plain text pass it on unchanged. */
 export const intlLocale = (locale: string): string =>
   (LOCALE_INFO as Readonly<Record<string, LocaleInfo | undefined>>)[locale]?.intl ?? locale;
+/** The comma that joins the parts of an accessible name in this language ("، " in Arabic, "，" in Chinese). Takes any string, like `intlLocale`. */
+export const nameJoinerOf = (locale: string): string =>
+  (LOCALE_INFO as Readonly<Record<string, LocaleInfo | undefined>>)[locale]?.joiner ?? ', ';
 export const speechLanguageFor = (locale: Locale): string => LOCALE_INFO[locale].speech;
 
 /**
