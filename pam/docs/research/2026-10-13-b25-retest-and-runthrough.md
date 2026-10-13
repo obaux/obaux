@@ -319,3 +319,110 @@ in as they scroll into view; scrolling the page shows every row.
 - As planned (`2026-10-12-rewards-interest-plan.md`), the first full week is Mon 19–Sun 25
   October. Four full weeks end Sun 15 November, so **I read weeks 3–4 on Thursday 19
   November.**
+
+## b30 run-through (`8f0af8d1`, 07:55)
+
+This is the run-through planned in Part 2, plus Mira's items 2–5. I used a local build of
+`8f0af8d1` with pretend data, at 320px unless I say otherwise, and Storybook (built 07:30).
+Sign-in used pretend replies: no code was sent, and no real account or number was involved.
+Items 1–3 ran as one script, 29/29.
+
+### 1. Ava's a78 list: pass
+
+**The switcher is gone:**
+- None of the ten super admin screens has a "Switch the view" control: Home, Places, Place,
+  Interested, Notifications, Points, Everyone, Person, Reported places and Requests. Profile
+  has no "See the app as" row either.
+- Home keeps just the bell and Help where the switcher was
+  ([shot](shots/b30-super-admin-home-320.png)).
+- `/view-as/` has gone from the build. A typed address gets the 404.
+- In Storybook, the super admin Home and Profile stories have no switcher.
+
+**A stale view from before the update:** I opened a tab already holding `pam.view-as` set to
+`member`, `admin` or `provider`. Each time it landed on the super admin's own Home (Requests),
+and the key was then removed ([shot](shots/b30-super-admin-stale-view-member.png)). This was
+the case I flagged as a possible S, and it doesn't happen.
+
+**Connect:**
+- A real case manager on a real member gets no "Connect … to…" row. "Message Keisha" moves up
+  into its place with no gap ([shot](shots/b30-case-manager-real-member.png)).
+- Typing `/person/connect/?id=…` goes back to `/person/`.
+- In Storybook, example Jordan still has "Connect Jordan to…" and its Connect screen.
+
+**Join step 2:** "What others can see" now has a Contact Pam row, linking to
+`https://joinpam.org/support/`. No `tel:` link appears anywhere in the flow
+([shot](shots/b30-join-step2-contact.png)).
+
+### 2. W5, past visits: pass
+
+I gave the member four visits: one attended, one missed, and one unmarked in the past, plus
+one upcoming.
+
+- "Programs attended in the past" shows a count of **1**, and its screen lists only the
+  attended visit ([shot](shots/b30-w5-past-attended-only.png)).
+- "Trips coming up" shows 1, the upcoming visit.
+
+### 3. W6, the way on after Sign in: pass
+
+**Signing in by code, with `?next=/profile/add-program/`:**
+- A member never asked about reminders lands on Add a program. The link is cleared, and Sign
+  in later goes Home. **Fixed.**
+- A member who has already answered lands on Add a program, cleared.
+- A program lead, a case manager and a super admin each land Home, with the link cleared.
+
+**Already signed in:** a member goes to Add a program; the other three roles don't. In every
+case nothing is left stored.
+
+### 4. Street search off: pass, one polish
+
+I tested four ways the switch can be off: Pam's server says off, the server errors, the
+network fails, and signed out.
+
+- The area sheet keeps the old label "ZIP code or neighborhood" and hint "Like 19107, or
+  Fishtown."
+- Typing "Broad and Girard" shows no Google rows, no Google mark, and no error. The page makes
+  no request to Google, and "Fish" still finds Fishtown.
+- When the server says off, the app asks only for `status`, once.
+- When the switch can't be read (server error or no network), the app also sends `suggest`
+  with the typed words to **Pam's server**, which without a key asks Google nothing. Not a
+  finding; noted.
+- Privacy `sharing.p7` is on screen in all seven languages, with the date 13 October.
+
+**Polish:** "Pam remembers the area you pick on this phone only." is now centred even when
+street search is off. It was centred to sit under Google's mark (Will, 13 October), which only
+shows when the search is on. Everything else in the sheet is left-aligned, so with the search
+off this one line no longer matches "exactly as before"
+([shot](shots/b30-street-search-off.png)). Owner: Piper.
+
+### 5. Dot's test change (`claude/pam-design-signin-fit` @ `90533a90`): fail, and it hides a real gap
+
+**What the test was for:** the old test (D-502, Will: "otherwise they lose context") checked
+that after you scroll, the mark and the language switch are still at the top. Its
+precondition was "the page scrolled more than 100px".
+
+**The change:** the new version checks the bar only if the page scrolls **250px or more**;
+otherwise it only checks that the page scrolled more than 40px.
+
+**Why that doesn't test the same thing:**
+- I ran it on the branch with logging. The six cases at 320×568 scroll 114, 165, 165, 114,
+  123 and **72**px. None reaches 250, so **the bar is never checked in any case**.
+- The bar appears once the page has scrolled more than **72px** (`SignInScreen.tsx:382`). So
+  the 250 cut-off skips exactly the range where the bar should appear (73–249px).
+
+**The gap it hides** (on the branch, 320×568):
+- Arabic and Simplified Chinese, not invited, scroll **exactly 72px** at most (and Arabic at
+  360×640 too). The bar never appears, and the hero's mark has already left at about 60px.
+- At the bottom of the page there's **no Pam mark and no language button**
+  ([shot](shots/b30-dot-branch-signin-ar-320x568-scrolled.png)).
+- English and Russian scroll 114 and 133px and get the bar.
+- The old test failed on that Arabic case (72 is not more than 100), which is presumably why
+  its precondition was changed. The new one passes it.
+
+**A version that keeps the meaning:** drop the precondition. After scrolling to the end,
+whatever the distance, assert that a Pam mark and the language button are visible in the top
+140px, and that the invite line is at 0 when invited. That fails today on Arabic and Chinese
+at 320×568, which is right.
+
+**The fix to the page itself:** the bar should appear where the hero's mark actually leaves
+(about 60px, or measured with an `IntersectionObserver` on the hero's mark), not at a fixed
+72px. Owner: Dot. This is W-level for anyone on a small phone in those languages.
