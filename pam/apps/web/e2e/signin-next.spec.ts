@@ -8,7 +8,7 @@ import { settled } from './settled';
 const ME = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
 const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
 
-async function signedIn(page: Page, role: 'member' | 'provider') {
+async function signedIn(page: Page, role: 'member' | 'provider' | 'admin' | 'super_admin') {
   await page.addInitScript((userId: string) => {
     const session = {
       access_token: 't', refresh_token: 'r', token_type: 'bearer', expires_in: 3600,
@@ -49,4 +49,22 @@ test('a program lead is not sent to Add my program', async ({ page }) => {
   await page.goto('/signin/?next=/profile/add-program/');
   await settled(page);
   await expect(page).not.toHaveURL(/add-program/);
+});
+
+test('a case manager and a super admin are not sent to Add my program either', async ({ page }) => {
+  for (const role of ['admin', 'super_admin'] as const) {
+    await signedIn(page, role);
+    await page.goto('/signin/?next=/profile/add-program/');
+    await settled(page);
+    await expect(page, role).not.toHaveURL(/add-program/);
+    await page.unrouteAll();
+  }
+});
+
+test('the way on is forgotten when it is not taken: it does not fire on a later visit to Sign in (W6)', async ({ page }) => {
+  // A program lead arrives with ?next, is not taken there, and a member signing in later in the same tab is not either.
+  await signedIn(page, 'provider');
+  await page.goto('/signin/?next=/profile/add-program/');
+  await settled(page);
+  expect(await page.evaluate(() => window.sessionStorage.getItem('pam.signin-next'))).toBeNull();
 });

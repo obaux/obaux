@@ -12,7 +12,6 @@ import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { NotIn } from '../app/NotIn';
 import { ReportedPlacesLazy } from '../app/places/ReportedPlacesLazy';
-import { RoleSwitchControl } from '../app/RoleSwitchControl';
 import { HelpButton } from './HelpButton';
 
 /**
@@ -34,7 +33,7 @@ export function ReportedPlacesScreen() {
   const params = useSearchParams();
   const { state: session } = useSession();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const { demoRole, setViewAs } = useRoleView(trueRole);
+  const { demoRole } = useRoleView(trueRole);
   const viewedRole = demoRole ?? trueRole;
   const canReview = viewedRole === 'admin' || viewedRole === 'super_admin';
   const realCanReview = trueRole === 'admin' || trueRole === 'super_admin';
@@ -49,7 +48,6 @@ export function ReportedPlacesScreen() {
 
   const actions = (
     <>
-      {trueRole === 'super_admin' ? <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} /> : null}
       <HelpButton />
     </>
   );

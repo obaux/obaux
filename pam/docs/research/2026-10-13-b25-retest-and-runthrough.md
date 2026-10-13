@@ -264,3 +264,58 @@ Reminders hand on to the link when it finishes. Owner: Piper.
 program leads, so a signed-in case manager or super admin is sent to Add a program
 ([shot](shots/b27-s1-case-manager-lands.png)). Profile offers that screen only to members
 (`ProfileScreen.tsx:88`). The same member-only rule would fit here.
+
+## b29 re-test (`96f27a77`, 07:00)
+
+joinpam.org is blocked from this environment, so I tested a local build of the website at
+`96f27a77` (the same code Vercel built). For the app, I used a local build with pretend data
+and the e2e suite. I never signed in.
+
+### 1. Website on phones (a77) and the green card (a80): pass
+
+- **Layout:**
+  - At 320, 390 and 1280px, nothing scrolls sideways and every tap target is at least 44px
+    high. The name chips are 48px high on phones.
+  - Shots: [320](shots/b29-site-card-320.png), [1280](shots/b29-site-card-1280.png),
+    [390, programs row](shots/b29-site-programs-390.png).
+  - I checked against what D-550/553/556 describe, not against the Figma frame itself, which
+    I can't open from here.
+- **Cycle:** Residents → Program Providers → Case managers → Residents, at 5.7s, 11.8s and
+  17.9s, so every 6 seconds.
+- **Crossfade:** the incoming picture goes from 0 to 1 over about 600ms while the outgoing one
+  stays at 1 underneath, then drops. The green never shows through.
+- **Pill:**
+  - It reads "Pause card" while playing and "Play card" when paused.
+  - It has no `aria-label`, so its screen-reader name is its text and the two match.
+  - It's 48px high.
+  - A tap on Pause held the card for 13 seconds; a tap on Play moved it on.
+- **A tap on a chip:** it shows that view and stops the cycle (held for 14 seconds), and the
+  pill turns to "Play card".
+- **Reduced motion:** nothing moves in 14 seconds, there's no pill, and no fill animates.
+- **b28's link:** "Add your program" now goes to
+  `app.joinpam.org/signin/?next=/profile/add-program/`. "Join as a case manager" still goes
+  to the help post.
+
+**An artefact, not a finding:** a full-page screenshot shows blank stretches. The rows draw
+in as they scroll into view; scrolling the page shows every row.
+
+### 2. W3, the Explore bell: pass for a phone that has had the bell before
+
+- Nico's `explore-bell-shift.spec.ts` and `explore-bell.spec.ts`: 21/21.
+- **Returning phone** (`pam.explore.bell` = 1) with the notification list held back 0.8s or
+  2s: the bell's place is kept from the first frame. The search box doesn't move after the
+  page appears, and the browser's layout-shift score is **0.000** at both 390px and 320px.
+  - In b25 the same case scored 0.006 at 390px and 0.027 at 320px.
+- **A phone's first-ever bell:** it still moves the page once (25px at 390px, 26px at
+  320px). The code says so (`HeaderBell.tsx`: "The first time a bell appears on a phone it
+  still moves the page once"). I'm not filing it: it happens once per phone, and holding a
+  slot for every member would leave members with no notifications an empty gap.
+
+### Noted: the a76 screen counter shipped in b29
+
+- The migration is `20261013042956_count_how_many_phones_open_your_points_and_profile_each_day`.
+- Sage's line is in Privacy as `what-we-keep.p13` in all seven languages, and Privacy is dated
+  13 October.
+- As planned (`2026-10-12-rewards-interest-plan.md`), the first full week is Mon 19–Sun 25
+  October. Four full weeks end Sun 15 November, so **I read weeks 3–4 on Thursday 19
+  November.**

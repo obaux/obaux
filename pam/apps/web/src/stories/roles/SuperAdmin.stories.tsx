@@ -5,7 +5,7 @@ import { screen } from './screen';
  * The super admin's app, screen by screen (D-217). Home is the requests
  * waiting on them (D-257); from a request they can look at the program it
  * describes and text the person, and in Messages they talk with staff
- * (D-262). Everyone, Programs and "See the app as" are Profile rows.
+ * (D-262). Everyone and Programs are Profile rows.
  */
 const meta = { title: 'Super admin/Screens' } satisfies Meta;
 
@@ -45,7 +45,6 @@ export const InvitesLog: Story = screen('super-admin', 'Invited people', '/invit
 export const Invite: Story = screen('super-admin', 'Invite someone', '/invite/');
 export const InviteOne: Story = screen('super-admin', 'A link for a member', '/invite/new/', { role: 'member' });
 export const InviteCaseManager: Story = screen('super-admin', 'A link for a case manager', '/invite/new/', { role: 'admin' });
-export const ViewAs: Story = screen('super-admin', 'See the app as', '/view-as/');
 export const Person: Story = screen('super-admin', 'A person', '/person/', { id: 'dummy-m1' });
 export const Notifications: Story = screen('super-admin', 'Notifications', '/notifications/');
 export const Place: Story = screen('super-admin', 'A place', '/place/', { id: 'dummy-place-learning', from: 'explore' });

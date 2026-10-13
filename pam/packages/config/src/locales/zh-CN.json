@@ -557,6 +557,7 @@
   "privacy.s.sharing.p4": "当Pam发送电子邮件时，替我们发送邮件的公司会收到电子邮件地址和邮件内容。它不得将这些用于其他任何用途。",
   "privacy.s.sharing.p5": "“预约”里的地图来自Google。Google会收到您手机的IP地址和您查看的那部分地图。这张地图是Pam中唯一由您的手机从Google加载的部分。",
   "privacy.s.sharing.p6": "如果您生成日历链接，您的预约会发送给您添加该链接的日历背后的公司，例如Apple、Google或Microsoft。Pam不知道是哪一家。每次预约只显示“Pam visit”和时间，除非您开启显示地点的名称和地址。任何拿到这个链接的人都能看到您的预约，所以请自己保管好。如果您生成新链接，旧链接就会失效。如果您关闭它，Pam会立即停止发送您的预约，但您的日历可能会保留已经收到的预约。",
+  "privacy.s.sharing.p7": "当您输入街道地址、路口，或Pam自己的区域列表里没有的地点时，Pam的服务器会把您输入的文字发送给Google，让Google给出地点建议。如果您选择了其中一个，Pam的服务器会向Google询问它的位置。Google只会收到这些文字、您选择的地点，以及每次搜索都重新生成的一个代码。它不会收到您的姓名、手机号码或手机的IP地址，因为您的手机不会为此连接Google。 Pam不会保存您输入的内容，也不会保存Google的回复。Google会保存什么，由Google决定。",
   "privacy.s.sharing.title": "还有谁会得到您的信息",
   "privacy.s.texts.p1": "您登录时，我们会给您发一条验证码短信。以后我们可能会给您发短信，内容是提醒和关于您账户的更新。",
   "privacy.s.texts.p2": "随时回复 STOP，短信就会停止。应用里没有任何功能可以重新开启短信。",
@@ -945,9 +946,6 @@
   "profile.menu.invite": "邀请他人",
   "profile.menu.everyone": "所有人",
   "profile.menu.requests": "工作人员申请",
-  "profile.menu.viewAs": "以其他身份查看应用",
-  "viewAs.title": "以其他身份查看应用",
-  "viewAs.intro": "按各类账户看到的样子来查看Pam。只有画面会变——每个列表仍然来自您自己的账户。",
   "nav.back.viewAs": "返回“以其他身份查看应用”",
   "nav.back.signin": "返回手机号码页",
   "nav.back.signInScreen": "返回“登录”",
@@ -1648,5 +1646,7 @@
   "legal.sources.title": "数据来源",
   "legal.sources.neighborhoods": "区域搜索中的街区名称来自 Abaca Labs 制作的“Philadelphia Neighborhoods”。Pam对其做了修改：每个街区只保留一个点，而不是边界。",
   "legal.sources.link": "查看原始数据",
-  "legal.sources.licence": "许可协议：CC BY 4.0"
+  "legal.sources.licence": "许可协议：CC BY 4.0",
+  "places.areaHint.street": "例如：19107、Fishtown，或 Broad 和 Girard 路口。",
+  "places.areaLabel.street": "邮政编码、街区或地址"
 }

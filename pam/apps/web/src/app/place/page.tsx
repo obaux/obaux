@@ -31,7 +31,6 @@ import { logCall } from '@/lib/logCall';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { usePlaceStatus, weekLines } from '@/lib/usePlaceStatus';
 import { useRoleView } from '@/lib/useViewedRole';
-import { RoleSwitchControl } from '../RoleSwitchControl';
 import { sharePlace } from '@/lib/sharePlace';
 import { usePlacePolicies } from '@/lib/usePlacePolicies';
 import { useMySignatures } from '@/lib/useMySignatures';
@@ -231,7 +230,7 @@ function PlaceScreen() {
   const { state: session } = useSession();
   const signedIn = session.status === 'signed-in';
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const { demoRole, setViewAs } = useRoleView(trueRole);
+  const { demoRole } = useRoleView(trueRole);
   const { isSaved, save, unsave } = useSavedPlaces(signedIn, demoRole);
 
   const place = state.status === 'ready' ? state.place : null;
@@ -314,9 +313,6 @@ function PlaceScreen() {
       backLabel={t(back.labelKey)}
       actions={
         <>
-          {trueRole === 'super_admin' ? (
-            <RoleSwitchControl trueRole={trueRole} viewedRole={demoRole ?? trueRole} onChange={setViewAs} />
-          ) : null}
           {/*
             A place's own bar once it has loaded (D-224): Save and the ⋯ menu.
             Before that, Help (D-217).

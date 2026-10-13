@@ -40,7 +40,8 @@ export function PastTripsView({ personId, name }: { readonly personId: string; r
   const realTrips = useMemberTrips(personId, !isExample && viewedRole === 'admin');
   const now = Date.now();
   const past = (isProgramView ? [] : isExample ? dummyTripsFor(personId) : realTrips)
-    .filter((trip) => new Date(trip.startsAt).getTime() < now)
+    // Only visits the program marked them as there for (W5); the example trips have no marks.
+    .filter((trip) => new Date(trip.startsAt).getTime() < now && ('attended' in trip ? trip.attended : true))
     .reverse();
   const when = (iso: string) =>
     `${new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long', month: 'short', day: 'numeric' }).format(new Date(iso))} · ${new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' }).format(new Date(iso))}`;

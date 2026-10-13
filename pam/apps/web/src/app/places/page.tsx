@@ -37,7 +37,6 @@ import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { placeStatus, useNow } from '@/lib/usePlaceStatus';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
-import { RoleSwitchControl } from '../RoleSwitchControl';
 import { CITY_HALL, loadOrigin, saveOrigin, type AreaOption } from '@/lib/useAreaSearch';
 import { AreaSearch, AreaTrigger } from './AreaPicker';
 
@@ -161,7 +160,7 @@ function PlacesScreen() {
    */
   const { state: session } = useSession();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const { demoRole, setViewAs } = useRoleView(trueRole);
+  const { demoRole } = useRoleView(trueRole);
   const viewedRole = demoRole ?? trueRole;
   /*
    * Reported places (D-189): a chip only a reviewer sees — drawn for the
@@ -206,11 +205,6 @@ function PlacesScreen() {
       <AppHeader
         roleLabel={
           session.status === 'signed-in' ? t(`role.${demoRole ?? session.session.role}`) : undefined
-        }
-        roleControl={
-          trueRole === 'super_admin' ? (
-            <RoleSwitchControl trueRole={trueRole} viewedRole={demoRole ?? trueRole} onChange={setViewAs} />
-          ) : undefined
         }
         trailing={
           <HStack gap={1} align="center" wrap="nowrap">

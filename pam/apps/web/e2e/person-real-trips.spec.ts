@@ -47,8 +47,8 @@ test('a real member with nothing planned shows no trips and no example note', as
 
 test('a real member shows the visits they really planned, from the database', async ({ page }) => {
   await open(page, [
-    { id: 'v1', starts_at: inDays(3), service_id: 'a1b2c3d4-0000-4000-8000-0000000000e1', services: { name: 'Riverside Job Center', category: 'workforce' } },
-    { id: 'v0', starts_at: inDays(-5), service_id: 'a1b2c3d4-0000-4000-8000-0000000000e2', services: { name: 'Santore Library', category: 'education' } },
+    { id: 'v1', starts_at: inDays(3), status: 'scheduled', service_id: 'a1b2c3d4-0000-4000-8000-0000000000e1', services: { name: 'Riverside Job Center', category: 'workforce' } },
+    { id: 'v0', starts_at: inDays(-5), status: 'attended', service_id: 'a1b2c3d4-0000-4000-8000-0000000000e2', services: { name: 'Santore Library', category: 'education' } },
   ]);
   await expect(page.getByText('Riverside Job Center').first()).toBeVisible();
   // Only the coming-up visit is on this page; the past one is a tap away.
@@ -59,9 +59,32 @@ test('a real member shows the visits they really planned, from the database', as
 test('the past visits page shows real ones too, and no example note', async ({ page }) => {
   await open(
     page,
-    [{ id: 'v0', starts_at: inDays(-5), service_id: 'a1b2c3d4-0000-4000-8000-0000000000e2', services: { name: 'Santore Library', category: 'education' } }],
+    [{ id: 'v0', starts_at: inDays(-5), status: 'attended', service_id: 'a1b2c3d4-0000-4000-8000-0000000000e2', services: { name: 'Santore Library', category: 'education' } }],
     `/person/past/?id=${MEMBER}`,
   );
   await expect(page.getByText('Santore Library').first()).toBeVisible();
   await expect(page.getByText('The trips shown are examples until Pam books visits.')).toHaveCount(0);
+});
+
+/** W5: "Programs attended in the past" says the member went only where the program marked them as there. */
+const MIXED = [
+  { id: 'a', starts_at: inDays(-10), status: 'attended', service_id: 'a1b2c3d4-0000-4000-8000-0000000000e2', services: { name: 'Santore Library', category: 'education' } },
+  { id: 'm', starts_at: inDays(-8), status: 'missed', service_id: 'a1b2c3d4-0000-4000-8000-0000000000e3', services: { name: 'Missed Place', category: 'workforce' } },
+  { id: 'u', starts_at: inDays(-2), status: 'scheduled', service_id: 'a1b2c3d4-0000-4000-8000-0000000000e4', services: { name: 'Unmarked Place', category: 'workforce' } },
+];
+
+test('the past visits page lists only attended visits: a missed one and an unmarked one are not there', async ({ page }) => {
+  await open(page, MIXED, `/person/past/?id=${MEMBER}`);
+  await expect(page.getByText('Santore Library').first()).toBeVisible();
+  await expect(page.getByText('Missed Place')).toHaveCount(0);
+  await expect(page.getByText('Unmarked Place')).toHaveCount(0);
+});
+
+test('the member\'s page counts only the attended ones next to "Programs attended in the past"', async ({ page }) => {
+  await open(page, MIXED);
+  // The count sits at the right of the row, beside its link.
+  const row = page.getByRole('listitem').filter({ hasText: 'Programs attended in the past' }).first();
+  await expect(row).toBeVisible();
+  // One attended visit of three: the label and a 1, not a 3.
+  await expect(row).toHaveText('Programs attended in the past1');
 });

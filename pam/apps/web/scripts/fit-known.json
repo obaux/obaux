@@ -638,5 +638,29 @@
   {
     "key": "pseudo|cut|program-lead-screens--home-folded|⟦Ŵóóóŕķ áñññð ɱóóóñééý⟧",
     "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "zh-CN|cut|member-created-states-street-search--sheet-open|工作和收入",
+    "reason": "The Places screen behind the open area sheet has a row of category filters (Work and money) whose label is partly under the sheet and its dimmed scrim, so the detector sees it partly hidden (partial=true, 0 in, 0 out). The sheet is a drawer over the page: nothing in it is cut, and the filter is fully visible once it closes. Looked at 13 October 2026 at 320px with a screenshot of the sheet open."
+  },
+  {
+    "key": "zh-HK|cut|member-created-states-street-search--sheet-open|工作與收入",
+    "reason": "The Places screen behind the open area sheet has a row of category filters (Work and money) whose label is partly under the sheet and its dimmed scrim, so the detector sees it partly hidden (partial=true, 0 in, 0 out). The sheet is a drawer over the page: nothing in it is cut, and the filter is fully visible once it closes. Looked at 13 October 2026 at 320px with a screenshot of the sheet open."
+  },
+  {
+    "key": "ar|cut|member-created-states-street-search--sheet-open|العمل والمال",
+    "reason": "The Places screen behind the open area sheet has a row of category filters (Work and money) whose label is partly under the sheet and its dimmed scrim, so the detector sees it partly hidden (partial=true, 0 in, 0 out). The sheet is a drawer over the page: nothing in it is cut, and the filter is fully visible once it closes. Looked at 13 October 2026 at 320px with a screenshot of the sheet open."
+  },
+  {
+    "key": "zh-CN|cut|member-created-states-street-search--results-showing|工作和收入",
+    "reason": "The Places screen behind the open area sheet has a row of category filters (Work and money) whose label is partly under the sheet and its dimmed scrim, so the detector sees it partly hidden (partial=true, 0 in, 0 out). The sheet is a drawer over the page: nothing in it is cut, and the filter is fully visible once it closes. Looked at 13 October 2026 at 320px with a screenshot of the sheet open."
+  },
+  {
+    "key": "zh-HK|cut|member-created-states-street-search--results-showing|工作與收入",
+    "reason": "The Places screen behind the open area sheet has a row of category filters (Work and money) whose label is partly under the sheet and its dimmed scrim, so the detector sees it partly hidden (partial=true, 0 in, 0 out). The sheet is a drawer over the page: nothing in it is cut, and the filter is fully visible once it closes. Looked at 13 October 2026 at 320px with a screenshot of the sheet open."
+  },
+  {
+    "key": "ar|cut|member-created-states-street-search--results-showing|العمل والمال",
+    "reason": "The Places screen behind the open area sheet has a row of category filters (Work and money) whose label is partly under the sheet and its dimmed scrim, so the detector sees it partly hidden (partial=true, 0 in, 0 out). The sheet is a drawer over the page: nothing in it is cut, and the filter is fully visible once it closes. Looked at 13 October 2026 at 320px with a screenshot of the sheet open."
   }
 ]

@@ -28,12 +28,16 @@ export function rememberNext(value: string | null | undefined): void {
   }
 }
 
-/** The remembered way on, once: it is forgotten as it is read. `null` when there is none or `role` is a program lead. */
+/**
+ * The remembered way on, once: it is forgotten as it is read, whether or not it is taken, so it can never fire on a later visit to Sign in.
+ * Only a member is taken there (Add my program is offered to members alone: a program lead, a case manager and a super admin get `null`).
+ * `role` left out is a brand-new account in the join flow, which is a member's.
+ */
 export function takeNext(role?: string | null): string | null {
   try {
     const stored = window.sessionStorage.getItem(KEY);
     window.sessionStorage.removeItem(KEY);
-    if (role === 'provider') return null;
+    if (role !== undefined && role !== 'member') return null;
     return safeNext(stored);
   } catch {
     return null;
