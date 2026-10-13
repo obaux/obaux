@@ -51,6 +51,14 @@ asks (06:00 UTC, with screenshots): bring back the language dropdown, and hide t
 - Pictures at 390px for Will: light, dark and Arabic, each closed, with the language list open and with
   the code open; Sign in from an invite. Arabic shows the two new lines in English until Lena answers.
 
+- **06:52 (Mira):** Sage's two code strings go in as their own last commit, so it can be dropped if Will
+  keeps his words (card a82); main merged (96f27a77); the 390px before/after pictures committed in
+  `docs/design/review/2026-10-13-join/`. The 320×568 test stays as it is: the words are Will's, and Dot
+  makes the hero smaller on short screens.
+- After the merge: `pnpm -r typecheck` clean; ui 124, site 95, web 156 pass; config fails only on the
+  six keys waiting for Lena (14 tests, every one naming them); Playwright join, account, consent,
+  signin-short, a11y: 258 passed, 6 failed (320×568, waiting for Dot).
+
 ## Left undone
 
 - Lena: the six languages for the six keys above.
