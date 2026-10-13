@@ -10,6 +10,8 @@ import { tap } from '../lib/tap';
 import { website } from '../lib/website.stylex';
 import { type } from '../lib/website-type.stylex';
 
+const linkColor = stylex.create({ text: { color: website['--website-text-link'] } });
+
 const styles = stylex.create({
   // Text keeps a readable line length; the cards (how to find it, pictures) use the full width.
   measure: { maxWidth: '760px' },
@@ -79,7 +81,7 @@ export function ReadMore({ label, href }: { readonly label: string; readonly hre
   return (
     <VStack>
       <HStack>
-        <Link href={href} hasUnderline isStandalone xstyle={tap.link}>
+        <Link href={href} hasUnderline isStandalone xstyle={[tap.link, linkColor.text]}>
           {label}
         </Link>
       </HStack>

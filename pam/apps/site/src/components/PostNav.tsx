@@ -7,6 +7,7 @@ import { Link } from '@astryxdesign/core/Link';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { website } from '../lib/website.stylex';
 import type { PostSection } from '../lib/sections';
 
 /**
@@ -45,6 +46,7 @@ const styles = stylex.create({
   },
   heading: { fontWeight: 700 },
   link: {
+    color: website['--website-text-link'],
     display: 'block',
     paddingBlock: '10px',
     paddingInlineStart: '12px',
@@ -54,7 +56,7 @@ const styles = stylex.create({
     minHeight: '24px',
   },
   current: { borderInlineStartColor: colorVars['--color-accent'], fontWeight: 700 },
-  barLink: { display: 'block', paddingBlock: '14px', minHeight: '48px', boxSizing: 'border-box' },
+  barLink: { color: website['--website-text-link'], display: 'block', paddingBlock: '14px', minHeight: '48px', boxSizing: 'border-box' },
   barTrigger: { minHeight: '56px' },
   barLabel: { fontWeight: 700 },
   barCurrent: { opacity: 0.85 },

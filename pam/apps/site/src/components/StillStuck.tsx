@@ -1,8 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
-import { Heading } from '@astryxdesign/core/Heading';
 import { VStack } from '@astryxdesign/core/VStack';
 import { website } from '../lib/website.stylex';
-import { type } from '../lib/website-type.stylex';
+import { lastBlockGap } from '../lib/last-block-gap';
 import { HelpRequest } from './HelpRequest';
 
 const styles = stylex.create({
@@ -17,9 +16,10 @@ const styles = stylex.create({
     backgroundColor: website['--website-surface-muted'],
     color: website['--website-text-primary'],
   },
-  title: { color: website['--website-text-primary'], margin: 0 },
   // The last stop in a post's "On this page" menu.
-  anchor: { scrollMarginTop: 'var(--post-scroll-offset, 24px)' },
+  anchor: {
+    scrollMarginTop: 'var(--post-scroll-offset, 24px)',
+  },
 });
 
 /**
@@ -29,10 +29,9 @@ const styles = stylex.create({
  */
 export function StillStuck() {
   return (
-    <VStack id="still-stuck" data-post-section="Still stuck?" tabIndex={-1} xstyle={styles.anchor}>
+    <VStack id="still-stuck" data-post-section="Still stuck?" tabIndex={-1} xstyle={[styles.anchor, lastBlockGap.end]}>
       <VStack gap={3} xstyle={styles.card}>
         <VStack gap={3} maxWidth={720}>
-          <Heading level={2} xstyle={[type.heading_title24, styles.title]}>Still stuck?</Heading>
           <HelpRequest />
         </VStack>
       </VStack>

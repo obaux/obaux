@@ -2280,10 +2280,10 @@ Below 640px tall the hero slide is shorter; `TextLink` can be always underlined 
 
 Component ready for Google's own logo files (18px, clear space, "Google Maps", light/dark, words as fallback); waiting for Will to download the files (D-557).
 
-## Design system & Storybook · Google logo under street suggestions: prepared (13 October)
-
-Component ready for Google's own logo files (18px, clear space, "Google Maps", light/dark, words as fallback); waiting for Will to download the files (D-557).
-
 ## Design system & Storybook · the green card transition (13 October)
 
 Crossfade 650ms, line out 160ms then in 320ms, no scale (D-556). Story: Website / Green card transition.
+
+## Design system & Storybook · help dialog and dark link text (13 October)
+
+Spec for the help call-out and dialog, and a new `--website-text-link` token (dark: very light lime #EEF1C2) for Wren (D-562).
