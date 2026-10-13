@@ -557,6 +557,16 @@
   - **Sage, 06:56 (A29, no Will needed):** join.staff.body drops "a day or two"; admin.caseload.empty.body says
     invites and where to make one; the expired-link page says "We'll email…", and its "Email me a new link" offer is
     hidden while invite emails are off (Ava builds).
+  - **07:36, the expired-link page's email offer:** invite emails are on, not off: `send-invite-emails` sent two
+    staff invites live on 10 October (19:16–19:20 UTC, none waiting), and the expired-link resend uses the same
+    INVITE_EMAILS switch. Ava's switch row (`invite_emails_live`, D-563) is seeded 'on' to match, so the "Email me a
+    new link" offer stays; the off state (the "ran out" line and Contact Pam) shows only if both are switched off
+    together. Sage told; her ledger corrected.
+  - **07:51, Iris's b30 run-through:** a78, W5, W6 and street search off pass. Dot's sign-in test edit (90533a90)
+    fails: on short phones in Arabic and Simplified Chinese the page scrolls at most 72px, the compact bar never
+    appears, and the Pam mark and language button are lost. Dot shows the bar when the hero's mark leaves view
+    (IntersectionObserver) and replaces the test with one without a precondition; W6 waits for it. Piper centres
+    "Pam remembers…" only when the Google mark shows.
 - **Batch b30 (13 October).** No migration. Ava (a78; Will's yes at 03:23 and 05:40): the super admin has no view-as
   switcher (D-558; a stale preview left in a tab is cleared), the Connect row shows only on example walks, and sign-up
   step 2 has a Contact Pam row. Lena: the street-search Privacy line `privacy.s.sharing.p7` in seven languages (Will
@@ -791,6 +801,12 @@
 | Batch b30 (a6dbc10e): db / config / ui / web unit / site / site a11y / usability / scrollspy / e2e full / storybook | 1579 ok / 1307 / 124 / 169 / 95 / 120 scans 0 / clear / 306 links 0 / 1757 passed, 19 skipped / builds; 11.1 kB spare; web tsc 0 after the build (stale `.next/types` before it) |
 | b30 English | three changed keys (sharing.p7, places.areaHint.street, places.areaLabel.street), none equal to English in six languages; three removed view-as keys used nowhere |
 | b30 + Piper W5 and W6, Nico 637f72b6, records (2abdbde6) | web tsc 0 / web unit 170 / config 1310 / build 0, 11.1 kB spare / e2e person-real-trips, signin-next, signin-short, join, account, directory, admin, places, street-search on 3 projects: 279 passed |
+| b30 main CI (8f0af8d1) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (08:00); Vercel web and pam-site READY (07:34) |
+| places-search v1 (07:30) | deployed from main's two files (read back: identical), JWT verification ON; answers { enabled: false } without GOOGLE_MAPS_SERVER_KEY |
+| help-request v5 (07:31) | deployed from main's three files, JWT verification off as before (not_yet, Role row only when sent) |
+| Invite emails before the W6 switch (07:35) | staff_invite_emails: 2 sent (10 October 19:16–19:20 UTC), 0 waiting; invite_emails: 0 rows; counts and times only read |
+| `list_migrations` before 20261013070505 | live ended at 20261013051051; applied as 20261013075601; row invite_emails_live = 'on'; app_settings RLS on, read-all and admin-write policies unchanged |
+| Iris's b30 run-through | a78 (ten super admin screens, stale view-as, Connect, Contact Pam), W5, W6 and street search off (four ways, p7 in seven languages): PASS, 29/29 scripted; Dot's sign-in test edit: FAIL (bar never shows at 72px scroll in ar, zh-CN) |
 
 ## Left undone
 
