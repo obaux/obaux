@@ -339,6 +339,15 @@ const AUTOPLAY_MS = 6000;
 // smoothly-eased scroll rather than a hard jump.
 const SCROLL_EASE_MS = 600;
 
+/** Focus a keyboard put there. A tap or a click focuses a button too, and that is not somebody reaching for it. */
+function isKeyboardFocus(target: EventTarget): boolean {
+  try {
+    return (target as Element).matches(':focus-visible');
+  } catch {
+    return true; // a browser without `:focus-visible`: hold, as before
+  }
+}
+
 export function OnboardingSlides({ slides, label, header, variant = 'hero', showLines = true, pauseLabel, playLabel }: OnboardingSlidesProps) {
   const isInline = variant === 'inline';
   const region = useRef<HTMLElement>(null);
@@ -346,8 +355,11 @@ export function OnboardingSlides({ slides, label, header, variant = 'hero', show
   const [here, setHere] = useState(0);
   const [loaded, setLoaded] = useState<ReadonlySet<string>>(new Set());
   const reducedMotion = usePrefersReducedMotion();
-  // Stopped by the person (stays stopped until Play), or held while focus is inside, so a
-  // keyboard user arriving at the button is not carried to another picture mid-reach.
+  // Stopped by the person (stays stopped until Play), or held while keyboard focus is inside, so a
+  // keyboard user arriving at the button is not carried to another picture mid-reach. Only focus
+  // that arrived by keyboard holds it: a tap leaves focus on the button it touched, and holding on
+  // that kept Play from restarting the pictures on a phone (Iris W1, 13 October). An explicit Play
+  // lets go of the hold, even for a keyboard user; moving focus to another control brings it back.
   const [paused, setPaused] = useState(false);
   const [focused, setFocused] = useState(false);
   const running = !reducedMotion && !paused && !focused;
@@ -454,7 +466,7 @@ export function OnboardingSlides({ slides, label, header, variant = 'hero', show
     <section
       ref={region}
       aria-label={label}
-      onFocus={() => setFocused(true)}
+      onFocus={(event) => setFocused(isKeyboardFocus(event.target))}
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(false);
       }}
@@ -512,7 +524,11 @@ export function OnboardingSlides({ slides, label, header, variant = 'hero', show
         <IconButton
           label={paused ? playLabel : pauseLabel}
           variant="ghost"
-          onClick={() => setPaused((p) => !p)}
+          onClick={() => {
+            // Play means play: the focus left on this button by the tap or the key press does not hold it.
+            if (paused) setFocused(false);
+            setPaused((p) => !p);
+          }}
           icon={
             // The tap target is the full 48px; what is drawn is a small quiet disc inside it.
             <span aria-hidden="true" {...stylex.props(styles.disc)}>
