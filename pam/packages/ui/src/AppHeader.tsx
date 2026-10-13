@@ -141,11 +141,12 @@ const styles = stylex.create({
    * The role chip is a word, not a sentence: it moves whole. `Badge` lets a pill
    * break anywhere (`overflow-wrap: anywhere`) so a long "who is this for" line
    * can take a second line; here that cut "Member" into "Membe / r" at 320px
-   * once the bell took the room. So the chip keeps its words whole (it breaks
-   * only between them) and never shrinks below its own width — when the row
+   * once the bell took the room. So the chip is one line, never broken (it breaks
+   * nowhere, not even at a hyphen) and never shrinks below its own width — when the row
    * cannot hold it beside the mark, the row's `wrap` puts it under the mark.
    */
   role: {
+    whiteSpace: 'nowrap',
     overflowWrap: 'normal',
     wordBreak: 'keep-all',
     flexShrink: 0,
