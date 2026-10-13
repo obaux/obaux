@@ -8,7 +8,9 @@ import { useCallback, useEffect, useState } from 'react';
  * `staff_requests` already grants a super admin full read access by RLS
  * (0046) — this is a direct table read, not an RPC, because nothing here is
  * more sensitive than what `directory_people` already shows: a name, a role
- * somebody asked for, and a city they typed. Deciding one is the RPC
+ * somebody asked for, and a city they typed. A case manager who asked from the
+ * website adds where they work and a work email (D-568), which only a super
+ * admin may read (D-441), as here. Deciding one is the RPC
  * (`review_staff_request`); reading the list is not.
  */
 
@@ -18,6 +20,9 @@ export interface StaffRequestRow {
   readonly firstName: string | null;
   readonly lastName: string | null;
   readonly city: string | null;
+  /** Where a case manager who asked from the website works, and their work email (D-568); null otherwise. */
+  readonly organization: string | null;
+  readonly workEmail: string | null;
   readonly createdAt: string;
   /** What a program lead said about their program at sign-up (0056), if anything. */
   readonly program: RequestedProgram | null;
@@ -56,7 +61,7 @@ export function useStaffRequests(enabled: boolean): {
         const { data, error } = await createClient()
           .from('staff_requests')
           .select(
-            'user_id, wants_role, first_name, last_name, city, created_at, program_name, program_category, program_subcategory, program_description, program_address, program_phone, program_website',
+            'user_id, wants_role, first_name, last_name, city, organization, work_email, created_at, program_name, program_category, program_subcategory, program_description, program_address, program_phone, program_website',
           )
           .is('decision', null)
           .order('created_at', { ascending: true });
@@ -73,6 +78,8 @@ export function useStaffRequests(enabled: boolean): {
           first_name: string | null;
           last_name: string | null;
           city: string | null;
+          organization?: string | null;
+          work_email?: string | null;
           created_at: string;
           program_name?: string | null;
           program_category?: string | null;
@@ -91,6 +98,8 @@ export function useStaffRequests(enabled: boolean): {
             firstName: row.first_name,
             lastName: row.last_name,
             city: row.city,
+            organization: row.organization ?? null,
+            workEmail: row.work_email ?? null,
             createdAt: row.created_at,
             program: row.program_name
               ? {

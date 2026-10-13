@@ -18,6 +18,7 @@ import { LanguageField } from '@pam/ui/LanguageField';
 import { useI18n } from '@/lib/i18n';
 import { HELP_DESK_URL } from '@/lib/helpDesk';
 import { navigate } from '@/lib/navigate';
+import { myStaffRequest } from '@/lib/useCaseManagerRequest';
 import { forgetInvite, recallInvite, type Invite } from '@/lib/appUrl';
 import { takeNext } from '@/lib/signinNext';
 import { readAddedTrips, withMoves } from '@/lib/addedTrips';
@@ -279,7 +280,14 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
     // No verified phone yet: that is Sign in's job (D-359), and it comes
     // back here once the code works. Any ?code= goes with it.
     if (session.status === 'signed-out') router.replace(`/signin/${window.location.search}`);
-    else if (session.status === 'no-profile') setPhase('details');
+    else if (session.status === 'no-profile') {
+      // A sign-in that asked to be a case manager (D-568) is not a new member: it goes to where its
+      // request stands, never to setting up a member's account.
+      void myStaffRequest().then((asked) => {
+        if (asked?.wantsRole === 'admin') router.replace('/join/case-manager/');
+        else setPhase('details');
+      });
+    }
     else if (session.status === 'signed-in') {
       // Finished already: there is nothing here for them. Otherwise pick up at
       // step 3, as whatever the account says they are.

@@ -40,6 +40,7 @@ export type FieldPurpose =
   | 'name'
   | 'lastName'
   | 'city'
+  | 'organization'
   | 'email'
   | 'theirEmail';
 
@@ -90,6 +91,8 @@ const PURPOSES: Record<FieldPurpose, Record<string, string>> = {
    * suggestion and spelling "Philadelphia" on a cracked keyboard.
    */
   city: { autoComplete: 'address-level2', htmlName: 'city', name: 'city' },
+  /** Where somebody works (D-568, a case manager asking from the website): the autofill token for it. */
+  organization: { autoComplete: 'organization', htmlName: 'organization', name: 'organization' },
   /** An email address: the @ keyboard, no capital first letter, no spellcheck. */
   email: {
     type: 'email',

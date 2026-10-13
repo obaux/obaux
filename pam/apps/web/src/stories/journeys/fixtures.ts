@@ -212,7 +212,17 @@ export const DIRECTORY_PEOPLE = [
 
 /** Two people waiting for a super admin's decision on /requests/; Andre described his program. */
 export const STAFF_REQUESTS = [
-  { user_id: 'r-1', wants_role: 'admin', first_name: 'Priya', last_name: 'Nair', city: 'Philadelphia', created_at: hoursAgo(5) },
+  {
+    user_id: 'r-1',
+    wants_role: 'admin',
+    first_name: 'Priya',
+    last_name: 'Nair',
+    city: 'Philadelphia',
+    // Asked from the website (D-568): where she works, and a work email only the super admin reads.
+    organization: 'Northside Reentry Center',
+    work_email: 'priya.nair@example.org',
+    created_at: hoursAgo(5),
+  },
   {
     user_id: 'r-2',
     wants_role: 'provider',

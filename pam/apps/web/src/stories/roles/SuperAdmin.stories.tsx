@@ -25,6 +25,8 @@ export const Everyone: Story = screen('super-admin', 'Everyone', '/directory/');
 export const AnswerByText: Story = screen('super-admin', 'Answer a help request by text', '/reply/', { to: '+12155550142' });
 export const Requests: Story = screen('super-admin', 'Staff requests', '/requests/');
 export const RequestReview: Story = screen('super-admin', 'A request to review', '/requests/review/', { id: 'r-2' });
+/** A case manager who asked from the website (D-568): where they work and their work email. */
+export const RequestReviewCaseManager: Story = screen('super-admin', 'A case manager\'s request', '/requests/review/', { id: 'r-1' });
 // The programs leaders have sent for Pam to check (D-386, part 6).
 export const ProgramsToCheck: Story = screen('super-admin', 'Programs to check', '/programs/review/');
 export const ProgramToCheckNew: Story = screen('super-admin', 'A new program to check (waiting four days)', '/programs/review/item/', { id: 'check-1' });

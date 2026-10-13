@@ -155,6 +155,8 @@ export const Privacy: Story = screen('member', 'Privacy policy', '/privacy/');
 
 // Before any of it.
 export const SignIn: Story = screen('signed-out', 'Sign in', '/signin/');
+/** The website's "Join as a case manager" (D-568): the phone is proved with a code before anything is asked. */
+export const CaseManagerRequest: Story = screen('signed-out', 'Join as a case manager', '/join/case-manager/');
 /** The code step after a code that did not work (D-510): a small alert under the boxes, no Call. */
 export const SignInWrongCode: Story = screen('member', 'Sign in — wrong code', '/prototype/signin/', { wrong: '1' });
 // Sign up, step by step, is below (D-319); the whole walk, from the phone, here.

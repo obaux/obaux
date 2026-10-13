@@ -144,6 +144,7 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
             description: [
               t(`requests.wants.${row.wantsRole}`),
               ...(row.city ? [t('requests.city', { city: row.city })] : []),
+              ...(row.organization ? [row.organization] : []),
               t('requests.requestedOn', { when: requestedWhen(row.createdAt, locale) }),
             ].join(' · '),
             href: `/requests/review/?id=${encodeURIComponent(row.userId)}`,

@@ -39,6 +39,7 @@ import PlacePolicyPage from '../../app/place/policies/view/page';
 import ProgramServicePage from '../../app/program/service/page';
 import { PrototypeRequestProgram } from './PrototypeRequestProgram';
 import { PrototypeRequestReview } from './PrototypeRequestReview';
+import { CaseManagerRequestScreen } from '../../screens/CaseManagerRequestScreen';
 import { PrototypeProgramReview } from './PrototypeProgramReview';
 import { ProgramsToCheckScreen } from '../../screens/ProgramsToCheckScreen';
 import { InvitesLogScreen } from '../../screens/InvitesLogScreen';
@@ -89,6 +90,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   // /signin/ — About Pam's "Sign in as…", Back from a policy, an expired
   // link's "Sign in" — lands on a Sign in that works here (D-259).
   '/signin/': screen(() => <PrototypeSignIn />),
+  '/join/case-manager/': screen(() => <CaseManagerRequestScreen />),
   // Where each role's prototype starts (D-253): Sign in, the code, Home.
   // Joining is the Onboarding stories' own route.
   '/prototype/signin/': screen(() => <PrototypeSignIn />),

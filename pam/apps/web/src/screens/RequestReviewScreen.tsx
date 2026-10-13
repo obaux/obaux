@@ -145,6 +145,9 @@ export function RequestReviewScreen({ userId }: { readonly userId: string | null
         {row.city ? `${t('requests.city', { city: row.city })} · ` : ''}
         {t('requests.requestedOn', { when: askedOn(row.createdAt, locale) })}
       </Text>
+      {/* What a case manager who asked from the website told us about their work (D-568). */}
+      {row.organization ? <Text xstyle={styles.facts}>{t('requests.organization', { organization: row.organization })}</Text> : null}
+      {row.workEmail ? <Text xstyle={styles.facts}>{t('requests.workEmail', { email: row.workEmail })}</Text> : null}
 
       {regions.length > 1 ? (
         <Card padding={6} xstyle={styles.card}>

@@ -928,6 +928,17 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Accounts & invites · a case manager asks to join from the website; refused and unanswered requests are deleted (13 October) — READY
+
+`claude/pam-case-manager-request` (D-568, migration 20261013203725, test 73). `/join/case-manager/` (Wren's website
+button points here): the phone and code first, then name, city, where they work and a work email
+(`request_case_manager_access`; no profile is made; an account is told to contact Pam). It is an ordinary staff request:
+the bell, Requests (now with "Works at" and "Work email") and the existing approve/deny texts. On approval the email
+moves to `profile_emails`. Join sends a sign-in with a case manager request to it, never into member setup.
+`purge_staff_requests` (nightly 03:55): refused after 30 days, unanswered after 90 (`staff_request_rules`), with the
+bell rows, any "no" text to the phone, and the sign-in only when it has no profile; approved rows never. Waiting on:
+Sage (23 strings), Lena (six languages), the merge desk's auth.users check (shared with D-567), then apply.
+
 ## Accounts & invites · Join Pam (W6), language dropdown, code behind a question (13 October) — live in b32
 
 `claude/pam-join-first-time-wording` (D-563, with Dot's D-561 and D-564 merged in). From an invite, Sign in
