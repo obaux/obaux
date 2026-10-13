@@ -2038,10 +2038,10 @@ test.describe('reported places (D-189)', () => {
     await signedInAs(page, 'admin');
     await page.route('**/rest/v1/rpc/services_near*', (route) => route.fulfill(json([])));
     await page.route('**/rest/v1/rpc/flagged_services*', (route) => route.fulfill(json([])));
-    await page.goto('/places/?filter=reported');
+    await page.goto('/places/reported/');
     await settled(page);
 
-    await expect(page.getByRole('button', { name: 'Reported' })).toHaveAttribute('aria-pressed', 'true');
+    // (The old list's pressed "Reported" chip is gone with that list; this screen is the list.)
     await expect(page.getByRole('heading', { name: 'Example Workforce Center' })).toBeVisible();
     await expect(page.getByText(/Something here is wrong/)).toBeVisible();
     // resolve_service_flag() refuses anyone but a super admin (0036), so no buttons are drawn.

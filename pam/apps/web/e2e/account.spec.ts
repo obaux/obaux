@@ -79,7 +79,7 @@ test.describe('the way out', () => {
     // The account button in the old header is the bar's Profile tab now (D-217, D-456): the same link,
     // in the same place, under every tab screen. Points left this list at D-217: it is a nested screen,
     // reached from Profile, with no bar.
-    for (const path of ['/', '/saved/', '/messages/', '/places/']) {
+    for (const path of ['/', '/saved/', '/messages/']) {
       await page.goto(path);
       const tab = page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: /Profile/ });
       await expect(tab, `${path} has no Profile tab`).toBeVisible();

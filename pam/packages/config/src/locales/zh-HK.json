@@ -1648,5 +1648,6 @@
   "legal.sources.link": "查看原始資料",
   "legal.sources.licence": "授權條款：CC BY 4.0",
   "places.areaHint.street": "例如19107、Fishtown，或 Broad 和 Girard 路口。",
-  "places.areaLabel.street": "ZIP 郵遞區號、社區或地址"
+  "places.areaLabel.street": "ZIP 郵遞區號、社區或地址",
+  "nav.back.reported": "Back to Reported places"
 }
