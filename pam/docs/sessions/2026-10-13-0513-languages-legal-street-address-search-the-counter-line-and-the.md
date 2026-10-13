@@ -1,13 +1,13 @@
 # 2026-10-13 — languages-legal street-address search, the counter line and the pins
 
-**Branches:** `claude/lena-street-search-guard` (live in b26), `claude/lena-street-search-line` (p7, this one), `claude/lena-street-search-pins`, `claude/lena-privacy-counter` (held), `claude/lena-counter-pins` · **Lane:** Languages & legal (Lena)
+**Branches:** `claude/lena-street-search-guard` (live in b26), `claude/lena-street-search-line` (p7, this one), `claude/lena-street-search-pins`, `claude/lena-privacy-counter` and `claude/lena-counter-pins` (both live in b29) · **Lane:** Languages & legal (Lena)
 
 ## What changed
 
 - **Street-address search (Piper a74, D-552).** The host guard names `places.googleapis.com` and `places-search` (arriving a74); `test/street-search-line.test.ts` reads a function's source and holds it to the four things Privacy promises (typed words in a POST body, no log of them, only the listed headers and host and nothing about the member, nothing stored), tried on a right sample and thirteen wrong ones, and on Piper's real `places-search` once it was pushed (she adapted it to read `handler.ts` too and to accept the auth check). I tightened it to inspect every `fetch` but the member's own sign-in check, and added a source pin that a Google pick is kept nowhere on the phone (`saveOrigin`, `loadOrigin`, no storage in the street-search code, nothing else touches `pam.origin`). `privacy.s.sharing.p7` is Sage's six sentences, signed by Will 13 October 05:02 (card a81), in seven languages; the English is checked equal to the ledger. `docs/before-launch.md`: no `GOOGLE_MAPS_SERVER_KEY` until p7 is live in seven languages; the Google Maps Platform terms are unread.
-- **The counter line (a76, D-555).** `privacy.s.what-we-keep.p13`, signed by Will 13 October 04:24 UTC, translated, held on `claude/lena-privacy-counter` until Nico's counter merges. DB test 71 and `screen-opens-counter.test.ts` (on top of Nico's branch) hold the counter to its line from both ends.
+- **The counter line (a76, D-555).** `privacy.s.what-we-keep.p13`, signed by Will 13 October 04:24 UTC, translated, held until Nico's counter merged; live in b29 (13 October) with the pins. DB test 71 and `screen-opens-counter.test.ts` (on top of Nico's branch) hold the counter to its line from both ends.
 - **Two street strings for Piper** (`places.areaHint.street`, `places.areaLabel.street`): six translations each.
-- **The "Last updated" date** (`claude/lena-legal-date`, in b26): the fingerprint moves when p7 and p13 ship, so `legal:date privacy 2026-10-13` was re-run here.
+- **The "Last updated" date** (`claude/lena-legal-date`, in b26): the fingerprint moves when p7 and p13 ship, so `legal:date privacy 2026-10-13` was re-run here, and again after b29 put p13 on main (the one conflict, in `legal-updated.json`, as predicted). It must be run once more, with the ship day, when p7 goes in.
 
 ## What was wrong, and what missed it
 
@@ -28,7 +28,6 @@ Config on this branch: 48 files, 1251 passed, 2 skipped; `copy:status` in step; 
 ## Left undone
 
 - The key (Will, only after p7 is live in seven languages) and the Google Maps Platform terms read.
-- The counter line waits for the counter to merge; then `legal:date privacy <day>` once more.
 - The Google Calendar lines (a71) wait for Will; they renumber to `sharing.p8` and `what-we-keep.p14`.
 - Native readers for every translation.
 

@@ -28,13 +28,27 @@ export const HOME = {
   },
   band: {
     label: 'Who is Pam for?',
-    chips: [
-      { label: 'Residents', href: '/support/#topic-members' },
-      { label: 'Program Providers', href: '/support/#topic-programs' },
-      { label: 'Case managers', href: '/support/#topic-case-managers' },
+    // The green card is a switcher (Will, 12 October, Figma "Callout card" 18:517): each name shows its own picture and line.
+    views: [
+      {
+        id: 'residents',
+        label: 'Residents',
+        line: 'Find help, plan your visit, and talk to a real person.',
+        alt: 'An isometric picture of Philadelphia with City Hall at the centre and map pins on the buildings.',
+      },
+      {
+        id: 'providers',
+        label: 'Program Providers',
+        line: 'Your policies, signed before they arrive. Check in and go!',
+        alt: 'A person walks through the warm, lit doorway of a city building.',
+      },
+      {
+        id: 'managers',
+        label: 'Case managers',
+        line: 'Their plans, your guidance, in one place.',
+        alt: 'A smiling person with a duffel bag looks at a phone in a bright community room.',
+      },
     ],
-    line: 'Find help, plan your visit, and talk to a real person.',
-    alt: 'An isometric picture of Philadelphia with City Hall at the centre and map pins on the buildings.',
   },
   rows: [
     {
@@ -50,7 +64,7 @@ export const HOME = {
       id: 'programs',
       head: 'Your services, built around people.',
       body: 'Residents find your program and plan a visit. They sign your policies before they visit, and you see who’s coming on your calendar.',
-      cta: { label: 'Add your program', href: 'app' },
+      cta: { label: 'Add your program', href: 'add-program' },
       image: 'calendar',
       alt: 'A program lead’s calendar in Pam: the week by day, with each person who is coming and a check-in button.',
     },
@@ -76,7 +90,7 @@ export const HOME = {
       cta: { label: 'Go to Support', href: '/support/' },
     },
   ],
-  nav: { support: 'Get help', signIn: 'Sign in' },
+  nav: { support: 'Support', signIn: 'Sign in' },
   footer: {
     links: ['Support', 'About Pam', 'Privacy', 'Terms', 'Contact'],
     copyright: '© 2026 Pam. All rights reserved.',

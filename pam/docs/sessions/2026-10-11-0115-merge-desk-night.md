@@ -470,6 +470,79 @@
   client grants; the five functions are definer with search_path public, extensions, and match the file line for line
   (only the indentation was lost in the paste); anon executes none, authenticated the four member ones,
   calendar_feed_read the service role only; 20261011161548 recorded. The link ships in b28.
+- **Batch b28 (13 October).** Piper's calendar link (D-538): a member makes a private link in Profile > Calendar, adds
+  it to Apple, Google or Outlook, and their Pam visits appear there (discreet by default: "Pam visit" and a time). The
+  "English until Will signs" allow-list for the 29 calendar lines is gone (all translated and signed; b22 lesson). The
+  merge desk fixed one bug before deploy: `escapeText` wrote `'\;'`, which in JavaScript is just `;`, so semicolons in a
+  place name or address reached calendar apps unescaped; the test had the same slip and passed. Both now say `'\\;'`.
+  The `calendar-feed` function is live as v1 with JWT verification off (the address is the key); the deployed files
+  equal the merged ones. The website's "Add your program" goes to Sign in and then straight to Add my program (S1),
+  from Wren's patch with its comment corrected (it cited D-554, Dot's carousel decision). Dot's motion story and
+  decision for the green card (D-556; the card itself waits for Will on a80). Iris's b27 re-test: W1, W4 and S1 pass;
+  she found W5 (a missed or unmarked visit listed under "Programs attended in the past", live) and W6 (a stored
+  `next` fires later for a member never asked about reminders), both with Piper, W5 first.
+- **The a76 counter's migration is live** as 20261013051051 (Nico's file 20261013042956): table day, screen, count; RLS
+  forced; select-false policy; no client grants; both function bodies md5-equal to the file; anon executes neither,
+  authenticated only `count_screen_open`, the service role `screen_opens_weekly`. Nothing counts until the app ships in
+  b29 with Lena's Privacy line.
+- **Will's decisions, 13 October** (his words, the time in UTC, who builds it, and where it ends up recorded; written
+  down the same hour from now on, not at batch time; Will, about 06:02: "ensure all these decisions are being documented"):
+  - **03:21, a77 (website on phones):** "take off the arrows but let's add a progress translucent effect behind chips
+    because they should automatically switch from one to the next. If the user taps on one, it pauses the progress.
+    Everything else looks good." Wren built it with Dot's fill (D-553); held on card a80.
+  - **03:23, a78:** "go ahead and push it live and have our UX testing team do a run-through". Ava's rule needs his
+    words in her own session; he typed there at 05:40 ("Ask Mira if you can push this branch. w6 is approved by
+    me"). Mira said yes to both branches (Connect only on examples; super admin without the switcher) and to W6.
+  - **04:22, a80:** smoother transitions between the green card's slides; is the card shaking? Measured: the real card
+    does not move (840 frames, no layout shift); the jumps were stills taken during the recording. Dot's motion
+    (D-556), built by Wren.
+  - **04:24, a76:** "signed": the screen-count Privacy line (Sage's ledger, bfa5dcd3). Nico built the counter (D-555);
+    the Privacy line ships with it in b29, never before.
+  - **04:48 (terminal) and 04:58, a79:** the calendar migration pasted and "Done". The editor's "destructive
+    operations" warning was explained and is on the card for next time.
+  - **04:59, Control Room:** a tick box to cross off reviewed items. Built (Control Room v22): ticked cards fold into
+    "Reviewed", leave the counts, and come back if the card changes; saved on the card, so on every device.
+  - **05:02, a81:** "Signed" (street search Privacy line p7; Sage's ledger), and "center align powered by google text,
+    and text under it 'Pam remembers...'". Dot centred the mark (D-557, 167b0998); Piper folds it in.
+  - **05:44, a80:** "Approve the transition, but … just say 'Play Card' or 'Pause card' instead of 'Pause/Play who
+    Pam is'. The new label live is not intuitive." The pill becomes "Pause card" / "Play card" (sentence case; the
+    spoken name the same). Wren builds; Sage records his words. The phone layout and green card then ship.
+  - **05:45, a81:** "when the new address is selected, we only show the zipcode in the button to save space on main
+    screen (Explore)". Piper: the ZIP comes from the address Google already returns; nothing new goes to Google; the
+    pick is still never saved.
+  - **05:47, Control Room:** tapping a card's title opens or closes it; Reply a secondary button. Built (v23).
+  - **06:00 (terminal, with screenshots), sign-up:** (1) the step counter inside the footer button ("1 of 3"): no darker
+    background, smaller and more subtle, centred with the button text (Dot, BigButton `badge`); (2) the language chips
+    on Join go back to a dropdown (Ava builds, Dot the look); (3) the invite code hidden behind "Did someone invite you
+    via code?" with a link that shows the field (Ava; Sage records his words and proposes link text that says what it
+    does instead of "click here"). Pictures go to Will before any of it ships (the D-499 lesson).
+  - **About 06:02 (terminal):** every decision documented in the repository's records. This list; the rule is now in
+    `docs/control-room.md` ("How Mira keeps it current").
+  - **06:09, a62 (help form switched on and tested, "Email came through"):** the form counted one request at 06:04
+    (count and time only read). His notes: (1) ask on the form whether the person is a member, a program, a case
+    manager (choose all that apply; Sage words it, Wren builds, Nico carries it into the email as `roles`, nothing
+    stored); (2) "The help form shouldn't be directly on the page … just a call out, clicking it opens the help form"
+    (Dot picks dialog or own page, Wren builds); (3) "formatted properly … Text is small" (site body size, labels above
+    fields); (4) dark mode: help desk link text "very light lime green / off white", icons stay lime (Dot, a site
+    token, contrast checked). Pictures to Will before it ships.
+  - **06:06, Sage's proposal for the Join code question** (put to Will in the terminal): "Did someone invite you with a
+    code?" and a link "Enter your code" instead of "click here"; his own words stand unless he picks hers.
+  - **Who they are, in the help email (decided 06:16, final):** Nico's `roles` (e11fd110, D-559): only member,
+    program and case manager, a fixed order, "Says they are: …" under From, nothing kept. It ships in the next batch
+    and the merge desk redeploys `help-request`. The site sends `roles`, not the free-text `role`. **Lesson:** I asked
+    Nico for it at 06:10, cancelled at 06:13 when Wren found the free-text field, and took it back at 06:15 when his
+    finished build arrived: three messages in five minutes, the same mistake as the 11 October "I'm here" turns.
+    The rule stands: once a decision is sent, wait for the builder's next message before changing it.
+- **Batch b29 (13 October).** No migration in the batch (the counter's went live at 05:10 as 20261013051051).
+  Nico: a member's phone counts opening Your points and Profile once a day (a76, D-555), with Lena's pins (DB test 71
+  and the phone's half) and her signed Privacy line `privacy.s.what-we-keep.p13` in seven languages, shipped together
+  (Ava reviewed the Profile call: right); Explore's bell holds its place, so the page no longer moves when it arrives
+  (W3). Wren: the website on phones from Will's Figma and the moving green card (a77, a80; D-550, D-553, D-556), the
+  pill reading "Pause card" / "Play card" (Will's words). Nico: the help email says who wrote in (`roles`, D-559);
+  `help-request` is redeployed after the push. Dot's nightly flow map. Not in it: Piper's W5 fix (next batch).
+- **Pushing records to main right after a batch cancelled the batch's accessibility run** (b28, 05:59): CI runs one
+  at a time per branch and a newer push cancels the older run. The newer run passed on the same code, but from now on
+  records wait until a batch's checks have finished.
 
 ## What was wrong, and what missed it
 
@@ -666,6 +739,16 @@
 | b26 on main (d8b7d37f): GitHub checks / Vercel | 4 of 4 green (accessibility 04:45) / web and pam-site READY |
 | Batch b27 (9025244b): db / config / ui / web unit / site / e2e full / storybook / site checks | 1498 ok / 1246 / 124 / 144 / 94 / 1694 passed, 19 skipped, 0 flaky / builds, 13.8 kB spare / 120 scans 0, clear, 306 links 0 |
 | Calendar migration 20261011161548 after Will's paste | table + RLS forced + 0 rows + select-false policy + no client grants; 5 bodies equal to the file ignoring indentation; grants as designed; recorded |
+| b27 on main (2991f703): GitHub checks / Vercel | 4 of 4 green (accessibility 05:34) / web and pam-site READY |
+| Batch b28 (7fb4853b): db / config / ui / web unit / site / e2e full / storybook / site checks | 1524 ok / 1261 / 124 / 148 / 95 / 1712 passed, 19 skipped, 0 flaky / builds, 13.2 kB spare / 120 scans 0, clear, 306 links 0 |
+| b28 calendar lines (29 keys) without the allow-list | copy test passes; translated in six languages, none equal to English; signed (ledger row 55 short names) |
+| calendar-feed escape fix (08b37d81) | calendar-feed.test.ts 15 passed with the corrected expectation; the old code returns 'a;b' |
+| calendar-feed edge function | v1 ACTIVE, verify_jwt false; get_edge_function returns the three merged files unchanged (live probe blocked: the sandbox cannot reach supabase.co) |
+| Counter migration 20261013051051 | table, RLS forced, 0 rows, columns day/screen/count, select-false policy, no client grants; bodies md5-equal; grants as designed |
+| b28 on main: 07cfaa71 run / 6d4697d5 run (same code plus records) | accessibility cancelled by the newer push / 4 of 4 green (06:30); Vercel READY |
+| Batch b29 (746951c1): db / config / ui / web unit / site / e2e full / storybook / site checks | 1579 ok (tests 70, 71) / 1277 / 124 / 156 / 95 / 1739 passed, 19 skipped, 0 flaky / builds, 12.6 kB spare / 120 scans 0, clear, 306 links 0 |
+| b29 + Wren 6bdea176 + Nico e11fd110 (9ef51cc8): site tsc / tests / build / a11y / usability / scrollspy / config / web tsc | 0 / 95 / 0 / 120 scans 0 / clear / 306 links 0 / 1285 / 0 |
+| b29 English: privacy.s.what-we-keep.p13 | Will's a76 words (straight quotes made curly); six translations, none equal to English; ledger row a76 |
 | Calendar migration 20261011161548 via the connector | timed out; table, functions and record all absent afterwards; no locks or running queries |
 | Batch b24 (0a36ada1): web/site tsc / web unit / site tests / config / site build / a11y / usability / scrollspy / storybook | 0 / 0 / 139 / 94 / 1176 / 0 / 120 scans 0 / clear / 306 links 0 / builds (no app code: e2e not rerun) |
 | Live help_request_allowed after Will's paste (a62) | definer; search_path public, extensions; anon and authenticated cannot execute, service_role can; same logic as the file (md5 differs: indentation and one comment); help_request_attempts RLS forced, no client grants, 0 rows |

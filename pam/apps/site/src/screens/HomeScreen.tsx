@@ -4,6 +4,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { EducationIcon, FamilyServicesIcon, WorkforceIcon } from '@pam/ui/icons';
+import { BandViews } from '../components/BandViews';
 import { FlipCarousel } from '../components/FlipCarousel';
 import { LegalLink } from '../components/LegalLink';
 import { PhonePanel } from '../components/PhonePanel';
@@ -12,7 +13,7 @@ import { SoftButton } from '../components/SoftButton';
 import { WebFrame } from '../components/WebFrame';
 import { VISIT_REMINDERS_LIVE } from '../content/flags';
 import { HOME } from '../content/home-copy';
-import { APP_URL } from '../lib/links';
+import { ADD_PROGRAM_URL, APP_URL } from '../lib/links';
 import { website } from '../lib/website.stylex';
 import { type } from '../lib/website-type.stylex';
 
@@ -41,65 +42,20 @@ const styles = stylex.create({
     color: website['--website-text-secondary'],
     fontFamily: 'var(--font-family-body)',
     fontWeight: 400,
-    fontSize: { default: '20px', '@media (min-width: 900px)': '26px' },
-    lineHeight: { default: '30px', '@media (min-width: 900px)': '37px' },
+    fontSize: { default: '17px', '@media (min-width: 900px)': '26px' },
+    lineHeight: { default: '24px', '@media (min-width: 900px)': '37px' },
     margin: 0,
   },
-  // The deep green band: the picture and "Who is Pam for?".
-  band: {
-    display: 'grid',
-    overflow: 'hidden',
-    borderRadius: { default: '28px', '@media (min-width: 900px)': '40px' },
-    backgroundColor: website['--website-surface-brand-deep'],
-    color: website['--website-text-on-brand-deep'],
-    gridTemplateColumns: { default: 'minmax(0, 1fr)', '@media (min-width: 900px)': 'minmax(0, 1fr) minmax(0, 1fr)' },
-    minHeight: { default: 'auto', '@media (min-width: 900px)': '400px' },
-  },
-  bandPicture: {
-    display: 'block',
-    width: '100%',
-    height: '100%',
-    minHeight: { default: '220px', '@media (min-width: 900px)': '400px' },
-    objectFit: 'cover',
-  },
-  bandText: {
-    justifyContent: 'space-between',
-    gap: '32px',
-    boxSizing: 'border-box',
-    padding: { default: '32px 24px', '@media (min-width: 900px)': '48px 48px 48px 60px' },
-  },
-  bandLabel: { color: website['--website-text-on-brand-deep'] },
   chips: { flexWrap: 'wrap', gap: '12px' },
-  chip: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    minHeight: '48px',
-    boxSizing: 'border-box',
-    paddingInline: '17px',
-    borderRadius: '24px',
-    borderWidth: '1.8px',
-    borderStyle: 'solid',
-    borderColor: website['--website-border-green'],
-    color: website['--website-text-on-brand-deep'],
-    textDecorationLine: 'none',
-    transitionProperty: 'transform, background-color',
-    transitionDuration: '125ms',
-    transitionTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)',
-    ':hover': { transform: 'translateY(-2px)' },
-    ':active': { transform: 'scale(0.97)' },
-  },
-  chipOn: { backgroundColor: website['--website-surface-green'], color: website['--website-text-primary'] },
-  bandLine: { color: website['--website-text-on-brand-deep'], margin: 0 },
   // A feature row: words and a phone panel, swapped on alternate rows.
   row: {
     display: 'grid',
     alignItems: 'center',
-    gap: { default: '24px', '@media (min-width: 900px)': '60px' },
-    paddingBlock: '48px',
+    gap: { default: '20px', '@media (min-width: 900px)': '60px' },
+    paddingBlock: { default: '24px', '@media (min-width: 900px)': '48px' },
     gridTemplateColumns: { default: 'minmax(0, 1fr)', '@media (min-width: 900px)': 'minmax(0, 1fr) minmax(0, 1fr)' },
   },
-  rowText: { gap: '24px', justifyContent: 'space-between', paddingInline: { default: '0px', '@media (min-width: 900px)': '24px' } },
+  rowText: { gap: { default: '20px', '@media (min-width: 900px)': '24px' }, justifyContent: 'space-between', paddingInline: '24px', paddingBlockStart: { default: '24px', '@media (min-width: 900px)': '0px' } },
   rowFlip: { order: { default: 0, '@media (min-width: 900px)': 2 } },
   head: {
     color: website['--website-text-primary'],
@@ -110,7 +66,7 @@ const styles = stylex.create({
     letterSpacing: '-1px',
     margin: 0,
   },
-  body: { color: website['--website-text-secondary'], maxWidth: '400px', margin: 0 },
+  body: { color: website['--website-text-secondary'], maxWidth: { default: '460px', '@media (min-width: 900px)': '400px' }, margin: 0 },
   smallChip: {
     display: 'inline-flex',
     alignItems: 'center',
@@ -129,24 +85,36 @@ const styles = stylex.create({
   callouts: {
     display: 'grid',
     gap: '32px',
-    padding: '32px',
+    padding: { default: '32px 24px', '@media (min-width: 900px)': '32px' },
     boxSizing: 'border-box',
     borderRadius: '24px',
     backgroundColor: website['--website-surface-muted'],
     gridTemplateColumns: { default: 'minmax(0, 1fr)', '@media (min-width: 900px)': 'minmax(0, 1fr) minmax(0, 1fr)' },
   },
-  callout: { gap: '12px', alignItems: 'center', textAlign: 'center' },
+  callout: { gap: { default: '18px', '@media (min-width: 900px)': '12px' }, alignItems: 'center', textAlign: 'center' },
   eyebrow: { color: website['--website-text-muted-strong'], textTransform: 'uppercase', margin: 0 },
-  calloutText: { color: website['--website-text-primary'], margin: 0, maxWidth: '520px' },
+  // Bold 17/24 on a phone (Figma "Heading/Small 17"), 20/30 from 900px.
+  calloutText: {
+    color: website['--website-text-primary'],
+    margin: 0,
+    maxWidth: '520px',
+    fontFamily: 'var(--font-family-body)',
+    fontWeight: { default: 700, '@media (min-width: 900px)': 400 },
+    fontSize: { default: '17px', '@media (min-width: 900px)': '20px' },
+    lineHeight: { default: '24px', '@media (min-width: 900px)': '30px' },
+  },
   divided: {
     borderBlockStartWidth: { default: '1px', '@media (min-width: 900px)': '0px' },
     borderInlineStartWidth: { default: '0px', '@media (min-width: 900px)': '1px' },
-    borderStyle: 'dashed',
+    // A plain 1px rule on a phone (Figma), dashed beside the other half from 900px.
+    borderStyle: { default: 'solid', '@media (min-width: 900px)': 'dashed' },
     borderColor: website['--website-border-strong'],
     paddingBlockStart: { default: '32px', '@media (min-width: 900px)': '0px' },
     paddingInlineStart: { default: '0px', '@media (min-width: 900px)': '32px' },
   },
-  gap: { height: '48px' },
+  // Phone: the callouts sit 48px under the last card and 120px above the footer's edge (Figma).
+  calloutsFrame: { marginBlockStart: { default: '24px', '@media (min-width: 900px)': '0px' } },
+  gap: { height: { default: '120px', '@media (min-width: 900px)': '48px' } },
 });
 
 const CAROUSEL = [
@@ -189,42 +157,14 @@ export function HomeScreen(_props: { readonly showAbout?: boolean } = {}) {
         </div>
       </WebFrame>
 
-      <WebFrame>
+      <WebFrame edge="card">
         <Reveal>
-          <div {...stylex.props(styles.band)}>
-            <img
-              src="/home/philly-1600.webp"
-              srcSet="/home/philly-900.webp 900w, /home/philly-1600.webp 1600w"
-              sizes="(min-width: 900px) 630px, 100vw"
-              width={2048}
-              height={1494}
-              alt={HOME.band.alt}
-              loading="lazy"
-              decoding="async"
-              {...stylex.props(styles.bandPicture)}
-            />
-            <VStack xstyle={styles.bandText}>
-              <VStack gap={4}>
-                <Text xstyle={[type.label_large, styles.bandLabel]}>{HOME.band.label}</Text>
-                <HStack xstyle={styles.chips}>
-                  {HOME.band.chips.map((chip, i) => (
-                    <a key={chip.label} href={chip.href} {...stylex.props(type.label_chip, styles.chip, i === 0 && styles.chipOn)}>
-                      {chip.label}
-                      <span aria-hidden="true">↗</span>
-                    </a>
-                  ))}
-                </HStack>
-              </VStack>
-              <Heading level={2} xstyle={[type.heading_band, styles.bandLine]}>
-                {HOME.band.line}
-              </Heading>
-            </VStack>
-          </div>
+          <BandViews />
         </Reveal>
       </WebFrame>
 
       {HOME.rows.map((row, i) => (
-        <WebFrame key={row.id}>
+        <WebFrame key={row.id} edge="card">
           <Reveal>
             <div {...stylex.props(styles.row)}>
               <VStack xstyle={styles.rowText}>
@@ -248,7 +188,7 @@ export function HomeScreen(_props: { readonly showAbout?: boolean } = {}) {
                   {row.body}
                 </Text>
                 <HStack>
-                  <SoftButton label={row.cta.label} href={row.cta.href === 'app' ? `${APP_URL}/` : row.cta.href} />
+                  <SoftButton label={row.cta.label} href={row.cta.href === 'app' ? `${APP_URL}/` : row.cta.href === 'add-program' ? ADD_PROGRAM_URL : row.cta.href} pill />
                 </HStack>
               </VStack>
               <div {...stylex.props(i % 2 === 0 ? undefined : styles.rowFlip)}>
@@ -259,19 +199,19 @@ export function HomeScreen(_props: { readonly showAbout?: boolean } = {}) {
         </WebFrame>
       ))}
 
-      <WebFrame>
+      <WebFrame edge="card">
         <Reveal>
-          <div {...stylex.props(styles.callouts)}>
+          <div {...stylex.props(styles.calloutsFrame, styles.callouts)}>
             {HOME.callouts.map((callout, i) => (
               <VStack key={callout.eyebrow} xstyle={[styles.callout, i === 1 && styles.divided]}>
                 <Text xstyle={[type.eyebrow_13, styles.eyebrow]}>{callout.eyebrow}</Text>
-                <Text as="p" xstyle={[type.lead_large20, styles.calloutText]}>
+                <Text as="p" xstyle={[styles.calloutText]}>
                   {callout.text}
                 </Text>
                 {callout.cta.href === 'privacy' ? (
                   <LegalLink kind="privacy" label={callout.cta.label} variant="soft" />
                 ) : (
-                  <SoftButton label={callout.cta.label} href={callout.cta.href} />
+                  <SoftButton label={callout.cta.label} href={callout.cta.href} compact />
                 )}
               </VStack>
             ))}

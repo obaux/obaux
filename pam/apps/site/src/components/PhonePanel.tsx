@@ -16,7 +16,7 @@ const styles = stylex.create({
     width: '100%',
     height: '400px',
     boxSizing: 'border-box',
-    borderRadius: '40px',
+    borderRadius: { default: '24px', '@media (min-width: 900px)': '40px' },
     backgroundColor: website['--website-surface-muted'],
   },
   phone: {
