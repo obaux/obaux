@@ -518,6 +518,15 @@
     does instead of "click here"). Pictures go to Will before any of it ships (the D-499 lesson).
   - **About 06:02 (terminal):** every decision documented in the repository's records. This list; the rule is now in
     `docs/control-room.md` ("How Mira keeps it current").
+  - **06:09, a62 (help form switched on and tested, "Email came through"):** the form counted one request at 06:04
+    (count and time only read). His notes: (1) ask on the form whether the person is a member, a program, a case
+    manager (choose all that apply; Sage words it, Wren builds, Nico carries it into the email as `roles`, nothing
+    stored); (2) "The help form shouldn't be directly on the page … just a call out, clicking it opens the help form"
+    (Dot picks dialog or own page, Wren builds); (3) "formatted properly … Text is small" (site body size, labels above
+    fields); (4) dark mode: help desk link text "very light lime green / off white", icons stay lime (Dot, a site
+    token, contrast checked). Pictures to Will before it ships.
+  - **06:06, Sage's proposal for the Join code question** (put to Will in the terminal): "Did someone invite you with a
+    code?" and a link "Enter your code" instead of "click here"; his own words stand unless he picks hers.
 
 ## What was wrong, and what missed it
 
