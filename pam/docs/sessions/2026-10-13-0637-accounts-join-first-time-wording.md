@@ -40,13 +40,24 @@ asks (06:00 UTC, with screenshots): bring back the language dropdown, and hide t
 |---|---|
 | `tsc` (web) | clean |
 | `@pam/web` build | builds |
-| Playwright join, account, consent, signin-short (320, dark-320, iPhone SE) | 189 passed, 6 failed: the 320×568 invited English case above |
+| Playwright join, account, consent, signin-short (320, dark-320, iPhone SE), after Dot's merge | 210 passed, 6 failed: the 320×568 invited English case above |
 | `copy:status` | 6 per language for Lena: `signin.invited.*` stale, `signin.title.invited`, `join.code.question`, `join.code.reveal` missing; the unit test fails on the same list until she answers |
 | Screenshots at 390px | before/after of Join › About you (closed and open) and Sign in from an invite, for Will's card |
 
-- **Later, 06:40:** Sage's words for the code (pending Will's yes): "Did someone invite you with a code?"
-  and the link "Enter your code". Dot's `LanguageField` (D-561, `claude/pam-design-button-counter`) is
-  not on `main` yet; the swap and its tag test follow when it is.
+- **Later, 06:40:** built with Sage's words for the code, then back to Will's at 06:50 (Mira: use
+  Will's until he answers; only `join.code.question` and `join.code.reveal` differ).
+- **06:50:** merged Dot's `claude/pam-design-button-counter` (eccfec15, D-561) at Mira's word and swapped
+  in `LanguageField`; the D-451/D-455 tag test now runs on the open list's rows (English and Arabic).
+- Pictures at 390px for Will: light, dark and Arabic, each closed, with the language list open and with
+  the code open; Sign in from an invite. Arabic shows the two new lines in English until Lena answers.
+
+- **06:52 (Mira):** Sage's two code strings go in as their own last commit, so it can be dropped if Will
+  keeps his words (card a82); main merged (96f27a77); the 390px before/after pictures committed in
+  `docs/design/review/2026-10-13-join/`. The 320×568 test stays as it is: the words are Will's, and Dot
+  makes the hero smaller on short screens.
+- After the merge: `pnpm -r typecheck` clean; ui 124, site 95, web 156 pass; config fails only on the
+  six keys waiting for Lena (14 tests, every one naming them); Playwright join, account, consent,
+  signin-short, a11y: 258 passed, 6 failed (320×568, waiting for Dot).
 
 ## Left undone
 
@@ -54,8 +65,7 @@ asks (06:00 UTC, with screenshots): bring back the language dropdown, and hide t
 - Sage: record Will's signature for the W6 lines and the two Join lines; propose the held fixes
   (`join.staff.body` without "a day or two", `admin.caseload.empty.body` with an invite link and a next
   step, the expired-link "Check your email" while email may be off). Not built until she signs.
-- Dot: the dropdown's look (and whether the D-451 tags come back); the reveal link's look (today it is
-  `TextLink`, with no underline).
+- Dot: the reveal link's look (today it is `TextLink`, with no underline, and reads as plain text).
 - The 320×568 overflow.
 
 ## Needs a human

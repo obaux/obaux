@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { SUPPORTED_LOCALES } from '@pam/config';
+import { LANGUAGE_TAGS, SUPPORTED_LOCALES } from '@pam/config';
 import en from '@pam/config/locales/en.json';
 import ar from '@pam/config/locales/ar.json';
 import { settled } from './settled';
@@ -143,22 +143,76 @@ test.describe('signing up', () => {
     await expect(page.getByRole('progressbar')).toHaveCount(0);
   });
 
-  for (const locale of ['en', 'ar'] as const) {
-    test(`${locale}: the language is a dropdown that lists all seven, each named in itself`, async ({ page }) => {
-      // Will, 13 October 2026: "with all these languages, let's bring back the dropdown, the chips are taking
-      // up too much space". The chips (D-451, D-455) are gone; the dropdown starts on the active language.
+  // Will, 13 October (D-560): the count in the button is quiet text, no pill, level with the label, and the label stays centred.
+  for (const locale of SUPPORTED_LOCALES) {
+    test(`${locale}: the step count is plain 12px text level with the label, and the label stays centred in the button`, async ({ page }) => {
       await page.addInitScript((code) => localStorage.setItem('pam.locale', code), locale);
       await newcomer(page);
       await page.goto('/join/');
       await expect(page.locator('html')).toHaveAttribute('lang', locale);
+      await settled(page);
+      const button = page.locator('button:has([data-count])').first();
+      await expect(button).toBeVisible();
+      const m = await button.evaluate((btn) => {
+        const box = btn.getBoundingClientRect();
+        const ghost = btn.querySelector('[data-count]') as HTMLElement;
+        const leaves = [...btn.querySelectorAll('*')].filter((e) => e.children.length === 0 && (e.textContent ?? '').trim() !== '' && e !== ghost);
+        const [count, label] = leaves as HTMLElement[];
+        const c = count!.getBoundingClientRect();
+        const l = label!.getBoundingClientRect();
+        const cs = getComputedStyle(count!);
+        const rtl = getComputedStyle(btn).direction === 'rtl';
+        return {
+          buttonCentre: box.left + box.width / 2,
+          labelCentre: l.left + l.width / 2,
+          countMid: c.top + c.height / 2,
+          labelMid: l.top + l.height / 2,
+          size: parseFloat(cs.fontSize),
+          fill: cs.backgroundColor,
+          overlap: rtl ? c.left < l.right : c.right > l.left,
+          inside: c.left >= box.left && c.right <= box.right,
+        };
+      });
+      expect(Math.abs(m.labelCentre - m.buttonCentre), 'label centred').toBeLessThanOrEqual(1.5);
+      expect(Math.abs(m.countMid - m.labelMid), 'count level with the label').toBeLessThanOrEqual(1.5);
+      expect(m.size).toBeLessThanOrEqual(12);
+      expect(m.fill, 'no pill').toBe('rgba(0, 0, 0, 0)');
+      expect(m.overlap, 'the count does not run into the label').toBe(false);
+      expect(m.inside, 'inside the button').toBe(true);
+    });
+  }
+
+  for (const locale of ['en', 'ar'] as const) {
+    test(`${locale}: the language dropdown's rows lead with their English tag, in the page's direction, and read as the name alone (D-451, D-455, D-561)`, async ({ page }) => {
+      // Will, 13 October 2026: "with all these languages, let's bring back the dropdown, the chips are taking up too much
+      // space". Dot's LanguageField (D-561) keeps what the chips had (Will, 10 October): in the open list the tag says which
+      // language a row is before the row says it in itself. Always English; hidden from a screen reader; first at the start
+      // of the row, so on an English page the Arabic row reads "AR  العربية" and on an Arabic page the English row "EN  English".
+      await page.addInitScript((code) => localStorage.setItem('pam.locale', code), locale);
+      await newcomer(page);
+      await page.goto('/join/');
+      await expect(page.locator('html')).toHaveAttribute('lang', locale);
+      // No chips any more.
       await expect(page.locator('[aria-pressed]')).toHaveCount(0);
       const strings: Record<string, string> = locale === 'ar' ? ar : en;
       const language = page.getByRole('combobox', { name: strings['onboarding.language.title'] });
       await expect(language).toContainText(strings[`language.${locale}`] ?? '');
+      await settled(page);
       await language.click();
       for (const code of SUPPORTED_LOCALES) {
         const name = en[`language.${code}` as keyof typeof en] as string;
-        await expect(page.getByRole('option', { name, exact: true }), `${code} option`).toHaveCount(1);
+        const row = page.getByRole('option', { name, exact: true });
+        await expect(row, `${code} row`).toHaveCount(1);
+        const tag = row.locator('[aria-hidden="true"]', { hasText: LANGUAGE_TAGS[code] });
+        await expect(tag).toHaveText(LANGUAGE_TAGS[code]);
+        // The name is in its own voice and its own direction, on the words.
+        const words = row.locator(`span[lang="${code}"]`);
+        await expect(words).toHaveText(name);
+        await expect(words).toHaveAttribute('dir', code === 'ar' ? 'rtl' : 'ltr');
+        const tagBox = (await tag.boundingBox())!;
+        const wordsBox = (await words.boundingBox())!;
+        if (locale === 'ar') expect(tagBox.x, `${code}: tag on the right of the name`).toBeGreaterThan(wordsBox.x);
+        else expect(tagBox.x, `${code}: tag on the left of the name`).toBeLessThan(wordsBox.x);
       }
     });
   }
