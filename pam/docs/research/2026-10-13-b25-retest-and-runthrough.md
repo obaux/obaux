@@ -190,7 +190,7 @@ Iris
   row, the header is taller whenever the bell shows, so the jump when it appears is worth
   his measuring.
 
-## b27 re-test (`2991f703`, 05:40)
+## b27 re-test (`2991f703`, 05:33)
 
 Storybook (built 05:09) and a local build of `2991f703` with pretend data. I tested sign-in
 with pretend replies: no code was sent, and no number or account is real. b27's three new e2e
