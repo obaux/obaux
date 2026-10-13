@@ -2236,3 +2236,7 @@ The role chip beside the mark no longer breaks inside a word, and the header giv
 ## Design system & Storybook · the green card transition (13 October)
 
 Crossfade 650ms, line out 160ms then in 320ms, no scale (D-556). Story: Website / Green card transition.
+
+## Design system & Storybook · help dialog and dark link text (13 October)
+
+Spec for the help call-out and dialog, and a new `--website-text-link` token (dark: very light lime #EEF1C2) for Wren (D-562).

@@ -74,6 +74,25 @@ describe('website colours: AA in both themes', () => {
   });
 });
 
+describe('website link text (D-562)', () => {
+  it('passes AA on every surface a link sits on, in both themes, and on the row hover', () => {
+    for (const mode of ['light', 'dark'] as Mode[])
+      for (const s of ['surface-page', 'surface-muted', 'surface-gray', 'surface-brand-soft'] as const)
+        expect(ratio('text-link', s, mode), `${mode} text-link on ${s}`).toBeGreaterThanOrEqual(4.5);
+  });
+  it('light is the brand green; dark is not the lime brand colour (that stays for icons and fills)', () => {
+    expect(c['text-link'].light).toBe(c['brand-primary'].light);
+    expect(c['text-link'].dark).not.toBe(c['brand-primary'].dark);
+  });
+  it('dark: close to white text, so a link needs more than colour (under 1.3:1 apart)', () => {
+    const white = parse(c['text-primary'].dark).slice(0, 3);
+    const link = parse(c['text-link'].dark).slice(0, 3);
+    const hi = Math.max(lum(white), lum(link));
+    const lo = Math.min(lum(white), lum(link));
+    expect((hi + 0.05) / (lo + 0.05)).toBeLessThan(1.3);
+  });
+});
+
 describe('Support search pill (Iris H2)', () => {
   // Placeholder colours as the built /support/ page computes them (measured in Chromium, 11 October):
   // the theme's secondary text on SearchPill's own fill (`light-dark(#FFFFFF, #262626)`). The scan
