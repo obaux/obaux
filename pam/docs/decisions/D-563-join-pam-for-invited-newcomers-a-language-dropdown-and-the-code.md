@@ -22,12 +22,13 @@ to type code. otherwise let's hide it so it doesn't take up real estate."
    itself. It starts on the active language, changes the screen's words at once and is still sent as
    `language`. This reverses the chips of D-359/D-451; the English tag before each name (D-451, D-455)
    went with them, pending Dot's look for the control.
-4. **Join › About you: the code field is hidden** behind "Did someone invite you via code?" and a link,
-   "If yes, click here to enter code." The link opens the field and moves focus into it. The field is
-   open from the start when a code is already there (an invite link) or when a code needs fixing
-   (`inviteProblem`), and once open it stays open. The field keeps its label, `join.code.label`.
-   The link text is Will's sentence whole, so it says what it does even read out of context; Sage may
-   propose other words, which go back to Will.
+4. **Join › About you: the code field is hidden** behind a question and a link that opens the field
+   and moves focus into it. The field is open from the start when a code is already there (an invite
+   link) or when a code needs fixing (`inviteProblem`), and once open it stays open. It keeps its
+   label, `join.code.label`. Will wrote "Did someone invite you via code?" and "click here"; Sage
+   (06:19) proposed "Did someone invite you with a code?" and the link "Enter your code", since
+   "click here" says nothing read out of context. Built with Sage's words, pending Will's yes on his
+   card; if he keeps his, only the question changes back.
 
 ## What a later session might reverse
 

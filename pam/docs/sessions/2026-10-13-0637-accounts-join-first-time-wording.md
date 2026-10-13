@@ -44,6 +44,10 @@ asks (06:00 UTC, with screenshots): bring back the language dropdown, and hide t
 | `copy:status` | 6 per language for Lena: `signin.invited.*` stale, `signin.title.invited`, `join.code.question`, `join.code.reveal` missing; the unit test fails on the same list until she answers |
 | Screenshots at 390px | before/after of Join › About you (closed and open) and Sign in from an invite, for Will's card |
 
+- **Later, 06:40:** Sage's words for the code (pending Will's yes): "Did someone invite you with a code?"
+  and the link "Enter your code". Dot's `LanguageField` (D-561, `claude/pam-design-button-counter`) is
+  not on `main` yet; the swap and its tag test follow when it is.
+
 ## Left undone
 
 - Lena: the six languages for the six keys above.
