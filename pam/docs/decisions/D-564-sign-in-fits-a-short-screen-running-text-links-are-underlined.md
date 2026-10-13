@@ -18,3 +18,11 @@ Will's longer member line ("You were invited to join Pam. Start with your phone 
 ## 2. The reveal link ("If yes, click here to enter code.")
 
 **An underlined `TextLink`**, not a quiet button. It sits among words, so colour alone does not tell it (D-562's rule, for the app too); and it is a text link that reveals a field, which is what `TextLink` is for. New prop **`isUnderlined`** on `TextLink` (`@pam/ui`): the line all the time; the look otherwise as D-271 (no pill; the accent colour on hover). Ava: `<TextLink label={t('join.code.reveal')} onClick={revealCode} isUnderlined />`. A link standing alone in a row (Back, Sign out, Skip) needs no line and keeps D-271.
+
+## Follow-up: the compact bar follows the mark, and the test has no precondition
+
+Iris's run-through failed the relaxed test precondition. Two changes:
+
+- **Page.** `SignInScreen` shows the compact bar when the hero's Pam mark has actually left view (an `IntersectionObserver` on the mark, its top margin set to the pinned note's height and re-read on resize), not at a fixed 72px of scroll. Where `IntersectionObserver` is missing it falls back to the old scroll test.
+- **Test.** `signin-short.spec.ts` ("header stays on top") has no precondition: after scrolling to the end, a Pam mark and the language button are within the top 140px, and the invite line is at 0 when invited. It covers en, es, ar and zh-CN at 320×568. On 90533a90 it failed for ar and zh-CN (not invited); with the fix it passes.
+- **Fit.** The 42 cases (7 languages × 320×568, 360×640, 390×844 × invited or not), on a throwaway merge with Lena's lines, all fit (ru 553, pt-BR 542, en 503 of 568 at 320×568). The look is unchanged, so no new pictures.
