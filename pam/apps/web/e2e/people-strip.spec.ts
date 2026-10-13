@@ -175,12 +175,11 @@ test.describe('the people strip on Home', () => {
     }
   });
 
-  test('the example strip follows the same rule while a super admin previews a case manager', async ({ page }) => {
+  test('the example strip follows the same rule for a demo case manager', async ({ page }) => {
     // Keisha's example thread ends with her message (unread for Teresa);
     // Aaliyah's example record carries a save two hours ago. Both lit, the
     // newer first; the other four in their written order.
-    await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));
-    await signedInAs(page, 'super_admin', true);
+    await signedInAs(page, 'admin', true);
     // Nobody on the list: the demo shows the example people (D-172).
     await page.route(PEOPLE, (route) => route.fulfill(json([])));
     await page.route(ACTIVITY, (route) => route.fulfill(json([])));

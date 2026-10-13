@@ -13,7 +13,7 @@ journey to check how the journey is."
   request screens. `app/RoleSwitchControl.tsx` and `app/RoleSwitchLazy.tsx` are deleted;
   `setViewAs` dropped where nothing else used it; a stale comment in `HeaderBell.tsx` fixed.
 - New test in `e2e/directory.spec.ts`: the super admin's Everyone header has no switch.
-- D-503, a changelog fragment, this log, a STATUS section.
+- D-558 (claimed online at push; first D-497, then D-501 to D-503 by hand, all taken), a changelog fragment, this log, a STATUS section.
 
 - **Later, 11 October (Iris's member flow, relayed by Mira):** W2 — sign-up step 2 ("What
   others can see") now has a Call Pam row (the support number from `app_settings`, the hours,
@@ -41,7 +41,7 @@ journey to check how the journey is."
 
 ## Decisions made
 
-- D-503 — remove the header icon; keep "See the app as", "Use Pam as" and `@pam/ui/RoleSwitch`.
+- D-558 — remove the header icon; keep "See the app as", "Use Pam as" and `@pam/ui/RoleSwitch`.
 
 ## Verified
 
@@ -67,3 +67,34 @@ journey to check how the journey is."
 ## Needs a human
 
 - Where to push this branch, and whether "See the app as" goes too.
+
+## 13 October: pushed (Will: "Ask Mira if you can push"; Mira: yes)
+
+- Merged `main` (07cfaa71); conflicts in STATUS, the person page (kept main's real trips) and
+  Profile (kept main's Add my program; `canViewAs` stays gone).
+- **D-512 had landed: Pam has no phone line.** W2's Call Pam row (`tel:` from `useSupportPhone`,
+  now deleted) became a Contact Pam row opening the help desk (`HELP_DESK_URL`); `join.spec`
+  checks the link and that there is no `tel:`.
+- **The stored preview is retired** (Mira asked for a test of a stale `pam.view-as`). With no
+  switcher it would have stranded a super admin in another role: `useViewAs` now clears the key
+  and always answers their own role. New tests in `directory.spec` and `admin.spec`; both fail
+  against the old hook and pass now.
+- Tests that drew a role through the preview now sign in as that role (messages ×5,
+  people-strip). Four that only tested the preview were removed: directory "previewing Program
+  meets the closed door" (the case manager's closed door has its own test), directory
+  "switching the view never changes whose data is asked for" (no view to switch), messages
+  "previewing a member sees no examples" and no-examples-profile "previewing a member sees
+  none" (each duplicated the real member's test beside it).
+- Renumbered to **D-558** with `pnpm claim decision`, online. D-503 is Sage's voice guide.
+
+| Check | Result |
+|---|---|
+| `pnpm -r typecheck` | clean |
+| Unit: config / ui / web / site | 1261 (+6 skipped) / 124 / 148 / 95 pass |
+| `copy:status` | all languages in step |
+| `@pam/web` build, bundle budget | builds; 14.3 kB to spare |
+| `build-storybook` | builds |
+| Playwright: directory, admin, people-strip, messages, no-examples-profile, join (320 light, 320 dark, iPhone SE) | 396 passed |
+| New stale-preview tests against the old `useViewAs` | fail (2), pass with the change |
+
+Screens: `/view-as/` removed; no header switcher on the ten super admin screens; sign-up step 2 gains a Contact Pam row.

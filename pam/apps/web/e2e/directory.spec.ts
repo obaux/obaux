@@ -131,7 +131,7 @@ test.describe('everyone, for the person running Pam', () => {
 
   test('the header has no role-preview switch (Will, 10 October)', async ({ page }) => {
     // Storybook's journeys show each role now; the super admin's header lost its
-    // preview icon, and "See the app as" went with it (D-503).
+    // preview icon, and "See the app as" went with it (D-558).
     await signedInAs(page, 'super_admin');
     await page.goto('/directory/');
     await expect(page.getByRole('heading', { name: 'Everyone', exact: true })).toBeVisible();
@@ -141,6 +141,19 @@ test.describe('everyone, for the person running Pam', () => {
     await expect(page.getByRole('link', { name: /Help/ }).or(page.getByRole('button', { name: /Help/ })).first()).toBeVisible();
     await page.waitForTimeout(1500);
     await expect(page.getByRole('button', { name: /Switch the view/ })).toHaveCount(0);
+  });
+
+  test('a super admin whose tab still holds an old preview lands as super admin, with no switch', async ({ page }) => {
+    // Before D-558 a tab could hold "member" in pam.view-as. With no switcher to undo it, it
+    // must not decide anything: the stored choice is cleared and Everyone is theirs.
+    await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'member'));
+    await signedInAs(page, 'super_admin');
+    await page.goto('/directory/');
+    await settled(page);
+    await expect(page.getByText('3 people')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'This screen is for the Pam team' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /Switch the view/ })).toHaveCount(0);
+    await expect.poll(() => page.evaluate(() => sessionStorage.getItem('pam.view-as'))).toBeNull();
   });
 
   test('says how many, so a filter that finds nothing is obviously that', async ({ page }) => {
@@ -159,24 +172,6 @@ test.describe('everyone, for the person running Pam', () => {
     ).toBeVisible();
     await expect(page.getByRole('link', { name: /Contact Pam/ })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Back' })).toBeVisible();
-  });
-
-  test('a super admin previewing "Program" meets the same closed door a program would', async ({ page }) => {
-    // The preview a super admin sets on Home is written to sessionStorage
-    // (D-108) and every screen now reads it, not just Home's tiles (Will, 16
-    // September). This is the screen that used to disagree with the header:
-    // the badge said "Viewing as Program" and the list underneath it kept
-    // showing every account anyway.
-    await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'provider'));
-    await signedInAs(page, 'super_admin');
-    await page.goto('/directory/');
-
-    await expect(
-      page.getByRole('heading', { name: 'This screen is for the Pam team' }),
-    ).toBeVisible();
-    // The template still names the screen (D-217); what must not appear is
-    // the list itself.
-    await expect(page.getByRole('heading', { name: 'Marcus' })).toHaveCount(0);
   });
 
   test('a signed-out visitor is told what this is, and how to get in', async ({ page }) => {
@@ -200,7 +195,7 @@ test.describe('everyone, for the person running Pam', () => {
 
   test('a super admin\'s Profile has Everyone and no "See the app as"', async ({ page }) => {
     // Each role's screens are checked in Storybook's journeys now; the in-app
-    // preview is gone (Will, 11 October: "remove", D-503).
+    // preview is gone (Will, 11 October: "remove", D-558).
     await signedInAs(page, 'super_admin');
     await page.route('**/rest/v1/rpc/member_points*', (route) => route.fulfill(json(400)));
     await page.route('**/rest/v1/rpc/saved_places_mine*', (route) => route.fulfill(json([])));
@@ -210,27 +205,6 @@ test.describe('everyone, for the person running Pam', () => {
     await expect(page.getByRole('link', { name: /See the app as/ })).toHaveCount(0);
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Requests', level: 1 })).toBeVisible();
-  });
-
-  test('switching the view never changes whose data is asked for', async ({ page }) => {
-    // The switch is a rendering choice. If it ever started changing the query,
-    // it would be impersonation, which is a different product decision and one
-    // that would have to be argued in front of the people it is about.
-    const asked: string[] = [];
-    await signedInAs(page, 'super_admin');
-    await page.route('**/rest/v1/rpc/member_points*', (route) => {
-      asked.push(String((route.request().postDataJSON() as { p_member_id: string }).p_member_id));
-      return route.fulfill(json(400));
-    });
-    await page.route('**/rest/v1/rpc/saved_places_mine*', (route) => route.fulfill(json([])));
-
-    // Its screen is gone (D-503); the stored choice still exists, so it is set directly.
-    await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'member'));
-    await page.goto('/profile/');
-    await expect(page.getByText(/400\s*Points/)).toBeVisible();
-
-    // Every id asked for is the signed-in person's own.
-    expect(new Set(asked)).toEqual(new Set([WILL]));
   });
 
   test('has no WCAG A/AA violations', async ({ page }) => {
