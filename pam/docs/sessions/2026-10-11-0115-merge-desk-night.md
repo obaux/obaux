@@ -591,6 +591,17 @@
   "Pam remembers the area you pick on this phone only." is centred only while Google's mark shows; and nothing typed
   goes to `places-search` until its status says a key exists (Iris's b30 notes). After b31 the street search waits
   only on Will: Google's logo files (a81 step 2), then the key.
+- **Will, 18:18 (a81, chat w20261013181806g6qz): the old Places list is retired.** Picture 3 of the street
+  search (v2) showed the old `/places/` list, with its old header and layout. Will: that page is "no longer an
+  active page that we support". The ZIP shows on the member's Explore page (`/`); a case manager or program searching
+  all programs gets their results on All Programs (`/programs/`). The ZIP chip was already right: it lives in the
+  shared `useStreetSearch` hook that Explore and All Programs both use. Piper's e2e opened `/places/` by its old
+  address, and the page was still reachable from Reported places (`from=places` Back) and `?filter=reported`.
+  Merge desk, 18:22: Piper retires the list. `/places/` redirects members to `/` and staff to `/programs/`;
+  `?filter=reported` sends a super admin to `/places/reported/` (kept as is); Back from a reported place returns
+  there; the e2e specs move to the screens they test; the three street pictures are re-shot on `/` and `/programs/`
+  (v3) and shown to Will before they ship. If the old list's Reported chip was a super admin's only way in to
+  Reported places, Piper stops and asks rather than adding an entry point. Will is preparing Google's logo files.
 
 ## What was wrong, and what missed it
 
@@ -814,6 +825,7 @@
 | `list_migrations` before 20261013070505 | live ended at 20261013051051; applied as 20261013075601; row invite_emails_live = 'on'; app_settings RLS on, read-all and admin-write policies unchanged |
 | Iris's b30 run-through | a78 (ten super admin screens, stale view-as, Connect, Contact Pam), W5, W6 and street search off (four ways, p7 in seven languages): PASS, 29/29 scripted; Dot's sign-in test edit: FAIL (bar never shows at 72px scroll in ar, zh-CN) |
 | Batch b31 (Piper f748c465): db / config / ui / web unit / site / site a11y / usability / e2e full / storybook | 1579 ok / 1310 / 124 / 173 / 95 / 120 scans 0 / clear / 1775 passed, 19 skipped / builds; scrollspy 306 links 0; web tsc 0; 11.0 kB spare |
+| b31 main CI (d14dab33) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (09:43); Vercel web and pam-site READY (09:22) |
 
 ## Left undone
 
