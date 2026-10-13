@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { SUPPORTED_LOCALES } from '@pam/config';
+import { LANGUAGE_TAGS, SUPPORTED_LOCALES } from '@pam/config';
 import en from '@pam/config/locales/en.json';
 import ar from '@pam/config/locales/ar.json';
 import { settled } from './settled';
@@ -183,21 +183,36 @@ test.describe('signing up', () => {
   }
 
   for (const locale of ['en', 'ar'] as const) {
-    test(`${locale}: the language is a dropdown that lists all seven, each named in itself`, async ({ page }) => {
-      // Will, 13 October 2026: "with all these languages, let's bring back the dropdown, the chips are taking
-      // up too much space". The chips (D-451, D-455) are gone; the dropdown starts on the active language.
+    test(`${locale}: the language dropdown's rows lead with their English tag, in the page's direction, and read as the name alone (D-451, D-455, D-561)`, async ({ page }) => {
+      // Will, 13 October 2026: "with all these languages, let's bring back the dropdown, the chips are taking up too much
+      // space". Dot's LanguageField (D-561) keeps what the chips had (Will, 10 October): in the open list the tag says which
+      // language a row is before the row says it in itself. Always English; hidden from a screen reader; first at the start
+      // of the row, so on an English page the Arabic row reads "AR  العربية" and on an Arabic page the English row "EN  English".
       await page.addInitScript((code) => localStorage.setItem('pam.locale', code), locale);
       await newcomer(page);
       await page.goto('/join/');
       await expect(page.locator('html')).toHaveAttribute('lang', locale);
+      // No chips any more.
       await expect(page.locator('[aria-pressed]')).toHaveCount(0);
       const strings: Record<string, string> = locale === 'ar' ? ar : en;
       const language = page.getByRole('combobox', { name: strings['onboarding.language.title'] });
       await expect(language).toContainText(strings[`language.${locale}`] ?? '');
+      await settled(page);
       await language.click();
       for (const code of SUPPORTED_LOCALES) {
         const name = en[`language.${code}` as keyof typeof en] as string;
-        await expect(page.getByRole('option', { name, exact: true }), `${code} option`).toHaveCount(1);
+        const row = page.getByRole('option', { name, exact: true });
+        await expect(row, `${code} row`).toHaveCount(1);
+        const tag = row.locator('[aria-hidden="true"]', { hasText: LANGUAGE_TAGS[code] });
+        await expect(tag).toHaveText(LANGUAGE_TAGS[code]);
+        // The name is in its own voice and its own direction, on the words.
+        const words = row.locator(`span[lang="${code}"]`);
+        await expect(words).toHaveText(name);
+        await expect(words).toHaveAttribute('dir', code === 'ar' ? 'rtl' : 'ltr');
+        const tagBox = (await tag.boundingBox())!;
+        const wordsBox = (await words.boundingBox())!;
+        if (locale === 'ar') expect(tagBox.x, `${code}: tag on the right of the name`).toBeGreaterThan(wordsBox.x);
+        else expect(tagBox.x, `${code}: tag on the left of the name`).toBeLessThan(wordsBox.x);
       }
     });
   }
