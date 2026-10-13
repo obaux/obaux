@@ -602,6 +602,13 @@
   there; the e2e specs move to the screens they test; the three street pictures are re-shot on `/` and `/programs/`
   (v3) and shown to Will before they ship. If the old list's Reported chip was a super admin's only way in to
   Reported places, Piper stops and asks rather than adding an entry point. Will is preparing Google's logo files.
+- **Will, 18:40 (a82, chat w20261013184025uked): sign-up "signed on all".** The quiet step count, the language
+  dropdown, the hidden code, the short-phone fit and "Join Pam" from an invite are all signed. He did not pick Sage's
+  words, so his stand (the card said his stand unless he picked hers): `join.code.question` "Did someone invite you
+  via code?" and `join.code.reveal` "Click here", underlined. Merge desk, 18:41: Ava reverts ce18f5ff (Sage's words)
+  on `claude/pam-join-first-time-wording` with `git revert`; Lena translates the two lines into the six languages on
+  a branch that touches only those six files, using the natural word for a link where "click" reads oddly on a phone
+  (Sage's point, without changing Will's English). Then full checks, Iris's walk-through, and W6 ships whole.
 
 ## What was wrong, and what missed it
 
