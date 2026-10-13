@@ -2242,3 +2242,7 @@ The role chip beside the mark no longer breaks inside a word, and the header giv
 ## Design system & Storybook · the green card transition (13 October)
 
 Crossfade 650ms, line out 160ms then in 320ms, no scale (D-556). Story: Website / Green card transition.
+
+## Design system & Storybook · Sign in fits a short screen (13 October)
+
+Below 640px tall the hero slide is shorter; `TextLink` can be always underlined (D-564).
