@@ -77,6 +77,9 @@ STATUS row too.
      reading p11 first: a copy elsewhere has its own retention. None exists today (Piper searched the code and package.json).
   3. `no-typed-text-in-urls.test.ts` keeps "what you search for" out of the logged URL: a new GET filter must be on an id,
      a state or a setting, and typed words go in a POST body (an rpc).
+  4. Supabase Auth's own `auth.audit_log_entries` table holds 0 rows (read-only count on the live project, 13 October, Mira):
+     Auth activity is in the platform logs, which are the 1 day above. So no phone number sits in that table; recheck if the
+     count is ever not 0.
 
 - [ ] **Read Twilio's own record of every text before texts go on** (Lena for Nico, 11 October 2026, from Piper's log check; Mira).
   Twilio keeps, for each text Pam sends, the number, the text, the time and the status. Nobody has read its retention
@@ -84,6 +87,21 @@ STATUS row too.
   our texts" handles the information for Pam and may not use it for anything else (`privacy.s.sharing.p3`), and nothing says
   how long it keeps it. Do it before the first real text: if Twilio keeps them longer than a person would expect, either shorten
   it there or say so in `privacy.s.how-long` (Sage edits, Will signs). Texts are off today (`texts_live`), so it is not urgent.
+
+- [ ] **A new phone number (D-567): say only the texts Pam sends** (Lena, 13 October 2026, card a84).
+  Two lines say today that Pam does not text about a move, and are true only while no such text exists:
+  1. `newNumber.received.body` ("A person on the Pam team will check it. **Pam won't text you when it's done.** Come back and
+     sign in with your new number to see.", Sage, A29). If a text to the new number is ever added when the super admin decides,
+     this sentence changes with it, in all seven languages, and so does `newNumber.waiting.body`.
+  2. The text to the **old** number ("Someone asked to move your Pam account to a new number. If this wasn't you, contact Pam",
+     Nico's later job, Sage's words, "contact Pam" and never "call", D-512) is not in Privacy yet: it is not sent. When it is, add
+     one sentence to `privacy.s.texts` (Sage edits, Will signs) and check the old number's other copies first: it will then also be
+     in `outbound_messages.phone` and with the text company (see the Twilio item above), which the p14 line ("we delete the old
+     number 90 days after we decide") does not cover.
+  3. When the a84 lines go live (`privacy.s.what-we-keep.p14` and `p15`, signed by Sage, waiting for Will): the 90 days (a move,
+     decided or not) and the 30 days (a refused case manager request) are one constant each in Ava's purge
+     (`number_change_rules()` and the staff request purge). Change a number there and in the line, and in its six
+     translations, together.
 
 - [ ] **A28: finish taking Pam's number off every place a person reads it** (Lena, 11 October 2026, D-514, D-515).
   The app, the privacy page and the terms are done and signed (card a59). What is still open, each with an owner:

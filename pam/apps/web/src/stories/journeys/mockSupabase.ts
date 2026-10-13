@@ -101,7 +101,47 @@ export interface MockOptions {
   readonly hasLead?: boolean;
   /** Street search is on (D-552): the pretend function has a key and answers two suggestions, so the area sheet draws its street label, hint and Google row. */
   readonly streetSearch?: boolean;
+  /** Moving an account to a new number (D-567): the states of the two screens, one story each. */
+  readonly newNumber?: NewNumberOptions;
 }
+
+/**
+ * What a story can change about moving an account to a new number (D-567). Without any of it the person is not signed in and the
+ * super admin has one ordinary request waiting; nothing a story does moves a number.
+ */
+export interface NewNumberOptions {
+  /** Signed in with the new number only: the code has proved it, and Pam has no record of it (the "temporary sign-in"). */
+  readonly signInOnly?: boolean;
+  /** Where the request that sign-in made stands. Without it the person has asked for nothing yet. */
+  readonly standing?: 'waiting' | 'approved' | 'denied';
+  /** What asking answers; without it the request is received. */
+  readonly ask?: 'invalid' | 'tooMany' | 'other';
+  /** The super admin's list also has a super admin's account, which cannot be moved. */
+  readonly protectedRow?: boolean;
+  /** The request the super admin opens: a staff account, a super admin's account, or an old number no account has. */
+  readonly review?: 'staff' | 'protected' | 'noAccount';
+  /** What deciding answers, in the database's own words; without it a yes or a no is accepted. */
+  readonly decide?: 'decided' | 'mustSpeak' | 'cannotMove' | 'noAccount' | 'numberInUse' | 'other';
+  /** After a yes, the move itself does not go through (the `move-number` function fails). */
+  readonly moveFails?: boolean;
+}
+
+/** The database's own words for each thing deciding can refuse (useNumberChange's `decideNumberChange`). */
+const DECIDE_REFUSALS: Record<NonNullable<NewNumberOptions['decide']>, string> = {
+  decided: 'REQUEST_ALREADY_DECIDED',
+  mustSpeak: 'MUST_SPEAK',
+  cannotMove: 'CANNOT_MOVE',
+  noAccount: 'NO_ACCOUNT',
+  numberInUse: 'NEW_NUMBER_IN_USE',
+  other: 'SOMETHING_ELSE',
+};
+
+/** The database's own words for each thing asking can refuse (`submitNumberChange`). */
+const ASK_REFUSALS: Record<NonNullable<NewNumberOptions['ask']>, string> = {
+  invalid: 'INVALID',
+  tooMany: 'TOO_MANY',
+  other: 'SOMETHING_ELSE',
+};
 
 /** A real place of the catalogue, to plan a trip to in a story (the examples' ids are not real). */
 export const SAVED_PLACE = {
@@ -321,7 +361,7 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     has(part)(url) ? answer(url, method, body) : null;
 
   return [
-    profile
+    profile || options.newNumber?.signInOnly
       ? on('/auth/v1/user', () => ({ body: { id: ME_ID, phone: '12155550199' } }))
       : on('/auth/v1/', () => ({ status: 401, body: {} })),
     on('/auth/v1/', () => ({ body: {} })),
@@ -642,36 +682,64 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
           created_at: new Date(Date.now() - 3 * 3_600_000).toISOString(),
           is_protected: false,
         },
+        ...(options.newNumber?.protectedRow
+          ? [
+              {
+                id: '7a1f0000-0000-4000-8000-000000000568',
+                first_name: 'Will',
+                last_name: 'Reyes',
+                city: 'Philadelphia',
+                created_at: new Date(Date.now() - 26 * 3_600_000).toISOString(),
+                is_protected: true,
+              },
+            ]
+          : []),
       ],
     })),
-    on('/rpc/number_change_detail', () => ({
-      body: [
-        {
-          id: NUMBER_CHANGE_ID,
-          status: 'waiting',
-          created_at: new Date(Date.now() - 3 * 3_600_000).toISOString(),
-          first_name: 'Rosa',
-          last_name: 'Diaz',
-          city: 'Philadelphia',
-          who_knows: 'Tanya at the library',
-          new_phone: '+12155550188',
-          old_phone_last4: '0142',
-          has_account: true,
-          is_protected: false,
-          is_staff: false,
-          account_first: 'Rosa',
-          account_last: 'Díaz',
-          account_city: 'Philadelphia',
-          invited_by_name: 'Tanya',
-          last_active_at: new Date(Date.now() - 20 * 86_400_000).toISOString(),
-          must_speak: true,
-        },
-      ],
+    on('/rpc/number_change_detail', () => {
+      const review = options.newNumber?.review;
+      return {
+        body: [
+          {
+            id: NUMBER_CHANGE_ID,
+            status: 'waiting',
+            created_at: new Date(Date.now() - 3 * 3_600_000).toISOString(),
+            first_name: 'Rosa',
+            last_name: 'Diaz',
+            city: 'Philadelphia',
+            who_knows: 'Tanya at the library',
+            new_phone: '+12155550188',
+            old_phone_last4: '0142',
+            has_account: review !== 'noAccount',
+            is_protected: review === 'protected',
+            is_staff: review === 'staff',
+            account_first: 'Rosa',
+            account_last: 'Díaz',
+            account_city: 'Philadelphia',
+            invited_by_name: 'Tanya',
+            last_active_at: new Date(Date.now() - 20 * 86_400_000).toISOString(),
+            must_speak: true,
+          },
+        ],
+      };
+    }),
+    // The person who asked, signed in with the new number only: where their request stands, and what asking answers.
+    on('/rpc/my_number_change', () => ({
+      body: options.newNumber?.standing ? [{ status: options.newNumber.standing }] : [],
     })),
-    on('/rpc/my_number_change', () => ({ body: [] })),
-    on('/rpc/submit_number_change', () => ({ body: 'received' })),
-    on('/rpc/decide_number_change', (_url, _method, body) => ({ body: (body as { p_decision?: string } | null)?.p_decision ?? 'denied' })),
-    on('/functions/v1/move-number', () => ({ body: { moved: true } })),
+    on('/rpc/submit_number_change', () =>
+      options.newNumber?.ask
+        ? { status: 400, body: { code: 'P0001', message: ASK_REFUSALS[options.newNumber.ask] } }
+        : { body: 'received' },
+    ),
+    on('/rpc/decide_number_change', (_url, _method, body) =>
+      options.newNumber?.decide
+        ? { status: 400, body: { code: 'P0001', message: DECIDE_REFUSALS[options.newNumber.decide] } }
+        : { body: (body as { p_decision?: string } | null)?.p_decision ?? 'denied' },
+    ),
+    on('/functions/v1/move-number', () =>
+      options.newNumber?.moveFails ? { status: 500, body: { error: 'move failed' } } : { body: { moved: true } },
+    ),
     on('/rest/v1/conversation_members', (url, method) => {
       if (method === 'PATCH') return { body: [] };
       if (url.includes('conversation_id=eq.')) {
@@ -785,7 +853,7 @@ export function installSupabaseMock(journeyRole: JourneyRole, options: MockOptio
       if (key.startsWith('pam.') || key.startsWith('sb-')) store.removeItem(key);
     }
   }
-  if (profile) {
+  if (profile || options.newNumber?.signInOnly) {
     const session = {
       access_token: 'storybook',
       refresh_token: 'storybook',
