@@ -124,3 +124,23 @@ describe('website tokens: files agree', () => {
     expect((t.match(/^ {2}\w+: \{$/gm) ?? []).length).toBe(32);
   });
 });
+
+// a83 (Will, 13 October): the grey "Still stuck?" card is 60px above the footer on a phone and 120px from 900px.
+describe('website spacing: the space under the Still stuck? card', () => {
+  const source = (p: string) => readFileSync(new URL(p, import.meta.url), 'utf8');
+  it('names 60px for a phone and 120px for desktop, and the footer gap it counts', () => {
+    const s = source('../src/lib/website-space.stylex.ts');
+    expect(s).toMatch(/stillStuckGapPhone: '60px'/);
+    expect(s).toMatch(/stillStuckGapDesktop: '120px'/);
+    expect(s).toMatch(/footerGapDesktop: '64px'/);
+  });
+  it('is used by the card and the footer, from the one place, at the one breakpoint', () => {
+    const card = source('../src/components/StillStuck.tsx');
+    const foot = source('../src/components/SiteFooter.tsx');
+    expect(card).toMatch(/space\.stillStuckGapPhone/);
+    expect(card).toMatch(/space\.stillStuckGapDesktop/);
+    expect(card).toMatch(/min-width: 900px/);
+    expect(foot).toMatch(/space\.footerGapDesktop/);
+    expect(card + foot).not.toMatch(/!important/);
+  });
+});

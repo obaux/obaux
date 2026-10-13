@@ -380,6 +380,24 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
   }
 }
 
+// a83 (Will, 13 October): the grey Still stuck? card is 60px above the footer on a phone and 120px from 900px.
+{
+  for (const [width, want] of [[390, 60], [1280, 120]]) {
+    const ctx = await browser.newContext({ viewport: { width, height: 800 } });
+    const page = await ctx.newPage();
+    for (const path of ['/support/', '/support/cant-sign-in/', '/support/start-here/']) {
+      await page.goto(base + path, { waitUntil: 'load' });
+      const gap = await page.evaluate(() => {
+        const card = document.querySelector('#still-stuck');
+        const foot = document.querySelector('footer');
+        return Math.round(foot.getBoundingClientRect().top - card.getBoundingClientRect().bottom);
+      });
+      if (Math.abs(gap - want) > 1) fail(`${path} at ${width}px: ${gap}px between the Still stuck? card and the footer, expected ${want}`);
+    }
+    await ctx.close();
+  }
+}
+
 await browser.close();
 server.close();
 console.log(failures ? `\n${failures} problem(s).` : 'usability: all clear');

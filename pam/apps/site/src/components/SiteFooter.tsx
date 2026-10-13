@@ -8,6 +8,7 @@ import { HELP_EMAIL } from '../lib/links';
 import { footerLink } from '../lib/footer-link';
 import { tap } from '../lib/tap';
 import { website } from '../lib/website.stylex';
+import { space } from '../lib/website-space.stylex';
 import { type } from '../lib/website-type.stylex';
 import { LegalLink } from './LegalLink';
 import { WebFrame } from './WebFrame';
@@ -15,7 +16,7 @@ import { Wordmark } from './Wordmark';
 
 const styles = stylex.create({
   foot: {
-    marginBlockStart: { default: '0px', '@media (min-width: 900px)': '64px' },
+    marginBlockStart: { default: '0px', '@media (min-width: 900px)': space.footerGapDesktop },
     paddingBlock: { default: '64px', '@media (min-width: 900px)': '64px 40px' },
     backgroundColor: website['--website-surface-brand-deep'],
     color: website['--website-text-on-brand-deep'],

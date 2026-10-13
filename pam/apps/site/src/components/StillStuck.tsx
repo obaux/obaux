@@ -1,6 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { website } from '../lib/website.stylex';
+import { space } from '../lib/website-space.stylex';
 import { HelpRequest } from './HelpRequest';
 
 const styles = stylex.create({
@@ -16,7 +17,11 @@ const styles = stylex.create({
     color: website['--website-text-primary'],
   },
   // The last stop in a post's "On this page" menu.
-  anchor: { scrollMarginTop: 'var(--post-scroll-offset, 24px)' },
+  anchor: {
+    scrollMarginTop: 'var(--post-scroll-offset, 24px)',
+    // Clear of the footer: 60px on a phone, 120px from 900px (a83). The footer already leaves 64px above itself from 900px.
+    marginBlockEnd: { default: space.stillStuckGapPhone, '@media (min-width: 900px)': `calc(${space.stillStuckGapDesktop} - ${space.footerGapDesktop})` },
+  },
 });
 
 /**
