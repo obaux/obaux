@@ -55,7 +55,7 @@ const styles = stylex.create({
 });
 
 /**
- * The header of the new site (Figma "Pam — Website": wordmark, Get help, Sign in; 78px high, a 1200 column).
+ * The header of the new site (Figma "Pam — Website": wordmark, Support, Sign in; 78px high, a 1200 column).
  * The language button in the design (a globe) is left out until a second language is signed off: with only English
  * live it would be a control that goes nowhere (`content/signed-off.json`, `LanguageSwitcher`).
  * `path` is Storybook's, where there is no router.

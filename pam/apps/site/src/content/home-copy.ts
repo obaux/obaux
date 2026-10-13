@@ -39,14 +39,14 @@ export const HOME = {
       {
         id: 'providers',
         label: 'Program Providers',
-        line: 'Your policies, signed before they arrive. Check-in and go!',
-        alt: 'An isometric picture of a person walking through the warm, lit doorway of a city building.',
+        line: 'Your policies, signed before they arrive. Check in and go!',
+        alt: 'A person walks through the warm, lit doorway of a city building.',
       },
       {
         id: 'managers',
         label: 'Case managers',
         line: 'Their plans, your guidance, in one place.',
-        alt: 'An isometric picture of a smiling person with a duffel bag, looking at a phone in a bright community room.',
+        alt: 'A smiling person with a duffel bag looks at a phone in a bright community room.',
       },
     ],
   },
@@ -90,7 +90,7 @@ export const HOME = {
       cta: { label: 'Go to Support', href: '/support/' },
     },
   ],
-  nav: { support: 'Get help', signIn: 'Sign in' },
+  nav: { support: 'Support', signIn: 'Sign in' },
   footer: {
     links: ['Support', 'About Pam', 'Privacy', 'Terms', 'Contact'],
     copyright: '© 2026 Pam. All rights reserved.',
