@@ -495,7 +495,7 @@
   "place.hours.today": "Today",
   "place.hours.sample": "These are sample hours while Pam checks the real ones. Call before you go.",
   "place.hoursOnGoogle": "Check hours on Google",
-  "place.notFound.body": "It may have been taken off Pam. Go back to Places and try another one.",
+  "place.notFound.body": "It may have been taken off Pam. Go back to Explore and try another one.",
   "place.notFound.title": "We could not find that place",
   "place.openUntil": "Open until {time}",
   "place.save": "Save this place",

@@ -533,7 +533,7 @@
   "place.hours.today": "اليوم",
   "place.hours.sample": "هذه ساعات عمل تجريبية ريثما يتحقق Pam من الساعات الفعلية. اتصل قبل الذهاب.",
   "place.hoursOnGoogle": "تحقق من الساعات في Google",
-  "place.notFound.body": "ربما تمت إزالته من Pam. ارجع إلى الأماكن وجرب مكانا آخر.",
+  "place.notFound.body": "ربما تمت إزالته من Pam. ارجع إلى «استكشاف» وجرب مكانا آخر.",
   "place.notFound.title": "لم نعثر على هذا المكان",
   "place.openUntil": "مفتوح حتى {time}",
   "place.save": "حفظ هذا المكان",

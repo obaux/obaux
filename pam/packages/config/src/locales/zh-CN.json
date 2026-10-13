@@ -498,7 +498,7 @@
   "place.hours.today": "今天",
   "place.hours.sample": "这是示例时间，Pam正在核实真实时间。出发前请先打电话。",
   "place.hoursOnGoogle": "在Google上查看开放时间",
-  "place.notFound.body": "它可能已从Pam上移除。请回到“地点”，试试别的。",
+  "place.notFound.body": "它可能已从Pam上移除。请回到“探索”，试试别的。",
   "place.notFound.title": "我们找不到这个地点",
   "place.openUntil": "开门至{time}",
   "place.save": "收藏此地点",

@@ -339,7 +339,7 @@ function PlaceScreen() {
     const key = state.status === 'error' && state.offline ? 'offline' : 'something_went_wrong';
     return (
       <Page gap={4}>
-        {header(t('places.title'))}
+        {header(t('tab.explore'))}
         <Notice
           notice={state.status === 'missing' ? 'service_not_available' : key}
           title={state.status === 'missing' ? t('place.notFound.title') : t(NOTICES[key].titleKey)}

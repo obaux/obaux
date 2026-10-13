@@ -260,11 +260,15 @@ test.describe("a place's own screen", () => {
     await page.goto('/place/?id=nope');
 
     await expect(page.getByRole('heading', { name: 'We could not find that place' })).toBeVisible();
-    // §0: never dead-end. The list, and Contact Pam, both on the screen (A28: Pam
+    // §0: never dead-end. Explore, and Contact Pam, both on the screen (A28: Pam
     // has no phone line, so Contact Pam opens Help). "Not on Pam right now" is an
     // empty state rather than an alarm — nothing went wrong, the place is simply
     // not there — so the way out is a link on the card, not inside a banner.
-    await expect(page.getByRole('link', { name: 'Places' }).first()).toBeVisible();
+    // The list is Explore now (D-565): the round back and "Find the place" both go there.
+    await expect(page.getByRole('link', { name: 'Back to Explore' })).toHaveAttribute('href', '/');
+    await expect(page.getByRole('link', { name: 'Find the place' })).toHaveAttribute('href', '/');
+    await expect(page.getByText(/Go back to Explore/)).toBeVisible();
+    await expect(page.getByText(/Go back to Places/)).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'Contact Pam' }).first()).toHaveAttribute('href', '/help/');
     await expect(page.locator('a[href^="tel:"]')).toHaveCount(0);
   });

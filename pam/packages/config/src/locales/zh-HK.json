@@ -498,7 +498,7 @@
   "place.hours.today": "今天",
   "place.hours.sample": "這些是示範時間，Pam正在核實真實時間。出發前請先致電。",
   "place.hoursOnGoogle": "在Google上查看開放時間",
-  "place.notFound.body": "它可能已從Pam移除。請返回地點，試試另一個。",
+  "place.notFound.body": "它可能已從Pam移除。請返回「探索」，試試另一個。",
   "place.notFound.title": "我們找不到該地點",
   "place.openUntil": "開放至{time}",
   "place.save": "收藏此地點",
