@@ -11,9 +11,12 @@ import { type } from '../lib/website-type.stylex';
 import { Frame } from '../components/Frame';
 import { PostNav } from '../components/PostNav';
 import { StillStuck } from '../components/StillStuck';
+import { lastBlockGap } from '../lib/last-block-gap';
 import { STILL_STUCK, collectSections } from '../lib/sections';
 import { BODIES } from '../content/bodies';
 import { anyPostBySlug, formatDate, postBySlug } from '../content/posts';
+
+const crumbLink = stylex.create({ text: { color: website['--website-text-link'] } });
 
 const styles = stylex.create({
   // The post and, from 1180px, its "On this page" column beside it.
@@ -102,14 +105,14 @@ export function PostScreen({ slug, allowDraft = false }: { readonly slug: string
       <div {...stylex.props(styles.menuCell)}>
         <PostNav sections={sections} variant="side" />
       </div>
-      <VStack as="article" gap={10} xstyle={styles.column} data-page="post">
+      <VStack as="article" gap={10} xstyle={[styles.column, !withStuck && lastBlockGap.end]} data-page="post">
         {post.status === 'draft' ? (
           <Banner status="warning" title="Draft, not published: held until the feature ships. Not on the site, in Support or in search." />
         ) : null}
         <VStack gap={6} paddingBlockStart={8}>
           <VStack gap={4} xstyle={styles.header}>
             <HStack as="nav" gap={2} xstyle={styles.crumbs} aria-label="Breadcrumb">
-              <Link href="/support/" xstyle={tap.link}>Support</Link>
+              <Link href="/support/" hasUnderline xstyle={[tap.link, crumbLink.text]}>Support</Link>
               <Text type="supporting" aria-hidden xstyle={styles.arrow}>
                 →
               </Text>

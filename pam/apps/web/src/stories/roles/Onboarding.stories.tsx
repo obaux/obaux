@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { screen } from './screen';
-import { chooseAboutTab, showSlide } from '../support/showSlide';
+import { askForNewLink, chooseAboutTab, showSlide } from '../support/showSlide';
 
 /**
  * Creating an account, one story per kind of person (D-253) — kept apart
@@ -96,6 +96,13 @@ export const ExpiredLink: StoryObj = screen('provider', 'Expired link', '/protot
   invite: 'PAM-OLD1',
   as: 'program',
 });
+
+/** The same page after the request: what it says once an email has been asked for (the audit measures what a story shows, so this state needs its own). */
+export const ExpiredLinkSent: StoryObj = {
+  ...screen('provider', 'Expired link', '/prototype/signin/', { invite: 'PAM-OLD1', as: 'program' }),
+  name: 'Expired link, new link sent',
+  play: ({ canvasElement }) => askForNewLink(canvasElement, 'dana@example.org'),
+};
 
 /**
  * A staff invite for a number that already has a Pam account (D-373): one

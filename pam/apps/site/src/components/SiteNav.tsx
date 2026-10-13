@@ -18,7 +18,7 @@ const styles = stylex.create({
   row: { justifyContent: 'space-between', alignItems: 'center', width: '100%' },
   right: { alignItems: 'center' },
   link: {
-    color: website['--website-text-primary'],
+    color: website['--website-text-link'],
     textDecorationLine: 'none',
     paddingInline: '12px',
     borderRadius: '10px',

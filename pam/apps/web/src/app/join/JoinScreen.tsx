@@ -14,6 +14,7 @@ import { BellIcon, BigButton, Loading, Notice, Page, HelpIcon, PointsBadge, Star
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { LANGUAGE_TAGS, SUPPORTED_LOCALES, TRANSPARENCY_SCREEN, badgeForPoints, type Locale, intlLocale } from '@pam/config';
+import { LanguageField } from '@pam/ui/LanguageField';
 import { useI18n } from '@/lib/i18n';
 import { HELP_DESK_URL } from '@/lib/helpDesk';
 import { navigate } from '@/lib/navigate';
@@ -38,7 +39,6 @@ import {
 import { NOTICES } from '@pam/config';
 import { markFreshAccount } from '@/lib/programSetup';
 import { SetupArt, type SetupArtKind } from '@pam/ui/SetupArt';
-import { ChoiceChips } from '@pam/ui/ChoiceChips';
 import { InfoTip } from '@pam/ui/InfoTip';
 import { Dropdown } from '@pam/ui/Dropdown';
 
@@ -168,6 +168,9 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
    */
   const [inviteCode, setInviteCode] = useState('');
   const [inviteProblem, setInviteProblem] = useState<InviteProblem | null>(null);
+  // The code field is hidden until asked for; once shown it stays shown.
+  const [codeOpen, setCodeOpen] = useState(false);
+  const [focusCode, setFocusCode] = useState(false);
   /** Whether step 2 made an account, as opposed to recording a request. */
   const [hasAccount, setHasAccount] = useState(false);
   /**
@@ -204,6 +207,26 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
   const lastId = useId();
   const cityId = useId();
   const codeFieldId = useId();
+  const codeShown = codeOpen || inviteCode !== '' || inviteProblem !== null;
+  useEffect(() => {
+    if (inviteCode !== '' || inviteProblem !== null) setCodeOpen(true);
+  }, [inviteCode, inviteProblem]);
+  // The link that opens it moves the person into the field it opened.
+  useEffect(() => {
+    if (!focusCode || !codeShown) return;
+    // A frame later: the link that was tapped is gone, and the press that removed it
+    // finishes first, so focusing now would be undone and land on the page.
+    const frame = requestAnimationFrame(() => {
+      // By name: the field makes its own id and does not take `codeFieldId`.
+      document.querySelector<HTMLInputElement>('input[name="inviteCode"]')?.focus();
+      setFocusCode(false);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [focusCode, codeShown]);
+  const revealCode = () => {
+    setCodeOpen(true);
+    setFocusCode(true);
+  };
 
   /**
    * Who is signed in, asked of the sign-in system rather than of the profile.
@@ -613,17 +636,15 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 already send this locale as `language` — that part was here
                 before this control was; only the way to change it is new.
               */}
-              {/* Chips, as Plan a visit's days and times (D-359); the chosen one
-                  in the secondary green. English unless already switched. */}
-              <VStack gap={2}>
-                <Text xstyle={styles.chipsLabel}>{t('onboarding.language.title')}</Text>
-                <ChoiceChips
-                  label={t('onboarding.language.title')}
-                  options={SUPPORTED_LOCALES.map((code) => ({ value: code, label: t(`language.${code}`), tag: LANGUAGE_TAGS[code], lang: code }))}
-                  value={pendingLocale ?? locale}
-                  onChange={(code) => setLocale(code as Locale)}
-                />
-              </VStack>
+              {/* A dropdown again (Will, 13 October: "with all these languages ...
+                  the chips are taking up too much space"). Each language is named
+                  in itself, with its English tag in the list; Dot's control, D-561. */}
+              <LanguageField
+                label={t('onboarding.language.title')}
+                options={SUPPORTED_LOCALES.map((code) => ({ code, name: t(`language.${code}`), tag: LANGUAGE_TAGS[code] }))}
+                value={pendingLocale ?? locale}
+                onChange={(code) => setLocale(code as Locale)}
+              />
 
               {invitedAs ? null : (
                 <>
@@ -635,24 +656,37 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 {/* The hint behind an info tip on the label's line (D-369):
                     the form stays fields; the field keeps its own label for
                     screen readers, and the line you see is that label again. */}
-                <VStack gap={1}>
-                  <HStack gap={1} align="center" wrap="nowrap">
-                    <Text aria-hidden="true" xstyle={styles.chipsLabel}>
-                      {t('join.code.label')}
-                    </Text>
-                    <InfoTip label={t('join.code.more')} content={t('join.code.hint')} />
-                  </HStack>
-                  <TextField
-                    id={codeFieldId}
-                    purpose="inviteCode"
-                    label={t('join.code.label')}
-                    isLabelHidden
-                    value={inviteCode}
-                    onChange={(next) => setInviteCode(next.toUpperCase())}
-                    width="100%"
-                    xstyle={styles.field}
-                  />
-                </VStack>
+                {/*
+                  Hidden until asked for (Will, 13 October: "otherwise let's hide it so
+                  it doesn't take up real estate"): most people join without a code.
+                  Open from the start when a code is already there, or when the code
+                  they gave needs fixing (`inviteProblem`).
+                */}
+                {codeShown ? (
+                  <VStack gap={1}>
+                    <HStack gap={1} align="center" wrap="nowrap">
+                      <Text aria-hidden="true" xstyle={styles.chipsLabel}>
+                        {t('join.code.label')}
+                      </Text>
+                      <InfoTip label={t('join.code.more')} content={t('join.code.hint')} />
+                    </HStack>
+                    <TextField
+                      id={codeFieldId}
+                      purpose="inviteCode"
+                      label={t('join.code.label')}
+                      isLabelHidden
+                      value={inviteCode}
+                      onChange={(next) => setInviteCode(next.toUpperCase())}
+                      width="100%"
+                      xstyle={styles.field}
+                    />
+                  </VStack>
+                ) : (
+                  <VStack gap={1} align="start">
+                    <Text xstyle={styles.body}>{t('join.code.question')}</Text>
+                    <TextLink label={t('join.code.reveal')} onClick={revealCode} isUnderlined />
+                  </VStack>
+                )}
                 </>
               )}
 

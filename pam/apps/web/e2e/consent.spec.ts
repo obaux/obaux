@@ -215,6 +215,9 @@ test.describe('arriving by an invite link (D-254)', () => {
   test('says what they were invited to be, and the pictures speak to that work', async ({ page }) => {
     await page.goto('/signin/?invite=PAM7Q4KX&as=case-manager');
     await expect(page.getByRole('note')).toHaveText(en['signin.invited.admin']);
+    // W6 (Will, 13 October): a newcomer from an invite is joining, not signing in again.
+    await expect(page.getByRole('heading', { name: 'Join Pam', level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Sign in', level: 1 })).toHaveCount(0);
     await expect(page.getByText(en['onboarding.admin.1'])).toBeVisible();
     // Still the one sign in: the number, the consent line, the button.
     await expect(page.getByText(en['signin.phone.consent'])).toBeVisible();
@@ -237,6 +240,10 @@ test.describe('arriving by an invite link (D-254)', () => {
         body: JSON.stringify([{ inviter_first_name: 'Dana', invited_role: 'provider', state: 'expired' }]),
       }),
     );
+    // Invite emails are switched on (D-563): only then is the new link offered.
+    await page.route('**/rest/v1/app_settings*', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ value: 'on' }) }),
+    );
     const asked: Record<string, unknown>[] = [];
     await page.route('**/rest/v1/rpc/request_invite_link*', async (route) => {
       asked.push(route.request().postDataJSON() as Record<string, unknown>);
@@ -246,6 +253,8 @@ test.describe('arriving by an invite link (D-254)', () => {
     await page.goto('/signin/?invite=PAM7Q4KX&as=program');
     await expect(page).toHaveURL(/\/invite\/expired\/\?invite=PAM7Q4KX&as=program/);
     await expect(page.getByRole('heading', { name: en['invite.expired.title'], level: 1 })).toBeVisible();
+    // Its line keeps its own words: "Start with your phone number" would be wrong here.
+    await expect(page.getByRole('note')).toHaveText(en['invite.expired.invited.provider']);
     await expect(page.getByText('Dana invited you to be a program partner in the Pam network.', { exact: false })).toBeVisible();
 
     // Not an address: said so, and nothing is asked for.
@@ -260,6 +269,27 @@ test.describe('arriving by an invite link (D-254)', () => {
     await expect(page.getByText(/andre@example\.org/)).toBeVisible();
     // The language the page was read in goes with it (0085): the email is written in it.
     expect(asked[0]).toMatchObject({ p_code: 'PAM7Q4KX', p_email: 'andre@example.org', p_language: 'en' });
+  });
+
+  test('while invite emails are off, the expired link offers no email, and the help desk is the way on (D-563)', async ({ page }) => {
+    // Sage, 13 October: "while invite emails are switched off, the whole 'Email me a new link' offer is untrue".
+    await page.route('**/rest/v1/rpc/invite_preview*', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([{ inviter_first_name: 'Dana', invited_role: 'member', state: 'expired' }]),
+      }),
+    );
+    await page.route('**/rest/v1/app_settings*', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ value: 'off' }) }),
+    );
+    await page.goto('/invite/expired/?invite=PAM7Q4KX&as=member');
+    await expect(page.getByRole('heading', { name: en['invite.expired.title'], level: 1 })).toBeVisible();
+    await expect(page.getByText('Dana invited you to join the Pam network.', { exact: false })).toBeVisible();
+    await expect(page.getByText(en['invite.expired.ask'])).toHaveCount(0);
+    await expect(page.getByLabel(en['invite.expired.email'])).toHaveCount(0);
+    await expect(page.getByRole('button', { name: en['invite.expired.action'] })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: en['help.contact.action'] })).toHaveAttribute('href', /\/support\/$/);
   });
 
   test('plain sign in has no invite line', async ({ page }) => {

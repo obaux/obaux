@@ -33,8 +33,8 @@ export interface BigButtonProps {
   isDisabled?: boolean;
   isLoading?: boolean;
   /**
-   * A short count tucked into the button's left end — "2 of 7" on a step
-   * (Will, 7 October, D-357). Drawn inside the button; part of its name.
+   * A short count at the button's start — "2 of 7" on a step (Will, 7 October,
+   * D-357), as quiet text and no pill (13 October, D-560). Drawn inside the button; part of its name.
    */
   badge?: string;
   /** Escape hatch for layout only (margins). Never for colour or type. */
@@ -42,28 +42,32 @@ export interface BigButtonProps {
 }
 
 const styles = stylex.create({
-  // Equal room both sides of the label, the badge's width and a little: the
-  // label stays centred, and a long one wraps rather than running under it.
-  withBadge: { position: 'relative', paddingInline: '88px' },
-  label: { fontSize: '17px', fontWeight: 600, lineHeight: 1.15, color: 'inherit', textAlign: 'center', whiteSpace: 'normal' },
-  // As far from the left end as from the top and bottom (D-357): 32px tall
-  // in a 56px button, so 12px all round.
-  badge: {
-    position: 'absolute',
-    insetInlineStart: '12px',
-    top: '12px',
-    height: '32px',
-    display: 'flex',
-    alignItems: 'center',
-    paddingInline: '12px',
-    borderRadius: '999px',
-    fontSize: '13px',
-    fontWeight: 600,
+  // The step count is a quiet line of text at the start of the button, not a pill (Will, 13 October): no fill, 12px, the
+  // button's own text colour a little lighter. It is one of three equal-width cells in a row, the count, the label and an
+  // invisible copy of the count at the other end, so the label stays centred whatever the count is called (in Chinese it
+  // is wider than "2 of 7") and a long label wraps in the room between them.
+  // The row is as wide as the button's inside (its 12px padding each side): the button is a size container, so `cqw` is its
+  // own width, and the row does not shrink to its words the way a child of the button's centring wrapper would.
+  withCount: { containerType: 'inline-size' },
+  row: { display: 'flex', alignItems: 'center', width: 'calc(100cqw - 24px)', gap: '8px' },
+  count: {
+    flexGrow: 1,
+    flexShrink: 0,
+    flexBasis: 0,
+    minWidth: 'max-content',
+    fontSize: '12px',
+    fontWeight: 500,
     lineHeight: 1,
+    whiteSpace: 'nowrap',
+    textAlign: 'start',
     pointerEvents: 'none',
-    backgroundColor: pam['--pam-on-accent-deep'],
-    color: colorVars['--color-on-accent'],
+    color: 'inherit',
+    opacity: 0.75,
   },
+  // The same words, unseen, so the room at the end matches the room at the start.
+  // Drawn from `data-count` by CSS, so the words are not in the page twice (a test, or a reader, finds the count once).
+  countGhost: { visibility: 'hidden', textAlign: 'end', '::before': { content: 'attr(data-count)' } },
+  label: { fontSize: '17px', fontWeight: 600, lineHeight: 1.15, color: 'inherit', textAlign: 'center', whiteSpace: 'normal', flexShrink: 1, minWidth: 0 },
   root: {
     // 56px with 17px text, full width (D-239, Will, 3 October: primary and
     // secondary matched — §2.5's 64px amended). Secondary uses this too.
@@ -88,9 +92,8 @@ export function BigButton({
   badge,
   xstyle,
 }: BigButtonProps) {
-  // The badge is drawn inside the button, out of the flow (D-357): over the
-  // button it would cover part of the target, and in the icon slot it pushed
-  // the label off centre. The name says both: "Next, 2 of 7".
+  // The count is drawn inside the button, never over its target (D-357), and never in the icon slot, where it pushed the
+  // label off centre. It is a quiet line of text, level with the label (D-560). The name says both: "Next, 2 of 7".
   return (
     <Press>
       <Button
@@ -103,17 +106,18 @@ export function BigButton({
         isDisabled={isDisabled}
         isLoading={isLoading}
         clickAction={onPress}
-        xstyle={[styles.root, badge ? styles.withBadge : null, xstyle]}
+        xstyle={[styles.root, badge ? styles.withCount : null, xstyle]}
       >
         {badge ? (
-          <>
-            <Text aria-hidden xstyle={styles.badge}>
+          <span {...stylex.props(styles.row)}>
+            <Text aria-hidden xstyle={styles.count}>
               {badge}
             </Text>
             <Text aria-hidden xstyle={styles.label}>
               {label}
             </Text>
-          </>
+            <span aria-hidden="true" data-count={badge} {...stylex.props(styles.count, styles.countGhost)} />
+          </span>
         ) : undefined}
       </Button>
     </Press>

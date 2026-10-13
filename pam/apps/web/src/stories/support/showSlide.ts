@@ -1,4 +1,4 @@
-import { waitFor } from 'storybook/test';
+import { userEvent, waitFor } from 'storybook/test';
 
 /**
  * Bring one slide of the on-screen carousel into view, the way a swipe does (stories only).
@@ -36,4 +36,23 @@ export async function chooseAboutTab(canvasElement: HTMLElement, who: 'member' |
     if (tab.getAttribute('aria-checked') !== 'true') throw new Error(`${who} tab not chosen yet`);
   });
   await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+}
+
+/**
+ * Ask the expired-link page for a new link, as a person does (stories only): type an email address into its one field and press its
+ * one enabled button, so the page shows what it says after the request (`invite.expired.sent.*`). The pretend database answers yes.
+ */
+export async function askForNewLink(canvasElement: HTMLElement, email: string): Promise<void> {
+  const field = await waitFor(() => {
+    const found = canvasElement.querySelector<HTMLInputElement>('input[type="email"]');
+    if (!found) throw new Error('no email field yet');
+    return found;
+  });
+  await userEvent.type(field, email);
+  const button = await waitFor(() => {
+    const found = canvasElement.querySelector<HTMLButtonElement>('button:not([disabled])');
+    if (!found) throw new Error('no enabled button yet');
+    return found;
+  });
+  await userEvent.click(button);
 }

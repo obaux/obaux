@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
@@ -50,12 +50,13 @@ const styles = stylex.create({
   invited: {
     display: 'block',
     width: '100%',
-    paddingBlock: '10px',
+    // A little tighter on a short screen, where the line can run to four lines (D-564).
+    paddingBlock: { default: '10px', '@media (max-height: 640px)': '6px' },
     paddingInline: '16px',
     boxSizing: 'border-box',
     textAlign: 'center',
     fontSize: '15px',
-    lineHeight: 1.4,
+    lineHeight: { default: 1.4, '@media (max-height: 640px)': 1.3 },
     fontWeight: 600,
     color: '#FFFFFF',
     backgroundColor: '#000000',
@@ -88,7 +89,7 @@ const styles = stylex.create({
   pinBarShown: { opacity: 1, visibility: 'visible' },
   heroGroup: { width: '100%', marginBlockStart: '-24px' },
   heroHeader: { position: 'relative', width: '100%' },
-  heroBrand: { width: 'fit-content', marginInline: 'auto' },
+  heroBrand: { width: 'fit-content', marginInline: 'auto', rowGap: { default: null, '@media (max-height: 640px)': '8px' } },
   // Larger and always white (Will, 16 September) — the themed mark
   // `AppHeader` renders elsewhere picks dark or light ink to sit on the
   // page's own background, which is the wrong call directly over art, in
@@ -345,6 +346,7 @@ export function SignInScreen({
         code={code}
         onCodeChange={setCode}
         hasTitle={onFirstStep}
+        isInvited={invite !== null}
         isFlat
       />
     );
@@ -354,6 +356,8 @@ export function SignInScreen({
       <TextLink label={t('signin.phone.label')} onClick={startOver} />
     ) : null;
 
+  const pinnedRef = useRef<HTMLDivElement | null>(null);
+  const markRef = useRef<HTMLImageElement | null>(null);
   /*
    * The mark, the region, and the locale switcher, overlaid on the hero
    * rather than in a header row above it (Will, 16 September, matching the
@@ -366,7 +370,7 @@ export function SignInScreen({
   const heroHeader = (
     <div {...stylex.props(styles.heroHeader)}>
       <VStack gap={4} align="center" xstyle={styles.heroBrand}>
-        <img src="/pam-wordmark-white.svg" alt="Pam" {...stylex.props(styles.heroMark)} />
+        <img ref={markRef} src="/pam-wordmark-white.svg" alt="Pam" {...stylex.props(styles.heroMark)} />
         <Text xstyle={styles.heroCity}>{t('signin.city')}</Text>
       </VStack>
       <div {...stylex.props(styles.heroGlobe)}>
@@ -375,14 +379,34 @@ export function SignInScreen({
     </div>
   );
 
-  // Past the hero's own mark and globe: the compact bar takes over (see `pinned`).
+  // Past the hero's own mark and globe: the compact bar takes over (see `pinned`). When the mark has gone from view, not at a
+  // fixed distance (D-564): a short phone's page scrolls only 72px in some languages, and a fixed 72 never fired. The mark is
+  // "gone" once it is behind the pinned invite line as well as off the top, so the observer's top edge is that line's height.
   const [pinBarShown, setPinBarShown] = useState(false);
   useEffect(() => {
-    const read = () => setPinBarShown(window.scrollY > 72);
-    read();
-    window.addEventListener('scroll', read, { passive: true });
-    return () => window.removeEventListener('scroll', read);
-  }, []);
+    const mark = markRef.current;
+    if (!mark) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      const read = () => setPinBarShown(window.scrollY > 72);
+      read();
+      window.addEventListener('scroll', read, { passive: true });
+      return () => window.removeEventListener('scroll', read);
+    }
+    let io: IntersectionObserver | null = null;
+    const watch = () => {
+      io?.disconnect();
+      const top = Math.round(pinnedRef.current?.getBoundingClientRect().height ?? 0);
+      io = new IntersectionObserver(([entry]) => setPinBarShown(entry ? !entry.isIntersecting : false), { rootMargin: `-${top}px 0px 0px 0px`, threshold: 0 });
+      io.observe(mark);
+    };
+    watch();
+    const resize = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(watch);
+    if (pinnedRef.current) resize?.observe(pinnedRef.current);
+    return () => {
+      io?.disconnect();
+      resize?.disconnect();
+    };
+  }, [onFirstStep]);
 
   return (
     <>
@@ -393,7 +417,7 @@ export function SignInScreen({
         first step it is pinned, with the compact mark bar under it once the hero has gone
         (D-502). The code step's own bar (`SubPageHeader`) is already pinned.
       */}
-      <VStack xstyle={onFirstStep ? styles.pinned : undefined}>
+      <div ref={pinnedRef} {...stylex.props(onFirstStep ? styles.pinned : undefined)}>
         {invite ? (
           <Text role="note" xstyle={styles.invited}>
             {t(`signin.invited.${invite.role}`)}
@@ -404,7 +428,7 @@ export function SignInScreen({
             <AppHeader homeHref={null} trailing={<LanguageSwitcher />} />
           </VStack>
         ) : null}
-      </VStack>
+      </div>
       {/* Centred under the hero; the code step is a nested page, left-aligned
           like every other (D-253), with only "Sent to" centred. */}
       <Page

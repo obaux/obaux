@@ -14,6 +14,10 @@ import * as stylex from '@stylexjs/stylex';
  * (Mira, 11 October): `text-muted-strong` is muted text on Gray, Green and
  * Purple surfaces; `text-success` is success-green text on white (page only).
  * Figma keeps Will's values until he chooses.
+ *
+ * `text-link` (Will, 13 October, D-562): the words of a link. Light is the brand green as before; in dark it is a very light lime
+ * (off-white with a hint of green), not the lime `brand-primary`, which stays for icons, chevrons and fills. A link in dark is
+ * therefore told from the text round it by an underline or its row, not by colour alone (the two are 1.17:1 apart).
  */
 export const website = stylex.defineVars({
   '--website-surface-page': 'light-dark(#FFFFFF, #1B1B1B)',
@@ -41,4 +45,5 @@ export const website = stylex.defineVars({
   '--website-accent-success': 'light-dark(#0B991F, #0B991F)',
   '--website-text-muted-strong': 'light-dark(#595959, #A6A6A6)',
   '--website-text-success': 'light-dark(#087A18, #0B991F)',
+  '--website-text-link': 'light-dark(#0F5847, #EEF1C2)',
 });
