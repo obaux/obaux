@@ -89,9 +89,13 @@ for (const locale of ['en', 'es', 'ar', 'zh-CN'] as const) {
 
       const pinned = await page.evaluate(() => {
         const note = document.querySelector('[role="note"]');
+        // The bar sits under the invite line, whatever height the language gives it: measure against the note's bottom
+        // (0 when not invited), plus the bar's own height, not a fixed 140.
+        const noteBottom = note ? Math.round(note.getBoundingClientRect().bottom) : 0;
+        const limit = noteBottom + 56;
         const inTop = (el: Element) => {
           const r = el.getBoundingClientRect();
-          return r.top >= 0 && r.bottom <= 140 && r.width > 0 && getComputedStyle(el.parentElement!).visibility !== 'hidden' && getComputedStyle(el).visibility !== 'hidden';
+          return r.top >= 0 && r.bottom <= limit && r.width > 0 && getComputedStyle(el.parentElement!).visibility !== 'hidden' && getComputedStyle(el).visibility !== 'hidden';
         };
         const marks = [...document.querySelectorAll('img[alt="Pam"]')].filter(inTop);
         const buttons = [...document.querySelectorAll('button')].filter(inTop);
