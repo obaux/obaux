@@ -35,10 +35,15 @@ export const LIMITS = {
   body: 12_000,
 } as const;
 
-/** Who the form lets a person say they are (Will, 13 October). Anything else in `roles` is dropped. */
-export const WHO = ['member', 'program', 'case_manager'] as const;
+/** Who the form lets a person say they are (Will, 13 October; not_yet from Sage's fourth choice). Anything else in `roles` is dropped. */
+export const WHO = ['member', 'program', 'case_manager', 'not_yet'] as const;
 export type Who = (typeof WHO)[number];
-const WHO_WORDS: Record<Who, string> = { member: 'a member', program: 'a program', case_manager: 'a case manager' };
+const WHO_WORDS: Record<Who, string> = {
+  member: 'a member',
+  program: 'a program',
+  case_manager: 'a case manager',
+  not_yet: 'not using Pam yet',
+};
 const MAX_ROLES = 10;
 
 /**
@@ -57,6 +62,8 @@ export function rolesOf(input: Record<string, unknown>): Who[] {
     const value = item.replace(CONTROL, '').trim().toLowerCase().replace(/[\s-]+/g, '_');
     if ((WHO as readonly string[]).includes(value)) seen.add(value as Who);
   }
+  // "I don't use Pam yet" ticked beside a role is the role: the role says more.
+  if (seen.size > 1) seen.delete('not_yet');
   return WHO.filter((w) => seen.has(w));
 }
 
@@ -166,7 +173,8 @@ export function render(input: Request_): { subject: string; text: string; html: 
     ['Answer by', `Reply to this email (it goes to ${input.email})`],
     ['Page', input.page ?? 'not given'],
     ['Language', input.lang ?? 'not given'],
-    ['Role', input.role ?? 'not known'],
+    // Only when the site sent one: the form asks "Says they are" now, and "Role: not known" beside it would confuse.
+    ...(input.role ? ([['Role', input.role]] as [string, string][]) : []),
   ];
   const text = `${rows.map(([k, v]) => `${k}: ${v}`).join('\n')}\n\n${input.message}\n`;
   const html =

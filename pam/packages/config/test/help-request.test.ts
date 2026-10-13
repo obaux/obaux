@@ -78,6 +78,36 @@ describe('the help request forward', () => {
   });
 
   describe('who they say they are (roles, Will 13 October)', () => {
+    it('"I don\'t use Pam yet" is said in the email as it is', async () => {
+      const w = world();
+      await w.post({ ...GOOD, roles: ['not_yet'] });
+      expect(w.sent[0]!.text).toContain('Says they are: not using Pam yet');
+      expect(w.sent[0]!.text).not.toContain('not said');
+      expect(saysTheyAre(['not_yet'])).toBe('not using Pam yet');
+    });
+
+    it('ticked beside a role it is dropped and the roles are kept', async () => {
+      expect(rolesOf({ roles: ['not_yet', 'member'] })).toEqual(['member']);
+      expect(rolesOf({ roles: ['case_manager', 'not_yet', 'program'] })).toEqual(['program', 'case_manager']);
+      expect(rolesOf({ roles: ['not_yet', 'not_yet'] })).toEqual(['not_yet']);
+      expect(rolesOf({ roles: ['not_yet', 'nonsense'] })).toEqual(['not_yet']);
+      const w = world();
+      await w.post({ ...GOOD, roles: ['not_yet', 'member', 'case_manager'] });
+      expect(w.sent[0]!.text).toContain('Says they are: a member and a case manager');
+      expect(w.sent[0]!.text).not.toContain('not using Pam yet');
+    });
+
+    it('shows the Role row only when a role was sent', async () => {
+      const without = world();
+      await without.post({ message: GOOD.message, email: GOOD.email, roles: ['member'] });
+      expect(without.sent[0]!.text).not.toMatch(/^Role:/m);
+      expect(without.sent[0]!.text).not.toContain('not known');
+      expect(without.sent[0]!.html).not.toContain('Role');
+      const withRole = world();
+      await withRole.post({ ...GOOD, role: 'member, case manager' });
+      expect(withRole.sent[0]!.text).toMatch(/^Role: member, case manager$/m);
+    });
+
     it('is optional: without it the email says "not said" and everything else is as before', async () => {
       const w = world();
       expect((await w.post(GOOD)).status).toBe(200);
@@ -108,7 +138,7 @@ describe('the help request forward', () => {
       expect(rolesOf({ roles: ['super_admin', 'provider'] })).toEqual([]);
       expect(rolesOf({})).toEqual([]);
       expect(rolesOf({ roles: null })).toEqual([]);
-      expect(WHO).toEqual(['member', 'program', 'case_manager']);
+      expect(WHO).toEqual(['member', 'program', 'case_manager', 'not_yet']);
     });
 
     it('refuses what is not a list, or an absurd list, and names the field', async () => {

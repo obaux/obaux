@@ -18,8 +18,8 @@ No login and no key are needed (the function is deployed with JWT verification o
 | `name` | no | 100 | What to call them |
 | `page` | no | 300 | The path or title of the page they came from (e.g. `/support/posts/where-is-my-program`) |
 | `lang` | no | 16 | The language they read in (e.g. `es`, `zh-HK`) |
-| `role` | no | 40 | Their role if the site knows it (the site usually does not) |
-| `roles` | no | an array of up to 10 | Who they say they are, from the form's "choose all that apply": any of `member`, `program`, `case_manager` ("Case manager" with a space is read the same). Repeats and anything else are dropped, not refused; a value that is not an array is refused (`field: "roles"`). It is shown in the email as "Says they are: a member and a case manager" and goes nowhere else: not stored, not logged, not in the subject or the duplicate check |
+| `role` | no | 40 | Their role as free text, if the site sends it. The email has a "Role:" row only when this is sent |
+| `roles` | no | an array of up to 10 | Who they say they are, from the form's "choose all that apply": any of `member`, `program`, `case_manager`, `not_yet` ("I don't use Pam yet"; the email says "not using Pam yet", and it is dropped if a role is ticked beside it) ("Case manager" with a space is read the same). Repeats and anything else are dropped, not refused; a value that is not an array is refused (`field: "roles"`). It is shown in the email as "Says they are: a member and a case manager" and goes nowhere else: not stored, not logged, not in the subject or the duplicate check |
 | `website` | **honeypot** | – | A field no person sees: hide it with CSS (not `type=hidden`), `tabindex=-1`, `autocomplete=off`. Send it empty. A filled one is treated as a bot: the reply says `ok` and nothing is sent |
 
 Unknown fields are ignored. The whole body may be at most 12,000 characters. Control characters are stripped.
