@@ -21,12 +21,11 @@ import { goBack } from '@/lib/navigate';
  *
  * - The nested template: back (to where it was opened) and Pam's wordmark
  *   where the round buttons usually sit.
- * - One sentence for what Pam is; then a pill switch for who is reading, a
- *   line for how it helps them, and their three-slide story — the Sign in
- *   carousel, but in line with the page and rounded, with the pictures alone:
- *   no words over them (Will, 10 October: "only tab and image — it's
- *   redundant text"). Each picture is named for a screen reader by the same
- *   line Sign in shows that person (D-254), through `tPlain`.
+ * - One sentence for what Pam is; then a pill switch for who is reading and
+ *   their three-slide story — the Sign in carousel, but in line with the
+ *   page and rounded, with its words on the pictures and a Pause / Play button
+ *   (Will, 12 October: "the words in it were great"; what he asked to remove was
+ *   the line between the carousel and the tabs, which is gone: D-548).
  * - The way on: "Sign in as …", one row each, opening Sign in with that
  *   person's slides.
  */
@@ -39,7 +38,6 @@ const styles = stylex.create({
   logo: { height: '32px', width: 'auto', display: 'block' },
   intro: { fontSize: '19px', lineHeight: 1.5 },
   pills: { borderRadius: '999px', alignSelf: 'flex-start' },
-  how: { fontSize: '18px', lineHeight: 1.5 },
   section: { fontSize: '20px', lineHeight: 1.3 },
 });
 
@@ -83,10 +81,8 @@ export function AboutScreen() {
       </SegmentedControl>
 
       <VStack gap={3}>
-        <Text xstyle={styles.how}>{t(`about.how.${who}`)}</Text>
         {/* Keyed by who, so switching starts their story at its first slide. */}
         <OnboardingSlides key={who} slides={slides} label={t(`about.tab.${who}`)} variant="inline"
-          showLines={false}
           pauseLabel={tPlain('carousel.pause')}
           playLabel={tPlain('carousel.play')}
         />

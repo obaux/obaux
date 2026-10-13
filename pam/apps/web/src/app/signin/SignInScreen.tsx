@@ -16,6 +16,7 @@ import { useAlertBanner } from '@/lib/alertBanner';
 import { LanguageSwitcher } from '../LanguageSwitcher';
 import { PhoneSignInCard } from './PhoneSignInCard';
 import { LegalLinks } from './LegalFooter';
+import { rememberNext, takeNext } from '@/lib/signinNext';
 import { recallInvite, rememberInvite, type Invite, type InviteRole } from '@/lib/appUrl';
 import { pendingInviteForMe, previewInvite } from '@/lib/useInviteLinks';
 import { navigate } from '@/lib/navigate';
@@ -165,6 +166,12 @@ export function SignInScreen({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // A way on after Sign in (S1): the website's "Add your program" arrives as ?next=/profile/add-program/. Only a listed screen is kept.
+  useEffect(() => {
+    if (preview) return;
+    rememberNext(new URLSearchParams(window.location.search).get('next'));
+  }, [preview]);
+
   /**
    * Somebody who is already in does not get asked for their phone again.
    *
@@ -179,7 +186,7 @@ export function SignInScreen({
     if (preview) return;
     if (state.step !== 'phone') return;
     if (session.status === 'signed-in') {
-      router.replace(session.session.isOnboarded ? '/' : '/join/');
+      router.replace(session.session.isOnboarded ? (takeNext(session.session.role) ?? '/') : '/join/');
     } else if (session.status === 'no-profile') {
       router.replace('/join/');
     }
@@ -256,7 +263,7 @@ export function SignInScreen({
 
         const { data: profile } = await supabase
           .from('profiles')
-          .select('id, onboarded_at')
+          .select('id, onboarded_at, role')
           .eq('id', auth.user.id)
           .maybeSingle();
         if (cancelled) return;
@@ -298,7 +305,9 @@ export function SignInScreen({
         const asked = await getReminderConsent(auth.user.id);
         if (cancelled) return;
 
-        router.replace(asked === null ? '/reminders/' : '/');
+        // A listed way on (S1) goes first for somebody who is not a program lead; the reminders question waits for next time.
+        const next = asked === null ? null : takeNext((profile as { role?: string | null }).role ?? null);
+        router.replace(asked === null ? '/reminders/' : (next ?? '/'));
       } catch {
         // A redirect that cannot decide still has to go somewhere.
         if (!cancelled) router.replace('/');

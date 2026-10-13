@@ -374,9 +374,110 @@
   Stop, Speed and Voice (the phone's English voices, most natural first; Apple's Premium voices sound closest to a
   person). A web page cannot keep talking with the screen locked; a recorded voice (Google) is offered to Will if
   he wants that.
+- **Batch b24, live at 0a36ada1 (12 October, 06:19).** No app code, no migrations. Wren: "Does the place know
+  I'm coming?" now says a program on Pam sees the visit (it had said programs are never told, untrue since b22:
+  my miss, it was held at e06fab16 and didn't ride b22), with Sage's signed paragraphs and summary; Home takes
+  Will's a65 lines 1 and 3. Sage: the a65 lines 4 and 5 and the place-told update in the ledger. Dot: the website
+  text colours side by side for Will (D-546, the story Website / Text colours) and the nightly user-flow map. Nico:
+  a story for the super admin's Answer by text page.
+- **Will's messages, 05:43 to 06:17:**
+  - **The website's words (a65, 05:43 and 05:47).** Line 1 stays in Will's words ("talk to a real person" means
+    messaging a program in the app; live in b24). Line 2 keeps his words too (the help desk is open 24/7) but
+    waits until the website is translated, before launch. Line 3 is back (attendance shipped in b22; live in b24).
+    Line 4 keeps "history"; line 5 is about messaging, guiding and points, not literal cheering (Wren's next SHA). The Home buttons in the middle go to Sign in. New feature, "case
+    manager request from website": a page where a case manager asks to use Pam with their people, and the super
+    admin approves (Ava plans it, Wren builds the page). Fix the footer typo. Colours: examples first (a75).
+  - **A new phone number (a73, 05:51).** A "New number?" link on Sign in next to Privacy, a page to ask for the
+    change, the super admin decides; for someone on a caseload the case manager is asked first, and after 24 to
+    48 hours with no answer it goes to the super admin. Ava plans it, build first.
+  - **Texting people back (a61, 05:58):** not now, a nice-to-have. **Translation paragraph (a70, 06:00):** signed.
+    **Reading calendars (a69, 06:02):** not yet; Iris sets up a count of how many members open the rewards screen
+    (one daily number, no account in it), which needs a Privacy line first. **Google Calendar sync (a71, 06:03):**
+    waits until the sync is switched on.
+  - **The help form (a62).** Will pasted the check and added the salt (06:14). Live: security definer,
+    search_path public, extensions; only service_role can run it; the body is the file's logic without its comment
+    and indentation; the table has RLS forced and no client grants. Recorded in schema_migrations as
+    20261011041940 under its file name. The help-request edge function has been deployed, off, since 11 October 04:49 (the code on
+    main). The card is now step 3 only: HELP_REQUESTS_LIVE = on and one test from Will.
+  - **a67 and a68 signed** (06:06, 06:05). Lena sends both Privacy texts in seven languages and Piper the calendar
+    link brought up to main, for b25.
+  - **Street search (a74).** Will: "Isn't it better to use Google Maps api for this? City data hub sucks." Agreed:
+    Google through a Pam server function (the typed words go from Pam's server, not the phone; Philadelphia only;
+    nothing logged), its own key with a daily cap, off until Will enters the key, and one Privacy line for him to
+    sign. The City-file plan and its network setting are dropped. Piper plans it after the calendar link.
+  - **Explore's bell** (06:17): a member's Explore shows the bell only when they have notifications. Nico.
+  - **Colours:** card a75 with Dot's examples and the scores.
+- **A 20-hour pause (12 October 06:30 to 13 October 02:05 UTC).** My session stopped after b24's CI went green
+  (06:45) and picked up again at 02:05. Nico, Piper and Lena got my 06:22 messages only at 02:06. Will's five
+  messages from 06:20 to 06:58 waited about 20 hours; I told him so plainly when answering.
+- **Will's messages, 06:20 to 06:58 (answered 02:08, 13 October):**
+  - **About Pam (06:20).** We misread him on 10 October (D-499): he wanted the line between the tabs and the
+    carousel removed, not the carousel's words. Wren's D-548 puts the words back (Pause stays) and removes the
+    about.how.* line. Sage found two carousel lines that aren't true (admin.2 "Send someone to a program in one
+    tap", provider.3 "Case managers nearby send people your way": recommend is a placeholder) and replaced them;
+    Lena translates.
+  - **"Coming home" (06:22).** Off About Pam: the line under the tabs went with D-548, and about.intro is now
+    "Pam connects people with the programs, mentors and case managers who can help: ..." (Sage signed 02:15, Lena
+    seven languages). The invite button "Someone coming home" stays unless Will says otherwise.
+  - **Pictures and colour samples (06:27).** Control Room v17: a sample beside every hex code (chat and cards),
+    pictures on cards and messages (the page's own img/ files, /_blob/ or data: images only), tap for full size,
+    and Listen spells a colour ("colour 0 8 7 A 1 8"). Tested at 320/390/1280, light and dark.
+  - **"Is Nico stuck?" (06:28).** No: he was building the Explore bell; the pause held everyone.
+  - **Colours and the phone layout (06:58, a75).** The colours stay. The website's phone layout follows his Figma
+    (7:3), and the green card shows three views (18:517: Residents, Program providers, Case managers) instead of
+    linking to the help desk. Dot wrote the spec (Figma read fine; PNG export is blocked by the proxy, and Will
+    drew the frames, so his card links to them). Wren builds it and holds it off main until Will sees pictures.
+- **Card a76:** Sage's line for counting interest in points (a69), with Iris's plan.
+- **Street search:** Piper's plan is in (edge function places-search, Autocomplete + Place Details Essentials,
+  Philadelphia only, off until GOOGLE_MAPS_SERVER_KEY). Changed: Google is also asked for corners and names when
+  Pam's own areas have no match. Cost from Google's pages: 10,000 free a month per kind, about 2,500 to 3,000
+  searches a month free at 3 to 4 autocomplete calls each.
+- **Batch b25 (13 October).** No migrations. Wren: Home takes Will's a65 lines 4 and 5, and "Add your program" goes to
+  Sign in; About Pam's carousel words back, the line under the tabs gone (D-548). Lena: Privacy a67 (servers'
+  records, the Trips map from Google), a68 (the calendar link, both paragraphs) and a70 (translation by Claude, shown
+  only while translation is on) in seven languages; about.intro without "coming home"; the two true carousel lines;
+  stories that draw every staff slide, so the fit audit measures them. Sage: ledger rows for all of it. Nico: a
+  member's Explore shows the bell only when there are notifications (D-549; first claimed as D-548, renumbered at
+  merge because Wren's About decision holds D-548).
+- **Held from b25:** Piper's calendar link (D-538, 2a2ecf7a). Its migration (20261011161548) timed out at the
+  connector, as the help form's did, because calendar_link_off() deletes a row; nothing was applied, no locks. It
+  is one paste for Will (card a79, guarded schema_migrations insert, one transaction). The link and the
+  calendar-feed function (JWT off) ship after his paste. Its copy test also carried a stale allow-list for every
+  calendar.* key ("English until Will signs"): all 29 are translated and signed, so the line comes out when it
+  merges. Ava's Connect fix (56f5ec16) is in her session unpushed until Will answers a78. Wren's phone layout
+  (c4ef13c4, D-550) waits for Will on a77. Lena's member slide stories (7af31084) and Sage's green-card rows
+  (b8067c7e) go in b26.
+- **Batch b26 (13 October, `d8b7d37f`).** No migrations. Dot: the header's role chip never splits a word, and
+  the header's corner takes its own row when it can't fit (D-551; Iris's W3). Lena: stories for the member's welcome
+  slides 2 and 3 (a carousel needs one story per slide, or the 320px audit never sees it); a host guard and a test
+  that hold Piper's coming street-search function to Privacy's promises (no copy, off until Will signs p7 and adds
+  the key); the "Last updated" date follows the words (Privacy 13 October 2026, Terms 11 October 2026, seven
+  languages, Iris's W2), with `legal-updated.json` and a test that turns red when either document's English
+  changes without a new date (`pnpm --filter @pam/config legal:date <privacy|terms> <day>`). Sage: the ledger rows
+  for the date pattern, Will's a77 lines, the green card's Pause/Play labels and p7 option A.
+- **Held from b26:** Wren's phone layout and the moving green card (D-550, `345fc148`, card a80; Dot tap-checked
+  Play at 390px), Dot's Play-restarts fix for the app and website carousels (D-554, `b82aeca6`, for b27), Ava's two
+  branches (card a78), the calendar link (card a79).
+- **Batch b27 (13 October).** No migrations. Piper: a real member's page and their past trips show the visits really
+  planned, read as the case manager (appointments_select_admin decides), never made-up ones; the "examples" note only
+  on example people (W4, D-509). Sign in takes `?next=/profile/add-program/` to Add my program, one listed screen,
+  once, never for a program lead (S1); the website link follows in b28, after the app understands it. Dot: only
+  keyboard focus holds a carousel and Play lets go, so Pause then Play works with a tap (D-554, Iris W1). Sage: the
+  street hint, label and Google attribution ("Google Maps", per Google's Places policy), Will's a76 signature. Iris:
+  the b25 run-through and b26 re-check (W2 and D-551 pass).
+- **Will pasted the calendar migration (a79, about 04:50).** Supabase's SQL editor warned "destructive operations" (it reacts
+  to `delete` and `revoke`); the card now says so. Verified live: table, RLS forced, 0 rows, select-false policy, no
+  client grants; the five functions are definer with search_path public, extensions, and match the file line for line
+  (only the indentation was lost in the paste); anon executes none, authenticated the four member ones,
+  calendar_feed_read the service role only; 20261011161548 recorded. The link ships in b28.
 
 ## What was wrong, and what missed it
 
+- **D-499 removed the wrong words.** Will (10 October): "That page should not have text over the carousel image. Only
+  tab and image. It's redundant text." We took the words off the pictures; he meant the separate line between the
+  tabs and the carousel. Nobody showed him the result before it shipped. Now: a design change Will asked for goes
+  back to him as a picture on his card before it ships (the Control Room shows pictures since v17), and an
+  ambiguous "remove the text" gets a one-line "this one?" with a screenshot.
 - **I ran part of a migration through execute_sql after apply_migration timed out.** Will had asked whether I could
   do the help form's SQL without him. I applied the table piecewise, then the function (the part with a `delete`)
   timed out the same way. A safety check then refused my reply about it. The connector holds statements like that
@@ -557,6 +658,18 @@
 | Batch b23 (fe7aea7b): db / config / ui / web unit / site / e2e full / storybook / site checks | 1498 ok / 1176 / 124 / 139 / 94 / 1532 passed, 19 skipped / builds / 120 scans 0, clear, 300 links 0 |
 | b23 + Wren b4d0e66d: site tsc / tests / build / a11y / usability / scrollspy | 0 / 94 / 0 / 120 scans 0 / clear / 300 links 0 |
 | b23 new or changed English keys (place.about) and removed (checkin.notNow) | translated in six languages, signed by Sage 02:25; removed from all seven |
+| Batch b25 (0fd87df1): db / config / ui / web unit / site / e2e full / storybook / site checks | 1498 ok, 0 not ok / 1211 / 124 / 139 / 94 / 1541 passed, 19 skipped / builds, 13.9 kB spare / 120 scans 0, clear, 306 links 0 |
+| b25 new or changed English keys (privacy p5, p6, p11, p12, translation.p2, about.intro, onboarding.admin.2, onboarding.provider.3) | translated in six languages, none equal to English; all in the signed ledger |
+| Batch b26 (6a6ca551): db / config / ui / web unit / site / e2e full / storybook / site checks | 1498 ok / 1224 / 124 / 139 / 94 / 1666 passed, 1 flaky (places.spec:118 at 320, passed on retry), 19 skipped / builds, 13.8 kB spare / 120 scans 0, clear, 306 links 0 |
+| b26 + Lena 5bed032e + Sage caab3bee (d8b7d37f): config / copy:status / web and site tsc | 1246 / in step / 0 / 0 |
+| b26 new or changed English keys (privacy.updated, terms.updated) | translated in six languages, none equal to English; signed as a pattern |
+| b26 on main (d8b7d37f): GitHub checks / Vercel | 4 of 4 green (accessibility 04:45) / web and pam-site READY |
+| Batch b27 (9025244b): db / config / ui / web unit / site / e2e full / storybook / site checks | 1498 ok / 1246 / 124 / 144 / 94 / 1694 passed, 19 skipped, 0 flaky / builds, 13.8 kB spare / 120 scans 0, clear, 306 links 0 |
+| Calendar migration 20261011161548 after Will's paste | table + RLS forced + 0 rows + select-false policy + no client grants; 5 bodies equal to the file ignoring indentation; grants as designed; recorded |
+| Calendar migration 20261011161548 via the connector | timed out; table, functions and record all absent afterwards; no locks or running queries |
+| Batch b24 (0a36ada1): web/site tsc / web unit / site tests / config / site build / a11y / usability / scrollspy / storybook | 0 / 0 / 139 / 94 / 1176 / 0 / 120 scans 0 / clear / 306 links 0 / builds (no app code: e2e not rerun) |
+| Live help_request_allowed after Will's paste (a62) | definer; search_path public, extensions; anon and authenticated cannot execute, service_role can; same logic as the file (md5 differs: indentation and one comment); help_request_attempts RLS forced, no client grants, 0 rows |
+| help-request edge function | v2, deployed 11 October 04:49, after the last code change (821e6526, 04:48); off without HELP_REQUESTS_LIVE |
 
 ## Left undone
 
@@ -576,13 +689,10 @@
 
 ## Needs a human
 
-- Will: card a56 (attendance plan A–D; advice: go after Trips, no missed text, no points yet).
-- Will: card a62. The table is live. Paste the one short function block on the card, add HELP_REQUEST_SALT, then
-  HELP_REQUESTS_LIVE = on and one test request. Record 041940 in schema_migrations after his paste.
-- Will: card a61 (texting people back). The pitch deck is linked there, with its questions and Nico's
-  recommendations.
-- Will: card a73 (a new phone number), a74 (street search data), a65, a67, a68, a69, a71; a70 (the translation
-  paragraph, not urgent). a63, a66 and a72 are signed and live in b22.
+- Will: card a62, step 3 only: HELP_REQUESTS_LIVE = on in Supabase's secrets, then one test from "Still stuck?"
+  (his paste and the salt are in and checked; 041940 is recorded).
+- Will: card a75 (website text colours, Dot's examples linked). Later cards: the Google street search (a key and a
+  Privacy line), the new number flow and the case manager request (Ava), the rewards-screen count (Iris).
 - Will: if he wants the Control Room read with the screen off, "Google voice" (a Google Cloud key he enters).
 - Will: delete the stand-in Figma file o9axtp3IwICQixuJVoSlpg (Dot).
 - A native Brazilian Portuguese reader for "registrada" (Lena's choice for "marked", since "marcada" reads as
