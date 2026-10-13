@@ -360,6 +360,15 @@
     the new functions.
   - Dot redrew the member and program-lead pages of the user-flow map in Figma (r32 on Will's Ready list); the
     stories behind them ride b23.
+- **Batch b23, live at 1f81924e (12 October).** No migrations. Piper: "About this place" on every place page
+  (Sage signed one heading for both kinds of place, so a branch bug can't show the wrong one; Lena, six languages)
+  and the unused checkin.notNow removed. Sage: Will's a72 signature. Dot: the stories behind the a72 user-flow map
+  (the member card, hasLead and programMemberCard on the pretend database, hasLead on the I'm here story, which had
+  stopped showing the card after D-545). Lena: her records for b22. Wren: Messages in Pam dated 12 October.
+- **Iris's b22 re-test:** the Privacy page in seven languages, Messages in Pam and the scraped-place screens all
+  pass. The I'm here story is fixed by Dot's b23 change. "No Send a message row" on the place-with-lead story is by
+  design (Nico): the example thread is unread, so the row reads "New message". Dot keeps the New message search
+  pill without words: the shape and the magnifier say what it is, and the label is still read out once.
 - **Control Room v15 and v16:** Listen reads the cards still waiting aloud in the phone's own voice, keeps the
   screen awake, and has Back, Pause, Next, Reply (opens the message box on that card, then carries on after Send),
   Stop, Speed and Voice (the phone's English voices, most natural first; Apple's Premium voices sound closest to a
@@ -545,6 +554,9 @@
 | b22 + Wren b84e56de: site tsc / tests / build / a11y / usability / scrollspy | 0 / 94 / 0 / 120 scans 0 / clear / 300 links 0 |
 | b22 new or changed English keys (30) in es, pt-BR, zh-CN, zh-HK, ru, ar | all present, none equal to English |
 | b22 migrations live (20261012042222 to 20261012042427) | 13 function bodies match the files by md5; appointments_provider_select = false; cron sweep-missed-visits 20 4 * * *; anon executes none |
+| Batch b23 (fe7aea7b): db / config / ui / web unit / site / e2e full / storybook / site checks | 1498 ok / 1176 / 124 / 139 / 94 / 1532 passed, 19 skipped / builds / 120 scans 0, clear, 300 links 0 |
+| b23 + Wren b4d0e66d: site tsc / tests / build / a11y / usability / scrollspy | 0 / 94 / 0 / 120 scans 0 / clear / 300 links 0 |
+| b23 new or changed English keys (place.about) and removed (checkin.notNow) | translated in six languages, signed by Sage 02:25; removed from all seven |
 
 ## Left undone
 

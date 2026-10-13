@@ -479,7 +479,7 @@
   "person.savedPlaces.title": "Lugares que a pessoa salvou",
   "person.signedOut.body": "Esta página precisa que você entre na sua conta.",
   "person.signedOut.title": "Entre para ver isto",
-  "place.about": "Sobre o programa",
+  "place.about": "Sobre este lugar",
   "place.address": "Endereço",
   "place.audience.students": "Dentro de uma escola · só estudantes",
   "place.audience.youth": "De 10 a 17 anos",
@@ -1617,6 +1617,5 @@
   "legal.sources.title": "Fontes de dados",
   "legal.sources.neighborhoods": "Os nomes dos bairros na busca por área vêm de “Philadelphia Neighborhoods”, criado pela Abaca Labs. Pam o modificou para guardar um ponto por bairro em vez dos limites.",
   "legal.sources.link": "Ver os dados de origem",
-  "legal.sources.licence": "Licença: CC BY 4.0",
-  "checkin.notNow": "Agora não"
+  "legal.sources.licence": "Licença: CC BY 4.0"
 }

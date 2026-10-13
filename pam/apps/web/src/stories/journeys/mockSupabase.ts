@@ -92,6 +92,10 @@ export interface MockOptions {
   readonly pastTrip?: boolean;
   /** Also a saved trip that is on now, so its page offers "I'm here" (D-535). */
   readonly tripNow?: boolean;
+  /** A program lead's small card for a member linked to their program (D-542), so the story can show it. */
+  readonly programMemberCard?: boolean;
+  /** The catalogue place in the story has a program on Pam (D-498), so its page offers Message and I'm here (D-541, D-545). */
+  readonly hasLead?: boolean;
 }
 
 /** A real place of the catalogue, to plan a trip to in a story (the examples' ids are not real). */
@@ -358,8 +362,22 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/my_trip_services', () => ({ body: [] })),
     // A program lead's own visits (D-526): none in a story.
     on('/rpc/my_program_visits', () => ({ body: [] })),
+    on('/rpc/service_has_lead', () => ({ body: options.hasLead === true })),
     // The program's small card for a linked member (D-542): a story's people are examples, so no real member is linked.
-    on('/rpc/program_member_card', () => ({ body: null })),
+    on('/rpc/program_member_card', () => ({
+      body: options.programMemberCard
+        ? {
+            member_id: 'story-member-1',
+            first_name: 'Marcus',
+            visits: [
+              { appointment_id: 'story-visit-1', starts_at: onTheHour(1, 10), ends_at: onTheHour(1, 11), service_name: 'GED classes' },
+              { appointment_id: 'story-visit-2', starts_at: onTheHour(4, 14), ends_at: null, service_name: 'Computer room' },
+            ],
+          }
+        : null,
+    })),
+    // Neither has blocked the other: the card offers Message (D-542).
+    on('/rpc/is_blocked_between', () => ({ body: false })),
     // "I'm here" and "I went" (D-535): the pretend database says yes. No position is ever kept.
     on('/rpc/i_am_here', (_url, _method, body) => ({
       body: [{ appointment_id: ((body ?? {}) as { p_appointment_id?: string }).p_appointment_id ?? null, there: true, points: 100 }],

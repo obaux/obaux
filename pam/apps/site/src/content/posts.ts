@@ -77,8 +77,8 @@ const ALL: readonly SupportPost[] = [
     topic: 'members',
     audience: 'residents and programs',
     title: 'Does the place know I’m coming?',
-    summary: 'Pam does not tell a place about your visit. How to call ahead, and what to do if they did not know you were coming.',
-    updated: '2026-10-11',
+    summary: 'Programs on Pam see your visit. Most places are not told. How to call ahead, and what to do if they didn’t know you were coming.',
+    updated: '2026-10-12',
     keywords: ['told', 'know', 'expect', 'expecting', 'coming', 'showed up', 'turned away', 'appointment', 'call ahead', 'front desk', 'list', 'no clue'],
   },
   {
@@ -179,7 +179,7 @@ const ALL: readonly SupportPost[] = [
     audience: 'members, case managers and program leads',
     title: 'Messages: who can write, and why nothing is texted',
     summary: 'Who can start a chat with whom, how to send and report a message, and why a message does not come by text.',
-    updated: '2026-10-10',
+    updated: '2026-10-12',
     keywords: ['message', 'chat', 'conversation', 'report', 'photo', 'document', 'new message', 'unsafe'],
   },
   {

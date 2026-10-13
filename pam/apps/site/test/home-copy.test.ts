@@ -11,8 +11,8 @@ describe('Home words (Mira, 11 October: hold what is untrue today or a new promi
     }
   });
 
-  it('never promises 24/7, a call, or hours', () => {
-    expect(shown).not.toMatch(/24\/7|call pam|monday to friday|real person/i);
+  it('never promises 24/7, a call, or hours ("a real person" is Will’s, a65, 12 October: members can message programs)', () => {
+    expect(shown).not.toMatch(/24\/7|call pam|monday to friday/i);
   });
 
   it('sends the two CTAs that start something to the post that explains it', () => {
