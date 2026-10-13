@@ -86,6 +86,9 @@ describe('every other language is actually translated', () => {
   MAY_MATCH_ENGLISH.add('role.super_admin');
   // "Link" is the Brazilian word for a link (the bundle says "Link aberto" too).
   MAY_MATCH_ENGLISH.add('messages.files.link');
+  // "ZIP code" is the word a Brazilian in Philadelphia reads on every US form and envelope; "CEP" is Brazil's own postal code
+  // (eight digits, not five) and would send them looking for one (Iris, b20; native reader to confirm).
+  MAY_MATCH_ENGLISH.add('places.kind.zip');
   // A place, a day and a time and no word of its own: Chinese and Russian have nothing to translate in it (D-498).
   MAY_MATCH_ENGLISH.add('trips.moved.body.self');
   // The calendar link page: English in every language until Will signs the line (D-538).
@@ -187,7 +190,8 @@ describe('transparency screen (SOP §4.1)', () => {
     expect(bundle[TRANSPARENCY_SCREEN.titleKey]).toBe(TRANSPARENCY_SCREEN.title);
     expect(bundle[TRANSPARENCY_SCREEN.confirmKey]).toBe(TRANSPARENCY_SCREEN.confirm);
     expect(bundle[TRANSPARENCY_SCREEN.footerKey]).toBe(TRANSPARENCY_SCREEN.footer);
-    for (const line of [...TRANSPARENCY_SCREEN.canSee, ...TRANSPARENCY_SCREEN.cannotSee]) {
+    expect(bundle[TRANSPARENCY_SCREEN.programHeadingKey]).toBe(TRANSPARENCY_SCREEN.programHeading);
+    for (const line of [...TRANSPARENCY_SCREEN.canSee, ...TRANSPARENCY_SCREEN.program, ...TRANSPARENCY_SCREEN.cannotSee]) {
       expect(bundle[line.key], `drift on ${line.key}`).toBe(line.en);
     }
   });

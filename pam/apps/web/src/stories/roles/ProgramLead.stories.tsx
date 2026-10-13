@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { screen, screenWithControls } from './screen';
+import { asRole } from '../journeys/journey';
+import { REDESIGN_ROUTES } from '../prototype/routes';
 import { withSetup } from '../journeys/journey';
 
 /**
@@ -14,6 +16,16 @@ export default meta;
 type Story = StoryObj;
 
 export const Home: Story = screen('provider', 'Home — coming in', '/');
+
+/**
+ * The small card a program lead sees when they tap the name of a member linked to their program (D-542): first name, the
+ * visits planned at THEIR program, and Message. No last name, phone, photo, points or last active.
+ */
+export const MemberCard: Story = {
+  ...asRole('provider', '/person/', { id: 'story-member-1' }, { programMemberCard: true }),
+  name: "A member's card",
+  render: () => <>{REDESIGN_ROUTES['/person/']!.render()}</>,
+};
 
 /*
  * Home for a lead who has just signed up (D-352): what the sign-up journey

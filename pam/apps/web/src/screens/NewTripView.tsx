@@ -378,7 +378,11 @@ export function NewTripView({
             change: confirmed.id,
           }).toString()}`}
         />
-        {hasLead ? null : <Banner status="info" title={t('place.noLead', { place: place.name })} />}
+        {hasLead ? (
+          forMember ? null : <Banner status="info" title={t('trips.booked.hasLead', { place: place.name })} />
+        ) : (
+          <Banner status="info" title={t('place.noLead', { place: place.name })} />
+        )}
         {/* Plain rows on the page, like a place's (D-337): no card around them. */}
         <MenuList
           label={t('trips.confirm.next')}
@@ -672,9 +676,9 @@ export function NewTripView({
             countdown={countdown(at(day, time), t)}
           />
           <TextArea label={t(hasLead ? 'trips.new.note' : 'trips.new.note.self')} value={note} onChange={setNote} rows={2} width="100%" />
-          {hasLead || forMember ? null : (
+          {forMember ? null : (
             <Text type="supporting" xstyle={styles.note}>
-              {t('place.noLead', { place: place.name })}
+              {t(hasLead ? 'place.lead.sees' : 'place.noLead', { place: place.name })}
             </Text>
           )}
           {/* True only for an example place or a program booking: a trip to a real

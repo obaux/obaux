@@ -56,8 +56,9 @@ describe('tripsFromRows', () => {
     ]);
   });
 
-  it('leaves out a trip already attended or missed, and one whose place is gone', () => {
-    expect(tripsFromRows([{ ...ROW, status: 'attended' }, { ...ROW, status: 'missed' }, { ...ROW, service_id: null }])).toEqual([]);
+  it('keeps an attended or missed trip and says which, and leaves out a cancelled one and one whose place is gone', () => {
+    const kept = tripsFromRows([{ ...ROW, status: 'attended' }, { ...ROW, id: 'm', status: 'missed' }, { ...ROW, status: 'cancelled' }, { ...ROW, service_id: null }]);
+    expect(kept.map((t) => t.attendance)).toEqual(['attended', 'missed']);
   });
 
   it('keeps a trip whose place has no coordinates, at nowhere rather than lost', () => {

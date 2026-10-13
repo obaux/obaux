@@ -17,7 +17,7 @@ import {
   directionsHref,
   googlePlaceHref,
 } from '@pam/ui';
-import { usePlaceHasLead } from '@/lib/usePlaceHasLead';
+import { usePlaceLead } from '@/lib/usePlaceHasLead';
 import { PlaceBarActions, leadMessageFor, messageHrefFor, newMessageFrom } from '../../screens/PlaceBarActions';
 import { PlaceDetailSkeleton } from '@pam/ui/Skeletons';
 import { SubPageHeader } from '@pam/ui/SubPage';
@@ -43,7 +43,9 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { examplesOn } from '@/lib/examples';
 import { exampleTrips } from '@/lib/exampleTrips';
 import { readAddedTrips, TRIPS_CHANGED, withMoves, withoutCancelled } from '@/lib/addedTrips';
-import { cancelSavedOrLocalTrip } from '@/lib/savedTrips';
+import { cancelSavedOrLocalTrip, isSavedPlace } from '@/lib/savedTrips';
+import { inMarkWindow } from '@/lib/imHere';
+import { ImHereCard } from '../../screens/ImHereCard';
 import { navigate } from '@/lib/navigate';
 import { ConfirmDialog } from '../../screens/ConfirmDialog';
 import { Banner } from '@astryxdesign/core/Banner';
@@ -234,7 +236,8 @@ function PlaceScreen() {
 
   const place = state.status === 'ready' ? state.place : null;
   // A place with no program lead on Pam is not told about a visit (D-498).
-  const hasLead = usePlaceHasLead(place?.id, place?.name);
+  const leadKnown = usePlaceLead(place?.id, place?.name);
+  const hasLead = leadKnown === true;
   const { forPlace: policiesAt } = usePlacePolicies();
   const { progress } = useMySignatures();
   const { forPlace } = useServices();
@@ -242,7 +245,7 @@ function PlaceScreen() {
   // to the top of the page (D-271). Opened from a trip card, the page is
   // about that visit (D-273): its day and time instead of "Plan a trip".
   const [hasTrip, setHasTrip] = useState(false);
-  const [visit, setVisit] = useState<{ id: string; startsAt: string; serviceId: string | null } | null>(null);
+  const [visit, setVisit] = useState<{ id: string; startsAt: string; serviceId: string | null; attendance: 'attended' | 'missed' | null } | null>(null);
   // Cancel this visit (asks first): the one thing here that takes a plan away.
   const [askingCancel, setAskingCancel] = useState(false);
   const [cancelFailed, setCancelFailed] = useState(false);
@@ -263,7 +266,7 @@ function PlaceScreen() {
         .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
       setHasTrip(here.length > 0);
       const found = here.find((trip) => trip.id === tripId) ?? (fromTrips ? here[0] : undefined);
-      setVisit(fromTrips && found ? { id: found.id, startsAt: found.startsAt, serviceId: found.serviceId ?? null } : null);
+      setVisit(fromTrips && found ? { id: found.id, startsAt: found.startsAt, serviceId: found.serviceId ?? null, attendance: ('attendance' in found ? found.attendance : null) ?? null } : null);
     };
     read();
     // A visit moved from here (D-281) shows its new time on the way back.
@@ -387,7 +390,13 @@ function PlaceScreen() {
   // plan one (D-273).
   const plansVisit = (demoRole ?? trueRole) === 'member' && !visit;
   // Said where a member plans or keeps a visit, only at a place with no lead (D-498).
-  const tellsNoLead = (demoRole ?? trueRole) === 'member' && !hasLead;
+  const isMemberView = (demoRole ?? trueRole) === 'member';
+  const tellsNoLead = isMemberView && !hasLead;
+  // A place with a lead on Pam sees the visit (D-526): said before the member plans one.
+  const tellsLeadSees = isMemberView && hasLead;
+  // A member can message a place only if somebody on Pam runs it (Will, 12 October: programs gathered from
+  // the internet have no one to answer). Until that is known the entry points wait, not flash in and out (D-544).
+  const hidesMessage = isMemberView && leadKnown !== true;
   const services = forPlace(place!.id);
   const staff = programStaffFor(place!.id);
   // How the program takes people (D-313): a visit to plan, or a schedule
@@ -477,7 +486,8 @@ function PlaceScreen() {
           onSave={signedIn && (demoRole ?? trueRole) !== 'provider' ? toggleSave : undefined}
           onShare={() => void sharePlace(place!.name, place!.address)}
           flagHref={`/flag/?place=${encodeURIComponent(place!.id)}`}
-          messageHref={messageHrefFor(place!.name, place!.id)}
+          // A member can write to a program before booking, if it has a lead on Pam (D-541); none, no item (D-544).
+          messageHref={hidesMessage ? undefined : messageHrefFor(place!.name, place!.id)}
         />,
         true,
       )}
@@ -512,7 +522,7 @@ function PlaceScreen() {
         addressFirst={visitWhen !== null}
         hoursHref={googleHref}
         notice={
-          visitWhen || policiesOnTop || tellsNoLead ? (
+          visitWhen || policiesOnTop || tellsNoLead || tellsLeadSees ? (
             <VStack gap={3}>
               {visitWhen ? (
                 // The visit, confirmed (D-273), as a small hero (D-281): only
@@ -536,7 +546,12 @@ function PlaceScreen() {
                   <TextLink label={t('place.visit.cancel')} onClick={() => setAskingCancel(true)} />
                 </>
               ) : null}
+              {/* "I'm here" (D-535): only a real visit, in its window, not yet marked, at a program with a lead on Pam (D-545). */}
+              {visit && hasLead && isSavedPlace(visit.id) && isMemberView && !visit.attendance && inMarkWindow(visit.startsAt) ? (
+                <ImHereCard visitId={visit.id} placeName={place!.name} />
+              ) : null}
               {tellsNoLead ? <Banner status="info" title={t('place.noLead', { place: place!.name })} /> : null}
+              {tellsLeadSees ? <Banner status="info" title={t('place.lead.sees', { place: place!.name })} /> : null}
               {policiesOnTop ? (
                 <PolicyStatusCard
                   isDone={allSigned}
@@ -600,8 +615,8 @@ function PlaceScreen() {
                 // A message from the program waiting (D-305): the row says so,
                 // with a pink dot and their newest words, and opens that
                 // conversation.
-                unread
-                  ? {
+                ...(unread
+                  ? [{
                       id: 'message',
                       label: t('place.quick.newMessage'),
                       description: unread.preview,
@@ -611,14 +626,16 @@ function PlaceScreen() {
                       // One line, then "…" (Will, D-306): the row says there is a
                       // message, the conversation says the rest.
                       isDescriptionOneLine: true,
-                    }
-                  : {
+                    }]
+                  : hidesMessage
+                    ? []
+                    : [{
                       id: 'message',
                       label: t('place.quick.message'),
                       description: t('place.quick.message.body'),
                       icon: <MessagesIcon {...QUICK} />,
                       href: messageHrefFor(place!.name, place!.id),
-                    },
+                    }]),
               ]),
           ...(phone
             ? [

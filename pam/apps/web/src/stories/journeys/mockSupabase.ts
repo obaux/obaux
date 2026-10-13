@@ -92,6 +92,13 @@ export interface MockOptions {
   readonly pastTrip?: boolean;
   /** The calendar link is already on (D-538): the page shows the switch and "make a new link" / "turn it off". */
   readonly calendarOn?: boolean;
+
+  /** Also a saved trip that is on now, so its page offers "I'm here" (D-535). */
+  readonly tripNow?: boolean;
+  /** A program lead's small card for a member linked to their program (D-542), so the story can show it. */
+  readonly programMemberCard?: boolean;
+  /** The catalogue place in the story has a program on Pam (D-498), so its page offers Message and I'm here (D-541, D-545). */
+  readonly hasLead?: boolean;
 }
 
 /** A real place of the catalogue, to plan a trip to in a story (the examples' ids are not real). */
@@ -303,7 +310,9 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
   ];
   // The member's saved trips (D-454): planning one adds it, moving one changes it, and reading answers with them.
   const savedTrips: SavedTripRow[] = options.savedTrip
-    ? [savedTripRow(1, onTheHour(4, 12), 'Bring my ID'), ...(options.pastTrip ? [savedTripRow(2, onTheHour(-3, 10))] : [])]
+    ? [savedTripRow(1, onTheHour(4, 12), 'Bring my ID'), ...(options.pastTrip ? [savedTripRow(2, onTheHour(-3, 10))] : []),
+        ...(options.tripNow ? [savedTripRow(3, new Date(Date.now() + 20 * 60_000).toISOString())] : []),
+      ]
     : [];
   const has = (part: string) => (url: string) => url.includes(part);
   const on = (part: string, answer: (url: string, method: string, body: unknown) => Answer): Route => (url, method, body) =>
@@ -361,6 +370,32 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/calendar_link_make', () => ({ body: 'storybook-example-address-not-a-real-secret' })),
     on('/rpc/calendar_link_set_details', () => ({ body: true })),
     on('/rpc/calendar_link_off', () => ({ body: null })),
+
+    // A program lead's own visits (D-526): none in a story.
+    on('/rpc/my_program_visits', () => ({ body: [] })),
+    on('/rpc/service_has_lead', () => ({ body: options.hasLead === true })),
+    // The program's small card for a linked member (D-542): a story's people are examples, so no real member is linked.
+    on('/rpc/program_member_card', () => ({
+      body: options.programMemberCard
+        ? {
+            member_id: 'story-member-1',
+            first_name: 'Marcus',
+            visits: [
+              { appointment_id: 'story-visit-1', starts_at: onTheHour(1, 10), ends_at: onTheHour(1, 11), service_name: 'GED classes' },
+              { appointment_id: 'story-visit-2', starts_at: onTheHour(4, 14), ends_at: null, service_name: 'Computer room' },
+            ],
+          }
+        : null,
+    })),
+    // Neither has blocked the other: the card offers Message (D-542).
+    on('/rpc/is_blocked_between', () => ({ body: false })),
+    // "I'm here" and "I went" (D-535): the pretend database says yes. No position is ever kept.
+    on('/rpc/i_am_here', (_url, _method, body) => ({
+      body: [{ appointment_id: ((body ?? {}) as { p_appointment_id?: string }).p_appointment_id ?? null, there: true, points: 100 }],
+    })),
+    on('/rpc/i_went', (_url, _method, body) => ({
+      body: [{ appointment_id: ((body ?? {}) as { p_appointment_id?: string }).p_appointment_id ?? null, points: 60 }],
+    })),
     on('/rpc/book_trip_at_service', (_url, _method, body) => {
       const args = (body ?? {}) as { p_starts_at: string; p_note?: string | null };
       const row = savedTripRow(savedTrips.length + 1, args.p_starts_at, args.p_note ?? null);
@@ -599,6 +634,8 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     // Message {name} on a caseload member's page (D-231, D-234) opens the one
     // example conversation, so the tap lands in a thread instead of the list.
     on('/rpc/open_direct_conversation', () => ({ body: CONVO_ID })),
+    // A place's Message button opens the member's conversation with the program's lead (D-541).
+    on('/rpc/message_program', () => ({ body: CONVO_ID })),
     on('/rpc/conversation_partners', () => ({ body: [partnerFor(role)] })),
     on('/rpc/conversation_block_state', () => ({
       body: [{ i_blocked: options.blocked === 'mine', blocked_me: options.blocked === 'theirs' }],

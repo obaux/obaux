@@ -332,6 +332,48 @@
   - `the_area_search_knows_philadelphia_s_neighborhoods` (20261011211225), 159 rows whose fingerprint matches the
     file;
   - `search_areas_by_every_word_typed` (body md5 matches the file; "east germantown" finds "Germantown, East").
+  Vercel and CI were green, and Iris's re-test passed both items.
+- **Batch b21 (small, no migrations):** fixes from Iris's notes:
+  - Dot: the area picker's field is named once and described by its hint. SearchField is shared, so all five
+    search fields now have a single accessible name.
+  - Lena: the es and pt-BR hint loses its comma; pt-BR keeps "ZIP code" (CEP is Brazil's code); the es picker
+    uses tú throughout.
+  - Lena: DB test 69, nobody writes an appointment row directly.
+- **Batch b22, live at 8b20e7a8 (04:30, 12 October).** Will signed a63 (01:06), a66 (01:08) and a72 (03:33, "yes
+  to both, let's also update design to reflect this"). In it:
+  - Nico: a member can message a program before booking (D-541 part 2), and a place nobody on Pam runs offers no
+    message (D-544; the row waits while the lead is unknown). Will's rule (a72): a program starts a chat only with a
+    member signed up with it or with a non-cancelled visit there; otherwise it only answers.
+  - Piper: a lead sees visits at their program by first name, checks a member in and can take it back, and a visit
+    nobody marked becomes missed a day after it ends (D-526 A to C); I'm here and I went (D-535); the program's small
+    card (D-542); a lead reads no appointment row directly; at a scraped place there is no I'm here or I went
+    (D-545, also NO_LEAD_HERE in the database). Her audit of scraped places against programs on Pam found only the
+    message rows wrong on live main.
+  - Lena: the a63, a66 and a72 Privacy wording in seven languages; her I'm here test checks each language's p9
+    against that language's own buttons.
+  - Sage: the signed-English ledger, with all twelve new app sentences signed (seven reworded: "Your visit is
+    marked." instead of "checked in", the I went limit as "3 times in 7 days", and the rest).
+  - Wren: Messages in Pam says who can start a chat, with Will's sentence. Dot: the New message search named once.
+  - Seven migrations, applied in file order after `list_migrations` (live ended at 20261011211241): live as
+    20261012042222 to 20261012042427. None drops or deletes; thirteen function bodies match the files by md5;
+    appointments_provider_select is `false`; the missed-visit sweep runs at 04:20 UTC; anon can execute none of
+    the new functions.
+  - Dot redrew the member and program-lead pages of the user-flow map in Figma (r32 on Will's Ready list); the
+    stories behind them ride b23.
+- **Batch b23, live at 1f81924e (12 October).** No migrations. Piper: "About this place" on every place page
+  (Sage signed one heading for both kinds of place, so a branch bug can't show the wrong one; Lena, six languages)
+  and the unused checkin.notNow removed. Sage: Will's a72 signature. Dot: the stories behind the a72 user-flow map
+  (the member card, hasLead and programMemberCard on the pretend database, hasLead on the I'm here story, which had
+  stopped showing the card after D-545). Lena: her records for b22. Wren: Messages in Pam dated 12 October.
+- **Iris's b22 re-test:** the Privacy page in seven languages, Messages in Pam and the scraped-place screens all
+  pass. The I'm here story is fixed by Dot's b23 change. "No Send a message row" on the place-with-lead story is by
+  design (Nico): the example thread is unread, so the row reads "New message". Dot keeps the New message search
+  pill without words: the shape and the magnifier say what it is, and the label is still read out once.
+- **Control Room v15 and v16:** Listen reads the cards still waiting aloud in the phone's own voice, keeps the
+  screen awake, and has Back, Pause, Next, Reply (opens the message box on that card, then carries on after Send),
+  Stop, Speed and Voice (the phone's English voices, most natural first; Apple's Premium voices sound closest to a
+  person). A web page cannot keep talking with the screen locked; a recorded voice (Google) is offered to Will if
+  he wants that.
 
 ## What was wrong, and what missed it
 
@@ -425,6 +467,18 @@
   around 5 minutes each) on branches cut before the fix, not main's own run. They stop as branches merge
   main. That's a few thousand calls a day at most, well inside the free plan.
 
+- **An English-copy allow-list hid nine untranslated lines.** Piper's copy.test.ts exempted every `checkin.*` key
+  "until Will signs the location line". He signed it at 01:08 and the exemption stayed, so copy:status and the copy
+  test both said "in step" while eight check-in lines and trips.notMarked were English in all six languages. Lena
+  caught it. The exemption is gone, and the merge desk now checks every new or changed English key in a batch
+  against the other six languages before a push.
+- **A READY can count a failure as a skip.** Piper's 128-passed run included the no-location I'm here test, which
+  was red on the old wording. The merge desk's own run of the touched specs found it. Lesson: the desk re-runs the
+  specs a string change touches, whatever the READY says.
+- **Twelve new sentences reached the batch unsigned.** Under A29 the desk does not merge an unsigned sentence, and
+  only a key-by-key check against Sage's ledger found them. Sage signed all twelve and reworded seven. The check
+  stays part of the desk's gate.
+
 ## Decisions
 
 - Will's answer on a card goes to the teammate waiting on it the same turn. If that teammate needs Will's own
@@ -490,7 +544,19 @@
 | Batch b19 + functions guard + User-Agent + guard cleanup: config | 1106 passed |
 | Batch b20 (e025446d): db / config / ui / web unit / site / e2e full / storybook / site checks | 1308 ok / 1129 / 124 / 135 / 94 / 1454 passed, 19 skipped, 2 area-picker failures on Sage's new hint (Piper's 1bbb75e2 fixed the test) / builds / 120 scans 0, clear, 300 links 0 |
 | Batch b20 head (034b0c13): db / config / area-picker e2e (app code unchanged since the full run) | 1327 ok, 0 not ok / 1129 / 24 passed |
+| Batch b21 (9aab8c69): db / config / ui / web unit / site / e2e full / storybook / site checks | 1327 ok / 1129 / 124 / 135 / 94 / 1463 passed, 19 skipped / builds / 120 scans 0, clear, 300 links 0 |
+| Batch b21 + test 69: db | 1345 ok, 0 not ok |
+| main CI on e27afa24 (b20); Iris's b20 re-test | all four green, READY; two of two pass |
 | Live: enrollments grants and policies after D-541 part 1 | no INSERT/UPDATE/DELETE for anon or authenticated; UPDATE (status, notes, updated_at); own check false; provider check own org |
+| Batch b22 (48f4730f): db / config / ui / web unit / site / e2e full / storybook / site checks | 1498 ok, 0 not ok / 1171 / 124 / 139 / 94 / 1532 passed, 19 skipped / builds / 120 scans 0, clear, 300 links 0 |
+| b22 + Nico 03c8ad8b, Piper 5930fd77 + fbfb834b, Sage d4b1d61d: config / copy:status / tsc / web unit / build / touched e2e | 1171 / in step / 0 / 139 / 0, 14.5 kB spare / 401 passed + I'm here 18 of 18 |
+| b22 final (6b8ef537, + Lena 6af68435): full run | db 1498 ok; config 1176; ui 124; web 139; site 94; e2e 1532 passed, 19 skipped; storybook; site 120 scans 0, clear, 300 links 0 |
+| b22 + Wren b84e56de: site tsc / tests / build / a11y / usability / scrollspy | 0 / 94 / 0 / 120 scans 0 / clear / 300 links 0 |
+| b22 new or changed English keys (30) in es, pt-BR, zh-CN, zh-HK, ru, ar | all present, none equal to English |
+| b22 migrations live (20261012042222 to 20261012042427) | 13 function bodies match the files by md5; appointments_provider_select = false; cron sweep-missed-visits 20 4 * * *; anon executes none |
+| Batch b23 (fe7aea7b): db / config / ui / web unit / site / e2e full / storybook / site checks | 1498 ok / 1176 / 124 / 139 / 94 / 1532 passed, 19 skipped / builds / 120 scans 0, clear, 300 links 0 |
+| b23 + Wren b4d0e66d: site tsc / tests / build / a11y / usability / scrollspy | 0 / 94 / 0 / 120 scans 0 / clear / 300 links 0 |
+| b23 new or changed English keys (place.about) and removed (checkin.notNow) | translated in six languages, signed by Sage 02:25; removed from all seven |
 
 ## Left undone
 
@@ -515,9 +581,12 @@
   HELP_REQUESTS_LIVE = on and one test request. Record 041940 in schema_migrations after his paste.
 - Will: card a61 (texting people back). The pitch deck is linked there, with its questions and Nico's
   recommendations.
-- Will: card a63, sign the reworded line 1, the "A program can see:" card and the short line. Card a72: who starts
-  a chat, and the program's view of a member. Card a73: a new phone number. Card a70: the translation paragraph
-  (not urgent).
+- Will: card a73 (a new phone number), a74 (street search data), a65, a67, a68, a69, a71; a70 (the translation
+  paragraph, not urgent). a63, a66 and a72 are signed and live in b22.
+- Will: if he wants the Control Room read with the screen off, "Google voice" (a Google Cloud key he enters).
+- Will: delete the stand-in Figma file o9axtp3IwICQixuJVoSlpg (Dot).
+- A native Brazilian Portuguese reader for "registrada" (Lena's choice for "marked", since "marcada" reads as
+  "booked").
 - Will: the DMARC record at joinpam.org's DNS, then "test it" for Nico.
 - Will: in Ava's session (the Control Room's "Waiting for you to unblock" strip opens it), type "push the
   switcher branch".
