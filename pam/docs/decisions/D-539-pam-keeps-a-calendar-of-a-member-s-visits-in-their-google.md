@@ -35,3 +35,9 @@ An erase is a plain delete of the profile, which Google cannot be part of. A `be
 
 - Not built, by decision: the finder ("find my appointments from places I've planned"): a read scope on the whole calendar, a sensitive scope needing Google's verification; the plan was sent to the merge desk.
 - The event text is English whatever the member's language.
+
+## Status (12 October 2026, Will on a71: "wait until we switch sync on. Not now.")
+
+The sync stays on `claude/places-programs-google-sync`: not merged to `main`, not deployed, no migration applied. The calendar link (D-538) is
+separate and ships on its own. When Will wants the sync, its two Privacy lines come back on a card together with the Google Cloud
+checklist in `docs/before-launch.md`; this branch is merged with current `main` then, not before.

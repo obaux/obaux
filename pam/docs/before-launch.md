@@ -11,7 +11,7 @@ STATUS row too.
 
 ## Open
 
-- [ ] **Google Calendar sync: Will makes the Google Cloud project, then it goes on** (Piper, 11 October 2026, D-539). The sync is built and
+- [ ] **Google Calendar sync: WAITING until Will wants it switched on (a71, 12 October 2026: "wait until we switch sync on. Not now.")** — Not merged, not deployed, no migration applied; it lives only on the branch `claude/places-programs-google-sync` (head below). When Will asks, the two Privacy lines come back on a card with this checklist. (Piper, 11 October 2026, D-539). The sync is built and
   switched OFF (`GOOGLE_SYNC_LIVE` unset: the app hides the section, the function touches nothing, the 15-minute clock does nothing).
   To turn it on, in order. **No value goes in the repository.** (1) In Google Cloud Console, make a project (say "Pam"); enable the
   **Google Calendar API**. (2) OAuth consent screen: user type External; app name Pam; support email; the app's home page
