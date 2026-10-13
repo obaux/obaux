@@ -64,3 +64,13 @@ export async function askStatus(invoke: Invoke): Promise<boolean | null> {
   const enabled = (data as { enabled?: boolean } | null)?.enabled;
   return typeof enabled === 'boolean' ? enabled : null;
 }
+
+/**
+ * What the area chip says for a picked Google address: only its 5-digit ZIP, to save room on the main screen (Will, 13 October), or
+ * "Philadelphia" when the address has none. Read from the address Google already returned, so nothing new is asked of or sent to Google.
+ */
+export function zipOf(address: string): string {
+  const afterState = /\b[A-Z]{2}\s+(\d{5})(?:-\d{4})?\b/.exec(address);
+  const atEnd = /(\d{5})(?:-\d{4})?\s*$/.exec(address.trim());
+  return afterState?.[1] ?? atEnd?.[1] ?? 'Philadelphia';
+}

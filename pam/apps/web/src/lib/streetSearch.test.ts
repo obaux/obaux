@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { askChoose, askSuggest, wantsGoogle } from './streetSearch';
+import { askChoose, askSuggest, wantsGoogle, zipOf } from './streetSearch';
 
 /** When Google is asked about what somebody typed in the area search, and what is done with its answer (D-552). */
 describe('wantsGoogle', () => {
@@ -57,5 +57,20 @@ describe('the calls', () => {
   it('gives a point only when the function gave one', async () => {
     expect(await askChoose(async () => ({ data: { place: null }, error: null }), 'p', 't')).toBeNull();
     expect(await askChoose(async () => ({ data: { place: { label: 'x', lat: 1, lon: 2 } }, error: null }), 'p', 't')).toEqual({ label: 'x', lat: 1, lon: 2 });
+  });
+});
+
+describe('zipOf: what the chip says for a Google address', () => {
+  it('is the 5-digit ZIP', () => {
+    expect(zipOf('1500 Market St, Philadelphia, PA 19102')).toBe('19102');
+    expect(zipOf('1500 Market St, Philadelphia, PA 19102-1234')).toBe('19102');
+  });
+  it('is not fooled by a five-digit house number', () => {
+    expect(zipOf('12345 Roosevelt Blvd, Philadelphia, PA 19116')).toBe('19116');
+    expect(zipOf('12345 Roosevelt Blvd, Philadelphia')).toBe('Philadelphia');
+  });
+  it('is "Philadelphia" with no ZIP', () => {
+    expect(zipOf('Temple University Hospital, Philadelphia, PA')).toBe('Philadelphia');
+    expect(zipOf('')).toBe('Philadelphia');
   });
 });

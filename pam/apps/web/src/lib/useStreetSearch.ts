@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { MIN_CHARS, PAUSE_MS, askChoose, askStatus, askSuggest, newToken, wantsGoogle, type Suggestion } from './streetSearch';
+import { MIN_CHARS, PAUSE_MS, askChoose, askStatus, askSuggest, newToken, wantsGoogle, zipOf, type Suggestion } from './streetSearch';
 import { GOOGLE_PICK, type AreaOption } from './useAreaSearch';
 
 /**
@@ -97,7 +97,8 @@ export function useStreetSearch(
       // The pick ends Google's session; the next search is a new one.
       token.current = newToken();
       if (!place) return null;
-      return { id: `${GOOGLE_PICK}${suggestion.placeId}`, kind: 'address', label: place.label || suggestion.label, lat: place.lat, lon: place.lon };
+      return { id: `${GOOGLE_PICK}${suggestion.placeId}`, kind: 'address', // Only its ZIP on the chip (Will, 13 October); the picked point still orders the places.
+      label: zipOf(place.label || suggestion.label), lat: place.lat, lon: place.lon };
     } catch {
       return null;
     }

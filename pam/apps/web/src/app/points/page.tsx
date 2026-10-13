@@ -43,6 +43,7 @@ import { useSession } from '@/lib/useSession';
 import { usePoints } from '@/lib/usePoints';
 import { useRoleView } from '@/lib/useViewedRole';
 import { RoleSwitchControl } from '../RoleSwitchControl';
+import { useCountScreenOpen } from '@/lib/screenOpens';
 
 /**
  * What the points are for — a journey, not a table (D-278, Will, 5 October:
@@ -190,6 +191,8 @@ function Rung({ badge, points, t }: { badge: BadgeDefinition; points: number | n
 export default function PointsPage() {
   const { t, tPlain } = useI18n();
   const { state: session } = useSession();
+  // One more phone opened Your points today, counted once a day (a76, D-555).
+  useCountScreenOpen('points');
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { demoRole, setViewAs } = useRoleView(trueRole);
   const points = usePoints(session.status === 'signed-in' ? session.session.userId : null);
