@@ -36,6 +36,7 @@ import { List, ListItem } from '@astryxdesign/core/List';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
 import { useSession } from '@/lib/useSession';
+import { useExamplesOn } from '@/lib/useExamplesOn';
 import { useRoleView } from '@/lib/useViewedRole';
 import { RoleSwitchControl } from '../RoleSwitchControl';
 import { DUMMY_SELF_ID, dummyConversationIdBetween, dummyConversationsFor } from '@pam/config/dummy-conversations';
@@ -156,6 +157,9 @@ function PersonScreen() {
   const params = useSearchParams();
   const router = useRouter();
   const { state: session } = useSession();
+  // Connect recommends nothing yet (ConnectView: nothing is stored or sent), so a real
+  // account does not get the row (D-509: no examples for real accounts).
+  const examples = useExamplesOn();
 
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { viewedRole, setViewAs } = useRoleView(trueRole);
@@ -428,7 +432,7 @@ function PersonScreen() {
                   },
                 ]
               : []),
-            ...(viewedRole === 'admin'
+            ...(viewedRole === 'admin' && examples
               ? [
                   {
                     id: 'connect',
