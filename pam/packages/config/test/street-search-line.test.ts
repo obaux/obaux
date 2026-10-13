@@ -1,5 +1,6 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { EN } from './_bundles.js';
 import { PRIVACY } from '../src/legal.js';
@@ -79,8 +80,10 @@ function problemsIn(source: string): string[] {
   }
   for (const m of source.matchAll(/\bfetch\s*\(/g)) {
     const call = between(source, m.index! + m[0].length - 1);
-    // Only the calls that go to Google: the function also asks Pam's own database who is signed in, with the member's own sign-in.
-    if (!call.includes(GOOGLE_HOST)) continue;
+    // Every call but one is held to the rules below: the exception is the function asking Pam's own database who is signed in, with
+    // the member's own sign-in (`/auth/v1/user`). Naming the exception, not "the calls that go to Google", means a Google call whose
+    // address sits in a variable is inspected too.
+    if (/\/auth\/v1\/user/.test(call)) continue;
     const at = call.search(/\bheaders\s*:/);
     if (at < 0) continue;
     const open = call.indexOf('{', at);
@@ -139,6 +142,10 @@ const WRONG: Record<string, [string, RegExp]> = {
   'answers a request with no one signed in': [RIGHT.replace("if (!data.user) return new Response('Sign in first', { status: 401 });", ''), /signed-in/],
   'stores what it was asked': [RIGHT.replace("if (!res.ok)", "await supabase.from('searches').insert({ text }); if (!res.ok)"), /writes something/],
   'stores the answer in a cache': [RIGHT.replace("if (!res.ok)", "await (await caches.open('p')).put(text, res.clone()); if (!res.ok)"), /writes something/],
+  'sends Google the member’s sign-in through an address held in a variable': [
+    RIGHT.replace("const res = placeId", "const target = 'https://places.googleapis.com/v1/places:autocomplete'; await fetch(target, { headers: { 'X-Goog-Api-Key': key, Authorization: req.headers.get('Authorization') ?? '' } });\n  const res = placeId"),
+    /header it should not|something about the member/,
+  ],
   'does not insist on POST': [RIGHT.replace("if (req.method !== 'POST') return new Response('POST only', { status: 405 });", ''), /insist on POST/],
 };
 
@@ -159,6 +166,54 @@ describe('the street-address search keeps what Privacy says it keeps (a74)', () 
     it('is held to the same four promises', () => {
       expect(problemsIn(`${readFileSync(FUNCTION, 'utf8')}\n${existsSync(HANDLER) ? readFileSync(HANDLER, 'utf8') : ''}`)).toEqual([]);
     });
+  });
+});
+
+/**
+ * “Pam does not keep what you type or what Google answers” (option A, Mira 13 October; D-552): a place picked from Google's suggestions
+ * is for that one search. The function writes nothing (above); the phone must write nothing either. `saveOrigin` is the only thing that
+ * keeps a picked area (`pam.origin`, on the phone), and it skips an id that starts with GOOGLE_PICK, like the phone's own position;
+ * `loadOrigin` throws away one an earlier build might have kept. Behaviour is tested in `areaOrigin.test.ts` (web); this holds the source
+ * so Privacy's sentence cannot become untrue by another route: no storage API in the street-search code, and nobody else writes `pam.origin`.
+ */
+const WEB = fileURLToPath(new URL('../../../apps/web/src', import.meta.url));
+const AREA = join(WEB, 'lib/useAreaSearch.ts');
+const STREET_FILES = [join(WEB, 'lib/streetSearch.ts'), join(WEB, 'lib/useStreetSearch.ts')];
+
+describe.skipIf(!existsSync(AREA) || !/GOOGLE_PICK/.test(existsSync(AREA) ? readFileSync(AREA, 'utf8') : ''))('a picked street address is kept nowhere on the phone (option A, D-552)', () => {
+  const area = readFileSync(AREA, 'utf8');
+  const save = area.slice(area.indexOf('export function saveOrigin'));
+
+  it('has saveOrigin skip a Google pick before it writes anything', () => {
+    const skip = save.search(/origin\.id\.startsWith\(GOOGLE_PICK\)/);
+    const write = save.search(/setItem\(/);
+    expect(skip, 'saveOrigin must return early for a Google pick').toBeGreaterThan(-1);
+    expect(write).toBeGreaterThan(skip);
+  });
+
+  it('has loadOrigin throw away a Google pick an earlier build kept', () => {
+    const load = area.slice(area.indexOf('export function loadOrigin'), area.indexOf('export function saveOrigin'));
+    expect(load).toMatch(/startsWith\(GOOGLE_PICK\)[\s\S]*removeItem\(/);
+  });
+
+  it('uses no storage, cookie or beacon in the street-search code', () => {
+    for (const file of STREET_FILES.filter(existsSync)) {
+      expect(readFileSync(file, 'utf8'), file).not.toMatch(/localStorage|sessionStorage|indexedDB|document\.cookie|sendBeacon|caches\./);
+    }
+  });
+
+  it('has nothing but useAreaSearch.ts write the saved area', () => {
+    const others: string[] = [];
+    const walk = (dir: string): void => {
+      for (const name of readdirSync(dir)) {
+        const path = join(dir, name);
+        if (statSync(path).isDirectory()) {
+          if (name !== 'stories' && name !== 'node_modules') walk(path);
+        } else if (/\.tsx?$/.test(name) && !/\.test\./.test(name) && path !== AREA && /pam\.origin/.test(readFileSync(path, 'utf8'))) others.push(path);
+      }
+    };
+    walk(WEB);
+    expect(others, 'Only useAreaSearch.ts may read or write pam.origin').toEqual([]);
   });
 });
 
