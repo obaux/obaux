@@ -8,7 +8,7 @@ Two functions, spike code on **its own branch, never merged**. If it were merged
 
 | Function | Who may call it | Does |
 |---|---|---|
-| **`docusign-spike`** | the test only (section 2); `verify_jwt` on | `consent` (returns the consent link), `whoami` (token, account id, base URI, checks they match the secrets), `envelope` (E1, E100 or E-ar), `mint` (a new one-time signing link for an envelope), `status`, `purge`, `template-view` (embedded tagging link) |
+| **`docusign-spike`** | the test only (section 2); `verify_jwt` on (the anon key passes it) | `consent` (returns the consent link), `whoami` (token, account id, base URI, checks they match the secrets), `envelope` (E1, E100 or E-ar), `mint` (a new one-time signing link for an envelope), `status`, `purge`, `template-view` (embedded tagging link) |
 | **`docusign-spike-hook`** | public (DocuSign and a browser), `verify_jwt` off | `POST /connect` (the Connect webhook, HMAC checked) and `GET /return` (the page a signer lands on, which only prints the event name) |
 
 The made-up forms F1–F5 are generated once by a script on the branch, with **anchor strings** (`/fullName/`, `/initials/`, `/dob/`, `/ssn/`, `/date/`, `/sig/`) so DocuSign places the tabs itself and nobody tags by hand. The same `tabLabel` means the same thing in every form (`fullName`, `initials`, `dob`, `ssn`), each with a tooltip for screen readers. No PDF library runs on the server.
@@ -23,19 +23,21 @@ Envelopes, as Iris asked: **E1** (F1–F5 in one), **E100** (F1–F5 ×20), **E-
 
 **Connect:** set up without documents and without tab data. `/connect` verifies the HMAC and logs the envelope id, the status, and the **names of the keys present** in the payload. For the E1 test only, it also logs the whole payload (made-up data, function logs expire) so Iris can check it carries no field values. That one line is removed before anything else is tested.
 
-## 2. How it is locked so only the test can call it
+## 2. How it is locked so only the test can call it (as approved by Mira, 06:08)
 
-1. **JWT verification on** at the gateway for `docusign-spike`: a signed-in test account is needed.
-2. **Allow-list of caller ids** in the secret `DOCUSIGN_SPIKE_USERS` (the test account only); anyone else gets 403 before anything is read.
-3. **A second secret in a header**, `x-spike-key` = `DOCUSIGN_SPIKE_KEY`, compared in constant time.
-4. **An end date**: `DOCUSIGN_SPIKE_UNTIL` (48 hours from deploy); after it every call answers 410, whatever else is right.
-5. POST only, JSON only, a fixed list of actions; an unknown action answers 400. No action takes a URL or a host from the caller.
-6. `docusign-spike-hook` only accepts a DocuSign-signed `/connect` and prints a fixed list of event names on `/return`; it calls nothing out.
-7. Nothing in the app calls either function; neither is in `apps/web`, `apps/site` or a story.
+No live Pam account is involved in the spike, so there is no caller allow-list.
+1. **JWT verification on** at the gateway for `docusign-spike` (the project's anon key passes it).
+2. **A key in a header**, `x-spike-key`. I generate it in my own container and keep it there; it is in no message and no repository. Mira sets `DOCUSIGN_SPIKE_KEY_SHA256` to its SHA-256; the function hashes the header and compares the two in constant time.
+3. **An end date**: `DOCUSIGN_SPIKE_UNTIL` (48 hours from deploy, set by Mira); after it every call answers 410, whatever else is right.
+4. POST only, JSON only, a fixed list of actions; an unknown action answers 400. No action takes a URL or a host from the caller.
+5. `docusign-spike-hook` only accepts a DocuSign-signed `/connect` (until `DOCUSIGN_CONNECT_KEY` is set it answers 503 "not set up") and prints a fixed list of event names on `/return`; it calls nothing out.
+6. Nothing in the app calls either function; neither is in `apps/web`, `apps/site` or a story.
 
 ## 3. Hosts it talks to
 
 **Only `account-d.docusign.com` (sign-in and consent; the JWT grant and user info) and `demo.docusign.net` (the eSignature API).** In code: every outbound call goes through one wrapper with that allow-list, `redirect: 'manual'`, https only; a unit test shows `fetch` to any other host throws before it is sent. The base URI DocuSign returns from user info is checked against the list too, so a changed answer cannot send a call elsewhere. The function never fetches the signing URL: it hands it back.
+
+**Network:** the proxy in these sessions also refuses Pam's own server (`shobqzuhicoiymtumiaz.supabase.co`), so card a88 step 7 asks Will to allow that host and DocuSign's three; Mira deploys both functions after consent and deletes them and the secrets at cleanup.
 
 **Hosts the signing page loads in a browser** (what Iris needs allowed): at least `demo.docusign.net` and `account-d.docusign.com`. DocuSign's page loads its own scripts, fonts and images from more hosts, which I do not know yet. The first run records every host the page asks for (Playwright's request log) and I send Mira the exact list; if Iris's environment cannot allow them, she hands me her Playwright scripts and I send back output and screenshots.
 
@@ -47,12 +49,12 @@ My own checks: JWT grant and consent with the redirect `https://joinpam.org`; th
 
 ## 5. What Will provides (card a88)
 
-The four secrets in Supabase Edge Function secrets: `DOCUSIGN_PRIVATE_KEY`, `DOCUSIGN_INTEGRATION_KEY`, `DOCUSIGN_USER_ID`, `DOCUSIGN_ACCOUNT_ID`, with JWT grant and redirect URI `https://joinpam.org`; the consent click. The spike adds, set by Mira, the lock secrets (`DOCUSIGN_SPIKE_USERS`, `DOCUSIGN_SPIKE_KEY`, `DOCUSIGN_SPIKE_UNTIL`) and the Connect key (`DOCUSIGN_CONNECT_KEY`). No key, id or secret ever appears in the repository or in a log.
+The four secrets in Supabase Edge Function secrets: `DOCUSIGN_PRIVATE_KEY`, `DOCUSIGN_INTEGRATION_KEY`, `DOCUSIGN_USER_ID`, `DOCUSIGN_ACCOUNT_ID`, with JWT grant and redirect URI `https://joinpam.org`; the consent click. The spike adds, set by Mira, `DOCUSIGN_SPIKE_KEY_SHA256` and `DOCUSIGN_SPIKE_UNTIL`; and the Connect key `DOCUSIGN_CONNECT_KEY`, made by Will in DocuSign (Settings › Connect › Connect Keys) when we reach the Connect step. No key, id or secret ever appears in the repository or in a log.
 
 ## 6. What gets deleted afterwards
 
 1. Both functions, from the live project.
-2. All six spike secrets (and, after the test, the four DocuSign ones if Will wants the sandbox closed).
+2. The spike secrets (and, after the test, the four DocuSign ones if Will wants the sandbox closed).
 3. In DocuSign's developer account (Will, or me with consent): the test envelopes, any templates, the Connect configuration, the integration key's secret and the private key, which are rotated or deleted.
 4. The spike branch stays unmerged and is deleted once the findings are written.
 5. The function logs expire on their own; nothing was written to the database.
