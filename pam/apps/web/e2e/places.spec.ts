@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { settled } from './settled';
+import { asMember } from './asMember';
 
 /**
  * The places screen, which is the first one backed by real data.
@@ -59,12 +60,17 @@ const ROWS = [
 
 const RPC = '**/rest/v1/rpc/services_near*';
 
+// Explore is behind the tab gate; the retired public list these tests opened is gone (13 October 2026).
+test.beforeEach(async ({ page }) => {
+  await asMember(page);
+});
+
 test.describe('the places screen', () => {
   test('renders the catalogue, with distances a person would say', async ({ page }) => {
     await page.route(RPC, (route) =>
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(ROWS) }),
     );
-    await page.goto('/places/');
+    await page.goto('/');
 
     await expect(page.getByRole('heading', { name: 'J J Peters' })).toBeVisible();
 
@@ -79,7 +85,7 @@ test.describe('the places screen', () => {
     await page.route(RPC, (route) =>
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(ROWS) }),
     );
-    await page.goto('/places/');
+    await page.goto('/');
     await expect(page.getByRole('heading', { name: 'J J Peters' })).toBeVisible();
 
     // The sentence that says what the place is, which is what a name alone
@@ -97,7 +103,7 @@ test.describe('the places screen', () => {
     // Home (Will, 16 September).
     await expect(page.getByRole('link', { name: 'J J Peters' })).toHaveAttribute(
       'href',
-      `/place/?id=${ROWS[0]!.id}&from=places`,
+      `/place/?id=${ROWS[0]!.id}&from=explore`,
     );
   });
 
@@ -105,7 +111,7 @@ test.describe('the places screen', () => {
     await page.route(RPC, (route) =>
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(ROWS) }),
     );
-    await page.goto('/places/');
+    await page.goto('/');
     await expect(page.getByRole('heading', { name: 'J J Peters' })).toBeVisible();
 
     // Placeholder hours stand in until `enrich-places` runs, so a card says one
@@ -117,22 +123,20 @@ test.describe('the places screen', () => {
 
   test('a failed query is explained, not left blank', async ({ page }) => {
     await page.route(RPC, (route) => route.fulfill({ status: 500, body: '{}' }));
-    await page.goto('/places/');
+    await page.goto('/');
 
-    // The alert that carries the way out. Anything else that announces itself in a role="alert" at the same moment (a banner, the
-    // sign-in check) is not what this is about, and a bare getByRole('alert') is a strict-mode failure when there are two.
-    const alert = page.getByRole('alert').filter({ has: page.getByRole('link') }).first();
-    await expect(alert).toBeVisible();
-    // §0: never dead-end. Whatever the message says, there is a way out of it.
-    // Signed out here, so Contact Pam opens the help desk on the website directly (A28).
-    await expect(alert.getByRole('link')).toHaveAttribute('href', 'https://joinpam.org/support/');
+    // Explore says so and offers Try again. The old list also carried a Contact Pam link inside the alert; Explore is a
+    // looking-around screen, which A26 exempts from a help link (help is one tap away on Profile and Home), so that
+    // one check no longer applies and is not kept here.
+    await expect(page.getByRole('heading', { name: 'Something went wrong' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Try again' })).toBeVisible();
   });
 
   test('an empty area says so instead of showing nothing', async ({ page }) => {
     await page.route(RPC, (route) =>
       route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
     );
-    await page.goto('/places/');
+    await page.goto('/');
 
     await expect(page.getByRole('heading', { name: 'Places' })).toBeVisible();
     await expect(page.locator('.astryx-empty-state')).toBeVisible();
@@ -151,7 +155,7 @@ test.describe('the places screen', () => {
         body: empty ? '[]' : JSON.stringify(ROWS),
       });
     });
-    await page.goto('/places/');
+    await page.goto('/');
     await expect(page.getByRole('heading', { name: 'J J Peters' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Work and money' }).click();
@@ -165,7 +169,7 @@ test.describe('the places screen', () => {
     await page.route(RPC, (route) =>
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(ROWS) }),
     );
-    await page.goto('/places/');
+    await page.goto('/');
     await expect(page.getByRole('heading', { name: 'J J Peters' })).toBeVisible();
 
     await settled(page);
@@ -200,10 +204,12 @@ test.describe('finding a place by name (D-188)', () => {
         body: JSON.stringify(ROWS.filter((row) => /Peters/.test(row.name))),
       });
     });
-    await page.goto('/places/');
+    await page.goto('/');
     await expect(page.getByRole('heading', { name: 'J J Peters' })).toBeVisible();
 
-    await page.getByRole('textbox', { name: 'Search by name or address' }).fill('petres');
+    // Explore opens search from a launcher (the old list had the box always open).
+    await page.getByRole('button', { name: 'Search programs' }).click();
+    await page.getByRole('combobox', { name: /Search programs by name or address/ }).fill('petres');
     await expect.poll(() => searches.length).toBeGreaterThan(0);
     expect(searches[searches.length - 1]).toContain('petres');
     await expect(page.getByRole('heading', { name: 'J J Peters' })).toBeVisible();
@@ -215,7 +221,7 @@ test.describe('reported places (D-189)', () => {
     await page.route(RPC, (route) =>
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(ROWS) }),
     );
-    await page.goto('/places/');
+    await page.goto('/');
     await expect(page.getByRole('heading', { name: 'J J Peters' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Reported' })).toHaveCount(0);
   });

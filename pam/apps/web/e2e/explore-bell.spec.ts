@@ -20,7 +20,7 @@ const ROW = {
   read_at: null,
 };
 
-async function signedIn(page: Page, role: 'member' | 'admin', notifications: unknown[]) {
+async function signedIn(page: Page, role: 'member' | 'admin', notifications: unknown[], hasPeople = false) {
   await page.addInitScript((userId: string) => {
     const session = {
       access_token: 't',
@@ -42,25 +42,29 @@ async function signedIn(page: Page, role: 'member' | 'admin', notifications: unk
     ),
   );
   await page.route('**/rest/v1/notifications*', (route) => route.fulfill(json(notifications)));
+  // Somebody to message means the Messages tab, and a member's Explore then carries no bell; nobody means the bell moves up here.
+  await page.route('**/rest/v1/rpc/messageable_people*', (route) => route.fulfill(json(hasPeople ? [{ id: 'p-1' }] : [])));
 }
 
 const bell = (page: Page) => page.getByRole('link', { name: /^Notifications/ });
 
 test.describe("a member's Explore and the bell", () => {
-  test('no notifications: no bell, and the search box fills the page width', async ({ page }) => {
-    await signedIn(page, 'member', []);
-    await page.goto('/places/');
+  test('with the Messages tab: no bell, and no room held for one: the search launcher stays centred', async ({ page }) => {
+    await signedIn(page, 'member', [], true);
+    await page.goto('/');
     await settled(page);
-    await expect(page.getByPlaceholder('Search by name or address')).toBeVisible();
+    const launcher = page.getByRole('button', { name: 'Search programs' });
+    await expect(launcher).toBeVisible();
     await expect(bell(page)).toHaveCount(0);
-    const box = await page.getByPlaceholder('Search by name or address').boundingBox();
+    // (The old list's full-width search box is gone with that page; Explore's launcher is centred, so what is held for a bell shows as a shift off centre.)
+    const box = await launcher.boundingBox();
     const vw = page.viewportSize()!.width;
-    expect(box!.width).toBeGreaterThan(vw - 80);
+    expect(Math.abs(box!.x + box!.width / 2 - vw / 2)).toBeLessThan(2);
   });
 
-  test('one notification: the bell is there, with its dot count', async ({ page }) => {
+  test('nobody to message: the bell moves up to Explore, with its link', async ({ page }) => {
     await signedIn(page, 'member', [ROW]);
-    await page.goto('/places/');
+    await page.goto('/');
     await settled(page);
     await expect(bell(page)).toBeVisible();
     await expect(bell(page)).toHaveAttribute('href', '/notifications/');
@@ -68,7 +72,7 @@ test.describe("a member's Explore and the bell", () => {
 
   test('a case manager keeps the bell on Explore even with nothing in the list', async ({ page }) => {
     await signedIn(page, 'admin', []);
-    await page.goto('/places/');
+    await page.goto('/');
     await settled(page);
     await expect(bell(page)).toBeVisible();
   });

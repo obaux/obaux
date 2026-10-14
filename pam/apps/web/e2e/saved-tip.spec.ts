@@ -62,7 +62,7 @@ const announced = (page: Page) => page.getByRole('status').filter({ hasText: 'Sa
 test.describe('the Saved tooltip', () => {
   test('on a place card: appears when saved, is announced, and is gone after about two seconds', async ({ page }) => {
     await signedIn(page);
-    await page.goto('/places/');
+    await page.goto('/');
     await settled(page);
     await expect(tip(page)).toHaveCount(0);
 
@@ -81,7 +81,7 @@ test.describe('the Saved tooltip', () => {
 
   test('taking it off says nothing', async ({ page }) => {
     await signedIn(page);
-    await page.goto('/places/');
+    await page.goto('/');
     await settled(page);
 
     await page.getByRole('button', { name: 'Save' }).click();
@@ -107,7 +107,7 @@ test.describe('the Saved tooltip', () => {
   test('with reduce-motion there is no fade at all', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await signedIn(page);
-    await page.goto('/places/');
+    await page.goto('/');
     await settled(page);
 
     await page.getByRole('button', { name: 'Save' }).click();
@@ -120,7 +120,7 @@ test.describe('the Saved tooltip', () => {
   test('without reduce-motion the only movement is the opacity fade', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await signedIn(page);
-    await page.goto('/places/');
+    await page.goto('/');
     await settled(page);
 
     await page.getByRole('button', { name: 'Save' }).click();

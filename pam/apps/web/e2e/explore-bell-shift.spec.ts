@@ -48,11 +48,12 @@ async function member(page: Page, withNotification: boolean) {
 const NOTE = 'pam.explore.bell';
 
 async function open(page: Page) {
-  await page.goto('/places/');
-  const search = page.getByPlaceholder('Search by name or address');
+  await page.goto('/');
+  // A member's Explore opens search from a launcher button under the title (the old list's search box is gone with the page).
+  const search = page.getByRole('button', { name: 'Search programs' });
   await expect(search).toBeVisible();
-  // The role chip is drawn once the session is known; measure after it, so what moves is the bell.
-  await page.getByText('Member', { exact: true }).first().waitFor();
+  // The area chip is drawn once the session is known; measure after it, so what moves is the bell.
+  await page.getByRole('button', { name: /Near City Hall/ }).first().waitFor();
   return search;
 }
 
@@ -70,29 +71,35 @@ test('a phone that had the bell last time: the page does not move when it arrive
   await expect(page.getByRole('link', { name: /^Notifications/ })).toHaveCount(1);
 });
 
-test('the first time a phone has a bell, it is remembered for the next', async ({ page }) => {
+// The old list drew its bell only when notifications existed (hideWhenEmpty) and kept a note on the
+// phone to hold its place. A member's Explore does not: with nobody to message the bell is simply there
+// from the first paint, with or without notifications, so there is nothing to arrive late and nothing
+// to remember. What is left to prove is that the page is already where it will stay.
+test('a member with nobody to message: the bell is there from the first paint and nothing moves', async ({ page }) => {
   await member(page, true);
-  await open(page);
-  await expect(page.getByRole('link', { name: /^Notifications/ })).toBeVisible({ timeout: 8000 });
-  expect(await page.evaluate((k) => window.localStorage.getItem(k), NOTE)).toBe('1');
-});
-
-test('a phone that had the bell, but has no notifications now: no bell, nothing held, and the note is dropped', async ({ page }) => {
-  await member(page, false);
-  await page.addInitScript((k: string) => window.localStorage.setItem(k, '1'), NOTE);
   const search = await open(page);
+  const bell = page.getByRole('link', { name: /^Notifications/ });
+  await expect(bell).toBeVisible();
+  const before = await search.boundingBox();
   await page.waitForTimeout(2200);
-  await expect(page.getByRole('link', { name: /^Notifications/ })).toHaveCount(0);
+  const after = await search.boundingBox();
+  expect(Math.abs(after!.y - before!.y)).toBeLessThanOrEqual(1);
+  await expect(page.getByRole('link', { name: /^Notifications/ })).toHaveCount(1);
   expect(await page.evaluate((k) => window.localStorage.getItem(k), NOTE)).toBeNull();
-  // The search box is on the same line as when no bell was ever held.
-  const box = await search.boundingBox();
-  expect(box!.y).toBeGreaterThan(0);
 });
 
-test('a phone with no note and no notifications holds no place', async ({ page }) => {
+test('the same with no notifications: the bell still opens the (empty) list and nothing moves', async ({ page }) => {
   await member(page, false);
-  await open(page);
+  const search = await open(page);
+  const bell = page.getByRole('link', { name: /^Notifications/ });
+  await expect(bell).toBeVisible();
+  const before = await search.boundingBox();
   await page.waitForTimeout(2200);
-  await expect(page.getByRole('link', { name: /^Notifications/ })).toHaveCount(0);
-  expect(await page.evaluate((k) => window.localStorage.getItem(k), NOTE)).toBeNull();
+  const after = await search.boundingBox();
+  expect(Math.abs(after!.y - before!.y)).toBeLessThanOrEqual(1);
+  expect(box(after)).toBeGreaterThan(0);
 });
+
+function box(b: { y: number } | null) {
+  return b ? b.y : 0;
+}

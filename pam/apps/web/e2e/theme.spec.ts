@@ -133,16 +133,20 @@ test.describe('the brand on a button', () => {
   });
 
   test('the focus ring is the brand, and stands out from the page', async ({ page }) => {
-    // 3:1 against what surrounds it — the rule for a non-text indicator.
+    // 3:1 against what surrounds it — the rule for a non-text indicator. A text box draws no ring of ours (D-569), so this is
+    // read on a button Tab lands on: Sign in's language button.
     await page.goto('/signin/');
-    const field = page.getByLabel('Your phone number');
-    await field.focus();
+    await page.getByLabel('Your phone number').focus();
+    await page.keyboard.press('Tab');
+    const focus = await page.evaluate(() => {
+      const el = document.activeElement as HTMLElement;
+      const style = getComputedStyle(el);
+      return { tag: el.tagName.toLowerCase(), ring: style.outlineColor, width: parseFloat(style.outlineWidth), kind: style.outlineStyle, page: getComputedStyle(document.body).backgroundColor };
+    });
 
-    const { ring, page: ground } = await field.evaluate((el) => ({
-      ring: getComputedStyle(el.parentElement as HTMLElement).outlineColor,
-      page: getComputedStyle(document.body).backgroundColor,
-    }));
-
-    expect(contrast(ring, ground), `ring ${ring} on ${ground}`).toBeGreaterThanOrEqual(3);
+    expect(focus.tag).toMatch(/^(button|a)$/);
+    expect(focus.kind).not.toBe('none');
+    expect(focus.width).toBeGreaterThanOrEqual(2);
+    expect(contrast(focus.ring, focus.page), `ring ${focus.ring} on ${focus.page}`).toBeGreaterThanOrEqual(3);
   });
 });

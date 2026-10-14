@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:e2e": "NEXT_PUBLIC_SUPABASE_URL=https://stub.supabase.co NEXT_PUBLIC_SUPABASE_ANON_KEY=stub-anon-key-for-ci next build",
     "start": "next start",
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run --passWithNoTests",

@@ -37,6 +37,11 @@ const styles = stylex.create({
   intro: { color: website['--website-text-primary'], margin: 0 },
   note: { color: website['--website-text-secondary'], margin: 0 },
   title: { color: website['--website-text-primary'], margin: 0 },
+  // "Write to us": the width of the phone on a phone, as wide as its words from 900px, left-aligned under the line (Will, 14 October).
+  open: { alignSelf: { default: 'stretch', '@media (min-width: 900px)': 'flex-start' } },
+  // Raises the keyboard inside the tap that opens the form: iOS only shows it for focus that happens in the gesture itself, and
+  // the dialog's own field does not exist until after it. Focus is given here first, then moves to the message box.
+  proxy: { position: 'fixed', insetBlockStart: 0, insetInlineStart: 0, width: '1px', height: '1px', padding: 0, border: 'none', opacity: 0, pointerEvents: 'none', fontSize: '16px' },
   // The dialog (Dot, D-562): full screen on a phone, a 560px card from 900px, backdrop black at 50% (60% in dark).
   dialog: {
     borderRadius: { default: '0px', '@media (min-width: 900px)': '24px' },
@@ -116,6 +121,44 @@ export function HelpRequest() {
   const [email, setEmail] = useState('');
   const [who, setWho] = useState<readonly string[]>([]);
   const [bad, setBad] = useState<{ message?: string; email?: string }>({});
+  const [focusError, setFocusError] = useState(0); // bumped when Send finds a problem: focus goes to the first field in error
+  const formBox = useRef<HTMLDivElement>(null);
+  const keyboardProxy = useRef<HTMLInputElement>(null);
+  const calloutBox = useRef<HTMLDivElement>(null);
+  const wasOpen = useRef(false);
+  const sentBox = useRef<HTMLDivElement>(null);
+
+  // An empty or wrong Send says nothing to a screen reader unless focus moves: it goes to the first field in error, which
+  // carries `aria-invalid` and `aria-describedby`, so its error is read (Iris W1).
+  useEffect(() => {
+    if (!focusError) return;
+    const id = window.requestAnimationFrame(() => formBox.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus());
+    return () => window.cancelAnimationFrame(id);
+  }, [focusError]);
+
+  // The message box takes focus as soon as the form is there; the keyboard is already up from the proxy (above).
+  useEffect(() => {
+    if (!open) return;
+    const id = window.requestAnimationFrame(() => formBox.current?.querySelector<HTMLTextAreaElement>('textarea')?.focus());
+    return () => window.cancelAnimationFrame(id);
+  }, [open]);
+
+  // When the form closes, focus goes back to "Write to us" (the dialog would hand it to the keyboard proxy it saw first).
+  useEffect(() => {
+    if (open) {
+      wasOpen.current = true;
+      return;
+    }
+    if (!wasOpen.current) return;
+    wasOpen.current = false;
+    const id = window.requestAnimationFrame(() => calloutBox.current?.querySelector<HTMLElement>('a, button')?.focus());
+    return () => window.cancelAnimationFrame(id);
+  }, [open]);
+
+  // After a successful Send "Write to us" is replaced by the thank-you: focus goes to it, so a person keeps their place (Iris P2).
+  useEffect(() => {
+    if (phase === 'sent') sentBox.current?.focus();
+  }, [phase]);
 
   // The page behind does not scroll while the form is open (iOS ignores the dialog's own lock): globals.css reads this.
   useEffect(() => {
@@ -187,7 +230,7 @@ export function HelpRequest() {
 
   if (phase === 'sent') {
     return (
-      <VStack gap={1} role="status">
+      <VStack gap={1} role="status" ref={sentBox} tabIndex={-1} id="help-sent">
         <Heading level={2} xstyle={[type.heading_title24, styles.title]}>
           Still stuck?
         </Heading>
@@ -205,7 +248,11 @@ export function HelpRequest() {
       ...(message.trim().length < 3 ? { message: WORDS.message } : {}),
       ...(!email.trim() ? { email: WORDS.emailEmpty } : !/^\S+@\S+\.\S+$/.test(email.trim()) ? { email: WORDS.emailWrong } : {}),
     };
-    if (problems.message || problems.email) return setBad(problems);
+    if (problems.message || problems.email) {
+      setBad(problems);
+      setFocusError((n) => n + 1);
+      return;
+    }
     setBad({});
     setPhase('sending');
     const roles = WHO.filter((w) => who.includes(w.id) && w.role).map((w) => w.role);
@@ -243,16 +290,19 @@ export function HelpRequest() {
   };
 
   return (
-    <VStack gap={3}>
+    <VStack gap={3} ref={calloutBox}>
       <Heading level={2} xstyle={[type.heading_title24, styles.title]}>
         Still stuck?
       </Heading>
       <Text as="p" xstyle={styles.intro}>
         Write to us. A person at Pam reads every message.
       </Text>
+      <input ref={keyboardProxy} type="text" aria-hidden="true" tabIndex={-1} autoComplete="off" {...stylex.props(styles.proxy)} />
       <SoftButton
         label="Write to us"
+        xstyle={styles.open}
         onClick={() => {
+          keyboardProxy.current?.focus({ preventScroll: true });
           setPhone(window.matchMedia('(max-width: 899px)').matches);
           setOpen(true);
         }}
@@ -270,7 +320,7 @@ export function HelpRequest() {
         aria-labelledby="help-title"
         xstyle={styles.dialog}
       >
-        <VStack gap={6} xstyle={styles.inside}>
+        <VStack gap={6} xstyle={styles.inside} ref={formBox}>
         <VStack xstyle={styles.head}>
           <Heading level={2} id="help-title" xstyle={[type.heading_title24, styles.title]}>
             Still stuck?

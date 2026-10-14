@@ -411,19 +411,19 @@ test.describe('phone and code fields', () => {
     await expect(phone).toHaveAttribute('inputmode', 'tel');
   });
 
-  test('focus lights up the whole field, not a box inside it', async ({ page }) => {
+  test('focus draws no ring on the field or its frame; the cursor shows where you are (D-569)', async ({ page }) => {
     await page.goto('/signin/');
     const phone = page.getByLabel('Your phone number');
     await phone.focus();
+    await expect(phone).toBeFocused();
 
-    // The ring belongs on the frame a person can see. A second rectangle drawn
-    // inside the first reads as a stray element — and collided with the label.
+    // Will, 14 October (a83): no highlight on a text box, however focus got there.
     const outlines = await phone.evaluate((el) => ({
       input: getComputedStyle(el).outlineStyle,
       frame: getComputedStyle(el.parentElement as HTMLElement).outlineStyle,
     }));
     expect(outlines.input).toBe('none');
-    expect(outlines.frame).toBe('solid');
+    expect(outlines.frame).toBe('none');
   });
 });
 

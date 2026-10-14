@@ -1,7 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { website } from '../lib/website.stylex';
-import { lastBlockGap } from '../lib/last-block-gap';
 import { HelpRequest } from './HelpRequest';
 
 const styles = stylex.create({
@@ -29,7 +28,7 @@ const styles = stylex.create({
  */
 export function StillStuck() {
   return (
-    <VStack id="still-stuck" data-post-section="Still stuck?" tabIndex={-1} xstyle={[styles.anchor, lastBlockGap.end]}>
+    <VStack id="still-stuck" data-post-section="Still stuck?" tabIndex={-1} xstyle={styles.anchor}>
       <VStack gap={3} xstyle={styles.card}>
         <VStack gap={3} maxWidth={720}>
           <HelpRequest />

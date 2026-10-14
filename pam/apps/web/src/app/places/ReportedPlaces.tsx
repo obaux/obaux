@@ -14,7 +14,7 @@ import { placeStatus } from '@/lib/usePlaceStatus';
 import { resolveFlag, type FlaggedPlace, type FlaggedPlacesState } from '@/lib/useFlaggedPlaces';
 
 /**
- * The Reported filter on `/places/` (D-189): places somebody said are closed,
+ * The Reported places screen (D-189; it was a filter on the old `/places/` list, retired 13 October 2026): places somebody said are closed,
  * moved, full or wrong, for the people who review them. The same `PlaceCard`
  * as the rest of the list, with the reason on it and — for a super admin —
  * the two decisions `resolve_service_flag()` (0036) offers: keep it, or take
@@ -77,7 +77,7 @@ export function ReportedPlaces({
         reason: f.reason,
         count: f.count,
         hours: null,
-        href: `/place/?id=${encodeURIComponent(f.place.id)}&from=places`,
+        href: `/place/?id=${encodeURIComponent(f.place.id)}&from=reported`,
       }))
     : state.status === 'ready'
       ? state.places.map((p) => ({
@@ -89,7 +89,7 @@ export function ReportedPlaces({
           reason: p.reason,
           count: p.flagCount,
           hours: p.hours,
-          href: `/place/?id=${encodeURIComponent(p.id)}&from=places`,
+          href: `/place/?id=${encodeURIComponent(p.id)}&from=reported`,
         }))
       : [];
 
