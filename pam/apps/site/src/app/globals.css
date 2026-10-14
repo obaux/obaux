@@ -58,17 +58,22 @@
 
   /* A visible ring on everything you can reach with Tab (Iris's finding S2, 11 October: the header links, search box,
      topic and post links, Open Pam and the footer showed none). Astryx's own focus rule loses to an
-     `outline-style: none` that its link, nav and button styles also set, so it is drawn here, from the same tokens. */
+     `outline-style: none` that its link, nav and button styles also set, so it is drawn here, from the same tokens.
+     Text boxes are not in this list and draw no ring in any mode (Will, 14 October: "undo any rules about text box being
+     selected, I don't want that": the cursor shows where you are; the keyboard comes up when a box appears). Buttons,
+     links, tick boxes, selects and summary keep theirs. */
   a:focus-visible,
   button:focus-visible,
-  input:focus-visible,
+  input[type='checkbox']:focus-visible,
+  input[type='radio']:focus-visible,
+  input[type='button']:focus-visible,
+  input[type='submit']:focus-visible,
   select:focus-visible,
-  textarea:focus-visible,
   summary:focus-visible,
   [role='button']:focus-visible,
-  [role='combobox']:focus-visible,
+  [role='combobox']:not(input, textarea):focus-visible,
   [role='tab']:focus-visible,
-  [tabindex]:not([tabindex='-1']):focus-visible {
+  [tabindex]:not([tabindex='-1']):not(textarea):not(input[type='text'], input[type='email'], input[type='search'], input[type='tel'], input[type='url'], input[type='number'], input[type='password'], input:not([type])):focus-visible {
     outline: var(--focus-outline-width, 2px) var(--focus-outline-style, solid) var(--focus-outline-color, currentColor) !important;
     outline-offset: var(--focus-outline-offset, 3px) !important;
   }

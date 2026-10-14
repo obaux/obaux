@@ -22,6 +22,7 @@ import { POSTS, type SupportPost } from '../content/posts';
 import { TOPICS } from '../content/topics';
 import { Frame } from '../components/Frame';
 import { StillStuck } from '../components/StillStuck';
+import { lastBlockGap } from '../lib/last-block-gap';
 import { SEARCH_PHRASES } from '../content/search-phrases';
 import { MOST_ASKED } from '../content/most-asked';
 import { asQuestion, didYouMean, search, suggest, type Suggestion } from '../lib/search';
@@ -253,7 +254,7 @@ export function SupportScreen() {
         </Frame>
       </VStack>
 
-      <VStack paddingBlockStart={8}>
+      <VStack paddingBlockStart={8} xstyle={lastBlockGap.end}>
       <Frame gap={8}>
         <VisuallyHidden role="status" aria-live="polite">
           {heard}

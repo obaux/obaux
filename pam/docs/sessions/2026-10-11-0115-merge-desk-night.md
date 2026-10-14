@@ -763,9 +763,65 @@
   Three choices on the card with my advice: chips on Programs only, full screen, and a ZIP typed on Programs switches
   to Area. Sage signed the "Got a new phone number?" post (e708a7e8). Her "We may call your new number" line follows
   a84 (i). Correction to the 04:15 entry: the ZIP-only chip rule is D-552, not D-561.
+- **Will, 04:39 (a86, chat w20261014043914e19d): one box, like Google Maps.** In his words: "Let's talk about this
+  before we push anything. If I'm in Google Maps I can type either a program name or an address and it will just show
+  me the list. I don't have to select whether it's a service or an area. Why do we need to make a distinction? Also I
+  don't like the subtitle under 'Search program' inside the search bar. It feels too crowded. Can we just streamline
+  this and merge everything into one?" Merge desk, 04:39: agreed, no switch. The bar has one line ("Search programs
+  or places"), and one list comes back with programs first, Pam's areas next and addresses last. **Google is asked
+  only when the text looks like an address** (a house number, a street suffix, an "X and Y" corner) or when the
+  person taps an explicit "Search addresses" row, so what people search for ("food pantry", "rehab") never leaves Pam.
+  That keeps the signed a74/a81 Privacy line true and Google's bill down; Piper checks whether the line's "a place
+  Pam's own list of areas doesn't have" clause is broader than this. Piper redraws it (v2, pictures only).
+- **Will, 04:40 (a81, chat w20261014044028qel6): keep "Near 19102".** The area control on the right of "All programs"
+  (or a category) stays as it is today, for people who browse rather than type. Picking an area or address in the one
+  box updates the same control. Piper's v2 includes it.
+- **Will, 04:43 (a85, chat w20261014044303piq9): the banner he meant is the blue one.** "That green card in the places
+  profile isn't even an alert banner. I'm talking about the more subtle blue banner" — the place page's
+  `<Banner status="info">` ("This is only to help you plan. Pam does not tell {place} you are coming."). The merge
+  desk's 04:31 brief had sent Dot to the green VisitCard. Dot redraws every note as the blue info Banner and shows
+  the two confirmations once in Banner success beside them, so Will can pick.
+- **Will, 04:47 (a84, chat w20261014044728k4y4): Sign in's spacing is off.** In Ava's picture the heading sits against
+  the hero and the field, button and line are packed together. Ava's branch changed no gaps (it is based on b32), so Dot
+  checks main at 390×844 and 375×667 and gives it room with spacing tokens, keeping the short-phone fit, with before and
+  after pictures for Will.
+- **Will, 04:48 (chat w202610140448305pq6): the Control Room loses his place and his reply.** Merge desk, 04:53,
+  Control Room v23 (version 42): every picture publish had reloaded the page on his screen (six in the hour). The page
+  now declares `assets`, and card pictures go to its asset store (`/_blob/<id>`), which needs no new version. A data
+  change keeps the card or picture at the top of the screen where it was (`keepPlace`). A reload restores the card he
+  was on, which cards were open, the picture he had open, and the reply being written (kept on his device until sent).
+  Tested in a harness at 390: a new card plus longer text above held the picture within a pixel, and the draft and the
+  open picture came back after a reload. The forms pictures (Dot 3b76742c, blue info banners with a green version to
+  compare) were the first to arrive through the asset store.
+- **Will, 04:50 (a83, chat w20261014045002p6tc): the help form "looks good. Approved".** D-569 (app) and D-570
+  (website) ship in b36 once the full checks pass. Sage signed Wren's "More: Got a new phone number?" link (0344f23b).
+  That post stays held for a84.
+- **Merge desk, 04:55: a86 shows Piper's take three (ec5195b0).** One-line bar "Search programs or places"; the "Near
+  City Hall ✎" control kept; typing "food" lists programs and asks Google for nothing unless the explicit "Search
+  addresses for 'food'" row is tapped; typing "1500 Market" shows areas, then Google's addresses. Piper's privacy check
+  found that today's rule (`wantsGoogle`: ask when Pam's own areas find nothing) would have sent "food" from a merged
+  box. So the box asks Google only for address-like text that matches no program, or on the explicit tap, and fails safe.
+  The drawer keeps today's rule, so the signed p7 stays true. Decided, and Will can change them: all digits put Areas
+  first; a street picked in the box shows only its ZIP (D-552).
+- **Merge desk, 05:03: Sign in's spacing, D-572 (Dot c0ed1c8d), card a87.** It was live since b32. D-564's short-screen
+  rules used `default: null` for the stack gap, the card padding and the brand gap, and in StyleX that unsets the
+  component's own `gap`/`padding` on every screen: title 4px under the picture, field, button and consent line 0px
+  apart at 390×844. The defaults are now the tokens (--spacing-3/5/4), and the tight values apply only under 640px tall;
+  641 to 720px gets a 46vh slide so 375×667 still fits. All 42 fit cases still fit, and a new signin-short case covers
+  390×844 and 375×667. It restores the look Will signed, so it ships as b37 after b36.
 
 ## What was wrong, and what missed it
 
+- **Sign in's spacing was squeezed on every phone for a night.** A `default: null` meant for short screens removed the
+  component's own spacing everywhere; the tests only measured 320×568, where tight is right. Will saw it in a picture.
+  Rule (D-572): never `default: null` over a component's own prop; give the token instead.
+- **Every picture added to a card reloaded Will's page.** Publishing files with the page makes a new version, and every
+  open view reloads to it, so his scroll, his open picture and his half-written reply went each time. Nothing showed it
+  from this side. Pictures now go to the asset store; publish the page only when the page itself changes.
+- **"Booking Confirmed" read as the green booked card.** Will named a style by the words he remembered on it. The merge
+  desk picked the component with those words (VisitCard) without checking which of the place page's two notices he
+  meant, and Dot redrew ten screens on it. Next time a style is named by a remembered label, put a picture of each
+  candidate in the reply and ask, or have the redraw show both.
 - **A live finding went out to three people before it was checked.** Ava reported join.staff.* promising an unsent
   text; I sent Sage, Lena and Ava to fix it without reading claim_outbound_messages or outbound_messages. Sage
   checked the code and was right: those texts are exempt. Check a reported live fault against the live system (one

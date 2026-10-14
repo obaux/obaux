@@ -1513,6 +1513,10 @@ connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merge
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
 
+## Design system & Storybook · text boxes show no ring (14 October)
+
+Text boxes draw no ring of ours in any mode; the keyboard still comes up when a screen opens with one ready (D-569, Will a83, supersedes D-523's text-box line). Buttons, links, tick boxes and selects keep the brand ring on Tab. The chat composer has no ring (none on Tab); the code boxes keep their 2px accent edge on purpose (D-251). On `claude/pam-design-text-box-no-ring`; not on `main`.
+
 ## Design system & Storybook · sign-in hand-over and name commas (13 October)
 
 The compact Sign in bar takes over when half the hero mark is gone, not all of it (D-566, Iris b32 P1); `BigButton`'s name joins label and count with the language's own comma via `nameJoinerOf` (P5). On `claude/pam-design-signin-polish`, off `mira/batch-b32`; not on `main`.
@@ -1718,6 +1722,8 @@ fine and the fit audit was over-counting (D-448).
 ## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, merged 9 October (PR #29)
 
 ## Website · public site and help centre (10 October) — `apps/site`, on `main`
+
+**14 October (D-570).** The site's text boxes draw no focus ring, the keyboard comes up as the help form opens, "Write to us" is as wide as its words from 900px, and the space under Still stuck? is padding on the container.
 
 **13 October (held for Will, D-548/D-550).** About Pam shows its carousel words again and loses the line above its tabs (bd6d016a). The Home phone layout follows Figma 7:3 and the green card switches between three views; pictures to look at are in `docs/design/review/2026-10-13-website-phone/`. Not for `main` until Will says yes.
 
