@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { settled } from './settled';
+import { asMember } from './asMember';
 
 /**
  * A visible highlight on focus that a script puts somewhere belongs to text boxes only (Will, 11 October: "Modals
@@ -249,5 +250,29 @@ test.describe('Tab shows a ring on every control (the Astryx tiles, rows, tabs a
     expect(seen.join('|')).toMatch(/Connections/);
     expect(seen.join('|')).toMatch(/Sign out/);
     expect(seen.length).toBeGreaterThanOrEqual(9);
+  });
+});
+
+test.describe('a search field shows what is typed as typed, in any language (D-574 follow-up, Lena, a86)', () => {
+  test('in Arabic "1500 Market" is not turned into "Market 1500"; empty, the placeholder follows the page', async ({ page }) => {
+    await asMember(page, 'member', 'ar');
+    await page.route('**/rest/v1/rpc/services_near*', (route) => route.fulfill(json([])));
+    await page.route('**/rest/v1/rpc/search_areas*', (route) => route.fulfill(json([])));
+    await page.goto('/');
+    await settled(page);
+    await page.getByRole('button').filter({ hasText: 'City Hall' }).first().click();
+    const box = page.locator('.astryx-input-group[data-size="lg"] input').first();
+    await expect(box).toBeVisible();
+    const direction = () => box.evaluate((el) => getComputedStyle(el).direction);
+    // Empty: the page's own direction, right to left in Arabic, so the placeholder reads the way the language does.
+    expect(await direction()).toBe('rtl');
+    await box.fill('1500 Market');
+    // Latin words typed: left to right, number first, as typed.
+    await expect.poll(direction).toBe('ltr');
+    // Arabic words typed: right to left.
+    await box.fill('شارع');
+    await expect.poll(direction).toBe('rtl');
+    await box.fill('');
+    await expect.poll(direction).toBe('rtl');
   });
 });

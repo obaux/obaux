@@ -245,6 +245,15 @@ export function SearchField({
     if (describedBy) input.setAttribute('aria-describedby', describedBy);
     else input.removeAttribute('aria-describedby');
   }, [describedBy]);
+  // What is typed reads as typed, in any language: an address like "1500 Market" must not be turned into "Market 1500" by the
+  // right-to-left page (Lena, a86). `dir="auto"` follows the words' own first strong letter; while the field is empty it is left
+  // off, so the placeholder keeps following the page's direction (an empty `auto` field falls back to left to right).
+  useEffect(() => {
+    const input = groupRef.current?.querySelector('input');
+    if (!input) return;
+    if (value) input.setAttribute('dir', 'auto');
+    else input.removeAttribute('dir');
+  }, [value]);
   return (
     <InputGroup ref={groupRef} label={label} isLabelHidden size="lg" xstyle={[styles.group, isSubtle && styles.subtle]}>
       {/*
