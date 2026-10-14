@@ -714,6 +714,22 @@
   Tab, because that is how a keyboard user sees where they are. Dot writes it as a new D-number; Wren does the
   same on the site. (3) "Write to us" fits its words from 600px and stays full width on a phone. Pictures go to
   Will before any of it ships.
+- **Merge desk, 04:20: forms card a85 for Will.** All four came back READY: Iris's research (b7da9ba5), Lena's legal
+  note (59e88997, not legal advice; tags every claim), Piper's plan (8302dea4) and Dot's pictures (63671ef4). All four
+  are merged into main as records. Position on the card: DocuSign on **each program's own account**, shown inside Pam
+  (DocuSign's page under Pam's bar, or full screen and back), so the member types an SSN on DocuSign's page and Pam
+  never sees it. Pam keeps only the envelope id, the status and "signed, on this day". Piper's plan started on one Pam
+  account; Iris and Lena both found that would leave every completed form in Pam's DocuSign until purged, which is
+  storing it by another name, so the program's account it is. The honest cost: Pam cannot carry details across
+  programs, so a member types them once per program package, not once per sitting. The Pam-only route (fill and sign
+  on the phone, details only in memory) is later, bigger, and needs a lawyer. Today's policies stay; forms become a
+  second kind (`kind = 'form'`). Fixed whatever Will picks: Pam never asks for an SSN, no form title in a text or
+  notice, a program sees "signed, on this day", Pam's code never downloads a form, a Pennsylvania lawyer before
+  launch, off until Will switches it on. Not promised: that the DocuSign token itself cannot download (Lena's
+  least-privilege point; the spike shows how far DocuSign lets it be narrowed). Four questions for Will, my advice
+  yes on each: (1) that order; (2) a free DocuSign developer account he makes, for Iris and Piper's spike; (3) stop
+  keeping the drawn signature picture on read-and-agree policies (D-485 point 1), keeping only the date; (4) a
+  program's own form may use words Pam doesn't. Nothing is built or claimed until he answers.
 
 ## What was wrong, and what missed it
 
@@ -971,7 +987,7 @@
 - **As of b34 (14 October, 04:10):** with Will: a84 (the new number and the case manager request, with their
   Privacy lines; the release is ready the moment he signs), a81 (Google's logo files, then the key), and the forms
   and DocuSign questions (a) to (c). Research round on forms and DocuSign: Iris, Lena, Piper and Dot; then a card
-  for Will with pictures and choices. Nothing on forms is built before he picks. Dot: Google's logo files (then
+  for Will with pictures and choices (posted as a85 at 04:20). Nothing on forms is built before he picks. Dot: Google's logo files (then
   Will's key), then text boxes without a ring. Wren: the help form's three changes (Will, 04:08).
 - **As of b32 (13 October, about 20:00):** b33 is ready to merge: Piper's D-565 (9aade728, the old Places list
   retired, with Lena's 911312da for "Back to Reported places"), Dot's D-566 (5737dfae), Ava's P2 (3dfb043c). With
@@ -999,7 +1015,8 @@
 ## Needs a human
 
 - Will: forms and DocuSign. (a) Which programs use DocuSign, and on whose account; (b) where a signed form has to
-  end up; (c) a few blank forms in a Drive folder "Pam forms". Then the card with pictures and choices.
+  end up; (c) a few blank forms in a Drive folder "Pam forms". And card a85's four questions (the order, a free
+  DocuSign developer account he makes, the drawn signature picture, a program's own words).
 - Will: card a62, step 3 only: HELP_REQUESTS_LIVE = on in Supabase's secrets, then one test from "Still stuck?"
   (his paste and the salt are in and checked; 041940 is recorded).
 - Will: card a75 (website text colours, Dot's examples linked). Later cards: the Google street search (a key and a
