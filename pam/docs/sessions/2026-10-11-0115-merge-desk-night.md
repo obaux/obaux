@@ -781,9 +781,24 @@
   `<Banner status="info">` ("This is only to help you plan. Pam does not tell {place} you are coming."). The merge
   desk's 04:31 brief had sent Dot to the green VisitCard. Dot redraws every note as the blue info Banner and shows
   the two confirmations once in Banner success beside them, so Will can pick.
+- **Will, 04:47 (a84, chat w20261014044728k4y4): Sign in's spacing is off.** In Ava's picture the heading sits against
+  the hero and the field, button and line are packed together. Ava's branch changed no gaps (it is based on b32), so Dot
+  checks main at 390×844 and 375×667 and gives it room with spacing tokens, keeping the short-phone fit, with before and
+  after pictures for Will.
+- **Will, 04:48 (chat w202610140448305pq6): the Control Room loses his place and his reply.** Merge desk, 04:53,
+  Control Room v23 (version 42): every picture publish had reloaded the page on his screen (six in the hour). The page
+  now declares `assets`, and card pictures go to its asset store (`/_blob/<id>`), which needs no new version. A data
+  change keeps the card or picture at the top of the screen where it was (`keepPlace`). A reload restores the card he
+  was on, which cards were open, the picture he had open, and the reply being written (kept on his device until sent).
+  Tested in a harness at 390: a new card plus longer text above held the picture within a pixel, and the draft and the
+  open picture came back after a reload. The forms pictures (Dot 3b76742c, blue info banners with a green version to
+  compare) were the first to arrive through the asset store.
 
 ## What was wrong, and what missed it
 
+- **Every picture added to a card reloaded Will's page.** Publishing files with the page makes a new version, and every
+  open view reloads to it, so his scroll, his open picture and his half-written reply went each time. Nothing showed it
+  from this side. Pictures now go to the asset store; publish the page only when the page itself changes.
 - **"Booking Confirmed" read as the green booked card.** Will named a style by the words he remembered on it. The merge
   desk picked the component with those words (VisitCard) without checking which of the place page's two notices he
   meant, and Dot redrew ten screens on it. Next time a style is named by a remembered label, put a picture of each
