@@ -986,6 +986,10 @@
   proof: a live build is refused before any test; with the check off, 861 attempted requests to the live host, 0
   answered; never-live.spec.ts in all three projects; full suite 1859 passed, 19 skipped. Merged as b39 (39481be0),
   Screens: none.
+- **Ava, 10:16: both held a84 branches carry main f8cf7a2e and pass with D-576's guard.** D-567 is now 6a2c19f5 (one
+  en.json conflict, keys added at the end on both sides, both kept): db all pass, ui 124, e2e 405 on three projects.
+  D-568 is now 3c9c929e (clean): db all pass, ui 124, e2e 474. No missing mocks. Config is red only on the
+  untranslated newNumber.* (60) and case-manager (23) keys, which come with Lena's branches in the a84 release.
 - **One send-invite-emails 500 at 06:25:01** (`claim_staff_invite_emails: 401`). The 21 runs either side of it all
   returned 200. Not acted on. Watch only.
 
