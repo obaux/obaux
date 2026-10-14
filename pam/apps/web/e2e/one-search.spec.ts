@@ -215,8 +215,8 @@ test.describe('one search field', () => {
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
     // The field's name is Arabic here, so find it by what it is.
     const box = page.locator('.astryx-input-group[data-size="lg"] input').first();
-    await expect(box).toHaveAttribute('dir', 'auto');
     await box.fill('1500 Market');
+    await expect(box).toHaveAttribute('dir', 'auto');
     // The browser resolves "auto" from the first strong letter: this text lays out left to right.
     expect(await box.evaluate((el) => el.matches(':dir(ltr)'))).toBe(true);
     // An Arabic word typed in the same field lays out right to left.

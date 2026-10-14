@@ -323,7 +323,8 @@ test.describe('a search field shows what is typed as typed, in any language (D-5
     await page.goto('/');
     await settled(page);
     await page.getByRole('button').filter({ hasText: 'City Hall' }).first().click();
-    const box = page.locator('.astryx-input-group[data-size="lg"] input').first();
+    // The drawer's field (the last one; the page's own search field is before it).
+    const box = page.locator('.astryx-input-group[data-size="lg"] input').last();
     await expect(box).toBeVisible();
     const direction = () => box.evaluate((el) => getComputedStyle(el).direction);
     // Empty: the page's own direction, right to left in Arabic, so the placeholder reads the way the language does.
