@@ -990,6 +990,17 @@
   en.json conflict, keys added at the end on both sides, both kept): db all pass, ui 124, e2e 405 on three projects.
   D-568 is now 3c9c929e (clean): db all pass, ui 124, e2e 474. No missing mocks. Config is red only on the
   untranslated newNumber.* (60) and case-manager (23) keys, which come with Lena's branches in the a84 release.
+- **Will, 20:03 (chat): "Store this info in our documentation and memory".** The info is his Claude doc "PAM — Google
+  Places API (New) setup & cost guardrails" (13 October). It is now `docs/google-places.md`, without the key's value
+  or the Google Cloud project's id. The merge desk checked it against the code:
+  - places-search makes Autocomplete calls, and Place Details calls with `location,formattedAddress` (Essentials).
+    No contact fields. Over a cap it answers `unavailable` and Pam's own areas still work.
+  - The Place Details cap of 30 a day is the one that binds. It can go to 300 (Will).
+  - a86 looks up the first suggestion after every typing pause, so it should come down to about one Place Details call
+    per search before it ships (Piper).
+  - pam/CLAUDE.md now points every session at the doc. The before-launch street-search item is closed.
+  - Will's question on his doc (does Pam's own database hold contact details?): yes. It is answered in the repo doc;
+    the doc's thread was not replied to.
 - **One send-invite-emails 500 at 06:25:01** (`claim_staff_invite_emails: 401`). The 21 runs either side of it all
   returned 200. Not acted on. Watch only.
 
@@ -1325,6 +1336,11 @@
 
 ## Needs a human
 
+- Will, Google Cloud Console (`docs/google-places.md`, "Open items"):
+  - Raise the Place Details (GetPlaceRequest) cap from 30 to 300 a day before a86 ships.
+  - Add a billing budget alert.
+  - Confirm the key's display name.
+  - Decide on the older "Maps Platform API Key" (the Trips map may use it).
 - Will: card a86, his yes to the inline search and his signature on the p7 Privacy line. Card a88: open the DocuSign
   consent link (sent 06:40) and check demo.docusign.net in Allowed domains (still refused at 07:49). Card a85 is
   fully decided (06:28 to 06:54).
