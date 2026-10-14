@@ -6,6 +6,7 @@
  * writes the real ones (A29).
  */
 import { Suspense } from 'react';
+import { ConfirmDialog } from '@/screens/ConfirmDialog';
 import { useSearchParams } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { Banner } from '@astryxdesign/core/Banner';
@@ -260,7 +261,7 @@ function Screen({ which }: { readonly which: string }) {
       );
     case 'signed':
       return (
-        <PamPage gap={4} footer={<VStack gap={2}><TextLink label="Undo this signature" /><BigButton label="Next form" badge="4 of 112" /></VStack>}>
+        <PamPage gap={4} footer={<VStack gap={2}><TextLink label="Undo this signature" /><BigButton label="Next form" /></VStack>}>
           <BackBar title="Intake and consent" sub="Example Food Pantry" pct={3} />
           <FormPaper signed />
           <Calm confirm body="Signed and sent to Example Food Pantry" />
@@ -268,14 +269,20 @@ function Screen({ which }: { readonly which: string }) {
       );
     case 'leave':
       return (
-        <PamPage gap={4} footer={<VStack gap={2}><TextLink label="Leave for now" /><BigButton label="Keep signing" /></VStack>}>
+        <PamPage gap={4} footer={<VStack gap={2}><TextLink label="Skip this one for now" /><BigButton label="Sign this form" /></VStack>}>
           <BackBar title="Intake and consent" sub="Example Food Pantry" pct={3} />
           <FormPaper signed={false} />
-          <VStack xstyle={styles.scrim} />
-          <VStack gap={3} xstyle={styles.leave}>
-            <Text weight="bold">Leave for now?</Text>
-            <Text type="supporting">Pam keeps the 3 forms you signed. Your details are cleared, so you will type them again when you come back.</Text>
-          </VStack>
+          <Text type="supporting">Your details are filled in. Check them, then sign.</Text>
+          {/* Pam's own confirmation dialog (ConfirmDialog, D-234, D-255): the action is the one big button, the quiet way out below. */}
+          <ConfirmDialog
+            isOpen
+            title="Leave for now?"
+            body="Pam keeps the 3 forms you signed. Your details are cleared, so you will type them again when you come back."
+            confirmLabel="Leave for now"
+            onConfirm={() => {}}
+            cancelLabel="Keep signing"
+            onCancel={() => {}}
+          />
         </PamPage>
       );
     case 'pause':
@@ -338,7 +345,7 @@ function Screen({ which }: { readonly which: string }) {
       );
     case 'handoff':
       return (
-        <SubPage title="Signed" subtitle="Form 3 of 112" backLabel="Back" backHref="#" footer={<BigButton label="Next form" badge="4 of 112" />}>
+        <SubPage title="Signed" subtitle="Form 3 of 112" backLabel="Back" backHref="#" footer={<BigButton label="Next form" />}>
           <Progress pct={3} label="3 signed · 109 to go" />
           <Calm
             confirm
