@@ -17,6 +17,8 @@ Envelopes, as Iris asked: **E1** (F1–F5 in one), **E100** (F1–F5 ×20), **E-
 
 **Mint:** signing links last about 5 minutes and work once, so `mint` makes a fresh one on demand. Iris gets a small local script that calls `mint` and prints or opens the URL; she sees only the URL. The DocuSign key and private key never leave Supabase secrets.
 
+**Iris's script** (`docs/research/docusign-sandbox/signing-pages.mjs` on `claude/research-help-site`) needs three mint URLs (E1, E-ar, E100) that each create a fresh recipient view and redirect to it, with a `returnUrl` that lands on a URL containing `event=`; and an optional `&display=focused` (focused view, `frameAncestors` set to the test origin), record-only, skipped if awkward. I run it from `apps/web` once consent is done and send back `results.json`, the two aria files and the screenshots, and the hosts list it reports.
+
 **Return:** `returnUrl` is the hook's `/return`, which shows `signing_complete`, `cancel`, `decline`, `session_timeout` and nothing else it was not told to print (an allow-list of event names).
 
 **Connect:** set up without documents and without tab data. `/connect` verifies the HMAC and logs the envelope id, the status, and the **names of the keys present** in the payload. For the E1 test only, it also logs the whole payload (made-up data, function logs expire) so Iris can check it carries no field values. That one line is removed before anything else is tested.
