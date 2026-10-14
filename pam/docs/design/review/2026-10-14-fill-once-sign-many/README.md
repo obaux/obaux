@@ -1,5 +1,10 @@
 # Fill once, sign many: the member's side (pictures only, 390px, light and dark)
 
+## Decided (Will, 14 October, 06:54): our own confirmation dialog
+On 2b: "This is not our confirmation modal design. Please stay consistent with our DS." 2b now is Pam's own `ConfirmDialog` (`apps/web/src/screens/ConfirmDialog.tsx`, D-234, D-255; the one `ScheduleView` and the other "Are you sure?" screens use), drawn with the real component: 32px corners over the page washed out, the question as the heading, the explanation, the action ("Leave for now") as the one big button, and the quiet way out ("Keep signing") under it. The forms' words are stand-ins.
+
+**Will's answers (06:54, via the merge desk):** 1 yes: each program's own DocuSign account comes first; 3 agree: no picture of a drawn signature is kept; 4 allow: the program's own words; and "Skip this one for now" above the main button is good.
+
 ## Decided (Will, 14 October, 06:51): no count inside Next form
 On 3b (the DocuSign hand-back) and 2c (signed, next): "I don't think it makes sense to have counter inside button here, since it's already on top." The primary is just **Next form**; the count stays only in the bar ("Form 3 of 112" and the progress bar). **This overrides the in-button count of D-560 for the forms screens** (the counter line in Join's steps is unchanged). The set was approved by Will at 06:49 before this one change.
 
