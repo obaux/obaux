@@ -1513,6 +1513,10 @@ connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merge
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
 
+## Design system & Storybook · Sign in's spacing is back (14 October)
+
+D-564's short-screen rules had unset Sign in's own gaps on every screen (a `null` default); fixed with the spacing tokens, and a 641–720px tier keeps 375×667 above the fold (D-572, Will a84). On `claude/pam-design-signin-spacing`; not on `main`.
+
 ## Design system & Storybook · sign-in hand-over and name commas (13 October)
 
 The compact Sign in bar takes over when half the hero mark is gone, not all of it (D-566, Iris b32 P1); `BigButton`'s name joins label and count with the language's own comma via `nameJoinerOf` (P5). On `claude/pam-design-signin-polish`, off `mira/batch-b32`; not on `main`.
