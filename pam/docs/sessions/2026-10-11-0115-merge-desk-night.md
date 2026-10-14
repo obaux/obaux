@@ -870,6 +870,12 @@
   ("Used for this search only.", with `saveOrigin` skipping `here` and `google:` picks) it would read as if the address
   were kept. Piper takes it out of the box; the drawer keeps its own line. Will was told at 06:13, correcting the
   05:56 note.
+- **Merge desk, 06:16: D-574 take two (Dot 1918d84c).** The outline is back on active search fields (3px ink, white
+  at night), and `--pam-search-height` is 60px for every search box. The heights already matched. What makes the
+  resting bar and the active box feel apart is width and alignment, since the resting bar is full width with centred
+  words. Decided: the resting bar's magnifier and words sit at the left, as in the active box. A tap changes nothing
+  but the outline and the right edge drawing in for Cancel (no transition under reduced motion), with at least 12px
+  between the outline and Cancel. D-574 merges together with a86, and Will sees both in one set of pictures.
 - **Merge desk, 06:08: Piper's DocuSign spike plan (4076102e) approved, with changes.**
   - No live Pam account for the spike: the gateway JWT is the anon key, and the caller-id list is dropped.
   - The spike key never travels. Piper keeps it, and only its SHA-256 is set (`DOCUSIGN_SPIKE_KEY_SHA256`), with a
