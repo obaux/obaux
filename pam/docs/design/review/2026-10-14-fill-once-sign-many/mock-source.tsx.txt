@@ -260,7 +260,7 @@ function Screen({ which }: { readonly which: string }) {
       );
     case 'signed':
       return (
-        <PamPage gap={4} footer={<VStack gap={2}><TextLink label="Undo this signature" /><BigButton label="Next form" badge="4 of 112" /></VStack>}>
+        <PamPage gap={4} footer={<VStack gap={2}><TextLink label="Undo this signature" /><BigButton label="Next form" /></VStack>}>
           <BackBar title="Intake and consent" sub="Example Food Pantry" pct={3} />
           <FormPaper signed />
           <Calm confirm body="Signed and sent to Example Food Pantry" />
@@ -338,7 +338,7 @@ function Screen({ which }: { readonly which: string }) {
       );
     case 'handoff':
       return (
-        <SubPage title="Signed" subtitle="Form 3 of 112" backLabel="Back" backHref="#" footer={<BigButton label="Next form" badge="4 of 112" />}>
+        <SubPage title="Signed" subtitle="Form 3 of 112" backLabel="Back" backHref="#" footer={<BigButton label="Next form" />}>
           <Progress pct={3} label="3 signed · 109 to go" />
           <Calm
             confirm

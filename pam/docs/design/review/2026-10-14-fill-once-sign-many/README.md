@@ -1,5 +1,8 @@
 # Fill once, sign many: the member's side (pictures only, 390px, light and dark)
 
+## Decided (Will, 14 October, 06:51): no count inside Next form
+On 3b (the DocuSign hand-back) and 2c (signed, next): "I don't think it makes sense to have counter inside button here, since it's already on top." The primary is just **Next form**; the count stays only in the bar ("Form 3 of 112" and the progress bar). **This overrides the in-button count of D-560 for the forms screens** (the counter line in Join's steps is unchanged). The set was approved by Will at 06:49 before this one change.
+
 ## Decided (Will, 14 October, 06:30): no Pause button
 Will: "Also why pause button?" The bar's close (×) already does Pause's job, because Pam always remembers which forms are signed. So the bar is: close, the form's name, "Form 3 of 112" and the progress bar; no Pause button, and no "Pause here" on the DocuSign hand-back (3b). The screen they see when they come back after closing is **2d, "coming back"** (was "Paused"): progress, the calm note that Pam remembers which forms are signed but not their details, the list, "Carry on with form 4".
 
