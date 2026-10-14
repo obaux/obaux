@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
+import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { pam } from './tokens.stylex.js';
 import { Icon } from '@astryxdesign/core/Icon';
 import { Button } from '@astryxdesign/core/Button';
@@ -93,9 +94,15 @@ const styles = stylex.create({
     minHeight: pam['--pam-search-height'],
     borderRadius: '999px',
     borderWidth: 0,
-    gap: '10px',
-    fontSize: '18px',
+    // The words in place (Will, 14 October, a86: "they should feel as one"): the magnifier and the words sit where the open
+    // field's do, at the left, with the same room before them, the same gap and the same type, so a tap changes nothing
+    // under the eye but the outline and the room for Cancel (D-574).
+    justifyContent: 'flex-start',
+    paddingInlineStart: '16px',
+    gap: '4px',
+    fontSize: '16px',
     fontWeight: 600,
+    textAlign: 'start',
     color: 'light-dark(#111111, #F2F2F2)',
     backgroundColor: 'light-dark(#FFFFFF, #262626)',
     boxShadow:
@@ -103,10 +110,31 @@ const styles = stylex.create({
   },
 });
 
+const cancelIn = stylex.keyframes({
+  from: { maxWidth: '0px', opacity: 0 },
+  to: { maxWidth: '120px', opacity: 1 },
+});
+
+/**
+ * What goes with an open search bar that has a Cancel beside it (D-574). The pill keeps 12px (a spacing token) clear of the
+ * Cancel once its 5px outline is counted, and Cancel draws in over 200ms, so the pill's right edge moves in to make room
+ * instead of jumping. With reduced motion there is no animation: Cancel is simply there.
+ */
+export const searchRow = stylex.create({
+  pill: { marginInlineEnd: spacingVars['--spacing-3'] },
+  cancelIn: {
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    animationName: { default: null, '@media (prefers-reduced-motion: no-preference)': cancelIn },
+    animationDuration: '200ms',
+    animationTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)',
+  },
+});
+
 /**
  * The search bar at rest, on a member's Explore (Will, 5 October, D-265:
  * "notice how the search in the reference is … bolder text, center
- * aligned"): one big pill-shaped button, magnifier and words centred. A tap
+ * aligned"; since 14 October, D-574, the words are at the left where the open field's are): one big pill-shaped button. A tap
  * opens the real `SearchPill` in its place, focused, with Cancel beside it.
  */
 export function SearchLauncher({ label, onOpen }: { readonly label: string; readonly onOpen: () => void }) {
@@ -114,7 +142,7 @@ export function SearchLauncher({ label, onOpen }: { readonly label: string; read
     <Button
       label={label}
       variant="secondary"
-      icon={<Icon icon="search" size="md" />}
+      icon={<Icon icon="search" size="sm" />}
       onClick={onOpen}
       xstyle={styles.launcher}
     />

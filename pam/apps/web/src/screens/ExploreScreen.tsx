@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { EducationIcon, FamilyServicesIcon, Notice, PlaceCard, PlusIcon, ScrollReveal, WorkforceIcon, textLinkLook } from '@pam/ui';
-import { SearchLauncher, SearchPill, type SearchPillItem } from '@pam/ui/SearchPill';
+import { SearchLauncher, SearchPill, searchRow, type SearchPillItem } from '@pam/ui/SearchPill';
 import { NextTripCard } from '@pam/ui/NextTripCard';
 import { useTrips } from '@/lib/useTrips';
 import { useNextVisits, visitTagLabel } from '@/lib/useNextVisits';
@@ -24,6 +24,7 @@ import { useMessagingReach } from '@/lib/useMessagingReach';
 import { HelpButton } from './HelpButton';
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
+import { VStack } from '@astryxdesign/core/VStack';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { Button } from '@pam/ui/Button';
 import { Icon } from '@astryxdesign/core/Icon';
@@ -176,7 +177,9 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
           ? null
           : isMember && !isSearching
             ? <SearchLauncher label={t('explore.search.placeholder')} onOpen={() => setIsSearching(true)} />
-            : pill
+            : programsSearching || (isMember && isSearching)
+              ? <VStack xstyle={searchRow.pill}>{pill}</VStack>
+              : pill
       }
       leading={
         mode === 'programs' && !isSearching ? (
@@ -192,7 +195,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
               setIsSearching(false);
               setClearSignal((n) => n + 1);
             }}
-            xstyle={[styles.cancel, textLinkLook.link]}
+            xstyle={[styles.cancel, textLinkLook.link, searchRow.cancelIn]}
           />
         ) : mode === 'programs' ? (
           <>
