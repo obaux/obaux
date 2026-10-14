@@ -1723,6 +1723,8 @@ fine and the fit audit was over-counting (D-448).
 
 ## Website · public site and help centre (10 October) — `apps/site`, on `main`
 
+**14 October (D-570).** The site's text boxes draw no focus ring, the keyboard comes up as the help form opens, "Write to us" is as wide as its words from 900px, and the space under Still stuck? is padding on the container.
+
 **13 October (held for Will, D-548/D-550).** About Pam shows its carousel words again and loses the line above its tabs (bd6d016a). The Home phone layout follows Figma 7:3 and the green card switches between three views; pictures to look at are in `docs/design/review/2026-10-13-website-phone/`. Not for `main` until Will says yes.
 
 **12 October (b25).** "Does the place know I'm coming?" now says programs on Pam see your visit and other places are not told (Sage's words, the day attendance went live). Home takes Will's a65 lines ("talk to a real person"; "you see who's coming on your calendar"); the 24/7 line stays held until launch and translation.

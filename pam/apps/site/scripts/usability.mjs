@@ -51,11 +51,18 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
         // a focus ring drawn by a child or an ancestor wrapper (a search pill) counts
         const wrap = el.closest('[data-focus-within],[class*="focus"]');
         const label = (el.getAttribute('aria-label') || el.textContent || el.tagName).trim().slice(0, 40);
+        // Will, 14 October: a text box draws no ring in any mode (the cursor shows where you are); everything else does
+        const textBox = el.tagName === 'TEXTAREA' || (el.tagName === 'INPUT' && !['checkbox', 'radio', 'button', 'submit', 'reset', 'file', 'range', 'color'].includes(el.type));
+        if (textBox) return { label: `${el.tagName.toLowerCase()} “${label}”`, textBox: true, drawsRing: cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) > 0, key: `${el.tagName}|${label}|${Math.round(el.getBoundingClientRect().top)}` };
         return { label: `${el.tagName.toLowerCase()} “${label}”`, ring: !!ring || (wrap && getComputedStyle(wrap).boxShadow !== 'none'), key: `${el.tagName}|${label}|${Math.round(el.getBoundingClientRect().top)}` };
       });
       if (!r) break;
       if (stops.has(r.key)) break;
       stops.add(r.key);
+      if (r.textBox) {
+        if (r.drawsRing) fail(`focus ring: ${path} ${r.label} draws an outline, text boxes draw none (Will, 14 October)`);
+        continue;
+      }
       if (!r.ring) fail(`focus ring: ${path} ${r.label} shows none when reached with Tab`);
     }
   }
@@ -154,8 +161,8 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
 // "Still stuck?": the address while the help-request function is off (503), the form when it is on (400 to an empty
 // probe), then Sent or That did not send. The function is stood in for here (Nico's contract, D-521).
 {
-  const run = async (probe, submit) => {
-    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const run = async (probe, submit, width = 390) => {
+    const ctx = await browser.newContext({ viewport: { width, height: width === 390 ? 844 : 800 } });
     // The form only asks the function from the real site's origin, so the page is served as https://joinpam.org
     await ctx.route('https://joinpam.org/**', async (route) => {
       const u = new URL(route.request().url());
@@ -239,6 +246,7 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
       await page.waitForTimeout(500);
       if (!(await box.isVisible())) fail(`help form (${label}): the call-out did not open the form`);
       if (!(await page.evaluate(() => !!document.activeElement?.closest('dialog')))) fail(`help form (${label}): focus did not go into the form`);
+      if (!(await page.evaluate(() => document.activeElement?.tagName === 'TEXTAREA'))) fail(`help form (${label}): the message box should have focus as the form opens, so the keyboard comes up`);
       // Esc closes it and focus goes back to the button; then open it again to fill it in.
       await page.keyboard.press('Escape');
       await page.waitForTimeout(400);
@@ -259,6 +267,8 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
             return { tag: el?.tagName, invalid: el?.getAttribute('aria-invalid'), label, text, n };
           }, name);
         const w1 = await described('message');
+        const ringless = () => page.evaluate(() => { const cs = getComputedStyle(document.activeElement); return cs.outlineStyle === 'none' || parseFloat(cs.outlineWidth) === 0; });
+        if (!(await ringless())) fail('help form: the focused message box draws an outline, text boxes draw none (Will, 14 October)');
         if (w1.tag !== 'TEXTAREA' || w1.invalid !== 'true' || !/Tell us what happened, in a few words\./.test(w1.text)) fail(`help form (W1): an empty Send should focus the message box and describe it with its error, focus is on ${JSON.stringify(w1)}`);
         await box.fill('x y z');
         await page.getByRole('textbox', { name: /How should we answer you/ }).fill('nope');
@@ -268,6 +278,7 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
         const empty = await page.getByText('Add your email so we can write back.').count();
         if (!wrong && !empty) fail('help form: a wrong email says nothing about what to do');
         const w1b = await described('email');
+        if (!(await ringless())) fail('help form: the focused email box draws an outline, text boxes draw none');
         if (w1b.tag !== 'INPUT' || w1b.invalid !== 'true' || !/email/i.test(w1b.text)) fail(`help form (W1): a wrong email should focus the email box and describe it with its error, focus is on ${JSON.stringify(w1b)}`);
       }
       await box.fill('I cannot get the code');
@@ -288,6 +299,19 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
       if (expected.startsWith('That') && !(await page.getByRole('link', { name: 'hello@joinpam.org' }).count())) fail('help form: a failed send does not show the address');
     }
     await ctx.close();
+  }
+  {
+    for (const [width, check] of [[390, (b, f) => Math.abs(b.width - f.width) <= 2], [1280, (b, f) => b.width < 360 && Math.abs(b.x - f.left) <= 2]]) {
+      const { page, ctx } = await run([400, { error: 'invalid', field: 'body' }], [200, { ok: true }], width);
+      const btn = page.getByRole('button', { name: 'Write to us' });
+      if (!(await btn.count())) fail(`help call-out at ${width}px: no button`);
+      else {
+        const b = await btn.boundingBox();
+        const f = await page.locator('#still-stuck > div').first().evaluate((el) => { const r = el.querySelector('p')?.getBoundingClientRect(); return { left: r.left, width: r.width }; });
+        if (!check(b, f)) fail(`"Write to us" at ${width}px is ${Math.round(b.width)}px wide (left ${Math.round(b.x)}), the line above is ${Math.round(f.width)}px wide (left ${Math.round(f.left)})`);
+      }
+      await ctx.close();
+    }
   }
 }
 
@@ -406,7 +430,7 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
       await page.goto(base + path, { waitUntil: 'load' });
       const gap = await page.evaluate(() => {
         // a post that ends without the Still stuck? card (Your safety) ends the same way, measured from its article
-        const card = document.querySelector('#still-stuck') ?? document.querySelector('article[data-page="post"]');
+        const card = document.querySelector('#still-stuck') ?? document.querySelector('article[data-page="post"]').lastElementChild;
         const foot = document.querySelector('footer');
         return Math.round(foot.getBoundingClientRect().top - card.getBoundingClientRect().bottom);
       });
