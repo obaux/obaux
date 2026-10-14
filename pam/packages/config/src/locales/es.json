@@ -799,7 +799,7 @@
   "explore.search.none": "Ningún programa con ese nombre o dirección",
   "explore.search.clear": "Borrar búsqueda",
   "explore.search.nothing": "No encontramos eso.",
-  "explore.search.nearest": "Nearest to {zip}",
+  "explore.search.nearest": "Más cerca de {zip}",
   "explore.categories": "Tipos de lugares",
   "explore.results": "Resultados para “{query}”",
   "explore.error.retry": "Intentar de nuevo",

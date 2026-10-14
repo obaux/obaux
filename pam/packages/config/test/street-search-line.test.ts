@@ -202,6 +202,17 @@ describe.skipIf(!existsSync(AREA) || !/GOOGLE_PICK/.test(existsSync(AREA) ? read
     }
   });
 
+  it('keeps the main search\'s typed-address point in React state and nowhere else (D-573)', () => {
+    const file = join(WEB, 'lib/useAddressOrigin.ts');
+    if (!existsSync(file)) return;
+    // Its own comments say what it never does, so read the code without them.
+    const code = readFileSync(file, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    expect(code, file).not.toMatch(/localStorage|sessionStorage|indexedDB|document\.cookie|sendBeacon|caches\./);
+    expect(code, file).not.toMatch(/saveOrigin|loadOrigin|pam\.origin/);
+    // The only thing it takes from the saved-area module is a type, which is gone when the code runs.
+    for (const line of code.split('\n').filter((l) => /from '\.\/useAreaSearch'/.test(l))) expect(line).toMatch(/^import type /);
+  });
+
   it('has nothing but useAreaSearch.ts write the saved area', () => {
     const others: string[] = [];
     const walk = (dir: string): void => {

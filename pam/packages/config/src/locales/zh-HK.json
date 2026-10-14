@@ -802,7 +802,7 @@
   "explore.search.none": "沒有符合該名稱或地址的計劃",
   "explore.search.clear": "清除搜尋",
   "explore.search.nothing": "找不到符合的結果。",
-  "explore.search.nearest": "Nearest to {zip}",
+  "explore.search.nearest": "離{zip}最近",
   "explore.categories": "地點類別",
   "explore.results": "「{query}」的結果",
   "explore.error.retry": "再試一次",
