@@ -14,10 +14,18 @@ import { defineConfig, devices } from '@playwright/test';
  * downloading a second copy; unset, Playwright resolves its own as usual.
  */
 const chromiumPath = process.env['PLAYWRIGHT_CHROMIUM_PATH'];
-const launch = chromiumPath ? { executablePath: chromiumPath } : {};
+/**
+ * The browser cannot reach anything outside this machine (D-576): every host but loopback goes to a proxy that is not there, so a request
+ * nobody mocked fails in the browser instead of leaving it, whatever the build was made for and whatever proxy the container has. (Mocks, and
+ * the local server on 127.0.0.1, are not affected: `page.route` answers before the network is asked.) Checked by e2e/never-live.spec.ts.
+ */
+const NO_OUTSIDE = ['--proxy-server=http://127.0.0.1:9', '--proxy-bypass-list=127.0.0.1;localhost;[::1]'];
+const launch = { ...(chromiumPath ? { executablePath: chromiumPath } : {}), args: NO_OUTSIDE };
 
 export default defineConfig({
   testDir: './e2e',
+  // Stops the run when the build in out/ is for the live project (D-576).
+  globalSetup: './e2e/global-setup.ts',
   fullyParallel: true,
   forbidOnly: Boolean(process.env['CI']),
   retries: process.env['CI'] ? 1 : 0,
