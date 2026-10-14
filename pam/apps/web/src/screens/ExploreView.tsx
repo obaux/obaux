@@ -61,6 +61,8 @@ export interface ExploreViewProps {
   readonly areaPanel?: ReactNode;
   /** A member's next visit, above the list when nothing is searched (D-265). */
   readonly nextTrip?: ReactNode;
+  /** The list is being searched or sorted by a typed address: the bar and chips stay put and nothing else hides (default: when `query` has words). */
+  readonly isSearchActive?: boolean;
   /** A message that belongs above the list — "Couldn't save that". */
   readonly notice?: ReactNode;
   /** The words the list was searched for, once they settled; '' for none. */
@@ -126,6 +128,7 @@ export function ExploreView({
   nextTrip,
   notice,
   query,
+  isSearchActive,
   state,
   renderPlace,
   onRetry,
@@ -133,10 +136,11 @@ export function ExploreView({
 }: ExploreViewProps) {
   const { t } = useI18n();
   const searching = query.trim() !== '';
+  const active = isSearchActive ?? searching;
   // The search row hides scrolling down and comes back scrolling up (D-222,
   // Will, 2 October) — never while a search is typed or the area is open.
   // The area drawer is modal (D-275), so it no longer holds the header open.
-  const hidden = useHideOnScroll({ isDisabled: searching });
+  const hidden = useHideOnScroll({ isDisabled: active });
   const chipsRef = useRef<HTMLElement | null>(null);
   const [hideBy, setHideBy] = useState(0);
   useLayoutEffect(() => {
@@ -176,7 +180,7 @@ export function ExploreView({
 
       {areaPanel}
       {notice}
-      {searching ? null : nextTrip}
+      {active ? null : nextTrip}
 
       {/* One row while it fits (D-274); when it does not, the area link goes
           underneath (D-422). D-274 cut the heading to "Todos los progra…" so
@@ -221,8 +225,7 @@ export function ExploreView({
             headingLevel={2}
             xstyle={styles.state}
             icon={<NoResultsIcon {...stylex.props(emptyState.icon)} aria-hidden />}
-            title={t('explore.empty.search.title', { query: query.trim() })}
-            description={t('explore.empty.search.body')}
+            title={t('explore.search.nothing')}
             actions={<Button label={t('explore.search.clear')} variant="primary" onClick={onClearSearch} />}
           />
         ) : (

@@ -53,13 +53,14 @@ test.describe("a member's Explore and the bell", () => {
     await signedIn(page, 'member', [], true);
     await page.goto('/');
     await settled(page);
-    const launcher = page.getByRole('button', { name: 'Search programs' });
-    await expect(launcher).toBeVisible();
+    const field = page.getByRole('textbox', { name: /Search programs/ });
+    await expect(field).toBeVisible();
     await expect(bell(page)).toHaveCount(0);
-    // (The old list's full-width search box is gone with that page; Explore's launcher is centred, so what is held for a bell shows as a shift off centre.)
-    const box = await launcher.boundingBox();
+    // The search field takes the whole line, so room held for a bell would show as a narrower field.
+    const box = await page.locator('.astryx-input-group[data-size="lg"]').first().boundingBox();
     const vw = page.viewportSize()!.width;
-    expect(Math.abs(box!.x + box!.width / 2 - vw / 2)).toBeLessThan(2);
+    expect(Math.abs(box!.x - 16)).toBeLessThan(3);
+    expect(Math.abs(box!.width - (vw - 32))).toBeLessThan(3);
   });
 
   test('nobody to message: the bell moves up to Explore, with its link', async ({ page }) => {

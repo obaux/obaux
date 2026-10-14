@@ -113,27 +113,6 @@ const styles = stylex.create({
   },
 });
 
-const cancelIn = stylex.keyframes({
-  from: { maxWidth: '0px', opacity: 0 },
-  to: { maxWidth: '120px', opacity: 1 },
-});
-
-/**
- * What goes with an open search bar that has a Cancel beside it (D-574). The pill keeps 12px (a spacing token) clear of the
- * Cancel once its 5px outline is counted, and Cancel draws in over 200ms, so the pill's right edge moves in to make room
- * instead of jumping. With reduced motion there is no animation: Cancel is simply there.
- */
-export const searchRow = stylex.create({
-  pill: { marginInlineEnd: spacingVars['--spacing-3'] },
-  cancelIn: {
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
-    animationName: { default: null, '@media (prefers-reduced-motion: no-preference)': cancelIn },
-    animationDuration: '200ms',
-    animationTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)',
-  },
-});
-
 /**
  * The search bar at rest, on a member's Explore (Will, 5 October, D-265:
  * "notice how the search in the reference is … bolder text, center

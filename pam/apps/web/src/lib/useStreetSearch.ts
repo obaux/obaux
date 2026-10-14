@@ -45,18 +45,12 @@ export function useStreetSearch(
   suggestions: Suggestion[];
   isSearching: boolean;
   choose: (suggestion: Suggestion) => Promise<AreaOption | null>;
-  /** The person tapped "Search addresses" for these very words (the one search box only): Google is asked, once, for exactly them. */
-  searchAddresses: () => void;
-  /** They have tapped it for the words now in the box. */
-  askedByTap: boolean;
 } {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [enabled, setEnabled] = useState(known === true);
   const token = useRef(newToken());
   const latest = useRef(0);
-  // The words the person asked Google about by tapping; a different text is no longer asked for (D-573).
-  const [tapped, setTapped] = useState<string | null>(null);
   const box = 'box' in pam ? pam.programs : null;
   const area = 'box' in pam ? null : pam;
   const isBox = box !== null;
@@ -94,8 +88,7 @@ export function useStreetSearch(
     if (text === '') token.current = newToken();
     // Nothing about what was typed is sent to the function until it has said there is a key (status), so with the status unreadable or off
     // the area search is exactly Pam's own.
-    const byTap = isBox && tapped !== null && tapped === text && text.length >= MIN_CHARS;
-    const wants = box ? byTap || wantsGoogleFromBox(text, box) : Boolean(area?.settled) && wantsGoogle(text, area?.matches ?? 0);
+    const wants = box ? wantsGoogleFromBox(text, box) : Boolean(area?.settled) && wantsGoogle(text, area?.matches ?? 0);
     if (off || !enabled || !wants) {
       latest.current += 1;
       setSuggestions([]);
@@ -117,9 +110,9 @@ export function useStreetSearch(
           if (mine === latest.current) setIsSearching(false);
         }
       })();
-    }, byTap ? 0 : PAUSE_MS);
+    }, PAUSE_MS);
     return () => clearTimeout(timer);
-  }, [query, isBox, box?.matches, box?.settled, box?.ok, area?.matches, area?.settled, enabled, tapped]);
+  }, [query, isBox, box?.matches, box?.settled, box?.ok, area?.matches, area?.settled, enabled]);
 
   const choose = useCallback(async (suggestion: Suggestion): Promise<AreaOption | null> => {
     try {
@@ -134,10 +127,7 @@ export function useStreetSearch(
     }
   }, []);
 
-  const searchAddresses = useCallback(() => setTapped(query.trim()), [query]);
-  const askedByTap = tapped !== null && tapped === query.trim();
-
-  return { enabled, suggestions, isSearching, choose, searchAddresses, askedByTap };
+  return { enabled, suggestions, isSearching, choose };
 }
 
 export { MIN_CHARS };

@@ -218,56 +218,46 @@ test.describe('a search bar is the exception: focused, it shows the dark pill ou
     await expect.poll(async () => (await outline()).pill, { timeout: 3000 }).toMatch(/^solid 3px/);
   });
 
-  test('the resting bar and the open search field are one bar: one height, the words in place, room before Cancel (D-574)', async ({ page }) => {
+  test('the search bar is one field, at rest and in use: one height, the words in place, a clear button inside it, no Cancel (D-574, a86)', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await signedIn(page);
     await page.route('**/rest/v1/rpc/services_near*', (route) => route.fulfill(json([])));
     await page.goto('/');
     await settled(page);
-    const launcher = page.getByRole('button', { name: /Search programs/ }).first();
-    const restingBox = (await launcher.boundingBox())!;
-    const restingAt = await launcher.evaluate((el) => {
-      const icon = el.querySelector('svg')!.getBoundingClientRect();
-      const label = [...el.querySelectorAll('span,div')].find((n) => n.children.length === 0 && (n.textContent ?? '').trim())!;
-      return { icon: Math.round(icon.x), text: Math.round(label.getBoundingClientRect().x), size: getComputedStyle(label).fontSize };
-    });
-    await launcher.click();
-    await page.waitForTimeout(500);
-    const open = await page.evaluate(() => {
-      const group = document.querySelector('.astryx-input-group[data-size="lg"]') as HTMLElement;
-      const icon = group.querySelector('svg')!.getBoundingClientRect();
-      const input = group.querySelector('input')!;
-      const cancel = [...document.querySelectorAll('button')].find((b) => /cancel/i.test(b.textContent ?? ''))!.getBoundingClientRect();
-      return {
-        height: Math.round(group.getBoundingClientRect().height),
-        icon: Math.round(icon.x),
-        text: Math.round(input.getBoundingClientRect().x),
-        size: getComputedStyle(input).fontSize,
-        // from the pill's outline (3px, offset 2px) to the start of "Cancel"
-        gap: Math.round(cancel.x - (group.getBoundingClientRect().right + 5)),
-      };
-    });
-    expect(open.height).toBe(Math.round(restingBox.height));
-    expect(open.height).toBe(60);
-    // The magnifier and the words are where they were, in the same type.
-    expect(Math.abs(open.icon - restingAt.icon)).toBeLessThanOrEqual(1);
-    expect(Math.abs(open.text - restingAt.text)).toBeLessThanOrEqual(1);
-    expect(open.size).toBe(restingAt.size);
-    // At least 12px between the outline and Cancel.
-    expect(open.gap).toBeGreaterThanOrEqual(12);
-    // The sheet's search box is the same height too.
-    await page.getByRole('button', { name: 'Cancel' }).click();
+    const group = page.locator('.astryx-input-group[data-size="lg"]').first();
+    const where = () =>
+      group.evaluate((g) => ({
+        height: Math.round(g.getBoundingClientRect().height),
+        top: Math.round(g.getBoundingClientRect().top),
+        icon: Math.round(g.querySelector('svg')!.getBoundingClientRect().x),
+        text: Math.round(g.querySelector('input')!.getBoundingClientRect().x),
+        size: getComputedStyle(g.querySelector('input')!).fontSize,
+      }));
+    const resting = await where();
+    expect(resting.height).toBe(60);
+    // A tap focuses it in place: nothing opens, nothing moves, and the only change is the outline.
+    await page.getByRole('textbox', { name: /Search programs/ }).click();
+    await page.waitForTimeout(400);
+    expect(await where()).toEqual(resting);
+    expect(await page.getByRole('button', { name: 'Cancel' }).count()).toBe(0);
+    // Typing puts a clear button inside the field, 48px, and keeps the bar where it was.
+    await page.keyboard.type('food');
+    const clear = group.getByRole('button', { name: /^Clear/ });
+    await expect(clear).toBeVisible();
+    const clearBox = (await clear.boundingBox())!;
+    expect(clearBox.width).toBeGreaterThanOrEqual(47);
+    expect((await where()).top).toBe(resting.top);
+    // The sheet's search box agrees: the same height, and its words start where the bar's do.
+    await clear.click();
     await page.getByRole('button', { name: /Near/ }).first().click();
     await page.waitForTimeout(800);
-    const sheet = (await page.locator('.astryx-input-group[data-size="lg"]').last().boundingBox())!;
-    expect(Math.round(sheet.height)).toBe(60);
-    // ... and its words start where the resting bar's do: `SearchField` (the sheet, Messages, Schedule) and `SearchPill` agree.
     const inSheet = await page.evaluate(() => {
-      const g = document.querySelector('.astryx-input-group[data-size="lg"]') as HTMLElement;
-      return { icon: Math.round(g.querySelector('svg')!.getBoundingClientRect().x), text: Math.round(g.querySelector('input')!.getBoundingClientRect().x) };
+      const g = [...document.querySelectorAll('.astryx-input-group[data-size="lg"]')].at(-1) as HTMLElement;
+      return { height: Math.round(g.getBoundingClientRect().height), icon: Math.round(g.querySelector('svg')!.getBoundingClientRect().x), text: Math.round(g.querySelector('input')!.getBoundingClientRect().x) };
     });
-    expect(Math.abs(inSheet.icon - restingAt.icon)).toBeLessThanOrEqual(1);
-    expect(Math.abs(inSheet.text - restingAt.text)).toBeLessThanOrEqual(1);
+    expect(inSheet.height).toBe(60);
+    expect(Math.abs(inSheet.icon - resting.icon)).toBeLessThanOrEqual(1);
+    expect(Math.abs(inSheet.text - resting.text)).toBeLessThanOrEqual(1);
   });
 });
 

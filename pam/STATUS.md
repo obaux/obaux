@@ -2285,7 +2285,7 @@ D-552, `claude/places-programs-street-search`: the area search asks Google (Plac
 
 ## Places & programs · one search box on Explore (14 October 2026)
 
-D-573, `claude/places-programs-one-search`: one box finds programs, Pam's areas and addresses in one list; "Near ZIP ✎" and its drawer stay. Google is asked only for address-like text no program matches, or on a tap on "Search addresses". Staff's All programs has the same bar on its own row. Waiting: Will's look at the built pictures, Lena's six languages. Log: see `docs/sessions/`.
+D-573, `claude/places-programs-one-search-inline`: Explore's search is one inline field; typing filters the list under it (only Pam's programs show). A typed address no program matches is turned into a point by Pam's server and the list is the programs nearest it, with "Nearest to {ZIP}" and Google's mark; "Near ZIP ✎" and its drawer stay. Google is asked only for address-like text, automatically. Waiting: Will's look at the pictures, Lena's translation of one line, Sage's p7 edit. Log: see `docs/sessions/`.
 
 ## Places & programs · the old Places list is retired (13 October 2026)
 

@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { EducationIcon, FamilyServicesIcon, Notice, PlaceCard, PlusIcon, ScrollReveal, WorkforceIcon } from '@pam/ui';
-import { SearchLauncher } from '@pam/ui/SearchPill';
+import { SearchField } from '@pam/ui/SearchPill';
+import { Text } from '@astryxdesign/core/Text';
 import { NextTripCard } from '@pam/ui/NextTripCard';
 import { useTrips } from '@/lib/useTrips';
 import { useNextVisits, visitTagLabel } from '@/lib/useNextVisits';
@@ -18,7 +19,8 @@ import { useRoleView } from '@/lib/useViewedRole';
 import { CITY_HALL, loadOrigin, saveOrigin, type AreaOption } from '@/lib/useAreaSearch';
 import { AreaSearch, AreaTrigger } from '../app/places/AreaPicker';
 import { ExploreView, type ExploreCategory } from './ExploreView';
-import { ExploreSearch } from './ExploreSearch';
+import { PoweredByGoogle } from './PoweredByGoogle';
+import { useAddressOrigin } from '@/lib/useAddressOrigin';
 import { HeaderActions } from './HeaderActions';
 import { useMessagingReach } from '@/lib/useMessagingReach';
 import { HelpButton } from './HelpButton';
@@ -29,6 +31,7 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BackButton } from '@pam/ui/SubPage';
 
 const styles = stylex.create({
+  nearest: { fontSize: '14px', lineHeight: 1.5 },
   // The same white disc with a grey edge as Help (D-216).
   add: {
     width: '48px',
@@ -48,6 +51,16 @@ const styles = stylex.create({
  * same RPCs, saved places and area choice as today's Places (D-054, D-102,
  * D-188), so nothing a member already relies on is lost in the move.
  */
+/** A pause after typing, so a slow phone is not searching on every letter. */
+function useDebounced(value: string, ms: number): string {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const handle = setTimeout(() => setDebounced(value), ms);
+    return () => clearTimeout(handle);
+  }, [value, ms]);
+  return debounced;
+}
+
 /** "Tue, Oct 7 · 10:00 AM". */
 function tripWhen(iso: string, locale: string): string {
   const d = new Date(iso);
@@ -79,7 +92,9 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
   // A program lead has no Saved (D-218), so no Save on a card (Will, 3 October, D-237).
   const canSave = (demoRole ?? trueRole) !== 'provider';
   const [category, setCategory] = useState<ExploreCategory>('all');
-  const [isSearching, setIsSearching] = useState(false);
+  // The one search field (D-573): inline, filtering the list under it. No pop-up, no dropdown, no full screen.
+  const [query, setQuery] = useState('');
+  const settled = useDebounced(query, 300);
   const [reload, setReload] = useState(0);
 
   const [area, setArea] = useState<AreaOption>(CITY_HALL);
@@ -89,13 +104,21 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
   const now = useNow();
   const { isSaved, save, unsave, failed: saveFailed } = useSavedPlaces(session.status === 'signed-in', demoRole);
 
-  const state = usePlaces({
-    lat: area.lat,
-    lon: area.lon,
+  // A typed address no program matches becomes a point (Pam's server asks Google; kept in memory only), and the list is Pam's programs
+  // nearest it, closest first. Otherwise the words filter the list by name. The "Near …" control is not changed by any of it.
+  const text = settled.trim();
+  const { origin, resolving } = useAddressOrigin(text, area);
+  const measuredFrom = origin ?? area;
+  const found = usePlaces({
+    lat: measuredFrom.lat,
+    lon: measuredFrom.lon,
     ...(category === 'all' ? {} : { category }),
     limit: 20,
+    query: origin ? '' : text,
     reload,
   });
+  // While the address is being turned into a point the list waits, rather than say "nothing" for a moment.
+  const state = resolving ? ({ status: 'loading' } as const) : found;
 
   // A member's Explore (Will, 5 October, D-265): no bell or Help up top (both
   // are on Profile), the search bar at rest is a centred launcher, and the
@@ -111,31 +134,14 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
   // the Visit profile (D-305) — the same wherever the place appears.
   const visits = useNextVisits(isMember);
 
-  // The one search box (D-573): programs, Pam's areas and addresses in one list, full screen, the cursor already in it. A program opens
-  // its page; an area or an address comes back here and sets the "Near …" control, which stays where it was beside the heading.
-  if (isSearching) {
-    return (
-      <ExploreSearch
-        area={area}
-        onCancel={() => setIsSearching(false)}
-        onPickProgram={(place) => router.push(`/place/?id=${encodeURIComponent(place.id)}&from=${from}`)}
-        onPickArea={(next) => {
-          setArea(next);
-          saveOrigin(next);
-          setIsSearching(false);
-        }}
-      />
-    );
-  }
+  const field = (
+    <SearchField label={t('explore.search.label')} placeholder={t('explore.search.placeholder')} value={query} onChange={setQuery} />
+  );
 
   return (
     <ExploreView
-      search={
-        mode === 'programs' ? null : <SearchLauncher label={t('explore.search.placeholder')} onOpen={() => setIsSearching(true)} />
-      }
-      searchBelow={
-        mode === 'programs' ? <SearchLauncher label={t('explore.search.placeholder')} onOpen={() => setIsSearching(true)} /> : undefined
-      }
+      search={mode === 'programs' ? null : field}
+      searchBelow={mode === 'programs' ? field : undefined}
       leading={mode === 'programs' ? <BackButton href="/profile/" label={t('nav.back.profile')} /> : undefined}
       actions={
         mode === 'programs' ? (
@@ -191,19 +197,31 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
         />
       }
       notice={
-        saveFailed ? (
-          <Notice
-            notice="something_went_wrong"
-            title={t('saved.failed.title')}
-            body={t('saved.failed.body')}
-            contactLabel={t('help.contact.action')}
-          />
-        ) : null
+        <>
+          {saveFailed ? (
+            <Notice
+              notice="something_went_wrong"
+              title={t('saved.failed.title')}
+              body={t('saved.failed.body')}
+              contactLabel={t('help.contact.action')}
+            />
+          ) : null}
+          {/* The list is sorted from a typed address: one quiet line, its ZIP only (D-552), and Google's mark where its answer shaped the list. */}
+          {origin ? (
+            <>
+              <Text type="supporting" xstyle={styles.nearest}>
+                {t('explore.search.nearest', { zip: origin.label })}
+              </Text>
+              <PoweredByGoogle />
+            </>
+          ) : null}
+        </>
       }
-      query=""
+      query={origin ? '' : text}
+      isSearchActive={query.trim() !== ''}
       state={state}
       onRetry={() => setReload((n) => n + 1)}
-      onClearSearch={() => undefined}
+      onClearSearch={() => setQuery('')}
       renderPlace={(place, index) => {
         const miles = distanceLabel(place.meters / METRES_PER_MILE, locale);
         const saved = isSaved(place.id);
