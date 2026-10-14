@@ -214,21 +214,47 @@ test.describe('a search bar is the exception: focused, it shows the dark pill ou
     await page.getByRole('button', { name: 'Done' }).focus();
     await page.keyboard.press('Tab');
     await expect(box).toBeFocused();
-    expect((await outline()).pill).toMatch(/^solid 3px/);
+    // The outline grows in over a moment on some Astryx controls: read it once it has.
+    await expect.poll(async () => (await outline()).pill, { timeout: 3000 }).toMatch(/^solid 3px/);
   });
 
-  test('the resting bar on Explore and the open search field are one height', async ({ page }) => {
+  test('the resting bar and the open search field are one bar: one height, the words in place, room before Cancel (D-574)', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await signedIn(page);
     await page.route('**/rest/v1/rpc/services_near*', (route) => route.fulfill(json([])));
     await page.goto('/');
     await settled(page);
     const launcher = page.getByRole('button', { name: /Search programs/ }).first();
-    const resting = (await launcher.boundingBox())!;
+    const restingBox = (await launcher.boundingBox())!;
+    const restingAt = await launcher.evaluate((el) => {
+      const icon = el.querySelector('svg')!.getBoundingClientRect();
+      const label = [...el.querySelectorAll('span,div')].find((n) => n.children.length === 0 && (n.textContent ?? '').trim())!;
+      return { icon: Math.round(icon.x), text: Math.round(label.getBoundingClientRect().x), size: getComputedStyle(label).fontSize };
+    });
     await launcher.click();
-    const open = (await page.locator('.astryx-input-group[data-size="lg"]').first().boundingBox())!;
-    expect(Math.round(open.height)).toBe(Math.round(resting.height));
-    expect(Math.round(resting.height)).toBe(60);
+    await page.waitForTimeout(500);
+    const open = await page.evaluate(() => {
+      const group = document.querySelector('.astryx-input-group[data-size="lg"]') as HTMLElement;
+      const icon = group.querySelector('svg')!.getBoundingClientRect();
+      const input = group.querySelector('input')!;
+      const cancel = [...document.querySelectorAll('button')].find((b) => /cancel/i.test(b.textContent ?? ''))!.getBoundingClientRect();
+      return {
+        height: Math.round(group.getBoundingClientRect().height),
+        icon: Math.round(icon.x),
+        text: Math.round(input.getBoundingClientRect().x),
+        size: getComputedStyle(input).fontSize,
+        // from the pill's outline (3px, offset 2px) to the start of "Cancel"
+        gap: Math.round(cancel.x - (group.getBoundingClientRect().right + 5)),
+      };
+    });
+    expect(open.height).toBe(Math.round(restingBox.height));
+    expect(open.height).toBe(60);
+    // The magnifier and the words are where they were, in the same type.
+    expect(Math.abs(open.icon - restingAt.icon)).toBeLessThanOrEqual(1);
+    expect(Math.abs(open.text - restingAt.text)).toBeLessThanOrEqual(1);
+    expect(open.size).toBe(restingAt.size);
+    // At least 12px between the outline and Cancel.
+    expect(open.gap).toBeGreaterThanOrEqual(12);
     // The sheet's search box is the same height too.
     await page.getByRole('button', { name: 'Cancel' }).click();
     await page.getByRole('button', { name: /Near/ }).first().click();
