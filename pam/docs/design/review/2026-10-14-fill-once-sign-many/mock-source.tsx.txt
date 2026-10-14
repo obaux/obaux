@@ -93,6 +93,8 @@ const styles = stylex.create({
   dsBody: { width: '100%', padding: '16px', backgroundColor: '#F3F3F5', color: '#1B1B1F' },
   dsTag: { backgroundColor: '#FFD84D', color: '#1B1B1F', padding: '6px 10px', borderRadius: '4px', fontWeight: 700, fontSize: '14px' },
   pad: { padding: '16px' },
+  scrim: { position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 4 },
+  leave: { position: 'fixed', left: '16px', right: '16px', bottom: '150px', padding: '20px', borderRadius: '24px', backgroundColor: colorVars['--color-background-card'], boxShadow: '0 12px 40px rgba(0,0,0,0.35)', zIndex: 6 },
   glyph: { fontSize: '24px', width: '24px', height: '24px', flexShrink: 0, color: colorVars['--color-text-accent'] },
   foot: { padding: '16px', position: 'sticky', bottom: 0, backgroundColor: colorVars['--color-background-body'] },
   row: { width: '100%' },
@@ -179,7 +181,6 @@ function BackBar({ title, sub, pct }: { readonly title: string; readonly sub: st
           <Text weight="bold">{title}</Text>
           <Text type="supporting">{sub}</Text>
         </VStack>
-        <TextLink label="Pause" />
       </HStack>
       <Progress pct={pct} label="Form 3 of 112" />
     </VStack>
@@ -265,9 +266,21 @@ function Screen({ which }: { readonly which: string }) {
           <Calm confirm body="Signed and sent to Example Food Pantry" />
         </PamPage>
       );
+    case 'leave':
+      return (
+        <PamPage gap={4} footer={<VStack gap={2}><TextLink label="Leave for now" /><BigButton label="Keep signing" /></VStack>}>
+          <BackBar title="Intake and consent" sub="Example Food Pantry" pct={3} />
+          <FormPaper signed={false} />
+          <VStack xstyle={styles.scrim} />
+          <VStack gap={3} xstyle={styles.leave}>
+            <Text weight="bold">Leave for now?</Text>
+            <Text type="supporting">Pam keeps the 3 forms you signed. Your details are cleared, so you will type them again when you come back.</Text>
+          </VStack>
+        </PamPage>
+      );
     case 'pause':
       return (
-        <SubPage title="Paused" subtitle="3 of 112 signed" backLabel="Back to the form" backHref="#" footer={<BigButton label="Carry on with form 4" />}>
+        <SubPage title="Welcome back" subtitle="3 of 112 signed" backLabel="Back" backHref="#" footer={<BigButton label="Carry on with form 4" />}>
           <Progress pct={3} label="3 signed · 109 to go" />
           <Calm
             title="Pick up whenever you like"
@@ -338,7 +351,6 @@ function Screen({ which }: { readonly which: string }) {
               <Text type="supporting">Example Food Pantry</Text>
             </VStack>
           </Card>
-          <TextLink label="Pause here" />
         </SubPage>
       );
     // 4 · Done.
