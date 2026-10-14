@@ -1278,10 +1278,14 @@
 | a86 trial full run (main a5fdfbdc + 00e538f6, local only): db / config / ui / web unit / site / site a11y / usability / scrollspy / e2e full / storybook | 1579 ok / 1312 / 123 of 124 (tokens.css order, fixed in 04ad2ce5; ui build failed for the same reason) / 182 / 100 / 120 scans 0 / all clear / 306 links 0 / 1895 passed, 19 skipped, exit 0 / builds; tsc 0 (web and site); 11.7 kB spare |
 | Live project logs, 06:00 to 07:57 (edge_logs, function_edge_logs; counts only) | from Anthropic's network: about 3,500 requests since 06:38:25, all 401/403 except OPTIONS; no auth/v1/otp, no help-request, no 2xx writes. Will's street search 06:41 to 06:43: 11 POST 200 |
 | Batch b39 (39481be0, D-576): config / copy / ui / web build:e2e / tsc / web unit / budget / e2e full / storybook / refusal proof | 1311 passed, 1 skipped / in step / 124 / 0 / 0 / 177 / 12.0 kB spare / 1859 passed, 19 skipped, exit 0 / 0 / a plain (live) build is refused before any test: "The e2e suite will not run: _next/static/chunks/1529….js names the live project", exit 1 |
+| b39 main CI (f8cf7a2e) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (09:45); Vercel web and pam-site success |
+| Live project logs, 07:50 to 09:48 (edge_logs, counts only) | from Anthropic's network: the last requests at 07:51, none since, after the 07:56 stub-build rule and before D-576 |
 | Control Room v24 harness (390 and 1280) | reply about a card: section lands at 76px under the tabs, card folded, button "Replied" (aria "Replied. Reply again"); pressing it restores the card's prefix; a general message leaves scrollY unchanged; a data push mid-glide doesn't stop it; 0 page errors |
 
 ## Left undone
 
+- **As of b39 (14 October, 09:45):** as b38 below, less the dir="auto" and token-refresh items (done: one
+  `dir="auto"`, Dot's; the 401s were our own e2e runs, now stopped by D-576). a86 is at 04ad2ce5.
 - **As of b38 (14 October, 07:51):** with Will: a86 (one search on Explore: his yes, and his signature on the p7
   Privacy line), a88 (the DocuSign consent link, and demo.docusign.net in Allowed domains), a84 (unchanged). Piper:
   drop the second `dir="auto"`, merge Dot's fbe93cba into the inline branch, and send a new READY. Lena: the p7
