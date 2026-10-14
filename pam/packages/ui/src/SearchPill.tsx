@@ -84,6 +84,9 @@ const styles = stylex.create({
       '0 1px 2px light-dark(oklch(0 0 0 / 5%), oklch(0 0 0 / 30%)), 0 2px 8px light-dark(oklch(0 0 0 / 6%), oklch(0 0 0 / 35%)), inset 0 0 0 1px light-dark(oklch(0 0 0 / 6%), oklch(1 0 0 / 9%))',
   },
   clear: { backgroundColor: 'transparent', borderWidth: 0, paddingInline: 0 },
+  // The magnifier-to-words gap of the open `SearchPill`'s field is 4px; this field's is 8px. One gap, so the words start in
+  // the same place in every search bar (D-574; Piper, a86).
+  fieldGap: { columnGap: '4px', gap: '4px' },
   // The launcher (D-265): the pill itself, as one button — the same white,
   // the same lift, the icon and words centred and bold.
   launcher: {
@@ -296,6 +299,7 @@ export function SearchField({
         hasClear
         hasAutoFocus={hasAutoFocus}
         size="lg"
+        xstyle={styles.fieldGap}
       />
     </InputGroup>
   );

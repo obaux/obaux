@@ -845,6 +845,55 @@
   - a general message left the page where it was;
   - no page errors.
 - **Will, 05:23 (a87, chat w2026101405230857qn): Sign in "Approved".** D-572 ships as b37 after b36's CI.
+- **Will, 05:51 (a81, chat w20261014055126vnjb): the Google key is in.** He made the key and added it in Supabase as
+  `GOOGLE_MAPS_SERVER_KEY`. `places-search` (v2, JWT on) answers `{ enabled: false }` only while the key is unset, so
+  street search is on from here. The merge desk can't check it from here: the proxy refuses
+  shobqzuhicoiymtumiaz.supabase.co. Card a81 is now "try one address": Explore, "Near City Hall ✎", "1500 Market",
+  then pick one and see "Near 19102". Afterwards the merge desk reads the function's logs for errors.
+- **Merge desk, 05:40: DocuSign's demo hosts are blocked here.** Iris found it and the merge desk confirmed it: the
+  proxy refuses account-d.docusign.com, demo.docusign.net and apps-d.docusign.com (403). Card a88 step 7 asks Will to
+  add them under the environment's Network access › Allowed domains. Until he does, Piper runs Iris's checks for her;
+  no made-up results. Iris's plan, da15074e, is in b37.
+- **Will, 05:55 (a86, chat w20261014055553bfbe): the search bar's dark pill comes back, one height for the bar.**
+  "Also please bring back the selected dark pill outline around search bar when user selects it. And make search bar on
+  homepage match the height of search when active, they should feel as one. not disconnected." That makes search fields
+  the exception to D-569: an active search field shows the ink pill again, while other text boxes keep no ring. The
+  resting bar on Explore and on staff All programs is the same height as the active box (one token). Dot does both in
+  the shared SearchField, and Piper builds a86 on top. His "extra text under use my current location" was take three's
+  old picture 2. The build already drops the "Type a program..." line. The two privacy notes ("Used for this search
+  only.", "Pam remembers the area you pick on this phone only.") stay unless he says otherwise; he was asked.
+- **Merge desk, 06:07: a86 built (Piper D-573, 96952804) and held.** Pictures go to Will only after Dot's SearchField
+  change (the dark pill, one height), re-shot with it. Piper left "Pam remembers the area you pick on this phone only."
+  out of the box (the drawer keeps it), which is not what Will was told at 05:56. Lena was asked whether the box needs
+  it, and Will hears her answer with the pictures.
+- **Lena, 06:12: the box is fine without "Pam remembers the area…".** Privacy never promises it, and under Google's rows
+  ("Used for this search only.", with `saveOrigin` skipping `here` and `google:` picks) it would read as if the address
+  were kept. Piper takes it out of the box; the drawer keeps its own line. Will was told at 06:13, correcting the
+  05:56 note.
+- **Merge desk, 06:16: D-574 take two (Dot 1918d84c).** The outline is back on active search fields (3px ink, white
+  at night), and `--pam-search-height` is 60px for every search box. The heights already matched. What makes the
+  resting bar and the active box feel apart is width and alignment, since the resting bar is full width with centred
+  words. Decided: the resting bar's magnifier and words sit at the left, as in the active box. A tap changes nothing
+  but the outline and the right edge drawing in for Cancel (no transition under reduced motion), with at least 12px
+  between the outline and Cancel. D-574 merges together with a86, and Will sees both in one set of pictures.
+- **Will, 06:28 (a85, chat w202610140628228h1g): confirmations in green.** "Good news in green is a nice touch." The
+  forms' "Signed and sent to [program]" and the done screens use `Banner status="success"`. Informational notes stay
+  the blue `Banner status="info"` (his 04:43). Dot redraws the set with green only. Still open: questions 1, 3 and 4,
+  and whether "Skip this one for now" stays above the main button.
+- **06:24 (a88): which RSA key.** Will asked which of the two keys goes into Supabase: the private one, BEGIN to END,
+  as DOCUSIGN_PRIVATE_KEY. The public key stays with the app in DocuSign.
+- **Will, 06:30 (a85, chat w20261014063039evnz): "Also why pause button?"** Merge desk: Pause goes. The bar's close
+  (X) does the same job, because Pam always remembers which forms are signed. The bar is close, the form's name, "Form 3
+  of 112" and progress. 2c becomes the coming-back screen. Dot redraws it with the green change, and draws a "Leave
+  now?" step only if one is needed.
+- **Merge desk, 06:08: Piper's DocuSign spike plan (4076102e) approved, with changes.**
+  - No live Pam account for the spike: the gateway JWT is the anon key, and the caller-id list is dropped.
+  - The spike key never travels. Piper keeps it, and only its SHA-256 is set (`DOCUSIGN_SPIKE_KEY_SHA256`), with a
+    48-hour `DOCUSIGN_SPIKE_UNTIL`.
+  - `DOCUSIGN_CONNECT_KEY` comes from Will's DocuSign account, so he enters it when the Connect step is reached.
+  - The proxy also refuses Pam's own Supabase host from the containers, so a88 step 7 now lists it with DocuSign's
+    three.
+  - The merge desk deploys both spike functions after consent and deletes them, and the spike secrets, at cleanup.
 
 ## What was wrong, and what missed it
 
@@ -975,6 +1024,10 @@
 - **Twelve new sentences reached the batch unsigned.** Under A29 the desk does not merge an unsigned sentence, and
   only a key-by-key check against Sage's ledger found them. Sage signed all twelve and reworded seven. The check
   stays part of the desk's gate.
+- **Merge commits carried no `Screens:` lines (Dot's nightly map, 06:07).** team.md says the merge desk copies each
+  READY's `Screens:` line into its merge commit for the nightly map. Tonight's merges didn't, so Dot rebuilt the map
+  from diffs and subjects. From 06:10 every merge commit carries the READY's `Screens:` line, or `Screens: none` when
+  the READY says so.
 
 ## Decisions
 
@@ -1111,6 +1164,7 @@
 | Batch b36, full run (8269b4c6): db / config / ui / web unit / site / site a11y / usability / scrollspy / e2e full / storybook | 1579 ok / 1311 / 124 / 177 / 100 / 120 scans 0 / all clear / 306 links 0 / 1835 passed, 19 skipped, e2e exit 0 / builds; tsc 0 (web and site); 12.0 kB spare |
 | b36 main CI (8269b4c6) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (05:54); Vercel web and pam-site success |
 | Batch b37, targeted run (7823702f): config / copy / web build / tsc / web unit / budget / e2e (signin-short, consent, signin-next, signin-wrong-code, join, focus-text-boxes, theme) / storybook | 1311 passed, 1 skipped / in step / 0 / 0 / 177 passed / 12.0 kB spare / 267 passed, exit 0 / 0 |
+| b37 main CI (9d91f3bd) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (06:26); Vercel web and pam-site success |
 | Control Room v24 harness (390 and 1280) | reply about a card: section lands at 76px under the tabs, card folded, button "Replied" (aria "Replied. Reply again"); pressing it restores the card's prefix; a general message leaves scrollY unchanged; a data push mid-glide doesn't stop it; 0 page errors |
 
 ## Left undone
