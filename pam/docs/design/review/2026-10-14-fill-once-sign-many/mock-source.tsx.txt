@@ -1,0 +1,411 @@
+'use client';
+
+/*
+ * THROWAWAY mock (Dot, 14 October): the member's side of "fill once, sign many", drawn with Pam's own components so the
+ * pictures are true to the app. Not routed, not shipped; the pictures are what Will looks at. Words are stand-ins: Sage
+ * writes the real ones (A29).
+ */
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import * as stylex from '@stylexjs/stylex';
+import { Card } from '@astryxdesign/core/Card';
+import { Heading } from '@astryxdesign/core/Heading';
+import { HStack } from '@astryxdesign/core/HStack';
+import { Icon } from '@astryxdesign/core/Icon';
+import { Text } from '@astryxdesign/core/Text';
+import { VStack } from '@astryxdesign/core/VStack';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { Badge } from '@pam/ui/Badge';
+import { BigButton, CheckIcon, ClockIcon, EyeOffIcon, ShieldIcon, SignIcon, SubPage, TextField, TextLink } from '@pam/ui';
+
+const styles = stylex.create({
+  frame: { width: '390px', minHeight: '844px' },
+  // The progress bar: a track and a fill, the fill's width the share done.
+  track: { width: '100%', height: '8px', borderRadius: '999px', backgroundColor: colorVars['--color-background-muted'] },
+  fill: (pct: number) => ({
+    width: `${pct}%`,
+    height: '8px',
+    borderRadius: '999px',
+    backgroundColor: colorVars['--color-text-accent'],
+  }),
+  calm: { width: '100%', borderInlineStartWidth: '4px', borderInlineStartStyle: 'solid', borderInlineStartColor: colorVars['--color-text-accent'] },
+  // The one careful field: a heavier edge, set apart from the rest.
+  careful: {
+    width: '100%',
+    borderWidth: '2px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-text-accent'],
+    borderRadius: '20px',
+    padding: '16px',
+  },
+  // A form page is a document, white in light and dark, like the PDF it stands for.
+  paper: {
+    width: '100%',
+    backgroundColor: '#FFFFFF',
+    color: '#1B1B1F',
+    borderRadius: '12px',
+    padding: '16px',
+    boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
+  },
+  paperRule: { width: '100%', height: '1px', backgroundColor: '#C9C9CF' },
+  paperText: { color: '#1B1B1F' },
+  paperQuiet: { color: '#55555C' },
+  paperField: {
+    width: '100%',
+    borderBottomWidth: '1px',
+    borderBottomStyle: 'solid',
+    borderBottomColor: '#8A8A92',
+    paddingBottom: '4px',
+  },
+  signLine: {
+    width: '100%',
+    height: '56px',
+    borderRadius: '8px',
+    borderWidth: '2px',
+    borderStyle: 'dashed',
+    borderColor: '#0F5847',
+    backgroundColor: '#EAF5F1',
+  },
+  signed: { fontStyle: 'italic', fontSize: '26px', color: '#0F5847' },
+  disc: {
+    width: '44px',
+    height: '44px',
+    borderRadius: '50%',
+    flexShrink: 0,
+    backgroundColor: colorVars['--color-background-muted'],
+  },
+  // DocuSign's window: its own page inside Pam's, with its own edge and a caption saying whose it is.
+  ds: {
+    width: '100%',
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border'],
+    borderRadius: '12px',
+    overflow: 'hidden',
+  },
+  dsBar: { width: '100%', padding: '8px 12px', backgroundColor: colorVars['--color-background-muted'] },
+  dsBody: { width: '100%', padding: '16px', backgroundColor: '#F3F3F5', color: '#1B1B1F' },
+  dsTag: { backgroundColor: '#FFD84D', color: '#1B1B1F', padding: '6px 10px', borderRadius: '4px', fontWeight: 700, fontSize: '14px' },
+  pad: { padding: '16px' },
+  glyph: { fontSize: '24px', width: '24px', height: '24px', flexShrink: 0, color: colorVars['--color-text-accent'] },
+  foot: { padding: '16px', position: 'sticky', bottom: 0, backgroundColor: colorVars['--color-background-body'] },
+  row: { width: '100%' },
+  grow: { flexGrow: 1, minWidth: 0 },
+  listRow: { width: '100%', padding: '12px 0', borderBottomWidth: '1px', borderBottomStyle: 'solid', borderBottomColor: colorVars['--color-border'] },
+  dim: { opacity: 0.6 },
+});
+
+function Progress({ pct, label }: { readonly pct: number; readonly label: string }) {
+  return (
+    <VStack gap={2} xstyle={styles.row}>
+      <HStack justify="between" xstyle={styles.row}>
+        <Text type="supporting">{label}</Text>
+        <Text type="supporting">{pct}%</Text>
+      </HStack>
+      <HStack xstyle={styles.track}>
+        <HStack xstyle={styles.fill(pct)} />
+      </HStack>
+    </VStack>
+  );
+}
+
+function Calm({ icon, title, body }: { readonly icon: React.ReactNode; readonly title: string; readonly body: string }) {
+  return (
+    <Card padding={4} xstyle={styles.calm}>
+      <HStack gap={3} align="start" wrap="nowrap">
+        <HStack align="center" justify="center" xstyle={styles.glyph}>
+          {icon}
+        </HStack>
+        <VStack gap={1} xstyle={styles.grow}>
+          <Text weight="bold">{title}</Text>
+          <Text type="supporting">{body}</Text>
+        </VStack>
+      </HStack>
+    </Card>
+  );
+}
+
+/** One line of a form as it sits on the paper: the field's name small, its filled-in value under it. */
+function PaperField({ label, value, wide }: { readonly label: string; readonly value: string; readonly wide?: boolean }) {
+  return (
+    <VStack gap={0} xstyle={wide ? styles.row : styles.grow}>
+      <Text type="supporting" xstyle={styles.paperQuiet}>
+        {label}
+      </Text>
+      <HStack xstyle={styles.paperField}>
+        <Text xstyle={styles.paperText}>{value}</Text>
+      </HStack>
+    </VStack>
+  );
+}
+
+function FormPaper({ signed }: { readonly signed: boolean }) {
+  return (
+    <VStack gap={3} xstyle={styles.paper}>
+      <VStack gap={0}>
+        <Text weight="bold" xstyle={styles.paperText}>
+          Intake and consent
+        </Text>
+        <Text type="supporting" xstyle={styles.paperQuiet}>
+          Example Food Pantry · page 1 of 2
+        </Text>
+      </VStack>
+      <HStack xstyle={styles.paperRule} />
+      <PaperField wide label="Full name" value="Marcus Example" />
+      <HStack gap={3} wrap="nowrap" xstyle={styles.row}>
+        <PaperField label="Initials" value="M.E." />
+        <PaperField label="Birth date" value="04/12/1985" />
+      </HStack>
+      <HStack gap={3} wrap="nowrap" xstyle={styles.row}>
+        <PaperField label="Social Security no." value="•••-••-6789" />
+        <PaperField label="Today" value="10/14/2026" />
+      </HStack>
+      <VStack gap={1} xstyle={styles.row}>
+        <Text type="supporting" xstyle={styles.paperQuiet}>
+          Signature
+        </Text>
+        <HStack align="center" justify="center" xstyle={styles.signLine}>
+          {signed ? <Text xstyle={styles.signed}>Marcus Example</Text> : <Text weight="bold" xstyle={styles.paperText}>Sign here</Text>}
+        </HStack>
+      </VStack>
+    </VStack>
+  );
+}
+
+function BackBar({ title, sub, pct }: { readonly title: string; readonly sub: string; readonly pct: number }) {
+  return (
+    <VStack gap={3} xstyle={styles.row}>
+      <HStack gap={3} align="center" wrap="nowrap" xstyle={styles.row}>
+        <HStack align="center" justify="center" xstyle={styles.disc}>
+          <Icon icon="close" size="md" />
+        </HStack>
+        <VStack gap={0} xstyle={styles.grow}>
+          <Text weight="bold">{title}</Text>
+          <Text type="supporting">{sub}</Text>
+        </VStack>
+        <TextLink label="Pause" />
+      </HStack>
+      <Progress pct={pct} label="Form 3 of 112" />
+    </VStack>
+  );
+}
+
+function Screen({ which }: { readonly which: string }) {
+  switch (which) {
+    // 1 · Fill once.
+    case 'fill':
+      return (
+        <SubPage title="Your details, once" subtitle="For the forms you sign today" backLabel="Back" backHref="#" footer={<BigButton label="Start signing" />}>
+          <Calm
+            icon={<ClockIcon />}
+            title="Pam doesn't keep these"
+            body="They stay on this phone while you sign, and are cleared when you finish or close Pam."
+          />
+          <TextField label="Full name" value="Marcus Example" purpose="name" onChange={() => {}} />
+          <HStack gap={3} wrap="nowrap" align="start" xstyle={styles.row}>
+            <VStack xstyle={styles.grow}>
+              <TextField label="Initials" value="M.E." onChange={() => {}} />
+            </VStack>
+            <VStack xstyle={styles.grow}>
+              <TextField label="Birth date" value="04/12/1985" onChange={() => {}} />
+            </VStack>
+          </HStack>
+          <TextField label="Today's date" value="10/14/2026" isReadOnly onChange={() => {}} />
+          <VStack gap={3} xstyle={styles.careful}>
+            <HStack gap={2} align="center" wrap="nowrap">
+              <ShieldIcon />
+              <Text weight="bold">Social Security number</Text>
+            </HStack>
+            <Text type="supporting">
+              The most private thing here. It goes onto the forms and nowhere else: not saved, not sent to Pam, hidden again as soon as you leave this screen.
+            </Text>
+            <TextField label="Number" value="•••-••-6789" onChange={() => {}} />
+            <HStack gap={2} align="center" wrap="nowrap">
+              <EyeOffIcon />
+              <TextLink label="Show it while I check" />
+            </HStack>
+          </VStack>
+        </SubPage>
+      );
+    case 'check':
+      return (
+        <SubPage title="Check, then sign" subtitle="One look before the first form" backLabel="Back to your details" backHref="#" footer={<BigButton label="Looks right: start" />}>
+          <Card padding={4}>
+            <VStack gap={3}>
+              {[
+                ['Full name', 'Marcus Example'],
+                ['Initials', 'M.E.'],
+                ['Birth date', '04/12/1985'],
+                ['Today', '10/14/2026'],
+                ['Social Security number', '•••-••-6789'],
+              ].map(([k, v]) => (
+                <HStack key={k} justify="between" wrap="nowrap" xstyle={styles.row}>
+                  <Text type="supporting">{k}</Text>
+                  <Text weight="bold">{v}</Text>
+                </HStack>
+              ))}
+              <TextLink label="Change something" />
+            </VStack>
+          </Card>
+          <Calm
+            icon={<ShieldIcon />}
+            title="Gone when you are done"
+            body="Closing Pam, or finishing the last form, clears all of this. Coming back later means entering it again."
+          />
+        </SubPage>
+      );
+    // 2 · Sign many.
+    case 'sign':
+      return (
+        <VStack gap={4} xstyle={styles.frame}>
+          <VStack gap={4} xstyle={styles.pad}>
+            <BackBar title="Intake and consent" sub="Example Food Pantry" pct={3} />
+            <FormPaper signed={false} />
+            <Text type="supporting">Your details are filled in. Check them, then sign.</Text>
+          </VStack>
+          <VStack gap={2} xstyle={styles.foot}>
+            <BigButton label="Sign this form" />
+            <TextLink label="Skip this one for now" />
+          </VStack>
+        </VStack>
+      );
+    case 'signed':
+      return (
+        <VStack gap={4} xstyle={styles.frame}>
+          <VStack gap={4} xstyle={styles.pad}>
+            <BackBar title="Intake and consent" sub="Example Food Pantry" pct={3} />
+            <FormPaper signed />
+            <HStack gap={2} align="center" wrap="nowrap">
+              <CheckIcon />
+              <Text weight="bold">Signed and sent to Example Food Pantry</Text>
+            </HStack>
+          </VStack>
+          <VStack gap={2} xstyle={styles.foot}>
+            <BigButton label="Next form" badge="4 of 112" />
+            <TextLink label="Undo this signature" />
+          </VStack>
+        </VStack>
+      );
+    case 'pause':
+      return (
+        <SubPage title="Paused" subtitle="3 of 112 signed" backLabel="Back to the form" backHref="#" footer={<BigButton label="Carry on with form 4" />}>
+          <Progress pct={3} label="3 signed · 109 to go" />
+          <Calm
+            icon={<ClockIcon />}
+            title="Pick up whenever you like"
+            body="Pam remembers which forms are signed. It does not remember your details, so you will enter them again, Social Security number included."
+          />
+          <VStack gap={0} xstyle={styles.row}>
+            {[
+              ['Intake and consent', 'Example Food Pantry', 'Signed'],
+              ['Release of information', 'Example Food Pantry', 'Signed'],
+              ['Program rules', 'Example Job Center', 'Signed'],
+              ['Photo permission', 'Example Job Center', 'Next'],
+              ['Emergency contact', 'Example Clinic', ''],
+            ].map(([f, p, s]) => (
+              <HStack key={f} gap={3} align="center" wrap="nowrap" xstyle={[styles.listRow, s === '' ? styles.dim : null]}>
+                <VStack gap={0} xstyle={styles.grow}>
+                  <Text weight="bold">{f}</Text>
+                  <Text type="supporting">{p}</Text>
+                </VStack>
+                {s ? <Badge variant={s === 'Signed' ? 'success' : 'info'} label={s} /> : null}
+              </HStack>
+            ))}
+          </VStack>
+          <TextLink label="Stop and clear my details" />
+        </SubPage>
+      );
+    // 3 · The DocuSign route.
+    case 'docusign':
+      return (
+        <VStack gap={4} xstyle={styles.frame}>
+          <VStack gap={4} xstyle={styles.pad}>
+            <BackBar title="Intake and consent" sub="Example Food Pantry" pct={3} />
+            <VStack gap={0} xstyle={styles.ds}>
+              <HStack justify="between" align="center" wrap="nowrap" xstyle={styles.dsBar}>
+                <Text type="supporting">Shown by DocuSign</Text>
+                <HStack gap={1} align="center">
+                  <ShieldIcon />
+                  <Text type="supporting">docusign.net</Text>
+                </HStack>
+              </HStack>
+              <VStack gap={3} xstyle={styles.dsBody}>
+                <HStack>
+                  <Text xstyle={styles.dsTag}>Start</Text>
+                </HStack>
+                <PaperField wide label="Full name" value="Marcus Example" />
+                <PaperField wide label="Social Security no." value="" />
+                <PaperField wide label="Date" value="10/14/2026" />
+                <HStack align="center" justify="center" xstyle={styles.signLine}>
+                  <Text weight="bold" xstyle={styles.paperText}>Sign</Text>
+                </HStack>
+              </VStack>
+            </VStack>
+            <Text type="supporting">DocuSign's own window. What you type here goes to DocuSign, not to Pam.</Text>
+          </VStack>
+          <VStack gap={2} xstyle={styles.foot}>
+            <TextLink label="Need help with this form?" />
+          </VStack>
+        </VStack>
+      );
+    case 'handoff':
+      return (
+        <SubPage title="Signed" subtitle="Form 3 of 112" backLabel="Back" backHref="#" footer={<BigButton label="Next form" badge="4 of 112" />}>
+          <Progress pct={3} label="3 signed · 109 to go" />
+          <Calm
+            icon={<SignIcon />}
+            title="DocuSign has it"
+            body="You are back in Pam. DocuSign sends the signed form to Example Food Pantry. Pam only knows that it is done."
+          />
+          <Card padding={4}>
+            <VStack gap={1}>
+              <Text weight="bold">Next: Release of information</Text>
+              <Text type="supporting">Example Food Pantry</Text>
+            </VStack>
+          </Card>
+          <TextLink label="Pause here" />
+        </SubPage>
+      );
+    // 4 · Done.
+    case 'done':
+      return (
+        <SubPage title="All 112 signed" subtitle="Nothing left to sign" backLabel="Back to Home" backHref="#" footer={<BigButton label="Save my copies" />}>
+          <Progress pct={100} label="112 of 112" />
+          <Calm
+            icon={<CheckIcon />}
+            title="Sent to the programs"
+            body="Each program has its own signed form: 9 programs, 112 forms."
+          />
+          <Card padding={4}>
+            <VStack gap={2}>
+              <Text weight="bold">Your copies</Text>
+              <Text type="supporting">
+                Pam does not keep them. Save them to your phone or send them to yourself now: once you leave this screen they are not in Pam.
+              </Text>
+              <TextLink label="Send them to my email" />
+            </VStack>
+          </Card>
+          <Calm
+            icon={<ShieldIcon />}
+            title="Your details are cleared"
+            body="Your name, birth date and Social Security number are gone from this phone."
+          />
+        </SubPage>
+      );
+    default:
+      return <Text>Unknown screen</Text>;
+  }
+}
+
+function Page() {
+  const which = useSearchParams().get('s') ?? 'fill';
+  return <Screen which={which} />;
+}
+
+export default function DesignSign() {
+  return (
+    <Suspense>
+      <Page />
+    </Suspense>
+  );
+}
