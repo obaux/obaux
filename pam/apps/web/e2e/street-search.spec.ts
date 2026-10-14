@@ -67,6 +67,15 @@ test.describe('street search', () => {
     // Under option A a pick is never kept, and the row says so where it is picked, like "Use my current location".
     await expect(page.getByRole('button', { name: /^1500 Market St, Philadelphia, PA.*Used for this search only\./ }).first()).toBeVisible();
     await expect(page.locator('[data-google-attribution]')).toBeVisible();
+    // Google's own file, served by Pam: it loaded (not the words standing in), is 18px high, and came from this origin (D-557).
+    const logo = page.locator('[data-google-attribution] img[alt="Google Maps"]');
+    await expect(logo).toBeVisible();
+    expect(await logo.evaluate((img: HTMLImageElement) => ({ ok: img.complete && img.naturalWidth > 0, h: Math.round(img.getBoundingClientRect().height), local: new URL(img.currentSrc).origin === location.origin, src: new URL(img.currentSrc).pathname }))).toEqual({
+      ok: true,
+      h: 18,
+      local: true,
+      src: expect.stringMatching(/^\/google\/google-maps-attribution-(light|dark)\.svg$/),
+    });
     // The mark and the footer line under it are centred on one line (Will, 13 October).
     const mark = await page.locator('[data-google-attribution]').boundingBox();
     const footer = await page.getByText('Pam remembers the area you pick on this phone only.').boundingBox();
