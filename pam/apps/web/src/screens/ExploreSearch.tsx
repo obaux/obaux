@@ -35,6 +35,8 @@ const styles = stylex.create({
   cancel: { flexShrink: 0, fontSize: '17px', fontWeight: 600 },
   section: { fontSize: '14px', fontWeight: 700, letterSpacing: '0.02em', textTransform: 'uppercase', paddingBlockStart: '8px' },
   hint: { fontSize: '15px', lineHeight: 1.5 },
+  privacy: { fontSize: '14px', lineHeight: 1.5 },
+  privacyCentered: { textAlign: 'center' },
 });
 
 const ICON = { width: 24, height: 24, 'aria-hidden': true } as const;
@@ -247,6 +249,10 @@ export function ExploreSearch({
         {nothing ? <Text type="supporting" xstyle={styles.hint}>{t('explore.search.nothing')}</Text> : null}
       </div>
 
+      {/* Under the list, as the drawer says it: the area picked is remembered on this phone only (kept until Will says otherwise, 14 October). */}
+      <Text type="supporting" xstyle={[styles.privacy, addressItems.length > 0 && styles.privacyCentered]}>
+        {t('places.areaPrivacy')}
+      </Text>
     </Page>
   );
 }
