@@ -27,8 +27,8 @@ const FOOD = [
 ];
 const NEAREST = [row('b1000000-0000-4000-8000-000000000001', 'Example Market Street Clinic', '1500 Market St Philadelphia, PA 19102', 40)];
 
-async function open(page: Page, opts: { enabled?: boolean | 'unreadable'; programs?: (q: string) => unknown[] | 'fail'; role?: 'member' | 'admin'; path?: string } = {}) {
-  const { enabled = true, programs = (q) => (/food/i.test(q) ? FOOD : []), role = 'member', path = '/' } = opts;
+async function open(page: Page, opts: { areas?: unknown[]; enabled?: boolean | 'unreadable'; programs?: (q: string) => unknown[] | 'fail'; role?: 'member' | 'admin'; path?: string } = {}) {
+  const { areas = [], enabled = true, programs = (q) => (/food/i.test(q) ? FOOD : []), role = 'member', path = '/' } = opts;
   await asMember(page, role);
   const asked: Record<string, unknown>[] = [];
   const nearAsked: Record<string, unknown>[] = [];
@@ -36,7 +36,7 @@ async function open(page: Page, opts: { enabled?: boolean | 'unreadable'; progra
   page.on('request', (request) => {
     if (/googleapis\.com|google\.com\/maps/.test(request.url())) outside.push(request.url());
   });
-  await page.route(AREAS, (route) => route.fulfill(json([])));
+  await page.route(AREAS, (route) => route.fulfill(json(areas)));
   await page.route(PROGRAMS, (route) => {
     const q = String((route.request().postDataJSON() as { p_query?: string }).p_query ?? '');
     const answer = programs(q);
@@ -109,7 +109,8 @@ test.describe('one search field', () => {
     const { box } = await open(page);
     await box.fill('zzzz');
     await expect(page.getByRole('heading', { name: 'Nothing matched that.' })).toBeVisible();
-    await page.getByRole('button', { name: 'Clear search' }).click();
+    // Two buttons are named Clear search: the one in the field, and the one under "Nothing matched that."
+    await page.getByRole('button', { name: 'Clear search' }).last().click();
     await expect(page.getByRole('heading', { name: 'All programs' })).toBeVisible();
   });
 
@@ -142,7 +143,7 @@ test.describe('one search field', () => {
     expect(page.url()).not.toMatch(/Market|39\.95|-75\.16/);
     expect(nearAsked.some((body) => Math.abs(Number(body['p_lat']) - 39.9526) < 0.0003)).toBe(true);
     // Clearing brings the normal list back, and the control says the area as before.
-    await page.getByRole('button', { name: /^Clear/ }).click();
+    await page.getByRole('button', { name: /^Clear/ }).first().click();
     await expect(page.getByRole('button', { name: 'Near City Hall' })).toBeVisible();
     await expect(page.locator('[data-google-attribution]')).toHaveCount(0);
     await expect(page.getByRole('heading', { name: 'Example Learning Hub' })).toBeVisible();
@@ -151,8 +152,7 @@ test.describe('one search field', () => {
   });
 
   test('a pick in the drawer wins over a typed address: it clears the box and sets Near for real', async ({ page }) => {
-    const { box } = await open(page);
-    await page.route(AREAS, (route) => route.fulfill(json([{ id: 'a1', kind: 'zip', label: '19104', lat: 39.963788, lon: -75.202914 }])));
+    const { box } = await open(page, { areas: [{ id: 'a1', kind: 'zip', label: '19104', lat: 39.963788, lon: -75.202914 }] });
     await box.fill('1500 Market');
     await expect(page.getByRole('button', { name: 'Near 19102' })).toBeVisible();
     await page.getByRole('button', { name: 'Near 19102' }).click();
