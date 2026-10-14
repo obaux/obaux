@@ -669,9 +669,159 @@
   says the answer is texted. a84 is final at 21:51: p15 widened to add-a-program requests (Sage d8c9db1e) and (j),
   "If we add a program you asked for, its name, type, address, phone number, website and description are shown on
   Pam." (Lena: a lead's first name is shown to members who write, so "Your name is not" stays out).
+- **Batch b34 (13 October, 22:11, afee3198).** No migration, no function change. Lena's 134af68d: the six
+  Spanish staff Join strings in usted, with stories that draw the staff privacy step and the "We will text you"
+  notice. Sage's ledger 402dc982: D-568, Wren's website lines and a84 (j) signed; the withdrawn line marked.
+- **Will, 14 October 04:03 (Control Room comment, chat w20261014040306dvaw): forms and DocuSign.** In his words:
+  "We're going to need to reimagine how we offer policies both from the program lead with a DocuSign integration
+  and for the member who's signing forms. Social programs have forms that are PDFs with tags for members to add:
+  name, initials, birth date, Social Security number, current (today's) date, signatures, information. We need a
+  way to not store this but allow them to sign over 100 forms in one go, one at a time, conveniently, placing their
+  name and all of those other details mentioned. Additionally programs use DocuSign for asking members to sign
+  digitally so we need to set up an integration with DocuSign as a priority and allow that integration to funnel in
+  the PDF previews in a way that is easy for members to sign. Maybe through an embed window where they can access
+  the DocuSign document and use the DocuSign interface inside of Pam. Alternatively let them sign and tag the PDFs
+  inside of Pam without DocuSign." Merge desk, 04:04 (chat m20261014040418forms), the starting position: Pam does
+  not keep what a member types into a form; DocuSign comes first, with the member filling and signing in
+  DocuSign's own window inside Pam, so Pam never sees a Social Security number; today's program policies (D-485,
+  D-489) stay as they are until the new way is ready; nothing is built until Will has seen a card with pictures
+  and choices. The research round went out at 04:06. Iris: DocuSign's signing inside another app, its cost, the
+  alternatives, filling a PDF inside Pam, the e-signature law (ESIGN, UETA) and accessibility, from public pages
+  only, with no accounts. Lena: Social Security numbers and birth dates, e-signatures, DocuSign's role, and the
+  Privacy lines it would need. Piper: how it fits program policies. Dot: pictures of fill once and sign many, the
+  DocuSign window and the finished state, at 390 in both themes. Asked Will: (a) which programs use DocuSign, and
+  on whose account; (b) where a signed form has to end up; (c) a few blank forms in a Drive folder "Pam forms" to
+  design and test with.
+- **Will, 04:05 (a81, chat w20261014040538az2g): street search "approved", with Google's logo files.** The Drive
+  file is Google's `Google_Maps_Attribution_Assets.zip` (91,462 bytes: Gray, DarkGray and White, plus two outline
+  sets, each as an SVG and 1x/2x/4x PNGs). The proxy refuses Google's hosts, so it came through the Drive connector.
+  It was unpacked in its own folder, and the SVGs were checked: no script, link or foreign object. It went up unchanged,
+  without the macOS extras, on `mira/google-maps-attribution-assets` (41d6e8ab) for Dot. Merge desk, 04:15: Dot
+  finishes D-557 (Google's rule: the version that contrasts, so expect Gray on light and White on dark; 18px; alt
+  "Google Maps"), shows Will pictures, and it ships; then Will makes the key. Will did not confirm the 16 to 19 px
+  sentence on Google's page, so Dot records that it was not checked.
+- **Will, 04:08 (a83, chat w20261014040802nbtc): three help form changes.** In his words: "the still stuck card still
+  touches footer on mobile. Also please undo any rules about text box being selected, I don't want that. All I want
+  is for the keyboard to be active when a text box presents itself, for the user's convenience in typing.
+  Additionally the desktop 'Still stuck?' card: there's something off about that button, 'Write to us,' being so
+  long, stretching all the way. Just make it fit the text. No reason for it to be so wide but on mobile it's okay".
+  Merge desk, 04:15: (1) The gap. pam-site is live on 3975ce34, and the live code, measured, gives 60px (see
+  Verified). Will was told to reload a tab opened before b32, and that the card's sixth picture was the old one (now
+  removed). Wren checks every page that ends in a card, in both themes and in WebKit's terms, and moves the gap to
+  padding if any engine could drop the margin. (2) Text boxes. D-523's text-box line (Will's own 11 October words) is
+  reversed: a text box shows no ring in any mode, on the website and in the app. A text box that opens ready still
+  takes focus, inside the tap, so iOS raises the keyboard. Buttons, links, tick boxes and selects keep their ring on
+  Tab, because that is how a keyboard user sees where they are. Dot writes it as a new D-number; Wren does the
+  same on the site. (3) "Write to us" fits its words from 600px and stays full width on a phone. Pictures go to
+  Will before any of it ships.
+- **Merge desk, 04:20: forms card a85 for Will.** All four came back READY: Iris's research (b7da9ba5), Lena's legal
+  note (59e88997, not legal advice; tags every claim), Piper's plan (8302dea4) and Dot's pictures (63671ef4). All four
+  are merged into main as records. Position on the card: DocuSign on **each program's own account**, shown inside Pam
+  (DocuSign's page under Pam's bar, or full screen and back), so the member types an SSN on DocuSign's page and Pam
+  never sees it. Pam keeps only the envelope id, the status and "signed, on this day". Piper's plan started on one Pam
+  account; Iris and Lena both found that would leave every completed form in Pam's DocuSign until purged, which is
+  storing it by another name, so the program's account it is. The honest cost: Pam cannot carry details across
+  programs, so a member types them once per program package, not once per sitting. The Pam-only route (fill and sign
+  on the phone, details only in memory) is later, bigger, and needs a lawyer. Today's policies stay; forms become a
+  second kind (`kind = 'form'`). Fixed whatever Will picks: Pam never asks for an SSN, no form title in a text or
+  notice, a program sees "signed, on this day", Pam's code never downloads a form, a Pennsylvania lawyer before
+  launch, off until Will switches it on. Not promised: that the DocuSign token itself cannot download (Lena's
+  least-privilege point; the spike shows how far DocuSign lets it be narrowed). Four questions for Will, my advice
+  yes on each: (1) that order; (2) a free DocuSign developer account he makes, for Iris and Piper's spike; (3) stop
+  keeping the drawn signature picture on read-and-agree policies (D-485 point 1), keeping only the date; (4) a
+  program's own form may use words Pam doesn't. Nothing is built or claimed until he answers.
+- **Merge desk, 04:22: Dot's logo files are in (ef517da1, D-557).** Gray on light, White on dark, 18px, alt "Google
+  Maps", served from Pam, with a test that nothing in them runs or loads. Merged as batch b35 with the records,
+  targeted checks first. Card a81 shows the pictures. Nothing changes for members until Will's key, which is the next
+  step once b35 is live.
+- **Will, 04:23 (on a84, chat w20261014042353dose): one search, and a help post for a new number.** In his words
+  (dictated): "also simplify the user and merge search and filter. When they search it opens a message where they
+  can write, and write in the filter between the two. Also for the new number, add that as an article inside the
+  support website and in the article it has a callout to this form and have the post facilitate this process".
+  Neither a84 screen has a search or filter (checked), so the merge desk's reading is Explore (and All programs).
+  The "Search programs" bar and the area control ("Near 19102 ✎") become one bar; tapping it opens a screen with the
+  cursor in the box, a "Programs" | "Area" switch and the category chips under it. Piper draws it (pictures only) and
+  Will confirms or corrects before anything is built; the reading was posted to him at 04:25. The help post: Sage
+  writes and signs "Got a new phone number?", and Wren builds it after the help form, with a call-out that opens
+  `/signin/new-number/` in the app. It is held off main until a84 is signed and D-567 ships. a84 itself is still
+  unanswered.
+- **Will, 04:31 (a85, chat w20261014043123eeo6): "Good job on these", with four changes to the forms pictures.** The
+  banners take the place page's "Booking confirmed" style, not the edge border; the main buttons stay fixed at the
+  bottom; on "All 112 signed" the banners sit close together with "Your copies" under them; and the cleared banner
+  says plainly that the name, birth date and SSN are no longer stored in Pam. Dot redraws (pictures only) and Sage
+  words the cleared line so it is true on both routes. The card's four questions are still unanswered, and nothing is
+  built.
+- **Merge desk, 04:30: Dot's D-569 (56d7d929, follow-up 76ed2731), text boxes without a ring, is accepted.** The
+  chat composer never had a ring; its old "Tab rings" test never ran, and it now asserts none. The sign-in code boxes
+  keep D-251's 2px edge on the box the next digit goes into, on purpose: it is not a ring and a caret can't do that
+  job across six boxes. WCAG 2.4.7 then rests on the caret for text boxes, recorded as Will's call. The pictures are
+  on a83. It ships with Wren's website version of the same rule.
+- **Merge desk, 04:35: card a86, one search on Explore.** Piper drew it (fe40db8a, pictures only, no app code). One
+  bar ("Search programs", with the area on its second line); tapping it opens a screen with the cursor in the box and
+  a Programs | Area switch. The Area side holds today's rows (current location, Pam's areas, Google's rows, the mark,
+  the footer); the area link with its pencil and the Location drawer go. Nothing changes in what is saved or sent.
+  Three choices on the card with my advice: chips on Programs only, full screen, and a ZIP typed on Programs switches
+  to Area. Sage signed the "Got a new phone number?" post (e708a7e8). Her "We may call your new number" line follows
+  a84 (i). Correction to the 04:15 entry: the ZIP-only chip rule is D-552, not D-561.
+- **Will, 04:39 (a86, chat w20261014043914e19d): one box, like Google Maps.** In his words: "Let's talk about this
+  before we push anything. If I'm in Google Maps I can type either a program name or an address and it will just show
+  me the list. I don't have to select whether it's a service or an area. Why do we need to make a distinction? Also I
+  don't like the subtitle under 'Search program' inside the search bar. It feels too crowded. Can we just streamline
+  this and merge everything into one?" Merge desk, 04:39: agreed, no switch. The bar has one line ("Search programs
+  or places"), and one list comes back with programs first, Pam's areas next and addresses last. **Google is asked
+  only when the text looks like an address** (a house number, a street suffix, an "X and Y" corner) or when the
+  person taps an explicit "Search addresses" row, so what people search for ("food pantry", "rehab") never leaves Pam.
+  That keeps the signed a74/a81 Privacy line true and Google's bill down; Piper checks whether the line's "a place
+  Pam's own list of areas doesn't have" clause is broader than this. Piper redraws it (v2, pictures only).
+- **Will, 04:40 (a81, chat w20261014044028qel6): keep "Near 19102".** The area control on the right of "All programs"
+  (or a category) stays as it is today, for people who browse rather than type. Picking an area or address in the one
+  box updates the same control. Piper's v2 includes it.
+- **Will, 04:43 (a85, chat w20261014044303piq9): the banner he meant is the blue one.** "That green card in the places
+  profile isn't even an alert banner. I'm talking about the more subtle blue banner" — the place page's
+  `<Banner status="info">` ("This is only to help you plan. Pam does not tell {place} you are coming."). The merge
+  desk's 04:31 brief had sent Dot to the green VisitCard. Dot redraws every note as the blue info Banner and shows
+  the two confirmations once in Banner success beside them, so Will can pick.
+- **Will, 04:47 (a84, chat w20261014044728k4y4): Sign in's spacing is off.** In Ava's picture the heading sits against
+  the hero and the field, button and line are packed together. Ava's branch changed no gaps (it is based on b32), so Dot
+  checks main at 390×844 and 375×667 and gives it room with spacing tokens, keeping the short-phone fit, with before and
+  after pictures for Will.
+- **Will, 04:48 (chat w202610140448305pq6): the Control Room loses his place and his reply.** Merge desk, 04:53,
+  Control Room v23 (version 42): every picture publish had reloaded the page on his screen (six in the hour). The page
+  now declares `assets`, and card pictures go to its asset store (`/_blob/<id>`), which needs no new version. A data
+  change keeps the card or picture at the top of the screen where it was (`keepPlace`). A reload restores the card he
+  was on, which cards were open, the picture he had open, and the reply being written (kept on his device until sent).
+  Tested in a harness at 390: a new card plus longer text above held the picture within a pixel, and the draft and the
+  open picture came back after a reload. The forms pictures (Dot 3b76742c, blue info banners with a green version to
+  compare) were the first to arrive through the asset store.
+- **Will, 04:50 (a83, chat w20261014045002p6tc): the help form "looks good. Approved".** D-569 (app) and D-570
+  (website) ship in b36 once the full checks pass. Sage signed Wren's "More: Got a new phone number?" link (0344f23b).
+  That post stays held for a84.
+- **Merge desk, 04:55: a86 shows Piper's take three (ec5195b0).** One-line bar "Search programs or places"; the "Near
+  City Hall ✎" control kept; typing "food" lists programs and asks Google for nothing unless the explicit "Search
+  addresses for 'food'" row is tapped; typing "1500 Market" shows areas, then Google's addresses. Piper's privacy check
+  found that today's rule (`wantsGoogle`: ask when Pam's own areas find nothing) would have sent "food" from a merged
+  box. So the box asks Google only for address-like text that matches no program, or on the explicit tap, and fails safe.
+  The drawer keeps today's rule, so the signed p7 stays true. Decided, and Will can change them: all digits put Areas
+  first; a street picked in the box shows only its ZIP (D-552).
+- **Merge desk, 05:03: Sign in's spacing, D-572 (Dot c0ed1c8d), card a87.** It was live since b32. D-564's short-screen
+  rules used `default: null` for the stack gap, the card padding and the brand gap, and in StyleX that unsets the
+  component's own `gap`/`padding` on every screen: title 4px under the picture, field, button and consent line 0px
+  apart at 390×844. The defaults are now the tokens (--spacing-3/5/4), and the tight values apply only under 640px tall;
+  641 to 720px gets a 46vh slide so 375×667 still fits. All 42 fit cases still fit, and a new signin-short case covers
+  390×844 and 375×667. It restores the look Will signed, so it ships as b37 after b36.
 
 ## What was wrong, and what missed it
 
+- **Sign in's spacing was squeezed on every phone for a night.** A `default: null` meant for short screens removed the
+  component's own spacing everywhere; the tests only measured 320×568, where tight is right. Will saw it in a picture.
+  Rule (D-572): never `default: null` over a component's own prop; give the token instead.
+- **Every picture added to a card reloaded Will's page.** Publishing files with the page makes a new version, and every
+  open view reloads to it, so his scroll, his open picture and his half-written reply went each time. Nothing showed it
+  from this side. Pictures now go to the asset store; publish the page only when the page itself changes.
+- **"Booking Confirmed" read as the green booked card.** Will named a style by the words he remembered on it. The merge
+  desk picked the component with those words (VisitCard) without checking which of the place page's two notices he
+  meant, and Dot redrew ten screens on it. Next time a style is named by a remembered label, put a picture of each
+  candidate in the reply and ask, or have the redraw show both.
 - **A live finding went out to three people before it was checked.** Ava reported join.staff.* promising an unsent
   text; I sent Sage, Lena and Ava to fix it without reading claim_outbound_messages or outbound_messages. Sage
   checked the code and was right: those texts are exempt. Check a reported live fault against the live system (one
@@ -917,9 +1067,17 @@
 | Live checks for a84 (read-only, 20:30 to 20:34) | postgres has DELETE on auth.users (not superuser; owner supabase_auth_admin); pg_cron installed, five jobs; auth.audit_log_entries 0 rows; organization plan free |
 | b33 main CI (448d5790) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (21:59); Vercel web and pam-site READY (21:33) |
 | Staff-request texts (read-only, 21:30) | texts_live 'off'; live claim_outbound_messages exempts staff_request_approved and _denied; dispatch-sms */5 active; outbound_messages: one approved sent 10 October, one denied sent 17 September |
+| Batch b34, targeted run: config / copy / web build / tsc / web unit / budget / e2e (join, account, consent, signin-short, signin-next, staff-request, invite) / storybook | 1311 passed, 1 skipped / in step / 0 / 0 / 173 passed / 12.0 kB spare / 311 passed, 1 skipped, exit 0 / 0 |
+| b34 main CI (afee3198) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (22:43); Vercel web and pam-site READY (22:16) |
+| Still stuck gap, live code (b33's `out/` = main's site, served as https://joinpam.org in Chromium, probe answering 400 so the call-out shows) | card to footer 60px at 390 and 120px at 1280 on /support/joining-pam/, /support/cant-sign-in/ and /support/; "Write to us" fills its column (292 of 292px at 390, 720 of 720px at 1280) |
 
 ## Left undone
 
+- **As of b34 (14 October, 04:10):** with Will: a84 (the new number and the case manager request, with their
+  Privacy lines; the release is ready the moment he signs), a81 (Google's logo files, then the key), and the forms
+  and DocuSign questions (a) to (c). Research round on forms and DocuSign: Iris, Lena, Piper and Dot; then a card
+  for Will with pictures and choices (posted as a85 at 04:20). Nothing on forms is built before he picks. Dot: Google's logo files (then
+  Will's key), then text boxes without a ring. Wren: the help form's three changes (Will, 04:08).
 - **As of b32 (13 October, about 20:00):** b33 is ready to merge: Piper's D-565 (9aade728, the old Places list
   retired, with Lena's 911312da for "Back to Reported places"), Dot's D-566 (5737dfae), Ava's P2 (3dfb043c). With
   Will: a84 (choices (b) to (g); Lena's Privacy words after Sage's edit), a81 (Google's logo files, then the key).
@@ -945,6 +1103,9 @@
 
 ## Needs a human
 
+- Will: forms and DocuSign. (a) Which programs use DocuSign, and on whose account; (b) where a signed form has to
+  end up; (c) a few blank forms in a Drive folder "Pam forms". And card a85's four questions (the order, a free
+  DocuSign developer account he makes, the drawn signature picture, a program's own words).
 - Will: card a62, step 3 only: HELP_REQUESTS_LIVE = on in Supabase's secrets, then one test from "Still stuck?"
   (his paste and the salt are in and checked; 041940 is recorded).
 - Will: card a75 (website text colours, Dot's examples linked). Later cards: the Google street search (a key and a

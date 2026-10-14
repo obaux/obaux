@@ -1,0 +1,164 @@
+From e3065f0c393eff6881588b9fcf24d813f6734c93 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Tue, 13 Oct 2026 21:29:15 +0000
+Subject: [PATCH] Site: Join as a case manager goes to the app's request page;
+ the help post links it (D-568, held)
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_012vS6F7CMTwFn3u5UG66JWz
+---
+ pam/apps/site/src/content/CantSignIn.tsx     |  3 +++
+ pam/apps/site/src/content/JoiningAsStaff.tsx |  5 ++++-
+ pam/apps/site/src/content/home-copy.ts       |  8 +-------
+ pam/apps/site/src/lib/links.ts               |  2 ++
+ pam/apps/site/src/screens/HomeScreen.tsx     |  7 +++++--
+ pam/apps/site/test/home-copy.test.ts         | 10 +++++++---
+ 6 files changed, 22 insertions(+), 13 deletions(-)
+
+diff --git a/pam/apps/site/src/content/CantSignIn.tsx b/pam/apps/site/src/content/CantSignIn.tsx
+index 2316e812..bc36ed2a 100644
+--- a/pam/apps/site/src/content/CantSignIn.tsx
++++ b/pam/apps/site/src/content/CantSignIn.tsx
+@@ -1,6 +1,7 @@
+ import { CompareTable } from '../components/CompareTable';
+ import { Body, Lead, P, ReadMore, Section } from '../components/Prose';
+ import { HowTo } from '../components/HowTo';
++import { CASE_MANAGER_JOIN_URL } from '../lib/links';
+ 
+ /**
+  * Support post: I can't sign in (everyone). Words by Sage (docs/help-drafts/cant-sign-in.md), signed by Will (a57,
+@@ -49,6 +50,8 @@ export function CantSignIn() {
+       </Section>
+ 
+       <Section title="I want to be a case manager">
++        <P>You can also ask to join yourself, without an invite. A person at Pam checks every request before anyone joins.</P>
++        <ReadMore label="Join as a case manager" href={CASE_MANAGER_JOIN_URL} />
+         <HowTo
+           steps={[
+             'Ask a case manager you work with, or the Pam team, for an invite link. (Contact Pam, below.)',
+diff --git a/pam/apps/site/src/content/JoiningAsStaff.tsx b/pam/apps/site/src/content/JoiningAsStaff.tsx
+index a6aeaf86..f3538699 100644
+--- a/pam/apps/site/src/content/JoiningAsStaff.tsx
++++ b/pam/apps/site/src/content/JoiningAsStaff.tsx
+@@ -1,5 +1,6 @@
+ import { Needs } from '../components/Needs';
+-import { Body, Lead, P, Section } from '../components/Prose';
++import { Body, Lead, P, ReadMore, Section } from '../components/Prose';
++import { CASE_MANAGER_JOIN_URL } from '../lib/links';
+ import { HowTo } from '../components/HowTo';
+ 
+ /**
+@@ -36,6 +37,8 @@ export function JoiningAsStaff() {
+           Ask the person at Pam who works with you to send you one. A case manager or a Pam super admin can send
+           one. If you do not know who to ask, contact Pam.
+         </P>
++        <P>No invite? You can ask to join as a case manager yourself. A person at Pam checks every request.</P>
++        <ReadMore label="Join as a case manager" href={CASE_MANAGER_JOIN_URL} />
+         <Needs title="A link works once, for one person.">
+           It only works on the phone number it was made for, and it lasts 30 days. If it has expired, ask for a
+           new one.
+diff --git a/pam/apps/site/src/content/home-copy.ts b/pam/apps/site/src/content/home-copy.ts
+index b7da1b70..98f7f167 100644
+--- a/pam/apps/site/src/content/home-copy.ts
++++ b/pam/apps/site/src/content/home-copy.ts
+@@ -72,7 +72,7 @@ export const HOME = {
+       id: 'case-managers',
+       head: 'Walk with them, one visit at a time.',
+       body: 'Invite the people you work with, cheer on every step, and message them in Pam along the way.',
+-      cta: { label: 'Join as a case manager', href: '/support/cant-sign-in/' },
++      cta: { label: 'Join as a case manager', href: 'case-manager-join' },
+       image: 'conversation',
+       alt: 'A conversation in Pam between a case manager and the person they work with, with documents shared in the chat.',
+       bubble: 'Thursday at 2. I have the letter',
+@@ -105,10 +105,4 @@ export const HELD: readonly HeldLine[] = [
+     shown: HOME.callouts[1].text,
+     reason: 'Will, 12 October (a65): hold until launch, because the website has to be translated first. Today the help desk is email with no hours.',
+   },
+-  {
+-    id: 'case-manager-link',
+-    wanted: 'Join as a case manager, sending the person to sign in.',
+-    shown: HOME.rows[2].cta.label,
+-    reason: 'Will, 12 October (a65): the middle buttons go to sign in. Not this one yet: signing in would make a case manager a member account. It stays on the help post until Ava’s case-manager request page exists, then points there.',
+-  },
+ ];
+diff --git a/pam/apps/site/src/lib/links.ts b/pam/apps/site/src/lib/links.ts
+index 1731703f..f178012f 100644
+--- a/pam/apps/site/src/lib/links.ts
++++ b/pam/apps/site/src/lib/links.ts
+@@ -11,6 +11,8 @@ export const APP_URL = (
+ export const SIGN_IN_URL = `${APP_URL}/signin/`;
+ /** Sign in, then straight to Add my program (the app keeps `next` to one listed screen, used once, never for a program lead: S1). */
+ export const ADD_PROGRAM_URL = `${APP_URL}/signin/?next=/profile/add-program/`;
++/** The page where a case manager asks to join, in the app (D-568, Ava). Not live until the app page is: this change is held for it. */
++export const CASE_MANAGER_JOIN_URL = `${APP_URL}/join/case-manager/`;
+ export const PRIVACY_URL = `${APP_URL}/privacy/`;
+ export const TERMS_URL = `${APP_URL}/terms/`;
+ 
+diff --git a/pam/apps/site/src/screens/HomeScreen.tsx b/pam/apps/site/src/screens/HomeScreen.tsx
+index 74a23e19..60a99227 100644
+--- a/pam/apps/site/src/screens/HomeScreen.tsx
++++ b/pam/apps/site/src/screens/HomeScreen.tsx
+@@ -13,7 +13,7 @@ import { SoftButton } from '../components/SoftButton';
+ import { WebFrame } from '../components/WebFrame';
+ import { VISIT_REMINDERS_LIVE } from '../content/flags';
+ import { HOME } from '../content/home-copy';
+-import { ADD_PROGRAM_URL, APP_URL } from '../lib/links';
++import { ADD_PROGRAM_URL, APP_URL, CASE_MANAGER_JOIN_URL } from '../lib/links';
+ import { website } from '../lib/website.stylex';
+ import { type } from '../lib/website-type.stylex';
+ 
+@@ -134,6 +134,9 @@ const CAROUSEL = [
+   },
+ ].map((slide, i) => ({ id: `hero-${i + 1}`, width: 900, height: 1102, ...slide }));
+ 
++/** Where each row's button goes: the app, Sign in and on to Add my program, or the case-manager request page. */
++const CTA_HREF = { app: `${APP_URL}/`, 'add-program': ADD_PROGRAM_URL, 'case-manager-join': CASE_MANAGER_JOIN_URL } as const;
++
+ const CHIP_ICON = [WorkforceIcon, FamilyServicesIcon, EducationIcon] as const;
+ 
+ /** The new Home (Figma "Pam — Website", Home 24:575 desktop, 7:3 phone). Its words are `content/home-copy.ts`. `showAbout` is kept for Storybook's walker and ignored: the design's Home has no About section. */
+@@ -188,7 +191,7 @@ export function HomeScreen(_props: { readonly showAbout?: boolean } = {}) {
+                   {row.body}
+                 </Text>
+                 <HStack>
+-                  <SoftButton label={row.cta.label} href={row.cta.href === 'app' ? `${APP_URL}/` : row.cta.href === 'add-program' ? ADD_PROGRAM_URL : row.cta.href} pill />
++                  <SoftButton label={row.cta.label} href={CTA_HREF[row.cta.href]} pill />
+                 </HStack>
+               </VStack>
+               <div {...stylex.props(i % 2 === 0 ? undefined : styles.rowFlip)}>
+diff --git a/pam/apps/site/test/home-copy.test.ts b/pam/apps/site/test/home-copy.test.ts
+index fd6d3331..120de80a 100644
+--- a/pam/apps/site/test/home-copy.test.ts
++++ b/pam/apps/site/test/home-copy.test.ts
+@@ -1,6 +1,6 @@
+ import { describe, expect, it } from 'vitest';
+ import { HELD, HOME } from '../src/content/home-copy';
+-import { ADD_PROGRAM_URL, SIGN_IN_URL } from '../src/lib/links';
++import { ADD_PROGRAM_URL, CASE_MANAGER_JOIN_URL, SIGN_IN_URL } from '../src/lib/links';
+ 
+ const shown = JSON.stringify(HOME);
+ 
+@@ -16,14 +16,18 @@ describe('Home words (Mira, 11 October: hold what is untrue today or a new promi
+     expect(shown).not.toMatch(/24\/7|call pam|monday to friday/i);
+   });
+ 
+-  it('sends “Add your program” to sign in and on to Add my program (Will, a65; S1) and “Join as a case manager” to the help post until the request page exists', () => {
++  it('sends “Add your program” to sign in and on to Add my program (Will, a65; S1) and “Join as a case manager” to the app’s request page (D-568)', () => {
+     const programs = HOME.rows.find((r) => r.id === 'programs')!;
+     const managers = HOME.rows.find((r) => r.id === 'case-managers')!;
+     expect(programs.cta.href).toBe('add-program');
+-    expect(managers.cta.href).toBe('/support/cant-sign-in/');
++    expect(managers.cta.href).toBe('case-manager-join');
+   });
+ 
+   it('points “Add your program” at Sign in with only the one listed screen to go on to', () => {
+     expect(ADD_PROGRAM_URL).toBe(`${SIGN_IN_URL}?next=/profile/add-program/`);
+   });
++
++  it('points “Join as a case manager” at the app’s case-manager page', () => {
++    expect(CASE_MANAGER_JOIN_URL.endsWith('/join/case-manager/')).toBe(true);
++  });
+ });
+-- 
+2.43.0
+

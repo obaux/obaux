@@ -105,7 +105,7 @@ export function PostScreen({ slug, allowDraft = false }: { readonly slug: string
       <div {...stylex.props(styles.menuCell)}>
         <PostNav sections={sections} variant="side" />
       </div>
-      <VStack as="article" gap={10} xstyle={[styles.column, !withStuck && lastBlockGap.end]} data-page="post">
+      <VStack as="article" gap={10} xstyle={[styles.column, lastBlockGap.end]} data-page="post">
         {post.status === 'draft' ? (
           <Banner status="warning" title="Draft, not published: held until the feature ships. Not on the site, in Support or in search." />
         ) : null}
