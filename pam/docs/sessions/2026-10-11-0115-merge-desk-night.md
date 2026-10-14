@@ -959,6 +959,23 @@
   - The proxy also refuses Pam's own Supabase host from the containers, so a88 step 7 now lists it with DocuSign's
     three.
   - The merge desk deploys both spike functions after consent and deletes them, and the spike secrets, at cleanup.
+- **Merge desk, 07:37: card a86 posted ("One search on Explore: the list changes as you type").** Eight pictures of
+  Piper's 5084c0dc, plus Sage's p7 edit for Will to sign (the bar no longer offers a list of Google suggestions). The
+  build waits for his yes and the signature. Lena: the p7 edit ships in the same batch as the inline search, with its
+  six translations and the Privacy date for that day.
+- **Lena, about 07:40: no recut of her pin.** Piper merged claude/lena-explore-nearest before the 07:14 call and then
+  removed `explore.search.nearest` everywhere. So 5084c0dc already carries Lena's street-search-line pin (fdfde536 is an
+  ancestor) and none of the "Nearest to" translations. The "Near …" control is `places.near` and the heading is
+  `explore.results`, both already translated: no new string. claude/lena-explore-nearest is superseded.
+- **Merge desk, 07:48: one `dir="auto"` in SearchField, Dot's.** Both Dot (fbe93cba, 07:43, on
+  claude/pam-design-searchfield-dir) and Piper (8933ff49, 07:45, on the inline branch) added `dir="auto"` to the shared
+  SearchField's input, so a Latin address typed in the Arabic app reads "1500 Market", not "Market 1500" (Lena's
+  finding). Only one can ship, since both edit the same function in packages/ui/src/SearchPill.tsx. Dot's is taken:
+  the design system is Dot's, and it sets `dir="auto"` only while the field has words. Empty, the attribute is off, so
+  the Arabic placeholder follows the page, right to left. Piper's set it once on mount, the empty field included, and
+  an empty `auto` input can resolve to left to right. Piper drops their effect, merges fbe93cba into the inline branch,
+  and keeps their Arabic test without the empty-box `dir` check (Dot's focus-text-boxes test covers the empty case).
+  It ships inside the a86 batch, since the field only matters once a86 lands.
 
 ## What was wrong, and what missed it
 
@@ -1230,10 +1247,17 @@
 | b36 main CI (8269b4c6) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (05:54); Vercel web and pam-site success |
 | Batch b37, targeted run (7823702f): config / copy / web build / tsc / web unit / budget / e2e (signin-short, consent, signin-next, signin-wrong-code, join, focus-text-boxes, theme) / storybook | 1311 passed, 1 skipped / in step / 0 / 0 / 177 passed / 12.0 kB spare / 267 passed, exit 0 / 0 |
 | b37 main CI (9d91f3bd) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (06:26); Vercel web and pam-site success |
+| Batch b38, targeted run (623a8668): config / copy / web build / tsc / web unit / budget / e2e (area-picker, street-search, focus-text-boxes, explore-bell, places, place) / storybook | 1311 passed, 1 skipped / in step / 0 / 0 / 177 passed / 12.0 kB spare / 231 passed, exit 0 / 0 |
+| b38 main CI (a5fdfbdc) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (07:51); Vercel web and pam-site success |
 | Control Room v24 harness (390 and 1280) | reply about a card: section lands at 76px under the tabs, card folded, button "Replied" (aria "Replied. Reply again"); pressing it restores the card's prefix; a general message leaves scrollY unchanged; a data push mid-glide doesn't stop it; 0 page errors |
 
 ## Left undone
 
+- **As of b38 (14 October, 07:51):** with Will: a86 (one search on Explore: his yes, and his signature on the p7
+  Privacy line), a88 (the DocuSign consent link, and demo.docusign.net in Allowed domains), a84 (unchanged). Piper:
+  drop the second `dir="auto"`, merge Dot's fbe93cba into the inline branch, and send a new READY. Lena: the p7
+  translations and the Privacy date on Will's signature, in the same batch as a86. Piper: the 401s at 06:38 to 06:40
+  (token refresh). Then the DocuSign spike: deploy, Iris's phone run, and cleanup.
 - **As of b34 (14 October, 04:10):** with Will: a84 (the new number and the case manager request, with their
   Privacy lines; the release is ready the moment he signs), a81 (Google's logo files, then the key), and the forms
   and DocuSign questions (a) to (c). Research round on forms and DocuSign: Iris, Lena, Piper and Dot; then a card
@@ -1264,10 +1288,9 @@
 
 ## Needs a human
 
-- Will: forms and DocuSign. (a) Which programs use DocuSign, and on whose account; (b) where a signed form has to
-  end up; (c) a few blank forms in a Drive folder "Pam forms". Card a85's questions 1, 3 and 4 (the order, the drawn
-  signature picture, a program's own words) and blue or green for confirmations. Card a88: the DocuSign developer
-  account, the four Supabase secrets, then the integration key so the merge desk can send the consent link.
+- Will: card a86, his yes to the inline search and his signature on the p7 Privacy line. Card a88: open the DocuSign
+  consent link (sent 06:40) and check demo.docusign.net in Allowed domains (still refused at 07:49). Card a85 is
+  fully decided (06:28 to 06:54).
 - Will: card a62, step 3 only: HELP_REQUESTS_LIVE = on in Supabase's secrets, then one test from "Still stuck?"
   (his paste and the salt are in and checked; 041940 is recorded).
 - Will: card a75 (website text colours, Dot's examples linked). Later cards: the Google street search (a key and a
