@@ -183,10 +183,22 @@ function toPlace(row: ServicesNearRow): NearbyPlace {
  */
 export async function searchPlaces(
   query: string,
-  { lat, lon, category, limit = 6 }: { lat: number; lon: number; category?: Category; limit?: number },
+  options: { lat: number; lon: number; category?: Category; limit?: number },
 ): Promise<NearbyPlace[]> {
+  return (await searchPlacesChecked(query, options)).places;
+}
+
+/**
+ * The same search, saying whether it WORKED. `searchPlaces` gives an empty list for a failure, which is right for a list of
+ * suggestions but cannot tell "no program by that name" from "could not ask": the one search box needs the difference before it
+ * decides whether an address may be asked of Google.
+ */
+export async function searchPlacesChecked(
+  query: string,
+  { lat, lon, category, limit = 6 }: { lat: number; lon: number; category?: Category; limit?: number },
+): Promise<{ places: NearbyPlace[]; ok: boolean }> {
   const q = query.trim();
-  if (!q) return [];
+  if (!q) return { places: [], ok: true };
   try {
     const { createClient } = await import('./supabase');
     const { data, error } = await createClient().rpc('services_search', {
@@ -196,10 +208,10 @@ export async function searchPlaces(
       p_category: category ?? null,
       p_limit: limit,
     });
-    if (error) return [];
-    return ((data ?? []) as ServicesNearRow[]).map(toPlace);
+    if (error) return { places: [], ok: false };
+    return { places: ((data ?? []) as ServicesNearRow[]).map(toPlace), ok: true };
   } catch {
-    return [];
+    return { places: [], ok: false };
   }
 }
 

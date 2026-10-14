@@ -2275,6 +2275,10 @@ Will (a65) wants to see two website text colours before choosing. Story **Websit
 
 D-552, `claude/places-programs-street-search`: the area search asks Google (Places New, from Pam's `places-search` function only) for an address, a corner or a place by name, below Pam's own ZIP and neighborhood rows, with Google's mark. Off until Will enters `GOOGLE_MAPS_SERVER_KEY`; no key, no change. Waiting: the key and quota (Will), the Privacy line (Lena, Sage, Will), Google's own mark (Dot). Log: see `docs/sessions/`.
 
+## Places & programs · one search box on Explore (14 October 2026)
+
+D-573, `claude/places-programs-one-search`: one box finds programs, Pam's areas and addresses in one list; "Near ZIP ✎" and its drawer stay. Google is asked only for address-like text no program matches, or on a tap on "Search addresses". Staff's All programs has the same bar on its own row. Waiting: Will's look at the built pictures, Lena's six languages. Log: see `docs/sessions/`.
+
 ## Places & programs · the old Places list is retired (13 October 2026)
 
 D-565, `claude/places-programs-retire-old-places`: `/places/` forwards (members to `/`, case managers and programs to `/programs/`, `?filter=reported` to `/places/reported/` for admin and super admin). Reported places is unchanged and reachable from Profile and the bell. `nav.back.reported` signed by Sage and translated by Lena (merged).

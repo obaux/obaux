@@ -207,11 +207,14 @@ test.describe('finding a place by name (D-188)', () => {
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'J J Peters' })).toBeVisible();
 
-    // Explore opens search from a launcher (the old list had the box always open).
+    // Explore opens its one search box from a launcher; the programs it finds are rows in the list, and the Explore list stays as it was.
     await page.getByRole('button', { name: 'Search programs' }).click();
-    await page.getByRole('combobox', { name: /Search programs by name or address/ }).fill('petres');
+    await page.getByRole('textbox', { name: /Search programs/ }).fill('petres');
     await expect.poll(() => searches.length).toBeGreaterThan(0);
     expect(searches[searches.length - 1]).toContain('petres');
+    await expect(page.getByRole('button', { name: /^J J Peters/ })).toBeVisible();
+    // Cancel goes back to the nearby list.
+    await page.getByRole('button', { name: 'Cancel' }).click();
     await expect(page.getByRole('heading', { name: 'J J Peters' })).toBeVisible();
   });
 });

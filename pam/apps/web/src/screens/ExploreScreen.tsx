@@ -1,38 +1,35 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { EducationIcon, FamilyServicesIcon, Notice, PlaceCard, PlusIcon, ScrollReveal, WorkforceIcon, textLinkLook } from '@pam/ui';
-import { SearchLauncher, SearchPill, type SearchPillItem } from '@pam/ui/SearchPill';
+import { EducationIcon, FamilyServicesIcon, Notice, PlaceCard, PlusIcon, ScrollReveal, WorkforceIcon } from '@pam/ui';
+import { SearchLauncher } from '@pam/ui/SearchPill';
 import { NextTripCard } from '@pam/ui/NextTripCard';
 import { useTrips } from '@/lib/useTrips';
 import { useNextVisits, visitTagLabel } from '@/lib/useNextVisits';
 import { CategoryPicture } from './CategoryPicture';
 import { categoryLabelKey, distanceLabel, intlLocale } from '@pam/config';
-import type { SearchSource } from '@astryxdesign/core/Typeahead';
 import { useI18n } from '@/lib/i18n';
-import { usePlaces, searchPlaces, METRES_PER_MILE, type NearbyPlace } from '@/lib/usePlaces';
+import { usePlaces, METRES_PER_MILE } from '@/lib/usePlaces';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { placeStatus, useNow } from '@/lib/usePlaceStatus';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { CITY_HALL, loadOrigin, saveOrigin, type AreaOption } from '@/lib/useAreaSearch';
 import { AreaSearch, AreaTrigger } from '../app/places/AreaPicker';
-import { CATEGORY_ICONS, ExploreView, type ExploreCategory } from './ExploreView';
+import { ExploreView, type ExploreCategory } from './ExploreView';
+import { ExploreSearch } from './ExploreSearch';
 import { HeaderActions } from './HeaderActions';
 import { useMessagingReach } from '@/lib/useMessagingReach';
 import { HelpButton } from './HelpButton';
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { IconButton } from '@astryxdesign/core/IconButton';
-import { Button } from '@pam/ui/Button';
-import { Icon } from '@astryxdesign/core/Icon';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BackButton } from '@pam/ui/SubPage';
 
 const styles = stylex.create({
   // The same white disc with a grey edge as Help (D-216).
-  cancel: { flexShrink: 0, fontSize: '17px', fontWeight: 600 },
   add: {
     width: '48px',
     height: '48px',
@@ -51,20 +48,6 @@ const styles = stylex.create({
  * same RPCs, saved places and area choice as today's Places (D-054, D-102,
  * D-188), so nothing a member already relies on is lost in the move.
  */
-interface PlaceSuggestion extends SearchPillItem {
-  readonly auxiliaryData: NearbyPlace;
-}
-
-/** A pause after typing, so a slow phone is not searching on every letter. */
-function useDebounced(value: string, ms: number): string {
-  const [debounced, setDebounced] = useState(value);
-  useEffect(() => {
-    const handle = setTimeout(() => setDebounced(value), ms);
-    return () => clearTimeout(handle);
-  }, [value, ms]);
-  return debounced;
-}
-
 /** "Tue, Oct 7 · 10:00 AM". */
 function tripWhen(iso: string, locale: string): string {
   const d = new Date(iso);
@@ -96,9 +79,6 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
   // A program lead has no Saved (D-218), so no Save on a card (Will, 3 October, D-237).
   const canSave = (demoRole ?? trueRole) !== 'provider';
   const [category, setCategory] = useState<ExploreCategory>('all');
-  const [query, setQuery] = useState('');
-  const settled = useDebounced(query, 300);
-  const [clearSignal, setClearSignal] = useState(0);
   const [isSearching, setIsSearching] = useState(false);
   const [reload, setReload] = useState(0);
 
@@ -114,47 +94,9 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
     lon: area.lon,
     ...(category === 'all' ? {} : { category }),
     limit: 20,
-    query: settled,
     reload,
   });
 
-  const searchSource = useMemo<SearchSource<PlaceSuggestion>>(
-    () => ({
-      search: async (text) =>
-        (
-          await searchPlaces(text, {
-            lat: area.lat,
-            lon: area.lon,
-            ...(category === 'all' ? {} : { category }),
-          })
-        ).map((place) => ({
-          id: place.id,
-          label: place.name,
-          ...(place.address ? { description: place.address } : {}),
-          auxiliaryData: place,
-        })),
-      bootstrap: () => [],
-    }),
-    [area.lat, area.lon, category],
-  );
-
-  // Programs in Pam (D-238): search is a round button there, like a
-  // program's Home; tapping it swaps the top row for the pill and Cancel.
-  const pill = (
-        <SearchPill<PlaceSuggestion>
-          label={t('explore.search.label')}
-          placeholder={t('explore.search.placeholder')}
-          searchSource={searchSource}
-          onPick={(item) => router.push(`/place/?id=${encodeURIComponent(item.id)}&from=${from}`)}
-          onQuery={setQuery}
-          emptyText={t('explore.search.none')}
-          clearLabel={t('explore.search.clear')}
-          itemIcon={(item) => CATEGORY_ICONS[item.auxiliaryData.category]}
-          clearSignal={clearSignal}
-          hasAutoFocus={isSearching}
-        />
-  );
-  const programsSearching = mode === 'programs' && isSearching;
   // A member's Explore (Will, 5 October, D-265): no bell or Help up top (both
   // are on Profile), the search bar at rest is a centred launcher, and the
   // next visit sits above the list. Staff reach this screen as All programs.
@@ -169,40 +111,35 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
   // the Visit profile (D-305) — the same wherever the place appears.
   const visits = useNextVisits(isMember);
 
+  // The one search box (D-573): programs, Pam's areas and addresses in one list, full screen, the cursor already in it. A program opens
+  // its page; an area or an address comes back here and sets the "Near …" control, which stays where it was beside the heading.
+  if (isSearching) {
+    return (
+      <ExploreSearch
+        area={area}
+        onCancel={() => setIsSearching(false)}
+        onPickProgram={(place) => router.push(`/place/?id=${encodeURIComponent(place.id)}&from=${from}`)}
+        onPickArea={(next) => {
+          setArea(next);
+          saveOrigin(next);
+          setIsSearching(false);
+        }}
+      />
+    );
+  }
+
   return (
     <ExploreView
       search={
-        mode === 'programs' && !isSearching
-          ? null
-          : isMember && !isSearching
-            ? <SearchLauncher label={t('explore.search.placeholder')} onOpen={() => setIsSearching(true)} />
-            : pill
+        mode === 'programs' ? null : <SearchLauncher label={t('explore.search.placeholder')} onOpen={() => setIsSearching(true)} />
       }
-      leading={
-        mode === 'programs' && !isSearching ? (
-          <BackButton href="/profile/" label={t('nav.back.profile')} />
-        ) : undefined
+      searchBelow={
+        mode === 'programs' ? <SearchLauncher label={t('explore.search.placeholder')} onOpen={() => setIsSearching(true)} /> : undefined
       }
+      leading={mode === 'programs' ? <BackButton href="/profile/" label={t('nav.back.profile')} /> : undefined}
       actions={
-        programsSearching || (isMember && isSearching) ? (
-          <Button
-            label={t('messages.search.cancel')}
-            variant="ghost"
-            onClick={() => {
-              setIsSearching(false);
-              setClearSignal((n) => n + 1);
-            }}
-            xstyle={[styles.cancel, textLinkLook.link]}
-          />
-        ) : mode === 'programs' ? (
+        mode === 'programs' ? (
           <>
-            <IconButton
-              label={t('explore.search.label')}
-              variant="ghost"
-              icon={<Icon icon="search" size="md" />}
-              onClick={() => setIsSearching(true)}
-              xstyle={styles.add}
-            />
             <IconButton
               label={t('programs.add')}
               href="/programs/new/"
@@ -263,10 +200,10 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
           />
         ) : null
       }
-      query={settled}
+      query=""
       state={state}
       onRetry={() => setReload((n) => n + 1)}
-      onClearSearch={() => setClearSignal((n) => n + 1)}
+      onClearSearch={() => undefined}
       renderPlace={(place, index) => {
         const miles = distanceLabel(place.meters / METRES_PER_MILE, locale);
         const saved = isSaved(place.id);

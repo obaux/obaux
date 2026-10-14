@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { askChoose, askSuggest, wantsGoogle, zipOf } from './streetSearch';
+import { askChoose, askSuggest, looksLikeAddress, wantsGoogle, wantsGoogleFromBox, zipOf } from './streetSearch';
 
 /** When Google is asked about what somebody typed in the area search, and what is done with its answer (D-552). */
 describe('wantsGoogle', () => {
@@ -28,6 +28,33 @@ describe('wantsGoogle', () => {
     expect(wantsGoogle('', 0)).toBe(false);
     expect(wantsGoogle('ab', 0)).toBe(false);
     expect(wantsGoogle('a&b', 0)).toBe(true);
+  });
+});
+
+/** The one search box on Explore: only an address-like text that no program matches, and never when the programs search is unsure. */
+describe('wantsGoogleFromBox', () => {
+  const none = { matches: 0, settled: true, ok: true };
+  it('asks for an address or a corner no program matches', () => {
+    expect(wantsGoogleFromBox('1500 Market', none)).toBe(true);
+    expect(wantsGoogleFromBox('Broad and Girard', none)).toBe(true);
+    expect(wantsGoogleFromBox('Broad & Girard', none)).toBe(true);
+  });
+  it('never asks for program words, whatever Pam’s areas say', () => {
+    for (const text of ['food', 'job training', 'Temple Hospital', 'fishtown', '19107', '1500', 'ab']) {
+      expect(wantsGoogleFromBox(text, none), text).toBe(false);
+    }
+  });
+  it('does not ask when a program matches, even an address-like name', () => {
+    expect(wantsGoogleFromBox('12 Steps Recovery', { matches: 1, settled: true, ok: true })).toBe(false);
+    expect(wantsGoogleFromBox('Arts and Crafts Center', { matches: 2, settled: true, ok: true })).toBe(false);
+  });
+  it('does not ask while the programs search is unsettled or has failed', () => {
+    expect(wantsGoogleFromBox('1500 Market', { matches: 0, settled: false, ok: true })).toBe(false);
+    expect(wantsGoogleFromBox('1500 Market', { matches: 0, settled: true, ok: false })).toBe(false);
+  });
+  it('reads an address the same way the drawer does', () => {
+    expect(looksLikeAddress('1234 N Broad St')).toBe(true);
+    expect(looksLikeAddress('99999')).toBe(false);
   });
 });
 

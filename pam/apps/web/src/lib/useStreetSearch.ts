@@ -1,7 +1,19 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { MIN_CHARS, PAUSE_MS, askChoose, askStatus, askSuggest, newToken, wantsGoogle, zipOf, type Suggestion } from './streetSearch';
+import {
+  MIN_CHARS,
+  PAUSE_MS,
+  askChoose,
+  askStatus,
+  askSuggest,
+  newToken,
+  wantsGoogle,
+  wantsGoogleFromBox,
+  zipOf,
+  type ProgramsAnswer,
+  type Suggestion,
+} from './streetSearch';
 import { GOOGLE_PICK, type AreaOption } from './useAreaSearch';
 
 /**
@@ -18,9 +30,14 @@ async function invoke(name: string, options: { body: Record<string, unknown> }) 
   return createClient().functions.invoke(name, options);
 }
 
+/** What the hook is told about the other searches: the drawer knows Pam's areas; the one search box also knows the programs (D-573). */
+export type StreetContext =
+  | { readonly matches: number; readonly settled: boolean }
+  | { readonly box: true; readonly programs: ProgramsAnswer };
+
 export function useStreetSearch(
   query: string,
-  pam: { readonly matches: number; readonly settled: boolean },
+  pam: StreetContext,
   isOpen = true,
 ): {
   /** The function has a key: the field's label and hint can say an address works. False until it says so. */
@@ -28,12 +45,21 @@ export function useStreetSearch(
   suggestions: Suggestion[];
   isSearching: boolean;
   choose: (suggestion: Suggestion) => Promise<AreaOption | null>;
+  /** The person tapped "Search addresses" for these very words (the one search box only): Google is asked, once, for exactly them. */
+  searchAddresses: () => void;
+  /** They have tapped it for the words now in the box. */
+  askedByTap: boolean;
 } {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [enabled, setEnabled] = useState(known === true);
   const token = useRef(newToken());
   const latest = useRef(0);
+  // The words the person asked Google about by tapping; a different text is no longer asked for (D-573).
+  const [tapped, setTapped] = useState<string | null>(null);
+  const box = 'box' in pam ? pam.programs : null;
+  const area = 'box' in pam ? null : pam;
+  const isBox = box !== null;
 
   // Asked once when the area sheet opens, and not again this session: no Google call is made to find out.
   useEffect(() => {
@@ -68,7 +94,9 @@ export function useStreetSearch(
     if (text === '') token.current = newToken();
     // Nothing about what was typed is sent to the function until it has said there is a key (status), so with the status unreadable or off
     // the area search is exactly Pam's own.
-    if (off || !enabled || !pam.settled || !wantsGoogle(text, pam.matches)) {
+    const byTap = isBox && tapped !== null && tapped === text && text.length >= MIN_CHARS;
+    const wants = box ? byTap || wantsGoogleFromBox(text, box) : Boolean(area?.settled) && wantsGoogle(text, area?.matches ?? 0);
+    if (off || !enabled || !wants) {
       latest.current += 1;
       setSuggestions([]);
       setIsSearching(false);
@@ -89,9 +117,9 @@ export function useStreetSearch(
           if (mine === latest.current) setIsSearching(false);
         }
       })();
-    }, PAUSE_MS);
+    }, byTap ? 0 : PAUSE_MS);
     return () => clearTimeout(timer);
-  }, [query, pam.matches, pam.settled, enabled]);
+  }, [query, isBox, box?.matches, box?.settled, box?.ok, area?.matches, area?.settled, enabled, tapped]);
 
   const choose = useCallback(async (suggestion: Suggestion): Promise<AreaOption | null> => {
     try {
@@ -106,7 +134,10 @@ export function useStreetSearch(
     }
   }, []);
 
-  return { enabled, suggestions, isSearching, choose };
+  const searchAddresses = useCallback(() => setTapped(query.trim()), [query]);
+  const askedByTap = tapped !== null && tapped === query.trim();
+
+  return { enabled, suggestions, isSearching, choose, searchAddresses, askedByTap };
 }
 
 export { MIN_CHARS };

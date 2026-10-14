@@ -24,6 +24,34 @@ export function wantsGoogle(query: string, pamMatches: number): boolean {
   return ADDRESS.test(text) || CORNER.test(text) || pamMatches === 0;
 }
 
+/** Text that reads as an address or a corner: a house number and a word, or two streets joined. Nothing more is guessed. */
+export function looksLikeAddress(text: string): boolean {
+  const t = text.trim();
+  if (t.length < MIN_CHARS) return false;
+  if (/^\d+$/.test(t)) return false;
+  return ADDRESS.test(t) || CORNER.test(t);
+}
+
+/** What the programs search said about the typed words: how many programs matched, and whether it could be told. */
+export interface ProgramsAnswer {
+  readonly matches: number;
+  /** The answer is for these very words (not left over from the letters before). */
+  readonly settled: boolean;
+  /** The search itself worked. A failed search is not "no program matches". */
+  readonly ok: boolean;
+}
+
+/**
+ * The one search box on Explore (D-573): Google is asked ONLY when the words read as an address or a corner AND no program matches them,
+ * or when the person taps "Search addresses". Program words never go: a program called "12 Steps Recovery" or "Arts and Crafts Center"
+ * matches a program, so it is not sent. An unsettled or failed programs search counts as "a program might match": nothing is sent.
+ * (The area drawer keeps `wantsGoogle`, which also asks when Pam's list of areas has nothing.)
+ */
+export function wantsGoogleFromBox(text: string, programs: ProgramsAnswer): boolean {
+  if (!looksLikeAddress(text)) return false;
+  return programs.settled && programs.ok && programs.matches === 0;
+}
+
 /** A random token for one search (the phone makes it up; it is not tied to anyone). */
 export function newToken(): string {
   const bytes = new Uint8Array(16);

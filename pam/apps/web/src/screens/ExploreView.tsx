@@ -47,6 +47,8 @@ export type ExploreCategory = Category | 'all';
 export interface ExploreViewProps {
   /** The search bar — `SearchPill`, wired by the caller. */
   readonly search: ReactNode;
+  /** The same bar on a row of its own, under the top row and above the chips: staff's All programs, where Back, Add and Help fill the top row (Dot, 14 October). */
+  readonly searchBelow?: ReactNode;
   /** Before the search bar — a round back on All programs (D-218). */
   readonly leading?: ReactNode;
   /** The bell and Help, beside the bar. */
@@ -114,6 +116,7 @@ const styles = stylex.create({
 
 export function ExploreView({
   search,
+  searchBelow,
   leading,
   actions,
   category,
@@ -165,6 +168,7 @@ export function ExploreView({
           <VStack xstyle={styles.search}>{search}</VStack>
           {actions}
         </HStack>
+        {searchBelow ? <VStack xstyle={styles.search}>{searchBelow}</VStack> : null}
         <VStack ref={chipsRef as never}>
           <CategoryChips chips={chips} value={category} onChange={onCategory} label={t('explore.categories')} />
         </VStack>
