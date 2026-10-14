@@ -876,6 +876,12 @@
   words. Decided: the resting bar's magnifier and words sit at the left, as in the active box. A tap changes nothing
   but the outline and the right edge drawing in for Cancel (no transition under reduced motion), with at least 12px
   between the outline and Cancel. D-574 merges together with a86, and Will sees both in one set of pictures.
+- **Will, 06:28 (a85, chat w202610140628228h1g): confirmations in green.** "Good news in green is a nice touch." The
+  forms' "Signed and sent to [program]" and the done screens use `Banner status="success"`. Informational notes stay
+  the blue `Banner status="info"` (his 04:43). Dot redraws the set with green only. Still open: questions 1, 3 and 4,
+  and whether "Skip this one for now" stays above the main button.
+- **06:24 (a88): which RSA key.** Will asked which of the two keys goes into Supabase: the private one, BEGIN to END,
+  as DOCUSIGN_PRIVATE_KEY. The public key stays with the app in DocuSign.
 - **Merge desk, 06:08: Piper's DocuSign spike plan (4076102e) approved, with changes.**
   - No live Pam account for the spike: the gateway JWT is the anon key, and the caller-id list is dropped.
   - The spike key never travels. Piper keeps it, and only its SHA-256 is set (`DOCUSIGN_SPIKE_KEY_SHA256`), with a
