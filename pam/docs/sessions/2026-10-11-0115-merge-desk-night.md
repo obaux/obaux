@@ -1109,6 +1109,7 @@
 | Batch b35, targeted run: config / copy / web build / tsc / web unit / budget / e2e (street) / storybook | 1311 passed, 1 skipped / in step / 0 / 0 / 177 passed / 12.0 kB spare / 84 passed, exit 0 / 0 |
 | b35 main CI (36cd4651) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (05:08); Vercel web and pam-site success |
 | Batch b36, full run (8269b4c6): db / config / ui / web unit / site / site a11y / usability / scrollspy / e2e full / storybook | 1579 ok / 1311 / 124 / 177 / 100 / 120 scans 0 / all clear / 306 links 0 / 1835 passed, 19 skipped, e2e exit 0 / builds; tsc 0 (web and site); 12.0 kB spare |
+| b36 main CI (8269b4c6) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (05:54); Vercel web and pam-site success |
 | Batch b37, targeted run (7823702f): config / copy / web build / tsc / web unit / budget / e2e (signin-short, consent, signin-next, signin-wrong-code, join, focus-text-boxes, theme) / storybook | 1311 passed, 1 skipped / in step / 0 / 0 / 177 passed / 12.0 kB spare / 267 passed, exit 0 / 0 |
 | Control Room v24 harness (390 and 1280) | reply about a card: section lands at 76px under the tabs, card folded, button "Replied" (aria "Replied. Reply again"); pressing it restores the card's prefix; a general message leaves scrollY unchanged; a data push mid-glide doesn't stop it; 0 page errors |
 
