@@ -882,6 +882,10 @@
   and whether "Skip this one for now" stays above the main button.
 - **06:24 (a88): which RSA key.** Will asked which of the two keys goes into Supabase: the private one, BEGIN to END,
   as DOCUSIGN_PRIVATE_KEY. The public key stays with the app in DocuSign.
+- **Will, 06:30 (a85, chat w20261014063039evnz): "Also why pause button?"** Merge desk: Pause goes. The bar's close
+  (X) does the same job, because Pam always remembers which forms are signed. The bar is close, the form's name, "Form 3
+  of 112" and progress. 2c becomes the coming-back screen. Dot redraws it with the green change, and draws a "Leave
+  now?" step only if one is needed.
 - **Merge desk, 06:08: Piper's DocuSign spike plan (4076102e) approved, with changes.**
   - No live Pam account for the spike: the gateway JWT is the anon key, and the caller-id list is dropped.
   - The spike key never travels. Piper keeps it, and only its SHA-256 is set (`DOCUSIGN_SPIKE_KEY_SHA256`), with a
