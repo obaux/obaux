@@ -251,7 +251,7 @@ function Screen({ which }: { readonly which: string }) {
     // 2 · Sign many.
     case 'sign':
       return (
-        <PamPage gap={4} footer={<VStack gap={2}><BigButton label="Sign this form" /><TextLink label="Skip this one for now" /></VStack>}>
+        <PamPage gap={4} footer={<VStack gap={2}><TextLink label="Skip this one for now" /><BigButton label="Sign this form" /></VStack>}>
           <BackBar title="Intake and consent" sub="Example Food Pantry" pct={3} />
           <FormPaper signed={false} />
           <Text type="supporting">Your details are filled in. Check them, then sign.</Text>
@@ -259,7 +259,7 @@ function Screen({ which }: { readonly which: string }) {
       );
     case 'signed':
       return (
-        <PamPage gap={4} footer={<VStack gap={2}><BigButton label="Next form" badge="4 of 112" /><TextLink label="Undo this signature" /></VStack>}>
+        <PamPage gap={4} footer={<VStack gap={2}><TextLink label="Undo this signature" /><BigButton label="Next form" badge="4 of 112" /></VStack>}>
           <BackBar title="Intake and consent" sub="Example Food Pantry" pct={3} />
           <FormPaper signed />
           <Calm confirm body="Signed and sent to Example Food Pantry" />

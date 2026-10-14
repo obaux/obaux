@@ -1,5 +1,8 @@
 # Fill once, sign many: the member's side (pictures only, 390px, light and dark)
 
+## Fourth round: the primary stays put (Will, 14 October, 05:18)
+"Move undo this signature button to top of Primary action, so primary button is placed at same place across all." In the pinned strip, "Undo this signature" (2b, and its success-banner comparison) now sits **above** the primary button, so the primary is in the same place at the bottom on every screen. I did the same for "Skip this one for now" on 2a, for the same reason (Will's note named only Undo; say if he wants Skip left below). Redrawn: 2a-sign, 2b-signed-next, 2b-compare-signed-as-success, light and dark, and both sheets. The blue and green versions are both kept.
+
 ## Third round: the banner Will meant (14 October, 04:43)
 Will: the green card on the place page is not the alert banner he meant; he meant the subtle blue one ("this program wasn't created in Pam and the dates are only for your convenience"). That is Astryx's **`Banner` with `status="info"`**, as on the place page (`apps/web/src/app/place/page.tsx`, `<Banner status="info" title={t('place.noLead', …)} />`). Every note on every screen is now that component: "Pam doesn't keep these", "Gone when you are done", "Pick up whenever you like", "DocuSign has it", "Signed and sent to…", "Sent to the programs" and both "Not stored in Pam". Titles and bodies unchanged (a note with only a line shows it as the title). The fixed buttons, the 8px stacking and the two done screens are as before.
 
