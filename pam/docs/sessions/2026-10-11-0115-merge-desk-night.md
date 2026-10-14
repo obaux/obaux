@@ -776,9 +776,18 @@
 - **Will, 04:40 (a81, chat w20261014044028qel6): keep "Near 19102".** The area control on the right of "All programs"
   (or a category) stays as it is today, for people who browse rather than type. Picking an area or address in the one
   box updates the same control. Piper's v2 includes it.
+- **Will, 04:43 (a85, chat w20261014044303piq9): the banner he meant is the blue one.** "That green card in the places
+  profile isn't even an alert banner. I'm talking about the more subtle blue banner" — the place page's
+  `<Banner status="info">` ("This is only to help you plan. Pam does not tell {place} you are coming."). The merge
+  desk's 04:31 brief had sent Dot to the green VisitCard. Dot redraws every note as the blue info Banner and shows
+  the two confirmations once in Banner success beside them, so Will can pick.
 
 ## What was wrong, and what missed it
 
+- **"Booking Confirmed" read as the green booked card.** Will named a style by the words he remembered on it. The merge
+  desk picked the component with those words (VisitCard) without checking which of the place page's two notices he
+  meant, and Dot redrew ten screens on it. Next time a style is named by a remembered label, put a picture of each
+  candidate in the reply and ask, or have the redraw show both.
 - **A live finding went out to three people before it was checked.** Ava reported join.staff.* promising an unsent
   text; I sent Sage, Lena and Ava to fix it without reading claim_outbound_messages or outbound_messages. Sage
   checked the code and was right: those texts are exempt. Check a reported live fault against the live system (one
