@@ -862,6 +862,18 @@
   the shared SearchField, and Piper builds a86 on top. His "extra text under use my current location" was take three's
   old picture 2. The build already drops the "Type a program..." line. The two privacy notes ("Used for this search
   only.", "Pam remembers the area you pick on this phone only.") stay unless he says otherwise; he was asked.
+- **Merge desk, 06:07: a86 built (Piper D-573, 96952804) and held.** Pictures go to Will only after Dot's SearchField
+  change (the dark pill, one height), re-shot with it. Piper left "Pam remembers the area you pick on this phone only."
+  out of the box (the drawer keeps it), which is not what Will was told at 05:56. Lena was asked whether the box needs
+  it, and Will hears her answer with the pictures.
+- **Merge desk, 06:08: Piper's DocuSign spike plan (4076102e) approved, with changes.**
+  - No live Pam account for the spike: the gateway JWT is the anon key, and the caller-id list is dropped.
+  - The spike key never travels. Piper keeps it, and only its SHA-256 is set (`DOCUSIGN_SPIKE_KEY_SHA256`), with a
+    48-hour `DOCUSIGN_SPIKE_UNTIL`.
+  - `DOCUSIGN_CONNECT_KEY` comes from Will's DocuSign account, so he enters it when the Connect step is reached.
+  - The proxy also refuses Pam's own Supabase host from the containers, so a88 step 7 now lists it with DocuSign's
+    three.
+  - The merge desk deploys both spike functions after consent and deletes them, and the spike secrets, at cleanup.
 
 ## What was wrong, and what missed it
 
