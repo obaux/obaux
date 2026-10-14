@@ -15,15 +15,15 @@ test.describe('back', () => {
   test('returns to the screen you came from, not the fixed one', async ({ page }) => {
     await page.route(RPC, (route) => route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }));
     await page.goto('/help/');
-    // A link into Places, followed inside the app (no reload).
+    // A link into the Account screen (the old Places list this used is retired), followed inside the app (no reload).
     await page.evaluate(() => {
       const a = document.createElement('a');
-      a.href = '/places/';
-      a.textContent = 'Places';
+      a.href = '/account/';
+      a.textContent = 'Account';
       document.body.append(a);
     });
-    await page.getByRole('link', { name: 'Places', exact: true }).click();
-    await expect(page).toHaveURL(/\/places\/$/);
+    await page.getByRole('link', { name: 'Account', exact: true }).click();
+    await expect(page).toHaveURL(/\/account\/$/);
 
     await page.getByRole('link', { name: 'Back to Home' }).click();
     await expect(page).toHaveURL(/\/help\/$/);
@@ -31,9 +31,9 @@ test.describe('back', () => {
 
   test('opened cold, Back still goes to the fixed screen', async ({ page }) => {
     await page.route(RPC, (route) => route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }));
-    await page.goto('/places/');
+    await page.goto('/account/');
     await page.getByRole('link', { name: 'Back to Home' }).click();
-    await expect(page).not.toHaveURL(/\/places\/$/);
+    await expect(page).not.toHaveURL(/\/account\/$/);
     await expect(page).not.toHaveURL(/\/help\/$/);
   });
 });

@@ -111,7 +111,7 @@ function PlaceScreen({
   const { t, locale } = useI18n();
   return (
     <Page gap={4} footer={<PlaceFooter footerLabel={footerLabel} footerHref={footerHref} />}>
-      <PageTitle title={title} backHref="/places/" backLabel={t('nav.back.places')} />
+      <PageTitle title={title} backHref="/" backLabel={t('nav.back.explore')} />
       <LocalisedPlaceDetail
         {...args}
         weekLines={weekLines(hours, locale, t('place.hours.closed'))}

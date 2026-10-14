@@ -13,7 +13,7 @@ import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BellIcon, BigButton, Loading, Notice, Page, HelpIcon, PointsBadge, StarIcon, TextField, TextLink, TripsIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPageHeader } from '@pam/ui/SubPage';
-import { LANGUAGE_TAGS, SUPPORTED_LOCALES, TRANSPARENCY_SCREEN, badgeForPoints, type Locale, intlLocale } from '@pam/config';
+import { LANGUAGE_TAGS, SUPPORTED_LOCALES, TRANSPARENCY_SCREEN, badgeForPoints, type Locale, intlLocale, nameJoinerOf } from '@pam/config';
 import { LanguageField } from '@pam/ui/LanguageField';
 import { useI18n } from '@/lib/i18n';
 import { HELP_DESK_URL } from '@/lib/helpDesk';
@@ -207,6 +207,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
   const lastId = useId();
   const cityId = useId();
   const codeFieldId = useId();
+  const codeQuestionId = useId();
   const codeShown = codeOpen || inviteCode !== '' || inviteProblem !== null;
   useEffect(() => {
     if (inviteCode !== '' || inviteProblem !== null) setCodeOpen(true);
@@ -468,6 +469,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
       <BigButton
         label={busy ? t('join.saving') : t('action.next')}
         badge={progress}
+        nameJoiner={nameJoinerOf(locale)}
         onPress={() => void submit()}
         isDisabled={busy}
       />
@@ -481,13 +483,14 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
         <TextLink label={t('join.waiting.skip')} href="/" />
       </VStack>
     ) : phase === 'privacy' && !isStaff ? (
-      <BigButton label={t(TRANSPARENCY_SCREEN.confirmKey)} badge={progress} onPress={() => setPhase('texts')} />
+      <BigButton label={t(TRANSPARENCY_SCREEN.confirmKey)} badge={progress} nameJoiner={nameJoinerOf(locale)} onPress={() => setPhase('texts')} />
     ) : phase === 'privacy' && isStaff ? (
       hasAccount ? (
         // Came in by code: the account exists, and this is the last step.
         <BigButton
           label={busy ? t('join.saving') : t(TRANSPARENCY_SCREEN.confirmKey)}
           badge={progress}
+          nameJoiner={nameJoinerOf(locale)}
           onPress={() => void finishStaff()}
           isDisabled={busy}
         />
@@ -501,6 +504,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
         <BigButton
           label={busy ? t('join.saving') : t('reminders.optIn')}
           badge={progress}
+          nameJoiner={nameJoinerOf(locale)}
           onPress={() => void answerTexts(true)}
           isDisabled={busy}
         />
@@ -683,8 +687,11 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                   </VStack>
                 ) : (
                   <VStack gap={1} align="start">
-                    <Text xstyle={styles.body}>{t('join.code.question')}</Text>
-                    <TextLink label={t('join.code.reveal')} onClick={revealCode} isUnderlined />
+                    <Text id={codeQuestionId} xstyle={styles.body}>
+                      {t('join.code.question')}
+                    </Text>
+                    {/* Read with its question, so "Click here" is never heard alone (Iris, b32, P2). */}
+                    <TextLink label={t('join.code.reveal')} onClick={revealCode} isUnderlined describedBy={codeQuestionId} />
                   </VStack>
                 )}
                 </>

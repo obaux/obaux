@@ -32,12 +32,12 @@ async function waitFor<T extends Element>(find: () => T | null, ms = 6000): Prom
   }
 }
 
-const route = REDESIGN_ROUTES['/places/'];
-if (!route) throw new Error('No prototype route for /places/ — add it to src/stories/prototype/routes.tsx');
+const route = REDESIGN_ROUTES['/'];
+if (!route) throw new Error('No prototype route for / — add it to src/stories/prototype/routes.tsx');
 
 function sheet(name: string, typed: string | null): Story {
   return {
-    ...asRole('member', '/places/', {}, { streetSearch: true }),
+    ...asRole('member', '/', {}, { streetSearch: true }),
     name,
     render: () => <>{route!.render()}</>,
     play: async ({ canvas, canvasElement, userEvent, globals }) => {

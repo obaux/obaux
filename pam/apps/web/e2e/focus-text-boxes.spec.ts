@@ -190,10 +190,10 @@ test.describe('a confirm dialog', () => {
 });
 
 test.describe('a search box focused on arrival still shows its field highlight', () => {
-  test('the area drawer on Places', async ({ page }) => {
+  test('the area drawer on Explore', async ({ page }) => {
     await signedIn(page);
     await page.route('**/rest/v1/rpc/services_near*', (route) => route.fulfill(json([])));
-    await page.goto('/places/');
+    await page.goto('/');
     await settled(page);
     await page.getByRole('button', { name: /Near/ }).first().click();
     const box = page.getByRole('searchbox').or(page.getByRole('textbox', { name: 'ZIP code' })).first();

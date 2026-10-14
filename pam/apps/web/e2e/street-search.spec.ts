@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { settled } from './settled';
+import { asMember } from './asMember';
 
 /**
  * Street addresses and corners in the area search, from Google through Pam's server (D-552). Pam's own list answers first; Google is
@@ -18,6 +19,7 @@ const ZIPS = [
 const FISHTOWN = [{ id: 'n1', kind: 'neighborhood', label: 'Fishtown - Lower Kensington', lat: 39.97289, lon: -75.12471 }];
 
 async function open(page: Page, { enabled = true } = {}) {
+  await asMember(page);
   const asked: Record<string, unknown>[] = [];
   const outside: string[] = [];
   page.on('request', (request) => {
@@ -48,7 +50,7 @@ async function open(page: Page, { enabled = true } = {}) {
       }),
     );
   });
-  await page.goto('/places/');
+  await page.goto('/');
   await settled(page);
   await page.getByRole('button', { name: 'Change the area' }).click();
   return { asked, outside, box: page.getByRole('textbox', { name: /ZIP code/ }) };
@@ -127,6 +129,7 @@ test.describe('street search', () => {
 
   test('when the status cannot be read, what was typed is not sent to the function at all', async ({ page }) => {
     const asked: unknown[] = [];
+    await asMember(page);
     await page.route('**/rest/v1/rpc/search_areas*', (route) => route.fulfill(json([])));
     await page.route('**/rest/v1/rpc/services_near*', (route) => route.fulfill(json([])));
     await page.route(FUNCTION, (route) => {
@@ -134,7 +137,7 @@ test.describe('street search', () => {
       if (body['action'] !== 'status') asked.push(body);
       return route.fulfill({ status: 500, body: '{}' });
     });
-    await page.goto('/places/');
+    await page.goto('/');
     await settled(page);
     await page.getByRole('button', { name: 'Change the area' }).click();
     await page.getByRole('textbox', { name: /ZIP code/ }).fill('1500 Market');

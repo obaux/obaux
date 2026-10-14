@@ -601,6 +601,15 @@
   links, and 60px / 120px between the last block and the footer on every help page. Records: Sage's ledger (a82
   as Will's words, nav.back.reported signed), Iris's pre-ship walk-through (all three items pass). Two STATUS
   conflicts kept both sides; a duplicated Google-logo section dropped.
+- **Batch b33 (13 October).** No migration, no function change. Piper's D-565 (b8319ec2): the old Places list
+  is retired; /places/ sends members to Explore and staff to All programs, ?filter=reported sends a super admin to
+  Reported places, Back from a reported place returns there ("Back to Reported places", signed and in seven
+  languages), and a place Pam cannot find says "Go back to Explore" under an Explore title (Sage signed, Lena's six
+  languages). Dot's D-566 (the compact Sign in bar takes over at half the hero mark; Next's name uses each
+  language's comma), Ava's reveal link described by its question, Wren's help form focus (an empty Send lands on the
+  first field in error; a sent form focuses its thank-you), Dot's D-562 correction, Iris's two walk-throughs, Sage's
+  ledger. The first full run failed 3 of 1854 (place.spec's not-found screen still said Places); held, fixed, and
+  the second full run passed.
 - **Will, 18:18 (a81, chat w20261013181806g6qz): the old Places list is retired.** Picture 3 of the street
   search (v2) showed the old `/places/` list, with its old header and layout. Will: that page is "no longer an
   active page that we support". The ZIP shows on the member's Explore page (`/`); a case manager or program searching
@@ -641,8 +650,61 @@
   ADMIN_CAN_SEE does not allow, so the super admin decides every move request until Will signs a contract line.
   She also found that Privacy does not yet say staff keep a last name and a city: p7 is rewritten in the same
   signature. Live, counts only: staff_requests has one row, approved on 16 September. Nothing refused is kept.
+- **Merge desk, 19:48 to 21:27 (none needed Will):** a new-number request is read and decided by the super admin
+  only, so nothing is added to ADMIN_CAN_SEE (Lena's catch: the plan let a member's own case manager read it); no
+  24h escalation; every Approve needs the tick. A denial deletes the new number's sign-in at once; every purged
+  request takes its sign-in (Lena: also an approved request whose move never ran). An unanswered case manager
+  request is purged 90 days after asking, sign-in too. postgres can delete from auth.users on live (read-only
+  privilege check, 20:30), so remove_temporary_signin stays a definer function, revoked from every client role.
+  pg_cron is live (five jobs); auth.audit_log_entries has 0 rows; the organization is on the free plan, so platform
+  logs last 1 day and p11's "within a week" holds. The help dialog does not close on an outside click, so nothing
+  typed is lost (kept; Will told; D-562 corrected). p7's staff part may go live ahead of the features if Will says
+  yes (a84 h; Sage signed the short version). a84 gains (i): tell the person someone may call (Sage). Lena folds
+  "add a program" requests into p15, since the D-568 purge covers them and Privacy says nothing about them today.
+  Live finding (Ava, 21:24): join.staff.title / body promise "We will text you the answer" while texts are off;
+  Sage rewrites, Lena translates, and it ships next without waiting for a84. **Withdrawn at 21:31:** Sage showed
+  the staff-request decision texts are account texts, exempt from texts_live (D-481; claim_outbound_messages lists
+  staff_request_approved and staff_request_denied), and live confirms it (dispatch-sms every 5 minutes; one approved
+  text sent 10 October, one denied 17 September). join.staff.* and addProgram.ask.* stay; Sage's D-568 waiting line
+  says the answer is texted. a84 is final at 21:51: p15 widened to add-a-program requests (Sage d8c9db1e) and (j),
+  "If we add a program you asked for, its name, type, address, phone number, website and description are shown on
+  Pam." (Lena: a lead's first name is shown to members who write, so "Your name is not" stays out).
+- **Batch b34 (13 October, 22:11, afee3198).** No migration, no function change. Lena's 134af68d: the six
+  Spanish staff Join strings in usted, with stories that draw the staff privacy step and the "We will text you"
+  notice. Sage's ledger 402dc982: D-568, Wren's website lines and a84 (j) signed; the withdrawn line marked.
+- **Will, 14 October 04:03 (Control Room comment, chat w20261014040306dvaw): forms and DocuSign.** In his words:
+  "We're going to need to reimagine how we offer policies both from the program lead with a DocuSign integration
+  and for the member who's signing forms. Social programs have forms that are PDFs with tags for members to add:
+  name, initials, birth date, Social Security number, current (today's) date, signatures, information. We need a
+  way to not store this but allow them to sign over 100 forms in one go, one at a time, conveniently, placing their
+  name and all of those other details mentioned. Additionally programs use DocuSign for asking members to sign
+  digitally so we need to set up an integration with DocuSign as a priority and allow that integration to funnel in
+  the PDF previews in a way that is easy for members to sign. Maybe through an embed window where they can access
+  the DocuSign document and use the DocuSign interface inside of Pam. Alternatively let them sign and tag the PDFs
+  inside of Pam without DocuSign." Merge desk, 04:04 (chat m20261014040418forms), the starting position: Pam does
+  not keep what a member types into a form; DocuSign comes first, with the member filling and signing in
+  DocuSign's own window inside Pam, so Pam never sees a Social Security number; today's program policies (D-485,
+  D-489) stay as they are until the new way is ready; nothing is built until Will has seen a card with pictures
+  and choices. The research round went out at 04:06. Iris: DocuSign's signing inside another app, its cost, the
+  alternatives, filling a PDF inside Pam, the e-signature law (ESIGN, UETA) and accessibility, from public pages
+  only, with no accounts. Lena: Social Security numbers and birth dates, e-signatures, DocuSign's role, and the
+  Privacy lines it would need. Piper: how it fits program policies. Dot: pictures of fill once and sign many, the
+  DocuSign window and the finished state, at 390 in both themes. Asked Will: (a) which programs use DocuSign, and
+  on whose account; (b) where a signed form has to end up; (c) a few blank forms in a Drive folder "Pam forms" to
+  design and test with.
 
 ## What was wrong, and what missed it
+
+- **A live finding went out to three people before it was checked.** Ava reported join.staff.* promising an unsent
+  text; I sent Sage, Lena and Ava to fix it without reading claim_outbound_messages or outbound_messages. Sage
+  checked the code and was right: those texts are exempt. Check a reported live fault against the live system (one
+  read-only query) before dispatching a fix.
+
+- **b33's first full run failed while I reported it as passing.** The e2e summary's "1832 passed" sat under
+  "e2e=1"; I read the count, not the exit code, and told Will's channel it passed. Read every `name=N` line before
+  calling a run green; a count of passes says nothing about failures. Caught before the push. The cause: D-565
+  changed the not-found Back without running place.spec, which draws it. Piper now runs every spec that names the
+  screens a change touches.
 
 - **D-499 removed the wrong words.** Will (10 October): "That page should not have text over the carousel image. Only
   tab and image. It's redundant text." We took the words off the pictures; he meant the separate line between the
@@ -870,9 +932,23 @@
 | Iris's b32 walk-through (local stub build only) | Join step count, dropdown, hidden code, Join Pam, short-phone fit (56/56), keyboard and screen reader, the b30 zh-CN and ar bar: PASS, 506 checks; five polish notes |
 | b32 recheck on 334fe0eb (+ help form, Lena P4, records) | config 1310, copy:status in step / site tsc, 100 tests, build / site a11y 120 scans 0 / usability clear (gap checks) / scrollspy 306 links 0 / web build, tsc 0, 10.7 kB spare / e2e account, join, consent, signin-short, signin-next (and the specs those names match): 269 passed, 1 skipped |
 | staff_requests (counts only, 19:26) | one row ever, approved, 16 September; none refused or waiting |
+| b32 main CI (4d41d542) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (20:19); Vercel web and pam-site READY (19:56) |
+| Iris's help form walk-through (local build of main, nothing sent) | call-out, form, night links, 60/120 gap, keyboard and screen reader: all PASS; W1, P1, P2 |
+| Batch b33, first full run (cf5cab3c) | e2e 1832 passed, 3 failed (place.spec:257 on three projects), 19 skipped: held |
+| Batch b33, second full run (a7445521): db / config / ui / web unit / site / site a11y / usability / scrollspy / e2e full / storybook | 1579 ok / 1311 / 124 / 173 / 100 / 120 scans 0 / clear / 306 links 0 / 1835 passed, 19 skipped, e2e exit 0 / builds; tsc 0; 12.0 kB spare |
+| b33 English | 2 changed keys (nav.back.reported, place.notFound.body), none missing or equal to English in six languages |
+| Live checks for a84 (read-only, 20:30 to 20:34) | postgres has DELETE on auth.users (not superuser; owner supabase_auth_admin); pg_cron installed, five jobs; auth.audit_log_entries 0 rows; organization plan free |
+| b33 main CI (448d5790) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (21:59); Vercel web and pam-site READY (21:33) |
+| Staff-request texts (read-only, 21:30) | texts_live 'off'; live claim_outbound_messages exempts staff_request_approved and _denied; dispatch-sms */5 active; outbound_messages: one approved sent 10 October, one denied sent 17 September |
+| Batch b34, targeted run: config / copy / web build / tsc / web unit / budget / e2e (join, account, consent, signin-short, signin-next, staff-request, invite) / storybook | 1311 passed, 1 skipped / in step / 0 / 0 / 173 passed / 12.0 kB spare / 311 passed, 1 skipped, exit 0 / 0 |
+| b34 main CI (afee3198) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (22:43); Vercel web and pam-site READY (22:16) |
 
 ## Left undone
 
+- **As of b34 (14 October, 04:10):** with Will: a84 (the new number and the case manager request, with their
+  Privacy lines; the release is ready the moment he signs), a81 (Google's logo files, then the key), and the forms
+  and DocuSign questions (a) to (c). Research round on forms and DocuSign: Iris, Lena, Piper and Dot; then a card
+  for Will with pictures and choices. Nothing on forms is built before he picks.
 - **As of b32 (13 October, about 20:00):** b33 is ready to merge: Piper's D-565 (9aade728, the old Places list
   retired, with Lena's 911312da for "Back to Reported places"), Dot's D-566 (5737dfae), Ava's P2 (3dfb043c). With
   Will: a84 (choices (b) to (g); Lena's Privacy words after Sage's edit), a81 (Google's logo files, then the key).
@@ -898,6 +974,8 @@
 
 ## Needs a human
 
+- Will: forms and DocuSign. (a) Which programs use DocuSign, and on whose account; (b) where a signed form has to
+  end up; (c) a few blank forms in a Drive folder "Pam forms". Then the card with pictures and choices.
 - Will: card a62, step 3 only: HELP_REQUESTS_LIVE = on in Supabase's secrets, then one test from "Still stuck?"
   (his paste and the salt are in and checked; 041940 is recorded).
 - Will: card a75 (website text colours, Dot's examples linked). Later cards: the Google street search (a key and a

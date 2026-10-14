@@ -93,7 +93,10 @@ const BACK_TARGETS = {
   // The redesign's Explore, which is the home screen there (D-212).
   explore: { href: '/', labelKey: 'nav.back.explore' },
   trips: { href: '/trips/', labelKey: 'nav.back.trips' },
-  places: { href: '/places/', labelKey: 'nav.back.places' },
+  // The old Places list is retired (Will, 13 October): an old `from=places` link goes to Explore.
+  places: { href: '/', labelKey: 'nav.back.explore' },
+  // The places somebody reported, for the people who review them (D-189).
+  reported: { href: '/places/reported/', labelKey: 'nav.back.reported' },
   saved: { href: '/saved/', labelKey: 'nav.back.saved' },
   // All programs, a staff member's secondary path (D-218).
   programs: { href: '/programs/', labelKey: 'nav.back.programs' },
@@ -109,7 +112,7 @@ function resolveBack(from: string | null, thread: string | null = null): { href:
   if (from === 'thread' && thread) {
     return { href: `/messages/thread/?id=${encodeURIComponent(thread)}`, labelKey: 'messages.options.back' };
   }
-  return BACK_TARGETS[from as keyof typeof BACK_TARGETS] ?? BACK_TARGETS.places;
+  return BACK_TARGETS[from as keyof typeof BACK_TARGETS] ?? BACK_TARGETS.explore;
 }
 
 interface Detail {
@@ -336,7 +339,7 @@ function PlaceScreen() {
     const key = state.status === 'error' && state.offline ? 'offline' : 'something_went_wrong';
     return (
       <Page gap={4}>
-        {header(t('places.title'))}
+        {header(t('tab.explore'))}
         <Notice
           notice={state.status === 'missing' ? 'service_not_available' : key}
           title={state.status === 'missing' ? t('place.notFound.title') : t(NOTICES[key].titleKey)}
