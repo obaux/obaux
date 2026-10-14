@@ -1513,6 +1513,10 @@ connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merge
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
 
+## Design system & Storybook · text boxes show no ring (14 October)
+
+Text boxes draw no ring of ours in any mode; the keyboard still comes up when a screen opens with one ready (D-569, Will a83, supersedes D-523's text-box line). Buttons, links, tick boxes and selects keep the brand ring on Tab. Astryx's own composer ring and the code boxes' accent edge are left. On `claude/pam-design-text-box-no-ring`; not on `main`.
+
 ## Design system & Storybook · sign-in hand-over and name commas (13 October)
 
 The compact Sign in bar takes over when half the hero mark is gone, not all of it (D-566, Iris b32 P1); `BigButton`'s name joins label and count with the language's own comma via `nameJoinerOf` (P5). On `claude/pam-design-signin-polish`, off `mira/batch-b32`; not on `main`.
