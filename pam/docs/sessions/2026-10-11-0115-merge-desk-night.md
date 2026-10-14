@@ -959,6 +959,50 @@
   - The proxy also refuses Pam's own Supabase host from the containers, so a88 step 7 now lists it with DocuSign's
     three.
   - The merge desk deploys both spike functions after consent and deletes them, and the spike secrets, at cleanup.
+- **Merge desk, 07:37: card a86 posted ("One search on Explore: the list changes as you type").** Eight pictures of
+  Piper's 5084c0dc, plus Sage's p7 edit for Will to sign (the bar no longer offers a list of Google suggestions). The
+  build waits for his yes and the signature. Lena: the p7 edit ships in the same batch as the inline search, with its
+  six translations and the Privacy date for that day.
+- **Lena, about 07:40: no recut of her pin.** Piper merged claude/lena-explore-nearest before the 07:14 call and then
+  removed `explore.search.nearest` everywhere. So 5084c0dc already carries Lena's street-search-line pin (fdfde536 is an
+  ancestor) and none of the "Nearest to" translations. The "Near …" control is `places.near` and the heading is
+  `explore.results`, both already translated: no new string. claude/lena-explore-nearest is superseded.
+- **Merge desk, 07:48: one `dir="auto"` in SearchField, Dot's.** Both Dot (fbe93cba, 07:43, on
+  claude/pam-design-searchfield-dir) and Piper (8933ff49, 07:45, on the inline branch) added `dir="auto"` to the shared
+  SearchField's input, so a Latin address typed in the Arabic app reads "1500 Market", not "Market 1500" (Lena's
+  finding). Only one can ship, since both edit the same function in packages/ui/src/SearchPill.tsx. Dot's is taken:
+  the design system is Dot's, and it sets `dir="auto"` only while the field has words. Empty, the attribute is off, so
+  the Arabic placeholder follows the page, right to left. Piper's set it once on mount, the empty field included, and
+  an empty `auto` input can resolve to left to right. Piper drops their effect, merges fbe93cba into the inline branch,
+  and keeps their Arabic test without the empty-box `dir` check (Dot's focus-text-boxes test covers the empty case).
+  It ships inside the a86 batch, since the field only matters once a86 lands.
+- **Merge desk, 07:52: b38 live.** a89 and a81 answered, Will told in chat, Piper told.
+- **Piper, 08:06: a86 at 04ad2ce5.** Dot's fbe93cba merged and Piper's duplicate effect dropped (00e538f6, 07:51), Dot's
+  Arabic test aimed at the drawer's field with `.last()` (Dot told 07:52), and tokens.css regenerated. Screens: none
+  since 5084c0dc. It still waits on Will's yes and the p7 signature.
+- **Piper, 08:31: D-576 (29b202d4), the web e2e suite never reaches the live project.** Two layers: e2e/global-setup.ts
+  refuses a build in out/ that names `shobqzuhicoiymtumiaz` or doesn't name `stub.supabase.co` (new script
+  `build:e2e`), and every Playwright project launches Chromium with a dead proxy for all hosts but loopback. Piper's
+  proof: a live build is refused before any test; with the check off, 861 attempted requests to the live host, 0
+  answered; never-live.spec.ts in all three projects; full suite 1859 passed, 19 skipped. Merged as b39 (39481be0),
+  Screens: none.
+- **Ava, 10:16: both held a84 branches carry main f8cf7a2e and pass with D-576's guard.** D-567 is now 6a2c19f5 (one
+  en.json conflict, keys added at the end on both sides, both kept): db all pass, ui 124, e2e 405 on three projects.
+  D-568 is now 3c9c929e (clean): db all pass, ui 124, e2e 474. No missing mocks. Config is red only on the
+  untranslated newNumber.* (60) and case-manager (23) keys, which come with Lena's branches in the a84 release.
+- **Will, 20:03 (chat): "Store this info in our documentation and memory".** The info is his Claude doc "PAM — Google
+  Places API (New) setup & cost guardrails" (13 October). It is now `docs/google-places.md`, without the key's value
+  or the Google Cloud project's id. The merge desk checked it against the code:
+  - places-search makes Autocomplete calls, and Place Details calls with `location,formattedAddress` (Essentials).
+    No contact fields. Over a cap it answers `unavailable` and Pam's own areas still work.
+  - The Place Details cap of 30 a day is the one that binds. It can go to 300 (Will).
+  - a86 looks up the first suggestion after every typing pause, so it should come down to about one Place Details call
+    per search before it ships (Piper).
+  - pam/CLAUDE.md now points every session at the doc. The before-launch street-search item is closed.
+  - Will's question on his doc (does Pam's own database hold contact details?): yes. It is answered in the repo doc;
+    the doc's thread was not replied to.
+- **One send-invite-emails 500 at 06:25:01** (`claim_staff_invite_emails: 401`). The 21 runs either side of it all
+  returned 200. Not acted on. Watch only.
 
 ## What was wrong, and what missed it
 
@@ -1093,6 +1137,20 @@
   READY's `Screens:` line into its merge commit for the nightly map. Tonight's merges didn't, so Dot rebuilt the map
   from diffs and subjects. From 06:10 every merge commit carries the READY's `Screens:` line, or `Screens: none` when
   the READY says so.
+- **The web e2e suite reached the live project (Piper's finding, 07:54; the merge desk's log check, 07:56).** From
+  06:38 to 07:51, Playwright runs in our containers sent about 3,500 requests to the live Supabase project. All were
+  refused (401 or 403, the stub token 't' is not a valid JWT), apart from OPTIONS preflights. There were no
+  auth/v1/otp or help-request calls and no 2xx on anything that writes, so no text, no email and no data was touched.
+  What missed it: CI builds with the stub URL, and until Will allowed the Supabase host for street search (about
+  06:39) the containers couldn't reach live, so a container build without the stub env never mattered. Fix: the team
+  was told at 07:56 to build with the stub env, and D-576 (b39) makes it structural. The run refuses a build that names
+  the live project, and the test browser cannot reach any host but loopback. Lena re-ran her 59 audited stories with
+  every outside request refused: 0 tried to leave. Wren: no site script calls the live help-request function.
+- **Targeted checks skipped @pam/ui's own tests (the a86 trial, 07:57).** D-574 (1918d84c) added
+  `--pam-search-height` to tokens.css by hand, in a different place from the generator. So tokens.test.tsx and the
+  @pam/ui build both failed. Neither Piper's targeted run nor the merge desk's targeted template ran
+  `pnpm --filter @pam/ui test` (CI's unit step does, so it would have gone red after a push). Piper regenerated the
+  file (04ad2ce5, one line moved). From now on, any branch or batch that touches packages/ui runs the ui tests.
 
 ## Decisions
 
@@ -1230,10 +1288,24 @@
 | b36 main CI (8269b4c6) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (05:54); Vercel web and pam-site success |
 | Batch b37, targeted run (7823702f): config / copy / web build / tsc / web unit / budget / e2e (signin-short, consent, signin-next, signin-wrong-code, join, focus-text-boxes, theme) / storybook | 1311 passed, 1 skipped / in step / 0 / 0 / 177 passed / 12.0 kB spare / 267 passed, exit 0 / 0 |
 | b37 main CI (9d91f3bd) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (06:26); Vercel web and pam-site success |
+| Batch b38, targeted run (623a8668): config / copy / web build / tsc / web unit / budget / e2e (area-picker, street-search, focus-text-boxes, explore-bell, places, place) / storybook | 1311 passed, 1 skipped / in step / 0 / 0 / 177 passed / 12.0 kB spare / 231 passed, exit 0 / 0 |
+| b38 main CI (a5fdfbdc) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (07:51); Vercel web and pam-site success |
+| a86 trial full run (main a5fdfbdc + 00e538f6, local only): db / config / ui / web unit / site / site a11y / usability / scrollspy / e2e full / storybook | 1579 ok / 1312 / 123 of 124 (tokens.css order, fixed in 04ad2ce5; ui build failed for the same reason) / 182 / 100 / 120 scans 0 / all clear / 306 links 0 / 1895 passed, 19 skipped, exit 0 / builds; tsc 0 (web and site); 11.7 kB spare |
+| Live project logs, 06:00 to 07:57 (edge_logs, function_edge_logs; counts only) | from Anthropic's network: about 3,500 requests since 06:38:25, all 401/403 except OPTIONS; no auth/v1/otp, no help-request, no 2xx writes. Will's street search 06:41 to 06:43: 11 POST 200 |
+| Batch b39 (39481be0, D-576): config / copy / ui / web build:e2e / tsc / web unit / budget / e2e full / storybook / refusal proof | 1311 passed, 1 skipped / in step / 124 / 0 / 0 / 177 / 12.0 kB spare / 1859 passed, 19 skipped, exit 0 / 0 / a plain (live) build is refused before any test: "The e2e suite will not run: _next/static/chunks/1529….js names the live project", exit 1 |
+| b39 main CI (f8cf7a2e) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (09:45); Vercel web and pam-site success |
+| Live project logs, 07:50 to 09:48 (edge_logs, counts only) | from Anthropic's network: the last requests at 07:51, none since, after the 07:56 stub-build rule and before D-576 |
 | Control Room v24 harness (390 and 1280) | reply about a card: section lands at 76px under the tabs, card folded, button "Replied" (aria "Replied. Reply again"); pressing it restores the card's prefix; a general message leaves scrollY unchanged; a data push mid-glide doesn't stop it; 0 page errors |
 
 ## Left undone
 
+- **As of b39 (14 October, 09:45):** as b38 below, less the dir="auto" and token-refresh items (done: one
+  `dir="auto"`, Dot's; the 401s were our own e2e runs, now stopped by D-576). a86 is at 04ad2ce5.
+- **As of b38 (14 October, 07:51):** with Will: a86 (one search on Explore: his yes, and his signature on the p7
+  Privacy line), a88 (the DocuSign consent link, and demo.docusign.net in Allowed domains), a84 (unchanged). Piper:
+  drop the second `dir="auto"`, merge Dot's fbe93cba into the inline branch, and send a new READY. Lena: the p7
+  translations and the Privacy date on Will's signature, in the same batch as a86. Piper: the 401s at 06:38 to 06:40
+  (token refresh). Then the DocuSign spike: deploy, Iris's phone run, and cleanup.
 - **As of b34 (14 October, 04:10):** with Will: a84 (the new number and the case manager request, with their
   Privacy lines; the release is ready the moment he signs), a81 (Google's logo files, then the key), and the forms
   and DocuSign questions (a) to (c). Research round on forms and DocuSign: Iris, Lena, Piper and Dot; then a card
@@ -1264,10 +1336,14 @@
 
 ## Needs a human
 
-- Will: forms and DocuSign. (a) Which programs use DocuSign, and on whose account; (b) where a signed form has to
-  end up; (c) a few blank forms in a Drive folder "Pam forms". Card a85's questions 1, 3 and 4 (the order, the drawn
-  signature picture, a program's own words) and blue or green for confirmations. Card a88: the DocuSign developer
-  account, the four Supabase secrets, then the integration key so the merge desk can send the consent link.
+- Will, Google Cloud Console (`docs/google-places.md`, "Open items"):
+  - Raise the Place Details (GetPlaceRequest) cap from 30 to 300 a day before a86 ships.
+  - Add a billing budget alert.
+  - Confirm the key's display name.
+  - Decide on the older "Maps Platform API Key" (the Trips map may use it).
+- Will: card a86, his yes to the inline search and his signature on the p7 Privacy line. Card a88: open the DocuSign
+  consent link (sent 06:40) and check demo.docusign.net in Allowed domains (still refused at 07:49). Card a85 is
+  fully decided (06:28 to 06:54).
 - Will: card a62, step 3 only: HELP_REQUESTS_LIVE = on in Supabase's secrets, then one test from "Still stuck?"
   (his paste and the salt are in and checked; 041940 is recorded).
 - Will: card a75 (website text colours, Dot's examples linked). Later cards: the Google street search (a key and a
