@@ -8,6 +8,7 @@
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
+import { Banner } from '@astryxdesign/core/Banner';
 import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
@@ -114,21 +115,10 @@ function Progress({ pct, label }: { readonly pct: number; readonly label: string
   );
 }
 
-/** The green card of the place page's confirmed booking (VisitCard's look): used for every note on these screens. */
-function Calm({ icon, title, body }: { readonly icon: React.ReactNode; readonly title?: string; readonly body: string }) {
-  return (
-    <Card padding={5} xstyle={styles.calm}>
-      <HStack gap={3} align="center" wrap="nowrap">
-        <HStack align="center" justify="center" xstyle={styles.disc40}>
-          {icon}
-        </HStack>
-        <VStack gap={1} xstyle={styles.grow}>
-          {title ? <Text xstyle={styles.noteTitle}>{title}</Text> : null}
-          <Text xstyle={title ? styles.noteBody : styles.noteTitle}>{body}</Text>
-        </VStack>
-      </HStack>
-    </Card>
-  );
+/** Every note is Astryx's `Banner`, the subtle blue one the place page uses ("This is only to help you plan"). A confirmation can show as `success` for Will to compare. */
+let CONFIRM_AS: 'info' | 'success' = 'info';
+function Calm({ title, body, confirm }: { readonly icon?: unknown; readonly confirm?: boolean; readonly title?: string; readonly body: string }) {
+  return <Banner status={confirm ? CONFIRM_AS : 'info'} title={title ?? body} description={title ? body : undefined} />;
 }
 
 /** One line of a form as it sits on the paper: the field's name small, its filled-in value under it. */
@@ -203,7 +193,6 @@ function Screen({ which }: { readonly which: string }) {
       return (
         <SubPage title="Your details, once" subtitle="For the forms you sign today" backLabel="Back" backHref="#" footer={<BigButton label="Start signing" />}>
           <Calm
-            icon={<Icon icon="info" size="md" />}
             title="Pam doesn't keep these"
             body="They stay on this phone while you sign, and are cleared when you finish or close Pam."
           />
@@ -254,7 +243,6 @@ function Screen({ which }: { readonly which: string }) {
             </VStack>
           </Card>
           <Calm
-            icon={<Icon icon="info" size="md" />}
             title="Gone when you are done"
             body="Closing Pam, or finishing the last form, clears all of this. Coming back later means entering it again."
           />
@@ -274,7 +262,7 @@ function Screen({ which }: { readonly which: string }) {
         <PamPage gap={4} footer={<VStack gap={2}><BigButton label="Next form" badge="4 of 112" /><TextLink label="Undo this signature" /></VStack>}>
           <BackBar title="Intake and consent" sub="Example Food Pantry" pct={3} />
           <FormPaper signed />
-          <Calm icon={<Icon icon="check" size="md" />} body="Signed and sent to Example Food Pantry" />
+          <Calm confirm body="Signed and sent to Example Food Pantry" />
         </PamPage>
       );
     case 'pause':
@@ -282,7 +270,6 @@ function Screen({ which }: { readonly which: string }) {
         <SubPage title="Paused" subtitle="3 of 112 signed" backLabel="Back to the form" backHref="#" footer={<BigButton label="Carry on with form 4" />}>
           <Progress pct={3} label="3 signed · 109 to go" />
           <Calm
-            icon={<Icon icon="info" size="md" />}
             title="Pick up whenever you like"
             body="Pam remembers which forms are signed. It does not remember your details, so you will enter them again, Social Security number included."
           />
@@ -341,7 +328,7 @@ function Screen({ which }: { readonly which: string }) {
         <SubPage title="Signed" subtitle="Form 3 of 112" backLabel="Back" backHref="#" footer={<BigButton label="Next form" badge="4 of 112" />}>
           <Progress pct={3} label="3 signed · 109 to go" />
           <Calm
-            icon={<Icon icon="check" size="md" />}
+            confirm
             title="DocuSign has it"
             body="You are back in Pam. DocuSign sends the signed form to Example Food Pantry. Pam only knows that it is done."
           />
@@ -360,8 +347,8 @@ function Screen({ which }: { readonly which: string }) {
         <SubPage title="All 112 signed" subtitle="Nothing left to sign" backLabel="Back to Home" backHref="#" footer={<BigButton label="Save my copies" />}>
           <Progress pct={100} label="112 of 112" />
           <VStack gap={2} xstyle={styles.row}>
-            <Calm icon={<Icon icon="check" size="md" />} title="Sent to the programs" body="Each program has its own signed form: 9 programs, 112 forms." />
-            <Calm icon={<Icon icon="check" size="md" />} title="Not stored in Pam" body="The name, birth date and Social Security number you typed for this form are no longer stored in Pam." />
+            <Calm confirm title="Sent to the programs" body="Each program has its own signed form: 9 programs, 112 forms." />
+            <Calm confirm title="Not stored in Pam" body="The name, birth date and Social Security number you typed for this form are no longer stored in Pam." />
           </VStack>
           <Card padding={4}>
             <VStack gap={2}>
@@ -379,8 +366,8 @@ function Screen({ which }: { readonly which: string }) {
         <SubPage title="All 112 signed" subtitle="Nothing left to sign" backLabel="Back to Home" backHref="#" footer={<BigButton label="Back to Home" />}>
           <Progress pct={100} label="112 of 112" />
           <VStack gap={2} xstyle={styles.row}>
-            <Calm icon={<Icon icon="check" size="md" />} title="Sent to the programs" body="DocuSign sent each program its signed form: 9 programs, 112 forms." />
-            <Calm icon={<Icon icon="check" size="md" />} title="Not stored in Pam" body="Pam never had the name, birth date and Social Security number you gave for this form. They went straight to DocuSign." />
+            <Calm confirm title="Sent to the programs" body="DocuSign sent each program its signed form: 9 programs, 112 forms." />
+            <Calm confirm title="Not stored in Pam" body="Pam never had the name, birth date and Social Security number you gave for this form. They went straight to DocuSign." />
           </VStack>
           <Card padding={4}>
             <VStack gap={2}>
@@ -396,8 +383,9 @@ function Screen({ which }: { readonly which: string }) {
 }
 
 function Page() {
-  const which = useSearchParams().get('s') ?? 'fill';
-  return <Screen which={which} />;
+  const raw = useSearchParams().get('s') ?? 'fill';
+  CONFIRM_AS = raw.endsWith('-success') ? 'success' : 'info';
+  return <Screen which={raw.replace('-success', '')} />;
 }
 
 export default function DesignSign() {
