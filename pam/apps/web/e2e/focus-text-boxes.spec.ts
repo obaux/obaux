@@ -211,7 +211,7 @@ test.describe('a search bar is the exception: focused, it shows the dark pill ou
       });
     expect(await outline()).toEqual({ field: 'none', pill: expect.stringMatching(/^solid 3px (\d{3,}|[1-9]\d*)/) });
     // Tab onto it from the button before it: the same pill.
-    await page.getByRole('button', { name: 'Done' }).focus();
+    await page.getByRole('button', { name: 'Cancel' }).focus();
     await page.keyboard.press('Tab');
     await expect(box).toBeFocused();
     // The outline grows in over a moment on some Astryx controls: read it once it has.

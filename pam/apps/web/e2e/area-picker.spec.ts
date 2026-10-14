@@ -97,9 +97,9 @@ test.describe('choosing an area', () => {
     await stub(page);
     await page.goto('/');
     await page.getByRole('button', { name: 'Change the area' }).click();
-    // A row picks; Done keeps it (D-275).
+    // A row picks, and the drawer closes by itself (Will, 14 October).
     await page.getByRole('button', { name: /^19122/ }).click();
-    await page.getByRole('button', { name: 'Done' }).click();
+    await expect(page.getByRole('textbox', { name: 'ZIP code' })).toHaveCount(0);
 
     await expect(page.getByRole('button', { name: 'Near 19122' })).toBeVisible();
 
@@ -129,11 +129,42 @@ test.describe('choosing an area', () => {
     expect(outside).toEqual([]);
   });
 
-  test('closing without Done leaves the area as it was (D-275)', async ({ page }) => {
+  test('every kind of pick closes the drawer and sets the Near control (Will, 14 October)', async ({ page }) => {
+    await page.context().grantPermissions(['geolocation']);
+    await page.context().setGeolocation({ latitude: 39.9526, longitude: -75.1652 });
+    await stub(page);
+    await page.goto('/');
+    const drawerOpen = () => page.getByRole('textbox', { name: 'ZIP code' });
+    // A ZIP.
+    await page.getByRole('button', { name: 'Change the area' }).click();
+    await page.getByRole('button', { name: /^19104/ }).click();
+    await expect(drawerOpen()).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Near 19104' })).toBeVisible();
+    // A landmark.
+    await page.getByRole('button', { name: 'Change the area' }).click();
+    await page.getByRole('button', { name: /^City Hall/ }).click();
+    await expect(drawerOpen()).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Near City Hall' })).toBeVisible();
+    // The phone's own position.
+    await page.getByRole('button', { name: 'Change the area' }).click();
+    await page.getByRole('button', { name: /^Use my current location/ }).click();
+    await expect(drawerOpen()).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Near your location' })).toBeVisible();
+  });
+
+  test('Cancel closes the drawer and changes nothing', async ({ page }) => {
     await stub(page);
     await page.goto('/');
     await page.getByRole('button', { name: 'Change the area' }).click();
-    await page.getByRole('button', { name: /^19122/ }).click();
+    await page.getByRole('button', { name: 'Cancel' }).click();
+    await expect(page.getByRole('textbox', { name: 'ZIP code' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Near City Hall' })).toBeVisible();
+  });
+
+  test('closing without picking leaves the area as it was (Cancel, Escape)', async ({ page }) => {
+    await stub(page);
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Change the area' }).click();
     await page.keyboard.press('Escape');
 
     await expect(page.getByRole('button', { name: 'Near City Hall' })).toBeVisible();
