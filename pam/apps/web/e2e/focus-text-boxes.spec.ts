@@ -218,6 +218,18 @@ test.describe('a search bar is the exception: focused, it shows the dark pill ou
     await expect.poll(async () => (await outline()).pill, { timeout: 3000 }).toMatch(/^solid 3px/);
   });
 
+  test('the clear button of a search field is named in the language ("Clear search"), not Astryx\'s "Clear"', async ({ page }) => {
+    await signedIn(page);
+    await page.route('**/rest/v1/rpc/services_near*', (route) => route.fulfill(json([])));
+    await page.route('**/rest/v1/rpc/search_areas*', (route) => route.fulfill(json([])));
+    await page.goto('/');
+    await settled(page);
+    await page.getByRole('button', { name: /Near/ }).first().click();
+    const box = page.getByRole('searchbox').or(page.getByRole('textbox', { name: 'ZIP code' })).first();
+    await box.fill('19107');
+    await expect(page.getByRole('button', { name: 'Clear search' })).toBeVisible();
+  });
+
   test('the search bar is one field, at rest and in use: one height, the words in place, a clear button inside it, no Cancel (D-574, a86)', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await signedIn(page);

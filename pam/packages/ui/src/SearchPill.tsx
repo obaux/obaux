@@ -243,6 +243,11 @@ export interface SearchFieldProps {
   readonly hasAutoFocus?: boolean;
   /** A softer shadow — for a pill inside a sheet (the new-message picker). */
   readonly isSubtle?: boolean;
+  /**
+   * The clear button's name, in the person's language ("Clear search"). Astryx names it "Clear" in English whatever the language,
+   * with no prop to change it, so the name is set on the button once it is on screen (Sage, a86).
+   */
+  readonly clearLabel?: string;
 }
 
 export function SearchField({
@@ -253,8 +258,15 @@ export function SearchField({
   onChange,
   hasAutoFocus = false,
   isSubtle = false,
+  clearLabel,
 }: SearchFieldProps) {
   const groupRef = useRef<HTMLDivElement>(null);
+  // The clear button is there only while the field has words in it.
+  useEffect(() => {
+    if (!clearLabel) return;
+    const button = groupRef.current?.querySelector('button[aria-label]');
+    if (button) button.setAttribute('aria-label', clearLabel);
+  }, [clearLabel, value]);
   useEffect(() => {
     const input = groupRef.current?.querySelector('input');
     if (!input) return;

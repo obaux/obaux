@@ -100,7 +100,7 @@ export function AreaSearch({
   readonly onChange: (next: AreaOption) => void;
   readonly onClose: () => void;
 }) {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   const hintId = useId();
   const [query, setQuery] = useState('');
   const [picked, setPicked] = useState<AreaOption>(current);
@@ -181,6 +181,7 @@ export function AreaSearch({
             onChange={setQuery}
             hasAutoFocus
             isSubtle
+            clearLabel={tPlain('explore.search.clear')}
           />
           {/* The search finds ZIP codes (and City Hall), so say what to type (D-536). */}
           <Text id={hintId} type="supporting" xstyle={styles.hint}>
