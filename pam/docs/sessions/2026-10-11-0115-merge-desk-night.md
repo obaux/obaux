@@ -692,6 +692,28 @@
   DocuSign window and the finished state, at 390 in both themes. Asked Will: (a) which programs use DocuSign, and
   on whose account; (b) where a signed form has to end up; (c) a few blank forms in a Drive folder "Pam forms" to
   design and test with.
+- **Will, 04:05 (a81, chat w20261014040538az2g): street search "approved", with Google's logo files.** The Drive
+  file is Google's `Google_Maps_Attribution_Assets.zip` (91,462 bytes: Gray, DarkGray and White, plus two outline
+  sets, each as an SVG and 1x/2x/4x PNGs). The proxy refuses Google's hosts, so it came through the Drive connector.
+  It was unpacked in its own folder, and the SVGs were checked: no script, link or foreign object. It went up unchanged,
+  without the macOS extras, on `mira/google-maps-attribution-assets` (41d6e8ab) for Dot. Merge desk, 04:15: Dot
+  finishes D-557 (Google's rule: the version that contrasts, so expect Gray on light and White on dark; 18px; alt
+  "Google Maps"), shows Will pictures, and it ships; then Will makes the key. Will did not confirm the 16 to 19 px
+  sentence on Google's page, so Dot records that it was not checked.
+- **Will, 04:08 (a83, chat w20261014040802nbtc): three help form changes.** In his words: "the still stuck card still
+  touches footer on mobile. Also please undo any rules about text box being selected, I don't want that. All I want
+  is for the keyboard to be active when a text box presents itself, for the user's convenience in typing.
+  Additionally the desktop 'Still stuck?' card: there's something off about that button, 'Write to us,' being so
+  long, stretching all the way. Just make it fit the text. No reason for it to be so wide but on mobile it's okay".
+  Merge desk, 04:15: (1) The gap. pam-site is live on 3975ce34, and the live code, measured, gives 60px (see
+  Verified). Will was told to reload a tab opened before b32, and that the card's sixth picture was the old one (now
+  removed). Wren checks every page that ends in a card, in both themes and in WebKit's terms, and moves the gap to
+  padding if any engine could drop the margin. (2) Text boxes. D-523's text-box line (Will's own 11 October words) is
+  reversed: a text box shows no ring in any mode, on the website and in the app. A text box that opens ready still
+  takes focus, inside the tap, so iOS raises the keyboard. Buttons, links, tick boxes and selects keep their ring on
+  Tab, because that is how a keyboard user sees where they are. Dot writes it as a new D-number; Wren does the
+  same on the site. (3) "Write to us" fits its words from 600px and stays full width on a phone. Pictures go to
+  Will before any of it ships.
 
 ## What was wrong, and what missed it
 
@@ -942,13 +964,15 @@
 | Staff-request texts (read-only, 21:30) | texts_live 'off'; live claim_outbound_messages exempts staff_request_approved and _denied; dispatch-sms */5 active; outbound_messages: one approved sent 10 October, one denied sent 17 September |
 | Batch b34, targeted run: config / copy / web build / tsc / web unit / budget / e2e (join, account, consent, signin-short, signin-next, staff-request, invite) / storybook | 1311 passed, 1 skipped / in step / 0 / 0 / 173 passed / 12.0 kB spare / 311 passed, 1 skipped, exit 0 / 0 |
 | b34 main CI (afee3198) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (22:43); Vercel web and pam-site READY (22:16) |
+| Still stuck gap, live code (b33's `out/` = main's site, served as https://joinpam.org in Chromium, probe answering 400 so the call-out shows) | card to footer 60px at 390 and 120px at 1280 on /support/joining-pam/, /support/cant-sign-in/ and /support/; "Write to us" fills its column (292 of 292px at 390, 720 of 720px at 1280) |
 
 ## Left undone
 
 - **As of b34 (14 October, 04:10):** with Will: a84 (the new number and the case manager request, with their
   Privacy lines; the release is ready the moment he signs), a81 (Google's logo files, then the key), and the forms
   and DocuSign questions (a) to (c). Research round on forms and DocuSign: Iris, Lena, Piper and Dot; then a card
-  for Will with pictures and choices. Nothing on forms is built before he picks.
+  for Will with pictures and choices. Nothing on forms is built before he picks. Dot: Google's logo files (then
+  Will's key), then text boxes without a ring. Wren: the help form's three changes (Will, 04:08).
 - **As of b32 (13 October, about 20:00):** b33 is ready to merge: Piper's D-565 (9aade728, the old Places list
   retired, with Lena's 911312da for "Back to Reported places"), Dot's D-566 (5737dfae), Ava's P2 (3dfb043c). With
   Will: a84 (choices (b) to (g); Lena's Privacy words after Sage's edit), a81 (Google's logo files, then the key).
