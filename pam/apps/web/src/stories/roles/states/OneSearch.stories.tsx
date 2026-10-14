@@ -35,19 +35,21 @@ async function waitFor<T extends Element>(find: () => T | null, ms = 6000): Prom
   }
 }
 
-function search(name: string, typed: string | null, waitForText?: string): Story {
+function search(name: string, typed: string | null, waitForKey?: string): Story {
   return {
     ...asRole('member', '/', {}, { streetSearch: true }),
     name,
     render: () => <>{route!.render()}</>,
     play: async ({ canvas, canvasElement, userEvent, globals }) => {
       // The launcher says its words in the language the story is shown in.
-      const bundle = BUNDLES[(globals as { locale?: string }).locale ?? 'en'] ?? en;
+      const bundle: Record<string, string> = BUNDLES[(globals as { locale?: string }).locale ?? 'en'] ?? en;
       await userEvent.click(await canvas.findByRole('button', { name: bundle['explore.search.placeholder'] ?? en['explore.search.placeholder'] }));
       if (typed === null) return;
       const box = await waitFor(() => canvasElement.ownerDocument.querySelector('input'));
       await userEvent.type(box, typed);
-      if (waitForText) await waitFor(() => (canvasElement.ownerDocument.body.textContent?.includes(waitForText) ? canvasElement : null));
+      // The words it waits for are in the language the story is shown in.
+      const wait = waitForKey ? (bundle[waitForKey] ?? (en as Record<string, string>)[waitForKey]) : null;
+      if (wait) await waitFor(() => (canvasElement.ownerDocument.body.textContent?.includes(wait) ? canvasElement : null));
     },
   };
 }
@@ -58,5 +60,7 @@ export const Open: Story = search('Open', null);
 export const ProgramWord: Story = search('A program word', 'work');
 /** A ZIP: an area first, then the programs whose address has it. */
 export const Zip: Story = search('A ZIP', '191');
+/** Digits and nothing found: "Nothing matched that." (no program, no area, and Google is never asked for digits). */
+export const NothingMatched: Story = search('Nothing matched', '99999', 'explore.search.nothing');
 /** An address no program matches: Google's rows with "Used for this search only." and the mark. */
-export const Address: Story = search('An address', '1500 Market', 'Used for this search only.');
+export const Address: Story = search('An address', '1500 Market', 'places.area.hereNote');

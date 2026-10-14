@@ -8,7 +8,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { Page, PlacesIcon } from '@pam/ui';
 import { Button } from '@pam/ui/Button';
 import { MenuList, type MenuItem } from '@pam/ui/MenuList';
-import { SearchField } from '@pam/ui/SearchPill';
+import { SearchField, searchRow } from '@pam/ui/SearchPill';
 import { distanceLabel } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useAreaSearch, type AreaOption } from '@/lib/useAreaSearch';
@@ -182,7 +182,7 @@ export function ExploreSearch({
   return (
     <Page gap={3}>
       <HStack gap={2} align="center" wrap="nowrap">
-        <VStack xstyle={styles.grow}>
+        <VStack xstyle={[styles.grow, searchRow.pill]}>
           <SearchField
             label={t('explore.search.boxLabel')}
             placeholder={t('explore.search.placeholder')}
@@ -191,7 +191,7 @@ export function ExploreSearch({
             hasAutoFocus
           />
         </VStack>
-        <Button label={t('messages.search.cancel')} variant="ghost" onClick={onCancel} xstyle={styles.cancel} />
+        <Button label={t('messages.search.cancel')} variant="ghost" onClick={onCancel} xstyle={[styles.cancel, searchRow.cancelIn]} />
       </HStack>
 
       {!typed ? (
