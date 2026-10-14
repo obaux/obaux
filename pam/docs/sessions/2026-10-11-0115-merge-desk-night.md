@@ -745,6 +745,17 @@
   writes and signs "Got a new phone number?", and Wren builds it after the help form, with a call-out that opens
   `/signin/new-number/` in the app. It is held off main until a84 is signed and D-567 ships. a84 itself is still
   unanswered.
+- **Will, 04:31 (a85, chat w20261014043123eeo6): "Good job on these", with four changes to the forms pictures.** The
+  banners take the place page's "Booking confirmed" style, not the edge border; the main buttons stay fixed at the
+  bottom; on "All 112 signed" the banners sit close together with "Your copies" under them; and the cleared banner
+  says plainly that the name, birth date and SSN are no longer stored in Pam. Dot redraws (pictures only) and Sage
+  words the cleared line so it is true on both routes. The card's four questions are still unanswered, and nothing is
+  built.
+- **Merge desk, 04:30: Dot's D-569 (56d7d929, follow-up 76ed2731), text boxes without a ring, is accepted.** The
+  chat composer never had a ring; its old "Tab rings" test never ran, and it now asserts none. The sign-in code boxes
+  keep D-251's 2px edge on the box the next digit goes into, on purpose: it is not a ring and a caret can't do that
+  job across six boxes. WCAG 2.4.7 then rests on the caret for text boxes, recorded as Will's call. The pictures are
+  on a83. It ships with Wren's website version of the same rule.
 
 ## What was wrong, and what missed it
 
