@@ -1,0 +1,54 @@
+diff --git a/pam/apps/web/src/screens/ExploreScreen.tsx b/pam/apps/web/src/screens/ExploreScreen.tsx
+index fa63e175..24e11afd 100644
+--- a/pam/apps/web/src/screens/ExploreScreen.tsx
++++ b/pam/apps/web/src/screens/ExploreScreen.tsx
+@@ -178,6 +178,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
+             ? <SearchLauncher label={t('explore.search.placeholder')} onOpen={() => setIsSearching(true)} />
+             : pill
+       }
++      searchBelow={mode === 'programs' && !isSearching ? <SearchLauncher label="Search programs or places" onOpen={() => setIsSearching(true)} /> : undefined}
+       leading={
+         mode === 'programs' && !isSearching ? (
+           <BackButton href="/profile/" label={t('nav.back.profile')} />
+@@ -196,13 +197,6 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
+           />
+         ) : mode === 'programs' ? (
+           <>
+-            <IconButton
+-              label={t('explore.search.label')}
+-              variant="ghost"
+-              icon={<Icon icon="search" size="md" />}
+-              onClick={() => setIsSearching(true)}
+-              xstyle={styles.add}
+-            />
+             <IconButton
+               label={t('programs.add')}
+               href="/programs/new/"
+diff --git a/pam/apps/web/src/screens/ExploreView.tsx b/pam/apps/web/src/screens/ExploreView.tsx
+index 7548ced1..2e16f7f4 100644
+--- a/pam/apps/web/src/screens/ExploreView.tsx
++++ b/pam/apps/web/src/screens/ExploreView.tsx
+@@ -47,6 +47,7 @@ export type ExploreCategory = Category | 'all';
+ export interface ExploreViewProps {
+   /** The search bar — `SearchPill`, wired by the caller. */
+   readonly search: ReactNode;
++  readonly searchBelow?: ReactNode;
+   /** Before the search bar — a round back on All programs (D-218). */
+   readonly leading?: ReactNode;
+   /** The bell and Help, beside the bar. */
+@@ -114,6 +115,7 @@ const styles = stylex.create({
+ 
+ export function ExploreView({
+   search,
++  searchBelow,
+   leading,
+   actions,
+   category,
+@@ -165,6 +167,7 @@ export function ExploreView({
+           <VStack xstyle={styles.search}>{search}</VStack>
+           {actions}
+         </HStack>
++        {searchBelow ? <VStack xstyle={styles.search}>{searchBelow}</VStack> : null}
+         <VStack ref={chipsRef as never}>
+           <CategoryChips chips={chips} value={category} onChange={onCategory} label={t('explore.categories')} />
+         </VStack>
