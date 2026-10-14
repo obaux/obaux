@@ -10,7 +10,7 @@ import { settled } from './settled';
  * section a contents link on Privacy or Terms jumps to. Those are `tabindex="-1"` and not controls, so they show
  * no ring in any input mode. Buttons and links keep the brand ring when somebody Tabs to them. A text box shows no ring
  * of ours at all, whatever put the focus there, and is still focused on arrival so the keyboard is up (Will, 14 October,
- * a83, reversing his 11 October rule: D-569). Supabase is stubbed at the network.
+ * a83, reversing his 11 October rule: D-569), except a search bar, which keeps its dark pill (05:55, a86: D-574). Supabase is stubbed at the network.
  */
 const ME = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
 const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
@@ -190,8 +190,8 @@ test.describe('a confirm dialog', () => {
   }
 });
 
-test.describe('a search box focused on arrival is focused, so the keyboard is up, and shows no ring (D-569)', () => {
-  test('the area drawer on Explore', async ({ page }) => {
+test.describe('a search bar is the exception: focused, it shows the dark pill outline (D-574, beside D-569)', () => {
+  test('the area drawer on Explore: focused on arrival with the pill round it', async ({ page }) => {
     await signedIn(page);
     await page.route('**/rest/v1/rpc/services_near*', (route) => route.fulfill(json([])));
     await page.goto('/');
@@ -200,14 +200,41 @@ test.describe('a search box focused on arrival is focused, so the keyboard is up
     const box = page.getByRole('searchbox').or(page.getByRole('textbox', { name: 'ZIP code' })).first();
     await expect(box).toBeVisible();
     await expect(box).toBeFocused();
-    // No ring on the field or the frame round it (Will, 14 October, a83), once the drawer has finished opening.
     await page.waitForTimeout(600);
-    expect((await focused(page)).ring).toBe(false);
-    // A tap into a text box draws none either, and nor does Tab onto one.
+    // The pill: the whole rounded group is outlined, 3px; the field inside draws none (Will, 14 October, 05:55, a86).
+    const outline = () =>
+      box.evaluate((el) => {
+        const field = getComputedStyle(el);
+        const pill = el.closest('.astryx-input-group') as HTMLElement | null;
+        const p = pill ? getComputedStyle(pill) : null;
+        return { field: field.outlineStyle, pill: p ? `${p.outlineStyle} ${p.outlineWidth} ${p.borderTopLeftRadius}` : null };
+      });
+    expect(await outline()).toEqual({ field: 'none', pill: expect.stringMatching(/^solid 3px (\d{3,}|[1-9]\d*)/) });
+    // Tab onto it from the button before it: the same pill.
     await page.getByRole('button', { name: 'Done' }).focus();
     await page.keyboard.press('Tab');
     await expect(box).toBeFocused();
-    expect((await focused(page)).ring).toBe(false);
+    expect((await outline()).pill).toMatch(/^solid 3px/);
+  });
+
+  test('the resting bar on Explore and the open search field are one height', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await signedIn(page);
+    await page.route('**/rest/v1/rpc/services_near*', (route) => route.fulfill(json([])));
+    await page.goto('/');
+    await settled(page);
+    const launcher = page.getByRole('button', { name: /Search programs/ }).first();
+    const resting = (await launcher.boundingBox())!;
+    await launcher.click();
+    const open = (await page.locator('.astryx-input-group[data-size="lg"]').first().boundingBox())!;
+    expect(Math.round(open.height)).toBe(Math.round(resting.height));
+    expect(Math.round(resting.height)).toBe(60);
+    // The sheet's search box is the same height too.
+    await page.getByRole('button', { name: 'Cancel' }).click();
+    await page.getByRole('button', { name: /Near/ }).first().click();
+    await page.waitForTimeout(800);
+    const sheet = (await page.locator('.astryx-input-group[data-size="lg"]').last().boundingBox())!;
+    expect(Math.round(sheet.height)).toBe(60);
   });
 });
 

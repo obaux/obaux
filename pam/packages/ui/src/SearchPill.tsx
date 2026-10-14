@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
+import { pam } from './tokens.stylex.js';
 import { Icon } from '@astryxdesign/core/Icon';
 import { Button } from '@astryxdesign/core/Button';
 import { IconButton } from '@astryxdesign/core/IconButton';
@@ -67,7 +68,13 @@ const styles = stylex.create({
   // White under the pill whatever is behind it — a map, on Trips. The theme's
   // own background for the large group loses to the component's (it rendered
   // transparent); set here, it holds.
-  group: { width: '100%', backgroundColor: 'light-dark(#FFFFFF, #262626)' },
+  group: {
+    width: '100%',
+    // The same height as the resting launcher, from one token (D-574).
+    height: pam['--pam-search-height'],
+    minHeight: pam['--pam-search-height'],
+    backgroundColor: 'light-dark(#FFFFFF, #262626)',
+  },
   // A lighter lift, for a pill that sits inside a sheet rather than on the
   // page: the full shadow there read as a second layer floating over the
   // first (Will, 3 October).
@@ -80,11 +87,10 @@ const styles = stylex.create({
   // the same lift, the icon and words centred and bold.
   launcher: {
     width: '100%',
-    // The open pill's own height (the large input group, 60px) — the
-    // button's default 48px otherwise wins over a min-height (Will,
-    // 5 October: "these two should match in height").
-    height: '60px',
-    minHeight: '60px',
+    // The open pill's own height, from the one token both read (D-574) — the button's default 48px otherwise wins over a
+    // min-height (Will, 5 October: "these two should match in height").
+    height: pam['--pam-search-height'],
+    minHeight: pam['--pam-search-height'],
     borderRadius: '999px',
     borderWidth: 0,
     gap: '10px',

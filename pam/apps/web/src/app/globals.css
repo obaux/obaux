@@ -179,6 +179,18 @@
   }
 
   /*
+   * A search bar is the exception (Will, 14 October, 05:55, a86: "please bring back the selected dark pill outline around
+   * search bar when user selects it"; D-574, which sits beside D-569): while its field is active the whole pill is outlined,
+   * the same 3px ink ring that was there before, white in dark mode. The large input group is only ever a search pill
+   * (`SearchPill`, `SearchField`), so this reaches every search bar and nothing else. The field inside still draws none.
+   */
+  .astryx-input-group[data-size='lg']:has(input:focus-visible) {
+    outline: 3px solid currentColor;
+    outline-offset: 2px;
+    border-radius: 999px;
+  }
+
+  /*
    * The chat composer's editor is a contenteditable, and browsers treat an
    * editable element as focus-visible on ANY focus, a tap included — so the
    * ring above lit the editor's line inside the composer every time somebody
