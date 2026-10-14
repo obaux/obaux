@@ -20,8 +20,8 @@ D-569.
 
 ## Left undone
 
-Astryx's own ring on the chat composer's frame (keyboard) and the code boxes' 2px accent edge stay, as "leave Astryx's field styling" asked; both said in D-569. The accessibility trade (WCAG 2.4.7) is written there too.
+The chat composer has no ring to remove (checked: none on Tab); the code boxes keep their 2px accent edge on purpose (D-251); both said in D-569. The accessibility trade (WCAG 2.4.7) is written there too.
 
 ## Needs a human
 
-Will: confirm the composer and code-box edge stay.
+Will: the code-box edge stays unless he says otherwise.

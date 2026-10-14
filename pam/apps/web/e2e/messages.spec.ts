@@ -578,7 +578,7 @@ test.describe('a conversation', () => {
     expect(moreBox!.width).toBeGreaterThanOrEqual(48);
   });
 
-  test('tapping into the composer draws no ring; Tab into it does (D-195)', async ({ page }) => {
+  test('tapping into the composer draws no ring, and Tab into it draws none either (D-195, D-569)', async ({ page }) => {
     await signedInAs(page, 'admin');
     await withOneConversation(page);
     await page.goto(`/messages/thread/?id=${CONVO}`);
@@ -595,17 +595,21 @@ test.describe('a conversation', () => {
     });
     expect(frameOnTap).toBe('none');
 
-    // Keyboard focus keeps a visible ring somewhere on the composer (WCAG 2.4.7).
+    // Tab into it: nothing on the composer rings either (Will, 14 October, a83: every text box behaves the same; D-569).
     await page.getByRole('link', { name: 'Back to Messages' }).focus();
-    await page.keyboard.press('Tab');
-    const focused = await page.evaluate(() => document.activeElement?.getAttribute('contenteditable'));
-    if (focused === 'true') {
-      const ringOnTab = await page.locator('.astryx-chat-composer').evaluate((el) => {
-        const all = [el, ...Array.from(el.querySelectorAll('*'))] as HTMLElement[];
-        return all.some((node) => getComputedStyle(node).outlineStyle !== 'none' && parseFloat(getComputedStyle(node).outlineWidth) > 0);
-      });
-      expect(ringOnTab).toBe(true);
+    for (let i = 0; i < 20; i++) {
+      if ((await page.evaluate(() => document.activeElement?.getAttribute('contenteditable'))) === 'true') break;
+      await page.keyboard.press('Tab');
     }
+    await expect(editor).toBeFocused();
+    await page.waitForTimeout(400);
+    const ringsOnTab = await page.locator('.astryx-chat-composer').evaluate((el) => {
+      const all = [el, ...Array.from(el.querySelectorAll('*'))] as HTMLElement[];
+      return all
+        .filter((node) => getComputedStyle(node).outlineStyle !== 'none' && parseFloat(getComputedStyle(node).outlineWidth) > 0)
+        .map((node) => `${node.tagName}.${node.className} ${getComputedStyle(node).outline}`);
+    });
+    expect(ringsOnTab).toEqual([]);
   });
 
   test('sending adds the message to the log', async ({ page }) => {
