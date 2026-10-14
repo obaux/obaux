@@ -756,6 +756,13 @@
   keep D-251's 2px edge on the box the next digit goes into, on purpose: it is not a ring and a caret can't do that
   job across six boxes. WCAG 2.4.7 then rests on the caret for text boxes, recorded as Will's call. The pictures are
   on a83. It ships with Wren's website version of the same rule.
+- **Merge desk, 04:35: card a86, one search on Explore.** Piper drew it (fe40db8a, pictures only, no app code). One
+  bar ("Search programs", with the area on its second line); tapping it opens a screen with the cursor in the box and
+  a Programs | Area switch. The Area side holds today's rows (current location, Pam's areas, Google's rows, the mark,
+  the footer); the area link with its pencil and the Location drawer go. Nothing changes in what is saved or sent.
+  Three choices on the card with my advice: chips on Programs only, full screen, and a ZIP typed on Programs switches
+  to Area. Sage signed the "Got a new phone number?" post (e708a7e8). Her "We may call your new number" line follows
+  a84 (i). Correction to the 04:15 entry: the ZIP-only chip rule is D-552, not D-561.
 
 ## What was wrong, and what missed it
 
