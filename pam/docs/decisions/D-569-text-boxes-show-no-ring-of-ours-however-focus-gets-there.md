@@ -15,3 +15,7 @@
 **Kept on purpose: the sign-in code boxes' 2px accent edge (D-251).** It shows which of the six boxes the next digit goes into, a job a caret cannot do across six boxes, and it is not an outline ring. It stays; Will can still say otherwise when he sees it.
 
 **A trade, said plainly.** WCAG 2.4.7 (focus visible) asks that a keyboard user can see where focus is. In a text box the caret does that, which is what Will relies on; with no ring and a blinking caret that is hard to see (low vision, a bright screen), the position of focus is less obvious. Will's call, recorded as his. The website does the same (Wren).
+
+## Search bars are the exception (Will, 14 October, 05:55, a86)
+
+Will asked for the dark pill outline round a search bar back while it is active. D-574 does that in the shared search field; D-569 stands for every other text box. The sentence above ("a text box draws no ring of ours") now reads: every text box except a search bar.

@@ -32,6 +32,9 @@ export const pam = stylex.defineVars({
   // person aims at the drawing.
   '--pam-field-height': '56px',
   '--pam-big-button-height': '56px',
+  // A search bar's height, at rest and open (Will, 5 October: "these two should match in height"; again 14 October, a86: "they
+  // should feel as one"). The resting launcher and every open search field read this one token, so they cannot drift apart.
+  '--pam-search-height': '60px',
   '--pam-body-text-mobile': '16px',
   '--pam-body-text-desktop': '16px',
   '--pam-card-gap': '12px',

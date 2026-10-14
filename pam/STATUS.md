@@ -1513,6 +1513,10 @@ connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merge
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
 
+## Design system & Storybook · search bars keep the pill outline (14 October)
+
+A search field shows its dark pill outline again while active; every other text box has none (D-574, Will a86 05:55, beside D-569). The resting bar and the open search field read one token, `--pam-search-height` (60px). On `claude/pam-design-search-pill`; not on `main`.
+
 ## Design system & Storybook · text boxes show no ring (14 October)
 
 Text boxes draw no ring of ours in any mode; the keyboard still comes up when a screen opens with one ready (D-569, Will a83, supersedes D-523's text-box line). Buttons, links, tick boxes and selects keep the brand ring on Tab. The chat composer has no ring (none on Tab); the code boxes keep their 2px accent edge on purpose (D-251). On `claude/pam-design-text-box-no-ring`; not on `main`.
