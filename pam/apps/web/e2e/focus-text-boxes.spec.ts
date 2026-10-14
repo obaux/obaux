@@ -261,6 +261,13 @@ test.describe('a search bar is the exception: focused, it shows the dark pill ou
     await page.waitForTimeout(800);
     const sheet = (await page.locator('.astryx-input-group[data-size="lg"]').last().boundingBox())!;
     expect(Math.round(sheet.height)).toBe(60);
+    // ... and its words start where the resting bar's do: `SearchField` (the sheet, Messages, Schedule) and `SearchPill` agree.
+    const inSheet = await page.evaluate(() => {
+      const g = document.querySelector('.astryx-input-group[data-size="lg"]') as HTMLElement;
+      return { icon: Math.round(g.querySelector('svg')!.getBoundingClientRect().x), text: Math.round(g.querySelector('input')!.getBoundingClientRect().x) };
+    });
+    expect(Math.abs(inSheet.icon - restingAt.icon)).toBeLessThanOrEqual(1);
+    expect(Math.abs(inSheet.text - restingAt.text)).toBeLessThanOrEqual(1);
   });
 });
 

@@ -11,3 +11,7 @@
 **The Location drawer's box stays as it was.**
 
 **Tests.** `focus-text-boxes.spec.ts`: the drawer's search is focused on arrival with the pill (3px, rounded) round it and nothing on the field, also when Tab lands on it; the resting bar, the open pill and the sheet's box are all 60px; the magnifier and the words are at the same x and in the same type resting and open; and there are at least 12px between the outline and Cancel. `consent.spec` still asserts no ring on Sign in's field. Pictures: `docs/design/review/2026-10-14-search-pill/`.
+
+## Same words start in every search bar (Piper, a86, 14 October)
+
+`SearchField` (the sheet's box, Messages, Schedule, the one-search screen) had 8px between its magnifier and its words; `SearchPill` and the resting launcher have 4px, so the words started 4px further right in an open `SearchField`. `SearchField`'s inner field now takes the same 4px gap (`fieldGap` in `SearchPill.tsx`), and the test measures the resting bar, the open `SearchPill` and the sheet's `SearchField`: magnifier and words at the same x in all three.
