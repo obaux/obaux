@@ -844,7 +844,6 @@
   "explore.search.none": "Нет программы с таким названием или адресом",
   "explore.search.clear": "Очистить поиск",
   "explore.search.nothing": "Ничего не нашлось.",
-  "explore.search.nearest": "Ближайшие к {zip}",
   "explore.categories": "Виды мест",
   "explore.results": "Результаты по запросу «{query}»",
   "explore.error.retry": "Попробовать снова",

@@ -799,7 +799,6 @@
   "explore.search.none": "No program by that name or address",
   "explore.search.clear": "Clear search",
   "explore.search.nothing": "Nothing matched that.",
-  "explore.search.nearest": "Nearest to {zip}",
   "explore.categories": "Kinds of places",
   "explore.results": "Results for “{query}”",
   "explore.error.retry": "Try again",

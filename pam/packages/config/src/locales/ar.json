@@ -872,7 +872,6 @@
   "explore.search.none": "لا يوجد برنامج بهذا الاسم أو العنوان",
   "explore.search.clear": "مسح البحث",
   "explore.search.nothing": "لا شيء يطابق ذلك.",
-  "explore.search.nearest": "الأقرب إلى {zip}",
   "explore.categories": "أنواع الأماكن",
   "explore.results": "نتائج «{query}»",
   "explore.error.retry": "حاول مرة أخرى",

@@ -113,12 +113,20 @@ test.describe('one search field', () => {
     await expect(page.getByRole('heading', { name: 'All programs' })).toBeVisible();
   });
 
-  test('an address no program matches: Pam’s programs nearest it, closest first, with the ZIP line and Google’s mark', async ({ page }) => {
+  test('an address no program matches: the heading says what was typed, the control says Near 19102, Pam’s programs nearest it, Google’s mark', async ({ page }) => {
     const { box, asked, nearAsked, outside } = await open(page);
     await box.fill('1500 Market');
-    await expect(page.getByText('Nearest to 19102')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Results for “1500 Market”' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Near 19102' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Example Market Street Clinic' })).toBeVisible();
-    await expect(page.locator('[data-google-attribution]')).toBeVisible();
+    await expect(page.getByText(/^Nearest to/)).toHaveCount(0);
+    // Google's mark, left-aligned under the heading row, 18px.
+    const mark = page.locator('[data-google-attribution]');
+    await expect(mark).toBeVisible();
+    const logo = page.locator('[data-google-attribution] img[alt="Google Maps"]');
+    expect(Math.round((await logo.boundingBox())!.height)).toBe(18);
+    const heading = (await page.getByRole('heading', { name: 'Results for “1500 Market”' }).boundingBox())!;
+    expect(Math.abs((await logo.boundingBox())!.x - heading.x)).toBeLessThan(3);
     // Two calls, the same two as the drawer: the words and a session token, then the first suggestion's id and the same token.
     expect(asked).toEqual([
       { action: 'suggest', q: '1500 Market', token: expect.stringMatching(/^[0-9a-f]{32}$/) },
@@ -129,15 +137,38 @@ test.describe('one search field', () => {
     // Nothing from Google but its mark: no address, no suggestion row, no dropdown.
     await expect(page.getByText('1500 Market St, Philadelphia, PA')).toHaveCount(0);
     await expect(page.getByRole('listbox')).toHaveCount(0);
-    // The point stays in memory: the Near control is unchanged, nothing is written to the phone or the address.
-    await expect(page.getByRole('button', { name: 'Near City Hall' })).toBeVisible();
+    // The point stays in memory: nothing is written to the phone or the address.
     expect(await page.evaluate(() => JSON.stringify([window.localStorage, window.sessionStorage]))).not.toMatch(/Market|39\.95|google:/);
     expect(page.url()).not.toMatch(/Market|39\.95|-75\.16/);
     expect(nearAsked.some((body) => Math.abs(Number(body['p_lat']) - 39.9526) < 0.0003)).toBe(true);
-    // Clearing goes back to the normal list, measured from the area as before.
+    // Clearing brings the normal list back, and the control says the area as before.
     await page.getByRole('button', { name: /^Clear/ }).click();
-    await expect(page.getByText(/^Nearest to/)).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Near City Hall' })).toBeVisible();
+    await expect(page.locator('[data-google-attribution]')).toHaveCount(0);
     await expect(page.getByRole('heading', { name: 'Example Learning Hub' })).toBeVisible();
+    await page.reload();
+    await expect(page.getByRole('button', { name: 'Near City Hall' })).toBeVisible();
+  });
+
+  test('a pick in the drawer wins over a typed address: it clears the box and sets Near for real', async ({ page }) => {
+    const { box } = await open(page);
+    await page.route(AREAS, (route) => route.fulfill(json([{ id: 'a1', kind: 'zip', label: '19104', lat: 39.963788, lon: -75.202914 }])));
+    await box.fill('1500 Market');
+    await expect(page.getByRole('button', { name: 'Near 19102' })).toBeVisible();
+    await page.getByRole('button', { name: 'Near 19102' }).click();
+    await page.getByRole('button', { name: /^19104/ }).click();
+    await expect(box).toHaveValue('');
+    await expect(page.getByRole('button', { name: 'Near 19104' })).toBeVisible();
+    await page.reload();
+    await expect(page.getByRole('button', { name: 'Near 19104' })).toBeVisible();
+  });
+
+  test('an address with no programs near it: Nothing matched that., and Near 19102 still says where it looked', async ({ page }) => {
+    const { box } = await open(page);
+    await page.route(NEAR, (route) => route.fulfill(json([])));
+    await box.fill('1500 Market');
+    await expect(page.getByRole('heading', { name: 'Nothing matched that.' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Near 19102' })).toBeVisible();
   });
 
   test('an address a program matches is not sent to Google', async ({ page }) => {
@@ -182,7 +213,7 @@ test.describe('one search field', () => {
   test('has no WCAG A/AA violations while typing an address', async ({ page }) => {
     const { box } = await open(page);
     await box.fill('1500 Market');
-    await expect(page.getByText('Nearest to 19102')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Near 19102' })).toBeVisible();
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
     expect(results.violations).toEqual([]);
   });

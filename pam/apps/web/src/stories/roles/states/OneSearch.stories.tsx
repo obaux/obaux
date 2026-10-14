@@ -43,7 +43,7 @@ function search(name: string, typed: string | null, waitForKey?: string): Story 
       const bundle: Record<string, string> = BUNDLES[(globals as { locale?: string }).locale ?? 'en'] ?? en;
       const box = await waitFor(() => canvasElement.querySelector('input'));
       await userEvent.type(box, typed);
-      // The words it waits for are in the language the story is shown in ("Nearest to {zip}" up to the value).
+      // The words it waits for are in the language the story is shown in ("Results for “{query}”" up to the value).
       const wait = waitForKey ? (bundle[waitForKey] ?? (en as Record<string, string>)[waitForKey])!.split('{')[0]!.trim() : null;
       if (wait) await waitFor(() => (canvasElement.textContent?.includes(wait) ? canvasElement : null));
     },
@@ -56,5 +56,5 @@ export const Resting: Story = search('Resting', null);
 export const ProgramWord: Story = search('A program word', 'work');
 /** Digits and nothing found: "Nothing matched that." */
 export const NothingMatched: Story = search('Nothing matched', '99999', 'explore.search.nothing');
-/** An address no program matches: Pam's programs nearest it, "Nearest to 19102", and Google's mark. */
-export const Address: Story = search('An address', '1500 Market', 'explore.search.nearest');
+/** An address no program matches: Pam's programs nearest it, the heading "Results for …", "Near 19102" and Google's mark. */
+export const Address: Story = search('An address', '1500 Market', 'explore.results');

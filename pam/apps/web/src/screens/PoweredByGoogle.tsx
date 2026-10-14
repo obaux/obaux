@@ -25,14 +25,16 @@ const styles = stylex.create({
   row: { width: '100%', boxSizing: 'border-box' },
   // Google's clear space: 10 left, right and top; 5 below.
   space: { paddingInline: '10px', paddingBlockStart: '10px', paddingBlockEnd: '5px' },
+  // Left-aligned, under a heading: the mark's own clear space overlaps the page margin so its visible edge lines up with the heading's (Dot).
+  start: { marginInlineStart: '-10px', width: 'auto' },
   logo: { display: 'block', height: `${LOGO_HEIGHT}px`, width: 'auto' },
   words: { fontSize: '14px', lineHeight: 1.4, fontWeight: 600, whiteSpace: 'nowrap' },
 });
 
-export function PoweredByGoogle() {
+export function PoweredByGoogle({ align = 'center' }: { readonly align?: 'center' | 'start' }) {
   const [failed, setFailed] = useState(false);
   return (
-    <HStack justify="center" xstyle={[styles.row, styles.space]} data-google-attribution="">
+    <HStack justify={align === 'start' ? 'start' : 'center'} xstyle={[styles.row, styles.space, align === 'start' && styles.start]} data-google-attribution="">
       {failed ? (
         <span translate="no" lang="en" dir="ltr">
           <Text type="supporting" xstyle={styles.words}>

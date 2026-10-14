@@ -802,7 +802,6 @@
   "explore.search.none": "Nenhum programa com esse nome ou endereço",
   "explore.search.clear": "Limpar busca",
   "explore.search.nothing": "Nada encontrado.",
-  "explore.search.nearest": "Mais perto de {zip}",
   "explore.categories": "Tipos de lugares",
   "explore.results": "Resultados para “{query}”",
   "explore.error.retry": "Tentar de novo",

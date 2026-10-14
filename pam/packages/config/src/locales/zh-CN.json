@@ -802,7 +802,6 @@
   "explore.search.none": "没有这个名称或地址的项目",
   "explore.search.clear": "清除搜索",
   "explore.search.nothing": "没有找到匹配的内容。",
-  "explore.search.nearest": "离{zip}最近",
   "explore.categories": "地点类型",
   "explore.results": "“{query}”的搜索结果",
   "explore.error.retry": "再试一次",

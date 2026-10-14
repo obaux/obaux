@@ -91,8 +91,6 @@ describe('every other language is actually translated', () => {
   MAY_MATCH_ENGLISH.add('places.kind.zip');
   // A place, a day and a time and no word of its own: Chinese and Russian have nothing to translate in it (D-498).
   MAY_MATCH_ENGLISH.add('trips.moved.body.self');
-  // English in every language until Lena translates it (the line over a list sorted from a typed address; Sage signed it, D-573).
-  MAY_MATCH_ENGLISH.add('explore.search.nearest');
 
   it.each(OTHER_LOCALES)('%s differs from English except where a name or a symbol should not change', (locale) => {
     const same = Object.keys(EN).filter((k) => BUNDLES[locale][k] === EN[k] && /[A-Za-z]{3}/.test(EN[k]!));

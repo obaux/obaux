@@ -25,7 +25,10 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+export const Default: Story = { args: {} };
+
+/** Left-aligned under a heading (Explore, when a typed address sorted the list): its clear space overlaps the page margin so its edge lines up. */
+export const UnderAHeading: Story = { args: { align: 'start' } };
 
 /** The mark and the footer line under the Google rows in the area sheet, both centred, at the sheet's 320px. */
 export const WithFooterLine: Story = {

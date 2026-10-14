@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { EducationIcon, FamilyServicesIcon, Notice, PlaceCard, PlusIcon, ScrollReveal, WorkforceIcon } from '@pam/ui';
 import { SearchField } from '@pam/ui/SearchPill';
-import { Text } from '@astryxdesign/core/Text';
 import { NextTripCard } from '@pam/ui/NextTripCard';
 import { useTrips } from '@/lib/useTrips';
 import { useNextVisits, visitTagLabel } from '@/lib/useNextVisits';
@@ -31,7 +30,6 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BackButton } from '@pam/ui/SubPage';
 
 const styles = stylex.create({
-  nearest: { fontSize: '14px', lineHeight: 1.5 },
   // The same white disc with a grey edge as Help (D-216).
   add: {
     width: '48px',
@@ -105,7 +103,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
   const { isSaved, save, unsave, failed: saveFailed } = useSavedPlaces(session.status === 'signed-in', demoRole);
 
   // A typed address no program matches becomes a point (Pam's server asks Google; kept in memory only), and the list is Pam's programs
-  // nearest it, closest first. Otherwise the words filter the list by name. The "Near …" control is not changed by any of it.
+  // nearest it, closest first. Otherwise the words filter the list by name. The "Near …" control shows the typed address's ZIP while it is on, and is not changed for real.
   const text = settled.trim();
   const { origin, resolving } = useAddressOrigin(text, area);
   const measuredFrom = origin ?? area;
@@ -135,7 +133,13 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
   const visits = useNextVisits(isMember);
 
   const field = (
-    <SearchField label={t('explore.search.label')} placeholder={t('explore.search.placeholder')} value={query} onChange={setQuery} />
+    <SearchField
+      label={t('explore.search.label')}
+      placeholder={t('explore.search.placeholder')}
+      clearLabel={tPlain('explore.search.clear')}
+      value={query}
+      onChange={setQuery}
+    />
   );
 
   return (
@@ -183,7 +187,9 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
       }
       category={category}
       onCategory={setCategory}
-      area={<AreaTrigger area={area} onOpen={() => setIsPickingArea(true)} />}
+      // While a typed address sorts the list the control says that place (its ZIP, D-552): display only, saved nowhere; clearing the box brings
+      // back the area as it was. A pick in the drawer is the real choice and wins: it clears the box.
+      area={<AreaTrigger area={origin ?? area} onOpen={() => setIsPickingArea(true)} />}
       areaPanel={
         // A drawer now (D-275), kept mounted so it slides away as it came.
         <AreaSearch
@@ -192,6 +198,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
           onChange={(next) => {
             setArea(next);
             saveOrigin(next);
+            setQuery('');
           }}
           onClose={() => setIsPickingArea(false)}
         />
@@ -206,18 +213,10 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
               contactLabel={t('help.contact.action')}
             />
           ) : null}
-          {/* The list is sorted from a typed address: one quiet line, its ZIP only (D-552), and Google's mark where its answer shaped the list. */}
-          {origin ? (
-            <>
-              <Text type="supporting" xstyle={styles.nearest}>
-                {t('explore.search.nearest', { zip: origin.label })}
-              </Text>
-              <PoweredByGoogle />
-            </>
-          ) : null}
         </>
       }
-      query={origin ? '' : text}
+      query={text}
+      belowHeading={origin ? <PoweredByGoogle align="start" /> : undefined}
       isSearchActive={query.trim() !== ''}
       state={state}
       onRetry={() => setReload((n) => n + 1)}
