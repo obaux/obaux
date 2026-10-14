@@ -1,5 +1,8 @@
 # Fill once, sign many: the member's side (pictures only, 390px, light and dark)
 
+## Decided (Will, 14 October, 06:28): good news in green
+"Good news in green is a nice touch." A confirmation, something that is done, is Astryx's `Banner` with `status="success"` (green): "Signed and sent to…" (2b), "DocuSign has it" (3b), and on both done screens "Sent to the programs" and "Not stored in Pam" (4a, 4b). An informational note stays the subtle blue `Banner status="info"` he asked for at 04:43: "Pam doesn't keep these", "Gone when you are done", "Pick up whenever you like". The blue-and-green comparison tiles are gone; green is the only version. "Undo this signature" and "Skip this one for now" stay above the main button (the Skip question is still Will's to answer). The rounds below are the history.
+
 ## Fourth round: the primary stays put (Will, 14 October, 05:18)
 "Move undo this signature button to top of Primary action, so primary button is placed at same place across all." In the pinned strip, "Undo this signature" (2b, and its success-banner comparison) now sits **above** the primary button, so the primary is in the same place at the bottom on every screen. I did the same for "Skip this one for now" on 2a, for the same reason (Will's note named only Undo; say if he wants Skip left below). Redrawn: 2a-sign, 2b-signed-next, 2b-compare-signed-as-success, light and dark, and both sheets. The blue and green versions are both kept.
 
