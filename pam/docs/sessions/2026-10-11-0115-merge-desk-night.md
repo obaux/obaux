@@ -912,6 +912,18 @@
   "Map our database with the google map address" is read as distance from the geocoded point, since Pam's places
   already have coordinates. Piper says whether he means more. Lena re-checks p7, since Google is now asked without a
   tap. Sage signs the new line and the clear button's label.
+- **Will, 06:49 (a85, chat w20261014064937lxxq): "Great, approved."** Read as a yes to the pictures (green, no Pause,
+  Leave for now, Welcome back) and to the advice on questions 1, 3 and 4: DocuSign on each program's own account first,
+  Pam stops keeping the drawn signature, and a program's own words are allowed. Skip stays above. He was told this
+  reading and asked to say if any part is a no. Nothing is built on it before the build plan.
+  - His questions: the member's signature, and fields beyond "Your details, once" (household size, income).
+  - Answer: the signature is adopted once in DocuSign and stamped on every form in that sitting. Pam keeps "signed, on
+    this day" only.
+  - Each form asks its own questions through DocuSign's guided "Next", field by field. Programs label each blank
+    plainly at setup, and the same labels fill across one sitting.
+  - Plan B, if guided mode is clumsy on a phone: Pam asks the non-sensitive questions first, one per screen, and
+    passes the answers to DocuSign. The SSN never does this.
+  - The spike adds household-size and income fields shared across forms, to test exactly this.
 - **Merge desk, 06:08: Piper's DocuSign spike plan (4076102e) approved, with changes.**
   - No live Pam account for the spike: the gateway JWT is the anon key, and the caller-id list is dropped.
   - The spike key never travels. Piper keeps it, and only its SHA-256 is set (`DOCUSIGN_SPIKE_KEY_SHA256`), with a
