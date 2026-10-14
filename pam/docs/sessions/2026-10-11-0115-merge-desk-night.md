@@ -976,6 +976,18 @@
   an empty `auto` input can resolve to left to right. Piper drops their effect, merges fbe93cba into the inline branch,
   and keeps their Arabic test without the empty-box `dir` check (Dot's focus-text-boxes test covers the empty case).
   It ships inside the a86 batch, since the field only matters once a86 lands.
+- **Merge desk, 07:52: b38 live.** a89 and a81 answered, Will told in chat, Piper told.
+- **Piper, 08:06: a86 at 04ad2ce5.** Dot's fbe93cba merged and Piper's duplicate effect dropped (00e538f6, 07:51), Dot's
+  Arabic test aimed at the drawer's field with `.last()` (Dot told 07:52), and tokens.css regenerated. Screens: none
+  since 5084c0dc. It still waits on Will's yes and the p7 signature.
+- **Piper, 08:31: D-576 (29b202d4), the web e2e suite never reaches the live project.** Two layers: e2e/global-setup.ts
+  refuses a build in out/ that names `shobqzuhicoiymtumiaz` or doesn't name `stub.supabase.co` (new script
+  `build:e2e`), and every Playwright project launches Chromium with a dead proxy for all hosts but loopback. Piper's
+  proof: a live build is refused before any test; with the check off, 861 attempted requests to the live host, 0
+  answered; never-live.spec.ts in all three projects; full suite 1859 passed, 19 skipped. Merged as b39 (39481be0),
+  Screens: none.
+- **One send-invite-emails 500 at 06:25:01** (`claim_staff_invite_emails: 401`). The 21 runs either side of it all
+  returned 200. Not acted on. Watch only.
 
 ## What was wrong, and what missed it
 
@@ -1110,6 +1122,20 @@
   READY's `Screens:` line into its merge commit for the nightly map. Tonight's merges didn't, so Dot rebuilt the map
   from diffs and subjects. From 06:10 every merge commit carries the READY's `Screens:` line, or `Screens: none` when
   the READY says so.
+- **The web e2e suite reached the live project (Piper's finding, 07:54; the merge desk's log check, 07:56).** From
+  06:38 to 07:51, Playwright runs in our containers sent about 3,500 requests to the live Supabase project. All were
+  refused (401 or 403, the stub token 't' is not a valid JWT), apart from OPTIONS preflights. There were no
+  auth/v1/otp or help-request calls and no 2xx on anything that writes, so no text, no email and no data was touched.
+  What missed it: CI builds with the stub URL, and until Will allowed the Supabase host for street search (about
+  06:39) the containers couldn't reach live, so a container build without the stub env never mattered. Fix: the team
+  was told at 07:56 to build with the stub env, and D-576 (b39) makes it structural. The run refuses a build that names
+  the live project, and the test browser cannot reach any host but loopback. Lena re-ran her 59 audited stories with
+  every outside request refused: 0 tried to leave. Wren: no site script calls the live help-request function.
+- **Targeted checks skipped @pam/ui's own tests (the a86 trial, 07:57).** D-574 (1918d84c) added
+  `--pam-search-height` to tokens.css by hand, in a different place from the generator. So tokens.test.tsx and the
+  @pam/ui build both failed. Neither Piper's targeted run nor the merge desk's targeted template ran
+  `pnpm --filter @pam/ui test` (CI's unit step does, so it would have gone red after a push). Piper regenerated the
+  file (04ad2ce5, one line moved). From now on, any branch or batch that touches packages/ui runs the ui tests.
 
 ## Decisions
 
@@ -1249,6 +1275,8 @@
 | b37 main CI (9d91f3bd) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (06:26); Vercel web and pam-site success |
 | Batch b38, targeted run (623a8668): config / copy / web build / tsc / web unit / budget / e2e (area-picker, street-search, focus-text-boxes, explore-bell, places, place) / storybook | 1311 passed, 1 skipped / in step / 0 / 0 / 177 passed / 12.0 kB spare / 231 passed, exit 0 / 0 |
 | b38 main CI (a5fdfbdc) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (07:51); Vercel web and pam-site success |
+| a86 trial full run (main a5fdfbdc + 00e538f6, local only): db / config / ui / web unit / site / site a11y / usability / scrollspy / e2e full / storybook | 1579 ok / 1312 / 123 of 124 (tokens.css order, fixed in 04ad2ce5; ui build failed for the same reason) / 182 / 100 / 120 scans 0 / all clear / 306 links 0 / 1895 passed, 19 skipped, exit 0 / builds; tsc 0 (web and site); 11.7 kB spare |
+| Live project logs, 06:00 to 07:57 (edge_logs, function_edge_logs; counts only) | from Anthropic's network: about 3,500 requests since 06:38:25, all 401/403 except OPTIONS; no auth/v1/otp, no help-request, no 2xx writes. Will's street search 06:41 to 06:43: 11 POST 200 |
 | Control Room v24 harness (390 and 1280) | reply about a card: section lands at 76px under the tabs, card folded, button "Replied" (aria "Replied. Reply again"); pressing it restores the card's prefix; a general message leaves scrollY unchanged; a data push mid-glide doesn't stop it; 0 page errors |
 
 ## Left undone
