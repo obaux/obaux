@@ -1,7 +1,9 @@
 # Program forms: DocuSign, or filling PDFs inside Pam — how it meets what exists
 
 **By** Piper (Places & programs) · **For** Will's 04:03 note, 14 October 2026, relayed by the merge desk · **Status:** plan only, nothing built, no code on this branch.
-Iris is researching the tech, Lena the law, Dot the screens. Facts about DocuSign below are from memory and marked **(Iris to confirm)**.
+Iris is researching the tech, Lena the law, Dot the screens.
+
+> **Update, 04:20 UTC (merge desk, card a85):** the card recommends **each program's own DocuSign account**, not one Pam account. Iris and Lena found that in Pam's account every completed form sits in Pam's DocuSign until purged, which is Pam storing it by another name. Programs without DocuSign get the Pam-only route later. Where this note says "Pam's one account" (sections 3, 5 and question 1), read it as superseded: Pam holds only the program's connection (consent) and, per form, envelope id, status and dates, and the purge job in section 5 is not needed for a program's own account. Question 3 (read-and-agree policies keep the date only) is on the card with advice yes. Facts about DocuSign below are from memory and marked **(Iris to confirm)**.
 
 Will: "reimagine how we offer policies, both from the program lead with a DocuSign integration and for the member who's signing forms." Programs have PDF forms with fields (name, initials, birth date, Social Security number, today's date, signatures, other information). A member may sign 100+ in one sitting. **Pam must not store those details.**
 
