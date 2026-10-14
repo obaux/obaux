@@ -1,0 +1,28 @@
+'use client';
+/* THROWAWAY (Dot, 14 October): the inline search bar's states, drawn with the real SearchLauncher and SearchField. Not shipped. */
+import { Suspense, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { VStack } from '@astryxdesign/core/VStack';
+import { Heading } from '@astryxdesign/core/Heading';
+import { Text } from '@astryxdesign/core/Text';
+import { SearchField, SearchLauncher } from '@pam/ui/SearchPill';
+import { Page } from '@pam/ui';
+
+function Screen() {
+  const s = useSearchParams().get('s') ?? 'rest';
+  const [value, setValue] = useState(s === 'typed' ? 'food' : s === 'address' ? '1500 Market' : '');
+  return (
+    <Page gap={4}>
+      {s === 'rest' ? (
+        <SearchLauncher label="Search programs or places" onOpen={() => {}} />
+      ) : (
+        <SearchField label="Search programs or places" placeholder="Search programs or places" value={value} onChange={setValue} hasAutoFocus />
+      )}
+      {s === 'address' ? <Text type="supporting">Programs nearest 1500 Market St (stand-in line)</Text> : null}
+      <Heading level={1}>All programs</Heading>
+      <Text>Example Family Center · Closed · 0.1 miles</Text>
+      <Text>Example Learning Hub · Closed · 0.3 miles</Text>
+    </Page>
+  );
+}
+export default function P() { return <Suspense><Screen /></Suspense>; }
