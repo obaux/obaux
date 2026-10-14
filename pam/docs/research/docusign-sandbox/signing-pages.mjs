@@ -19,7 +19,7 @@ const { chromium, webkit } = require('@playwright/test');
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const SHOTS = path.join(HERE, 'shots');
 fs.mkdirSync(SHOTS, { recursive: true });
-const MADE_UP = { fullName: 'Test Member Ana', initials: 'TA', dob: '01/01/1990', ssn: '000-00-0000' };
+const MADE_UP = { fullName: 'Test Member Ana', initials: 'TA', dob: '01/01/1990', ssn: '000-00-0000', householdSize: '3', annualIncome: '12000' };
 const results = [];
 const note = (q, name, data) => { results.push({ q, name, ...data }); console.log(`[${q}] ${name} ${JSON.stringify(data).slice(0, 300)}`); };
 const exe = process.env.PLAYWRIGHT_CHROMIUM_PATH ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH } : {};
@@ -79,13 +79,14 @@ async function run() {
       for (let i = 0; i < 80; i++) {
         const s = await survey(page);
         if (/event=/.test(page.url())) break;
-        steps.push({ i, fields: s.fields.map((f) => `${f.name}${f.value}`) });
+        const guided = await page.evaluate(() => { const a = document.activeElement; const r = a?.getBoundingClientRect(); return a && a !== document.body ? { tag: a.tagName, name: (a.getAttribute('aria-label') || a.getAttribute('title') || '').slice(0, 40), empty: 'value' in a ? !a.value : null, inView: r ? r.top >= 0 && r.bottom <= innerHeight : null, required: a.required || a.getAttribute('aria-required') === 'true' } : null; });
+        steps.push({ i, focus: guided, fields: s.fields.map((f) => `${f.name}${f.value}${f.required ? ' [required]' : ''}`) });
         // agree to the disclosure, then Continue / Start / Next / Finish, whichever is there
         const cb = page.getByRole('checkbox').first(); if (await cb.count() && !(await cb.isChecked().catch(() => true))) await cb.check().catch(() => {});
         for (const f of await page.locator('input[type=text]:visible, input:not([type]):visible').all()) {
           if (await f.inputValue().catch(() => 'x')) continue;
           const label = ((await f.getAttribute('aria-label')) || '').toLowerCase();
-          const v = /ssn|social/.test(label) ? MADE_UP.ssn : /birth|dob/.test(label) ? MADE_UP.dob : /initial/.test(label) ? MADE_UP.initials : /name/.test(label) ? MADE_UP.fullName : null;
+          const v = /household/.test(label) ? MADE_UP.householdSize : /income/.test(label) ? MADE_UP.annualIncome : /ssn|social/.test(label) ? MADE_UP.ssn : /birth|dob/.test(label) ? MADE_UP.dob : /initial/.test(label) ? MADE_UP.initials : /name/.test(label) ? MADE_UP.fullName : null;
           if (v) await f.fill(v).catch(() => {});
         }
         const btn = page.getByRole('button', { name: /^(continue|start|next|finish|adopt and sign|adopt and initial|sign|initial)$/i }).first();

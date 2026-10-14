@@ -88,6 +88,27 @@ Five made-up PDFs, each with DocuSign tabs:
   - whether initials and the signature are adopted once for all forms;
   - how many taps E1 takes end to end.
 
+**Added 06:51 (Will's yes on the forms card).** Fields that aren't in "Your details, once",
+such as household size or income, are filled by DocuSign's guided "Next", with same-labelled
+blanks filling across the sitting. Piper adds `householdSize` and `annualIncome` text tabs, with
+the same labels, to F1, F2 and F4.
+
+- **Q2a. Does guided Next go to each blank, in order?**
+  - **Script:** after each Next, the focused element is the next empty tab and it's scrolled
+    into view, at 390×844 and 320×568.
+  - **Real phone (Will, about 10 minutes):** with the on-screen keyboard up, the field stays
+    visible above the keyboard and Next stays reachable. Headless Chromium has no on-screen
+    keyboard, so the script can't prove this; I'll say so in the report.
+- **Q2b. Does an answer typed once fill the other forms?** Type `householdSize` 3 and
+  `annualIncome` 12000 (made up) in F1. **Pass:** F2 and F4 show them when reached, without
+  retyping.
+- **Q2c. Is it obvious which blanks are required?**
+  - **Pass:** each required tab has `aria-required` (or `required`), so a screen reader says
+    "required".
+  - It's marked visibly by more than colour (a star, the word, or a label).
+  - Finishing with one left empty stops on that blank and names it.
+  - Optional ones look different.
+
 ### Q3. Does it fit Pam on a phone? (me)
 
 Pam opens the signing page **full screen**, then comes back through `returnUrl`. At 390×844
