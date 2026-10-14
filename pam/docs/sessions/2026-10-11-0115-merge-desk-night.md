@@ -809,6 +809,42 @@
   apart at 390×844. The defaults are now the tokens (--spacing-3/5/4), and the tight values apply only under 640px tall;
   641 to 720px gets a 46vh slide so 375×667 still fits. All 42 fit cases still fit, and a new signin-short case covers
   390×844 and 375×667. It restores the look Will signed, so it ships as b37 after b36.
+- **Will, 05:18 (a85, chat w20261014051828ivdx): "Undo this signature" goes above the main button, and send the
+  DocuSign steps.** "Let's move undo this signature button to top of Primary action, so primary button is placed at
+  same place across all. Please send Docusign instructions." Dot redraws the forms pictures so the main button sits in
+  the same place, fixed at the bottom, on every screen. Asking for the steps is a yes to question 2 (a free DocuSign
+  developer account that he makes). Merge desk, 05:31: card a88 has the steps.
+  - The developer account at developers.docusign.com. It is free and never expires, and it is demo only: forms are
+    watermarked, not binding, and deleted after 30 days.
+  - Apps and Keys: an app called "Pam test", Generate RSA, and the redirect URI https://joinpam.org.
+  - Four Supabase Edge Function secrets that Will enters himself: `DOCUSIGN_PRIVATE_KEY`, `DOCUSIGN_INTEGRATION_KEY`,
+    `DOCUSIGN_USER_ID` and `DOCUSIGN_ACCOUNT_ID`.
+  - He then gives the integration key, which is not a secret, and the merge desk sends the one-time consent link
+    (account-d.docusign.com/oauth/auth, scope `signature impersonation`).
+
+  Piper writes a spike plan: the function, how it is locked, demo hosts only, and the cleanup. Iris checks the pages
+  only, under her rules. Questions 1, 3 and 4, and blue or green, are still open.
+- **Will, 05:21 (a86, chat w20261014052112b61d): the placeholder is "Search programs", with no helper line.** "Search
+  placeholder 'Search programs" simple. NO need for explainer text below use my location [...] Too much info. Keep
+  placeholders text simple." The merge desk takes this as a go on take three, with his words. "Search programs" is
+  his own wording, so it counts as signed, and the line under "Use my current location" goes. Sage writes the other
+  lines as short as they can be, and the box's accessible name starts with "Search programs". Piper builds it, Dot
+  places the bar on the staff's All programs page, and Lena does the seven languages. Pictures of the built screens go
+  to Will before it ships.
+- **Will, 05:22 (chat w20261014052207fmmj and w20261014052243dva7): two Control Room changes.** A card he has
+  answered says "Replied" on its button, and pressing it still starts a reply. After he sends a reply about a card, the
+  page goes back to the top of "Waiting on you". Merge desk, 05:34, Control Room v24 (version 43):
+  - A message that isn't about a card leaves the page where it is, so the answer arrives where he is reading.
+  - In Listen, the next card is read as before.
+  - A data redraw no longer stops a tab's or a reply's glide halfway: `keepPlace` waits for the jump to finish, and
+    the fold's nudge to the next card stays out of the way.
+
+  Harness at 390 and 1280:
+  - the section landed under the tabs;
+  - the card folded and showed "Replied", and pressing it put the card's prefix back;
+  - a general message left the page where it was;
+  - no page errors.
+- **Will, 05:23 (a87, chat w2026101405230857qn): Sign in "Approved".** D-572 ships as b37 after b36's CI.
 
 ## What was wrong, and what missed it
 
@@ -1070,6 +1106,11 @@
 | Batch b34, targeted run: config / copy / web build / tsc / web unit / budget / e2e (join, account, consent, signin-short, signin-next, staff-request, invite) / storybook | 1311 passed, 1 skipped / in step / 0 / 0 / 173 passed / 12.0 kB spare / 311 passed, 1 skipped, exit 0 / 0 |
 | b34 main CI (afee3198) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (22:43); Vercel web and pam-site READY (22:16) |
 | Still stuck gap, live code (b33's `out/` = main's site, served as https://joinpam.org in Chromium, probe answering 400 so the call-out shows) | card to footer 60px at 390 and 120px at 1280 on /support/joining-pam/, /support/cant-sign-in/ and /support/; "Write to us" fills its column (292 of 292px at 390, 720 of 720px at 1280) |
+| Batch b35, targeted run: config / copy / web build / tsc / web unit / budget / e2e (street) / storybook | 1311 passed, 1 skipped / in step / 0 / 0 / 177 passed / 12.0 kB spare / 84 passed, exit 0 / 0 |
+| b35 main CI (36cd4651) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (05:08); Vercel web and pam-site success |
+| Batch b36, full run (8269b4c6): db / config / ui / web unit / site / site a11y / usability / scrollspy / e2e full / storybook | 1579 ok / 1311 / 124 / 177 / 100 / 120 scans 0 / all clear / 306 links 0 / 1835 passed, 19 skipped, e2e exit 0 / builds; tsc 0 (web and site); 12.0 kB spare |
+| Batch b37, targeted run (7823702f): config / copy / web build / tsc / web unit / budget / e2e (signin-short, consent, signin-next, signin-wrong-code, join, focus-text-boxes, theme) / storybook | 1311 passed, 1 skipped / in step / 0 / 0 / 177 passed / 12.0 kB spare / 267 passed, exit 0 / 0 |
+| Control Room v24 harness (390 and 1280) | reply about a card: section lands at 76px under the tabs, card folded, button "Replied" (aria "Replied. Reply again"); pressing it restores the card's prefix; a general message leaves scrollY unchanged; a data push mid-glide doesn't stop it; 0 page errors |
 
 ## Left undone
 
@@ -1104,8 +1145,9 @@
 ## Needs a human
 
 - Will: forms and DocuSign. (a) Which programs use DocuSign, and on whose account; (b) where a signed form has to
-  end up; (c) a few blank forms in a Drive folder "Pam forms". And card a85's four questions (the order, a free
-  DocuSign developer account he makes, the drawn signature picture, a program's own words).
+  end up; (c) a few blank forms in a Drive folder "Pam forms". Card a85's questions 1, 3 and 4 (the order, the drawn
+  signature picture, a program's own words) and blue or green for confirmations. Card a88: the DocuSign developer
+  account, the four Supabase secrets, then the integration key so the merge desk can send the consent link.
 - Will: card a62, step 3 only: HELP_REQUESTS_LIVE = on in Supabase's secrets, then one test from "Still stuck?"
   (his paste and the salt are in and checked; 041940 is recorded).
 - Will: card a75 (website text colours, Dot's examples linked). Later cards: the Google street search (a key and a
