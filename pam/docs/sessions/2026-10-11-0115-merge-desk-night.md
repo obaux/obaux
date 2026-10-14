@@ -1004,6 +1004,10 @@
 - **Twelve new sentences reached the batch unsigned.** Under A29 the desk does not merge an unsigned sentence, and
   only a key-by-key check against Sage's ledger found them. Sage signed all twelve and reworded seven. The check
   stays part of the desk's gate.
+- **Merge commits carried no `Screens:` lines (Dot's nightly map, 06:07).** team.md says the merge desk copies each
+  READY's `Screens:` line into its merge commit for the nightly map. Tonight's merges didn't, so Dot rebuilt the map
+  from diffs and subjects. From 06:10 every merge commit carries the READY's `Screens:` line, or `Screens: none` when
+  the READY says so.
 
 ## Decisions
 
