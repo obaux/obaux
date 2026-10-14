@@ -886,6 +886,59 @@
   (X) does the same job, because Pam always remembers which forms are signed. The bar is close, the form's name, "Form 3
   of 112" and progress. 2c becomes the coming-back screen. Dot redraws it with the green change, and draws a "Leave
   now?" step only if one is needed.
+- **Will, 06:39 (a88, chat w20261014063907oeyq): the DocuSign setup is done.** He has the APIs, the four Supabase
+  secrets, the integration key (not a secret, d2446c11-…) and the environment's allowed domains. The consent link was
+  sent at 06:39. Checked from the merge desk: account-d.docusign.com and apps-d.docusign.com answer, and Pam's
+  Supabase host is now reachable. demo.docusign.net still gets a 403, and Will was asked to check its spelling.
+  Street search confirmed on: `places-search` answered a GET with 405 "POST only", which it can only do once
+  `GOOGLE_MAPS_SERVER_KEY` is set, and nothing went to Google.
+- **Dot 2a2b4e32 (merged, pictures only): forms in green, no Pause.** The × asks "Leave for now?" once on the
+  Pam-only way, because leaving clears the details typed in. On DocuSign's way it just closes. 2d is "Welcome back".
+  Card a85 shows the new set and is back in Waiting.
+- **Will, 06:45 (a81, chat w20261014064551ywtf): street search tried live; the main search changes shape.** "I tried
+  it, but when I select a result, it should close the drawer with the new zipcode input into place. Now we need to map
+  our database with the google map address, so when users use the main search on app, no pop up opens, and instead they
+  see the programs listed by the address or name they're curious. The goal here is to provide a superior search
+  experience, but only show what we have in database, mapped to google. Remove the dropdown, and instead only show our
+  list of places." The function logs (06:41 to 06:45) show POST 200s and no "places-search failed", plus 401s from 06:38
+  to 06:40 (refused as not signed in; Piper checks the app's token refresh). Decided:
+  1. A live fix, on its own branch: picking anything in the area drawer closes it and sets Near (ZIP only for a
+     street, D-552).
+  2. a86 is reworked as an inline search. There is no full-screen view and no dropdown, and typing filters Explore's
+     list in place. Only Pam's programs show: by name, or nearest a typed address, which is geocoded server-side and
+     only for address-like text that matches no program. One quiet line names the point by ZIP. A clear (×) replaces
+     Cancel, and D-574's outline and height stay. The main search leaves Near alone.
+
+  "Map our database with the google map address" is read as distance from the geocoded point, since Pam's places
+  already have coordinates. Piper says whether he means more. Lena re-checks p7, since Google is now asked without a
+  tap. Sage signs the new line and the clear button's label.
+- **Will, 06:49 (a85, chat w20261014064937lxxq): "Great, approved."** Read as a yes to the pictures (green, no Pause,
+  Leave for now, Welcome back) and to the advice on questions 1, 3 and 4: DocuSign on each program's own account first,
+  Pam stops keeping the drawn signature, and a program's own words are allowed. Skip stays above. He was told this
+  reading and asked to say if any part is a no. Nothing is built on it before the build plan.
+  - His questions: the member's signature, and fields beyond "Your details, once" (household size, income).
+  - Answer: the signature is adopted once in DocuSign and stamped on every form in that sitting. Pam keeps "signed, on
+    this day" only.
+  - Each form asks its own questions through DocuSign's guided "Next", field by field. Programs label each blank
+    plainly at setup, and the same labels fill across one sitting.
+  - Plan B, if guided mode is clumsy on a phone: Pam asks the non-sensitive questions first, one per screen, and
+    passes the answers to DocuSign. The SSN never does this.
+  - The spike adds household-size and income fields shared across forms, to test exactly this.
+- **Will, 06:51 (a85, chat w20261014065116kirm): no count inside "Next form".** "it's already on top." The count
+  stays in the bar only, on 2c and 3b. This overrides D-560's in-button count for the forms screens.
+- **Will, 06:54 (a85, chat w20261014065418gzbo): the forms answers, explicitly.** "1) Yes. 3) Agree. 4) Allow it. And
+  'Skip above button is good'".
+  - 1: DocuSign on each program's own account first, the Pam-only way later.
+  - 3: Pam stops keeping the drawn-signature picture and keeps the date only.
+  - 4: a program's own words are allowed in its form.
+  - "Screen 2: This is not our confirmation modal design. Please stay consistent with our DS." So "Leave for now?" uses
+    the app's own ConfirmDialog (apps/web/src/screens/ConfirmDialog.tsx). Dot redraws it.
+- **Sage, 06:53 (ledger 9e5001e7): the inline search words.** "Nearest to {zip}" (new), "Clear search", the accessible
+  name "Search programs by name or address", and the placeholder and "Nothing matched that." as before. Merge desk:
+  there is no on-screen line saying address-like text goes to Google, since Will asked for less text and p7 covers it.
+  This goes to Will with Sage's p7 edit, which he signs.
+- **Piper 7bf7e92c (full-screen take, finished before the 06:45 reshape):** not shown to Will. It is the base for the
+  inline build, carrying Lena's words, the four fixes and Dot's token and outline.
 - **Merge desk, 06:08: Piper's DocuSign spike plan (4076102e) approved, with changes.**
   - No live Pam account for the spike: the gateway JWT is the anon key, and the caller-id list is dropped.
   - The spike key never travels. Piper keeps it, and only its SHA-256 is set (`DOCUSIGN_SPIKE_KEY_SHA256`), with a

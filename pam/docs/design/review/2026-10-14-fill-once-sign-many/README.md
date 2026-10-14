@@ -1,5 +1,21 @@
 # Fill once, sign many: the member's side (pictures only, 390px, light and dark)
 
+## Decided (Will, 14 October, 06:54): our own confirmation dialog
+On 2b: "This is not our confirmation modal design. Please stay consistent with our DS." 2b now is Pam's own `ConfirmDialog` (`apps/web/src/screens/ConfirmDialog.tsx`, D-234, D-255; the one `ScheduleView` and the other "Are you sure?" screens use), drawn with the real component: 32px corners over the page washed out, the question as the heading, the explanation, the action ("Leave for now") as the one big button, and the quiet way out ("Keep signing") under it. The forms' words are stand-ins.
+
+**Will's answers (06:54, via the merge desk):** 1 yes: each program's own DocuSign account comes first; 3 agree: no picture of a drawn signature is kept; 4 allow: the program's own words; and "Skip this one for now" above the main button is good.
+
+## Decided (Will, 14 October, 06:51): no count inside Next form
+On 3b (the DocuSign hand-back) and 2c (signed, next): "I don't think it makes sense to have counter inside button here, since it's already on top." The primary is just **Next form**; the count stays only in the bar ("Form 3 of 112" and the progress bar). **This overrides the in-button count of D-560 for the forms screens** (the counter line in Join's steps is unchanged). The set was approved by Will at 06:49 before this one change.
+
+## Decided (Will, 14 October, 06:30): no Pause button
+Will: "Also why pause button?" The bar's close (×) already does Pause's job, because Pam always remembers which forms are signed. So the bar is: close, the form's name, "Form 3 of 112" and the progress bar; no Pause button, and no "Pause here" on the DocuSign hand-back (3b). The screen they see when they come back after closing is **2d, "coming back"** (was "Paused"): progress, the calm note that Pam remembers which forms are signed but not their details, the list, "Carry on with form 4".
+
+**Does close ask? Yes, once: 2b.** Closing mid-form costs one thing: their details are cleared (Pam does not keep them), so they type them again, SSN included, when they come back. A tap on × by mistake would otherwise lose that without a word, so ×  asks "Leave for now?" with what is kept (the signed forms) and what is not, and **Keep signing** as the one primary, **Leave for now** above it. On the DocuSign route nothing of theirs is in Pam to lose, so × goes straight back with no question (stand-in words throughout). Numbers in the file names moved: 2b is new, so the old 2b, 2c are now 2c, 2d.
+
+## Decided earlier (Will, 14 October, 06:28): good news in green
+"Good news in green is a nice touch." A confirmation, something that is done, is Astryx's `Banner` with `status="success"` (green): "Signed and sent to…" (2b), "DocuSign has it" (3b), and on both done screens "Sent to the programs" and "Not stored in Pam" (4a, 4b). An informational note stays the subtle blue `Banner status="info"` he asked for at 04:43: "Pam doesn't keep these", "Gone when you are done", "Pick up whenever you like". The blue-and-green comparison tiles are gone; green is the only version. "Undo this signature" and "Skip this one for now" stay above the main button (the Skip question is still Will's to answer). The rounds below are the history.
+
 ## Fourth round: the primary stays put (Will, 14 October, 05:18)
 "Move undo this signature button to top of Primary action, so primary button is placed at same place across all." In the pinned strip, "Undo this signature" (2b, and its success-banner comparison) now sits **above** the primary button, so the primary is in the same place at the bottom on every screen. I did the same for "Skip this one for now" on 2a, for the same reason (Will's note named only Undo; say if he wants Skip left below). Redrawn: 2a-sign, 2b-signed-next, 2b-compare-signed-as-success, light and dark, and both sheets. The blue and green versions are both kept.
 
