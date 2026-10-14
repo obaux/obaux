@@ -144,7 +144,12 @@ describe('the envelopes', () => {
     expect(tabs.length).toBeGreaterThan(5);
     expect(tabs.every((tab) => tab.tooltip && tab.tooltip.length > 3)).toBe(true);
     const labels = tabs.map((tab) => tab.tabLabel);
-    for (const label of ['fullName', 'initials', 'dob', 'ssn']) expect(labels).toContain(label);
+    for (const label of ['fullName', 'initials', 'dob', 'ssn', 'householdSize', 'annualIncome']) expect(labels).toContain(label);
+    // Household size and income are in more than one form, under the same label, with a plain question as the tooltip.
+    const text = (name: string) => new TextDecoder().decode(makePdf('x', [{ label: 'l', anchor: `/${name}/` }]));
+    expect(text('householdSize')).toContain('/householdSize/');
+    expect(tabs.find((tab) => tab.tabLabel === 'householdSize')!.tooltip).toBe('How many people live with you?');
+    expect(tabs.find((tab) => tab.tabLabel === 'annualIncome')!.tooltip).toBe('About how much does your household make in a year?');
   });
   it('asks Connect for no documents and no field data', () => {
     const notice = envelopeDefinition('E1', { connectUrl: 'https://stub.supabase.co/functions/v1/docusign-spike-hook/connect' }).eventNotification!;

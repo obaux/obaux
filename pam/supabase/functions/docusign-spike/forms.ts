@@ -37,15 +37,17 @@ const FIELDS = {
   dob: { label: 'Birth date', anchor: '/dob/' },
   ssn: { label: 'Social Security number (made up)', anchor: '/ssn/' },
   contact: { label: 'Emergency contact name', anchor: '/contactName/' },
+  household: { label: 'How many people live with you?', anchor: '/householdSize/' },
+  income: { label: 'About how much does your household make in a year?', anchor: '/annualIncome/' },
   date: { label: 'Date signed', anchor: '/date/' },
   sig: { label: 'Signature', anchor: '/sig/' },
 } as const;
 
 export const FORMS = [
-  { id: 'F1', name: 'Intake', fields: [FIELDS.fullName, FIELDS.dob, FIELDS.ssn, FIELDS.initials, FIELDS.date, FIELDS.sig] },
-  { id: 'F2', name: 'Release', fields: [FIELDS.fullName, FIELDS.initials, FIELDS.date, FIELDS.sig] },
+  { id: 'F1', name: 'Intake', fields: [FIELDS.fullName, FIELDS.dob, FIELDS.ssn, FIELDS.household, FIELDS.income, FIELDS.initials, FIELDS.date, FIELDS.sig] },
+  { id: 'F2', name: 'Release', fields: [FIELDS.fullName, FIELDS.household, FIELDS.initials, FIELDS.date, FIELDS.sig] },
   { id: 'F3', name: 'Program rules', fields: [FIELDS.initials, FIELDS.date, FIELDS.sig] },
-  { id: 'F4', name: 'Emergency contact', fields: [FIELDS.fullName, FIELDS.contact, FIELDS.date, FIELDS.sig] },
+  { id: 'F4', name: 'Emergency contact', fields: [FIELDS.fullName, FIELDS.contact, FIELDS.household, FIELDS.income, FIELDS.date, FIELDS.sig] },
   { id: 'F5', name: 'Photo consent', fields: [FIELDS.fullName, FIELDS.initials, FIELDS.date, FIELDS.sig] },
 ] as const;
 
@@ -91,9 +93,12 @@ export function signerTabs() {
     dateSignedTabs: [{ ...at('date'), tabLabel: 'dateSigned', tooltip: 'Today’s date, filled in for you' }],
     textTabs: [
       { ...at('fullName'), tabLabel: 'fullName', tooltip: 'Your full name', required: 'true', width: '200', height: '20' },
+      { ...at('annualIncome'), tabLabel: 'annualIncome', tooltip: 'About how much does your household make in a year?', required: 'true', width: '200', height: '20' },
       { ...at('contactName'), tabLabel: 'contactName', tooltip: 'The name of the person to call in an emergency', required: 'true', width: '200', height: '20' },
     ],
     dateTabs: [{ ...at('dob'), tabLabel: 'dob', tooltip: 'Your birth date', required: 'true', width: '100', height: '20' }],
+    // Details not in "Your details, once": the same label in several forms, to see whether one answer fills the others.
+    numberTabs: [{ ...at('householdSize'), tabLabel: 'householdSize', tooltip: 'How many people live with you?', required: 'true', width: '60', height: '20' }],
     ssnTabs: [{ ...at('ssn'), tabLabel: 'ssn', tooltip: 'Your Social Security number', required: 'true' }],
   };
 }
