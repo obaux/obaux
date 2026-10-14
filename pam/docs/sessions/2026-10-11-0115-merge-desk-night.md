@@ -939,6 +939,18 @@
   This goes to Will with Sage's p7 edit, which he signs.
 - **Piper 7bf7e92c (full-screen take, finished before the 06:45 reshape):** not shown to Will. It is the base for the
   inline build, carrying Lena's words, the four fixes and Dot's token and outline.
+- **Piper, 07:00: D-575 (15d967e1), the area drawer closes on a pick.** Merged as b38 (623a8668). Done becomes Cancel,
+  and this replaces D-275's held-until-Done. Targeted checks: config 1311 passed and 1 skipped; copy in step; build,
+  tsc and web unit (177) clean; budget 12.0 kB spare; e2e (area-picker, street-search, focus-text-boxes, explore-bell,
+  places, place) 231 passed, exit 0; Storybook built. It is held for before-and-after pictures for Will, since the
+  Done → Cancel change is visible.
+- **Piper, 07:13: a86 inline (886bb762, D-573).** One inline SearchField with no pop-up, and the list filters in place.
+  For a typed address the bar makes the same two places-search calls (suggest, then choose the first), the point stays
+  in memory only, and the drawer keeps its own pick flow. Seven keys drop. Merge desk, 07:14: one fix before Will
+  sees it. The address picture said "Nearest to 19102", "All programs" and "Near City Hall ✎" while the list was
+  measured from 19102. Now the address case reads like the "food" case: the heading is Results for "…", the control
+  shows "Near 19102" for display only, the "Nearest to {zip}" line goes, and Google's mark sits small under the
+  heading.
 - **Merge desk, 06:08: Piper's DocuSign spike plan (4076102e) approved, with changes.**
   - No live Pam account for the spike: the gateway JWT is the anon key, and the caller-id list is dropped.
   - The spike key never travels. Piper keeps it, and only its SHA-256 is set (`DOCUSIGN_SPIKE_KEY_SHA256`), with a
