@@ -895,6 +895,23 @@
 - **Dot 2a2b4e32 (merged, pictures only): forms in green, no Pause.** The × asks "Leave for now?" once on the
   Pam-only way, because leaving clears the details typed in. On DocuSign's way it just closes. 2d is "Welcome back".
   Card a85 shows the new set and is back in Waiting.
+- **Will, 06:45 (a81, chat w20261014064551ywtf): street search tried live; the main search changes shape.** "I tried
+  it, but when I select a result, it should close the drawer with the new zipcode input into place. Now we need to map
+  our database with the google map address, so when users use the main search on app, no pop up opens, and instead they
+  see the programs listed by the address or name they're curious. The goal here is to provide a superior search
+  experience, but only show what we have in database, mapped to google. Remove the dropdown, and instead only show our
+  list of places." The function logs (06:41 to 06:45) show POST 200s and no "places-search failed", plus 401s from 06:38
+  to 06:40 (refused as not signed in; Piper checks the app's token refresh). Decided:
+  1. A live fix, on its own branch: picking anything in the area drawer closes it and sets Near (ZIP only for a
+     street, D-552).
+  2. a86 is reworked as an inline search. There is no full-screen view and no dropdown, and typing filters Explore's
+     list in place. Only Pam's programs show: by name, or nearest a typed address, which is geocoded server-side and
+     only for address-like text that matches no program. One quiet line names the point by ZIP. A clear (×) replaces
+     Cancel, and D-574's outline and height stay. The main search leaves Near alone.
+
+  "Map our database with the google map address" is read as distance from the geocoded point, since Pam's places
+  already have coordinates. Piper says whether he means more. Lena re-checks p7, since Google is now asked without a
+  tap. Sage signs the new line and the clear button's label.
 - **Merge desk, 06:08: Piper's DocuSign spike plan (4076102e) approved, with changes.**
   - No live Pam account for the spike: the gateway JWT is the anon key, and the caller-id list is dropped.
   - The spike key never travels. Piper keeps it, and only its SHA-256 is set (`DOCUSIGN_SPIKE_KEY_SHA256`), with a
