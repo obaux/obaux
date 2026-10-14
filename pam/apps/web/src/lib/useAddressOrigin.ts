@@ -24,6 +24,9 @@ export interface AddressOrigin {
   readonly resolving: boolean;
 }
 
+/** How long the words stand still before the first suggestion is resolved (one Place Details call per search). */
+const SETTLE_MS = 1000;
+
 export function useAddressOrigin(text: string, near: { readonly lat: number; readonly lon: number }): AddressOrigin {
   const [programs, setPrograms] = useState<ProgramsAnswer & { readonly text: string }>({ text: '', matches: 0, settled: false, ok: true });
   const latest = useRef(0);
@@ -45,18 +48,34 @@ export function useAddressOrigin(text: string, near: { readonly lat: number; rea
 
   const [origin, setOrigin] = useState<{ readonly text: string; readonly option: AreaOption } | null>(null);
   const [choosing, setChoosing] = useState(false);
+  // Place Details costs a call and Will capped them (docs/google-places.md): about one per search, not one per pause. The first suggestion is
+  // only resolved once the words have stood still for SETTLE_MS (apart from the 400 ms pause that asks for suggestions), and a place already
+  // resolved while this screen is open is reused. In memory only, like the point itself.
+  const resolved = useRef(new Map<string, AreaOption>());
   const first = street.suggestions[0];
   useEffect(() => {
-    if (!first || (origin && origin.text === text)) return;
+    // Only for words that read as an address: an emptied box has no point, even while the last suggestion is still in hand.
+    if (!first || !looksLikeAddress(text)) return;
+    const known = resolved.current.get(first.placeId);
+    if (known) {
+      setOrigin({ text, option: known });
+      return;
+    }
+    if (origin && origin.text === text) return;
     let cancelled = false;
     setChoosing(true);
-    void street.choose(first).then((option) => {
-      if (cancelled) return;
-      setChoosing(false);
-      if (option) setOrigin({ text, option });
-    });
+    const timer = setTimeout(() => {
+      void street.choose(first).then((option) => {
+        // Spent either way: keep the answer for the next time these words lead to this place.
+        if (option) resolved.current.set(first.placeId, option);
+        if (cancelled) return;
+        setChoosing(false);
+        if (option) setOrigin({ text, option });
+      });
+    }, SETTLE_MS);
     return () => {
       cancelled = true;
+      clearTimeout(timer);
       setChoosing(false);
     };
     // `street.choose` is stable; the first suggestion for these words is what is chosen.

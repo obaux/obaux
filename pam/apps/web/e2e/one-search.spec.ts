@@ -57,7 +57,9 @@ async function open(page: Page, opts: { language?: string; areas?: unknown[]; en
     if (body['action'] === 'choose') {
       return route.fulfill(json({ enabled: true, place: { label: '1500 Market St, Philadelphia, PA 19102', lat: 39.9526, lon: -75.1664 } }));
     }
-    return route.fulfill(json({ enabled: true, suggestions: [{ placeId: 'ChIJ1500marketstreet', label: '1500 Market St, Philadelphia, PA' }] }));
+    // One place per address (its first eleven characters), so a longer text for the same address leads to the same place.
+    const q = String(body['q'] ?? '');
+    return route.fulfill(json({ enabled: true, suggestions: [{ placeId: q.length >= 11 ? 'ChIJ1500marketstreet' : `ChIJshort${q.length}xxxxx`, label: '1500 Market St, Philadelphia, PA' }] }));
   });
   await page.goto(path);
   await settled(page);
@@ -169,6 +171,31 @@ test.describe('one search field', () => {
     await box.fill('1500 Market');
     await expect(page.getByRole('heading', { name: 'Nothing matched that.' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Near 19102' })).toBeVisible();
+  });
+
+  test('Place Details is frugal: three bursts of typing cost one choose, and a longer text for the same place costs none', async ({ page }) => {
+    const { box, asked } = await open(page);
+    // Three bursts with pauses long enough for each to be asked about (400 ms + the round trip), but not long enough to settle.
+    await box.pressSequentially('1500 M', { delay: 40 });
+    await page.waitForTimeout(900);
+    await box.pressSequentially('arket', { delay: 40 });
+    await page.waitForTimeout(900);
+    await box.pressSequentially(' St', { delay: 40 });
+    await expect(page.getByRole('heading', { name: 'Results for “1500 Market St”' })).toBeVisible({ timeout: 8000 });
+    await expect(page.getByRole('button', { name: 'Near 19102' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Example Market Street Clinic' })).toBeVisible();
+    const chooses = () => asked.filter((body) => body['action'] === 'choose').length;
+    const suggests = () => asked.filter((body) => body['action'] === 'suggest').length;
+    expect(chooses()).toBe(1);
+    // One Autocomplete per pause, no more than the bursts (and at least the two that were waited for).
+    expect(suggests()).toBeGreaterThanOrEqual(2);
+    expect(suggests()).toBeLessThanOrEqual(4);
+    // The same place for a longer text: reused, no second Place Details call.
+    await box.pressSequentially(' A', { delay: 40 });
+    await expect(page.getByRole('heading', { name: 'Results for “1500 Market St A”' })).toBeVisible({ timeout: 8000 });
+    await expect(page.getByRole('button', { name: 'Near 19102' })).toBeVisible();
+    await page.waitForTimeout(2500);
+    expect(chooses()).toBe(1);
   });
 
   test('an address a program matches is not sent to Google', async ({ page }) => {
