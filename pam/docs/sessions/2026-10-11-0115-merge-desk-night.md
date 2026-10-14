@@ -924,6 +924,21 @@
   - Plan B, if guided mode is clumsy on a phone: Pam asks the non-sensitive questions first, one per screen, and
     passes the answers to DocuSign. The SSN never does this.
   - The spike adds household-size and income fields shared across forms, to test exactly this.
+- **Will, 06:51 (a85, chat w20261014065116kirm): no count inside "Next form".** "it's already on top." The count
+  stays in the bar only, on 2c and 3b. This overrides D-560's in-button count for the forms screens.
+- **Will, 06:54 (a85, chat w20261014065418gzbo): the forms answers, explicitly.** "1) Yes. 3) Agree. 4) Allow it. And
+  'Skip above button is good'".
+  - 1: DocuSign on each program's own account first, the Pam-only way later.
+  - 3: Pam stops keeping the drawn-signature picture and keeps the date only.
+  - 4: a program's own words are allowed in its form.
+  - "Screen 2: This is not our confirmation modal design. Please stay consistent with our DS." So "Leave for now?" uses
+    the app's own ConfirmDialog (apps/web/src/screens/ConfirmDialog.tsx). Dot redraws it.
+- **Sage, 06:53 (ledger 9e5001e7): the inline search words.** "Nearest to {zip}" (new), "Clear search", the accessible
+  name "Search programs by name or address", and the placeholder and "Nothing matched that." as before. Merge desk:
+  there is no on-screen line saying address-like text goes to Google, since Will asked for less text and p7 covers it.
+  This goes to Will with Sage's p7 edit, which he signs.
+- **Piper 7bf7e92c (full-screen take, finished before the 06:45 reshape):** not shown to Will. It is the base for the
+  inline build, carrying Lena's words, the four fixes and Dot's token and outline.
 - **Merge desk, 06:08: Piper's DocuSign spike plan (4076102e) approved, with changes.**
   - No live Pam account for the spike: the gateway JWT is the anon key, and the caller-id list is dropped.
   - The spike key never travels. Piper keeps it, and only its SHA-256 is set (`DOCUSIGN_SPIKE_KEY_SHA256`), with a
