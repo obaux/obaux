@@ -845,6 +845,23 @@
   - a general message left the page where it was;
   - no page errors.
 - **Will, 05:23 (a87, chat w2026101405230857qn): Sign in "Approved".** D-572 ships as b37 after b36's CI.
+- **Will, 05:51 (a81, chat w20261014055126vnjb): the Google key is in.** He made the key and added it in Supabase as
+  `GOOGLE_MAPS_SERVER_KEY`. `places-search` (v2, JWT on) answers `{ enabled: false }` only while the key is unset, so
+  street search is on from here. The merge desk can't check it from here: the proxy refuses
+  shobqzuhicoiymtumiaz.supabase.co. Card a81 is now "try one address": Explore, "Near City Hall ✎", "1500 Market",
+  then pick one and see "Near 19102". Afterwards the merge desk reads the function's logs for errors.
+- **Merge desk, 05:40: DocuSign's demo hosts are blocked here.** Iris found it and the merge desk confirmed it: the
+  proxy refuses account-d.docusign.com, demo.docusign.net and apps-d.docusign.com (403). Card a88 step 7 asks Will to
+  add them under the environment's Network access › Allowed domains. Until he does, Piper runs Iris's checks for her;
+  no made-up results. Iris's plan, da15074e, is in b37.
+- **Will, 05:55 (a86, chat w20261014055553bfbe): the search bar's dark pill comes back, one height for the bar.**
+  "Also please bring back the selected dark pill outline around search bar when user selects it. And make search bar on
+  homepage match the height of search when active, they should feel as one. not disconnected." That makes search fields
+  the exception to D-569: an active search field shows the ink pill again, while other text boxes keep no ring. The
+  resting bar on Explore and on staff All programs is the same height as the active box (one token). Dot does both in
+  the shared SearchField, and Piper builds a86 on top. His "extra text under use my current location" was take three's
+  old picture 2. The build already drops the "Type a program..." line. The two privacy notes ("Used for this search
+  only.", "Pam remembers the area you pick on this phone only.") stay unless he says otherwise; he was asked.
 
 ## What was wrong, and what missed it
 
