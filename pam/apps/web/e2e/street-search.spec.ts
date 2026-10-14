@@ -88,7 +88,7 @@ test.describe('street search', () => {
     await expect.poll(() => asked.some((body) => body['action'] === 'choose')).toBe(true);
     // The pick ends the search session: the choose call carries the same token the suggestions did.
     expect(asked.at(-1)).toEqual({ action: 'choose', placeId: 'ChIJ1500marketstreet', token: (asked[0] as { token: string }).token });
-    await page.getByRole('button', { name: 'Done' }).click();
+    await expect(page.getByRole('textbox', { name: /ZIP code/ })).toHaveCount(0);
     // Only the ZIP on the chip, to save room on the main screen (Will, 13 October); the point still orders the places.
     await expect(page.getByRole('button', { name: 'Near 19102' })).toBeVisible();
     await expect(page.getByText('1500 Market St, Philadelphia, PA 19102')).toHaveCount(0);
