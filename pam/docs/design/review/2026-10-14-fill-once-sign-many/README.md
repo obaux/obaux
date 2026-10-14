@@ -1,5 +1,13 @@
 # Fill once, sign many: the member's side (pictures only, 390px, light and dark)
 
+## Decided (Will, 14 October, 06:30): no Pause button
+Will: "Also why pause button?" The bar's close (×) already does Pause's job, because Pam always remembers which forms are signed. So the bar is: close, the form's name, "Form 3 of 112" and the progress bar; no Pause button, and no "Pause here" on the DocuSign hand-back (3b). The screen they see when they come back after closing is **2d, "coming back"** (was "Paused"): progress, the calm note that Pam remembers which forms are signed but not their details, the list, "Carry on with form 4".
+
+**Does close ask? Yes, once: 2b.** Closing mid-form costs one thing: their details are cleared (Pam does not keep them), so they type them again, SSN included, when they come back. A tap on × by mistake would otherwise lose that without a word, so ×  asks "Leave for now?" with what is kept (the signed forms) and what is not, and **Keep signing** as the one primary, **Leave for now** above it. On the DocuSign route nothing of theirs is in Pam to lose, so × goes straight back with no question (stand-in words throughout). Numbers in the file names moved: 2b is new, so the old 2b, 2c are now 2c, 2d.
+
+## Decided earlier (Will, 14 October, 06:28): good news in green
+"Good news in green is a nice touch." A confirmation, something that is done, is Astryx's `Banner` with `status="success"` (green): "Signed and sent to…" (2b), "DocuSign has it" (3b), and on both done screens "Sent to the programs" and "Not stored in Pam" (4a, 4b). An informational note stays the subtle blue `Banner status="info"` he asked for at 04:43: "Pam doesn't keep these", "Gone when you are done", "Pick up whenever you like". The blue-and-green comparison tiles are gone; green is the only version. "Undo this signature" and "Skip this one for now" stay above the main button (the Skip question is still Will's to answer). The rounds below are the history.
+
 ## Fourth round: the primary stays put (Will, 14 October, 05:18)
 "Move undo this signature button to top of Primary action, so primary button is placed at same place across all." In the pinned strip, "Undo this signature" (2b, and its success-banner comparison) now sits **above** the primary button, so the primary is in the same place at the bottom on every screen. I did the same for "Skip this one for now" on 2a, for the same reason (Will's note named only Undo; say if he wants Skip left below). Redrawn: 2a-sign, 2b-signed-next, 2b-compare-signed-as-success, light and dark, and both sheets. The blue and green versions are both kept.
 
