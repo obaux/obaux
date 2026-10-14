@@ -886,6 +886,15 @@
   (X) does the same job, because Pam always remembers which forms are signed. The bar is close, the form's name, "Form 3
   of 112" and progress. 2c becomes the coming-back screen. Dot redraws it with the green change, and draws a "Leave
   now?" step only if one is needed.
+- **Will, 06:39 (a88, chat w20261014063907oeyq): the DocuSign setup is done.** He has the APIs, the four Supabase
+  secrets, the integration key (not a secret, d2446c11-…) and the environment's allowed domains. The consent link was
+  sent at 06:39. Checked from the merge desk: account-d.docusign.com and apps-d.docusign.com answer, and Pam's
+  Supabase host is now reachable. demo.docusign.net still gets a 403, and Will was asked to check its spelling.
+  Street search confirmed on: `places-search` answered a GET with 405 "POST only", which it can only do once
+  `GOOGLE_MAPS_SERVER_KEY` is set, and nothing went to Google.
+- **Dot 2a2b4e32 (merged, pictures only): forms in green, no Pause.** The × asks "Leave for now?" once on the
+  Pam-only way, because leaving clears the details typed in. On DocuSign's way it just closes. 2d is "Welcome back".
+  Card a85 shows the new set and is back in Waiting.
 - **Merge desk, 06:08: Piper's DocuSign spike plan (4076102e) approved, with changes.**
   - No live Pam account for the spike: the gateway JWT is the anon key, and the caller-id list is dropped.
   - The spike key never travels. Piper keeps it, and only its SHA-256 is set (`DOCUSIGN_SPIKE_KEY_SHA256`), with a
