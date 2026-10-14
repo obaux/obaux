@@ -361,7 +361,7 @@ function Screen({ which }: { readonly which: string }) {
           <Progress pct={100} label="112 of 112" />
           <VStack gap={2} xstyle={styles.row}>
             <Calm icon={<Icon icon="check" size="md" />} title="Sent to the programs" body="Each program has its own signed form: 9 programs, 112 forms." />
-            <Calm icon={<Icon icon="check" size="md" />} body="Your name, birth date and Social Security number are no longer stored in Pam." />
+            <Calm icon={<Icon icon="check" size="md" />} title="Not stored in Pam" body="The name, birth date and Social Security number you typed for this form are no longer stored in Pam." />
           </VStack>
           <Card padding={4}>
             <VStack gap={2}>
@@ -370,6 +370,22 @@ function Screen({ which }: { readonly which: string }) {
                 Pam does not keep them. Save them to your phone or send them to yourself now: once you leave this screen they are not in Pam.
               </Text>
               <TextLink label="Send them to my email" />
+            </VStack>
+          </Card>
+        </SubPage>
+      );
+    case 'done-docusign':
+      return (
+        <SubPage title="All 112 signed" subtitle="Nothing left to sign" backLabel="Back to Home" backHref="#" footer={<BigButton label="Back to Home" />}>
+          <Progress pct={100} label="112 of 112" />
+          <VStack gap={2} xstyle={styles.row}>
+            <Calm icon={<Icon icon="check" size="md" />} title="Sent to the programs" body="DocuSign sent each program its signed form: 9 programs, 112 forms." />
+            <Calm icon={<Icon icon="check" size="md" />} title="Not stored in Pam" body="Pam never had the name, birth date and Social Security number you gave for this form. They went straight to DocuSign." />
+          </VStack>
+          <Card padding={4}>
+            <VStack gap={2}>
+              <Text weight="bold">Your copies</Text>
+              <Text type="supporting">DocuSign sends you a copy of each form. Pam does not have them, so look for them in the email you gave DocuSign.</Text>
             </VStack>
           </Card>
         </SubPage>
