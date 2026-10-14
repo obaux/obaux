@@ -93,7 +93,7 @@ export function signerTabs() {
     dateSignedTabs: [{ ...at('date'), tabLabel: 'dateSigned', tooltip: 'Today’s date, filled in for you' }],
     textTabs: [
       { ...at('fullName'), tabLabel: 'fullName', tooltip: 'Your full name', required: 'true', width: '200', height: '20' },
-      { ...at('annualIncome'), tabLabel: 'annualIncome', tooltip: 'About how much does your household make in a year?', required: 'true', width: '200', height: '20' },
+      { ...at('annualIncome'), tabLabel: 'annualIncome', tooltip: 'About how much does your household make in a year? You can leave this blank.', required: 'false', width: '200', height: '20' },
       { ...at('contactName'), tabLabel: 'contactName', tooltip: 'The name of the person to call in an emergency', required: 'true', width: '200', height: '20' },
     ],
     dateTabs: [{ ...at('dob'), tabLabel: 'dob', tooltip: 'Your birth date', required: 'true', width: '100', height: '20' }],

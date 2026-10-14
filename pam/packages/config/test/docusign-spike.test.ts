@@ -149,7 +149,11 @@ describe('the envelopes', () => {
     const text = (name: string) => new TextDecoder().decode(makePdf('x', [{ label: 'l', anchor: `/${name}/` }]));
     expect(text('householdSize')).toContain('/householdSize/');
     expect(tabs.find((tab) => tab.tabLabel === 'householdSize')!.tooltip).toBe('How many people live with you?');
-    expect(tabs.find((tab) => tab.tabLabel === 'annualIncome')!.tooltip).toBe('About how much does your household make in a year?');
+    expect(tabs.find((tab) => tab.tabLabel === 'annualIncome')!.tooltip).toMatch(/^About how much does your household make in a year\?/);
+    // Some tabs are required and some optional, so the run can see how each is marked and what Finish does with a blank.
+    const required = (label: string) => (tabs.find((tab) => tab.tabLabel === label) as { required?: string }).required;
+    expect(required('householdSize')).toBe('true');
+    expect(required('annualIncome')).toBe('false');
   });
   it('asks Connect for no documents and no field data', () => {
     const notice = envelopeDefinition('E1', { connectUrl: 'https://stub.supabase.co/functions/v1/docusign-spike-hook/connect' }).eventNotification!;
