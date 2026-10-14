@@ -27,9 +27,9 @@ const FOOD = [
 ];
 const NEAREST = [row('b1000000-0000-4000-8000-000000000001', 'Example Market Street Clinic', '1500 Market St Philadelphia, PA 19102', 40)];
 
-async function open(page: Page, opts: { areas?: unknown[]; enabled?: boolean | 'unreadable'; programs?: (q: string) => unknown[] | 'fail'; role?: 'member' | 'admin'; path?: string } = {}) {
-  const { areas = [], enabled = true, programs = (q) => (/food/i.test(q) ? FOOD : []), role = 'member', path = '/' } = opts;
-  await asMember(page, role);
+async function open(page: Page, opts: { language?: string; areas?: unknown[]; enabled?: boolean | 'unreadable'; programs?: (q: string) => unknown[] | 'fail'; role?: 'member' | 'admin'; path?: string } = {}) {
+  const { language = null, areas = [], enabled = true, programs = (q) => (/food/i.test(q) ? FOOD : []), role = 'member', path = '/' } = opts;
+  await asMember(page, role, language);
   const asked: Record<string, unknown>[] = [];
   const nearAsked: Record<string, unknown>[] = [];
   const outside: string[] = [];
@@ -208,6 +208,20 @@ test.describe('one search field', () => {
     await box.fill('food');
     await expect(page.getByRole('heading', { name: 'Example Food Pantry' })).toBeVisible();
     await expect(page.getByRole('button', { name: /^Search programs$/ })).toHaveCount(0);
+  });
+
+  test('in Arabic, a typed Latin address keeps its own direction (dir="auto"): "1500 Market", not "Market 1500"', async ({ page }) => {
+    await open(page, { language: 'ar' });
+    await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+    // The field's name is Arabic here, so find it by what it is.
+    const box = page.locator('.astryx-input-group[data-size="lg"] input').first();
+    await expect(box).toHaveAttribute('dir', 'auto');
+    await box.fill('1500 Market');
+    // The browser resolves "auto" from the first strong letter: this text lays out left to right.
+    expect(await box.evaluate((el) => el.matches(':dir(ltr)'))).toBe(true);
+    // An Arabic word typed in the same field lays out right to left.
+    await box.fill('طعام');
+    expect(await box.evaluate((el) => el.matches(':dir(rtl)'))).toBe(true);
   });
 
   test('has no WCAG A/AA violations while typing an address', async ({ page }) => {

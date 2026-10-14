@@ -267,6 +267,11 @@ export function SearchField({
     const button = groupRef.current?.querySelector('button[aria-label]');
     if (button) button.setAttribute('aria-label', clearLabel);
   }, [clearLabel, value]);
+  // What is typed keeps its own direction: in the Arabic UI a Latin address such as "1500 Market" must not be turned into "Market 1500" by the
+  // page's right-to-left base (Lena, 14 October). `dir="auto"` follows the first strong letter of what was typed; an empty field follows the page.
+  useEffect(() => {
+    groupRef.current?.querySelector('input')?.setAttribute('dir', 'auto');
+  }, []);
   useEffect(() => {
     const input = groupRef.current?.querySelector('input');
     if (!input) return;
