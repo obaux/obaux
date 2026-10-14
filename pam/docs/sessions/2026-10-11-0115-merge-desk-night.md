@@ -1001,6 +1001,13 @@
   - pam/CLAUDE.md now points every session at the doc. The before-launch street-search item is closed.
   - Will's question on his doc (does Pam's own database hold contact details?): yes. It is answered in the repo doc;
     the doc's thread was not replied to.
+- **Piper, 20:21: a86 at 5d6353b3, about one Place Details call per search.** The first suggestion is resolved only
+  after the words stand still for 1 s (`SETTLE_MS`, separate from the 400 ms suggest pause). A place already resolved
+  on this screen is reused (in memory only, so Lena's no-storage pin holds). Nothing is resolved for words that aren't
+  an address. A new spec counts the calls: three typed bursts give 1 choose and 2 to 4 suggests, with the same result.
+  Checks: one-search, area-picker, focus-text-boxes and street-search on all three projects 132/132; ui 124; config
+  1312; tsc clean. Screens: none. Cost: the list re-sorts for a typed address about 1 s later than before; the
+  finished screen is unchanged.
 - **One send-invite-emails 500 at 06:25:01** (`claim_staff_invite_emails: 401`). The 21 runs either side of it all
   returned 200. Not acted on. Watch only.
 
