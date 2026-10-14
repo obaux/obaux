@@ -793,6 +793,16 @@
   Tested in a harness at 390: a new card plus longer text above held the picture within a pixel, and the draft and the
   open picture came back after a reload. The forms pictures (Dot 3b76742c, blue info banners with a green version to
   compare) were the first to arrive through the asset store.
+- **Will, 04:50 (a83, chat w20261014045002p6tc): the help form "looks good. Approved".** D-569 (app) and D-570
+  (website) ship in b36 once the full checks pass. Sage signed Wren's "More: Got a new phone number?" link (0344f23b).
+  That post stays held for a84.
+- **Merge desk, 04:55: a86 shows Piper's take three (ec5195b0).** One-line bar "Search programs or places"; the "Near
+  City Hall ✎" control kept; typing "food" lists programs and asks Google for nothing unless the explicit "Search
+  addresses for 'food'" row is tapped; typing "1500 Market" shows areas, then Google's addresses. Piper's privacy check
+  found that today's rule (`wantsGoogle`: ask when Pam's own areas find nothing) would have sent "food" from a merged
+  box. So the box asks Google only for address-like text that matches no program, or on the explicit tap, and fails safe.
+  The drawer keeps today's rule, so the signed p7 stays true. Decided, and Will can change them: all digits put Areas
+  first; a street picked in the box shows only its ZIP (D-552).
 
 ## What was wrong, and what missed it
 
