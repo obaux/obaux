@@ -730,6 +730,21 @@
   yes on each: (1) that order; (2) a free DocuSign developer account he makes, for Iris and Piper's spike; (3) stop
   keeping the drawn signature picture on read-and-agree policies (D-485 point 1), keeping only the date; (4) a
   program's own form may use words Pam doesn't. Nothing is built or claimed until he answers.
+- **Merge desk, 04:22: Dot's logo files are in (ef517da1, D-557).** Gray on light, White on dark, 18px, alt "Google
+  Maps", served from Pam, with a test that nothing in them runs or loads. Merged as batch b35 with the records,
+  targeted checks first. Card a81 shows the pictures. Nothing changes for members until Will's key, which is the next
+  step once b35 is live.
+- **Will, 04:23 (on a84, chat w20261014042353dose): one search, and a help post for a new number.** In his words
+  (dictated): "also simplify the user and merge search and filter. When they search it opens a message where they
+  can write, and write in the filter between the two. Also for the new number, add that as an article inside the
+  support website and in the article it has a callout to this form and have the post facilitate this process".
+  Neither a84 screen has a search or filter (checked), so the merge desk's reading is Explore (and All programs).
+  The "Search programs" bar and the area control ("Near 19102 ✎") become one bar; tapping it opens a screen with the
+  cursor in the box, a "Programs" | "Area" switch and the category chips under it. Piper draws it (pictures only) and
+  Will confirms or corrects before anything is built; the reading was posted to him at 04:25. The help post: Sage
+  writes and signs "Got a new phone number?", and Wren builds it after the help form, with a call-out that opens
+  `/signin/new-number/` in the app. It is held off main until a84 is signed and D-567 ships. a84 itself is still
+  unanswered.
 
 ## What was wrong, and what missed it
 
