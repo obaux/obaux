@@ -763,6 +763,19 @@
   Three choices on the card with my advice: chips on Programs only, full screen, and a ZIP typed on Programs switches
   to Area. Sage signed the "Got a new phone number?" post (e708a7e8). Her "We may call your new number" line follows
   a84 (i). Correction to the 04:15 entry: the ZIP-only chip rule is D-552, not D-561.
+- **Will, 04:39 (a86, chat w20261014043914e19d): one box, like Google Maps.** In his words: "Let's talk about this
+  before we push anything. If I'm in Google Maps I can type either a program name or an address and it will just show
+  me the list. I don't have to select whether it's a service or an area. Why do we need to make a distinction? Also I
+  don't like the subtitle under 'Search program' inside the search bar. It feels too crowded. Can we just streamline
+  this and merge everything into one?" Merge desk, 04:39: agreed, no switch. The bar has one line ("Search programs
+  or places"), and one list comes back with programs first, Pam's areas next and addresses last. **Google is asked
+  only when the text looks like an address** (a house number, a street suffix, an "X and Y" corner) or when the
+  person taps an explicit "Search addresses" row, so what people search for ("food pantry", "rehab") never leaves Pam.
+  That keeps the signed a74/a81 Privacy line true and Google's bill down; Piper checks whether the line's "a place
+  Pam's own list of areas doesn't have" clause is broader than this. Piper redraws it (v2, pictures only).
+- **Will, 04:40 (a81, chat w20261014044028qel6): keep "Near 19102".** The area control on the right of "All programs"
+  (or a category) stays as it is today, for people who browse rather than type. Picking an area or address in the one
+  box updates the same control. Piper's v2 includes it.
 
 ## What was wrong, and what missed it
 
