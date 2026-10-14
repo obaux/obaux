@@ -866,6 +866,10 @@
   change (the dark pill, one height), re-shot with it. Piper left "Pam remembers the area you pick on this phone only."
   out of the box (the drawer keeps it), which is not what Will was told at 05:56. Lena was asked whether the box needs
   it, and Will hears her answer with the pictures.
+- **Lena, 06:12: the box is fine without "Pam remembers the area…".** Privacy never promises it, and under Google's rows
+  ("Used for this search only.", with `saveOrigin` skipping `here` and `google:` picks) it would read as if the address
+  were kept. Piper takes it out of the box; the drawer keeps its own line. Will was told at 06:13, correcting the
+  05:56 note.
 - **Merge desk, 06:08: Piper's DocuSign spike plan (4076102e) approved, with changes.**
   - No live Pam account for the spike: the gateway JWT is the anon key, and the caller-id list is dropped.
   - The spike key never travels. Piper keeps it, and only its SHA-256 is set (`DOCUSIGN_SPIKE_KEY_SHA256`), with a
