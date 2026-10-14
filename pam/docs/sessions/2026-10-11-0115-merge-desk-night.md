@@ -601,6 +601,15 @@
   links, and 60px / 120px between the last block and the footer on every help page. Records: Sage's ledger (a82
   as Will's words, nav.back.reported signed), Iris's pre-ship walk-through (all three items pass). Two STATUS
   conflicts kept both sides; a duplicated Google-logo section dropped.
+- **Batch b33 (13 October).** No migration, no function change. Piper's D-565 (b8319ec2): the old Places list
+  is retired; /places/ sends members to Explore and staff to All programs, ?filter=reported sends a super admin to
+  Reported places, Back from a reported place returns there ("Back to Reported places", signed and in seven
+  languages), and a place Pam cannot find says "Go back to Explore" under an Explore title (Sage signed, Lena's six
+  languages). Dot's D-566 (the compact Sign in bar takes over at half the hero mark; Next's name uses each
+  language's comma), Ava's reveal link described by its question, Wren's help form focus (an empty Send lands on the
+  first field in error; a sent form focuses its thank-you), Dot's D-562 correction, Iris's two walk-throughs, Sage's
+  ledger. The first full run failed 3 of 1854 (place.spec's not-found screen still said Places); held, fixed, and
+  the second full run passed.
 - **Will, 18:18 (a81, chat w20261013181806g6qz): the old Places list is retired.** Picture 3 of the street
   search (v2) showed the old `/places/` list, with its old header and layout. Will: that page is "no longer an
   active page that we support". The ZIP shows on the member's Explore page (`/`); a case manager or program searching
@@ -641,8 +650,367 @@
   ADMIN_CAN_SEE does not allow, so the super admin decides every move request until Will signs a contract line.
   She also found that Privacy does not yet say staff keep a last name and a city: p7 is rewritten in the same
   signature. Live, counts only: staff_requests has one row, approved on 16 September. Nothing refused is kept.
+- **Merge desk, 19:48 to 21:27 (none needed Will):** a new-number request is read and decided by the super admin
+  only, so nothing is added to ADMIN_CAN_SEE (Lena's catch: the plan let a member's own case manager read it); no
+  24h escalation; every Approve needs the tick. A denial deletes the new number's sign-in at once; every purged
+  request takes its sign-in (Lena: also an approved request whose move never ran). An unanswered case manager
+  request is purged 90 days after asking, sign-in too. postgres can delete from auth.users on live (read-only
+  privilege check, 20:30), so remove_temporary_signin stays a definer function, revoked from every client role.
+  pg_cron is live (five jobs); auth.audit_log_entries has 0 rows; the organization is on the free plan, so platform
+  logs last 1 day and p11's "within a week" holds. The help dialog does not close on an outside click, so nothing
+  typed is lost (kept; Will told; D-562 corrected). p7's staff part may go live ahead of the features if Will says
+  yes (a84 h; Sage signed the short version). a84 gains (i): tell the person someone may call (Sage). Lena folds
+  "add a program" requests into p15, since the D-568 purge covers them and Privacy says nothing about them today.
+  Live finding (Ava, 21:24): join.staff.title / body promise "We will text you the answer" while texts are off;
+  Sage rewrites, Lena translates, and it ships next without waiting for a84. **Withdrawn at 21:31:** Sage showed
+  the staff-request decision texts are account texts, exempt from texts_live (D-481; claim_outbound_messages lists
+  staff_request_approved and staff_request_denied), and live confirms it (dispatch-sms every 5 minutes; one approved
+  text sent 10 October, one denied 17 September). join.staff.* and addProgram.ask.* stay; Sage's D-568 waiting line
+  says the answer is texted. a84 is final at 21:51: p15 widened to add-a-program requests (Sage d8c9db1e) and (j),
+  "If we add a program you asked for, its name, type, address, phone number, website and description are shown on
+  Pam." (Lena: a lead's first name is shown to members who write, so "Your name is not" stays out).
+- **Batch b34 (13 October, 22:11, afee3198).** No migration, no function change. Lena's 134af68d: the six
+  Spanish staff Join strings in usted, with stories that draw the staff privacy step and the "We will text you"
+  notice. Sage's ledger 402dc982: D-568, Wren's website lines and a84 (j) signed; the withdrawn line marked.
+- **Will, 14 October 04:03 (Control Room comment, chat w20261014040306dvaw): forms and DocuSign.** In his words:
+  "We're going to need to reimagine how we offer policies both from the program lead with a DocuSign integration
+  and for the member who's signing forms. Social programs have forms that are PDFs with tags for members to add:
+  name, initials, birth date, Social Security number, current (today's) date, signatures, information. We need a
+  way to not store this but allow them to sign over 100 forms in one go, one at a time, conveniently, placing their
+  name and all of those other details mentioned. Additionally programs use DocuSign for asking members to sign
+  digitally so we need to set up an integration with DocuSign as a priority and allow that integration to funnel in
+  the PDF previews in a way that is easy for members to sign. Maybe through an embed window where they can access
+  the DocuSign document and use the DocuSign interface inside of Pam. Alternatively let them sign and tag the PDFs
+  inside of Pam without DocuSign." Merge desk, 04:04 (chat m20261014040418forms), the starting position: Pam does
+  not keep what a member types into a form; DocuSign comes first, with the member filling and signing in
+  DocuSign's own window inside Pam, so Pam never sees a Social Security number; today's program policies (D-485,
+  D-489) stay as they are until the new way is ready; nothing is built until Will has seen a card with pictures
+  and choices. The research round went out at 04:06. Iris: DocuSign's signing inside another app, its cost, the
+  alternatives, filling a PDF inside Pam, the e-signature law (ESIGN, UETA) and accessibility, from public pages
+  only, with no accounts. Lena: Social Security numbers and birth dates, e-signatures, DocuSign's role, and the
+  Privacy lines it would need. Piper: how it fits program policies. Dot: pictures of fill once and sign many, the
+  DocuSign window and the finished state, at 390 in both themes. Asked Will: (a) which programs use DocuSign, and
+  on whose account; (b) where a signed form has to end up; (c) a few blank forms in a Drive folder "Pam forms" to
+  design and test with.
+- **Will, 04:05 (a81, chat w20261014040538az2g): street search "approved", with Google's logo files.** The Drive
+  file is Google's `Google_Maps_Attribution_Assets.zip` (91,462 bytes: Gray, DarkGray and White, plus two outline
+  sets, each as an SVG and 1x/2x/4x PNGs). The proxy refuses Google's hosts, so it came through the Drive connector.
+  It was unpacked in its own folder, and the SVGs were checked: no script, link or foreign object. It went up unchanged,
+  without the macOS extras, on `mira/google-maps-attribution-assets` (41d6e8ab) for Dot. Merge desk, 04:15: Dot
+  finishes D-557 (Google's rule: the version that contrasts, so expect Gray on light and White on dark; 18px; alt
+  "Google Maps"), shows Will pictures, and it ships; then Will makes the key. Will did not confirm the 16 to 19 px
+  sentence on Google's page, so Dot records that it was not checked.
+- **Will, 04:08 (a83, chat w20261014040802nbtc): three help form changes.** In his words: "the still stuck card still
+  touches footer on mobile. Also please undo any rules about text box being selected, I don't want that. All I want
+  is for the keyboard to be active when a text box presents itself, for the user's convenience in typing.
+  Additionally the desktop 'Still stuck?' card: there's something off about that button, 'Write to us,' being so
+  long, stretching all the way. Just make it fit the text. No reason for it to be so wide but on mobile it's okay".
+  Merge desk, 04:15: (1) The gap. pam-site is live on 3975ce34, and the live code, measured, gives 60px (see
+  Verified). Will was told to reload a tab opened before b32, and that the card's sixth picture was the old one (now
+  removed). Wren checks every page that ends in a card, in both themes and in WebKit's terms, and moves the gap to
+  padding if any engine could drop the margin. (2) Text boxes. D-523's text-box line (Will's own 11 October words) is
+  reversed: a text box shows no ring in any mode, on the website and in the app. A text box that opens ready still
+  takes focus, inside the tap, so iOS raises the keyboard. Buttons, links, tick boxes and selects keep their ring on
+  Tab, because that is how a keyboard user sees where they are. Dot writes it as a new D-number; Wren does the
+  same on the site. (3) "Write to us" fits its words from 600px and stays full width on a phone. Pictures go to
+  Will before any of it ships.
+- **Merge desk, 04:20: forms card a85 for Will.** All four came back READY: Iris's research (b7da9ba5), Lena's legal
+  note (59e88997, not legal advice; tags every claim), Piper's plan (8302dea4) and Dot's pictures (63671ef4). All four
+  are merged into main as records. Position on the card: DocuSign on **each program's own account**, shown inside Pam
+  (DocuSign's page under Pam's bar, or full screen and back), so the member types an SSN on DocuSign's page and Pam
+  never sees it. Pam keeps only the envelope id, the status and "signed, on this day". Piper's plan started on one Pam
+  account; Iris and Lena both found that would leave every completed form in Pam's DocuSign until purged, which is
+  storing it by another name, so the program's account it is. The honest cost: Pam cannot carry details across
+  programs, so a member types them once per program package, not once per sitting. The Pam-only route (fill and sign
+  on the phone, details only in memory) is later, bigger, and needs a lawyer. Today's policies stay; forms become a
+  second kind (`kind = 'form'`). Fixed whatever Will picks: Pam never asks for an SSN, no form title in a text or
+  notice, a program sees "signed, on this day", Pam's code never downloads a form, a Pennsylvania lawyer before
+  launch, off until Will switches it on. Not promised: that the DocuSign token itself cannot download (Lena's
+  least-privilege point; the spike shows how far DocuSign lets it be narrowed). Four questions for Will, my advice
+  yes on each: (1) that order; (2) a free DocuSign developer account he makes, for Iris and Piper's spike; (3) stop
+  keeping the drawn signature picture on read-and-agree policies (D-485 point 1), keeping only the date; (4) a
+  program's own form may use words Pam doesn't. Nothing is built or claimed until he answers.
+- **Merge desk, 04:22: Dot's logo files are in (ef517da1, D-557).** Gray on light, White on dark, 18px, alt "Google
+  Maps", served from Pam, with a test that nothing in them runs or loads. Merged as batch b35 with the records,
+  targeted checks first. Card a81 shows the pictures. Nothing changes for members until Will's key, which is the next
+  step once b35 is live.
+- **Will, 04:23 (on a84, chat w20261014042353dose): one search, and a help post for a new number.** In his words
+  (dictated): "also simplify the user and merge search and filter. When they search it opens a message where they
+  can write, and write in the filter between the two. Also for the new number, add that as an article inside the
+  support website and in the article it has a callout to this form and have the post facilitate this process".
+  Neither a84 screen has a search or filter (checked), so the merge desk's reading is Explore (and All programs).
+  The "Search programs" bar and the area control ("Near 19102 ✎") become one bar; tapping it opens a screen with the
+  cursor in the box, a "Programs" | "Area" switch and the category chips under it. Piper draws it (pictures only) and
+  Will confirms or corrects before anything is built; the reading was posted to him at 04:25. The help post: Sage
+  writes and signs "Got a new phone number?", and Wren builds it after the help form, with a call-out that opens
+  `/signin/new-number/` in the app. It is held off main until a84 is signed and D-567 ships. a84 itself is still
+  unanswered.
+- **Will, 04:31 (a85, chat w20261014043123eeo6): "Good job on these", with four changes to the forms pictures.** The
+  banners take the place page's "Booking confirmed" style, not the edge border; the main buttons stay fixed at the
+  bottom; on "All 112 signed" the banners sit close together with "Your copies" under them; and the cleared banner
+  says plainly that the name, birth date and SSN are no longer stored in Pam. Dot redraws (pictures only) and Sage
+  words the cleared line so it is true on both routes. The card's four questions are still unanswered, and nothing is
+  built.
+- **Merge desk, 04:30: Dot's D-569 (56d7d929, follow-up 76ed2731), text boxes without a ring, is accepted.** The
+  chat composer never had a ring; its old "Tab rings" test never ran, and it now asserts none. The sign-in code boxes
+  keep D-251's 2px edge on the box the next digit goes into, on purpose: it is not a ring and a caret can't do that
+  job across six boxes. WCAG 2.4.7 then rests on the caret for text boxes, recorded as Will's call. The pictures are
+  on a83. It ships with Wren's website version of the same rule.
+- **Merge desk, 04:35: card a86, one search on Explore.** Piper drew it (fe40db8a, pictures only, no app code). One
+  bar ("Search programs", with the area on its second line); tapping it opens a screen with the cursor in the box and
+  a Programs | Area switch. The Area side holds today's rows (current location, Pam's areas, Google's rows, the mark,
+  the footer); the area link with its pencil and the Location drawer go. Nothing changes in what is saved or sent.
+  Three choices on the card with my advice: chips on Programs only, full screen, and a ZIP typed on Programs switches
+  to Area. Sage signed the "Got a new phone number?" post (e708a7e8). Her "We may call your new number" line follows
+  a84 (i). Correction to the 04:15 entry: the ZIP-only chip rule is D-552, not D-561.
+- **Will, 04:39 (a86, chat w20261014043914e19d): one box, like Google Maps.** In his words: "Let's talk about this
+  before we push anything. If I'm in Google Maps I can type either a program name or an address and it will just show
+  me the list. I don't have to select whether it's a service or an area. Why do we need to make a distinction? Also I
+  don't like the subtitle under 'Search program' inside the search bar. It feels too crowded. Can we just streamline
+  this and merge everything into one?" Merge desk, 04:39: agreed, no switch. The bar has one line ("Search programs
+  or places"), and one list comes back with programs first, Pam's areas next and addresses last. **Google is asked
+  only when the text looks like an address** (a house number, a street suffix, an "X and Y" corner) or when the
+  person taps an explicit "Search addresses" row, so what people search for ("food pantry", "rehab") never leaves Pam.
+  That keeps the signed a74/a81 Privacy line true and Google's bill down; Piper checks whether the line's "a place
+  Pam's own list of areas doesn't have" clause is broader than this. Piper redraws it (v2, pictures only).
+- **Will, 04:40 (a81, chat w20261014044028qel6): keep "Near 19102".** The area control on the right of "All programs"
+  (or a category) stays as it is today, for people who browse rather than type. Picking an area or address in the one
+  box updates the same control. Piper's v2 includes it.
+- **Will, 04:43 (a85, chat w20261014044303piq9): the banner he meant is the blue one.** "That green card in the places
+  profile isn't even an alert banner. I'm talking about the more subtle blue banner" — the place page's
+  `<Banner status="info">` ("This is only to help you plan. Pam does not tell {place} you are coming."). The merge
+  desk's 04:31 brief had sent Dot to the green VisitCard. Dot redraws every note as the blue info Banner and shows
+  the two confirmations once in Banner success beside them, so Will can pick.
+- **Will, 04:47 (a84, chat w20261014044728k4y4): Sign in's spacing is off.** In Ava's picture the heading sits against
+  the hero and the field, button and line are packed together. Ava's branch changed no gaps (it is based on b32), so Dot
+  checks main at 390×844 and 375×667 and gives it room with spacing tokens, keeping the short-phone fit, with before and
+  after pictures for Will.
+- **Will, 04:48 (chat w202610140448305pq6): the Control Room loses his place and his reply.** Merge desk, 04:53,
+  Control Room v23 (version 42): every picture publish had reloaded the page on his screen (six in the hour). The page
+  now declares `assets`, and card pictures go to its asset store (`/_blob/<id>`), which needs no new version. A data
+  change keeps the card or picture at the top of the screen where it was (`keepPlace`). A reload restores the card he
+  was on, which cards were open, the picture he had open, and the reply being written (kept on his device until sent).
+  Tested in a harness at 390: a new card plus longer text above held the picture within a pixel, and the draft and the
+  open picture came back after a reload. The forms pictures (Dot 3b76742c, blue info banners with a green version to
+  compare) were the first to arrive through the asset store.
+- **Will, 04:50 (a83, chat w20261014045002p6tc): the help form "looks good. Approved".** D-569 (app) and D-570
+  (website) ship in b36 once the full checks pass. Sage signed Wren's "More: Got a new phone number?" link (0344f23b).
+  That post stays held for a84.
+- **Merge desk, 04:55: a86 shows Piper's take three (ec5195b0).** One-line bar "Search programs or places"; the "Near
+  City Hall ✎" control kept; typing "food" lists programs and asks Google for nothing unless the explicit "Search
+  addresses for 'food'" row is tapped; typing "1500 Market" shows areas, then Google's addresses. Piper's privacy check
+  found that today's rule (`wantsGoogle`: ask when Pam's own areas find nothing) would have sent "food" from a merged
+  box. So the box asks Google only for address-like text that matches no program, or on the explicit tap, and fails safe.
+  The drawer keeps today's rule, so the signed p7 stays true. Decided, and Will can change them: all digits put Areas
+  first; a street picked in the box shows only its ZIP (D-552).
+- **Merge desk, 05:03: Sign in's spacing, D-572 (Dot c0ed1c8d), card a87.** It was live since b32. D-564's short-screen
+  rules used `default: null` for the stack gap, the card padding and the brand gap, and in StyleX that unsets the
+  component's own `gap`/`padding` on every screen: title 4px under the picture, field, button and consent line 0px
+  apart at 390×844. The defaults are now the tokens (--spacing-3/5/4), and the tight values apply only under 640px tall;
+  641 to 720px gets a 46vh slide so 375×667 still fits. All 42 fit cases still fit, and a new signin-short case covers
+  390×844 and 375×667. It restores the look Will signed, so it ships as b37 after b36.
+- **Will, 05:18 (a85, chat w20261014051828ivdx): "Undo this signature" goes above the main button, and send the
+  DocuSign steps.** "Let's move undo this signature button to top of Primary action, so primary button is placed at
+  same place across all. Please send Docusign instructions." Dot redraws the forms pictures so the main button sits in
+  the same place, fixed at the bottom, on every screen. Asking for the steps is a yes to question 2 (a free DocuSign
+  developer account that he makes). Merge desk, 05:31: card a88 has the steps.
+  - The developer account at developers.docusign.com. It is free and never expires, and it is demo only: forms are
+    watermarked, not binding, and deleted after 30 days.
+  - Apps and Keys: an app called "Pam test", Generate RSA, and the redirect URI https://joinpam.org.
+  - Four Supabase Edge Function secrets that Will enters himself: `DOCUSIGN_PRIVATE_KEY`, `DOCUSIGN_INTEGRATION_KEY`,
+    `DOCUSIGN_USER_ID` and `DOCUSIGN_ACCOUNT_ID`.
+  - He then gives the integration key, which is not a secret, and the merge desk sends the one-time consent link
+    (account-d.docusign.com/oauth/auth, scope `signature impersonation`).
+
+  Piper writes a spike plan: the function, how it is locked, demo hosts only, and the cleanup. Iris checks the pages
+  only, under her rules. Questions 1, 3 and 4, and blue or green, are still open.
+- **Will, 05:21 (a86, chat w20261014052112b61d): the placeholder is "Search programs", with no helper line.** "Search
+  placeholder 'Search programs" simple. NO need for explainer text below use my location [...] Too much info. Keep
+  placeholders text simple." The merge desk takes this as a go on take three, with his words. "Search programs" is
+  his own wording, so it counts as signed, and the line under "Use my current location" goes. Sage writes the other
+  lines as short as they can be, and the box's accessible name starts with "Search programs". Piper builds it, Dot
+  places the bar on the staff's All programs page, and Lena does the seven languages. Pictures of the built screens go
+  to Will before it ships.
+- **Will, 05:22 (chat w20261014052207fmmj and w20261014052243dva7): two Control Room changes.** A card he has
+  answered says "Replied" on its button, and pressing it still starts a reply. After he sends a reply about a card, the
+  page goes back to the top of "Waiting on you". Merge desk, 05:34, Control Room v24 (version 43):
+  - A message that isn't about a card leaves the page where it is, so the answer arrives where he is reading.
+  - In Listen, the next card is read as before.
+  - A data redraw no longer stops a tab's or a reply's glide halfway: `keepPlace` waits for the jump to finish, and
+    the fold's nudge to the next card stays out of the way.
+
+  Harness at 390 and 1280:
+  - the section landed under the tabs;
+  - the card folded and showed "Replied", and pressing it put the card's prefix back;
+  - a general message left the page where it was;
+  - no page errors.
+- **Will, 05:23 (a87, chat w2026101405230857qn): Sign in "Approved".** D-572 ships as b37 after b36's CI.
+- **Will, 05:51 (a81, chat w20261014055126vnjb): the Google key is in.** He made the key and added it in Supabase as
+  `GOOGLE_MAPS_SERVER_KEY`. `places-search` (v2, JWT on) answers `{ enabled: false }` only while the key is unset, so
+  street search is on from here. The merge desk can't check it from here: the proxy refuses
+  shobqzuhicoiymtumiaz.supabase.co. Card a81 is now "try one address": Explore, "Near City Hall ✎", "1500 Market",
+  then pick one and see "Near 19102". Afterwards the merge desk reads the function's logs for errors.
+- **Merge desk, 05:40: DocuSign's demo hosts are blocked here.** Iris found it and the merge desk confirmed it: the
+  proxy refuses account-d.docusign.com, demo.docusign.net and apps-d.docusign.com (403). Card a88 step 7 asks Will to
+  add them under the environment's Network access › Allowed domains. Until he does, Piper runs Iris's checks for her;
+  no made-up results. Iris's plan, da15074e, is in b37.
+- **Will, 05:55 (a86, chat w20261014055553bfbe): the search bar's dark pill comes back, one height for the bar.**
+  "Also please bring back the selected dark pill outline around search bar when user selects it. And make search bar on
+  homepage match the height of search when active, they should feel as one. not disconnected." That makes search fields
+  the exception to D-569: an active search field shows the ink pill again, while other text boxes keep no ring. The
+  resting bar on Explore and on staff All programs is the same height as the active box (one token). Dot does both in
+  the shared SearchField, and Piper builds a86 on top. His "extra text under use my current location" was take three's
+  old picture 2. The build already drops the "Type a program..." line. The two privacy notes ("Used for this search
+  only.", "Pam remembers the area you pick on this phone only.") stay unless he says otherwise; he was asked.
+- **Merge desk, 06:07: a86 built (Piper D-573, 96952804) and held.** Pictures go to Will only after Dot's SearchField
+  change (the dark pill, one height), re-shot with it. Piper left "Pam remembers the area you pick on this phone only."
+  out of the box (the drawer keeps it), which is not what Will was told at 05:56. Lena was asked whether the box needs
+  it, and Will hears her answer with the pictures.
+- **Lena, 06:12: the box is fine without "Pam remembers the area…".** Privacy never promises it, and under Google's rows
+  ("Used for this search only.", with `saveOrigin` skipping `here` and `google:` picks) it would read as if the address
+  were kept. Piper takes it out of the box; the drawer keeps its own line. Will was told at 06:13, correcting the
+  05:56 note.
+- **Merge desk, 06:16: D-574 take two (Dot 1918d84c).** The outline is back on active search fields (3px ink, white
+  at night), and `--pam-search-height` is 60px for every search box. The heights already matched. What makes the
+  resting bar and the active box feel apart is width and alignment, since the resting bar is full width with centred
+  words. Decided: the resting bar's magnifier and words sit at the left, as in the active box. A tap changes nothing
+  but the outline and the right edge drawing in for Cancel (no transition under reduced motion), with at least 12px
+  between the outline and Cancel. D-574 merges together with a86, and Will sees both in one set of pictures.
+- **Will, 06:28 (a85, chat w202610140628228h1g): confirmations in green.** "Good news in green is a nice touch." The
+  forms' "Signed and sent to [program]" and the done screens use `Banner status="success"`. Informational notes stay
+  the blue `Banner status="info"` (his 04:43). Dot redraws the set with green only. Still open: questions 1, 3 and 4,
+  and whether "Skip this one for now" stays above the main button.
+- **06:24 (a88): which RSA key.** Will asked which of the two keys goes into Supabase: the private one, BEGIN to END,
+  as DOCUSIGN_PRIVATE_KEY. The public key stays with the app in DocuSign.
+- **Will, 06:30 (a85, chat w20261014063039evnz): "Also why pause button?"** Merge desk: Pause goes. The bar's close
+  (X) does the same job, because Pam always remembers which forms are signed. The bar is close, the form's name, "Form 3
+  of 112" and progress. 2c becomes the coming-back screen. Dot redraws it with the green change, and draws a "Leave
+  now?" step only if one is needed.
+- **Will, 06:39 (a88, chat w20261014063907oeyq): the DocuSign setup is done.** He has the APIs, the four Supabase
+  secrets, the integration key (not a secret, d2446c11-…) and the environment's allowed domains. The consent link was
+  sent at 06:39. Checked from the merge desk: account-d.docusign.com and apps-d.docusign.com answer, and Pam's
+  Supabase host is now reachable. demo.docusign.net still gets a 403, and Will was asked to check its spelling.
+  Street search confirmed on: `places-search` answered a GET with 405 "POST only", which it can only do once
+  `GOOGLE_MAPS_SERVER_KEY` is set, and nothing went to Google.
+- **Dot 2a2b4e32 (merged, pictures only): forms in green, no Pause.** The × asks "Leave for now?" once on the
+  Pam-only way, because leaving clears the details typed in. On DocuSign's way it just closes. 2d is "Welcome back".
+  Card a85 shows the new set and is back in Waiting.
+- **Will, 06:45 (a81, chat w20261014064551ywtf): street search tried live; the main search changes shape.** "I tried
+  it, but when I select a result, it should close the drawer with the new zipcode input into place. Now we need to map
+  our database with the google map address, so when users use the main search on app, no pop up opens, and instead they
+  see the programs listed by the address or name they're curious. The goal here is to provide a superior search
+  experience, but only show what we have in database, mapped to google. Remove the dropdown, and instead only show our
+  list of places." The function logs (06:41 to 06:45) show POST 200s and no "places-search failed", plus 401s from 06:38
+  to 06:40 (refused as not signed in; Piper checks the app's token refresh). Decided:
+  1. A live fix, on its own branch: picking anything in the area drawer closes it and sets Near (ZIP only for a
+     street, D-552).
+  2. a86 is reworked as an inline search. There is no full-screen view and no dropdown, and typing filters Explore's
+     list in place. Only Pam's programs show: by name, or nearest a typed address, which is geocoded server-side and
+     only for address-like text that matches no program. One quiet line names the point by ZIP. A clear (×) replaces
+     Cancel, and D-574's outline and height stay. The main search leaves Near alone.
+
+  "Map our database with the google map address" is read as distance from the geocoded point, since Pam's places
+  already have coordinates. Piper says whether he means more. Lena re-checks p7, since Google is now asked without a
+  tap. Sage signs the new line and the clear button's label.
+- **Will, 06:49 (a85, chat w20261014064937lxxq): "Great, approved."** Read as a yes to the pictures (green, no Pause,
+  Leave for now, Welcome back) and to the advice on questions 1, 3 and 4: DocuSign on each program's own account first,
+  Pam stops keeping the drawn signature, and a program's own words are allowed. Skip stays above. He was told this
+  reading and asked to say if any part is a no. Nothing is built on it before the build plan.
+  - His questions: the member's signature, and fields beyond "Your details, once" (household size, income).
+  - Answer: the signature is adopted once in DocuSign and stamped on every form in that sitting. Pam keeps "signed, on
+    this day" only.
+  - Each form asks its own questions through DocuSign's guided "Next", field by field. Programs label each blank
+    plainly at setup, and the same labels fill across one sitting.
+  - Plan B, if guided mode is clumsy on a phone: Pam asks the non-sensitive questions first, one per screen, and
+    passes the answers to DocuSign. The SSN never does this.
+  - The spike adds household-size and income fields shared across forms, to test exactly this.
+- **Will, 06:51 (a85, chat w20261014065116kirm): no count inside "Next form".** "it's already on top." The count
+  stays in the bar only, on 2c and 3b. This overrides D-560's in-button count for the forms screens.
+- **Will, 06:54 (a85, chat w20261014065418gzbo): the forms answers, explicitly.** "1) Yes. 3) Agree. 4) Allow it. And
+  'Skip above button is good'".
+  - 1: DocuSign on each program's own account first, the Pam-only way later.
+  - 3: Pam stops keeping the drawn-signature picture and keeps the date only.
+  - 4: a program's own words are allowed in its form.
+  - "Screen 2: This is not our confirmation modal design. Please stay consistent with our DS." So "Leave for now?" uses
+    the app's own ConfirmDialog (apps/web/src/screens/ConfirmDialog.tsx). Dot redraws it.
+- **Sage, 06:53 (ledger 9e5001e7): the inline search words.** "Nearest to {zip}" (new), "Clear search", the accessible
+  name "Search programs by name or address", and the placeholder and "Nothing matched that." as before. Merge desk:
+  there is no on-screen line saying address-like text goes to Google, since Will asked for less text and p7 covers it.
+  This goes to Will with Sage's p7 edit, which he signs.
+- **Piper 7bf7e92c (full-screen take, finished before the 06:45 reshape):** not shown to Will. It is the base for the
+  inline build, carrying Lena's words, the four fixes and Dot's token and outline.
+- **Piper, 07:00: D-575 (15d967e1), the area drawer closes on a pick.** Merged as b38 (623a8668). Done becomes Cancel,
+  and this replaces D-275's held-until-Done. Targeted checks: config 1311 passed and 1 skipped; copy in step; build,
+  tsc and web unit (177) clean; budget 12.0 kB spare; e2e (area-picker, street-search, focus-text-boxes, explore-bell,
+  places, place) 231 passed, exit 0; Storybook built. It is held for before-and-after pictures for Will, since the
+  Done → Cancel change is visible.
+- **Piper, 07:13: a86 inline (886bb762, D-573).** One inline SearchField with no pop-up, and the list filters in place.
+  For a typed address the bar makes the same two places-search calls (suggest, then choose the first), the point stays
+  in memory only, and the drawer keeps its own pick flow. Seven keys drop. Merge desk, 07:14: one fix before Will
+  sees it. The address picture said "Nearest to 19102", "All programs" and "Near City Hall ✎" while the list was
+  measured from 19102. Now the address case reads like the "food" case: the heading is Results for "…", the control
+  shows "Near 19102" for display only, the "Nearest to {zip}" line goes, and Google's mark sits small under the
+  heading.
+- **Merge desk, 06:08: Piper's DocuSign spike plan (4076102e) approved, with changes.**
+  - No live Pam account for the spike: the gateway JWT is the anon key, and the caller-id list is dropped.
+  - The spike key never travels. Piper keeps it, and only its SHA-256 is set (`DOCUSIGN_SPIKE_KEY_SHA256`), with a
+    48-hour `DOCUSIGN_SPIKE_UNTIL`.
+  - `DOCUSIGN_CONNECT_KEY` comes from Will's DocuSign account, so he enters it when the Connect step is reached.
+  - The proxy also refuses Pam's own Supabase host from the containers, so a88 step 7 now lists it with DocuSign's
+    three.
+  - The merge desk deploys both spike functions after consent and deletes them, and the spike secrets, at cleanup.
+- **Merge desk, 07:37: card a86 posted ("One search on Explore: the list changes as you type").** Eight pictures of
+  Piper's 5084c0dc, plus Sage's p7 edit for Will to sign (the bar no longer offers a list of Google suggestions). The
+  build waits for his yes and the signature. Lena: the p7 edit ships in the same batch as the inline search, with its
+  six translations and the Privacy date for that day.
+- **Lena, about 07:40: no recut of her pin.** Piper merged claude/lena-explore-nearest before the 07:14 call and then
+  removed `explore.search.nearest` everywhere. So 5084c0dc already carries Lena's street-search-line pin (fdfde536 is an
+  ancestor) and none of the "Nearest to" translations. The "Near …" control is `places.near` and the heading is
+  `explore.results`, both already translated: no new string. claude/lena-explore-nearest is superseded.
+- **Merge desk, 07:48: one `dir="auto"` in SearchField, Dot's.** Both Dot (fbe93cba, 07:43, on
+  claude/pam-design-searchfield-dir) and Piper (8933ff49, 07:45, on the inline branch) added `dir="auto"` to the shared
+  SearchField's input, so a Latin address typed in the Arabic app reads "1500 Market", not "Market 1500" (Lena's
+  finding). Only one can ship, since both edit the same function in packages/ui/src/SearchPill.tsx. Dot's is taken:
+  the design system is Dot's, and it sets `dir="auto"` only while the field has words. Empty, the attribute is off, so
+  the Arabic placeholder follows the page, right to left. Piper's set it once on mount, the empty field included, and
+  an empty `auto` input can resolve to left to right. Piper drops their effect, merges fbe93cba into the inline branch,
+  and keeps their Arabic test without the empty-box `dir` check (Dot's focus-text-boxes test covers the empty case).
+  It ships inside the a86 batch, since the field only matters once a86 lands.
+- **Merge desk, 07:52: b38 live.** a89 and a81 answered, Will told in chat, Piper told.
+- **Piper, 08:06: a86 at 04ad2ce5.** Dot's fbe93cba merged and Piper's duplicate effect dropped (00e538f6, 07:51), Dot's
+  Arabic test aimed at the drawer's field with `.last()` (Dot told 07:52), and tokens.css regenerated. Screens: none
+  since 5084c0dc. It still waits on Will's yes and the p7 signature.
+- **Piper, 08:31: D-576 (29b202d4), the web e2e suite never reaches the live project.** Two layers: e2e/global-setup.ts
+  refuses a build in out/ that names `shobqzuhicoiymtumiaz` or doesn't name `stub.supabase.co` (new script
+  `build:e2e`), and every Playwright project launches Chromium with a dead proxy for all hosts but loopback. Piper's
+  proof: a live build is refused before any test; with the check off, 861 attempted requests to the live host, 0
+  answered; never-live.spec.ts in all three projects; full suite 1859 passed, 19 skipped. Merged as b39 (39481be0),
+  Screens: none.
+- **One send-invite-emails 500 at 06:25:01** (`claim_staff_invite_emails: 401`). The 21 runs either side of it all
+  returned 200. Not acted on. Watch only.
 
 ## What was wrong, and what missed it
+
+- **Sign in's spacing was squeezed on every phone for a night.** A `default: null` meant for short screens removed the
+  component's own spacing everywhere; the tests only measured 320×568, where tight is right. Will saw it in a picture.
+  Rule (D-572): never `default: null` over a component's own prop; give the token instead.
+- **Every picture added to a card reloaded Will's page.** Publishing files with the page makes a new version, and every
+  open view reloads to it, so his scroll, his open picture and his half-written reply went each time. Nothing showed it
+  from this side. Pictures now go to the asset store; publish the page only when the page itself changes.
+- **"Booking Confirmed" read as the green booked card.** Will named a style by the words he remembered on it. The merge
+  desk picked the component with those words (VisitCard) without checking which of the place page's two notices he
+  meant, and Dot redrew ten screens on it. Next time a style is named by a remembered label, put a picture of each
+  candidate in the reply and ask, or have the redraw show both.
+- **A live finding went out to three people before it was checked.** Ava reported join.staff.* promising an unsent
+  text; I sent Sage, Lena and Ava to fix it without reading claim_outbound_messages or outbound_messages. Sage
+  checked the code and was right: those texts are exempt. Check a reported live fault against the live system (one
+  read-only query) before dispatching a fix.
+
+- **b33's first full run failed while I reported it as passing.** The e2e summary's "1832 passed" sat under
+  "e2e=1"; I read the count, not the exit code, and told Will's channel it passed. Read every `name=N` line before
+  calling a run green; a count of passes says nothing about failures. Caught before the push. The cause: D-565
+  changed the not-found Back without running place.spec, which draws it. Piper now runs every spec that names the
+  screens a change touches.
 
 - **D-499 removed the wrong words.** Will (10 October): "That page should not have text over the carousel image. Only
   tab and image. It's redundant text." We took the words off the pictures; he meant the separate line between the
@@ -750,6 +1118,24 @@
 - **Twelve new sentences reached the batch unsigned.** Under A29 the desk does not merge an unsigned sentence, and
   only a key-by-key check against Sage's ledger found them. Sage signed all twelve and reworded seven. The check
   stays part of the desk's gate.
+- **Merge commits carried no `Screens:` lines (Dot's nightly map, 06:07).** team.md says the merge desk copies each
+  READY's `Screens:` line into its merge commit for the nightly map. Tonight's merges didn't, so Dot rebuilt the map
+  from diffs and subjects. From 06:10 every merge commit carries the READY's `Screens:` line, or `Screens: none` when
+  the READY says so.
+- **The web e2e suite reached the live project (Piper's finding, 07:54; the merge desk's log check, 07:56).** From
+  06:38 to 07:51, Playwright runs in our containers sent about 3,500 requests to the live Supabase project. All were
+  refused (401 or 403, the stub token 't' is not a valid JWT), apart from OPTIONS preflights. There were no
+  auth/v1/otp or help-request calls and no 2xx on anything that writes, so no text, no email and no data was touched.
+  What missed it: CI builds with the stub URL, and until Will allowed the Supabase host for street search (about
+  06:39) the containers couldn't reach live, so a container build without the stub env never mattered. Fix: the team
+  was told at 07:56 to build with the stub env, and D-576 (b39) makes it structural. The run refuses a build that names
+  the live project, and the test browser cannot reach any host but loopback. Lena re-ran her 59 audited stories with
+  every outside request refused: 0 tried to leave. Wren: no site script calls the live help-request function.
+- **Targeted checks skipped @pam/ui's own tests (the a86 trial, 07:57).** D-574 (1918d84c) added
+  `--pam-search-height` to tokens.css by hand, in a different place from the generator. So tokens.test.tsx and the
+  @pam/ui build both failed. Neither Piper's targeted run nor the merge desk's targeted template ran
+  `pnpm --filter @pam/ui test` (CI's unit step does, so it would have gone red after a push). Piper regenerated the
+  file (04ad2ce5, one line moved). From now on, any branch or batch that touches packages/ui runs the ui tests.
 
 ## Decisions
 
@@ -870,9 +1256,46 @@
 | Iris's b32 walk-through (local stub build only) | Join step count, dropdown, hidden code, Join Pam, short-phone fit (56/56), keyboard and screen reader, the b30 zh-CN and ar bar: PASS, 506 checks; five polish notes |
 | b32 recheck on 334fe0eb (+ help form, Lena P4, records) | config 1310, copy:status in step / site tsc, 100 tests, build / site a11y 120 scans 0 / usability clear (gap checks) / scrollspy 306 links 0 / web build, tsc 0, 10.7 kB spare / e2e account, join, consent, signin-short, signin-next (and the specs those names match): 269 passed, 1 skipped |
 | staff_requests (counts only, 19:26) | one row ever, approved, 16 September; none refused or waiting |
+| b32 main CI (4d41d542) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (20:19); Vercel web and pam-site READY (19:56) |
+| Iris's help form walk-through (local build of main, nothing sent) | call-out, form, night links, 60/120 gap, keyboard and screen reader: all PASS; W1, P1, P2 |
+| Batch b33, first full run (cf5cab3c) | e2e 1832 passed, 3 failed (place.spec:257 on three projects), 19 skipped: held |
+| Batch b33, second full run (a7445521): db / config / ui / web unit / site / site a11y / usability / scrollspy / e2e full / storybook | 1579 ok / 1311 / 124 / 173 / 100 / 120 scans 0 / clear / 306 links 0 / 1835 passed, 19 skipped, e2e exit 0 / builds; tsc 0; 12.0 kB spare |
+| b33 English | 2 changed keys (nav.back.reported, place.notFound.body), none missing or equal to English in six languages |
+| Live checks for a84 (read-only, 20:30 to 20:34) | postgres has DELETE on auth.users (not superuser; owner supabase_auth_admin); pg_cron installed, five jobs; auth.audit_log_entries 0 rows; organization plan free |
+| b33 main CI (448d5790) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (21:59); Vercel web and pam-site READY (21:33) |
+| Staff-request texts (read-only, 21:30) | texts_live 'off'; live claim_outbound_messages exempts staff_request_approved and _denied; dispatch-sms */5 active; outbound_messages: one approved sent 10 October, one denied sent 17 September |
+| Batch b34, targeted run: config / copy / web build / tsc / web unit / budget / e2e (join, account, consent, signin-short, signin-next, staff-request, invite) / storybook | 1311 passed, 1 skipped / in step / 0 / 0 / 173 passed / 12.0 kB spare / 311 passed, 1 skipped, exit 0 / 0 |
+| b34 main CI (afee3198) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (22:43); Vercel web and pam-site READY (22:16) |
+| Still stuck gap, live code (b33's `out/` = main's site, served as https://joinpam.org in Chromium, probe answering 400 so the call-out shows) | card to footer 60px at 390 and 120px at 1280 on /support/joining-pam/, /support/cant-sign-in/ and /support/; "Write to us" fills its column (292 of 292px at 390, 720 of 720px at 1280) |
+| Batch b35, targeted run: config / copy / web build / tsc / web unit / budget / e2e (street) / storybook | 1311 passed, 1 skipped / in step / 0 / 0 / 177 passed / 12.0 kB spare / 84 passed, exit 0 / 0 |
+| b35 main CI (36cd4651) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (05:08); Vercel web and pam-site success |
+| Batch b36, full run (8269b4c6): db / config / ui / web unit / site / site a11y / usability / scrollspy / e2e full / storybook | 1579 ok / 1311 / 124 / 177 / 100 / 120 scans 0 / all clear / 306 links 0 / 1835 passed, 19 skipped, e2e exit 0 / builds; tsc 0 (web and site); 12.0 kB spare |
+| b36 main CI (8269b4c6) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (05:54); Vercel web and pam-site success |
+| Batch b37, targeted run (7823702f): config / copy / web build / tsc / web unit / budget / e2e (signin-short, consent, signin-next, signin-wrong-code, join, focus-text-boxes, theme) / storybook | 1311 passed, 1 skipped / in step / 0 / 0 / 177 passed / 12.0 kB spare / 267 passed, exit 0 / 0 |
+| b37 main CI (9d91f3bd) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (06:26); Vercel web and pam-site success |
+| Batch b38, targeted run (623a8668): config / copy / web build / tsc / web unit / budget / e2e (area-picker, street-search, focus-text-boxes, explore-bell, places, place) / storybook | 1311 passed, 1 skipped / in step / 0 / 0 / 177 passed / 12.0 kB spare / 231 passed, exit 0 / 0 |
+| b38 main CI (a5fdfbdc) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (07:51); Vercel web and pam-site success |
+| a86 trial full run (main a5fdfbdc + 00e538f6, local only): db / config / ui / web unit / site / site a11y / usability / scrollspy / e2e full / storybook | 1579 ok / 1312 / 123 of 124 (tokens.css order, fixed in 04ad2ce5; ui build failed for the same reason) / 182 / 100 / 120 scans 0 / all clear / 306 links 0 / 1895 passed, 19 skipped, exit 0 / builds; tsc 0 (web and site); 11.7 kB spare |
+| Live project logs, 06:00 to 07:57 (edge_logs, function_edge_logs; counts only) | from Anthropic's network: about 3,500 requests since 06:38:25, all 401/403 except OPTIONS; no auth/v1/otp, no help-request, no 2xx writes. Will's street search 06:41 to 06:43: 11 POST 200 |
+| Batch b39 (39481be0, D-576): config / copy / ui / web build:e2e / tsc / web unit / budget / e2e full / storybook / refusal proof | 1311 passed, 1 skipped / in step / 124 / 0 / 0 / 177 / 12.0 kB spare / 1859 passed, 19 skipped, exit 0 / 0 / a plain (live) build is refused before any test: "The e2e suite will not run: _next/static/chunks/1529….js names the live project", exit 1 |
+| b39 main CI (f8cf7a2e) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (09:45); Vercel web and pam-site success |
+| Live project logs, 07:50 to 09:48 (edge_logs, counts only) | from Anthropic's network: the last requests at 07:51, none since, after the 07:56 stub-build rule and before D-576 |
+| Control Room v24 harness (390 and 1280) | reply about a card: section lands at 76px under the tabs, card folded, button "Replied" (aria "Replied. Reply again"); pressing it restores the card's prefix; a general message leaves scrollY unchanged; a data push mid-glide doesn't stop it; 0 page errors |
 
 ## Left undone
 
+- **As of b39 (14 October, 09:45):** as b38 below, less the dir="auto" and token-refresh items (done: one
+  `dir="auto"`, Dot's; the 401s were our own e2e runs, now stopped by D-576). a86 is at 04ad2ce5.
+- **As of b38 (14 October, 07:51):** with Will: a86 (one search on Explore: his yes, and his signature on the p7
+  Privacy line), a88 (the DocuSign consent link, and demo.docusign.net in Allowed domains), a84 (unchanged). Piper:
+  drop the second `dir="auto"`, merge Dot's fbe93cba into the inline branch, and send a new READY. Lena: the p7
+  translations and the Privacy date on Will's signature, in the same batch as a86. Piper: the 401s at 06:38 to 06:40
+  (token refresh). Then the DocuSign spike: deploy, Iris's phone run, and cleanup.
+- **As of b34 (14 October, 04:10):** with Will: a84 (the new number and the case manager request, with their
+  Privacy lines; the release is ready the moment he signs), a81 (Google's logo files, then the key), and the forms
+  and DocuSign questions (a) to (c). Research round on forms and DocuSign: Iris, Lena, Piper and Dot; then a card
+  for Will with pictures and choices (posted as a85 at 04:20). Nothing on forms is built before he picks. Dot: Google's logo files (then
+  Will's key), then text boxes without a ring. Wren: the help form's three changes (Will, 04:08).
 - **As of b32 (13 October, about 20:00):** b33 is ready to merge: Piper's D-565 (9aade728, the old Places list
   retired, with Lena's 911312da for "Back to Reported places"), Dot's D-566 (5737dfae), Ava's P2 (3dfb043c). With
   Will: a84 (choices (b) to (g); Lena's Privacy words after Sage's edit), a81 (Google's logo files, then the key).
@@ -898,6 +1321,9 @@
 
 ## Needs a human
 
+- Will: card a86, his yes to the inline search and his signature on the p7 Privacy line. Card a88: open the DocuSign
+  consent link (sent 06:40) and check demo.docusign.net in Allowed domains (still refused at 07:49). Card a85 is
+  fully decided (06:28 to 06:54).
 - Will: card a62, step 3 only: HELP_REQUESTS_LIVE = on in Supabase's secrets, then one test from "Still stuck?"
   (his paste and the salt are in and checked; 041940 is recorded).
 - Will: card a75 (website text colours, Dot's examples linked). Later cards: the Google street search (a key and a

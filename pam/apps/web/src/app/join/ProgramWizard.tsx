@@ -13,7 +13,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { BigButton, InfoTip, TextField, TextLink } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { ChoiceChips } from '@pam/ui/ChoiceChips';
-import { CATEGORY_LIST, type Category } from '@pam/config';
+import { CATEGORY_LIST, nameJoinerOf, type Category } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import type { ProgramDetails } from '@/lib/useJoin';
 
@@ -120,7 +120,7 @@ export function programSummary(
 }
 
 export function useProgramWizard({ value, onChange, onSubmit, busy, submitLabel, step, onStep }: ProgramWizardProps) {
-  const { t, tPlain } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   // Next is always tappable (D-334): without a name it says what is missing.
   const [triedName, setTriedName] = useState(false);
   const category = (value.category || 'education') as Category;
@@ -329,6 +329,7 @@ export function useProgramWizard({ value, onChange, onSubmit, busy, submitLabel,
           <BigButton
             label={t('action.next')}
             badge={progress}
+            nameJoiner={nameJoinerOf(locale)}
             onPress={() => {
               if (at === 'name' && needsName) setTriedName(true);
               else next();

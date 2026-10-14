@@ -32,14 +32,13 @@ export function firstTabIsHome(role: Role | null | undefined): boolean {
  * Only the five tab screens draw it (D-213): anything you tap into — a place,
  * a person, a conversation, Legal, Get help — is a nested screen on the
  * template, with its own way back and no bar, as in Will's references. The
- * old addresses of a tab (`/places/`, `/interested/`, `/account/`) are the same
+ * old addresses of a tab (`/interested/`, `/account/`) are the same
  * tab. The path may or may not end in a slash (the app is exported with one).
  */
 export function tabFor(pathname: string): TabKey | null {
   const path = pathname.endsWith('/') ? pathname : `${pathname}/`;
   switch (path) {
     case '/':
-    case '/places/':
     case '/interested/':
       return 'explore';
     case '/saved/':

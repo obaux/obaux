@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { settled } from './settled';
+import { asMember } from './asMember';
 import en from '@pam/config/locales/en.json';
 import ar from '@pam/config/locales/ar.json';
 
@@ -37,7 +38,8 @@ const PLACE = {
   has_hours: false,
 };
 
-async function stub(page: import('@playwright/test').Page) {
+async function stub(page: import('@playwright/test').Page, language: string | null = null) {
+  await asMember(page, 'member', language);
   await page.route(AREAS, (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(ZIPS) }),
   );
@@ -49,7 +51,7 @@ async function stub(page: import('@playwright/test').Page) {
 test.describe('choosing an area', () => {
   test('the area is a control, not a label', async ({ page }) => {
     await stub(page);
-    await page.goto('/places/');
+    await page.goto('/');
 
     // Tapping the area itself opens the picker: a member should not have to
     // find the pencil to discover that this is theirs to set.
@@ -63,7 +65,7 @@ test.describe('choosing an area', () => {
     // It is a picture with no word next to it, so its accessible name has to
     // carry the whole meaning — "Change the area", not "Edit".
     await stub(page);
-    await page.goto('/places/');
+    await page.goto('/');
 
     await page.getByRole('button', { name: 'Change the area' }).click();
     await expect(page.getByRole('textbox', { name: 'ZIP code' })).toBeVisible();
@@ -71,17 +73,19 @@ test.describe('choosing an area', () => {
 
   test('lives in the header, so the list starts at the top of the page', async ({ page }) => {
     await stub(page);
-    await page.goto('/places/');
+    await page.goto('/');
 
-    const inHeader = await page
-      .getByRole('button', { name: 'Near City Hall' })
-      .evaluate((el) => Boolean(el.closest('header')));
-    expect(inHeader, 'the area control is not in the header').toBe(true);
+    // On Explore the area control sits under the title, above the list (the old list's <header> is gone with the page): the list starts below it.
+    const chip = page.getByRole('button', { name: 'Near City Hall' });
+    await expect(chip).toBeVisible();
+    const box = await chip.boundingBox();
+    expect(box!.y, 'the area control is not at the top of the page').toBeLessThan(260);
+    await expect(page.getByRole('heading', { name: 'All programs' })).toBeVisible();
   });
 
   test('offers somewhere to start before anything is typed', async ({ page }) => {
     await stub(page);
-    await page.goto('/places/');
+    await page.goto('/');
     await page.getByRole('button', { name: 'Change the area' }).click();
 
     // No typing yet, and there are already options. Somebody who does not know
@@ -91,11 +95,11 @@ test.describe('choosing an area', () => {
 
   test('remembers the choice on this device', async ({ page }) => {
     await stub(page);
-    await page.goto('/places/');
+    await page.goto('/');
     await page.getByRole('button', { name: 'Change the area' }).click();
-    // A row picks; Done keeps it (D-275).
+    // A row picks, and the drawer closes by itself (Will, 14 October).
     await page.getByRole('button', { name: /^19122/ }).click();
-    await page.getByRole('button', { name: 'Done' }).click();
+    await expect(page.getByRole('textbox', { name: 'ZIP code' })).toHaveCount(0);
 
     await expect(page.getByRole('button', { name: 'Near 19122' })).toBeVisible();
 
@@ -115,7 +119,7 @@ test.describe('choosing an area', () => {
       asked.push(route.request().postDataJSON());
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(ZIPS) });
     });
-    await page.goto('/places/');
+    await page.goto('/');
     await page.getByRole('button', { name: 'Change the area' }).click();
     await page.getByRole('textbox', { name: 'ZIP code' }).fill('1234 Market');
 
@@ -125,11 +129,42 @@ test.describe('choosing an area', () => {
     expect(outside).toEqual([]);
   });
 
-  test('closing without Done leaves the area as it was (D-275)', async ({ page }) => {
+  test('every kind of pick closes the drawer and sets the Near control (Will, 14 October)', async ({ page }) => {
+    await page.context().grantPermissions(['geolocation']);
+    await page.context().setGeolocation({ latitude: 39.9526, longitude: -75.1652 });
     await stub(page);
-    await page.goto('/places/');
+    await page.goto('/');
+    const drawerOpen = () => page.getByRole('textbox', { name: 'ZIP code' });
+    // A ZIP.
     await page.getByRole('button', { name: 'Change the area' }).click();
-    await page.getByRole('button', { name: /^19122/ }).click();
+    await page.getByRole('button', { name: /^19104/ }).click();
+    await expect(drawerOpen()).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Near 19104' })).toBeVisible();
+    // A landmark.
+    await page.getByRole('button', { name: 'Change the area' }).click();
+    await page.getByRole('button', { name: /^City Hall/ }).click();
+    await expect(drawerOpen()).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Near City Hall' })).toBeVisible();
+    // The phone's own position.
+    await page.getByRole('button', { name: 'Change the area' }).click();
+    await page.getByRole('button', { name: /^Use my current location/ }).click();
+    await expect(drawerOpen()).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Near your location' })).toBeVisible();
+  });
+
+  test('Cancel closes the drawer and changes nothing', async ({ page }) => {
+    await stub(page);
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Change the area' }).click();
+    await page.getByRole('button', { name: 'Cancel' }).click();
+    await expect(page.getByRole('textbox', { name: 'ZIP code' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Near City Hall' })).toBeVisible();
+  });
+
+  test('closing without picking leaves the area as it was (Cancel, Escape)', async ({ page }) => {
+    await stub(page);
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Change the area' }).click();
     await page.keyboard.press('Escape');
 
     await expect(page.getByRole('button', { name: 'Near City Hall' })).toBeVisible();
@@ -137,7 +172,7 @@ test.describe('choosing an area', () => {
 
   test('has no WCAG A/AA violations while open', async ({ page }) => {
     await stub(page);
-    await page.goto('/places/');
+    await page.goto('/');
     await page.getByRole('button', { name: 'Change the area' }).click();
     await expect(page.getByRole('button', { name: /^19104/ })).toBeVisible();
 
@@ -166,8 +201,8 @@ test.describe('choosing an area', () => {
 for (const [locale, words] of [['en', en], ['ar', ar]] as const) {
   test(`${locale}: the area field is named once and its hint describes it`, async ({ page }) => {
     await page.addInitScript((code) => localStorage.setItem('pam.locale', code), locale);
-    await stub(page);
-    await page.goto('/places/');
+    await stub(page, locale);
+    await page.goto('/');
     await page.getByRole('button', { name: /City Hall/ }).first().click();
 
     const field = page.getByRole('dialog').getByRole('textbox');

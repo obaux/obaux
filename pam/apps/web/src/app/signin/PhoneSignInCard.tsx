@@ -6,6 +6,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
+import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BigButton, CompactNotice, TextField, TextLink } from '@pam/ui';
 import { CodeBoxes } from '@pam/ui/CodeBoxes';
 import { useI18n } from '@/lib/i18n';
@@ -62,8 +63,14 @@ const styles = stylex.create({
   hint: { fontSize: '17px', lineHeight: 1.5 },
   consent: { fontSize: '14px', lineHeight: 1.35 },
   // Tighter on a short screen (D-564): less above the title and between the title, the field and the button.
-  card: { width: '100%', paddingBlockStart: { default: null, '@media (max-height: 640px)': '8px' }, paddingBlockEnd: { default: null, '@media (max-height: 640px)': '12px' } },
-  stack: { rowGap: { default: null, '@media (max-height: 640px)': '8px' } },
+  card: {
+    width: '100%',
+    // The card's own room (padding 5) on a normal screen; less only on a short one. Never `null` here: a null default unsets what
+    // `padding={5}` gave, and it took the room out of every screen (Will, 14 October).
+    paddingBlockStart: { default: spacingVars['--spacing-5'], '@media (max-height: 640px)': '8px' },
+    paddingBlockEnd: { default: spacingVars['--spacing-5'], '@media (max-height: 640px)': '12px' },
+  },
+  stack: { rowGap: { default: spacingVars['--spacing-3'], '@media (max-height: 640px)': '8px' } },
   // Sign in's card sits on the white under the pictures and reads as part of
   // it (Will, 5 October, D-266): no lift, no outline.
   flat: { boxShadow: 'none', borderWidth: 0 },

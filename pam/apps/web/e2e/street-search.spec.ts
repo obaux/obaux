@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { settled } from './settled';
+import { asMember } from './asMember';
 
 /**
  * Street addresses and corners in the area search, from Google through Pam's server (D-552). Pam's own list answers first; Google is
@@ -18,6 +19,7 @@ const ZIPS = [
 const FISHTOWN = [{ id: 'n1', kind: 'neighborhood', label: 'Fishtown - Lower Kensington', lat: 39.97289, lon: -75.12471 }];
 
 async function open(page: Page, { enabled = true } = {}) {
+  await asMember(page);
   const asked: Record<string, unknown>[] = [];
   const outside: string[] = [];
   page.on('request', (request) => {
@@ -48,7 +50,7 @@ async function open(page: Page, { enabled = true } = {}) {
       }),
     );
   });
-  await page.goto('/places/');
+  await page.goto('/');
   await settled(page);
   await page.getByRole('button', { name: 'Change the area' }).click();
   return { asked, outside, box: page.getByRole('textbox', { name: /ZIP code/ }) };
@@ -65,6 +67,15 @@ test.describe('street search', () => {
     // Under option A a pick is never kept, and the row says so where it is picked, like "Use my current location".
     await expect(page.getByRole('button', { name: /^1500 Market St, Philadelphia, PA.*Used for this search only\./ }).first()).toBeVisible();
     await expect(page.locator('[data-google-attribution]')).toBeVisible();
+    // Google's own file, served by Pam: it loaded (not the words standing in), is 18px high, and came from this origin (D-557).
+    const logo = page.locator('[data-google-attribution] img[alt="Google Maps"]');
+    await expect(logo).toBeVisible();
+    expect(await logo.evaluate((img: HTMLImageElement) => ({ ok: img.complete && img.naturalWidth > 0, h: Math.round(img.getBoundingClientRect().height), local: new URL(img.currentSrc).origin === location.origin, src: new URL(img.currentSrc).pathname }))).toEqual({
+      ok: true,
+      h: 18,
+      local: true,
+      src: expect.stringMatching(/^\/google\/google-maps-attribution-(light|dark)\.svg$/),
+    });
     // The mark and the footer line under it are centred on one line (Will, 13 October).
     const mark = await page.locator('[data-google-attribution]').boundingBox();
     const footer = await page.getByText('Pam remembers the area you pick on this phone only.').boundingBox();
@@ -77,7 +88,7 @@ test.describe('street search', () => {
     await expect.poll(() => asked.some((body) => body['action'] === 'choose')).toBe(true);
     // The pick ends the search session: the choose call carries the same token the suggestions did.
     expect(asked.at(-1)).toEqual({ action: 'choose', placeId: 'ChIJ1500marketstreet', token: (asked[0] as { token: string }).token });
-    await page.getByRole('button', { name: 'Done' }).click();
+    await expect(page.getByRole('textbox', { name: /ZIP code/ })).toHaveCount(0);
     // Only the ZIP on the chip, to save room on the main screen (Will, 13 October); the point still orders the places.
     await expect(page.getByRole('button', { name: 'Near 19102' })).toBeVisible();
     await expect(page.getByText('1500 Market St, Philadelphia, PA 19102')).toHaveCount(0);
@@ -127,6 +138,7 @@ test.describe('street search', () => {
 
   test('when the status cannot be read, what was typed is not sent to the function at all', async ({ page }) => {
     const asked: unknown[] = [];
+    await asMember(page);
     await page.route('**/rest/v1/rpc/search_areas*', (route) => route.fulfill(json([])));
     await page.route('**/rest/v1/rpc/services_near*', (route) => route.fulfill(json([])));
     await page.route(FUNCTION, (route) => {
@@ -134,7 +146,7 @@ test.describe('street search', () => {
       if (body['action'] !== 'status') asked.push(body);
       return route.fulfill({ status: 500, body: '{}' });
     });
-    await page.goto('/places/');
+    await page.goto('/');
     await settled(page);
     await page.getByRole('button', { name: 'Change the area' }).click();
     await page.getByRole('textbox', { name: /ZIP code/ }).fill('1500 Market');

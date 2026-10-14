@@ -217,6 +217,20 @@ test.describe('signing up', () => {
     });
   }
 
+  for (const locale of ['en', 'ar'] as const) {
+    test(`${locale}: the link that opens the code field is read with its question (Iris, b32, P2)`, async ({ page }) => {
+      // Out of reading order (a screen reader's list of buttons), "Click here" alone says nothing: its description is
+      // the question beside it. Nothing changes on screen, and Will's words stay as they are (card a82).
+      await page.addInitScript((code) => localStorage.setItem('pam.locale', code), locale);
+      await newcomer(page);
+      await page.goto('/join/');
+      const strings: Record<string, string> = locale === 'ar' ? ar : en;
+      const reveal = page.getByRole('button', { name: strings['join.code.reveal'], exact: true });
+      await expect(reveal).toBeVisible();
+      await expect(reveal).toHaveAccessibleDescription(strings['join.code.question'] ?? '');
+    });
+  }
+
   test('never says "role" to the person filling it in', async ({ page }) => {
     // Role is a word this system uses about people, not one people use about
     // themselves (Will, 14 September).
