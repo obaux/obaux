@@ -1,5 +1,13 @@
 # Fill once, sign many: the member's side (pictures only, 390px, light and dark)
 
+## Second round: Will's four notes on card a85 (14 October, 04:31)
+1. **One banner style, the place page's.** Every note card (the ones that had the left accent edge) now uses the look of the place page's confirmed-booking card: **`VisitCard`** (`@pam/ui/VisitCard`, D-273 and D-281): an Astryx `Card`, padding 5, on `--color-background-green`, no edge border, a 40px disc in the card colour with a green mark, a bold 16px line and 16px body text. `VisitCard` itself is a booking card (eyebrow, day, time), so the mock draws the same look as a small `Calm` helper; if Will likes it, the build is one shared note component made from `VisitCard`'s styles, not a new look.
+2. **Main buttons fixed to the bottom on every screen.** Every screen uses `Page`'s footer (the strip pinned at the bottom with the page fading out above it, clearing the home indicator through `env(safe-area-inset-bottom)`), so content scrolls under it: Start signing, Looks right: start, Sign this form, Next form, Carry on, Save my copies. The DocuSign screen has no Pam button: DocuSign draws its own Sign, so the pinned strip holds the help link. See 1a and 1b (the SSN scrolled into view, the form fading under the button).
+3. **All 112 signed:** the two notes sit close together (8px apart), then the Your copies card below them.
+4. **The cleared note says it plainly:** "Your name, birth date and Social Security number are no longer stored in Pam." Will's own sentence stands in until Sage's line arrives.
+
+**For the build (not in the pictures):** the app's `body` carries 72px of bottom padding for the HelpBar (`globals.css`), which lifts a pinned `Page` footer 72px off the bottom once a page is scrolled to its end. These pictures were taken without it. Screens that pin a footer need it dropped, or the button rises when you reach the end.
+
 For Will's card, asked 14 October 04:03 (relayed by the merge desk). Nothing is built or shipped. The pictures were drawn with Pam's own components (SubPage, BigButton, TextField, TextLink, Badge, Card) in a throwaway page, kept as `mock-source.tsx.txt` so they can be redrawn. **All words are stand-ins: Sage writes the real ones (A29).** Names are examples (Marcus Example, Example Food Pantry). The SSN shown is made up.
 
 `all-light-390.png` and `all-dark-390.png` show every screen at once. Each screen is also on its own, `-light-390.png` and `-dark-390.png`.
