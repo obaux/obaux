@@ -180,6 +180,11 @@ const styles = stylex.create({
     // On a short screen the pictures give way, by height (13 October, D-564): at 320×568 the 280px floor left Will's longer
     // invited line (three lines) with "Send me a code" 12px below the screen. Below 640px tall the slide is 42.5% of the
     // window (it was 50%), down to 224px, and 32px under the words (it was 40); nothing taller than 640 changes.
+    // A small phone that is not that short (375×667, an iPhone SE): the card got its room back (the gaps between the title, the
+    // field, the button and the consent line, 14 October), so the slide gives a little: 46% of the window, not 50. Only from 641px up: the 640px rule below must still win under it.
+    '@media (min-height: 641px) and (max-height: 720px)': {
+      height: 'clamp(256px, 46vh, 520px)',
+    },
     '@media (max-height: 640px)': {
       height: 'clamp(224px, 42.5vh, 520px)',
       paddingBlockEnd: '32px',

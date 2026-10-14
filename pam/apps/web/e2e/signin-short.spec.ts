@@ -154,3 +154,37 @@ for (const locale of ['en', 'es', 'ar'] as const) {
     expect(privacy!.y).toBeGreaterThanOrEqual(box.y + box.height - 1);
   });
 }
+
+/**
+ * Sign in keeps its room on a normal phone (Will, 14 October: "what happened to the gap spacing in the sign-in screen?").
+ * D-564's short-screen rules set `rowGap` and the card's padding with a `null` default, which unset the card's own room on
+ * every screen, not just short ones: the title sat 4px under the picture and the label, field, button and consent line
+ * touched. The room is back, and on a 375×667 phone (not short, but small) it still fits above the fold.
+ */
+for (const [width, height] of [
+  [390, 844],
+  [375, 667],
+] as const) {
+  test(`${width}×${height}: the title, label, field, button and consent line have room, and all of it is above the fold`, async ({ page }) => {
+    await page.setViewportSize({ width, height });
+    await page.goto('/signin/');
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(500);
+
+    const box = async (locator: ReturnType<Page['locator']>) => (await locator.first().boundingBox())!;
+    const hero = await box(page.locator('section'));
+    const heading = await box(page.getByRole('heading', { name: en['signin.title'] }));
+    const label = await box(page.getByText(en['signin.phone.label'], { exact: true }));
+    const field = await box(page.locator('input[type="tel"]'));
+    const button = await box(page.getByRole('button', { name: en['signin.phone.action'] }));
+    const note = await box(page.getByText(/^Pam texts you a code/));
+    const legal = await box(page.getByRole('link', { name: 'Privacy' }));
+
+    expect(heading.y - (hero.y + hero.height), 'picture to title').toBeGreaterThanOrEqual(16);
+    expect(label.y - (heading.y + heading.height), 'title to label').toBeGreaterThanOrEqual(8);
+    expect(field.y - (label.y + label.height), 'label to field').toBeGreaterThanOrEqual(4);
+    expect(button.y - (field.y + field.height) , 'field to button').toBeGreaterThanOrEqual(8);
+    expect(note.y - (button.y + button.height), 'button to consent line').toBeGreaterThanOrEqual(8);
+    expect(legal.y + legal.height, 'the legal links are above the fold').toBeLessThanOrEqual(height);
+  });
+}

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
-import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
 import { AppHeader, Notice, Page, TextLink } from '@pam/ui';
@@ -89,7 +89,7 @@ const styles = stylex.create({
   pinBarShown: { opacity: 1, visibility: 'visible' },
   heroGroup: { width: '100%', marginBlockStart: '-24px' },
   heroHeader: { position: 'relative', width: '100%' },
-  heroBrand: { width: 'fit-content', marginInline: 'auto', rowGap: { default: null, '@media (max-height: 640px)': '8px' } },
+  heroBrand: { width: 'fit-content', marginInline: 'auto', rowGap: { default: spacingVars['--spacing-4'], '@media (max-height: 640px)': '8px' } },
   // Larger and always white (Will, 16 September) — the themed mark
   // `AppHeader` renders elsewhere picks dark or light ink to sit on the
   // page's own background, which is the wrong call directly over art, in
