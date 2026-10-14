@@ -803,9 +803,18 @@
   box. So the box asks Google only for address-like text that matches no program, or on the explicit tap, and fails safe.
   The drawer keeps today's rule, so the signed p7 stays true. Decided, and Will can change them: all digits put Areas
   first; a street picked in the box shows only its ZIP (D-552).
+- **Merge desk, 05:03: Sign in's spacing, D-572 (Dot c0ed1c8d), card a87.** It was live since b32. D-564's short-screen
+  rules used `default: null` for the stack gap, the card padding and the brand gap, and in StyleX that unsets the
+  component's own `gap`/`padding` on every screen: title 4px under the picture, field, button and consent line 0px
+  apart at 390×844. The defaults are now the tokens (--spacing-3/5/4), and the tight values apply only under 640px tall;
+  641 to 720px gets a 46vh slide so 375×667 still fits. All 42 fit cases still fit, and a new signin-short case covers
+  390×844 and 375×667. It restores the look Will signed, so it ships as b37 after b36.
 
 ## What was wrong, and what missed it
 
+- **Sign in's spacing was squeezed on every phone for a night.** A `default: null` meant for short screens removed the
+  component's own spacing everywhere; the tests only measured 320×568, where tight is right. Will saw it in a picture.
+  Rule (D-572): never `default: null` over a component's own prop; give the token instead.
 - **Every picture added to a card reloaded Will's page.** Publishing files with the page makes a new version, and every
   open view reloads to it, so his scroll, his open picture and his half-written reply went each time. Nothing showed it
   from this side. Pictures now go to the asset store; publish the page only when the page itself changes.
