@@ -1,8 +1,20 @@
 # Fill once, sign many: the member's side (pictures only, 390px, light and dark)
 
-For Will's card, asked 14 October 04:03 (relayed by the merge desk). Nothing is built or shipped. The pictures were drawn with Pam's own components (SubPage, BigButton, TextField, TextLink, Badge, Card) in a throwaway page, kept as `mock-source.tsx.txt` so they can be redrawn. **All words are stand-ins: Sage writes the real ones (A29).** Names are examples (Marcus Example, Example Food Pantry). The SSN shown is made up.
+## Fourth round: the primary stays put (Will, 14 October, 05:18)
+"Move undo this signature button to top of Primary action, so primary button is placed at same place across all." In the pinned strip, "Undo this signature" (2b, and its success-banner comparison) now sits **above** the primary button, so the primary is in the same place at the bottom on every screen. I did the same for "Skip this one for now" on 2a, for the same reason (Will's note named only Undo; say if he wants Skip left below). Redrawn: 2a-sign, 2b-signed-next, 2b-compare-signed-as-success, light and dark, and both sheets. The blue and green versions are both kept.
 
-`all-light-390.png` and `all-dark-390.png` show every screen at once. Each screen is also on its own, `-light-390.png` and `-dark-390.png`.
+## Third round: the banner Will meant (14 October, 04:43)
+Will: the green card on the place page is not the alert banner he meant; he meant the subtle blue one ("this program wasn't created in Pam and the dates are only for your convenience"). That is Astryx's **`Banner` with `status="info"`**, as on the place page (`apps/web/src/app/place/page.tsx`, `<Banner status="info" title={t('place.noLead', …)} />`). Every note on every screen is now that component: "Pam doesn't keep these", "Gone when you are done", "Pick up whenever you like", "DocuSign has it", "Signed and sent to…", "Sent to the programs" and both "Not stored in Pam". Titles and bodies unchanged (a note with only a line shows it as the title). The fixed buttons, the 8px stacking and the two done screens are as before.
+
+**For Will to pick:** a confirmation can read wrong in blue, so two screens are also drawn with `Banner status="success"` (green): `2b-compare-signed-as-success` and `4a-compare-done-as-success`, for "Signed and sent to…", "Sent to the programs" and "Not stored in Pam". On the sheets they are the last two tiles, beside their blue versions (2b and 4a).
+
+## Second round: Will's four notes on card a85 (04:31)
+1. Banner look: first drawn as the place page's green `VisitCard`; **replaced in the third round above.**
+2. **Main buttons fixed to the bottom on every screen.** Every screen uses `Page`'s footer (pinned strip, the page fading out above it, clearing the home indicator through `env(safe-area-inset-bottom)`), so content scrolls under it. The DocuSign screen has no Pam main button (DocuSign draws its own Sign), so the strip holds the help link. See 1a and 1b.
+3. **All 112 signed:** the two notes sit close together (8px apart), then the Your copies card below.
+4. **The cleared note, in Sage's words (mock words, she signs them when forms are built), one per route** because "no longer" is only true where Pam had the details for a while. **4a, Pam-only:** "Not stored in Pam. The name, birth date and Social Security number you typed for this form are no longer stored in Pam." **4b, DocuSign:** "Not stored in Pam. Pam never had the name, birth date and Social Security number you gave for this form. They went straight to DocuSign." On 4b the copies card says DocuSign sends the member their copies; Pam has none (stand-in words).
+
+**For the build (not in the pictures):** the app's `body` carries 72px of bottom padding for the HelpBar (`globals.css`), which lifts a pinned `Page` footer 72px off the bottom once a page is scrolled to its end. The pictures were taken without it.
 
 ## 1 · Fill once
 - **1a** Your details for the sitting: name, initials, birth date, today's date (read-only, filled for them). At the top, a calm card: Pam doesn't keep these; they stay on the phone and are cleared when you finish or close Pam.
