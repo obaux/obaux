@@ -169,7 +169,7 @@ export function ProgramReviewScreen({ id }: { readonly id: string | null }) {
         <Notice
           notice="admin_out_of_region"
           title={t(`review.decided.${decided}.title`, { program: program.programName })}
-          body={t(`review.decided.${decided}.body`, { name: program.leadName ?? t('review.theLeader') })}
+          body={t(`review.decided.${decided}.body`, { name: program.leadName ?? t('review.theProgramLead') })}
         />
       ) : null}
 

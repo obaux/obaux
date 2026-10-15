@@ -46,3 +46,5 @@ The merge desk routed Iris's super admin first pass to this lane (15 October, 14
 ## Needs a human
 
 - Sage: the 21 new keys and the reworded `requests.city`. Then Lena: six languages.
+
+- 15:30: Sage signed (ledger 08637d18) with two changes: review.confirm.approve.body, and the fallback name "The program lead" (new key review.theProgramLead). Applied.

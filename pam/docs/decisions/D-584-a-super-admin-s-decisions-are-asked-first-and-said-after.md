@@ -15,7 +15,7 @@ a84; W3 is Nico's; W4 and "Take it off the list" are Piper's.)
   - Each of those taps opens Pam's `ConfirmDialog`:
     - Approve on a request: "Approve {name}?", body "Pam will text {name} that they are in."
     - Deny: "Deny {name}?", body "Pam will text {name} that the answer is no. They can ask again later."
-    - Approve on a program: "Approve {program}?", body "What was sent goes on Pam as it is, for members to see."
+    - Approve on a program: "Approve {program}?", body "The program goes on Pam as it was sent, for members to see."
     - The buttons are "Yes, approve" / "Yes, deny" and "Not yet". Approve still asks for the city first, before the
       confirm, as before.
   - After the decision the screen stays put and says what happened at the top ("{name} is in", "Request denied",
@@ -26,6 +26,9 @@ a84; W3 is Nico's; W4 and "Take it off the list" are Piper's.)
   would survive the navigation. Staying is the pattern the new-number review (D-567) and the "is now a program lead
   too" notice already use. And going back with `goBack` fixes P2's "Back to Everyone" after a decision, which came
   from `navigate('/requests/')` pushing the stand-alone Requests page on top of Home.
+
+**Signed** by Sage under A29 (ledger 08637d18): all as drafted except the program's confirm body (above) and the
+fallback name after asking for changes, "The program lead" (`review.theProgramLead`), the lead-side term.
 
 ## The polish
 
