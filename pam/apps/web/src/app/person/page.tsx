@@ -175,9 +175,11 @@ function PersonScreen() {
   const { state: caseload } = useCaseload(viewedRole === 'admin');
   // Unread from this person, for the count on "Message {name}" (D-231).
   const { state: conversations } = useConversations(viewedRole === 'admin' || viewedRole === 'provider');
-  const header = (title: string) => (
+  // A person's name as the title is data: it keeps its own direction (D-534).
+  const header = (title: string, isName = false) => (
     <SubPageHeader
       title={title}
+      isTitleData={isName}
       backHref="/"
       backLabel={t('nav.back.home')}
       actions={
@@ -344,7 +346,7 @@ function PersonScreen() {
     <Page gap={4}>
       <RememberPersonName id={person.id} name={person.firstName ?? ''} />
       {/* Their name is the title, not "Profile", the word on the viewer's own tab (Iris, case manager W3). */}
-      {header(person.firstName || t('person.profile'))}
+      {header(person.firstName || t('person.profile'), Boolean(person.firstName))}
 
       {/*
         The profile card (D-231): the member profile's own card — face, name,

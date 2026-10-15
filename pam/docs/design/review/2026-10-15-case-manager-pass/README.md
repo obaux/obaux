@@ -11,3 +11,6 @@ Iris's findings: `docs/research/2026-10-15-case-manager-flow.md`.
 | P4 after recommending: back to the member, or Home | connect-member, then Recommend | `*-P4-after-recommend.png` |
 | P5 "What you can see" at reading size | case-manager-screens--home | `*-P5-home-what-you-can-see.png` |
 | P9 every missing invite field at once | case-manager-screens--invite-one, empty Create link | `*-P9-invite-errors.png` |
+| Program lead (Mira, 14:18): joining step 2 "What to expect" has a way back and Contact Pam | onboarding-staff-privacy-step--program-lead-invited, 320×568 | `*-PL-W1-join-step2-320x568.png` |
+| Program lead: a member's page titled with their name | program-lead-screens--member | `*-PL-W3-member-title.png` |
+| Item 10: the example member page, with no "Programs saved by" | case-manager-screens--member | `*-W3-member-title-example.png` |

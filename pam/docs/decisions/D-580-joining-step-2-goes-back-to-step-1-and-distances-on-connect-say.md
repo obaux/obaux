@@ -57,6 +57,14 @@
 - **11. P5's list:** Sage is signing new words for `admin.seeing.body` and `join.privacy.admin.1–4`. Home will show
   them as a short list at reading size once they arrive.
 
+## Program leads too (the merge desk, 14:18, from Iris's program lead pass)
+
+- Their joining step 2, "What to expect", has the same back and Contact Pam. It's the same code path as the case
+  manager's, now tested on its own.
+- A member's page as a program lead sees it (`ProgramMemberCardView`) is titled with the member's first name. Before,
+  the large title said "Profile" and the name sat under it as a second level-1 heading; now there's one h1.
+- The title is marked as data (`isTitleData`), so a name keeps its own direction (D-534), on both member pages.
+
 ## Proof
 
 `e2e/case-manager-pass.spec.ts` (W3, P3, P4, P5, P8, P9) and two new tests in `e2e/join.spec.ts` (W1 for a member and

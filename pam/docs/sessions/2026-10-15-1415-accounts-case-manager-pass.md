@@ -54,3 +54,4 @@ The merge desk routed Iris's case manager first pass to this lane (15 October, 1
 
 - 14:30: Sage signed W2, W3 and P7 (ledger 8710a563). W2's body and P7's missing line are wired. Item 10: the
   "Programs saved by" link, the /person/saved/ page, its story and its route are removed (test in case-manager-pass).
+- 14:45: program leads too (Mira 14:18): their step 2 back + Contact Pam (join test), and their member page titled with the name, one h1 (program-visits spec). Shots PL-*.

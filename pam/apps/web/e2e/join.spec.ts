@@ -360,6 +360,22 @@ test.describe('signing up', () => {
     expect(calls.profileWrites.some((w) => w['first_name'] === 'Dana')).toBe(true);
   });
 
+  test('a program lead\'s step 2 also goes back, with Contact Pam (Iris, program lead pass)', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.sessionStorage.setItem('pam.invite', JSON.stringify({ code: 'PAM7Q4KY', role: 'provider' }));
+    });
+    await newcomer(page);
+    await page.route('**/rest/v1/rpc/redeem_invite*', (route) => route.fulfill(json({ id: NEWCOMER, role: 'provider' })));
+    await page.goto('/join/');
+    await page.getByLabel('First name').fill('Pat');
+    await expect(page.getByRole('combobox', { name: 'City you work in' })).toContainText('Philadelphia');
+    await page.getByRole('button', { name: 'Next' }).click();
+    await expect(page.getByRole('heading', { name: 'What to expect' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Contact Pam' })).toBeVisible();
+    await page.getByRole('button', { name: 'Back a step' }).click();
+    await expect(page.getByLabel('First name')).toHaveValue('Pat');
+  });
+
   test('a city Pam does not serve is an offer, not an error', async ({ page }) => {
     const calls = await newcomer(page, { cityServed: false });
     await page.goto('/join/');
