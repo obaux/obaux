@@ -1224,6 +1224,10 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · Answer by text shows who wrote (15 October 2026)
+
+Built, not live: the super admin's Answer by text screen shows the first name for a number Pam knows (`profile_first_name_for_phone`, super admin only, nothing stored), the number as a person reads it, and what they wrote and when, read from the link's `#` fragment (D-583). Answering by text stays off (D-524, D-547); nothing builds the link yet. Needs the migration `20261015144245` applied; two new strings await Sage and Lena. Proof: DB test 74, `answer-by-text.spec.ts`, `replyContext.test.ts`.
+
 ## Messages & notifications · counting screen opens, and the bell not moving (13 October 2026)
 
 Live since b29 (13 October): `count_screen_open('points'|'profile')` adds one to a per-day count (no person, device, time or place), called once a day per phone from Your points and Profile for a real member (a69/a76, D-555); `screen_opens_weekly()` is the service-role report, a total under 5 shown as "under 5". The migration is live (20261013051051) and Lena's Privacy line `privacy.s.what-we-keep.p13` shipped with it. Separately, the Explore bell holds its place when the phone had it last time, so it no longer shifts the page (W3). Proof: DB test 70, unit and e2e (`screen-open-count`, `explore-bell-shift`).
