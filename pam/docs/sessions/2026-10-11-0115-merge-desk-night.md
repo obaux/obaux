@@ -1175,6 +1175,25 @@
   a day later (D-526 C) and a case manager sees missed visits, so under A a member could carry a "missed" for a visit
   they never agreed to. If Will picks A, a program-booked visit never shows as missed unless the member said yes.
 
+- **b41 green, b42 on main and red (15:20 to 15:33).** b41's CI went 4/4 green at 15:20, and b42 (772f14b5) went
+  to main at 15:21. Its "Types, unit tests, build" step failed at 15:22 on apps/site's about.test (below). Fix
+  991d8e18 at 15:33: two rows on the Points and badges post in Sage's signed words (ledger 30eecd88), and the test
+  expects six. The live app was never affected; the website post had been short since D-535.
+- **Batch b43 (15 October), assembled 15:18 to 15:29.** Dot's D-581 (6c8654ae) with the W4, signed-mark and tabs
+  pictures (91fcdaac, 262444c2, e80bd14a). Piper's program lead pass (4a52fdb0, D-582, with Lena's 65a83a33) and
+  Reported places (87e2c488, D-585). Ava's case manager pass (99f84302, D-580) with Lena's 4b5a9a93. Lena's records
+  (1b00fe1f), lead "members" words (2a70bf88) and Reported places words (353f156d). Conflicts: es.json/ledger on
+  program.service.policies.hint/.none (b42's usted for hint, "miembros" for none); every locale file and copy.test.ts
+  where two branches appended at the same place (both kept; Piper's temporary allow-list dropped once Lena
+  translated). Card a95 now shows all five of Will's earlier calls that b42 and b43 change, with pictures.
+- **Decisions, 15:29 to 15:34.**
+  - Lena: "City Hall" stays in each language's own word.
+  - Ava: super admin P5 rows stay unlinked. A super admin page for a real person would widen what staff see, so it
+    needs Will's sign-off first. Sage signed the super admin pass (08637d18) with two edits.
+  - Nico's D-583 (b83080e0): take the Answer by text screen ("They wrote", the number as a person reads it, words
+    only after the # so no server sees them). Hold the phone→name lookup (profile_first_name_for_phone) until
+    texting people back (a61) goes on: it is a new capability that Privacy doesn't describe, for a screen that is
+    off.
 ## What was wrong, and what missed it
 
 - **Sign in's spacing was squeezed on every phone for a night.** A `default: null` meant for short screens removed the
@@ -1331,6 +1350,11 @@
   d0872818). Ava's case manager branch still carries it until it merges 450f8eb3. Lesson: read the exit code, not
   only the pass count, and read every READY's file list.
 
+- **b42's local run skipped the website's tests, and CI caught it (15:22).** b42 touched no apps/site file, so the
+  desk's run left out `pnpm --filter @pam/site test`. But apps/site/test/about.test.ts reads
+  packages/config/src/points.ts (AWARDED_TODAY), which D-578 changed. Lesson: any batch that touches packages/config
+  runs the site tests and the site tsc too. The b43 run adds them.
+
 ## Decisions
 
 - Will's answer on a card goes to the teammate waiting on it the same turn. If that teammate needs Will's own
@@ -1478,6 +1502,11 @@
 | Batch b41 (ba89508e: Dot D-579 + 4e4d0276, Lena 748dabac): config / copy / ui / build:e2e / tsc / web unit / budget / e2e (points, languages, profile-skeleton, no-examples-profile, role-badge-fit, never-live) / storybook + guard | 1311 passed, 1 skipped (after 4e4d0276; 1 failed before) / in step / 124 / 0 / 0 / 180 / 12.0 kB spare / 354 passed, exit 0 / built; "no bundle names the live one"; grep 0 files |
 | b40 main CI (7f850755) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (14:50); Vercel web and pam-site success |
 | Batch b42, full run (06bcdef3: Lena 80721a97 and fc9b6ca4 with Piper 975cb919, Piper S1 87776c94, a2eff85e, Iris 280c8ba7): config / copy / ui / ui build / build:e2e / tsc / web unit / budget / e2e full / storybook + guard | 1311 passed, 1 skipped (exit 1 before a2eff85e: ENOTDIR on the committed link) / in step / 124 / 0 / 0 / 0 / 180 / 12.0 kB spare / 1901 passed, 19 skipped, exit 0 / built; "no bundle names the live one"; grep 0 files |
+| b41 main CI (cb7932bc) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (15:20); Vercel web and pam-site success |
+| b42 main CI (772f14b5) | Types/unit/build FAILED at 15:22: apps/site about.test, AWARDED_TODAY has 6 and the Points post named 4. Migrations and RLS and Publish Storybook green; Accessibility skipped |
+| b42 fix (991d8e18): site test / site tsc / site build / site a11y / config | 100 passed / 0 / 0 / 120 scans, 0 problems / 1311 passed, 1 skipped |
+| Batch b43, full run (e6488b23): config / copy / ui / ui build / build:e2e / tsc / web unit / budget / e2e full / storybook + guard | 1311 passed, 1 skipped / in step / 124 / 0 / 0 / 0 / 180 / 11.7 kB spare / 1964 passed, 19 skipped, 3 failed (reported-places-pass:47 on three projects: strict mode, the signed remove.hint and the closed dialog's body are one sentence) / built; "no bundle names the live one"; grep 0 files |
+| Batch b43, after Piper's 3606792a, main's 991d8e18 and 1d5df9ee: config / copy / ui / site test / site tsc / build:e2e / tsc / web unit / budget / e2e (reported-places-pass, admin, flag, messages, places, places-retired, a11y, never-live, points, lead-flow-pass) / storybook + guard | 1311 passed, 1 skipped / in step / 124 / 100 / 0 / 0 / 0 / 180 / 11.7 kB spare / 507 passed, exit 0 / built; "no bundle names the live one"; grep 0 files |
 | Control Room v24 harness (390 and 1280) | reply about a card: section lands at 76px under the tabs, card folded, button "Replied" (aria "Replied. Reply again"); pressing it restores the card's prefix; a general message leaves scrollY unchanged; a data push mid-glide doesn't stop it; 0 page errors |
 
 ## Left undone
