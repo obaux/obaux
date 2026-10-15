@@ -11,6 +11,7 @@ import { NOTICES, intlLocale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../app/NotIn';
 import { useSession } from '@/lib/useSession';
+import { useFlaggedPlaces } from '@/lib/useFlaggedPlaces';
 import { useStaffRequests } from '@/lib/useStaffRequests';
 import { useRoleView } from '@/lib/useViewedRole';
 
@@ -53,6 +54,9 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
   const isSuperAdmin = viewedRole === 'super_admin';
 
   const { state: requests } = useStaffRequests(isSuperAdmin);
+  // Reported places reach Home like Programs to check, with how many are waiting (Iris's super admin pass, W4).
+  const { state: reported } = useFlaggedPlaces(isSuperAdmin);
+  const reportedCount = reported.status === 'ready' ? reported.places.length : 0;
 
   const tools = (
     <>
@@ -111,7 +115,16 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
       {/* The programs leaders have sent for Pam to check, beside the people asking to be staff (D-386). */}
       <MenuList
         label={t('review.title')}
-        items={[{ id: 'programs-to-check', label: t('review.title'), href: '/programs/review/', icon: <PlacesIcon {...ICON} /> }]}
+        items={[
+          { id: 'programs-to-check', label: t('review.title'), href: '/programs/review/', icon: <PlacesIcon {...ICON} /> },
+          {
+            id: 'reported-places',
+            label: t('places.reported.title'),
+            href: '/places/reported/',
+            icon: <ShieldIcon {...ICON} />,
+            ...(reportedCount > 0 ? { badge: String(reportedCount), badgeLabel: t('places.reported.count', { count: reportedCount }) } : {}),
+          },
+        ]}
       />
 
       {requests.status === 'loading' ? <Loading label={t('common.loading')} variant="inline" /> : null}

@@ -1655,5 +1655,12 @@
   "legal.sources.licence": "Licença: CC BY 4.0",
   "places.areaHint.street": "Como 19107, Fishtown ou Broad e Girard.",
   "places.areaLabel.street": "ZIP code, bairro ou endereço",
-  "nav.back.reported": "Voltar para Lugares sinalizados"
+  "nav.back.reported": "Voltar para Lugares sinalizados",
+  "places.reported.wrote": "They wrote:",
+  "places.reported.keep.hint": "The place goes back on the list for members.",
+  "places.reported.remove.hint": "Members won't find it. Anyone who saved it is told.",
+  "places.reported.remove.confirm.title": "Take {place} off the list?",
+  "places.reported.remove.confirm.body": "Members won't find it any more, and anyone who saved it is told.",
+  "places.reported.done.keep": "{place} stays on the list.",
+  "places.reported.done.remove": "{place} is off the list."
 }

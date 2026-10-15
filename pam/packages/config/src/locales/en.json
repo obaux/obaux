@@ -1655,5 +1655,12 @@
   "legal.sources.licence": "License: CC BY 4.0",
   "places.areaHint.street": "Like 19107, Fishtown, or Broad and Girard.",
   "places.areaLabel.street": "ZIP code, neighborhood or address",
-  "nav.back.reported": "Back to Reported places"
+  "nav.back.reported": "Back to Reported places",
+  "places.reported.wrote": "They wrote:",
+  "places.reported.keep.hint": "The place goes back on the list for members.",
+  "places.reported.remove.hint": "Members won't find it. Anyone who saved it is told.",
+  "places.reported.remove.confirm.title": "Take {place} off the list?",
+  "places.reported.remove.confirm.body": "Members won't find it any more, and anyone who saved it is told.",
+  "places.reported.done.keep": "{place} stays on the list.",
+  "places.reported.done.remove": "{place} is off the list."
 }
