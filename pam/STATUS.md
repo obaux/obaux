@@ -1513,6 +1513,10 @@ connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merge
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
 
+## Design system & Storybook · member W3 and W5 layout proposals (15 October)
+
+Two proposals for Will, pictures only (`docs/design/review/2026-10-15-member-w3-w5/`, with `proposal.patch`): the "will see your visit" note below the service cards so the choices show at 320x568 (W3), and a secondary directions button under the visit card until the visit is marked (W5). Nothing is built; Piper builds what Will picks. On `claude/pam-design-member-w3-w5`.
+
 ## Design system & Storybook · text boxes show no ring (14 October)
 
 Text boxes draw no ring of ours in any mode; the keyboard still comes up when a screen opens with one ready (D-569, Will a83, supersedes D-523's text-box line). Buttons, links, tick boxes and selects keep the brand ring on Tab. The chat composer has no ring (none on Tab); the code boxes keep their 2px accent edge on purpose (D-251). On `claude/pam-design-text-box-no-ring`; not on `main`.

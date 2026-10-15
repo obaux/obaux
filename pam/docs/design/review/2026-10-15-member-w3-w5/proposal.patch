@@ -1,0 +1,51 @@
+diff --git a/pam/apps/web/src/app/place/page.tsx b/pam/apps/web/src/app/place/page.tsx
+index ab39d5b0..0924371b 100644
+--- a/pam/apps/web/src/app/place/page.tsx
++++ b/pam/apps/web/src/app/place/page.tsx
+@@ -443,6 +443,8 @@ function PlaceScreen() {
+   // Directions are the footer's one button for anybody who is neither planning
+   // a visit nor already booked (D-440); a row of the same name would say it twice.
+   const footerIsDirections = !plansVisit && !visitWhen && Boolean(directions);
++  // Until the member is there, getting there comes first (Iris W5): a button under the visit card.
++  const directionsUpTop = Boolean(visit && !visit.attendance && directions);
+ 
+   return (
+     <Page
+@@ -539,6 +541,7 @@ function PlaceScreen() {
+                   changeHref={visitAhead ? changeHref : null}
+                 />
+               ) : null}
++              {directionsUpTop ? <BigButton variant="secondary" label={t('place.directions')} href={directions ?? undefined} /> : null}
+               {visit && visitAhead ? (
+                 <>
+                   {cancelFailed ? <Banner status="error" title={t('place.visit.cancel.failed')} /> : null}
+@@ -583,7 +586,7 @@ function PlaceScreen() {
+         // Rows, most important first (Will, 5 October, D-291): getting
+         // there, then asking a question, then calling, then the website.
+         quickActions={[
+-          ...(!footerIsDirections && (directions || googleHref)
++          ...(!footerIsDirections && !directionsUpTop && (directions || googleHref)
+             ? [
+                 {
+                   id: 'directions',
+diff --git a/pam/packages/ui/src/PlaceDetail.tsx b/pam/packages/ui/src/PlaceDetail.tsx
+index 82898d19..21ce3f4f 100644
+--- a/pam/packages/ui/src/PlaceDetail.tsx
++++ b/pam/packages/ui/src/PlaceDetail.tsx
+@@ -479,7 +479,7 @@ export function PlaceDetail({
+ 
+       {status ? <VStack aria-hidden xstyle={styles.rule} /> : null}
+ 
+-      {notice ?? null}
++      {layout === 'chooseFirst' ? null : (notice ?? null)}
+ 
+       {/*
+         What to do about this place, as rows (Will, 5 October, D-291): "Get
+@@ -490,6 +490,7 @@ export function PlaceDetail({
+       {layout === 'chooseFirst' ? (
+         <>
+           {extra ?? null}
++          {notice ?? null}
+           {aboutCard}
+           {addressCard}
+           {quickActions && quickActions.length > 0 ? (
