@@ -1050,6 +1050,32 @@
   - W5: until the visit is marked, a secondary "How to get there" button sits under the visit card, and the Get
     directions row is hidden.
   Advice: yes to both; they are independent. Piper builds what Will picks.
+- **Iris, 15 October 13:47: Case manager flow, first pass** (`docs/research/2026-10-15-case-manager-flow.md`).
+  Storybook from main 7b58b1f9 plus one build:e2e check; no account made, nothing sent. Nothing stops anyone.
+  Routed by the merge desk at 13:51:
+  - **Ava (Accounts & invites):**
+    - W1: joining step 2 ("What you will see") has no way back and no Help (never dead-end, A26).
+    - W3: a member's page is titled "Profile", not their name.
+    - P3: "Connect Marcus" distances say nothing about where they're measured from.
+    - P4: after a recommendation, the only way on is "Return home".
+    - P5: "What you can see" is 12px on Home.
+    - P7: About you asks a case manager for "City you live in".
+    - P8: the search box's spoken name is said twice.
+    - P9: invite errors show one at a time.
+    - Ava also wires W2's words.
+  - **Sage:** the words for W2 (the empty Home points at Profile, but Invite someone is on the same screen), W3's
+    title and P7.
+  - **Lena:** P6 (Spanish staff screens mix tú and usted; under the 13:31 rule staff-only screens are usted) and the
+    P5 list mismatch (Home's "What you can see" list differs from the joining step's): check both against
+    transparency.ts, without widening it.
+  - **Dot:**
+    - Storybook's build ignores NEXT_PUBLIC_SUPABASE_URL, so 8 bundles name the live project. Nothing reached it,
+      but D-576 doesn't cover Storybook, so the stub and a guard are needed there too.
+    - Two prototype gaps on the surface Will reviews: P1 (Message does nothing in the case manager prototype) and
+      P2 (no appointments fixture, so a member shows no visits).
+    - W4 (Home doesn't say who has a visit, went or missed one, though the sign-in slide says "Know who showed up"):
+      a design proposal with pictures for Will.
+  - **Iris next:** a first pass over the Program lead flow.
 - **One send-invite-emails 500 at 06:25:01** (`claim_staff_invite_emails: 401`). The 21 runs either side of it all
   returned 200. Not acted on. Watch only.
 
