@@ -1027,6 +1027,55 @@
   - **Will's phone:** W6 (I went locked while the location prompt is open) joins the 10-minute phone check with the
     DocuSign keyboard test.
   - **Iris next:** a first pass over the Case manager flow.
+- **Merge desk, 15 October 13:31: the Spanish register rule (Lena, P4).** Lena's scan found about 200 member-side
+  lines in usted, not Iris's nine. The approved rule, the same principle as b34 (one register per screen):
+  - screens only members see: tú;
+  - screens both roles use (sign-in, the Join code, Messages, reminders, alerts, notifications, flag, Profile,
+    Help): tú for every key, the staff variants included;
+  - screens only staff see: usted, including b34's six join.staff.* strings;
+  - Privacy, Terms and legal.*: usted.
+  transparency.* moves to tú, so it now differs from the Privacy page. That's for Will later, since Privacy is his
+  signed text. trips.booked.sms is not touched. Only es.json and the ledger change. The English is unchanged, so it
+  needs no Sage signature and no Will.
+- **Sage, 15 October 13:32 (ledger 5259382d): Iris's P1, P2 and P5 signed.**
+  - P1: "Pick a day and a time." / "Pick a day." / "Pick a time."
+  - P2: a new form, "{place}, {when}", for a trip with no companion.
+  - P5: the badge names are translated, except Sankofa and Griot, which are borrowed words and stay as they are.
+  - Sage flagged "Craftsman" as gendered, the thing D-109 fixed once already. It went to Will as card a90 (13:33):
+    Maker is the merge desk's advice, Crafter is Sage's other choice, or he keeps it. Lena holds badge.craftsman until
+    he picks.
+- **Dot, 15 October 13:34: Iris's W3 and W5 as pictures** (claude/pam-design-member-w3-w5 @ cc35508c, pictures and a
+  6-line proposal.patch, nothing built). They went to Will as card a91 (13:34; assets b18e4ccf… and 791cde74…).
+  - W3: the "will see your visit" note moves below the service cards on a place with services.
+  - W5: until the visit is marked, a secondary "How to get there" button sits under the visit card, and the Get
+    directions row is hidden.
+  Advice: yes to both; they are independent. Piper builds what Will picks.
+- **Iris, 15 October 13:47: Case manager flow, first pass** (`docs/research/2026-10-15-case-manager-flow.md`).
+  Storybook from main 7b58b1f9 plus one build:e2e check; no account made, nothing sent. Nothing stops anyone.
+  Routed by the merge desk at 13:51:
+  - **Ava (Accounts & invites):**
+    - W1: joining step 2 ("What you will see") has no way back and no Help (never dead-end, A26).
+    - W3: a member's page is titled "Profile", not their name.
+    - P3: "Connect Marcus" distances say nothing about where they're measured from.
+    - P4: after a recommendation, the only way on is "Return home".
+    - P5: "What you can see" is 12px on Home.
+    - P7: About you asks a case manager for "City you live in".
+    - P8: the search box's spoken name is said twice.
+    - P9: invite errors show one at a time.
+    - Ava also wires W2's words.
+  - **Sage:** the words for W2 (the empty Home points at Profile, but Invite someone is on the same screen), W3's
+    title and P7.
+  - **Lena:** P6 (Spanish staff screens mix tú and usted; under the 13:31 rule staff-only screens are usted) and the
+    P5 list mismatch (Home's "What you can see" list differs from the joining step's): check both against
+    transparency.ts, without widening it.
+  - **Dot:**
+    - Storybook's build ignores NEXT_PUBLIC_SUPABASE_URL, so 8 bundles name the live project. Nothing reached it,
+      but D-576 doesn't cover Storybook, so the stub and a guard are needed there too.
+    - Two prototype gaps on the surface Will reviews: P1 (Message does nothing in the case manager prototype) and
+      P2 (no appointments fixture, so a member shows no visits).
+    - W4 (Home doesn't say who has a visit, went or missed one, though the sign-in slide says "Know who showed up"):
+      a design proposal with pictures for Will.
+  - **Iris next:** a first pass over the Program lead flow.
 - **One send-invite-emails 500 at 06:25:01** (`claim_staff_invite_emails: 401`). The 21 runs either side of it all
   returned 200. Not acted on. Watch only.
 
