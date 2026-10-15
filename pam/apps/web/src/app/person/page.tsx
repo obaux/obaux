@@ -355,6 +355,8 @@ function PersonScreen() {
       */}
       <ProfileSummary
         name={person.firstName}
+        // The title above already says it; the card shows it without a second heading.
+        isNameInTitle={Boolean(person.firstName)}
         // A program sees whether a member has signed all its policies (D-261).
         {...(isProgramView && isMember
           ? { nameAddon: <VerifiedBadge personId={person.id} name={person.firstName ?? ''} /> }
