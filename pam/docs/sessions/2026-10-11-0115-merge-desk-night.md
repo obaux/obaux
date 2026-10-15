@@ -1027,6 +1027,16 @@
   - **Will's phone:** W6 (I went locked while the location prompt is open) joins the 10-minute phone check with the
     DocuSign keyboard test.
   - **Iris next:** a first pass over the Case manager flow.
+- **Merge desk, 15 October 13:31: the Spanish register rule (Lena, P4).** Lena's scan found about 200 member-side
+  lines in usted, not Iris's nine. The approved rule, the same principle as b34 (one register per screen):
+  - screens only members see: tú;
+  - screens both roles use (sign-in, the Join code, Messages, reminders, alerts, notifications, flag, Profile,
+    Help): tú for every key, the staff variants included;
+  - screens only staff see: usted, including b34's six join.staff.* strings;
+  - Privacy, Terms and legal.*: usted.
+  transparency.* moves to tú, so it now differs from the Privacy page. That's for Will later, since Privacy is his
+  signed text. trips.booked.sms is not touched. Only es.json and the ledger change. The English is unchanged, so it
+  needs no Sage signature and no Will.
 - **One send-invite-emails 500 at 06:25:01** (`claim_staff_invite_emails: 401`). The 21 runs either side of it all
   returned 200. Not acted on. Watch only.
 
