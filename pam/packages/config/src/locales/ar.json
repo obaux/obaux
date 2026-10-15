@@ -1005,6 +1005,7 @@
   "trips.count.few": "الزيارات القادمة: {count}",
   "trips.count.many": "الزيارات القادمة: {count}",
   "trips.card.label": "{place}، {when}، مع {name}",
+  "trips.card.label.alone": "{place}, {when}",
   "explore.heading.all": "كل البرامج",
   "nav.back.trips": "العودة إلى الزيارات",
   "messages.thread.more": "مزيد من الخيارات",

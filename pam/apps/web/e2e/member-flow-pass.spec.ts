@@ -74,3 +74,20 @@ test('Copy address is 48px by 48px on a place (P7)', async ({ page }) => {
   expect(box!.width).toBeGreaterThanOrEqual(48);
   expect(box!.height).toBeGreaterThanOrEqual(48);
 });
+
+test('Next with nothing picked says "Pick a day and a time." (P1)', async ({ page }) => {
+  await asMember(page);
+  await page.goto('/trips/new/?place=dummy-place-learning&name=Example%20Learning%20Center&category=education');
+  await settled(page);
+  await page.getByRole('button', { name: 'Next', exact: true }).click();
+  await expect(page.getByText('Pick a day and a time.')).toBeVisible();
+});
+
+test('a trip card nobody comes along to is named without a trailing "with" (P2)', async ({ page }) => {
+  await withTrip(page, 'en');
+  await page.goto('/trips/');
+  await settled(page);
+  const card = page.getByRole('link', { name: new RegExp(`^${LONG}, \\w+day, .*[AP]M$`) });
+  await expect(card).toHaveCount(1);
+  await expect(page.getByRole('link', { name: /, with\s*$/ })).toHaveCount(0);
+});

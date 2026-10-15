@@ -915,6 +915,7 @@
   "trips.map.many": "{count} visitas",
   "trips.count": "{count} chegando",
   "trips.card.label": "{place}, {when}, com {name}",
+  "trips.card.label.alone": "{place}, {when}",
   "explore.heading.all": "Todos os programas",
   "nav.back.trips": "Voltar para Visitas",
   "messages.thread.more": "Mais opções",

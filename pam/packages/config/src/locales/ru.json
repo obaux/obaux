@@ -969,6 +969,7 @@
   "trips.count.few": "Ближайших: {count}",
   "trips.count.many": "Ближайших: {count}",
   "trips.card.label": "{place}, {when}. Вас встретит: {name}",
+  "trips.card.label.alone": "{place}, {when}",
   "explore.heading.all": "Все программы",
   "nav.back.trips": "Назад: Визиты",
   "messages.thread.more": "Другие параметры",

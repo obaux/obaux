@@ -27,7 +27,7 @@ Built with `build:e2e`. The touched specs on three projects (member-flow-pass, m
 
 ## Left undone
 
-P1 and P2 wait on Sage's and Lena's wording. W3 and W5 are Dot's; W6 goes on Will's phone list. `points.way.attend` is now unused (left in the ledger; remove with Lena's next pass).
+P1 and P2 went in with Sage's words (second commit). Lena: translate `trips.card.label.alone` and re-check the three `trips.new.missing.*` (kept, not retranslated). W3 and W5 are Dot's; W6 goes on Will's phone list. `points.way.attend` is now unused (left in the ledger; remove with Lena's next pass).
 
 ## Needs a human
 
