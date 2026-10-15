@@ -1518,6 +1518,10 @@ connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merge
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
 
+## Design system & Storybook · case manager Home: who showed up, proposal (15 October)
+
+A proposal for Will, pictures only (`docs/design/review/2026-10-15-cm-home-visits/`, with `proposal.patch`): one line under each member's name on Home (next visit, went, or a missed chip), replacing the points line. Nothing is built; words are stand-ins for Sage and Lena. On `claude/pam-design-cm-home-visits`.
+
 ## Design system & Storybook · case manager prototype: Message works, Marcus has visits (15 October)
 
 `router.push` now moves the Storybook prototype (it was passed under the wrong key for Storybook 10, D-581), so "Message Marcus" opens the conversation; Marcus has visits in the pretend database. On `claude/pam-design-cm-prototype-gaps`.
