@@ -1782,6 +1782,8 @@
   "carousel.play": "تشغيل",
   "supportReply.title": "الرد برسالة نصية",
   "supportReply.to": "إلى {phone}",
+  "supportReply.toNamed": "إلى {name}، {phone}",
+  "supportReply.theyWrote": "كتبوا",
   "supportReply.label": "ردك",
   "supportReply.count": "{used} من {max}",
   "supportReply.send": "إرسال رسالة نصية",

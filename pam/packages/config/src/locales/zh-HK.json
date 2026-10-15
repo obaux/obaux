@@ -1642,6 +1642,8 @@
   "carousel.play": "播放",
   "supportReply.title": "以短訊回覆",
   "supportReply.to": "傳送至 {phone}",
+  "supportReply.toNamed": "傳送至 {name}，{phone}",
+  "supportReply.theyWrote": "對方寫道",
   "supportReply.label": "您的回覆",
   "supportReply.count": "已用 {used} / {max}",
   "supportReply.send": "傳送短訊",

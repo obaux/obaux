@@ -1642,6 +1642,8 @@
   "carousel.play": "Play",
   "supportReply.title": "Answer by text",
   "supportReply.to": "To {phone}",
+  "supportReply.toNamed": "To {name}, {phone}",
+  "supportReply.theyWrote": "They wrote",
   "supportReply.label": "Your answer",
   "supportReply.count": "{used} of {max}",
   "supportReply.send": "Send text",

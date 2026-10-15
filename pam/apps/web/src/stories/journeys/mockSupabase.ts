@@ -658,6 +658,10 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/message_program', () => ({ body: CONVO_ID })),
     // Counting a screen open (a76): a story never writes, and does not count either.
     on('/rpc/count_screen_open', () => ({ body: null })),
+    // Answer by text: the first name of the account with the number, when Pam knows it (D-583).
+    on('/rpc/profile_first_name_for_phone', (_url, _method, body) => ({
+      body: JSON.stringify(body ?? '').includes('+12155550142') ? 'Ana' : null,
+    })),
     on('/rpc/conversation_partners', () => ({ body: [partnerFor(role)] })),
     on('/rpc/conversation_block_state', () => ({
       body: [{ i_blocked: options.blocked === 'mine', blocked_me: options.blocked === 'theirs' }],

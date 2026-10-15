@@ -1642,6 +1642,8 @@
   "carousel.play": "Reproducir",
   "supportReply.title": "Responder por texto",
   "supportReply.to": "Para {phone}",
+  "supportReply.toNamed": "Para {name}, {phone}",
+  "supportReply.theyWrote": "Escribió",
   "supportReply.label": "Su respuesta",
   "supportReply.count": "{used} de {max}",
   "supportReply.send": "Enviar texto",

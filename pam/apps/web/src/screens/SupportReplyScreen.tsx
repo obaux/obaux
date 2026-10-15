@@ -1,16 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { useSearchParams } from 'next/navigation';
 import { Card } from '@astryxdesign/core/Card';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { renderSms } from '@pam/config';
+import { displayPhone, intlLocale, renderSms } from '@pam/config';
 import { BigButton, Notice, TextField } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { goBack } from '@/lib/navigate';
+import { replyContextFrom, type ReplyContext } from '@/lib/replyContext';
+import { useExamplesOn } from '@/lib/useExamplesOn';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 
@@ -28,6 +30,8 @@ const MAX = 120;
 const styles = stylex.create({
   to: { fontSize: '18px', lineHeight: 1.5 },
   note: { fontSize: '15px', lineHeight: 1.5 },
+  // What they wrote, in their own words and line breaks.
+  question: { fontSize: '17px', lineHeight: 1.5, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' },
   field: { width: '100%' },
 });
 
@@ -42,7 +46,7 @@ function refusal(words: string): string | null {
 }
 
 export function SupportReplyScreen() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const params = useSearchParams();
   const to = (params.get('to') ?? '').trim();
   const { state: session } = useSession();
@@ -52,6 +56,41 @@ export function SupportReplyScreen() {
   const [words, setWords] = useState('');
   const [phase, setPhase] = useState<'idle' | 'sending' | 'sent'>('idle');
   const [problem, setProblem] = useState<string | null>(null);
+
+  // Who the number belongs to, if Pam knows (the Everyone list's first names, matched by number), and what they
+  // asked and when: the words come from the link, never the database (D-583).
+  const examples = useExamplesOn();
+  const [name, setName] = useState<string | null>(null);
+  const [asked, setAsked] = useState<ReplyContext>({ question: null, askedAt: null });
+  useEffect(() => {
+    // From the address after `#`, which no server sees. Storybook and demo accounts may also pass them as ordinary
+    // query values, so a story can show the screen; a real link does not.
+    const fromAddress = replyContextFrom(window.location.hash);
+    const fromQuery = examples ? replyContextFrom(`q=${encodeURIComponent(params.get('q') ?? '')}&at=${encodeURIComponent(params.get('at') ?? '')}`) : null;
+    setAsked({
+      question: fromAddress.question ?? fromQuery?.question ?? null,
+      askedAt: fromAddress.askedAt ?? fromQuery?.askedAt ?? null,
+    });
+  }, [examples, params]);
+  useEffect(() => {
+    if (!isSuperAdmin || to === '') return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const { createClient } = await import('@/lib/supabase');
+        const { data, error } = await createClient().rpc('profile_first_name_for_phone', { p_phone: to });
+        if (!cancelled) setName(!error && typeof data === 'string' && data !== '' ? data : null);
+      } catch {
+        if (!cancelled) setName(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isSuperAdmin, to]);
+  const askedWhen = asked.askedAt
+    ? new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(asked.askedAt))
+    : null;
 
   const trimmed = words.trim();
   const over = trimmed.length > MAX;
@@ -92,7 +131,23 @@ export function SupportReplyScreen() {
         <Text xstyle={styles.to}>{t('supportReply.sent')}</Text>
       ) : (
         <VStack gap={4}>
-          <Text xstyle={styles.to}>{t('supportReply.to', { phone: to })}</Text>
+          <Text xstyle={styles.to}>
+            {name
+              ? t('supportReply.toNamed', { name, phone: displayPhone(to) })
+              : t('supportReply.to', { phone: displayPhone(to) })}
+          </Text>
+          {asked.question ? (
+            <Card padding={6}>
+              <VStack gap={2}>
+                <Text type="supporting" xstyle={styles.note}>
+                  {askedWhen ? `${t('supportReply.theyWrote')} · ${askedWhen}` : t('supportReply.theyWrote')}
+                </Text>
+                <Text dir="auto" xstyle={styles.question}>
+                  {asked.question}
+                </Text>
+              </VStack>
+            </Card>
+          ) : null}
           <Card padding={6}>
             <TextField
               label={t('supportReply.label')}
