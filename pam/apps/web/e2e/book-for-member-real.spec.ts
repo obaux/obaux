@@ -11,10 +11,21 @@ const CONVO = '2a9d5e1c-3b7f-4d8e-9a1b-6c5d4e3f2a1b';
 const CONVO_STAFF = '2a9d5e1c-3b7f-4d8e-9a1b-6c5d4e3f2a1c';
 const JORDAN = '7c1f8c1e-1c7e-4a5c-9d6e-0f3a2b4c5d6e';
 const TANYA = '7c1f8c1e-1c7e-4a5c-9d6e-0f3a2b4c5d6f';
+const ORG = '22222222-0000-0000-0000-0000000000aa';
+const PROGRAM = '4c0f6b64-3a0e-4b8e-9d6c-0a0a0a0a0a0a';
 const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
 
-async function leadWith(page: import('@playwright/test').Page, people: boolean) {
+/** A lead who has a program on Pam (D-447), or one who has none yet. */
+async function leadWith(page: import('@playwright/test').Page, people: boolean, hasProgram = true) {
   await asMember(page, 'provider');
+  await page.route('**/rest/v1/profiles*', (route) =>
+    route.fulfill(json({ id: 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b', org_id: ORG, role: 'provider', first_name: 'Lou', region_id: null, regions: null, access_status: 'active', onboarded_at: '2026-09-14T00:00:00Z' })),
+  );
+  await page.route('**/rest/v1/program_services*', (route) => route.fulfill(json([])));
+  await page.route('**/rest/v1/program_submissions*', (route) => route.fulfill(json([])));
+  await page.route('**/rest/v1/services*', (route) =>
+    route.fulfill(json(hasProgram ? [{ id: PROGRAM, name: 'Fresh Start Kitchen', category: 'workforce', subcategory: null, description_plain: 'Words.', address: '1 Main St', phone: null, website: null, needs_review: false, is_active: true, created_at: '2026-10-06T10:00:00Z' }] : [])),
+  );
   await page.route('**/rest/v1/conversation_members*', (route) =>
     route.fulfill(json(people ? [{ conversation_id: CONVO, last_read_at: null }, { conversation_id: CONVO_STAFF, last_read_at: null }] : [])),
   );
@@ -70,4 +81,22 @@ test('a real lead nobody has written to is told so', async ({ page }) => {
   await page.goto('/program/book/');
   await settled(page);
   await expect(page.getByText(/Nobody has written to your program yet/)).toBeVisible();
+});
+
+test('a real lead whose program is not on Pam has no rows and no link to the example place (a55)', async ({ page }) => {
+  await leadWith(page, true, false);
+  await page.goto('/program/book/');
+  await settled(page);
+  await expect(page.getByRole('link', { name: /Jordan/ })).toHaveCount(0);
+  const hrefs = await page.getByRole('link').evaluateAll((els) => els.map((e) => e.getAttribute('href') ?? ''));
+  expect(hrefs.filter((h) => h.includes('dummy-place'))).toEqual([]);
+});
+
+test('a real lead\'s row books into her own program, never the example one', async ({ page }) => {
+  await leadWith(page, true);
+  await page.goto('/program/book/');
+  await settled(page);
+  await page.getByRole('link', { name: /Jordan/ }).click();
+  await expect(page).toHaveURL(new RegExp(`place=${PROGRAM}`));
+  await expect(page).not.toHaveURL(/dummy-place/);
 });
