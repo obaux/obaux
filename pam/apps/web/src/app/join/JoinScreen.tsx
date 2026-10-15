@@ -95,7 +95,8 @@ const STEP: Record<Phase, number> = {
 };
 
 /** What to expect, for a program lead (D-354): one picture per line. */
-const PROVIDER_EXPECT: readonly SetupArtKind[] = ['calendar', 'message', 'policy', 'private'];
+// Row 5 (Sage, ledger d05f9d80; with Privacy card a92): a new save is seen as "when", never which place.
+const PROVIDER_EXPECT: readonly SetupArtKind[] = ['calendar', 'message', 'policy', 'private', 'alerts'];
 
 /** The small print at the foot of the city list: shown, never chosen. */
 const CITY_NOTE = '__note';
