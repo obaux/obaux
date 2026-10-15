@@ -345,7 +345,8 @@ function PersonScreen() {
   return (
     <Page gap={4}>
       <RememberPersonName id={person.id} name={person.firstName ?? ''} />
-      {header(t('person.profile'))}
+      {/* Their name is the title, not "Profile", the word on the viewer's own tab (Iris, case manager W3). */}
+      {header(person.firstName || t('person.profile'))}
 
       {/*
         The profile card (D-231): the member profile's own card — face, name,

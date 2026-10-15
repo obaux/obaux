@@ -96,8 +96,11 @@ export function CaseloadHome() {
       // reads the same words, so the promise is visible from both sides.
       footer={
         <VStack gap={2}>
-          <Heading level={2}>{t('admin.seeing.title')}</Heading>
-          <Text type="supporting">{t('admin.seeing.body')}</Text>
+          <Heading level={2} xstyle={homeStyles.section}>
+            {t('admin.seeing.title')}
+          </Heading>
+          {/* The promise to members, at reading size, not the smallest text on the screen (Iris, case manager P5). */}
+          <Text xstyle={homeStyles.intro}>{t('admin.seeing.body')}</Text>
         </VStack>
       }
       actions={<HeaderActions role="admin" />}
