@@ -1208,6 +1208,22 @@
   - Conflict: RequestsScreen.tsx, where b43's Reported places row met Ava's Programs to check count. Both rows kept.
     Their counts now use two styles (value and badge), and Dot is asked to pick one.
   - Lena's fit audits at each SHA: 0 new findings. Only two spoken keys are drawn by no story.
+- **b44 green (17:14).** Team told at 17:15. Iris asked to re-test the super admin pass.
+- **Batch b45 (15 October), assembled 17:19 to 17:47.**
+  - Iris's re-test of b42 and b43 (43c92c1b): PASS on all four flows, with two polish notes, both in this batch.
+  - Piper (7493c78e): a real program lead whose program isn't loaded, or doesn't exist, no longer gets rows linking to
+    the example place. They wait, or see the empty state with no link. The example program is for examples only.
+  - Ava (edab444d): a member's page says the name once. The title is the name; the profile card shows it as text, not
+    a second heading (`ProfileSummary` `isNameInTitle`). Same look. The merge desk moved one story note back above
+    its story (23d38bb3).
+  - Iris's re-test of b44, the super admin pass (2930f230): PASS on W1, W3 and P1 to P7. The words after the # in an
+    Answer by text link reached none of the page's 55 requests. One new polish note: "Days waiting" still showed
+    after a program was approved.
+  - Ava (e267fbe1, merged after the full run): "Days waiting" shows only while a program waits for a decision, and is
+    gone after approve, changes asked or discard. Conflict: STATUS.md, her two sections at the same place; both kept.
+  - Every finding the desk sent back from Iris's four first passes has now been re-tested. Still open: Dot (member W3
+    and W5), Will's phone (W6), Will (program lead P3 and P10, card a92) and a84 (super admin W2).
+  - Dot's single count style for the super admin Home goes in a later batch.
 ## What was wrong, and what missed it
 
 - **Sign in's spacing was squeezed on every phone for a night.** A `default: null` meant for short screens removed the
@@ -1529,10 +1545,15 @@
 | Batch b43, after Piper's 3606792a, main's 991d8e18 and 1d5df9ee: config / copy / ui / site test / site tsc / build:e2e / tsc / web unit / budget / e2e (reported-places-pass, admin, flag, messages, places, places-retired, a11y, never-live, points, lead-flow-pass) / storybook + guard | 1311 passed, 1 skipped / in step / 124 / 100 / 0 / 0 / 0 / 180 / 11.7 kB spare / 507 passed, exit 0 / built; "no bundle names the live one"; grep 0 files |
 | b43 main CI (9b9d31b2) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (16:38); Vercel web and pam-site success. b42's fix 991d8e18: all four green (16:05) |
 | Batch b44, full run (92320c5c, then stories and records merged before the Storybook step): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard | 1311 passed, 1 skipped / in step / 124 / 0 / 100 / 0 / 0 / 0 / 186 / 11.5 kB spare / 1997 passed, 19 skipped, exit 0 / built; "no bundle names the live one"; grep 0 files |
+| b44 main CI (12d788ae) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (17:14); Vercel web and pam-site success |
+| Batch b45, full run (23d38bb3; Iris's 2930f230 merged during e2e, before the Storybook step): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard | 1311 passed, 1 skipped / in step / 124 / 0 / 100 / 0 / 0 / 0 / 186 / 11.5 kB spare / 2003 passed, 19 skipped, exit 0 / built; "no bundle names the live one"; grep 0 files |
+| Batch b45, after Ava's e267fbe1 (6f91431a): build:e2e / tsc / web unit / e2e (programs-review, super-admin-pass, a11y, case-manager-pass) / storybook + guard | 0 / 0 / 186 / 96 passed, exit 0 / built; "no bundle names the live one"; grep 0 files |
 | Control Room v24 harness (390 and 1280) | reply about a card: section lands at 76px under the tabs, card folded, button "Replied" (aria "Replied. Reply again"); pressing it restores the card's prefix; a general message leaves scrollY unchanged; a data push mid-glide doesn't stop it; 0 page errors |
 
 ## Left undone
 
+- **As of b45 (15 October, 17:47):** Dot: one count style on the super admin Home, then the builders' rows. Wren: re-shoot the Points and badges picture and its alt text. With
+  Will: a84, a86, a88, a90, a91, a92, a93, a94, a95, and the Cloud Console items below.
 - **As of b39 (14 October, 09:45):** as b38 below, less the dir="auto" and token-refresh items (done: one
   `dir="auto"`, Dot's; the 401s were our own e2e runs, now stopped by D-576). a86 is at 04ad2ce5.
 - **As of b38 (14 October, 07:51):** with Will: a86 (one search on Explore: his yes, and his signature on the p7
