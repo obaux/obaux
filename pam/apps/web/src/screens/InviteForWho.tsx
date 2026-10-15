@@ -56,16 +56,14 @@ export function InviteForWho({
   const [tried, setTried] = useState(false);
   const digits = phone.replace(/\D/g, '');
   const staff = role !== 'member';
-  const missing =
-    firstName.trim() === ''
-      ? 'name'
-      : digits.length < 10
-        ? 'phone'
-        : staff && email.trim() === ''
-          ? 'email'
-          : staff && !isEmailAddress(email.trim())
-            ? 'emailInvalid'
-            : null;
+  // Every missing field at once, in the order they are on the screen (Iris, case manager P9): one at a time
+  // made an empty form a guessing game, the number reported only after the name was filled.
+  const missing = [
+    ...(firstName.trim() === '' ? (['name'] as const) : []),
+    ...(digits.length < 10 ? (['phone'] as const) : []),
+    ...(staff && email.trim() === '' ? (['email'] as const) : []),
+    ...(staff && email.trim() !== '' && !isEmailAddress(email.trim()) ? (['emailInvalid'] as const) : []),
+  ];
 
   return (
     <VStack gap={4}>
@@ -106,17 +104,21 @@ export function InviteForWho({
       <Text type="supporting" xstyle={styles.note}>
         {t('invite.who.note')}
       </Text>
-      {tried && missing ? (
-        <Text role="alert" xstyle={styles.error}>
-          {t(`invite.who.need.${missing}`)}
-        </Text>
+      {tried && missing.length > 0 ? (
+        <VStack gap={1} role="alert">
+          {missing.map((need) => (
+            <Text key={need} xstyle={styles.error}>
+              {t(`invite.who.need.${need}`)}
+            </Text>
+          ))}
+        </VStack>
       ) : null}
       <BigButton
         label={busy ? t('admin.invite.creating') : t('invite.who.make')}
         isDisabled={busy}
         onPress={() => {
           setTried(true);
-          if (missing) return;
+          if (missing.length > 0) return;
           onSubmit({ firstName: firstName.trim(), phone: phone.trim(), ...(staff ? { email: email.trim() } : {}) });
         }}
       />

@@ -96,8 +96,24 @@ export function CaseloadHome() {
       // reads the same words, so the promise is visible from both sides.
       footer={
         <VStack gap={2}>
-          <Heading level={2}>{t('admin.seeing.title')}</Heading>
-          <Text type="supporting">{t('admin.seeing.body')}</Text>
+          <Heading level={2} xstyle={homeStyles.section}>
+            {t('admin.seeing.title')}
+          </Heading>
+          {/*
+            The promise to members as a short list at reading size, not one 12px paragraph (Iris, case manager P5;
+            the merge desk's item 11). The items are the joining step's own (join.privacy.admin.1–4, Sage's ledger
+            4269f020, matching the member's list), so Home and joining can never say two different things.
+          */}
+          <VStack gap={2} role="list">
+            {[1, 2, 3, 4].map((n) => (
+              <Text key={n} role="listitem" xstyle={homeStyles.intro}>
+                {t(`join.privacy.admin.${n}`)}
+              </Text>
+            ))}
+          </VStack>
+          <Text type="supporting" xstyle={homeStyles.intro}>
+            {t('admin.seeing.told')}
+          </Text>
         </VStack>
       }
       actions={<HeaderActions role="admin" />}

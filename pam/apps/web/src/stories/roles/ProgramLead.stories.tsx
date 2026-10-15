@@ -138,3 +138,11 @@ export const SignUp: Story = screenWithControls<SignUpArgs>(
   },
   (args) => ({ kind: 'provider', invite: 'PAM-7Q4K', step: SIGN_UP_STEPS[args.step] }),
 );
+
+/** About you with no city: the staff line, "Tell us the city you work in." (Iris P7; for Lena's fit audit). */
+export const SignUpCityMissing: Story = screen('provider', 'Sign up — no city', '/prototype/join/', {
+  kind: 'provider',
+  invite: 'PAM-7Q4K',
+  step: 'details',
+  missing: 'city',
+});

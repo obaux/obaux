@@ -35,6 +35,8 @@ export function PrototypeJoin() {
         firstName: NAMES[kind],
         ...(code ? { invite: { code, role: kind, ...(trip ? { trip } : {}) } } : {}),
         ...(startAt ? { startAt } : {}),
+        // About you with the city empty and its line showing (Lena's fit audit).
+        ...(params?.get('missing') === 'city' ? { isCityMissing: true } : {}),
       }}
     />
   );

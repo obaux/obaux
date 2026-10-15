@@ -207,14 +207,24 @@ export function ConnectView({ personId, name }: { readonly personId: string; rea
   );
 
   // Done (D-240): the success template — no bar, centred, confetti — and
-  // one quiet way on, home.
+  // two quiet ways on: back to the member, or home.
   if (recommended) {
     return (
       <SuccessScreen
         title={t('person.connect.done.title', { name })}
         body={t('person.connect.done.body', { name, program: recommended.name })}
         action={
-          <Button label={t('person.connect.done.home')} variant="secondary" href="/" xstyle={styles.home} />
+          // Back to the member first: the case manager was on their page, and may want to message them about
+          // it (Iris, case manager P4). Home stays, as the second way on.
+          <VStack gap={2} align="center">
+            <Button
+              label={t('nav.back.person', { name })}
+              variant="secondary"
+              href={back}
+              xstyle={styles.home}
+            />
+            <Button label={t('person.connect.done.home')} variant="secondary" href="/" xstyle={styles.home} />
+          </VStack>
         }
         note={t('person.connect.example')}
       />
@@ -263,6 +273,16 @@ export function ConnectView({ personId, name }: { readonly personId: string; rea
         </Text>
       ) : (
         <VStack gap={3}>
+          {/*
+            Where the miles are from (Iris, case manager P3): a fixed point, City Hall, not the case manager's
+            area and not the member's. The member's area is not something a case manager can see
+            (transparency.ts, ADMIN_CAN_SEE), so it is not used to measure.
+          */}
+          {programs.some((program) => program.meters !== null) ? (
+            <Text type="supporting" xstyle={styles.note}>
+              {t('person.connect.distanceFrom')}
+            </Text>
+          ) : null}
           {programs.map((program) => {
             const miles = program.meters === null ? null : distanceLabel(program.meters / METRES_PER_MILE, locale);
             return (
