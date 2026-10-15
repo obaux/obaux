@@ -150,6 +150,8 @@ export interface JoinPreview {
   readonly invite?: Invite;
   /** Open on this step (D-319): one story per screen, not one per flow. */
   readonly startAt?: JoinPhase;
+  /** Open About you with the city left empty and its line showing, so the words can be checked (Lena's fit audit). */
+  readonly isCityMissing?: boolean;
 }
 
 export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview | null } = {}) {
@@ -269,7 +271,8 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
       // The preview starts at the door, whoever the story is signed in as.
       setKind(preview.kind);
       setFirstName(preview.firstName);
-      setCity('Philadelphia');
+      setCity(preview.isCityMissing ? '' : 'Philadelphia');
+      if (preview.isCityMissing) setInvalid('city');
       // Approved, as if invited: staff finish on "I understand" and go Home
       // rather than on the waiting-for-review notice.
       setHasAccount(true);
