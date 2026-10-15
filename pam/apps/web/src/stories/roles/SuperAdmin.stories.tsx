@@ -1,4 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
+import { userEvent, within } from 'storybook/test';
+import en from '@pam/config/locales/en.json';
+import es from '@pam/config/locales/es.json';
+import ptBR from '@pam/config/locales/pt-BR.json';
+import zhCN from '@pam/config/locales/zh-CN.json';
+import zhHK from '@pam/config/locales/zh-HK.json';
+import ru from '@pam/config/locales/ru.json';
+import ar from '@pam/config/locales/ar.json';
 import { screen } from './screen';
 
 /**
@@ -16,6 +24,43 @@ export const Home: Story = screen('super-admin', 'Home — Requests', '/');
 export const Messages: Story = screen('super-admin', 'Messages', '/messages/');
 export const Profile: Story = screen('super-admin', 'Profile', '/profile/');
 export const ReportedPlaces: Story = screen('super-admin', 'Reported places — Keep it or take it off', '/places/reported/');
+/**
+ * The states of a decision, for the fit audit (Lena): the last card is the one with the long name and the note, and each
+ * story acts on it. The buttons are found by their words in the Language toolbar's locale; the dialog is in the page's
+ * portal, not the canvas.
+ */
+const WORDS = { en, es, 'pt-BR': ptBR, 'zh-CN': zhCN, 'zh-HK': zhHK, ru, ar } as Record<string, Record<string, string>>;
+const wordFor = (globals: Record<string, unknown>, key: string): string =>
+  (WORDS[String(globals['locale'] ?? 'en')] ?? (en as Record<string, string>))[key] ?? key;
+const reportedCard = screen('super-admin', 'Reported places', '/places/reported/');
+export const ReportedPlacesConfirmRemove: Story = {
+  ...reportedCard,
+  name: 'Reported places — Take it off the list? (long name)',
+  play: async ({ canvasElement, globals }) => {
+    const takes = await within(canvasElement).findAllByRole('button', { name: wordFor(globals, 'places.reported.remove') });
+    await userEvent.click(takes.at(-1)!);
+  },
+};
+export const ReportedPlacesKept: Story = {
+  ...reportedCard,
+  name: 'Reported places — after Keep it (long name)',
+  play: async ({ canvasElement, globals }) => {
+    const keeps = await within(canvasElement).findAllByRole('button', { name: wordFor(globals, 'places.reported.keep') });
+    await userEvent.click(keeps.at(-1)!);
+    canvasElement.ownerDocument.defaultView?.scrollTo(0, 0);
+  },
+};
+export const ReportedPlacesRemoved: Story = {
+  ...reportedCard,
+  name: 'Reported places — after Take it off the list (long name)',
+  play: async ({ canvasElement, globals }) => {
+    const takes = await within(canvasElement).findAllByRole('button', { name: wordFor(globals, 'places.reported.remove') });
+    await userEvent.click(takes.at(-1)!);
+    const dialog = await within(canvasElement.ownerDocument.body).findByRole('dialog');
+    await userEvent.click(within(dialog).getByRole('button', { name: wordFor(globals, 'places.reported.remove') }));
+    canvasElement.ownerDocument.defaultView?.scrollTo(0, 0);
+  },
+};
 export const ReportedPlacesFromTheBell: Story = screen('super-admin', 'Reported places, from the bell', '/places/reported/', {
   from: 'notifications',
 });

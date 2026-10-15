@@ -86,7 +86,7 @@ export function ReportedPlaces({
         category: f.place.category,
         description: f.place.description,
         reason: f.reason,
-        note: null,
+        note: f.note,
         count: f.count,
         hours: null,
         href: `/place/?id=${encodeURIComponent(f.place.id)}&from=reported`,
