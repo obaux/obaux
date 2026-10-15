@@ -16,8 +16,8 @@ case on Mira's 15 October 13:24 job (Iris P4, Friday batch) and told Mira the ru
 
 ## What changed
 
-194 Spanish lines (English and the other six languages untouched), plus one quoted screen name in the
-Privacy counter line:
+194 Spanish lines to *tú* and 30 to *usted* (English and the other six languages untouched), plus one quoted screen name in the
+Privacy counter line. The first list is the *tú* side; the staff side is under "Where a reader will meet the seam":
 
 - messages 37, transparency 26, onboarding 13, notice 13, reminders 13, badge 12, checkin 7, place 7,
   trips 7, alerts 7, home 6, saved 6, signin 6, profile 5, flag 5, points 4, notify 4, connections 3,
@@ -51,8 +51,13 @@ Privacy counter line:
   already are), which is code, not translation.
 - **Transparency is now *tú*; the Privacy page next to it is *usted*.** Mira asked for `transparency.*` in *tú*.
   The Privacy page is Will's signed text; whether it follows is his call, and not decided here.
-- Some staff screens already mixed before this (`home.caseload.*`, `join.program.services.hint` are *tú* among
-  *usted* lines). Not touched: they are staff screens, outside P4.
+- Staff-only screens that said *tú* are now *usted* (Iris's case manager pass, P6, 15 October): 30 lines on the case manager's Home
+  (`home.caseload.*`, `home.interested.*`, `home.people.empty.search.body`), the Schedule screen, the program screens
+  (`program.saved`, `.pending.body`, `.example`, `.services.*`, `.service.*`), `interested.empty.body`, `saved.people.empty.body`,
+  `directory.invite.pickCity`, `requests.viewProgram.hint`, `join.program.services(.hint)`.
+- **A case manager still reads *tú* then *usted* in one joining flow**, and that is by the rule, not a slip: "About you" (`join.details.*`)
+  is the Join step members use too (`JoinScreen.tsx` has no staff variant of it), so it is *tú*; "What you will see"
+  (`join.privacy.admin.*`) is the staff variant, *usted* since b34. Removing that seam needs separate keys per role (code).
 
 ## What a later session might reverse
 

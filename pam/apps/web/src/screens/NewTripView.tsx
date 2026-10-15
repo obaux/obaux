@@ -475,8 +475,9 @@ export function NewTripView({
         : step === 'check'
           ? { onBack: () => setStep('when') }
           : {})}
-      // Plan a trip (D-235): search where Help was on the first step; no
-      // Help on When either (Will). Check and Done keep Help.
+      // Plan a trip (D-235): search where Help was on the first step. When
+      // has Help too (Iris's second member pass, W4; A26: help on each step
+      // of a multi-step task), as Check and Done do.
       // The step's one button at the foot of the screen (D-326), like a
       // place's Plan a trip: Next on When, Add this trip on Check.
       footer={
@@ -559,7 +560,7 @@ export function NewTripView({
             href="/"
             xstyle={styles.round}
           />
-        ) : step === 'when' ? undefined : (
+        ) : (
           <HelpButton />
         )
       }
@@ -602,7 +603,9 @@ export function NewTripView({
                 id: 'all',
                 label: t('trips.new.viewAll'),
                 icon: <ExploreIcon {...ICON} />,
-                href: '/',
+                // A button, not a link (Iris's second member pass, P7): a link row's target is only
+                // its words, 24px tall; a button row is the whole row, like the places above it.
+                onSelect: () => navigate('/'),
               },
             ]}
           />

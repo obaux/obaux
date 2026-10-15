@@ -247,6 +247,8 @@ function PlaceScreen() {
   // to the top of the page (D-271). Opened from a trip card, the page is
   // about that visit (D-273): its day and time instead of "Plan a trip".
   const [hasTrip, setHasTrip] = useState(false);
+  // Marked from this page just now (I'm here / I went): the stored visit may not have been read again yet.
+  const [justMarked, setJustMarked] = useState(false);
   const [visit, setVisit] = useState<{ id: string; startsAt: string; serviceId: string | null; attendance: 'attended' | 'missed' | null } | null>(null);
   // Cancel this visit (asks first): the one thing here that takes a plan away.
   const [askingCancel, setAskingCancel] = useState(false);
@@ -539,7 +541,7 @@ function PlaceScreen() {
                   changeHref={visitAhead ? changeHref : null}
                 />
               ) : null}
-              {visit && visitAhead ? (
+              {visit && visitAhead && !visit.attendance && !justMarked ? (
                 <>
                   {cancelFailed ? <Banner status="error" title={t('place.visit.cancel.failed')} /> : null}
                   <TextLink label={t('place.visit.cancel')} onClick={() => setAskingCancel(true)} />
@@ -547,7 +549,7 @@ function PlaceScreen() {
               ) : null}
               {/* "I'm here" (D-535): only a real visit, in its window, not yet marked, at a program with a lead on Pam (D-545). */}
               {visit && hasLead && isSavedPlace(visit.id) && isMemberView && !visit.attendance && inMarkWindow(visit.startsAt) ? (
-                <ImHereCard visitId={visit.id} placeName={place!.name} />
+                <ImHereCard visitId={visit.id} placeName={place!.name} onMarked={() => setJustMarked(true)} />
               ) : null}
               {tellsNoLead ? <Banner status="info" title={t('place.noLead', { place: place!.name })} /> : null}
               {tellsLeadSees ? <Banner status="info" title={t('place.lead.sees', { place: place!.name })} /> : null}

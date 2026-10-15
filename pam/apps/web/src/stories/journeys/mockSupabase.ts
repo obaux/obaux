@@ -226,6 +226,9 @@ function ownProgramRow(state: 'review' | 'live') {
 function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[] {
   const profile = ROLES[journeyRole].profile;
   const role = profile?.role ?? null;
+  // What this story's member has signed, and the drawing kept on their account.
+  const signed: Record<string, { at: string; image: string | null }> = {};
+  let savedSignature: string | null = null;
   // A program sent from Add a program in this story is on file from then on.
   let ownProgram: 'review' | 'live' | undefined = options.ownProgram;
   // What is waiting for Pam on it (D-462): a first send, or a live program's change.
@@ -606,6 +609,23 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     // The member's three (D-304): the rest of Explore is not saved.
     on('/rpc/saved_places_mine', () => ({ body: PLACES.slice(0, 3) })),
     on('/rest/v1/saved_places', () => ({ body: [] })),
+    // Signatures (D-270, D-271): nothing signed and no saved drawing until the story signs, so the
+    // prototype's screens do not log "no fixture"; signing and "Clear signature" are remembered for
+    // the story's life, and a read after a write agrees with it.
+    on('/rest/v1/policy_signatures', () => ({
+      body: Object.entries(signed).map(([policy_id, row]) => ({ policy_id, signed_at: row.at, image: row.image })),
+    })),
+    on('/rest/v1/member_signatures', () => ({ body: savedSignature ? [{ image: savedSignature }] : [] })),
+    on('/rpc/sign_policy', (_url, _method, body) => {
+      const args = (body ?? {}) as { p_policy_id?: string; p_image?: string };
+      if (args.p_image) savedSignature = args.p_image;
+      if (args.p_policy_id) signed[args.p_policy_id] = { at: new Date().toISOString(), image: args.p_image ?? savedSignature };
+      return { body: null };
+    }),
+    on('/rpc/forget_my_signature', () => {
+      savedSignature = null;
+      return { body: null };
+    }),
     on('/rpc/flag_service', () => ({ body: { id: 'flag-1' } })),
     // An example code (D-218's Invite someone); the real one is made by the database.
     on('/rpc/create_invite', (_url, _method, body) => ({
