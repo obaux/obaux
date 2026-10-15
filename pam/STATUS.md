@@ -928,6 +928,17 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Accounts & invites · Iris's case manager pass: W1, W3, P3–P5, P7–P9 (15 October) — READY, W2 waits on Sage
+
+`claude/pam-case-manager-flow` (D-580).
+- Joining step 2 goes back to step 1, and a fixed name is saved on the account. Staff step 2 has Contact Pam.
+- A member's page is titled with their name. Connect says its miles are from City Hall.
+- After recommending, the screen offers Back to {name} as well as Home.
+- "What you can see" is at reading size. Staff are asked "City you work in".
+- The members search is named once. The invite form lists every missing field.
+- Before/after shots are in `docs/design/review/2026-10-15-case-manager-pass/`.
+- W2's words, and two new keys, are with Sage, then Lena.
+
 ## Accounts & invites · Join Pam (W6), language dropdown, code behind a question (13 October) — live in b32
 
 `claude/pam-join-first-time-wording` (D-563, with Dot's D-561 and D-564 merged in). From an invite, Sign in
