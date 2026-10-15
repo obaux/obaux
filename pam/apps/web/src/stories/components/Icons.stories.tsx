@@ -23,6 +23,7 @@ import {
   PlacesIcon,
   ShareIcon,
   ShieldIcon,
+  SignedDocIcon,
   StarIcon,
 } from '@pam/ui';
 
@@ -58,6 +59,7 @@ const ICONS: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
   PhotoIcon,
   PdfIcon,
   DocumentIcon,
+  SignedDocIcon,
 };
 
 function Gallery({ size }: { readonly size: 'regular' | 'big' }) {

@@ -77,7 +77,7 @@ test.describe('the staff Home', () => {
     const nav = page.getByRole('navigation', { name: 'Main' });
     await expect(nav.getByRole('link', { name: /Program/ })).toBeVisible();
     await expect(nav.getByRole('link', { name: /Home/ })).toBeVisible();
-    await expect(page.getByRole('link', { name: /People interested in your program/ })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /Members interested in your program/ })).toHaveCount(0);
   });
 
   test('nobody on the list: faint circles, and a (+) that starts a member invite', async ({ page }) => {
@@ -109,8 +109,8 @@ test.describe('the staff Home', () => {
 
     await expect(page.getByRole('heading', { name: 'Get started', level: 1 })).toBeVisible();
     // Nobody can be interested in a program that is not on Pam yet: no rings, no faint circles, no examples.
-    await expect(row(page, 'People interested in your program')).toHaveCount(0);
-    await expect(page.getByText('People interested in your program')).toHaveCount(0);
+    await expect(row(page, 'Members interested in your program')).toHaveCount(0);
+    await expect(page.getByText('Members interested in your program')).toHaveCount(0);
     // Inviting still works from day one, from the rows under Add your program.
     await page.getByRole('link', { name: /Invite someone/ }).first().click();
     await expect(page).toHaveURL(/\/invite\/$/);

@@ -50,6 +50,21 @@ test('a real lead sees the members who wrote to her program, and picking one ope
   await expect(page).toHaveURL(new RegExp(`for=${JORDAN}`));
 });
 
+test('a member in two conversations is one row, not two with the same key', async ({ page }) => {
+  await leadWith(page, true);
+  await page.route('**/rest/v1/rpc/conversation_partners*', (route) =>
+    route.fulfill(
+      json([
+        { conversation_id: CONVO, profile_id: JORDAN, first_name: 'Jordan', role: 'member', program_name: null },
+        { conversation_id: CONVO_STAFF, profile_id: JORDAN, first_name: 'Jordan', role: 'member', program_name: null },
+      ]),
+    ),
+  );
+  await page.goto('/program/book/');
+  await settled(page);
+  await expect(page.getByRole('link', { name: /Jordan/ })).toHaveCount(1);
+});
+
 test('a real lead nobody has written to is told so', async ({ page }) => {
   await leadWith(page, false);
   await page.goto('/program/book/');

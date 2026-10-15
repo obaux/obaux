@@ -100,6 +100,7 @@ export {
   BookIcon,
   SignIcon,
   SignedIcon,
+  SignedDocIcon,
   PlusIcon,
   NewMessageIcon,
   ClockIcon,

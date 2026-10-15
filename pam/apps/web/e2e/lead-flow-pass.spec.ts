@@ -85,7 +85,7 @@ test('a lead with a program and nobody yet has the people strip with a visible h
   await page.route('**/rest/v1/rpc/conversation_partners*', (route) => route.fulfill(json([])));
   await page.goto('/');
   await settled(page);
-  await expect(page.getByRole('heading', { name: 'People interested in your program' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Members interested in your program' })).toBeVisible();
 });
 
 test('Search sits under a rule in the + menu, apart from what it creates (P7)', async ({ page }) => {
