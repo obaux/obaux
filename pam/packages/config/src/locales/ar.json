@@ -1798,9 +1798,9 @@
   "nav.back.reported": "العودة إلى الأماكن المبلغ عنها",
   "places.reported.wrote": "They wrote:",
   "places.reported.keep.hint": "The place goes back on the list for members.",
-  "places.reported.remove.hint": "Members won't find it. Anyone who saved it is told.",
+  "places.reported.remove.hint": "Members won't find it in Pam anymore.",
   "places.reported.remove.confirm.title": "Take {place} off the list?",
-  "places.reported.remove.confirm.body": "Members won't find it any more, and anyone who saved it is told.",
+  "places.reported.remove.confirm.body": "Members won't find it in Pam anymore.",
   "places.reported.done.keep": "{place} stays on the list.",
   "places.reported.done.remove": "{place} is off the list."
 }
