@@ -1288,9 +1288,10 @@
   "alerts.connect.body": "只會說有人提出，絕不會在短訊中說是誰。",
   "profile.promo.alerts.body.adminList": "即將推出：有關訊息和到訪的短訊。",
   "program.quick.phone": "聯絡電話號碼",
-  "program.policies.row": "參加者守則",
-  "program.policies.rowBody": "{count}份待簽署",
-  "policies.title": "參加者守則",
+  "program.policies.row": "會員守則",
+  "program.policies.rowBody": "{count}項守則",
+  "program.policies.rowBody.one": "{count}項守則",
+  "policies.title": "會員守則",
   "policies.intro": "人們在參加之前閱讀並簽署的文件。他們在Pam中簽署，您可以看到誰已簽署。",
   "policies.upload.label": "新增守則",
   "policies.upload.hint": "一份PDF，或每一頁的相片。",
@@ -1551,7 +1552,7 @@
   "program.service.website": "這項服務的網站",
   "program.service.policies": "只適用於這項服務的守則",
   "program.service.policies.hint": "沒有選擇給任何服務的守則，會要求所有人簽署。",
-  "program.service.policies.none": "暫時沒有守則。請在「參加者守則」下新增。",
+  "program.service.policies.none": "暫時沒有守則。請在「會員守則」下新增。",
   "program.service.save": "儲存服務",
   "program.service.saved": "已儲存。會員會在您計劃的頁面上看到。",
   "program.service.remove": "移除這項服務",
@@ -1656,5 +1657,7 @@
   "legal.sources.licence": "授權條款：CC BY 4.0",
   "places.areaHint.street": "例如19107、Fishtown，或 Broad 和 Girard 路口。",
   "places.areaLabel.street": "ZIP 郵遞區號、社區或地址",
-  "nav.back.reported": "返回「已反映的地點」"
+  "nav.back.reported": "返回「已反映的地點」",
+  "join.program.review.noAddress.title": "暫時未有地址",
+  "join.program.review.noAddress.body": "會員將不知道該去哪裡。您仍然可以傳送，也可以先新增地址。"
 }

@@ -123,7 +123,10 @@ export function BookForMemberView() {
           : [];
       })
     : conversations.status === 'ready'
-      ? conversations.conversations.flatMap((c) =>
+      ? // One conversation per pair is the rule, but a repeat would collide on the list key: the first (newest) wins.
+        conversations.conversations
+          .filter((c, i, all) => c.otherProfileId === null || all.findIndex((o) => o.otherProfileId === c.otherProfileId) === i)
+          .flatMap((c) =>
           c.otherRole === 'member' && c.otherProfileId
             ? [
                 {
@@ -190,16 +193,15 @@ export function BookForMemberView() {
                 label={<Text xstyle={styles.name}>{person.firstName}</Text>}
                 description={
                   <VStack gap={0} xstyle={styles.words}>
-                    <HStack gap={1} align="center" wrap="wrap">
-                      <Text type={next ? 'body' : 'supporting'} xstyle={[styles.meta, Boolean(next) && styles.booked]}>
-                        {next ? t('book.booked', { when: when.format(new Date(next)) }) : t('book.notBooked')}
+                    <Text type={next ? 'body' : 'supporting'} xstyle={[styles.meta, Boolean(next) && styles.booked]}>
+                      {next ? t('book.booked', { when: when.format(new Date(next)) }) : t('book.notBooked')}
+                    </Text>
+                    {/* On a line of its own: a separator dot at the start of a wrapped line read as a stray mark. */}
+                    {person.lastMessageAt ? (
+                      <Text type="supporting" xstyle={styles.meta}>
+                        {t('book.wrote', { when: wrote(person.lastMessageAt) })}
                       </Text>
-                      {person.lastMessageAt ? (
-                        <Text type="supporting" xstyle={styles.meta}>
-                          · {t('book.wrote', { when: wrote(person.lastMessageAt) })}
-                        </Text>
-                      ) : null}
-                    </HStack>
+                    ) : null}
                     {person.preview ? (
                       <Text type="supporting" xstyle={styles.snippet}>
                         {person.preview.mine ? t('messages.preview.you', { text: person.preview.body }) : person.preview.body}

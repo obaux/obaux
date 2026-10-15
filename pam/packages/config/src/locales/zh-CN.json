@@ -1288,9 +1288,10 @@
   "alerts.connect.body": "只告诉您有人提出了请求，短信里绝不写是谁。",
   "profile.promo.alerts.body.adminList": "即将推出：关于消息和预约的短信。",
   "program.quick.phone": "联系电话",
-  "program.policies.row": "参与者规定",
-  "program.policies.rowBody": "{count}份待签署",
-  "policies.title": "参与者规定",
+  "program.policies.row": "成员规定",
+  "program.policies.rowBody": "{count}项规定",
+  "program.policies.rowBody.one": "{count}项规定",
+  "policies.title": "成员规定",
   "policies.intro": "人们参加之前要阅读并签署的文档。他们在Pam里签署，您可以看到谁已经签了。",
   "policies.upload.label": "添加一份规定",
   "policies.upload.hint": "一个PDF，或每一页的照片。",
@@ -1551,7 +1552,7 @@
   "program.service.website": "这项服务的网站",
   "program.service.policies": "仅适用于这项服务的规定",
   "program.service.policies.hint": "没有选给任何一项服务的规定，会要求所有人签署。",
-  "program.service.policies.none": "还没有规定。请在“参与者规定”中添加。",
+  "program.service.policies.none": "还没有规定。请在“成员规定”中添加。",
   "program.service.save": "保存服务",
   "program.service.saved": "已保存。成员会在您项目的页面上看到。",
   "program.service.remove": "移除这项服务",
@@ -1656,5 +1657,7 @@
   "legal.sources.licence": "许可协议：CC BY 4.0",
   "places.areaHint.street": "例如：19107、Fishtown，或 Broad 和 Girard 路口。",
   "places.areaLabel.street": "邮政编码、街区或地址",
-  "nav.back.reported": "返回“有反馈的地点”"
+  "nav.back.reported": "返回“有反馈的地点”",
+  "join.program.review.noAddress.title": "还没有地址",
+  "join.program.review.noAddress.body": "成员将不知道该去哪里。您仍然可以发送，也可以先添加地址。"
 }

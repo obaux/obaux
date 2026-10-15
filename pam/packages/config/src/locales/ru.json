@@ -1349,10 +1349,10 @@
   "profile.promo.alerts.body.adminList": "Скоро: SMS о сообщениях и визитах.",
   "program.quick.phone": "Контактный телефон",
   "program.policies.row": "Правила для участников",
-  "program.policies.rowBody": "Нужно подписать: {count}",
-  "program.policies.rowBody.one": "Нужно подписать: {count}",
-  "program.policies.rowBody.few": "Нужно подписать: {count}",
-  "program.policies.rowBody.many": "Нужно подписать: {count}",
+  "program.policies.rowBody": "{count} правила",
+  "program.policies.rowBody.one": "{count} правило",
+  "program.policies.rowBody.few": "{count} правила",
+  "program.policies.rowBody.many": "{count} правил",
   "policies.title": "Правила для участников",
   "policies.intro": "Документы, которые люди читают и подписывают перед участием. Они подписывают в Pam, и вы можете видеть, кто подписал.",
   "policies.upload.label": "Добавить правила",
@@ -1740,5 +1740,7 @@
   "legal.sources.licence": "Лицензия: CC BY 4.0",
   "places.areaHint.street": "Например, 19107, Fishtown или Broad и Girard.",
   "places.areaLabel.street": "Почтовый индекс (ZIP), район или адрес",
-  "nav.back.reported": "Назад: Места с жалобами"
+  "nav.back.reported": "Назад: Места с жалобами",
+  "join.program.review.noAddress.title": "Адреса пока нет",
+  "join.program.review.noAddress.body": "Участники не будут знать, куда идти. Вы всё равно можете отправить программу или сначала добавить адрес."
 }

@@ -372,7 +372,7 @@ function PersonScreen() {
                     : t('person.stat.never'),
                   label: t('person.stat.nextVisit'),
                 },
-                { value: String(pastVisits.length), label: t('person.stat.visits') },
+                { value: String(pastVisits.length), label: t('trips.past.title') },
                 { value: when ?? t('person.stat.never'), label: t('person.stat.lastUsed') },
               ]
             : [

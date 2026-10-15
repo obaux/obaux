@@ -71,8 +71,12 @@ export function AddMenu({ onSearch = null }: { readonly onSearch?: (() => void) 
         },
         // Search, from the + now (Will, 7 October, D-358): the bar turns into
         // the search field, ready to type. Only once there is enough to search.
+        // After a rule, so it reads as finding someone, not as a fourth thing to create (Iris's program lead pass, P7).
         ...(onSearch
-          ? [{ id: 'search', label: t('home.search'), icon: <ExploreIcon {...ICON} />, onClick: onSearch }]
+          ? [
+              { type: 'divider' as const },
+              { id: 'search', label: t('home.search'), icon: <ExploreIcon {...ICON} />, onClick: onSearch },
+            ]
           : []),
       ]}
     />

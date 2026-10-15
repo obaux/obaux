@@ -1288,9 +1288,10 @@
   "alerts.connect.body": "Solo que alguien lo pidió. Nunca quién, en el mensaje.",
   "profile.promo.alerts.body.adminList": "Próximamente: textos sobre mensajes y visitas.",
   "program.quick.phone": "Número de contacto",
-  "program.policies.row": "Políticas para participantes",
-  "program.policies.rowBody": "{count} para firmar",
-  "policies.title": "Políticas para participantes",
+  "program.policies.row": "Políticas para miembros",
+  "program.policies.rowBody": "{count} políticas",
+  "program.policies.rowBody.one": "{count} política",
+  "policies.title": "Políticas para miembros",
   "policies.intro": "Documentos que las personas leen y firman antes de participar. Firman en Pam, y usted puede ver quién lo hizo.",
   "policies.upload.label": "Agregar una política",
   "policies.upload.hint": "Un PDF, o una foto de cada página.",
@@ -1551,7 +1552,7 @@
   "program.service.website": "Sitio web de este servicio",
   "program.service.policies": "Políticas solo para este servicio",
   "program.service.policies.hint": "Una política que no elija para ningún servicio se pide a todos.",
-  "program.service.policies.none": "Aún no hay políticas. Agréguelas en Políticas para participantes.",
+  "program.service.policies.none": "Aún no hay políticas. Agréguelas en Políticas para miembros.",
   "program.service.save": "Guardar servicio",
   "program.service.saved": "Guardado. Los miembros lo ven en la página de su programa.",
   "program.service.remove": "Quitar este servicio",
@@ -1656,5 +1657,7 @@
   "legal.sources.licence": "Licencia: CC BY 4.0",
   "places.areaHint.street": "Como 19107, Fishtown o Broad y Girard.",
   "places.areaLabel.street": "Código postal, barrio o dirección",
-  "nav.back.reported": "Volver a Lugares reportados"
+  "nav.back.reported": "Volver a Lugares reportados",
+  "join.program.review.noAddress.title": "Aún no hay dirección",
+  "join.program.review.noAddress.body": "Los miembros no sabrán adónde ir. Puede enviarlo así, o agregar primero la dirección."
 }
