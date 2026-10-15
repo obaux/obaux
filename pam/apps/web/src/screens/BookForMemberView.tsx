@@ -20,6 +20,7 @@ import { SubPage } from '@pam/ui/SubPage';
 import { readAddedTrips, TRIPS_CHANGED, withMoves } from '@/lib/addedTrips';
 import { examplesOn } from '@/lib/examples';
 import { useI18n } from '@/lib/i18n';
+import { useConversations } from '@/lib/useConversations';
 import { useProgramSetup } from '@/lib/programSetup';
 import { useSession } from '@/lib/useSession';
 import { whenHappened } from '@/lib/when';
@@ -60,6 +61,14 @@ const styles = stylex.create({
   },
   words: { minWidth: 0 },
 });
+
+/** One person who has written to the program, from an example or a real conversation. */
+interface Person {
+  readonly id: string;
+  readonly firstName: string;
+  readonly lastMessageAt: string | null;
+  readonly preview: { readonly body: string; readonly mine: boolean } | null;
+}
 
 const EXAMPLE_PROGRAM_ID = 'dummy-place-learning';
 const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
@@ -103,9 +112,30 @@ export function BookForMemberView() {
       ? DUMMY_PLACES_BY_ID[EXAMPLE_PROGRAM_ID]
       : undefined;
   const nextHere = useNextVisitHere(programId);
-  const people = (examples ? dummyConversationsFor('provider') : [])
-    .map((c) => ({ convo: c, person: DUMMY_MEMBERS.find((m) => m.id === c.otherId) }))
-    .filter((x): x is { convo: (typeof x)['convo']; person: NonNullable<(typeof x)['person']> } => Boolean(x.person));
+  // Who wrote to the program (S1, Iris's program lead pass): a real lead's own conversations with members,
+  // first name and last message only (D-541 part 2, D-542); the example people only in a demo or Storybook.
+  const { state: conversations } = useConversations(!examples && session.status === 'signed-in');
+  const people: readonly Person[] = examples
+    ? dummyConversationsFor('provider').flatMap((c) => {
+        const member = DUMMY_MEMBERS.find((m) => m.id === c.otherId);
+        return member
+          ? [{ id: member.id, firstName: member.firstName, lastMessageAt: c.lastMessageAt ?? null, preview: c.preview ?? null }]
+          : [];
+      })
+    : conversations.status === 'ready'
+      ? conversations.conversations.flatMap((c) =>
+          c.otherRole === 'member' && c.otherProfileId
+            ? [
+                {
+                  id: c.otherProfileId,
+                  firstName: c.otherName ?? '',
+                  lastMessageAt: c.lastMessageAt,
+                  preview: c.lastMessageBody ? { body: c.lastMessageBody, mine: c.lastMessageMine } : null,
+                },
+              ]
+            : [],
+        )
+      : [];
 
   const when = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
   const clock = new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' });
@@ -145,13 +175,13 @@ export function BookForMemberView() {
       <Heading level={2} xstyle={styles.heading}>
         {t('book.people')}
       </Heading>
-      {people.length === 0 ? (
+      {people.length === 0 && !examples && conversations.status === 'loading' ? null : people.length === 0 ? (
         <Text type="supporting" xstyle={styles.empty}>
           {t('book.empty')}
         </Text>
       ) : (
         <List aria-label={t('book.people')}>
-          {people.map(({ convo, person }) => {
+          {people.map((person) => {
             const next = nextHere[person.id];
             return (
               <ListItem
@@ -164,15 +194,15 @@ export function BookForMemberView() {
                       <Text type={next ? 'body' : 'supporting'} xstyle={[styles.meta, Boolean(next) && styles.booked]}>
                         {next ? t('book.booked', { when: when.format(new Date(next)) }) : t('book.notBooked')}
                       </Text>
-                      {convo.lastMessageAt ? (
+                      {person.lastMessageAt ? (
                         <Text type="supporting" xstyle={styles.meta}>
-                          · {t('book.wrote', { when: wrote(convo.lastMessageAt) })}
+                          · {t('book.wrote', { when: wrote(person.lastMessageAt) })}
                         </Text>
                       ) : null}
                     </HStack>
-                    {convo.preview ? (
+                    {person.preview ? (
                       <Text type="supporting" xstyle={styles.snippet}>
-                        {convo.preview.mine ? t('messages.preview.you', { text: convo.preview.body }) : convo.preview.body}
+                        {person.preview.mine ? t('messages.preview.you', { text: person.preview.body }) : person.preview.body}
                       </Text>
                     ) : null}
                   </VStack>
