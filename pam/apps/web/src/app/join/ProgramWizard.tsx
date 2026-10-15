@@ -288,6 +288,16 @@ export function useProgramWizard({ value, onChange, onSubmit, busy, submitLabel,
         </VStack>
       ) : null}
 
+      {at === 'review' && value.address.trim() === '' ? (
+        // A program can be sent with no address, but nobody then knows where to go (Iris's program lead
+        // pass, P2; Sage's words): said here, and the address row below goes back to its question.
+        <Banner
+          status="warning"
+          title={t('join.program.review.noAddress.title')}
+          description={t('join.program.review.noAddress.body')}
+        />
+      ) : null}
+
       {at === 'review' ? (
         // Every answer, each a row back to its question (the review step
         // every checkout has). Unanswered ones say so, rather than vanish.

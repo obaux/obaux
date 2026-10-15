@@ -120,3 +120,33 @@ test('an info tip is 48px to tap, though drawn small (P9)', async ({ page }) => 
   expect(box!.width).toBeGreaterThanOrEqual(48);
   expect(box!.height).toBeGreaterThanOrEqual(48);
 });
+
+test('Review details warns when there is no address, and the address row goes back to it (P2)', async ({ page }) => {
+  await liveLead(page, []);
+  await page.goto('/programs/new/?from=home');
+  await settled(page);
+  await page.getByRole('textbox').first().fill('Fresh Start Kitchen');
+  for (let i = 0; i < 8; i += 1) {
+    const forward = page.getByRole('button', { name: /^(Next|Skip for now)/ });
+    if ((await forward.count()) === 0) break;
+    await forward.first().click();
+    await page.waitForTimeout(150);
+  }
+  await expect(page.getByRole('heading', { name: 'Review details' })).toBeVisible();
+  await expect(page.getByText('No address yet')).toBeVisible();
+  await expect(page.getByText("Members won't know where to go. You can still send it, or add the address first.")).toBeVisible();
+});
+
+test('the lead\'s Program tab says "Policies for members" and counts policies, not "to sign" (P4)', async ({ page }) => {
+  await liveLead(page, []);
+  const policy = (id: string) => ({
+    id, service_id: PROGRAM, title: `Policy ${id}`, version: 1, replaces_id: null, created_at: '2026-10-06T10:00:00Z', archived_at: null,
+    program_policy_files: [{ id: `${id}-f`, path: `${PROGRAM}/${id}.pdf`, name: `${id}.pdf`, content_type: 'application/pdf', size_bytes: 1000, position: 0 }],
+  });
+  await page.route('**/rest/v1/program_policies*', (route) => route.fulfill(json([policy('a'), policy('b')])));
+  await page.goto('/program/');
+  await settled(page);
+  await expect(page.getByText('Policies for members', { exact: true })).toBeVisible();
+  await expect(page.getByText('2 policies')).toBeVisible();
+  await expect(page.getByText(/to sign/)).toHaveCount(0);
+});

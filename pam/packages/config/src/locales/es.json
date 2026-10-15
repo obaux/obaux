@@ -1288,7 +1288,8 @@
   "profile.promo.alerts.body.adminList": "Próximamente: textos sobre mensajes y visitas.",
   "program.quick.phone": "Número de contacto",
   "program.policies.row": "Políticas para participantes",
-  "program.policies.rowBody": "{count} para firmar",
+  "program.policies.rowBody": "{count} policies",
+  "program.policies.rowBody.one": "1 policy",
   "policies.title": "Políticas para participantes",
   "policies.intro": "Documentos que las personas leen y firman antes de participar. Firman en Pam, y usted puede ver quién lo hizo.",
   "policies.upload.label": "Agregar una política",
@@ -1655,5 +1656,7 @@
   "legal.sources.licence": "Licencia: CC BY 4.0",
   "places.areaHint.street": "Como 19107, Fishtown o Broad y Girard.",
   "places.areaLabel.street": "Código postal, barrio o dirección",
-  "nav.back.reported": "Volver a Lugares reportados"
+  "nav.back.reported": "Volver a Lugares reportados",
+  "join.program.review.noAddress.title": "No address yet",
+  "join.program.review.noAddress.body": "Members won't know where to go. You can still send it, or add the address first."
 }

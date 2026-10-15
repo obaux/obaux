@@ -1388,12 +1388,12 @@
   "profile.promo.alerts.body.adminList": "قريبا: تنبيهات نصية عن الرسائل والزيارات.",
   "program.quick.phone": "رقم هاتف التواصل",
   "program.policies.row": "سياسات المشاركين",
-  "program.policies.rowBody": "للتوقيع: {count}",
-  "program.policies.rowBody.zero": "للتوقيع: {count}",
-  "program.policies.rowBody.one": "للتوقيع: {count}",
-  "program.policies.rowBody.two": "للتوقيع: {count}",
-  "program.policies.rowBody.few": "للتوقيع: {count}",
-  "program.policies.rowBody.many": "للتوقيع: {count}",
+  "program.policies.rowBody": "{count} policies",
+  "program.policies.rowBody.zero": "{count} policies",
+  "program.policies.rowBody.one": "1 policy",
+  "program.policies.rowBody.two": "{count} policies",
+  "program.policies.rowBody.few": "{count} policies",
+  "program.policies.rowBody.many": "{count} policies",
   "policies.title": "سياسات المشاركين",
   "policies.intro": "مستندات يقرؤها الناس ويوقعونها قبل المشاركة. يوقعون في Pam، ويمكنك معرفة من وقع.",
   "policies.upload.label": "إضافة سياسة",
@@ -1795,5 +1795,7 @@
   "legal.sources.licence": "الترخيص: CC BY 4.0",
   "places.areaHint.street": "مثل 19107 أو Fishtown أو تقاطع Broad و Girard.",
   "places.areaLabel.street": "الرمز البريدي (ZIP) أو الحي أو العنوان",
-  "nav.back.reported": "العودة إلى الأماكن المبلغ عنها"
+  "nav.back.reported": "العودة إلى الأماكن المبلغ عنها",
+  "join.program.review.noAddress.title": "No address yet",
+  "join.program.review.noAddress.body": "Members won't know where to go. You can still send it, or add the address first."
 }

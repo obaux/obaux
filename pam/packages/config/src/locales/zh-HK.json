@@ -1288,7 +1288,8 @@
   "profile.promo.alerts.body.adminList": "即將推出：有關訊息和到訪的短訊。",
   "program.quick.phone": "聯絡電話號碼",
   "program.policies.row": "參加者守則",
-  "program.policies.rowBody": "{count}份待簽署",
+  "program.policies.rowBody": "{count} policies",
+  "program.policies.rowBody.one": "1 policy",
   "policies.title": "參加者守則",
   "policies.intro": "人們在參加之前閱讀並簽署的文件。他們在Pam中簽署，您可以看到誰已簽署。",
   "policies.upload.label": "新增守則",
@@ -1655,5 +1656,7 @@
   "legal.sources.licence": "授權條款：CC BY 4.0",
   "places.areaHint.street": "例如19107、Fishtown，或 Broad 和 Girard 路口。",
   "places.areaLabel.street": "ZIP 郵遞區號、社區或地址",
-  "nav.back.reported": "返回「已反映的地點」"
+  "nav.back.reported": "返回「已反映的地點」",
+  "join.program.review.noAddress.title": "No address yet",
+  "join.program.review.noAddress.body": "Members won't know where to go. You can still send it, or add the address first."
 }
