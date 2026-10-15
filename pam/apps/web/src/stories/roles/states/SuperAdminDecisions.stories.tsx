@@ -73,6 +73,11 @@ export const ProgramChangesAsked: Story = {
     canvasElement.ownerDocument.defaultView?.scrollTo(0, 0);
   },
 };
+export const ProgramChangesAskedNoLead: Story = {
+  ...screen('super-admin', 'A program to check, no lead name', '/programs/review/item/', { id: 'check-7' }),
+  name: 'Program — note sent, no lead name (long name)',
+  play: ProgramChangesAsked.play,
+};
 export const ProgramDiscarded: Story = {
   ...screen('super-admin', 'A withdrawn program to check', '/programs/review/item/', { id: 'check-6' }),
   name: 'Program — discarded, said after (long name)',

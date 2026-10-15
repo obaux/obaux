@@ -302,6 +302,12 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
       lead_name: 'Bartholomew', replaces_id: null, replaced_by: null, withdrawn_at: onTheHour(-2, 9),
     },
     {
+      id: 'check-7', service_id: 'p-7', kind: 'new', status: 'in_review', sent_at: onTheHour(-1, 15), days_waiting: 1,
+      program_name: 'Germantown Avenue Returning Citizens Housing Navigation and Legal Clinic',
+      details: { name: 'Germantown Avenue Returning Citizens Housing Navigation and Legal Clinic', category: 'family_services', address: '5500 Germantown Ave, Philadelphia, PA 19144' },
+      lead_name: null, replaces_id: null, replaced_by: null, withdrawn_at: null,
+    },
+    {
       id: 'check-1', service_id: 'p-1', kind: 'new', status: 'in_review', sent_at: onTheHour(-4, 10), days_waiting: 4,
       program_name: 'Hearth Kitchen Training',
       details: { name: 'Hearth Kitchen Training', category: 'workforce', subcategory: 'job_training', description: 'Cooking classes and a job-readiness workshop.', address: '1234 Market St, Philadelphia, PA 19107', phone: '+12155550143', website: 'https://example.org/hearth' },
