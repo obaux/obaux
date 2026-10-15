@@ -1657,7 +1657,7 @@
   "places.areaHint.street": "Como 19107, Fishtown o Broad y Girard.",
   "places.areaLabel.street": "Código postal, barrio o dirección",
   "nav.back.reported": "Volver a Lugares reportados",
-  "places.reported.wrote": "Escribieron:",
+  "places.reported.wrote": "Escribió:",
   "places.reported.keep.hint": "El lugar vuelve a la lista para los miembros.",
   "places.reported.remove.hint": "Los miembros ya no lo encontrarán en Pam.",
   "places.reported.remove.confirm.title": "¿Quitar {place} de la lista?",
