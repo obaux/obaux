@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 import { placeAsksForPolicies, type DummyPolicy } from '@pam/config/dummy-policies';
 import { asksForSavedTrips, isSavedPlace } from './savedTrips';
+import { examplesOn } from './examples';
 import { useSession } from './useSession';
 
 /**
@@ -251,5 +252,6 @@ export function useMySignatures(): {
   }, []);
 
   // An example place keeps its drawing on this browser, so a signed-in member's account drawing is not the only one (P8).
-  return { signature: userId !== null && realNow.userId === userId ? (realNow.saved ?? kept.signature) : kept.signature, signedAt, signedWith, progress, sign, unsign, forgetSignature };
+  // Only where examples are shown: a real member is never handed a drawing left in this tab by somebody else's demo.
+  return { signature: userId !== null && realNow.userId === userId ? (realNow.saved ?? (examplesOn() ? kept.signature : null)) : kept.signature, signedAt, signedWith, progress, sign, unsign, forgetSignature };
 }

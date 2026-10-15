@@ -29,6 +29,12 @@ Built with `build:e2e`. The touched specs on three projects (member-flow-pass, m
 
 P1 and P2 went in with Sage's words (second commit). Lena: translate `trips.card.label.alone` and re-check the three `trips.new.missing.*` (kept, not retranslated). W3 and W5 are Dot's; W6 goes on Will's phone list. `points.way.attend` is now unused (left in the ledger; remove with Lena's next pass).
 
+Forms list (Mira, 13:55): Will's a85 Q3, "Pam stops keeping the drawn signature", covers policies too, so `member_signatures` (D-270's "real version") is due to change when the forms and DocuSign work is built.
+
+## Guard added after review
+
+The fallback to the tab's drawing (P8) is used only where examples are shown (`examplesOn()`); sign-out clears `pam.mySignatures` beside `pam.view-as`; two specs in `member-signs-policy.spec.ts` hold both.
+
 ## Needs a human
 
 Merge desk: READY. Screens: Trips (long name), New trip (When, Where), Policies to sign, a policy, a place with an address, a place after "I'm here", Your points.

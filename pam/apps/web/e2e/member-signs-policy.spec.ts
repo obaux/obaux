@@ -106,3 +106,28 @@ test('the sheet opens empty every time: Sign is greyed until something is drawn 
   await page.getByRole('button', { name: 'Sign', exact: true }).click();
   await expect(page.getByRole('dialog').getByRole('button', { name: 'Sign', exact: true })).toBeDisabled();
 });
+
+const LEFT_BEHIND = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+
+test('a drawing left in this tab by a demo is never offered to a real member (P8 guard)', async ({ page }) => {
+  await signedInMember(page, [policy(CONF, 'Confidentiality')]);
+  await page.addInitScript((image: string) => {
+    window.sessionStorage.setItem('pam.mySignatures', JSON.stringify({ signed: {}, signature: image }));
+  }, LEFT_BEHIND);
+  await page.goto(view(CONF));
+  await settled(page);
+  await expect(page.getByRole('img', { name: 'Your signature' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Sign', exact: true }).click();
+  // The sheet opens, empty, with Sign greyed: nothing is signed with somebody else's drawing.
+  await expect(page.getByRole('dialog').getByRole('button', { name: 'Sign', exact: true })).toBeDisabled();
+});
+
+test('signing out forgets a drawing kept in this tab, so the next person on the phone starts empty', async ({ page }) => {
+  await signedInMember(page, []);
+  await page.goto('/profile/');
+  await settled(page);
+  await page.evaluate((image: string) => window.sessionStorage.setItem('pam.mySignatures', JSON.stringify({ signed: {}, signature: image })), LEFT_BEHIND);
+  await page.getByRole('button', { name: 'Sign out' }).or(page.getByRole('link', { name: 'Sign out' })).first().click();
+  await expect(page).toHaveURL(/\/signin\//);
+  expect(await page.evaluate(() => window.sessionStorage.getItem('pam.mySignatures'))).toBeNull();
+});
