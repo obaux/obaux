@@ -102,16 +102,18 @@ test.describe('the staff Home', () => {
     await expect(page.getByRole('heading', { name: 'A link for a member', level: 1 })).toBeVisible();
   });
 
-  test('nobody on a program lead\'s list: the (+) opens their invite choice', async ({ page }) => {
+  test('a new program lead, with no program yet, has no strip of people above Add your program (W4)', async ({ page }) => {
     await signedInAs(page, 'provider', { fresh: true });
     await page.goto('/');
-
-    const link = row(page, 'People interested in your program').getByRole('link', { name: 'Invite someone' });
-    await expect(link).toHaveAttribute('href', '/invite/');
     await settled(page);
-    await link.click();
+
+    await expect(page.getByRole('heading', { name: 'Get started', level: 1 })).toBeVisible();
+    // Nobody can be interested in a program that is not on Pam yet: no rings, no faint circles, no examples.
+    await expect(row(page, 'People interested in your program')).toHaveCount(0);
+    await expect(page.getByText('People interested in your program')).toHaveCount(0);
+    // Inviting still works from day one, from the rows under Add your program.
+    await page.getByRole('link', { name: /Invite someone/ }).first().click();
     await expect(page).toHaveURL(/\/invite\/$/);
-    await expect(page.getByRole('heading', { name: 'Invite someone', level: 1 })).toBeVisible();
   });
 
   test('the empty Home has no WCAG A/AA violations', async ({ page }) => {
