@@ -57,10 +57,9 @@ export function SupportReplyScreen() {
   const [phase, setPhase] = useState<'idle' | 'sending' | 'sent'>('idle');
   const [problem, setProblem] = useState<string | null>(null);
 
-  // Who the number belongs to, if Pam knows (the Everyone list's first names, matched by number), and what they
-  // asked and when: the words come from the link, never the database (D-583).
+  // What they asked and when: the words come from the link, never the database (D-583). Who the number belongs
+  // to is not looked up: tying a number to a named account waits for texting people back to be switched on.
   const examples = useExamplesOn();
-  const [name, setName] = useState<string | null>(null);
   const [asked, setAsked] = useState<ReplyContext>({ question: null, askedAt: null });
   useEffect(() => {
     // From the address after `#`, which no server sees. Storybook and demo accounts may also pass them as ordinary
@@ -72,22 +71,6 @@ export function SupportReplyScreen() {
       askedAt: fromAddress.askedAt ?? fromQuery?.askedAt ?? null,
     });
   }, [examples, params]);
-  useEffect(() => {
-    if (!isSuperAdmin || to === '') return;
-    let cancelled = false;
-    void (async () => {
-      try {
-        const { createClient } = await import('@/lib/supabase');
-        const { data, error } = await createClient().rpc('profile_first_name_for_phone', { p_phone: to });
-        if (!cancelled) setName(!error && typeof data === 'string' && data !== '' ? data : null);
-      } catch {
-        if (!cancelled) setName(null);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [isSuperAdmin, to]);
   const askedWhen = asked.askedAt
     ? new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(asked.askedAt))
     : null;
@@ -132,9 +115,7 @@ export function SupportReplyScreen() {
       ) : (
         <VStack gap={4}>
           <Text xstyle={styles.to}>
-            {name
-              ? t('supportReply.toNamed', { name, phone: displayPhone(to) })
-              : t('supportReply.to', { phone: displayPhone(to) })}
+            {t('supportReply.to', { phone: displayPhone(to) })}
           </Text>
           {asked.question ? (
             <Card padding={6}>

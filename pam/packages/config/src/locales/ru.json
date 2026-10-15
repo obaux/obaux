@@ -1727,7 +1727,6 @@
   "carousel.play": "Воспроизвести",
   "supportReply.title": "Ответить по SMS",
   "supportReply.to": "Кому: {phone}",
-  "supportReply.toNamed": "Кому: {name}, {phone}",
   "supportReply.theyWrote": "Они написали",
   "supportReply.label": "Ваш ответ",
   "supportReply.count": "{used} из {max}",

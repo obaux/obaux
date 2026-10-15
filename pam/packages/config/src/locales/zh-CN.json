@@ -1643,7 +1643,6 @@
   "carousel.play": "播放",
   "supportReply.title": "用短信回复",
   "supportReply.to": "发送至 {phone}",
-  "supportReply.toNamed": "发送至 {name}，{phone}",
   "supportReply.theyWrote": "他们写道",
   "supportReply.label": "您的回复",
   "supportReply.count": "已用 {used} / {max}",

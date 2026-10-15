@@ -1224,9 +1224,9 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
-## Messages & notifications · Answer by text shows who wrote (15 October 2026)
+## Messages & notifications · Answer by text shows what they wrote (15 October 2026)
 
-Built, not live: the super admin's Answer by text screen shows the first name for a number Pam knows (`profile_first_name_for_phone`, super admin only, nothing stored), the number as a person reads it, and what they wrote and when, read from the link's `#` fragment (D-583). Answering by text stays off (D-524, D-547); nothing builds the link yet. Needs the migration `20261015144245` applied; two new strings await Sage and Lena. Proof: DB test 74, `answer-by-text.spec.ts`, `replyContext.test.ts`.
+Built, not live: the super admin's Answer by text screen shows the number as a person reads it and a "They wrote" card with the words and time, read from the link's `#` fragment (D-583). Answering by text stays off (D-524, D-547); nothing builds the link yet. The number→first-name lookup was built and then held by Mira for a61 (SQL in D-583); no migration. One new string awaits Sage and Lena (`supportReply.theyWrote`). Proof: `answer-by-text.spec.ts`, `replyContext.test.ts`.
 
 ## Messages & notifications · counting screen opens, and the bell not moving (13 October 2026)
 

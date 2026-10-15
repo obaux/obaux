@@ -28,8 +28,8 @@ export const AnswerByText: Story = screen('super-admin', 'Answer a help request 
   q: 'I signed up for the welding class but I cannot find where it meets. Can someone tell me?',
   at: '2026-10-15T14:05:00Z',
 });
-// A number Pam does not know and no question in the link: just the number and the box.
-export const AnswerByTextUnknownNumber: Story = screen('super-admin', 'Answer a help request by text — number Pam does not know', '/reply/', {
+// A link with only the number: the number and the box, nothing above it.
+export const AnswerByTextNumberOnly: Story = screen('super-admin', 'Answer a help request by text — a link with only the number', '/reply/', {
   to: '+12155550199',
 });
 export const Requests: Story = screen('super-admin', 'Staff requests', '/requests/');

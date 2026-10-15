@@ -12,7 +12,6 @@ const POINTS = '**/rest/v1/rpc/member_points*';
 const CONTROLS = '**/rest/v1/access_controls*';
 const NOTIFICATIONS = '**/rest/v1/notifications*';
 const SEND = '**/rest/v1/rpc/send_support_text*';
-const LOOKUP = '**/rest/v1/rpc/profile_first_name_for_phone*';
 const ME = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
 
 const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
@@ -35,8 +34,6 @@ async function signedInAs(page: import('@playwright/test').Page, role: 'super_ad
   await page.route(CONTROLS, (route) => route.fulfill(json([])));
   await page.route(USER, (route) => route.fulfill(json({ id: ME, phone: '12673095265' })));
   await page.route(POINTS, (route) => route.fulfill(json(250)));
-  // Pam does not know this number (D-583): the screen shows the number as a person reads it.
-  await page.route(LOOKUP, (route) => route.fulfill(json(null)));
   await page.route(PROFILES, (route) =>
     route.fulfill(
       json({ id: ME, role, first_name: 'Will', access_status: 'active', region_id: '0195b1c0-0000-4000-8000-000000000001', regions: { name: 'Philadelphia' } }),
