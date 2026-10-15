@@ -213,6 +213,15 @@ export const DIRECTORY_PEOPLE = [
 /** Two people waiting for a super admin's decision on /requests/; Andre described his program. */
 export const STAFF_REQUESTS = [
   { user_id: 'r-1', wants_role: 'admin', first_name: 'Priya', last_name: 'Nair', city: 'Philadelphia', created_at: hoursAgo(5) },
+  // A long name, for the decision states' fit audit (Lena; D-584).
+  {
+    user_id: 'r-3',
+    wants_role: 'admin',
+    first_name: 'Anna-Christina',
+    last_name: 'Castellanos-Whitfield',
+    city: 'Philadelphia',
+    created_at: hoursAgo(2),
+  },
   {
     user_id: 'r-2',
     wants_role: 'provider',
