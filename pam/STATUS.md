@@ -928,6 +928,16 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Accounts & invites · Iris's super admin pass: W1, P1–P7 (15 October) — READY, words with Sage
+
+`claude/pam-super-admin-pass` (D-584).
+- Approve and Deny on a staff request, and a program's Approve, ask first and say after. Deny says the person will be
+  texted.
+- Home counts the programs to check, and the count leaves out withdrawn ones. Back labels match the way in.
+- A program's phone, website and address are links. Each Demo view switch names its person.
+- Profile's staff list is "Your work". The invites log's states are at 14px.
+- Not done: a person's row on Everyone opening a page, because there's no super admin person page yet.
+
 ## Accounts & invites · Iris's case manager pass: W1, W3, P3–P5, P7–P9 (15 October) — READY, W2 waits on Sage
 
 `claude/pam-case-manager-flow` (D-580).

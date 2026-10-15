@@ -60,7 +60,7 @@ function whenLastActive(iso: string | null, locale: string): string | null {
 }
 
 export default function DirectoryPage() {
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   const { state: session } = useSession();
 
   // See admin/page.tsx: the same preview a super admin picks on Home now
@@ -262,7 +262,8 @@ export default function DirectoryPage() {
                   ]}
                   trailing={
                     <Switch
-                      label={t('directory.demoView')}
+                      // Each switch says whose it is, or a screen reader hears the same name on every row (Iris, super admin P5).
+                      label={tPlain('directory.demoView.for', { name: person.firstName ?? '' })}
                       isLabelHidden
                       value={person.isDemo}
                       isDisabled={demoBusyId === person.id}

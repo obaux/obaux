@@ -80,6 +80,11 @@ export function sentFields(program: ProgramToCheck): { field: SentField; value: 
   return out;
 }
 
+/** How many still need a decision (Iris, super admin P3): in review only, not withdrawn or waiting on the leader. */
+export function toLookAt(programs: readonly ProgramToCheck[]): number {
+  return programs.filter((p) => p.status === 'in_review').length;
+}
+
 export type ProgramsToCheckState =
   | { status: 'loading' }
   | { status: 'ready'; programs: readonly ProgramToCheck[] }

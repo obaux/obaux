@@ -4,14 +4,15 @@ import { useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
+import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { TextArea } from '@astryxdesign/core/TextArea';
 import { VStack } from '@astryxdesign/core/VStack';
-import { BigButton, Loading, Notice, TextLink } from '@pam/ui';
+import { BigButton, Loading, Notice, TextLink, directionsHref } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
-import { categoryLabelKey, intlLocale, type Category } from '@pam/config';
+import { categoryLabelKey, displayPhone, intlLocale, type Category } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
-import { goBack, navigate } from '@/lib/navigate';
+import { goBack } from '@/lib/navigate';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import {
@@ -60,6 +61,9 @@ export function ProgramReviewScreen({ id }: { readonly id: string | null }) {
   const [note, setNote] = useState('');
   const [needNote, setNeedNote] = useState(false);
   const [discarding, setDiscarding] = useState(false);
+  // Approve is asked first, and every decision is said after (Iris, super admin W1).
+  const [approving, setApproving] = useState(false);
+  const [decided, setDecided] = useState<ProgramDecision | null>(null);
 
   const back = { onBack: () => goBack('/programs/review/'), backLabel: t('nav.back.review') };
   const program = state.status === 'ready' ? state.programs.find((p) => p.id === id) : undefined;
@@ -84,6 +88,18 @@ export function ProgramReviewScreen({ id }: { readonly id: string | null }) {
   const valueOf = (field: SentField, value: string): string =>
     field === 'category' ? t(categoryLabelKey(value as Category)) : field === 'subcategory' ? t(`category.sub.${value}`) : value;
 
+  // Checking a program means trying its number, its site and its address: each opens from here (Iris, super admin P4).
+  const linkOf = (field: SentField, value: string): string | undefined =>
+    field === 'phone'
+      ? `tel:${value}`
+      : field === 'website'
+        ? /^https?:\/\//i.test(value)
+          ? value
+          : `https://${value}`
+        : field === 'address'
+          ? directionsHref(value)
+          : undefined;
+
   const decide = async (decision: ProgramDecision) => {
     if (decision === 'changes_asked' && note.trim() === '') {
       setNeedNote(true);
@@ -94,12 +110,18 @@ export function ProgramReviewScreen({ id }: { readonly id: string | null }) {
     setBusy(decision);
     const ok = await reviewProgram(program.id, decision, decision === 'changes_asked' ? note.trim() : undefined);
     setBusy(null);
-    if (ok) navigate('/programs/review/');
+    if (ok) {
+      setAsking(false);
+      setDecided(decision);
+    }
     else setFailed(true);
   };
 
-  const footer =
-    program.status === 'in_review' ? (
+  const footer = decided ? (
+    <VStack gap={2} xstyle={styles.actions}>
+      <BigButton label={t('nav.back.review')} onPress={() => goBack('/programs/review/')} />
+    </VStack>
+  ) : program.status === 'in_review' ? (
       asking ? (
         <VStack gap={2} xstyle={styles.actions}>
           <BigButton
@@ -114,7 +136,7 @@ export function ProgramReviewScreen({ id }: { readonly id: string | null }) {
           <BigButton
             label={busy === 'approved' ? t('requests.saving') : t('requests.approve')}
             isDisabled={busy !== null}
-            onPress={() => void decide('approved')}
+            onPress={() => setApproving(true)}
           />
           <BigButton label={t('review.askChanges')} variant="secondary" isDisabled={busy !== null} onPress={() => setAsking(true)} />
         </VStack>
@@ -141,6 +163,15 @@ export function ProgramReviewScreen({ id }: { readonly id: string | null }) {
           .filter(Boolean)
           .join(' · ')}
       </Text>
+
+      {/* What was just decided, at the top where it is seen (Iris, super admin W1). */}
+      {decided ? (
+        <Notice
+          notice="admin_out_of_region"
+          title={t(`review.decided.${decided}.title`, { program: program.programName })}
+          body={t(`review.decided.${decided}.body`, { name: program.leadName ?? t('review.theProgramLead') })}
+        />
+      ) : null}
 
       {isLate(program) ? (
         <Text role="status" xstyle={styles.late}>
@@ -176,7 +207,14 @@ export function ProgramReviewScreen({ id }: { readonly id: string | null }) {
               <Text type="supporting" xstyle={styles.note}>
                 {t(`review.field.${field}`)}
               </Text>
-              <Text xstyle={styles.value}>{valueOf(field, value)}</Text>
+              {linkOf(field, value) ? (
+                // At the start, like the other values, and underlined so it reads as a link among them.
+                <HStack>
+                  <TextLink label={field === 'phone' ? displayPhone(value) : value} href={linkOf(field, value)!} isUnderlined />
+                </HStack>
+              ) : (
+                <Text xstyle={styles.value}>{valueOf(field, value)}</Text>
+              )}
               {program.kind === 'change' && field === 'name' && program.programName !== value ? (
                 <Text type="supporting" xstyle={styles.note}>
                   {t('review.was', { value: program.programName })}
@@ -218,6 +256,20 @@ export function ProgramReviewScreen({ id }: { readonly id: string | null }) {
           contactLabel={t('help.contact.action')}
         />
       ) : null}
+
+
+      <ConfirmDialog
+        isOpen={approving}
+        title={t('review.confirm.approve.title', { program: program.programName })}
+        body={t('review.confirm.approve.body')}
+        confirmLabel={t('requests.confirm.approve.yes')}
+        onConfirm={() => {
+          setApproving(false);
+          void decide('approved');
+        }}
+        cancelLabel={t('requests.confirm.no')}
+        onCancel={() => setApproving(false)}
+      />
 
       <ConfirmDialog
         isOpen={discarding}

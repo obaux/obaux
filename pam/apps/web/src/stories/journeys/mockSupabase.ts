@@ -288,6 +288,19 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
   // Programs waiting for Pam (D-386): a first send that has waited four days, a change to a live
   // program, and one a leader deleted to start over (with the new one after it).
   let programsToCheck: Array<Record<string, unknown>> = [
+    // A long name and a long lead name, for the decision states' fit audit (Lena; D-584).
+    {
+      id: 'check-5', service_id: 'p-5', kind: 'new', status: 'in_review', sent_at: onTheHour(-2, 11), days_waiting: 2,
+      program_name: 'Northwest Philadelphia Community Reentry and Workforce Training Center',
+      details: { name: 'Northwest Philadelphia Community Reentry and Workforce Training Center', category: 'workforce', description: 'Job training, résumé help and a weekly hiring hall.', address: '4500 Germantown Ave, Philadelphia, PA 19144' },
+      lead_name: 'Bartholomew', replaces_id: null, replaced_by: null, withdrawn_at: null,
+    },
+    {
+      id: 'check-6', service_id: 'p-6', kind: 'new', status: 'withdrawn', sent_at: onTheHour(-3, 9), days_waiting: 3,
+      program_name: 'Southwest Philadelphia Neighborhood Family Services and Food Pantry',
+      details: { name: 'Southwest Philadelphia Neighborhood Family Services and Food Pantry', category: 'family_services', address: '6000 Woodland Ave, Philadelphia, PA 19142' },
+      lead_name: 'Bartholomew', replaces_id: null, replaced_by: null, withdrawn_at: onTheHour(-2, 9),
+    },
     {
       id: 'check-1', service_id: 'p-1', kind: 'new', status: 'in_review', sent_at: onTheHour(-4, 10), days_waiting: 4,
       program_name: 'Hearth Kitchen Training',
