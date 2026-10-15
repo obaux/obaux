@@ -474,6 +474,7 @@
   "person.connect.confirm.no": "暂时不用",
   "person.connect.none": "没有匹配的项目。",
   "person.connect.done.home": "返回首页",
+  "person.connect.distanceFrom": "距离是从市政厅算起的。",
   "person.connect.example": "这是示例：目前不会发送或保存任何内容。",
   "person.back": "返回",
   "person.message.action": "给{name}发消息",

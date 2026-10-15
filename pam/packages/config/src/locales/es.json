@@ -471,6 +471,7 @@
   "person.connect.confirm.no": "Ahora no",
   "person.connect.none": "Ningún programa coincide con eso.",
   "person.connect.done.home": "Volver al inicio",
+  "person.connect.distanceFrom": "Las distancias se miden desde el Ayuntamiento.",
   "person.connect.example": "Un ejemplo: todavía no se envía ni se guarda nada.",
   "person.back": "Atrás",
   "person.message.action": "Escribirle a {name}",
