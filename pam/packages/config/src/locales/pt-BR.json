@@ -1659,5 +1659,12 @@
   "places.areaLabel.street": "ZIP code, bairro ou endereço",
   "nav.back.reported": "Voltar para Lugares sinalizados",
   "join.program.review.noAddress.title": "Ainda sem endereço",
-  "join.program.review.noAddress.body": "Os membros não vão saber aonde ir. Você ainda pode enviá-lo assim, ou adicionar o endereço primeiro."
+  "join.program.review.noAddress.body": "Os membros não vão saber aonde ir. Você ainda pode enviá-lo assim, ou adicionar o endereço primeiro.",
+  "places.reported.wrote": "They wrote:",
+  "places.reported.keep.hint": "The place goes back on the list for members.",
+  "places.reported.remove.hint": "Members won't find it in Pam anymore.",
+  "places.reported.remove.confirm.title": "Take {place} off the list?",
+  "places.reported.remove.confirm.body": "Members won't find it in Pam anymore.",
+  "places.reported.done.keep": "{place} stays on the list.",
+  "places.reported.done.remove": "{place} is off the list."
 }
