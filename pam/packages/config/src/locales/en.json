@@ -1289,7 +1289,7 @@
   "program.quick.phone": "Contact phone number",
   "program.policies.row": "Policies for members",
   "program.policies.rowBody": "{count} policies",
-  "program.policies.rowBody.one": "1 policy",
+  "program.policies.rowBody.one": "{count} policy",
   "policies.title": "Policies for members",
   "policies.intro": "Documents people read and sign before they take part. They sign in Pam, and you can see who has.",
   "policies.upload.label": "Add a policy",
