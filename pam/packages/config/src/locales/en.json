@@ -1643,7 +1643,7 @@
   "carousel.play": "Play",
   "supportReply.title": "Answer by text",
   "supportReply.to": "To {phone}",
-  "supportReply.theyWrote": "They wrote",
+  "supportReply.theyWrote": "They wrote:",
   "supportReply.label": "Your answer",
   "supportReply.count": "{used} of {max}",
   "supportReply.send": "Send text",

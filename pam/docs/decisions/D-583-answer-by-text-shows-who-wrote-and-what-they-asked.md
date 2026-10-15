@@ -6,11 +6,11 @@
 
 **What the screen shows now:**
 - the number as a person reads it, `(215) 555-0142` (`displayPhone`);
-- what they wrote and when, in a card above the box: "They wrote · Oct 15, 2026, 2:05 PM", and their words as written, shown as text, never as markup.
+- what they wrote and when, in a card above the box: "They wrote:", their words, and the time under them ("Oct 15, 2026, 2:05 PM"), and their words as written, shown as text, never as markup.
 
 **Where the words and the time come from, and why nothing is stored:** the help request is stored nowhere (D-521: it is an email and a rate-limit hash), so they cannot be looked up. They ride in the link that opens the screen, in the part after `#`: `/reply/?to=+12155550142#q=<words>&at=<ISO time>`. A fragment never goes to a server, so it is in no request log. The screen reads it from the address and keeps nothing (`lib/replyContext.ts`: capped at the form's 3,000 characters, control characters out, a bad time dropped). **Nothing builds such a link today**: the email's "Reply by text" link is part of a61, which is off (D-547). When it is turned on, the help-request email must build the link with the words after `#`, never in the query. Storybook and demo accounts also accept `q` and `at` as ordinary query values so a story can show the screen; a real link does not use them. Anyone but the super admin gets the closed door and sees no words.
 
-**New words** (Sage signs, Lena translates; drafts are in all seven languages): `supportReply.theyWrote` "They wrote".
+**New words** (Sage signs, Lena translates; drafts are in all seven languages): `supportReply.theyWrote` "They wrote:" (Sage signed it, 15 October; Piper's Reported places note uses the same words).
 
 ## Held: showing whose number it is (Mira, 15 October)
 

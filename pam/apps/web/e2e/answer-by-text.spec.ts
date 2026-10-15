@@ -53,8 +53,8 @@ test.describe('Answer by text', () => {
     await settled(page);
     await expect(page.getByText('To (215) 555-0142')).toBeVisible();
     await expect(page.getByText(QUESTION)).toBeVisible();
-    await expect(page.getByText(/^They wrote · /)).toBeVisible();
-    await expect(page.getByText(/2026/)).toBeVisible();
+    await expect(page.getByText('They wrote:')).toBeVisible();
+    await expect(page.getByText(/Oct 15, 2026/)).toBeVisible();
     // The words are in the address after the #, so no request carries them; and nobody looks the number up.
     expect(leaked).toEqual([]);
     expect(lookups).toEqual([]);
@@ -65,7 +65,7 @@ test.describe('Answer by text', () => {
     await page.goto(`/reply/?to=${encodeURIComponent('+12155550199')}`);
     await settled(page);
     await expect(page.getByText('To (215) 555-0199')).toBeVisible();
-    await expect(page.getByText('They wrote')).toHaveCount(0);
+    await expect(page.getByText('They wrote:')).toHaveCount(0);
     await expect(page.getByLabel('Your answer')).toBeVisible();
   });
 

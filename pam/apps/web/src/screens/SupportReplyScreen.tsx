@@ -121,11 +121,16 @@ export function SupportReplyScreen() {
             <Card padding={6}>
               <VStack gap={2}>
                 <Text type="supporting" xstyle={styles.note}>
-                  {askedWhen ? `${t('supportReply.theyWrote')} · ${askedWhen}` : t('supportReply.theyWrote')}
+                  {t('supportReply.theyWrote')}
                 </Text>
                 <Text dir="auto" xstyle={styles.question}>
                   {asked.question}
                 </Text>
+                {askedWhen ? (
+                  <Text type="supporting" xstyle={styles.note}>
+                    {askedWhen}
+                  </Text>
+                ) : null}
               </VStack>
             </Card>
           ) : null}
