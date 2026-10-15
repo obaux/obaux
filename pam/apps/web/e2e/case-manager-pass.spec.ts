@@ -100,9 +100,13 @@ test.describe('a case manager after joining (Iris, 15 October)', () => {
     await caseManager(page);
     await page.goto('/');
     await settled(page);
-    const promise = page.getByText(/^Their goals, programs, visits/);
-    await expect(promise).toBeVisible();
-    expect(await promise.evaluate((el) => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(16);
+    // A short list, the joining step's own four items, each at reading size (item 11).
+    const items = page.getByRole('listitem').filter({ hasText: /What they want to work on|The programs they sign up for|Not what they say|When they save a new place/ });
+    await expect(items).toHaveCount(4);
+    for (const size of await items.evaluateAll((els) => els.map((el) => parseFloat(getComputedStyle(el).fontSize)))) {
+      expect(size).toBeGreaterThanOrEqual(16);
+    }
+    await expect(page.getByText('They were told exactly this.')).toBeVisible();
     await expect(page.getByRole('combobox', { name: 'Search your members by name', exact: true })).toBeVisible();
   });
 

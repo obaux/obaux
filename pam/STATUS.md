@@ -938,7 +938,7 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 - The members search is named once. The invite form lists every missing field.
 - Before/after shots are in `docs/design/review/2026-10-15-case-manager-pass/`.
 - W2 is wired with Sage's words. "Programs saved by" is gone, page included.
-- P5's list waits on Sage's new keys.
+- "What you can see" on Home is the joining step's list (Lena's lists merged). Program lead row 5 is held on its own branch for card a92.
 
 ## Accounts & invites · Join Pam (W6), language dropdown, code behind a question (13 October) — live in b32
 

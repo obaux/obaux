@@ -14,3 +14,4 @@ Iris's findings: `docs/research/2026-10-15-case-manager-flow.md`.
 | Program lead (Mira, 14:18): joining step 2 "What to expect" has a way back and Contact Pam | onboarding-staff-privacy-step--program-lead-invited, 320×568 | `*-PL-W1-join-step2-320x568.png` |
 | Program lead: a member's page titled with their name | program-lead-screens--member | `*-PL-W3-member-title.png` |
 | Item 10: the example member page, with no "Programs saved by" | case-manager-screens--member | `*-W3-member-title-example.png` |
+| Item 11: "What you can see" as the joining step's four items, a list at reading size (scrolled to show it whole) | case-manager-screens--home | `after-P5-home-what-you-can-see-scrolled.png` |

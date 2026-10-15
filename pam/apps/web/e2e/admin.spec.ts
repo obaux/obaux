@@ -297,7 +297,7 @@ test.describe('the case manager screen', () => {
     // §4.1: members agree to this list at onboarding. An admin should be looking
     // at the same words, so the promise is visible from both sides.
     await expect(page.getByRole('heading', { name: 'What you can see' })).toBeVisible();
-    await expect(page.getByText(/Not their messages/)).toBeVisible();
+    await expect(page.getByText(/Not what they say or send to other people/)).toBeVisible();
   });
 
   test('nothing outside the caseload contract is on the page', async ({ page }) => {

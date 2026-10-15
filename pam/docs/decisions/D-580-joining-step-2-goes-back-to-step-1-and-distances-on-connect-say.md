@@ -54,8 +54,11 @@
   the link (D-243). It's gone, and so is the page it led to (`/person/saved/`, `SavedByView`), its Storybook story
   and its prototype route, so Will's review surface keeps the contract too. The `person.savedPlaces.*` keys stay for
   now; removing them touches all seven languages.
-- **11. P5's list:** Sage is signing new words for `admin.seeing.body` and `join.privacy.admin.1–4`. Home will show
-  them as a short list at reading size once they arrive.
+- **11. P5's list:** Lena's `claude/lena-cm-lists` (Sage's ledger 4269f020) is merged. Home now shows "What you can
+  see" as the joining step's own four items (`join.privacy.admin.1–4`), a list at reading size, then "They were told
+  exactly this." (`admin.seeing.told`: the last sentence of Sage's signed `admin.seeing.body`, word for word). It
+  uses the same keys as joining rather than a second split of the same words, so the two can never drift. Nothing
+  splits a sentence in code, which wouldn't work across seven scripts. `admin.seeing.body` is now unused.
 
 ## Program leads too (the merge desk, 14:18, from Iris's program lead pass)
 

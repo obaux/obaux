@@ -55,3 +55,4 @@ The merge desk routed Iris's case manager first pass to this lane (15 October, 1
 - 14:30: Sage signed W2, W3 and P7 (ledger 8710a563). W2's body and P7's missing line are wired. Item 10: the
   "Programs saved by" link, the /person/saved/ page, its story and its route are removed (test in case-manager-pass).
 - 14:45: program leads too (Mira 14:18): their step 2 back + Contact Pam (join test), and their member page titled with the name, one h1 (program-visits spec). Shots PL-*.
+- 14:55: merged Lena's claude/lena-cm-lists (445936b2). Item 11: Home's What you can see is the join.privacy.admin.1–4 list + admin.seeing.told. admin.spec's old 'Not their messages' check updated to the signed words. Row 5 for program leads is on its own branch, claude/pam-lead-expect-row5 (572ed044), held for card a92.
