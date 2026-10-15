@@ -698,6 +698,17 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     // A fictional 555 number: a requester's phone, read on "Text Andre" (D-262).
     on('/rpc/staff_request_phone', () => ({ body: '+12155550177' })),
     on('/rest/v1/enrollments', () => ({ body: [] })),
+    // A real member's visits, read by their case manager on the member's page (D-509): Marcus (`m1`, on the example caseload) has
+    // one coming up, one the program marked him at and one it did not, so "Trips coming up" and "Programs attended" have something to show.
+    on('/rest/v1/appointments', (url) => ({
+      body: url.includes('member_id=eq.m1')
+        ? [
+            { id: 'a1', starts_at: onTheHour(-9, 13), status: 'missed', service_id: SAVED_PLACE.id, services: { name: SAVED_PLACE.name, category: SAVED_PLACE.category } },
+            { id: 'a2', starts_at: onTheHour(-5, 9), status: 'attended', service_id: SAVED_PLACE.id, services: { name: SAVED_PLACE.name, category: SAVED_PLACE.category } },
+            { id: 'a3', starts_at: onTheHour(2, 10), status: 'scheduled', service_id: SAVED_PLACE.id, services: { name: SAVED_PLACE.name, category: SAVED_PLACE.category } },
+          ]
+        : [],
+    })),
     // The people a case manager or a program lead may message are the caseload the list shows, so the row of
     // rings above it (D-198) agrees with it (a member's and a super admin's own list is empty).
     on('/rpc/messageable_people', () => ({
