@@ -197,7 +197,7 @@ export interface LocaleBrief {
 }
 
 export const LOCALE_BRIEFS: Readonly<Record<string, LocaleBrief>> = {
-  es: { name: 'Spanish', style: 'Formal "usted". Full accents, ñ, and opening ¿ and ¡. Plain words an adult reader with little schooling follows.' },
+  es: { name: 'Spanish', style: 'Address the reader as "tú" in anything a member reads, and on screens that members and staff both use (sign-in, Join, Messages, settings, notices, Help). Use "usted" only on screens only staff see, and on Privacy, Terms and the legal pages (D-577). Never mix the two inside one screen. Full accents, ñ, and opening ¿ and ¡. Plain words an adult reader with little schooling follows.' },
   'pt-BR': { name: 'Brazilian Portuguese', style: 'Address the reader as "você". Brazilian spelling and vocabulary. Full accents.' },
   'zh-CN': { name: 'Simplified Chinese (for Mandarin readers)', style: 'Address the reader as "您". Simplified characters. No space between Chinese and the word "Pam" unless the neighbouring examples use one.' },
   'zh-HK': { name: 'Traditional Chinese in Hong Kong\'s written standard (for Cantonese readers)', style: 'Address the reader as "您". Traditional characters and Hong Kong wording (訊息, 電話號碼, 電郵), standard written Chinese, not colloquial Cantonese spelling.' },
