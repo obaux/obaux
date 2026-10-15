@@ -131,6 +131,7 @@ const HOSTS: Record<string, HostEntry> = {
   'creativecommons.org': { kind: 'link', why: 'the CC BY 4.0 licence of that data, linked under Legal › Data sources (LegalView.tsx, D-540)' },
 
   // Example people only (a real account sees no examples: lib/examples.ts).
+  'stub.supabase.co': { kind: 'example', why: 'the stub project Storybook is built for (apps/web/.storybook/main.ts, D-579); tests and Storybook only, never the app, and nothing is sent to it: stories answer inside the page' },
   'images.unsplash.com': { kind: 'example', why: 'stock photos of the example staff in dummy-connections.ts; shown only while examples are on' },
 
   // Not a request: a namespace, a comment, a placeholder, a schema.

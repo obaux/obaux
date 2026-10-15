@@ -1110,6 +1110,18 @@
   - Lena: P10 (the "A program can see" card leaves out saves, D-199).
   - P3, how long a program's review takes, is a timing promise for Will.
   - Iris next: Super admin.
+- **Batch b41 (15 October).**
+  - Dot's D-579 (1001fdc7, then 4e4d0276): Storybook builds against the stub project, and a guard fails the build
+    if any bundle names the live one. The guard was 8 bundles before, 0 now.
+  - Lena's badge names (748dabac, Iris P5): 16 names in the six other languages. Sankofa and Griot are kept;
+    Craftsman is held for Will (a90). copy.test now refuses an English badge name outside those three.
+  - Screens: none.
+  - The merge desk's run caught one failure before the push. Lena's host guard (third-party-hosts.test.ts) found
+    `stub.supabase.co` in .storybook/main.ts, unlisted. Dot hadn't run the config tests, so Dot added it as
+    'example'.
+- **Lesson: a branch that names a new host anywhere runs the config tests.** The host guard scans more than app
+  source, so a tooling-only change (Storybook config) can trip it. CI's unit step would have gone red after a push.
+  The merge desk's targeted checks run config on every batch, and a builder's READY now does too when it adds a URL.
 - **One send-invite-emails 500 at 06:25:01** (`claim_staff_invite_emails: 401`). The 21 runs either side of it all
   returned 200. Not acted on. Watch only.
 
@@ -1405,6 +1417,7 @@
 | b39 main CI (f8cf7a2e) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (09:45); Vercel web and pam-site success |
 | Live project logs, 07:50 to 09:48 (edge_logs, counts only) | from Anthropic's network: the last requests at 07:51, none since, after the 07:56 stub-build rule and before D-576 |
 | Batch b40 (ccb2f8d8, Lena P4): config / copy / ui / web build:e2e / tsc / web unit / budget / e2e full / storybook | 1311 passed, 1 skipped / in step / 124 / 0 / 0 / 177 / 12.0 kB spare / 1859 passed, 19 skipped, exit 0 / 0 |
+| Batch b41 (ba89508e: Dot D-579 + 4e4d0276, Lena 748dabac): config / copy / ui / build:e2e / tsc / web unit / budget / e2e (points, languages, profile-skeleton, no-examples-profile, role-badge-fit, never-live) / storybook + guard | 1311 passed, 1 skipped (after 4e4d0276; 1 failed before) / in step / 124 / 0 / 0 / 180 / 12.0 kB spare / 354 passed, exit 0 / built; "no bundle names the live one"; grep 0 files |
 | Control Room v24 harness (390 and 1280) | reply about a card: section lands at 76px under the tabs, card folded, button "Replied" (aria "Replied. Reply again"); pressing it restores the card's prefix; a general message leaves scrollY unchanged; a data push mid-glide doesn't stop it; 0 page errors |
 
 ## Left undone

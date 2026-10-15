@@ -35,6 +35,15 @@ const config: StorybookConfig = {
   // The public site's own pictures (/art/…) sit beside the app's (D-437).
   staticDirs: ['../public', '../../site/public', './public'],
   docs: { defaultName: 'About' },
+  // Storybook never talks to Pam's live project. Next inlines NEXT_PUBLIC_* itself, but Storybook does not, so
+  // `src/lib/project.ts` fell back to the live URL in every bundle whatever the environment said, and the published
+  // Storybook is public: a story missing a fixture would have sent a viewer's browser to production. Set here, not
+  // read from the environment, so no build can get it wrong; `scripts/check-storybook-stub.mjs` proves it (D-579).
+  env: (config) => ({
+    ...config,
+    NEXT_PUBLIC_SUPABASE_URL: 'https://stub.supabase.co',
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: 'stub-anon-key-for-storybook',
+  }),
   // Storybook reads next.config but not its `webpack()` hook, so the same
   // `.js` -> `.ts` alias the workspace packages need is repeated here.
   webpackFinal: async (webpack) => {
@@ -47,6 +56,13 @@ const config: StorybookConfig = {
     // compiles what it leaves.
     webpack.module = webpack.module ?? {};
     webpack.module.rules = [
+      {
+        // The live project's address and key, in the two files that fall back to them, become the stub's (D-579).
+        test: /[\\/](lib[\\/]project|lib[\\/]links)\.ts$/,
+        enforce: 'pre',
+        include: [join(app, 'src/lib'), join(app, '../site/src/lib')],
+        use: { loader: join(here, 'stub-live-project.cjs') },
+      },
       {
         test: /\.[jt]sx?$/,
         enforce: 'pre',
