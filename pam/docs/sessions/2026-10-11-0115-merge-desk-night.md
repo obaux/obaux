@@ -1037,6 +1037,13 @@
   transparency.* moves to tú, so it now differs from the Privacy page. That's for Will later, since Privacy is his
   signed text. trips.booked.sms is not touched. Only es.json and the ledger change. The English is unchanged, so it
   needs no Sage signature and no Will.
+- **Sage, 15 October 13:32 (ledger 5259382d): Iris's P1, P2 and P5 signed.**
+  - P1: "Pick a day and a time." / "Pick a day." / "Pick a time."
+  - P2: a new form, "{place}, {when}", for a trip with no companion.
+  - P5: the badge names are translated, except Sankofa and Griot, which are borrowed words and stay as they are.
+  - Sage flagged "Craftsman" as gendered, the thing D-109 fixed once already. It went to Will as card a90 (13:33):
+    Maker is the merge desk's advice, Crafter is Sage's other choice, or he keeps it. Lena holds badge.craftsman until
+    he picks.
 - **One send-invite-emails 500 at 06:25:01** (`claim_staff_invite_emails: 401`). The 21 runs either side of it all
   returned 200. Not acted on. Watch only.
 
