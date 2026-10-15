@@ -1687,7 +1687,7 @@
   "nav.back.reported": "Volver a Lugares reportados",
   "join.program.review.noAddress.title": "Aún no hay dirección",
   "join.program.review.noAddress.body": "Los miembros no sabrán adónde ir. Puede enviarlo así, o agregar primero la dirección.",
-  "places.reported.wrote": "Escribieron:",
+  "places.reported.wrote": "Escribió:",
   "places.reported.keep.hint": "El lugar vuelve a la lista para los miembros.",
   "places.reported.remove.hint": "Los miembros ya no lo encontrarán en Pam.",
   "places.reported.remove.confirm.title": "¿Quitar {place} de la lista?",

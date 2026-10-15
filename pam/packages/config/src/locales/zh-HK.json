@@ -1687,7 +1687,7 @@
   "nav.back.reported": "返回「已反映的地點」",
   "join.program.review.noAddress.title": "暫時未有地址",
   "join.program.review.noAddress.body": "會員將不知道該去哪裡。您仍然可以傳送，也可以先新增地址。",
-  "places.reported.wrote": "他們寫道：",
+  "places.reported.wrote": "對方寫道：",
   "places.reported.keep.hint": "這個地點會回到會員看得到的列表中。",
   "places.reported.remove.hint": "會員在Pam中將不會再找到它。",
   "places.reported.remove.confirm.title": "要把{place}從列表中移除嗎？",
