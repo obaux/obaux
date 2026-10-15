@@ -474,6 +474,7 @@
   "person.connect.confirm.no": "暫時不用",
   "person.connect.none": "沒有符合的計劃。",
   "person.connect.done.home": "返回主頁",
+  "person.connect.distanceFrom": "距離是從市政廳起計。",
   "person.connect.example": "這是示範：尚未傳送或儲存任何內容。",
   "person.back": "返回",
   "person.message.action": "傳訊息給{name}",

@@ -509,6 +509,7 @@
   "person.connect.confirm.no": "ليس الآن",
   "person.connect.none": "لا توجد برامج مطابقة.",
   "person.connect.done.home": "العودة إلى الرئيسية",
+  "person.connect.distanceFrom": "تحسب المسافات من مبنى البلدية.",
   "person.connect.example": "هذا مثال: لم يتم إرسال أو حفظ أي شيء بعد.",
   "person.back": "رجوع",
   "person.message.action": "مراسلة {name}",
