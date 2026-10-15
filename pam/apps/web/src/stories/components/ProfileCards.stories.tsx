@@ -35,6 +35,9 @@ export const Default: Story = {};
 export const StaffNoStats: Story = { args: { name: 'Keisha', roleLabel: 'Case manager', stats: [] } };
 
 /** A case manager viewing a member: a star in the corner. */
+/** On someone else's page, whose title already says the name: the same card, but the name is not a second heading, so a screen reader says it once. */
+export const NameInTitle: Story = { args: { isNameInTitle: true } };
+
 export const WithCorner: Story = {
   args: {
     roleLabel: 'Member · North Philadelphia',

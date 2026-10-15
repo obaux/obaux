@@ -928,7 +928,13 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Accounts & invites · Iris's super admin pass: W1, P1–P7 (15 October) — READY, words with Sage
+## Accounts & invites · a member's name said once (15 October) — READY
+
+`claude/pam-member-name-once`. This is Iris's re-test note on the case manager pass, which is live in b43.
+- A member's page says the name once: as the h1 title. The profile card shows the name without a second heading
+  (`ProfileSummary` `isNameInTitle`).
+
+## Accounts & invites · Iris's super admin pass: W1, P1–P7 (15 October) — on main in b44
 
 `claude/pam-super-admin-pass` (D-584).
 - Approve and Deny on a staff request, and a program's Approve, ask first and say after. Deny says the person will be
@@ -938,7 +944,7 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 - Profile's staff list is "Your work". The invites log's states are at 14px.
 - Not done: a person's row on Everyone opening a page, because there's no super admin person page yet.
 
-## Accounts & invites · Iris's case manager pass: W1, W3, P3–P5, P7–P9 (15 October) — READY, W2 waits on Sage
+## Accounts & invites · Iris's case manager pass: W1, W3, P3–P5, P7–P9 (15 October) — live in b43, Iris PASS
 
 `claude/pam-case-manager-flow` (D-580).
 - Joining step 2 goes back to step 1, and a fixed name is saved on the account. Staff step 2 has Contact Pam.
