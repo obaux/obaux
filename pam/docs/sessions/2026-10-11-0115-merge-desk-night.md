@@ -1076,6 +1076,40 @@
     - W4 (Home doesn't say who has a visit, went or missed one, though the sign-in slide says "Know who showed up"):
       a design proposal with pictures for Will.
   - **Iris next:** a first pass over the Program lead flow.
+- **Batch b40 (15 October): Lena's a9d875ff, Spanish member lines to tú (D-577, Iris P4).** 195 es lines move to
+  tú under the 13:31 rule. es.json and the ledger only; the other five languages and English are byte-identical.
+  Privacy changes by one quoted screen name ("Tus puntos"), which a test pins to the screen. Also Lena's 13 October
+  records (22a5f434). Screens: none. For Will later: transparency.* is tú, while the Privacy page beside it stays
+  usted.
+- **Sage, 13:58 (ledger 8710a563) and 14:02 (ledger 4269f020): the case manager words.**
+  - W2: "To invite someone, tap Invite someone below."
+  - W3: the title is the member's name alone.
+  - P7: "City you work in".
+  - The staff "what you can see" lists now match the member's list and ADMIN_CAN_SEE item by item. Nothing shown
+    changes.
+- **Lena, 13:57: the case manager answers.**
+  - "About you" is a shared screen, so it stays tú.
+  - 30 staff-only lines move to usted (9f717ec1, next batch).
+  - The joining step's list told a case manager less than they see; Home's left out connections and the two
+    exceptions. Sage signed both fixes.
+  - The prototype's example member page offered "Programs saved by {name}", which is more than the contract allows.
+    That went to Ava to remove.
+- **Piper, 14:06: the member flow pass is ready at 975cb919 (D-578).** The merge desk asked for one guard before it
+  ships (13:55): the browser-kept drawing is offered only where examples show, and sign-out clears it. A demo
+  account's drawing could otherwise have been offered to the next person on a shared tab. Lena's fc9b6ca4 adds the
+  translations on top and redoes four languages' "must choose" lines as instructions. Queued as b42.
+- **Dot, 14:01: D-579 (1001fdc7), Storybook builds against the stub project, with a guard.** Storybook's build
+  ignored NEXT_PUBLIC_SUPABASE_URL, so 8 bundles named the live project. Now 0. Queued as b41 with Lena's badge names
+  (748dabac; Craftsman held for Will, a90).
+- **Iris, 14:11: Program lead flow, first pass** (`docs/research/2026-10-15-program-lead-flow.md`). **S1 stops
+  someone:** BookForMemberView fills "People who have written to your program" only from example data, so a real lead
+  always sees nobody. Live has one provider account (counts only, 14:18). Routed at 14:18:
+  - Piper: S1 first, then W1 (no Help on the lead's Home), W3 (Day/Week/Month 30px, the week opening on past days),
+    W4 (two unlabelled faces for a new lead) and P1, P2, P4–P7, P9.
+  - Ava: W2 and P8, for both staff roles.
+  - Lena: P10 (the "A program can see" card leaves out saves, D-199).
+  - P3, how long a program's review takes, is a timing promise for Will.
+  - Iris next: Super admin.
 - **One send-invite-emails 500 at 06:25:01** (`claim_staff_invite_emails: 401`). The 21 runs either side of it all
   returned 200. Not acted on. Watch only.
 
@@ -1370,6 +1404,7 @@
 | Batch b39 (39481be0, D-576): config / copy / ui / web build:e2e / tsc / web unit / budget / e2e full / storybook / refusal proof | 1311 passed, 1 skipped / in step / 124 / 0 / 0 / 177 / 12.0 kB spare / 1859 passed, 19 skipped, exit 0 / 0 / a plain (live) build is refused before any test: "The e2e suite will not run: _next/static/chunks/1529….js names the live project", exit 1 |
 | b39 main CI (f8cf7a2e) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (09:45); Vercel web and pam-site success |
 | Live project logs, 07:50 to 09:48 (edge_logs, counts only) | from Anthropic's network: the last requests at 07:51, none since, after the 07:56 stub-build rule and before D-576 |
+| Batch b40 (ccb2f8d8, Lena P4): config / copy / ui / web build:e2e / tsc / web unit / budget / e2e full / storybook | 1311 passed, 1 skipped / in step / 124 / 0 / 0 / 177 / 12.0 kB spare / 1859 passed, 19 skipped, exit 0 / 0 |
 | Control Room v24 harness (390 and 1280) | reply about a card: section lands at 76px under the tabs, card folded, button "Replied" (aria "Replied. Reply again"); pressing it restores the card's prefix; a general message leaves scrollY unchanged; a data push mid-glide doesn't stop it; 0 page errors |
 
 ## Left undone
