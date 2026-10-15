@@ -1518,6 +1518,10 @@ connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merge
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
 
+## Design system & Storybook · case manager prototype: Message works, Marcus has visits (15 October)
+
+`router.push` now moves the Storybook prototype (it was passed under the wrong key for Storybook 10, D-581), so "Message Marcus" opens the conversation; Marcus has visits in the pretend database. On `claude/pam-design-cm-prototype-gaps`.
+
 ## Design system & Storybook · text boxes show no ring (14 October)
 
 Text boxes draw no ring of ours in any mode; the keyboard still comes up when a screen opens with one ready (D-569, Will a83, supersedes D-523's text-box line). Buttons, links, tick boxes and selects keep the brand ring on Tab. The chat composer has no ring (none on Tab); the code boxes keep their 2px accent edge on purpose (D-251). On `claude/pam-design-text-box-no-ring`; not on `main`.
