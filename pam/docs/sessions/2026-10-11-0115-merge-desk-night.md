@@ -1194,6 +1194,20 @@
     only after the # so no server sees them). Hold the phone→name lookup (profile_first_name_for_phone) until
     texting people back (a61) goes on: it is a new capability that Privacy doesn't describe, for a screen that is
     off.
+- **b42 green (16:05), b43 on main (16:06) and green (16:38).** Team told at 16:39. Iris is re-testing the member,
+  case manager and program lead passes, and the Reported places part of the super admin pass, from Storybook and the
+  prototype built from main.
+- **Batch b44 (15 October), assembled 16:17 to 16:31.**
+  - Ava's super admin pass (06580818, D-584): ConfirmDialog before Approve and Deny, a short "what happened" after,
+    Home's Programs to check count, P1 to P7. Sage signed it (08637d18) with two edits. Ava checked both promises
+    against the code: staff-request texts are account texts, so they're sent while texts_live is off, and approving a
+    program clears needs_review. It includes Lena's six languages (67558940) and nine decision-state stories.
+  - Nico's Answer by text context (29dea226, D-583): the number as a person reads it, and "They wrote:" with the words
+    after the # only. The phone→name lookup is held for a61.
+  - Lena: "They wrote:" in the singular in es, pt-BR and zh-HK (59825d7b), and her evening records (04635dd8).
+  - Conflict: RequestsScreen.tsx, where b43's Reported places row met Ava's Programs to check count. Both rows kept.
+    Their counts now use two styles (value and badge), and Dot is asked to pick one.
+  - Lena's fit audits at each SHA: 0 new findings. Only two spoken keys are drawn by no story.
 ## What was wrong, and what missed it
 
 - **Sign in's spacing was squeezed on every phone for a night.** A `default: null` meant for short screens removed the
@@ -1355,6 +1369,12 @@
   packages/config/src/points.ts (AWARDED_TODAY), which D-578 changed. Lesson: any batch that touches packages/config
   runs the site tests and the site tsc too. The b43 run adds them.
 
+- **A words-only change broke an e2e spec (b43's full run, 15:50).** Sage's signed Reported places words made two keys
+  the same sentence, one in a closed dialog, so a getByText found two and failed strict mode. Piper swapped in the
+  words without re-running the spec that reads them. Fixed in 1d5df9ee (visible text only). Lesson: after a words-only
+  change, re-run the specs that read those words. And Lena's: an audit's "0" says nothing about a state no story draws,
+  so a READY names the keys no story reaches.
+
 ## Decisions
 
 - Will's answer on a card goes to the teammate waiting on it the same turn. If that teammate needs Will's own
@@ -1507,6 +1527,8 @@
 | b42 fix (991d8e18): site test / site tsc / site build / site a11y / config | 100 passed / 0 / 0 / 120 scans, 0 problems / 1311 passed, 1 skipped |
 | Batch b43, full run (e6488b23): config / copy / ui / ui build / build:e2e / tsc / web unit / budget / e2e full / storybook + guard | 1311 passed, 1 skipped / in step / 124 / 0 / 0 / 0 / 180 / 11.7 kB spare / 1964 passed, 19 skipped, 3 failed (reported-places-pass:47 on three projects: strict mode, the signed remove.hint and the closed dialog's body are one sentence) / built; "no bundle names the live one"; grep 0 files |
 | Batch b43, after Piper's 3606792a, main's 991d8e18 and 1d5df9ee: config / copy / ui / site test / site tsc / build:e2e / tsc / web unit / budget / e2e (reported-places-pass, admin, flag, messages, places, places-retired, a11y, never-live, points, lead-flow-pass) / storybook + guard | 1311 passed, 1 skipped / in step / 124 / 100 / 0 / 0 / 0 / 180 / 11.7 kB spare / 507 passed, exit 0 / built; "no bundle names the live one"; grep 0 files |
+| b43 main CI (9b9d31b2) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (16:38); Vercel web and pam-site success. b42's fix 991d8e18: all four green (16:05) |
+| Batch b44, full run (92320c5c, then stories and records merged before the Storybook step): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard | 1311 passed, 1 skipped / in step / 124 / 0 / 100 / 0 / 0 / 0 / 186 / 11.5 kB spare / 1997 passed, 19 skipped, exit 0 / built; "no bundle names the live one"; grep 0 files |
 | Control Room v24 harness (390 and 1280) | reply about a card: section lands at 76px under the tabs, card folded, button "Replied" (aria "Replied. Reply again"); pressing it restores the card's prefix; a general message leaves scrollY unchanged; a data push mid-glide doesn't stop it; 0 page errors |
 
 ## Left undone
