@@ -1110,8 +1110,70 @@
   - Lena: P10 (the "A program can see" card leaves out saves, D-199).
   - P3, how long a program's review takes, is a timing promise for Will.
   - Iris next: Super admin.
+- **Batch b41 (15 October).**
+  - Dot's D-579 (1001fdc7, then 4e4d0276): Storybook builds against the stub project, and a guard fails the build
+    if any bundle names the live one. The guard was 8 bundles before, 0 now.
+  - Lena's badge names (748dabac, Iris P5): 16 names in the six other languages. Sankofa and Griot are kept;
+    Craftsman is held for Will (a90). copy.test now refuses an English badge name outside those three.
+  - Screens: none.
+  - The merge desk's run caught one failure before the push. Lena's host guard (third-party-hosts.test.ts) found
+    `stub.supabase.co` in .storybook/main.ts, unlisted. Dot hadn't run the config tests, so Dot added it as
+    'example'.
+- **Lesson: a branch that names a new host anywhere runs the config tests.** The host guard scans more than app
+  source, so a tooling-only change (Storybook config) can trip it. CI's unit step would have gone red after a push.
+  The merge desk's targeted checks run config on every batch, and a builder's READY now does too when it adds a URL.
 - **One send-invite-emails 500 at 06:25:01** (`claim_staff_invite_emails: 401`). The 21 runs either side of it all
   returned 200. Not acted on. Watch only.
+- **b40 green, b41 on main (15 October).** b40's CI went 4/4 green at 14:50, so b41 (cb7932bc) went to main at
+  14:51.
+- **Batch b42 (15 October), built while b40's CI ran.**
+  - Lena's 80721a97: Spanish staff-only screens say usted (Iris case manager P6), 33 lines.
+  - Lena's fc9b6ca4, carrying Piper's D-578 member pass (975cb919): Help on every step of New trip and signing, a
+    trip card's name wraps instead of ending in "…", 48px targets, the signature sheet starts empty, "I'm here" and
+    "I went" first in Ways to earn, Cancel this visit hidden once marked, and the tab's drawing only where examples
+    show (sign-out clears it). Plus Sage's New trip prompts and `trips.card.label.alone` in seven languages. The
+    ledger conflict on trips.new.missing.* took the trips branch's hashes: same Spanish, newer English source.
+  - Piper's S1 (87776c94): a real program lead's Book a visit lists the members who wrote to the program, from the
+    lead's own conversations (first name and last message only; staff left out).
+  - Iris's super admin first pass (280c8ba7), docs only.
+  - a2eff85e, the merge desk's: the stray `node_modules` link out, and the ignore rule widened (below).
+  - Two of Will's earlier calls change here: a trip card's name was one line (3 October), and New trip's "When?" had
+    no Help (D-235's note). Card a95 (14:59) shows both before and after, before b42 ships; b43's three (D-355 tabs,
+    D-368 info tip, D-486 the (+) row) are added to it before b43 ships.
+  - The lighter "1:51 PM" in Piper's after-p3 shot is MapDrawer's foot fade (D-403, edgeFade.inScroll): the taller
+    card's last line sits in it while the drawer is half open. By design; not a bug.
+- **Signed mark decided (14:58, P5 of Iris's program lead pass):** Dot's A, a green document with a tick
+  (262444c2); nothing marks people still to sign (D-261 stands). The pen means "still to sign" elsewhere (D-270) and
+  a ticked circle means a check-in (D-316, D-369). Piper builds SignedDocIcon on the lead pass branch; it goes on
+  a95 with b43.
+- **More READYs for b43 (14:57 to 15:09).** Sage signed "people" → "members" on four lead lines (7fa02388) and the
+  Reported places lines without the saver clause (7cfbcb03; the clause waits for texts_live in before-launch.md).
+  Dot's 320 before/after of the 48px Day/Week/Month tabs (e80bd14a). Lena's lead P2/P4 words (65a83a33, off Piper's
+  028588e7). Her check found that the "participants" → "members" titles kept with copy:ack --keep still said
+  "participants" in five languages, so she fixed them. She also made rowBody.one "{count} policy", because pt-BR
+  picks "one" for 0 and ru for 21. Ava's case manager pass is final (f80de52d); with Lena's 5e1f5603 on top it drops
+  the stray link. The example "Programs saved by {name}" page is gone: it showed which places a member saved, and
+  members are told a case manager sees only when.
+- **Super admin words (14:58):** Piper's Reported places stand-ins went to Sage with a truth check. "Anyone who saved
+  it is told" is false today: the notice is a text (queue_saved_place_closed), the app never shows it, and
+  texts_live is off.
+  - Not in b42: Lena's records ed5eb187. Its "case manager lists" changelog fragment describes a change that ships
+    with Ava's case manager pass, so it rides with that.
+- **Afternoon READYs queued for b43 (14:40 to 14:46).** Dot's D-581 (6c8654ae): the prototype's router was a bare
+  spy in every story, so "Message Marcus" didn't open the conversation; also Marcus's three visits. Piper's program
+  lead pass (b76d4b35, D-582). Ava's case manager pass (D-580, f80de52d) waits on Lena's three keys, Sage's
+  "Distances are from City Hall." and dropping the stray link (merge 450f8eb3). Sage signed lead P2, P4 and P6
+  (a575a9ae). Wren checked Lena's held P10 site cell at 320 and 1280: fine. Lena's P10 fit audit: 0 findings.
+- **Card a93 (14:52): a case manager's Home shows visits instead of points** (Dot's W4 proposal, 91fcdaac, pictures
+  only). One line under each name: next visit, else "Went", else a dark "Missed" chip. It replaces "400 points".
+  Nothing new is shown (transparency.canSee.appointments). Will's two questions: re-sort whoever missed to the top,
+  and points off Home or kept as a second line. The merge desk advised one line, points off, no re-sort for now.
+- **Card a94 (14:57): should a program book a visit for a member?** Piper's plan (0b09e618,
+  `docs/research/2026-10-15-program-books-a-visit.md`): A, book for real (a security definer function, provider_id
+  set, a bell notice, one new Privacy sentence for Will); B, suggest by message with "Add to my trips"; C, take
+  "Create new booking" out of the + menu. Piper picks A. The merge desk advised B: an unmarked visit becomes missed
+  a day later (D-526 C) and a case manager sees missed visits, so under A a member could carry a "missed" for a visit
+  they never agreed to. If Will picks A, a program-booked visit never shows as missed unless the member said yes.
 
 ## What was wrong, and what missed it
 
@@ -1260,6 +1322,14 @@
   @pam/ui build both failed. Neither Piper's targeted run nor the merge desk's targeted template ran
   `pnpm --filter @pam/ui test` (CI's unit step does, so it would have gone red after a push). Piper regenerated the
   file (04ad2ce5, one line moved). From now on, any branch or batch that touches packages/ui runs the ui tests.
+- **A `node_modules` link was committed in three of Lena's branches (b42's config run, 14:42).**
+  fc9b6ca4, 445936b2 and b7366b52 each carried `pam/packages/config/node_modules`, a link to one worktree's own
+  folder. On any other checkout it points nowhere, and the config tests die with ENOTDIR before reporting (1311
+  passed, then exit 1). What missed it: pam/.gitignore said `node_modules/`, which matches folders only, and
+  `git add -A` took the link. Lena didn't read `git diff --stat` for non-source files before READY. Fix: a2eff85e
+  drops it and makes the rule `node_modules`. Lena re-cut her branches with one deletion each (3a258bc9, 450f8eb3,
+  d0872818). Ava's case manager branch still carries it until it merges 450f8eb3. Lesson: read the exit code, not
+  only the pass count, and read every READY's file list.
 
 ## Decisions
 
@@ -1405,6 +1475,9 @@
 | b39 main CI (f8cf7a2e) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (09:45); Vercel web and pam-site success |
 | Live project logs, 07:50 to 09:48 (edge_logs, counts only) | from Anthropic's network: the last requests at 07:51, none since, after the 07:56 stub-build rule and before D-576 |
 | Batch b40 (ccb2f8d8, Lena P4): config / copy / ui / web build:e2e / tsc / web unit / budget / e2e full / storybook | 1311 passed, 1 skipped / in step / 124 / 0 / 0 / 177 / 12.0 kB spare / 1859 passed, 19 skipped, exit 0 / 0 |
+| Batch b41 (ba89508e: Dot D-579 + 4e4d0276, Lena 748dabac): config / copy / ui / build:e2e / tsc / web unit / budget / e2e (points, languages, profile-skeleton, no-examples-profile, role-badge-fit, never-live) / storybook + guard | 1311 passed, 1 skipped (after 4e4d0276; 1 failed before) / in step / 124 / 0 / 0 / 180 / 12.0 kB spare / 354 passed, exit 0 / built; "no bundle names the live one"; grep 0 files |
+| b40 main CI (7f850755) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (14:50); Vercel web and pam-site success |
+| Batch b42, full run (06bcdef3: Lena 80721a97 and fc9b6ca4 with Piper 975cb919, Piper S1 87776c94, a2eff85e, Iris 280c8ba7): config / copy / ui / ui build / build:e2e / tsc / web unit / budget / e2e full / storybook + guard | 1311 passed, 1 skipped (exit 1 before a2eff85e: ENOTDIR on the committed link) / in step / 124 / 0 / 0 / 0 / 180 / 12.0 kB spare / 1901 passed, 19 skipped, exit 0 / built; "no bundle names the live one"; grep 0 files |
 | Control Room v24 harness (390 and 1280) | reply about a card: section lands at 76px under the tabs, card folded, button "Replied" (aria "Replied. Reply again"); pressing it restores the card's prefix; a general message leaves scrollY unchanged; a data push mid-glide doesn't stop it; 0 page errors |
 
 ## Left undone
