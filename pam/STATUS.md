@@ -1518,6 +1518,10 @@ connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merge
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
 
+## Design system & Storybook · a mark for "signed every policy", proposal (15 October)
+
+The green pen means "to sign" elsewhere (D-270) and reads as "edit"; a tick in a circle is taken by the check-in circle. Proposal for Will, pictures only (`docs/design/review/2026-10-15-signed-mark/`): a green document with a tick, and nothing for people who haven't signed. Nothing is built. On `claude/pam-design-signed-mark`.
+
 ## Design system & Storybook · text boxes show no ring (14 October)
 
 Text boxes draw no ring of ours in any mode; the keyboard still comes up when a screen opens with one ready (D-569, Will a83, supersedes D-523's text-box line). Buttons, links, tick boxes and selects keep the brand ring on Tab. The chat composer has no ring (none on Tab); the code boxes keep their 2px accent edge on purpose (D-251). On `claude/pam-design-text-box-no-ring`; not on `main`.
