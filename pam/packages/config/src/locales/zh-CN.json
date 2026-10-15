@@ -1670,6 +1670,7 @@
   "carousel.play": "播放",
   "supportReply.title": "用短信回复",
   "supportReply.to": "发送至 {phone}",
+  "supportReply.theyWrote": "他们写道：",
   "supportReply.label": "您的回复",
   "supportReply.count": "已用 {used} / {max}",
   "supportReply.send": "发送短信",

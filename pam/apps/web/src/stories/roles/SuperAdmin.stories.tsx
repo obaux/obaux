@@ -67,7 +67,16 @@ export const ReportedPlacesFromTheBell: Story = screen('super-admin', 'Reported 
 export const Everyone: Story = screen('super-admin', 'Everyone', '/directory/');
 // The page the "Reply by text" link in a help-request email opens (A28, D-524). The number is an invented one
 // (555-01xx is never assigned); the story never sends, as no journey writes.
-export const AnswerByText: Story = screen('super-admin', 'Answer a help request by text', '/reply/', { to: '+12155550142' });
+export const AnswerByText: Story = screen('super-admin', 'Answer a help request by text', '/reply/', {
+  to: '+12155550142',
+  // In a real link these ride after the `#`; Storybook has no such address, so it passes them as ordinary values.
+  q: 'I signed up for the welding class but I cannot find where it meets. Can someone tell me?',
+  at: '2026-10-15T14:05:00Z',
+});
+// A link with only the number: the number and the box, nothing above it.
+export const AnswerByTextNumberOnly: Story = screen('super-admin', 'Answer a help request by text — a link with only the number', '/reply/', {
+  to: '+12155550199',
+});
 export const Requests: Story = screen('super-admin', 'Staff requests', '/requests/');
 export const RequestReview: Story = screen('super-admin', 'A request to review', '/requests/review/', { id: 'r-2' });
 // The programs leaders have sent for Pam to check (D-386, part 6).
