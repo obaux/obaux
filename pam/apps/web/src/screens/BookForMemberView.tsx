@@ -74,7 +74,7 @@ const EXAMPLE_PROGRAM_ID = 'dummy-place-learning';
 const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
 
 /** The soonest visit still ahead at this program, per person, example and booked alike. */
-function useNextVisitHere(programId: string): Readonly<Record<string, string>> {
+function useNextVisitHere(programId: string | null): Readonly<Record<string, string>> {
   const [next, setNext] = useState<Readonly<Record<string, string>>>({});
   useEffect(() => {
     const read = () => {
@@ -105,7 +105,8 @@ export function BookForMemberView() {
   const [examples, setExamples] = useState(false);
   useEffect(() => setExamples(examplesOn()), []);
   const own = setup.program;
-  const programId = own ? own.id : EXAMPLE_PROGRAM_ID;
+  // A real lead with no program loaded has none to book into, and never the example one (a55): no list, no links.
+  const programId = own ? own.id : examples ? EXAMPLE_PROGRAM_ID : null;
   const place = own
     ? { name: own.details.name, category: own.details.category, address: own.details.address }
     : examples
@@ -122,7 +123,7 @@ export function BookForMemberView() {
           ? [{ id: member.id, firstName: member.firstName, lastMessageAt: c.lastMessageAt ?? null, preview: c.preview ?? null }]
           : [];
       })
-    : conversations.status === 'ready'
+    : conversations.status === 'ready' && programId !== null
       ? // One conversation per pair is the rule, but a repeat would collide on the list key: the first (newest) wins.
         conversations.conversations
           .filter((c, i, all) => c.otherProfileId === null || all.findIndex((o) => o.otherProfileId === c.otherProfileId) === i)
@@ -149,7 +150,7 @@ export function BookForMemberView() {
   };
   const hrefFor = (id: string, name: string) =>
     `/trips/new/?${new URLSearchParams({
-      place: programId,
+      place: programId ?? '',
       ...(place ? { name: place.name, category: place.category, address: place.address } : {}),
       for: id,
       forName: name,
@@ -178,7 +179,7 @@ export function BookForMemberView() {
       <Heading level={2} xstyle={styles.heading}>
         {t('book.people')}
       </Heading>
-      {people.length === 0 && !examples && conversations.status === 'loading' ? null : people.length === 0 ? (
+      {people.length === 0 && !examples && (conversations.status === 'loading' || setup.isLoading) ? null : people.length === 0 ? (
         <Text type="supporting" xstyle={styles.empty}>
           {t('book.empty')}
         </Text>
