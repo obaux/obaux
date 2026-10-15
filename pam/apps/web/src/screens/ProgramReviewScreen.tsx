@@ -173,7 +173,8 @@ export function ProgramReviewScreen({ id }: { readonly id: string | null }) {
         />
       ) : null}
 
-      {isLate(program) ? (
+      {/* Only while it waits for a decision: not once one is made here (Iris, re-test of b44). */}
+      {!decided && isLate(program) ? (
         <Text role="status" xstyle={styles.late}>
           {t('review.days', { days: program.daysWaiting })}
         </Text>

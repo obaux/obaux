@@ -928,7 +928,13 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Accounts & invites · a member's name said once (15 October) — READY
+## Accounts & invites · Days waiting goes after a decision (15 October) — on main in b45
+
+`claude/pam-days-waiting-decided`. This is Iris's re-test note on the super admin pass, which is live in b44.
+- A program's page says "Days waiting" only while it waits for a decision. The line is gone after approve, changes
+  asked or discard.
+
+## Accounts & invites · a member's name said once (15 October) — on main in b45
 
 `claude/pam-member-name-once`. This is Iris's re-test note on the case manager pass, which is live in b43.
 - A member's page says the name once: as the h1 title. The profile card shows the name without a second heading
