@@ -928,6 +928,12 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Accounts & invites · Days waiting goes after a decision (15 October) — READY
+
+`claude/pam-days-waiting-decided`. This is Iris's re-test note on the super admin pass, which is live in b44.
+- A program's page says "Days waiting" only while it waits for a decision. The line is gone after approve, changes
+  asked or discard.
+
 ## Accounts & invites · Iris's super admin pass: W1, P1–P7 (15 October) — READY, words with Sage
 
 `claude/pam-super-admin-pass` (D-584).
