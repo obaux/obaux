@@ -53,11 +53,14 @@ test('tapping I\'m here sends the position to the database once, and a yes says 
   });
   await open(page);
   expect(asked).toHaveLength(0); // Nothing is asked of the phone until the tap.
+  await expect(page.getByText('Cancel this visit')).toBeVisible();
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
   expect(results.violations).toEqual([]);
   await page.getByRole('button', { name: "I'm here" }).click();
   await expect(page.getByText("Your visit is marked.")).toBeVisible();
   await expect(page.getByText('You earned 100 points.')).toBeVisible();
+  // A marked visit is not cancelled (Iris's second member pass, P6).
+  await expect(page.getByText('Cancel this visit')).toHaveCount(0);
   expect(asked).toHaveLength(1);
   expect(asked[0]).toMatchObject({ p_appointment_id: VISIT, p_lat: 39.95, p_lon: -75.16 });
 });

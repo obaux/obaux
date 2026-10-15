@@ -94,6 +94,8 @@ describe('every other language is actually translated', () => {
   MAY_MATCH_ENGLISH.add('places.kind.zip');
   // A place, a day and a time and no word of its own: Chinese and Russian have nothing to translate in it (D-498).
   MAY_MATCH_ENGLISH.add('trips.moved.body.self');
+  // The same for a trip card's spoken name when nobody comes along: a place and a day, no word of its own (D-578; the comma is the language's).
+  MAY_MATCH_ENGLISH.add('trips.card.label.alone');
 
   it.each(OTHER_LOCALES)('%s differs from English except where a name or a symbol should not change', (locale) => {
     const same = Object.keys(EN).filter((k) => BUNDLES[locale][k] === EN[k] && /[A-Za-z]{3}/.test(EN[k]!));
