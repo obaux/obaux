@@ -94,11 +94,6 @@ describe('every other language is actually translated', () => {
   MAY_MATCH_ENGLISH.add('places.kind.zip');
   // A place, a day and a time and no word of its own: Chinese and Russian have nothing to translate in it (D-498).
   MAY_MATCH_ENGLISH.add('trips.moved.body.self');
-  // Sage's signed words for the program lead pass (15 October, P2 and P4), English until Lena translates them
-  // (D-582). Delete these lines when she has: the test then proves it.
-  MAY_MATCH_ENGLISH.add('join.program.review.noAddress.title');
-  MAY_MATCH_ENGLISH.add('join.program.review.noAddress.body');
-  for (const key of Object.keys(EN)) if (key.startsWith('program.policies.rowBody')) MAY_MATCH_ENGLISH.add(key);
 
   it.each(OTHER_LOCALES)('%s differs from English except where a name or a symbol should not change', (locale) => {
     const same = Object.keys(EN).filter((k) => BUNDLES[locale][k] === EN[k] && /[A-Za-z]{3}/.test(EN[k]!));
