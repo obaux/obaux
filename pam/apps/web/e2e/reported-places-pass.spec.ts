@@ -44,7 +44,8 @@ test('a report shows what was reported and what they wrote at reading size, and 
   await expect(page.getByText('The phone number is the old one')).toBeVisible();
   await expect(page.getByText('They wrote:')).toBeVisible();
   await expect(page.getByText('The place goes back on the list for members.')).toBeVisible();
-  await expect(page.getByText("Members won't find it in Pam anymore.")).toBeVisible();
+  // The same signed words are the confirm's body, in a closed dialog: only the line on the card is on screen.
+  await expect(page.getByText("Members won't find it in Pam anymore.").filter({ visible: true })).toBeVisible();
 });
 
 test('taking a place off the list asks first, and says what was done (W1)', async ({ page }) => {
