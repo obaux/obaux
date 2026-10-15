@@ -1796,11 +1796,11 @@
   "places.areaHint.street": "مثل 19107 أو Fishtown أو تقاطع Broad و Girard.",
   "places.areaLabel.street": "الرمز البريدي (ZIP) أو الحي أو العنوان",
   "nav.back.reported": "العودة إلى الأماكن المبلغ عنها",
-  "places.reported.wrote": "They wrote:",
-  "places.reported.keep.hint": "The place goes back on the list for members.",
-  "places.reported.remove.hint": "Members won't find it in Pam anymore.",
-  "places.reported.remove.confirm.title": "Take {place} off the list?",
-  "places.reported.remove.confirm.body": "Members won't find it in Pam anymore.",
-  "places.reported.done.keep": "{place} stays on the list.",
-  "places.reported.done.remove": "{place} is off the list."
+  "places.reported.wrote": "كتبوا:",
+  "places.reported.keep.hint": "يعود المكان إلى القائمة التي يراها الأعضاء.",
+  "places.reported.remove.hint": "لن يجد الأعضاء المكان في Pam بعد الآن.",
+  "places.reported.remove.confirm.title": "إزالة {place} من القائمة؟",
+  "places.reported.remove.confirm.body": "لن يجد الأعضاء المكان في Pam بعد الآن.",
+  "places.reported.done.keep": "يبقى {place} في القائمة.",
+  "places.reported.done.remove": "تمت إزالة {place} من القائمة."
 }

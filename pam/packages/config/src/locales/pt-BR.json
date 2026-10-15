@@ -1656,11 +1656,11 @@
   "places.areaHint.street": "Como 19107, Fishtown ou Broad e Girard.",
   "places.areaLabel.street": "ZIP code, bairro ou endereço",
   "nav.back.reported": "Voltar para Lugares sinalizados",
-  "places.reported.wrote": "They wrote:",
-  "places.reported.keep.hint": "The place goes back on the list for members.",
-  "places.reported.remove.hint": "Members won't find it in Pam anymore.",
-  "places.reported.remove.confirm.title": "Take {place} off the list?",
-  "places.reported.remove.confirm.body": "Members won't find it in Pam anymore.",
-  "places.reported.done.keep": "{place} stays on the list.",
-  "places.reported.done.remove": "{place} is off the list."
+  "places.reported.wrote": "Eles escreveram:",
+  "places.reported.keep.hint": "O lugar volta para a lista dos membros.",
+  "places.reported.remove.hint": "Os membros não vão mais encontrá-lo em Pam.",
+  "places.reported.remove.confirm.title": "Tirar {place} da lista?",
+  "places.reported.remove.confirm.body": "Os membros não vão mais encontrá-lo em Pam.",
+  "places.reported.done.keep": "{place} continua na lista.",
+  "places.reported.done.remove": "{place} saiu da lista."
 }

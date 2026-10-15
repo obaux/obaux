@@ -1656,11 +1656,11 @@
   "places.areaHint.street": "例如：19107、Fishtown，或 Broad 和 Girard 路口。",
   "places.areaLabel.street": "邮政编码、街区或地址",
   "nav.back.reported": "返回“有反馈的地点”",
-  "places.reported.wrote": "They wrote:",
-  "places.reported.keep.hint": "The place goes back on the list for members.",
-  "places.reported.remove.hint": "Members won't find it in Pam anymore.",
-  "places.reported.remove.confirm.title": "Take {place} off the list?",
-  "places.reported.remove.confirm.body": "Members won't find it in Pam anymore.",
-  "places.reported.done.keep": "{place} stays on the list.",
-  "places.reported.done.remove": "{place} is off the list."
+  "places.reported.wrote": "他们写道：",
+  "places.reported.keep.hint": "这个地点会回到成员能看到的列表中。",
+  "places.reported.remove.hint": "成员在Pam里将不再找到它。",
+  "places.reported.remove.confirm.title": "要把{place}从列表中移除吗？",
+  "places.reported.remove.confirm.body": "成员在Pam里将不再找到它。",
+  "places.reported.done.keep": "{place}仍在列表中。",
+  "places.reported.done.remove": "{place}已从列表中移除。"
 }
