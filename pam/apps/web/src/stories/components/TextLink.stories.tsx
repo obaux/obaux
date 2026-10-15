@@ -44,3 +44,6 @@ export const AsAButton: Story = { args: { label: 'signin.code.resend', href: und
 export const Disabled: Story = { args: { label: 'signin.code.resend', href: undefined, isDisabled: true } };
 
 export const Spanish: Story = { args: { label: 'signin.phone.label', href: undefined }, globals: { locale: 'es' } };
+
+/** In a sentence or among words (a reveal such as "If yes, click here to enter code"): underlined all the time, so it is not told only by colour (D-564). */
+export const Underlined: Story = { args: { label: 'signin.code.resend', href: undefined, isUnderlined: true } };

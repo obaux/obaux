@@ -83,7 +83,7 @@ async function signedIn(page: import('@playwright/test').Page, saved: unknown[])
 test.describe('keeping a place', () => {
   test('saving writes it down, and the card says so without saying it', async ({ page }) => {
     const writes = await signedIn(page, []);
-    await page.goto('/places/');
+    await page.goto('/');
     // Hydrated and the saved list loaded before tapping: a tap on the
     // pre-rendered button before then was lost, a flake seen twice (D-299).
     await settled(page);
@@ -170,9 +170,9 @@ test.describe('keeping a place', () => {
     await page.goto('/saved/');
 
     await expect(page.getByRole('heading', { name: 'Nothing saved yet' })).toBeVisible();
-    // A way to places, and no Call Pam button: there is nothing here support can solve.
+    // A way to places, and no Contact Pam button: there is nothing here support can solve.
     await expect(page.getByRole('link', { name: 'Show all places' })).toHaveAttribute('href', '/');
-    await expect(page.getByRole('link', { name: /Call Pam/ })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /Contact Pam/ })).toHaveCount(0);
   });
 
   test('has no WCAG A/AA violations', async ({ page }) => {

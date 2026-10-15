@@ -34,7 +34,9 @@ export type SmsTemplateKey =
   | 'booking_changed'
   | 'trip_planned'
   | 'staff_request_approved'
-  | 'staff_request_denied';
+  | 'staff_request_denied'
+  | 'support_reply'
+  | 'reply_no_read';
 
 /** The languages whose texts are signed off one by one; English and Spanish are signed with the template. */
 export type MoreLocale = Exclude<Locale, 'en' | 'es'>;
@@ -464,21 +466,24 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
    * number, skipping the quiet-hours/STOP check every other message goes
    * through (Will, 17 September — deliberate, see `0055_staff_denied_sms.sql`
    * and DECISIONS.md). Names no role, same reason as `staff_request_approved`.
-   * Carries `{supportPhone}` because Will asked specifically that someone
-   * denied has somewhere real to ask why.
+   * Points to the help desk (A28: Pam has no phone line) because Will asked specifically that
+   * someone denied has somewhere real to ask why.
    */
   staff_request_denied: {
     key: 'staff_request_denied',
-    en: 'Pam: Your request was not approved. Questions? Call {supportPhone}.',
-    es: 'Pam: Su solicitud no fue aprobada. Preguntas? Llame al {supportPhone}.',
+    en: 'Pam: Your request was not approved. Questions? Visit joinpam.org/support',
+    // A28: Pam has no phone line. The English is Will's (a59, 11 October); the Spanish and the five later
+    // languages are Lena's, in one segment each (70 characters in Chinese, Russian and Arabic), under the
+    // 9 October approval to learn from.
+    es: 'Pam: Su solicitud no fue aprobada. Preguntas? Visite joinpam.org/support',
     more: {
-      'pt-BR': approved('Pam: Seu pedido nao foi aprovado. Duvidas? Ligue para {supportPhone}.'),
-      'zh-CN': approved('Pam: 您的申请未获批准。有疑问请拨打 {supportPhone}。'),
-      'zh-HK': approved('Pam: 你的申請未獲批准。如有疑問請致電 {supportPhone}。'),
-      'ru': approved('Pam: Заявку не одобрили. Вопросы? Звоните {supportPhone}'),
-      'ar': approved('Pam: لم تتم الموافقة على طلبك. للاستفسار: {supportPhone}'),
+      'pt-BR': approved('Pam: Seu pedido nao foi aprovado. Duvidas? Acesse joinpam.org/support'),
+      'zh-CN': approved('Pam: 您的申请未获批准。有疑问请访问 joinpam.org/support'),
+      'zh-HK': approved('Pam: 你的申請未獲批准。如有疑問請瀏覽 joinpam.org/support'),
+      'ru': approved('Pam: Заявку не одобрили. Вопросы? Зайдите на joinpam.org/support'),
+      'ar': approved('Pam: لم تتم الموافقة على طلبك. للاستفسار: joinpam.org/support'),
     },
-    vars: ['supportPhone'],
+    vars: [],
     reviewedBy: 'Will (Oba), 17 September 2026',
     isFirstContact: false,
   },
@@ -611,17 +616,48 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
   },
   access_limited_notice: {
     key: 'access_limited_notice',
-    en: 'Pam: Some parts of Pam are turned off for now. Call {supportPhone} with questions.',
-    es: 'Pam: Algunas partes de Pam estan apagadas por ahora. Llame al {supportPhone} si tiene preguntas.',
+    en: 'Pam: Some parts of Pam are turned off for now. Questions? Visit joinpam.org/support',
+    // A28, as above: Lena's six, in one segment each, under the 9 October approval to learn from.
+    es: 'Pam: Algunas partes de Pam estan apagadas por ahora. Preguntas? Visite joinpam.org/support',
     more: {
-      'pt-BR': approved('Pam: Algumas partes do Pam estao desligadas por enquanto. Ligue para {supportPhone} se tiver duvidas.'),
-      'zh-CN': approved('Pam: Pam 的部分功能暂时关闭。有疑问请拨打 {supportPhone}。'),
-      'zh-HK': approved('Pam: Pam 部分功能暫時關閉。如有疑問請致電 {supportPhone}。'),
-      'ru': approved('Pam: Часть функций Pam пока отключена. Звоните {supportPhone}'),
-      'ar': approved('Pam: بعض ميزات Pam متوقفة الآن. اتصل بـ {supportPhone}'),
+      'pt-BR': approved('Pam: Algumas partes de Pam estao desligadas por enquanto. Duvidas? Acesse joinpam.org/support'),
+      'zh-CN': approved('Pam: Pam 的部分功能暂时关闭。有疑问请访问 joinpam.org/support'),
+      'zh-HK': approved('Pam: Pam 部分功能暫時關閉。如有疑問請瀏覽 joinpam.org/support'),
+      'ru': approved('Pam: Часть функций пока отключена. Вопросы: joinpam.org/support'),
+      'ar': approved('Pam: بعض ميزات Pam متوقفة الآن. للاستفسار: joinpam.org/support'),
     },
-    vars: ['supportPhone'],
+    vars: [],
     reviewedBy: REVIEWED_BY,
+    isFirstContact: false,
+  },
+  /**
+   * A super admin's answer to a help request, as one text to the number the person typed into the help
+   * form (A28, D-524). `{reply}` is what the super admin wrote (150 characters at most, checked when it is
+   * queued and again by the dispatcher's last check). The wrapper is the signed copy; the words are theirs.
+   * Held by `texts_live` like any non-account text. **Unsigned**: it cannot send until Will signs it.
+   */
+  support_reply: {
+    key: 'support_reply',
+    en: 'Pam: {reply}',
+    es: 'Pam: {reply}',
+    vars: ['reply'],
+    maxVarLengths: { reply: 120 },
+    reviewedBy: '',
+    // The person has never had a text from this number, so the way out travels with it (Twilio): the
+    // answer therefore has 120 characters, not 150, to leave room for "Reply STOP to stop texts."
+    isFirstContact: true,
+  },
+  /**
+   * The one fixed answer to anyone who texts a reply to Pam, which cannot read replies (D-524; Mira's advice,
+   * card a61). Not wired to anything yet: the inbound function still answers nothing (D-460) until Will decides.
+   * **Unsigned**: cannot send until Will signs it.
+   */
+  reply_no_read: {
+    key: 'reply_no_read',
+    en: "Pam: This number can't read replies. Write to hello@joinpam.org.",
+    es: 'Pam: Este numero no puede leer respuestas. Escriba a hello@joinpam.org.',
+    vars: [],
+    reviewedBy: '',
     isFirstContact: false,
   },
 };

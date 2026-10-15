@@ -44,8 +44,8 @@ export const WithSubtitle: Story = {
 export const LongPlaceName: Story = {
   args: {
     title: 'Free Library of Philadelphia — Joseph E. Coleman Northwest Regional Library',
-    backHref: '/places/',
-    backLabel: 'nav.back.places',
+    backHref: '/',
+    backLabel: 'nav.back.explore',
   },
 };
 

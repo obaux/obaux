@@ -30,12 +30,24 @@ export const PHOTOGRAPHS: readonly ImageryItem[] = [
     alsoAt: ['/friend/bring-a-friend-1200.webp'],
   },
   { src: '/og/invite.jpg', name: 'Invite link preview', note: 'Shown when a link is pasted into a text (D-263)' },
+  { src: '/og/add-program.jpg', name: 'Add your program link preview', note: 'Shown when the link in the approval text is pasted or opened (D-496)' },
 ];
 
 export const BRAND: readonly ImageryItem[] = [
   { src: '/pam-wordmark-light.svg', name: 'Wordmark, for light grounds', note: 'Sign in, About Pam' },
   { src: '/pam-wordmark-dark.svg', name: 'Wordmark, for dark grounds', note: 'Dark mode', isOnDark: true },
   { src: '/pam-wordmark-white.svg', name: 'Wordmark, white', note: 'Over pictures (the sign-in carousel)', isOnDark: true },
+  {
+    src: '/google/google-maps-attribution-light.svg',
+    name: 'Google Maps attribution, for light grounds',
+    note: "Google's own \"Gray\" logo, unchanged, 98 × 18, shown at 18px beside the street suggestions (D-557). A third party's mark Google requires; the README in public/google says where the files came from.",
+  },
+  {
+    src: '/google/google-maps-attribution-dark.svg',
+    name: 'Google Maps attribution, for dark grounds',
+    note: 'Google\'s own "White" logo, unchanged, for dark mode (D-557).',
+    isOnDark: true,
+  },
   { src: '/email/pam-logo.png', name: 'Email logo', note: 'Invite and renewal emails (D-263)' },
   {
     src: '/icon-512.png',

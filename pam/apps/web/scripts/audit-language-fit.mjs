@@ -10,6 +10,7 @@
  *
  *   pnpm --filter @pam/web build-storybook
  *   node apps/web/scripts/audit-language-fit.mjs [--locales ru,ar] [--match Cards/] [--out file.json]
+ *     [--width 320] [--height 760]   the window (320 by 568 is the shortest phone: heroes are a share of the height)
  *     [--from earlier.json]   re-check only the stories that run found defects in
  *     [--known scripts/fit-known.json]   defects somebody has looked at and accepted; only others fail the run
  *     [--write-known file.json]          write what this run found as that list (then say why each is accepted)
@@ -27,6 +28,14 @@
  *            Arabic) in a place nobody reads it off the screen: an attribute such as
  *            `aria-label` or `alt`, or text a screen reader speaks and no eye sees (D-435). A label
  *            built with `tPlain` has none; this is what notices one that was not.
+ *
+ * What it cannot see: a carousel shows one slide at a time, and the other slides are scrolled away (a
+ * line wholly outside its scroller is not measured, on purpose). So a carousel needs **one story per
+ * slide**: a story that opens on slide 1 audits slide 1 and nothing else. `src/stories/support/showSlide.ts`
+ * scrolls to a slide (and `chooseAboutTab` picks a tab) in a play function; the welcome slides on Sign in
+ * and in About Pam are the example (`Onboarding` stories, 13 October: slides 2 and 3 of every kind of
+ * person were never measured until they had stories). The same holds for any tab, drawer or step that
+ * shows its text only after a tap.
  *
  * English is the baseline: a defect that is already there in English is the
  * design's, not the translation's, and is listed apart. Only defects that are
@@ -50,6 +59,8 @@ const opt = (name, fallback) => {
 const LOCALES = opt('locales', 'en,es,pt-BR,zh-CN,zh-HK,ru,ar').split(',');
 const MATCH = opt('match', '');
 const WIDTH = Number(opt('width', '320'));
+/** The window's height: 760 by default; 568 is the shortest phone Pam supports (an iPhone SE), where a hero that is half the window is shorter. */
+const HEIGHT = Number(opt('height', '760'));
 const WORKERS = Number(opt('workers', '4'));
 const OUT = opt('out', '');
 const FROM = opt('from', '');
@@ -86,7 +97,7 @@ if (FROM) {
   const again = new Set(JSON.parse(fs.readFileSync(FROM, 'utf8')).fresh.map((f) => f.id));
   for (let i = stories.length - 1; i >= 0; i--) if (!again.has(stories[i].id)) stories.splice(i, 1);
 }
-console.error(`${stories.length} stories × ${LOCALES.length} languages at ${WIDTH}px`);
+console.error(`${stories.length} stories × ${LOCALES.length} languages at ${WIDTH}×${HEIGHT}px`);
 
 /** Runs in the page. Returns [{kind, key, text, detail}]. */
 function measure() {
@@ -306,7 +317,7 @@ async function run() {
   const failures = [];
   await Promise.all(
     Array.from({ length: WORKERS }, async () => {
-      const ctx = await browser.newContext({ viewport: { width: WIDTH, height: 760 }, reducedMotion: 'reduce' });
+      const ctx = await browser.newContext({ viewport: { width: WIDTH, height: HEIGHT }, reducedMotion: 'reduce' });
       // The example visits are "in 2 days", "in 5 days": their dates move with the calendar, and so
       // did the text a defect is recorded under — the accepted list went stale overnight (10 October,
       // "Wednesday, Oct 14" became "Thursday, Oct 15"). Every story sees the same day, which then

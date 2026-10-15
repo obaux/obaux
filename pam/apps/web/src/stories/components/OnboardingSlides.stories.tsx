@@ -38,6 +38,8 @@ function LocalisedSlides({ slides, label, header }: OnboardingSlidesProps) {
       slides={slides.map((slide) => ({ ...slide, text: tr(slide.text) }))}
       label={tr(label)}
       header={header}
+      pauseLabel={tr('carousel.pause')}
+      playLabel={tr('carousel.play')}
     />
   );
 }
@@ -60,7 +62,7 @@ const meta = {
     ),
   ],
   render: (args) => <LocalisedSlides {...args} />,
-  args: { slides: SLIDES, label: 'onboarding.label', header: <HeroHeader /> },
+  args: { slides: SLIDES, label: 'onboarding.label', header: <HeroHeader />, pauseLabel: 'carousel.pause', playLabel: 'carousel.play' },
   argTypes: { header: { control: false } },
 } satisfies Meta<typeof OnboardingSlides>;
 

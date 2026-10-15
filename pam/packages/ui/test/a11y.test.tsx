@@ -67,6 +67,8 @@ describe('accessibility', () => {
     const { container } = render(
       <OnboardingSlides
         label="How Pam works"
+        pauseLabel="Pause"
+        playLabel="Play"
         slides={[
           { id: 'a', image: '/onboarding/places.svg', text: 'Find places near you that can help.' },
           { id: 'b', image: '/onboarding/people.svg', text: 'A real person can answer questions.' },

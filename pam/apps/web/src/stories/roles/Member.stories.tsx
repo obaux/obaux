@@ -25,6 +25,8 @@ export const Trips: Story = screen('member', 'Trips', '/trips/');
 export const TripsJustBooked: Story = screen('member', 'Trips — just booked', '/trips/', { added: 'dummy-trip-1' });
 export const Messages: Story = screen('member', 'Messages', '/messages/');
 export const Profile: Story = screen('member', 'Profile', '/profile/');
+/** A member asks to add a program (D-525): the program questions, sent as a request Pam checks. */
+export const AddMyProgram: Story = screen('member', 'Add my program', '/profile/add-program/');
 /** A member who also works at a program (D-374): pick which side to use Pam as. */
 export const UseAs: Story = screen('member', 'Use Pam as — member and program', '/use-as/');
 
@@ -79,6 +81,18 @@ export const PlaceVisit: Story = screen('member', 'A place with a visit', '/plac
   from: 'trips',
   trip: 'dummy-trip-1',
 });
+/*
+ * Two kinds of place (D-498): one a program lead added on Pam, and one gathered from a public
+ * list. Only the first has anybody on Pam to be told about a visit, so the second says the plan
+ * is only the member's.
+ */
+export const PlaceWithLead: Story = screen('member', 'A place with a program lead', '/place/', { id: 'dummy-place-learning' });
+export const PlaceNoLead: Story = screen('member', 'A place with no program lead', '/place/', { id: 'dummy-place-library' });
+export const PlanTripNoLead: Story = screen('member', 'Plan a trip — place with no program lead', '/trips/new/', {
+  place: 'dummy-place-library',
+  name: 'Example Library Tech Lab',
+  category: 'education',
+});
 // A program's policies, read and signed by a member (D-270).
 export const PlacePolicies: Story = screen('member', 'Policies to sign', '/place/policies/', {
   id: 'dummy-place-learning',
@@ -129,6 +143,7 @@ export const Points: Story = screen('member', 'Points', '/points/');
 export const Reminders: Story = screen('member', 'Text reminders', '/reminders/');
 export const TextAlerts: Story = screen('member', 'Text alerts', '/alerts/');
 export const Language: Story = screen('member', 'Language', '/language/');
+export const Calendar: Story = screen('member', 'Calendar link', '/calendar/');
 export const GetHelp: Story = screen('member', 'Get help', '/help/');
 export const HelpTopics: Story = screen('member', 'What we can help with', '/help/topics/');
 export const HelpSafety: Story = screen('member', 'Your safety', '/help/safety/');
@@ -140,6 +155,8 @@ export const Privacy: Story = screen('member', 'Privacy policy', '/privacy/');
 
 // Before any of it.
 export const SignIn: Story = screen('signed-out', 'Sign in', '/signin/');
+/** The code step after a code that did not work (D-510): a small alert under the boxes, no Call. */
+export const SignInWrongCode: Story = screen('member', 'Sign in — wrong code', '/prototype/signin/', { wrong: '1' });
 // Sign up, step by step, is below (D-319); the whole walk, from the phone, here.
 export const SignUpWalk: Story = screen('member', 'Sign up — the whole walk', '/prototype/join/', { kind: 'member' });
 

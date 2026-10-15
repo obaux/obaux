@@ -5,15 +5,33 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Link } from '@astryxdesign/core/Link';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { tap } from '../lib/tap';
+import { website } from '../lib/website.stylex';
+import { type } from '../lib/website-type.stylex';
 import { Frame } from '../components/Frame';
+import { PostNav } from '../components/PostNav';
 import { StillStuck } from '../components/StillStuck';
+import { lastBlockGap } from '../lib/last-block-gap';
+import { STILL_STUCK, collectSections } from '../lib/sections';
 import { BODIES } from '../content/bodies';
 import { anyPostBySlug, formatDate, postBySlug } from '../content/posts';
 
+const crumbLink = stylex.create({ text: { color: website['--website-text-link'] } });
+
 const styles = stylex.create({
+  // The post and, from 1180px, its "On this page" column beside it.
+  layout: {
+    display: 'grid',
+    gridTemplateColumns: { default: 'minmax(0, 1fr)', '@media (min-width: 1180px)': 'minmax(0, 860px) 220px' },
+    columnGap: '40px',
+    justifyContent: 'center',
+    alignItems: 'start',
+    width: '100%',
+  },
   // One centred reading column for the whole post, as on Figma Learn: header, who it is for, body.
-  column: { width: '100%', maxWidth: '920px', marginInline: 'auto' },
+  // The menu comes first in the page (so Tab reaches it before the post, Iris SP4) and sits in the right-hand column; the post takes the first free cell.
+  menuCell: { alignSelf: 'stretch', gridColumn: { default: 'auto', '@media (min-width: 1180px)': 2 }, gridRow: 1, minWidth: 0 },
+  column: { width: '100%', maxWidth: '920px', marginInline: 'auto', minWidth: 0 },
   header: { alignItems: 'center', textAlign: 'center' },
   crumbs: { alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' },
   // The page you are on, as a small gray pill at the end of the path.
@@ -21,10 +39,14 @@ const styles = stylex.create({
     paddingBlock: '4px',
     paddingInline: '10px',
     borderRadius: '8px',
-    backgroundColor: colorVars['--color-background-gray'],
+    backgroundColor: website['--website-surface-gray'],
+    color: website['--website-text-primary'],
     fontWeight: 600,
+    // On a phone the title is right below, so the path stops at "Support" (it read three times at 320px).
+    display: { default: 'inline-block', '@media (max-width: 519px)': 'none' },
   },
-  title: { maxWidth: '24ch' },
+  arrow: { display: { default: 'inline-block', '@media (max-width: 519px)': 'none' } },
+  title: { maxWidth: '24ch', color: website['--website-text-primary'], margin: 0 },
   // "Who this is for": an outlined box under the title, like Figma's "Who can use this feature".
   meta: {
     width: '100%',
@@ -33,12 +55,12 @@ const styles = stylex.create({
     borderRadius: '12px',
     borderWidth: '1px',
     borderStyle: 'solid',
-    borderColor: colorVars['--color-border-emphasized'],
-    backgroundColor: colorVars['--color-background-card'],
+    borderColor: website['--website-border-strong'],
+    backgroundColor: website['--website-surface-page'],
   },
   audience: { alignItems: 'center' },
   metaTitle: { fontWeight: 700 },
-  icon: { flexShrink: 0, width: '20px', height: '20px', color: colorVars['--color-icon-gray'] },
+  icon: { flexShrink: 0, width: '20px', height: '20px', color: website['--website-icon-primary'] },
 });
 
 function PeopleGlyph() {
@@ -74,24 +96,31 @@ export function PostScreen({ slug, allowDraft = false }: { readonly slug: string
   const post = allowDraft ? anyPostBySlug(slug) : postBySlug(slug);
   const Body = BODIES[slug];
   if (!post || !Body) return null;
+  // The sections, read from the body's own element: the menu is in the first paint.
+  const withStuck = post.stillStuck !== false;
+  const sections = withStuck ? [...collectSections(Body(), slug), STILL_STUCK] : collectSections(Body(), slug);
   return (
     <Frame width="wide" gap={6}>
-      <VStack as="article" gap={10} xstyle={styles.column} data-page="post">
+      <div {...stylex.props(styles.layout)}>
+      <div {...stylex.props(styles.menuCell)}>
+        <PostNav sections={sections} variant="side" />
+      </div>
+      <VStack as="article" gap={10} xstyle={[styles.column, lastBlockGap.end]} data-page="post">
         {post.status === 'draft' ? (
           <Banner status="warning" title="Draft, not published: held until the feature ships. Not on the site, in Support or in search." />
         ) : null}
         <VStack gap={6} paddingBlockStart={8}>
           <VStack gap={4} xstyle={styles.header}>
             <HStack as="nav" gap={2} xstyle={styles.crumbs} aria-label="Breadcrumb">
-              <Link href="/support/">Support</Link>
-              <Text type="supporting" aria-hidden>
+              <Link href="/support/" hasUnderline xstyle={[tap.link, crumbLink.text]}>Support</Link>
+              <Text type="supporting" aria-hidden xstyle={styles.arrow}>
                 →
               </Text>
               <Text aria-current="page" xstyle={styles.here}>
                 {post.title}
               </Text>
             </HStack>
-            <Heading level={1} type="display-3" xstyle={styles.title}>
+            <Heading level={1} xstyle={[type.heading_title35, styles.title]}>
               {post.title}
             </Heading>
           </VStack>
@@ -104,9 +133,11 @@ export function PostScreen({ slug, allowDraft = false }: { readonly slug: string
             <Text type="supporting">Updated {formatDate(post.updated)}</Text>
           </VStack>
         </VStack>
+        <PostNav sections={sections} variant="bar" />
         <Body />
-        <StillStuck />
+        {withStuck ? <StillStuck /> : null}
       </VStack>
+      </div>
     </Frame>
   );
 }

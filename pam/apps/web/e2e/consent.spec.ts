@@ -76,7 +76,7 @@ test.describe('agreeing to reminders', () => {
     await page.goto('/reminders/');
     await expect(page.getByText(/reminder before a visit/i)).toBeVisible();
     // No promise about how often: only what really goes out today (10 October 2026, D-453).
-    await expect(page.getByText(/Today Pam sends only one of these/i)).toBeVisible();
+    await expect(page.getByText(/Pam does not send any of these yet/i)).toBeVisible();
     await expect(page.getByText(/few messages a week/i)).toHaveCount(0);
     await expect(page.getByText(/Reply STOP/)).toBeVisible();
     await expect(page.getByText(/rates may apply/i)).toBeVisible();
@@ -215,6 +215,9 @@ test.describe('arriving by an invite link (D-254)', () => {
   test('says what they were invited to be, and the pictures speak to that work', async ({ page }) => {
     await page.goto('/signin/?invite=PAM7Q4KX&as=case-manager');
     await expect(page.getByRole('note')).toHaveText(en['signin.invited.admin']);
+    // W6 (Will, 13 October): a newcomer from an invite is joining, not signing in again.
+    await expect(page.getByRole('heading', { name: 'Join Pam', level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Sign in', level: 1 })).toHaveCount(0);
     await expect(page.getByText(en['onboarding.admin.1'])).toBeVisible();
     // Still the one sign in: the number, the consent line, the button.
     await expect(page.getByText(en['signin.phone.consent'])).toBeVisible();
@@ -237,6 +240,10 @@ test.describe('arriving by an invite link (D-254)', () => {
         body: JSON.stringify([{ inviter_first_name: 'Dana', invited_role: 'provider', state: 'expired' }]),
       }),
     );
+    // Invite emails are switched on (D-563): only then is the new link offered.
+    await page.route('**/rest/v1/app_settings*', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ value: 'on' }) }),
+    );
     const asked: Record<string, unknown>[] = [];
     await page.route('**/rest/v1/rpc/request_invite_link*', async (route) => {
       asked.push(route.request().postDataJSON() as Record<string, unknown>);
@@ -246,6 +253,8 @@ test.describe('arriving by an invite link (D-254)', () => {
     await page.goto('/signin/?invite=PAM7Q4KX&as=program');
     await expect(page).toHaveURL(/\/invite\/expired\/\?invite=PAM7Q4KX&as=program/);
     await expect(page.getByRole('heading', { name: en['invite.expired.title'], level: 1 })).toBeVisible();
+    // Its line keeps its own words: "Start with your phone number" would be wrong here.
+    await expect(page.getByRole('note')).toHaveText(en['invite.expired.invited.provider']);
     await expect(page.getByText('Dana invited you to be a program partner in the Pam network.', { exact: false })).toBeVisible();
 
     // Not an address: said so, and nothing is asked for.
@@ -260,6 +269,27 @@ test.describe('arriving by an invite link (D-254)', () => {
     await expect(page.getByText(/andre@example\.org/)).toBeVisible();
     // The language the page was read in goes with it (0085): the email is written in it.
     expect(asked[0]).toMatchObject({ p_code: 'PAM7Q4KX', p_email: 'andre@example.org', p_language: 'en' });
+  });
+
+  test('while invite emails are off, the expired link offers no email, and the help desk is the way on (D-563)', async ({ page }) => {
+    // Sage, 13 October: "while invite emails are switched off, the whole 'Email me a new link' offer is untrue".
+    await page.route('**/rest/v1/rpc/invite_preview*', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([{ inviter_first_name: 'Dana', invited_role: 'member', state: 'expired' }]),
+      }),
+    );
+    await page.route('**/rest/v1/app_settings*', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ value: 'off' }) }),
+    );
+    await page.goto('/invite/expired/?invite=PAM7Q4KX&as=member');
+    await expect(page.getByRole('heading', { name: en['invite.expired.title'], level: 1 })).toBeVisible();
+    await expect(page.getByText('Dana invited you to join the Pam network.', { exact: false })).toBeVisible();
+    await expect(page.getByText(en['invite.expired.ask'])).toHaveCount(0);
+    await expect(page.getByLabel(en['invite.expired.email'])).toHaveCount(0);
+    await expect(page.getByRole('button', { name: en['invite.expired.action'] })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: en['help.contact.action'] })).toHaveAttribute('href', /\/support\/$/);
   });
 
   test('plain sign in has no invite line', async ({ page }) => {
@@ -381,19 +411,19 @@ test.describe('phone and code fields', () => {
     await expect(phone).toHaveAttribute('inputmode', 'tel');
   });
 
-  test('focus lights up the whole field, not a box inside it', async ({ page }) => {
+  test('focus draws no ring on the field or its frame; the cursor shows where you are (D-569)', async ({ page }) => {
     await page.goto('/signin/');
     const phone = page.getByLabel('Your phone number');
     await phone.focus();
+    await expect(phone).toBeFocused();
 
-    // The ring belongs on the frame a person can see. A second rectangle drawn
-    // inside the first reads as a stray element — and collided with the label.
+    // Will, 14 October (a83): no highlight on a text box, however focus got there.
     const outlines = await phone.evaluate((el) => ({
       input: getComputedStyle(el).outlineStyle,
       frame: getComputedStyle(el.parentElement as HTMLElement).outlineStyle,
     }));
     expect(outlines.input).toBe('none');
-    expect(outlines.frame).toBe('solid');
+    expect(outlines.frame).toBe('none');
   });
 });
 
@@ -453,9 +483,11 @@ test.describe('the way in explains itself', () => {
     await page.getByRole('button', { name: en['signin.phone.action'] }).click();
 
     await expect(page.getByText(en['signin.failed.send.title'])).toBeVisible();
-    await expect(page.getByRole('link', { name: en['help.callSupport'] })).toHaveAttribute(
+    // Pam has no phone line (A28): the way on is Contact Pam. Signed out, it opens the help desk on the
+    // website directly (Help is a screen of the app, and this person cannot get in).
+    await expect(page.getByRole('link', { name: en['help.contact.action'] })).toHaveAttribute(
       'href',
-      /^tel:/,
+      'https://joinpam.org/support/',
     );
   });
 });

@@ -1,8 +1,7 @@
-import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { ReadMore } from '../components/Prose';
-import { PRIVACY_URL } from '../lib/links';
+import { LegalLink } from '../components/LegalLink';
+import { Section } from '../components/Prose';
 
 /**
  * Support post: Case manager assignments.
@@ -24,27 +23,25 @@ export function CaseManagerAssignments() {
         you. If you joined another way, you may not have one yet.
       </Text>
 
-      <VStack gap={2}>
-        <Heading level={2}>A case manager looks after their own members</Heading>
+      <Section title="A case manager looks after their own members">
         <Text as="p">
           Each member has one case manager at a time. A case manager looks after the members assigned to
           them, and only those members. They can’t see or change anyone else’s account.
         </Text>
-      </VStack>
+      </Section>
 
-      <VStack gap={2}>
-        <Heading level={2}>Every change to your account has a reason</Heading>
+      <Section title="Every change to your account has a reason">
         <Text as="p">
           If an account is hurting other people, we can turn off parts of Pam for it. Whoever does it has to
           write down why, and the reason is kept in a log.
         </Text>
         <Text as="p">
           A limited account can read messages but can’t send them. A paused account can’t sign in. Pam
-          always tells you when something is turned off and who to call, and you can always call Pam for
+          always tells you when something is turned off and who to ask, and you can always contact Pam for
           help.
         </Text>
-        <ReadMore label="Read the privacy policy" href={PRIVACY_URL} />
-      </VStack>
+        <LegalLink kind="privacy" label="Read the privacy policy" variant="read-more" />
+      </Section>
     </VStack>
   );
 }

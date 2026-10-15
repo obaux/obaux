@@ -19,7 +19,9 @@
  *               marks it so the newest changes stand out
  *     actions — steps the capture script performs before the screenshot
  *               ({ fill: label, value } | { click: accessible name } |
- *                { press: key } | { wait: ms })
+ *                { press: key } | { wait: ms } |
+ *                { drag: name, dx?, dy? }  press on it, move by dx/dy px, let go: a drawer or sheet |
+ *                { scroll: name | 'page', by: px }  scroll that thing, or the page, down (up if negative))
  *     image   — a file instead of a story (the link preview picture)
  *   edge:    [from, to, label, { dashed? }] — dashed for a way back or a
  *            link that leaves the app (a text, an email)
@@ -27,7 +29,7 @@
  *   changes  — the newest decisions this flow shows, newest first
  */
 
-export const UPDATED = '2026-10-10';
+export const UPDATED = '2026-10-14';
 
 /**
  * Where each screen opens live: Chromatic's build of `main`, `https://main--<app id>.chromatic.com`.
@@ -58,8 +60,8 @@ export const flows = [
         title: 'Sign in — invited',
         story: 'onboarding--case-manager',
         path: '/signin/?invite=…&as=case-manager',
-        changed: 'D-254',
-        note: 'Black invite line, slides for their role',
+        changed: 'D-563',
+        note: 'Black invite line, slides for their role; the title says Join Pam, not Sign in, for somebody invited (W6)',
       },
       code: {
         title: 'The code we texted',
@@ -89,6 +91,20 @@ export const flows = [
           { wait: 2000 },
         ],
       },
+      privacy: {
+        title: 'What you will see',
+        story: 'onboarding-staff-privacy-step--case-manager-invited',
+        path: '/join/ (privacy step)',
+        changed: 'D-563',
+        note: 'The last sign-up step for a case manager (a program lead gets "What to expect"); the same step for somebody who asked to join without an invite',
+      },
+      askedNotice: {
+        title: 'We will text you',
+        story: 'onboarding-staff-privacy-step--asked-notice-on-its-own',
+        path: '/join/ (after asking to join)',
+        changed: 'D-563',
+        note: 'Somebody who asked to join with no invite: Pam looks at the request and texts them',
+      },
       cmHome: {
         title: 'Case manager Home',
         story: 'case-manager-screens--home',
@@ -102,6 +118,13 @@ export const flows = [
         path: '/signin/',
         changed: 'D-266',
         note: 'The card sits flat under the pictures',
+      },
+      wrongCode: {
+        title: 'A code that did not work',
+        story: 'member-created--sign-in-wrong-code',
+        path: '/signin/ (wrong or expired code)',
+        changed: 'D-510',
+        note: 'Stays on the code step: a small alert under the boxes, the boxes emptied with the cursor in them, Send again, and a quiet Need help? Contact Pam to the help desk (D-527). No Call, no trip back to the number',
       },
       about: {
         title: 'About Pam',
@@ -120,14 +143,9 @@ export const flows = [
       },
       sent: {
         title: 'Check your email',
-        story: 'onboarding--expired-link',
+        story: 'onboarding--expired-link-sent',
         path: '/invite/expired/ (sent)',
         changed: 'D-263',
-        actions: [
-          { fill: 'Your email', value: 'andre@example.org' },
-          { click: 'Email me a new link' },
-          { wait: 800 },
-        ],
       },
       inUse: {
         title: 'This number is already in Pam',
@@ -157,13 +175,19 @@ export const flows = [
       ['code', 'join', '6-digit code'],
       ['code', 'inUse', 'Staff invite, number already a member'],
       ['code', 'addProgram', 'Program invite, member in the same city'],
-      ['join', 'cmHome', 'I understand — straight to Home'],
+      ['join', 'privacy', 'Next'],
+      ['privacy', 'cmHome', 'I understand — straight to Home'],
+      ['privacy', 'askedNotice', 'No invite: Join', { dashed: true }],
       ['signin', 'about', 'About Pam (footer)'],
+      ['signin', 'wrongCode', 'A wrong or expired code', { dashed: true }],
       ['signin', 'memberJoin', 'Sign up'],
       ['expired', 'sent', 'Email me a new link'],
       ['sent', 'email', 'Arrives by email', { dashed: true }],
     ],
     changes: [
+      '14 October — an invited person sees "Join Pam" on the first screen (D-563); sign-up for a case manager or a program lead ends on its privacy step ("What you will see" / "What to expect"), and somebody who asked to join with no invite is told "We will text you"; a member\'s Join has a language dropdown and the invite code behind a question (D-563, D-564)',
+      "13 October (S1) — the website's Add your program arrives at Sign in and, once signed in, goes on to Add my program for a member or a case manager (a program lead goes Home); the reminders question waits for next time",
+      "D-510, D-527: a code that did not work keeps you on the code step with a small alert, and Need help? Contact Pam goes to the help desk; Sign in waits for all six digits (D-532)",
       'D-474 — the third slide says "Pam keeps your planned visits in one place" (it promised a reminder text); a program lead\'s second slide says "Members find your program and plan a visit"',
       'D-375 — a member can add their program to the same account; Use Pam as on Profile',
       'D-373 — invites need a name and phone; sign-in finds an invite waiting for the number; a member\'s number can\'t take a staff invite yet',
@@ -196,6 +220,43 @@ export const flows = [
         path: '/place/',
         changed: 'D-440',
         note: 'One layout: the ways to reach it as rows, About, the address (tap it to open Google or Apple Maps; a small copy button); Plan a trip pinned to the foot. Pre-booking: grey service cards first; walk-ins say when they meet. Post-booking: the visit card names the service',
+      },
+      placeOnPam: {
+        title: 'A place on Pam (a program runs it)',
+        story: 'member-created--place-with-lead',
+        path: '/place/ (a program on Pam)',
+        actions: [{ scroll: 'page', by: 700 }, { wait: 500 }],
+        changed: 'D-541',
+        note: 'Message is a row and a menu item: a member can write to the program before booking (D-541). Under Plan a trip, the program will see your visit: your first name, the day and time, the service you picked, and whether you were marked as there (D-526)',
+      },
+      placeGathered: {
+        title: 'A place gathered from the internet',
+        story: 'member-created--place-no-lead',
+        path: '/place/ (nobody on Pam runs it)',
+        actions: [{ scroll: 'page', by: 700 }, { wait: 500 }],
+        changed: 'D-544',
+        note: "No Message row or menu item, because nobody on Pam can answer; they wait, not flash in and out, while Pam works it out (D-544). No I'm here or I went (D-545). The plan is only the member's, and says so (D-498)",
+      },
+      imHere: {
+        title: "A visit that is on now: I'm here",
+        story: 'member-created-states-saved-trips--im-here',
+        path: '/place/ (a visit that is on now)',
+        changed: 'D-535',
+        note: "A card with I'm here (Pam checks where you are once and keeps no position) and I went (when it cannot tell; three times in seven days). Done: Your visit is marked, and the points. Only at a place with a program on Pam (D-545)",
+      },
+      newTripNoLead: {
+        title: 'Plan a visit: a place nobody on Pam runs',
+        story: 'member-created--plan-trip-no-lead',
+        path: '/trips/new/ (a place gathered from the internet)',
+        changed: 'D-498',
+        note: "From a place nobody on Pam runs: When (shown), then Check, which says the plan is only yours: Pam does not tell the place you are coming (D-498). A place a program runs says the program will see the visit instead (D-526)",
+      },
+      addMyProgram: {
+        title: 'Add my program',
+        story: 'member-created--add-my-program',
+        path: '/profile/add-program/',
+        changed: 'D-525',
+        note: 'A member asks to add a program: the program questions, one screen each, sent as a request Pam checks',
       },
       booked: {
         title: 'Your trip is booked',
@@ -293,6 +354,13 @@ export const flows = [
         note: 'A switch for each kind of text',
       },
       reminders: { title: 'Text reminders (first yes)', story: 'member-created--reminders', path: '/reminders/' },
+      calendar: {
+        title: 'Calendar link',
+        story: 'member-created--calendar',
+        path: '/calendar/',
+        changed: 'D-538',
+        note: 'A secret address for their Pam visits to follow in their own calendar app (Apple, Google, others); shown once, can be made new or turned off',
+      },
       language: { title: 'Language', story: 'member-created--language', path: '/language/' },
       help: { title: 'Get help', story: 'member-created--get-help', path: '/help/' },
       helpSafety: { title: 'Your safety', story: 'member-created--help-safety', path: '/help/safety/' },
@@ -317,11 +385,21 @@ export const flows = [
         story: 'member-created-states-saved-trips--trips-with-a-past-visit',
         path: '/trips/',
         changed: 'New',
+        // The list is in a drawer that opens halfway; the past visit is below, so drag the handle up (a generator
+        // `drag` action, which any screen with a drawer or sheet can use).
+        actions: [{ drag: 'Show more of your trips', dy: -450 }, { wait: 700 }],
         note: 'A visit whose day has gone moves down to Past visits, most recent first, with no policies to sign; coming up stays on the map',
       },
     },
     edges: [
       ['explore', 'place', 'Tap a place'],
+      ['explore', 'placeOnPam', 'Tap a place a program runs'],
+      ['explore', 'placeGathered', 'Tap a place gathered from the internet'],
+      ['placeOnPam', 'thread', 'Message (the program, before booking)'],
+      ['placeOnPam', 'newTrip', 'Plan a trip'],
+      ['placeGathered', 'newTripNoLead', 'Plan a trip (only yours)'],
+      ['newTripNoLead', 'booked', 'Add this trip'],
+      ['trips', 'imHere', 'A visit that is on now'],
       ['place', 'newTrip', 'Plan a trip · Change appointment'],
       ['place', 'report', 'Report'],
       ['place', 'policies', 'Policies to sign', { over: true }],
@@ -347,14 +425,20 @@ export const flows = [
       ['connections', 'thread', 'Message (round button)', { dashed: true }],
       ['profile', 'reminders', 'Get text reminders'],
       ['reminders', 'alerts', 'Then: switches'],
+      ['profile', 'calendar', 'Calendar link'],
       ['profile', 'language', 'Language'],
       ['profile', 'help', 'Get help'],
       ['help', 'helpSafety', 'Your safety'],
       ['profile', 'legal', 'Legal'],
       ['legal', 'whoSees', 'Who can see what'],
       ['profile', 'points', 'Points'],
+      ['profile', 'addMyProgram', 'Add my program'],
     ],
     changes: [
+      'D-538 — Calendar link on Profile: a member makes a secret address for their Pam visits and follows them in their own calendar app',
+      'D-565 — the old Places list is gone: Explore is the one list a member searches (staff have All programs)',
+      'D-525 — Add my program: a member asks to add their program from Profile; Pam checks the request',
+      "D-541, D-544, D-545: a place a program runs lets a member message it before booking; a place nobody on Pam runs shows no Message and no I'm here; the visit card says the program sees the visit",
       'D-472 — Points: four ways to earn that Pam pays (plan a trip once per place, call a place once per place and five a day, save a place, finish setting up); badge names wrap, never cut',
       'New — a coming-up visit can be cancelled from its place page (asks first); a visit whose day has gone moves to Past visits on Trips',
       'D-474 — a line on screen promises only a text Pam sends: the visit-reminder promises are gone from the booked screens and Profile\'s cards',
@@ -383,18 +467,24 @@ export const flows = [
   {
     key: 'case-manager',
     title: 'Case manager',
-    note: 'The tab bar is live in the app (D-456). Home is the old Home; the redesigned one with rings is beside it as Proposed, not in the app (card a22).',
+    note: 'The tab bar and the redesigned Home are live in the app (D-456, D-486): Home has the row of rings, and an empty row with a (+) when nobody is on the list.',
     intro:
       'Four tabs: Home (their members), Saved, Messages, Profile. A case manager invites people, keeps up with their members and connects them to programs.',
     roots: ['home', 'saved', 'messages', 'profile'],
     nodes: {
-      home: { title: 'Home — your members', story: 'case-manager-screens--home', path: '/' },
-      homeRings: {
-        title: 'Home with rings',
-        story: 'case-manager-states-home--caseload',
-        path: '/ (redesigned, in Storybook only)',
-        proposed: true,
-        note: 'Under the title, a row of rings on the people with something new, those first (D-198, D-477). Staff use the old Home until Will says the rings stay (card a22)',
+      home: {
+        title: 'Home — your members',
+        story: 'case-manager-screens--home',
+        path: '/',
+        changed: 'D-486',
+        note: 'Under the title, a row of rings on the people with something new, those first (D-198, D-477); a tap opens the conversation or the person',
+      },
+      homeEmpty: {
+        title: 'Home — nobody yet',
+        story: 'case-manager-states-home--empty',
+        path: '/ (nobody on the list)',
+        changed: 'D-486',
+        note: 'Faint circles where people will be; the first is a (+), "Invite someone", and starts a member invite. Shown to an account that just signed up',
       },
       member: { title: 'A member', story: 'case-manager-screens--member', path: '/person/' },
       past: { title: 'Past trips', story: 'case-manager-screens--member-past-trips', path: '/person/past/' },
@@ -460,7 +550,8 @@ export const flows = [
       ['member', 'memberSaved', 'Saved programs'],
       ['member', 'connect', 'Connect'],
       ['home', 'invite', 'Invite someone (floating)'],
-      ['home', 'homeRings', 'If the rings stay (a22)', { dashed: true }],
+      ['home', 'homeEmpty', 'Nobody on the list yet', { dashed: true }],
+      ['homeEmpty', 'inviteReady', 'Tap the (+)'],
       ['invite', 'inviteWho', 'Invite a program / case manager'],
       ['invite', 'inviteReady', 'Invite a member'],
       ['messages', 'thread', 'Open'],
@@ -469,12 +560,12 @@ export const flows = [
       ['profile', 'alerts', 'Text alerts'],
       ['profile', 'reported', 'Reported places'],
     ],
-    changes: ['D-189 — Reported places is a screen of its own, from Profile and the bell\'s "a place was reported" row, no longer only a chip on the old Places page', 'D-464 — Messages: a case manager and a super admin see Conversations | Reported (reported messages), and the bell\'s reported-message row opens Reported', 'D-463 — a conversation: ⋯ has Block this person (asks first; Unblock once blocked); after a block the composer says who blocked, and everything said stays readable and reportable', 'D-441 — inviting a program or a case manager asks for their email, required: it lands on their account when they sign in with that number; a member is never asked', "D-411 — a conversation: back and ⋯ where every nested screen has them, the name large, no fade; ⋯ outlined; Messages rows start at the page edge; dialogs open with no button chosen", 'D-400–401 — a conversation: a smaller visit card and a blurred fade under the header; one line under the name; an even frame round photos; the send button tucked into a rounder corner; photos open on near-black', 'D-399 — a conversation: send a PDF or Word file (the document button, or drop it on), opened when tapped; a Google Docs link shows as a card that opens it in Google', 'D-395 — a conversation: under the name, who they are in full (Program lead at Example Food Pantry; Case manager), not a cut-off tag', 'D-394 — a conversation: send a photo (the picture button beside the mic), tap one to see it full size; only the two people see it, and whoever checks a report about it', 'D-390 — a conversation: mine light green, theirs grey, no name or time on a bubble; drag sideways to see the times; closer to the edges; bolder mic and send', "D-389 — a conversation: one divider per day (Today, Yesterday, a weekday, a date), each bubble just its time; the composer one rounded box, mic left, round send grey until there is text, then dark green", 'D-347 — Add a program asks one question a screen, then a review', 'D-315 — a case manager can invite a case manager', 'D-263 — Invite someone makes the link straight away', 'D-260 — text alert switches'],
+    changes: ['D-486 — Home is the redesigned one with the rings of people with something new; with nobody on the list, faint circles and a (+) that starts an invite (Will, card a22)', 'D-189 — Reported places is a screen of its own, from Profile and the bell\'s "a place was reported" row, no longer only a chip on the old Places page', 'D-464 — Messages: a case manager and a super admin see Conversations | Reported (reported messages), and the bell\'s reported-message row opens Reported', 'D-463 — a conversation: ⋯ has Block this person (asks first; Unblock once blocked); after a block the composer says who blocked, and everything said stays readable and reportable', 'D-441 — inviting a program or a case manager asks for their email, required: it lands on their account when they sign in with that number; a member is never asked', "D-411 — a conversation: back and ⋯ where every nested screen has them, the name large, no fade; ⋯ outlined; Messages rows start at the page edge; dialogs open with no button chosen", 'D-400–401 — a conversation: a smaller visit card and a blurred fade under the header; one line under the name; an even frame round photos; the send button tucked into a rounder corner; photos open on near-black', 'D-399 — a conversation: send a PDF or Word file (the document button, or drop it on), opened when tapped; a Google Docs link shows as a card that opens it in Google', 'D-395 — a conversation: under the name, who they are in full (Program lead at Example Food Pantry; Case manager), not a cut-off tag', 'D-394 — a conversation: send a photo (the picture button beside the mic), tap one to see it full size; only the two people see it, and whoever checks a report about it', 'D-390 — a conversation: mine light green, theirs grey, no name or time on a bubble; drag sideways to see the times; closer to the edges; bolder mic and send', "D-389 — a conversation: one divider per day (Today, Yesterday, a weekday, a date), each bubble just its time; the composer one rounded box, mic left, round send grey until there is text, then dark green", 'D-347 — Add a program asks one question a screen, then a review', 'D-315 — a case manager can invite a case manager', 'D-263 — Invite someone makes the link straight away', 'D-260 — text alert switches'],
   },
   {
     key: 'program-lead',
     title: 'Program lead',
-    note: 'The tab bar is live in the app (D-456). Home is the old Home; the redesigned one with rings is beside it as Proposed, not in the app (card a22).',
+    note: 'The tab bar and the redesigned Home are live in the app (D-456, D-486): Home has the row of rings, and an empty row with a (+) when nobody is on the list.',
     intro:
       'Four tabs: Home (who is coming in), Program, Messages, Profile. A program lead looks after their listing, the policies participants sign, and the people booked in. A new lead\'s Home is getting started until somebody books.',
     roots: ['getStarted', 'home', 'program', 'messages', 'profile'],
@@ -535,19 +626,19 @@ export const flows = [
         changed: 'D-385',
         note: 'Read-only: the date sent and every answer. ⋯ menu: Delete and start over (asks first), Help',
       },
-      homeRings: {
-        title: 'Home with rings',
-        story: 'program-lead-states-home-with-people--with-rings',
-        path: '/ (redesigned, in Storybook only)',
-        proposed: true,
-        note: 'Between the header and the calendar, a row of rings on the people with something new, those first (D-198, D-477). Staff use the old Home until Will says the rings stay (card a22)',
+      homeEmpty: {
+        title: 'Home — nobody yet',
+        story: 'program-lead-states-home-with-people--empty',
+        path: '/ (nobody on the list)',
+        changed: 'D-486',
+        note: 'Faint circles above the calendar; the first is a (+), "Invite someone", which opens the invite choice (a member, or a colleague\'s program)',
       },
       home: {
         title: 'Home — coming in',
         story: 'program-lead-screens--home',
         path: '/',
-        changed: 'D-352',
-        note: 'Day / Week / Month tabs; Search in the + past ten visits; month days scroll sideways in two rows, with dots',
+        changed: 'D-486',
+        note: 'Rings on the people with something new above the calendar (D-198, D-477). Day / Week / Month tabs; Search in the + past ten visits; month days scroll sideways in two rows, with dots',
       },
       book: {
         title: 'Book a visit for a member',
@@ -569,6 +660,21 @@ export const flows = [
         path: '/person/',
         changed: 'D-324',
         note: 'Green pen = signed every policy; "Policies signed · 3 of 4"',
+      },
+      memberCard: {
+        title: "A member's card",
+        story: 'program-lead-screens--member-card',
+        path: '/person/ (a member linked to the program)',
+        changed: 'D-542',
+        note: 'What a program sees of a member who signed up with it or has a visit there: first name, the visits planned at THIS program, and Message (not shown if either has blocked the other). No last name, phone, photo, points or last active',
+      },
+      newMessage: {
+        title: 'New message: people who signed up or booked',
+        story: 'program-lead-screens--messages',
+        path: '/messages/ (New message)',
+        actions: [{ click: 'New message' }, { wait: 700 }],
+        changed: 'D-541',
+        note: 'A program starts a conversation only with a member signed up with it or with a visit there that is not cancelled; otherwise it can only answer someone who wrote first (Will, 12 October). Only the member can start with a program',
       },
       memberPolicies: {
         title: 'Policies signed',
@@ -631,11 +737,14 @@ export const flows = [
       ['getStarted', 'folded', 'Somebody books'],
       ['folded', 'home', 'Setup done'],
       ['home', 'member', 'A person'],
+      ['home', 'memberCard', "A real member's name (signed up or booked here)"],
+      ['messages', 'newMessage', 'New message'],
       ['member', 'memberPolicies', 'Policies signed'],
       ['home', 'book', '+ Book a visit for a member'],
       ['book', 'addPerson', 'Add a person'],
       ['home', 'invite', '+ Invite someone'],
-      ['home', 'homeRings', 'If the rings stay (a22)', { dashed: true }],
+      ['home', 'homeEmpty', 'Nobody on the list yet', { dashed: true }],
+      ['homeEmpty', 'invite', 'Tap the (+)'],
       ['program', 'service', 'A service · Add a service'],
       ['program', 'policies', 'Policies for participants'],
       ['program', 'switchPrograms', 'Your programs'],
@@ -644,6 +753,8 @@ export const flows = [
       ['profile', 'alerts', 'Text alerts'],
     ],
     changes: [
+      "D-542: tapping a real member's name gives a small card (first name, this program's visits, Message); a program starts a conversation only with a member signed up or booked, and can answer anyone who wrote first",
+      'D-486 — Home has the rings of people with something new above the calendar; with nobody on the list, faint circles and a (+) that opens the invite choice (Will, card a22)',
       'New — Edit and send again: a lead answers Pam\'s request for changes and sends the program back for review (D-386 part 5b); the super admin\'s side is Programs to check',
       'D-386 — Sent to Pam: Text me when it\'s live first, gone once texts are on',
       'D-385 — What you sent: ⋯ Delete and start over (asks first) → Add a program; Back on the pre-approval tab is always Home',
@@ -716,7 +827,6 @@ export const flows = [
         note: 'Two rows — Invite someone, Requests — then the list; no card of buttons',
       },
       person: { title: 'A person', story: 'super-admin-screens--person', path: '/person/' },
-      viewAs: { title: 'See the app as', story: 'super-admin-screens--view-as', path: '/view-as/' },
       reported: {
         title: 'Reported places',
         story: 'super-admin-screens--reported-places',
@@ -764,13 +874,13 @@ export const flows = [
       ['messages', 'thread', 'Open'],
       ['profile', 'everyone', 'Everyone'],
       ['everyone', 'person', 'A person'],
-      ['profile', 'viewAs', 'See the app as'],
       ['profile', 'reported', 'Reported places'],
       ['profile', 'programsToCheck', 'Programs to check'],
       ['home', 'programsToCheck', 'Programs to check'],
       ['programsToCheck', 'programReview', 'A program'],
     ],
     changes: [
+      'D-558 — no "See the app as" row or screen for a super admin (the view-as page is gone)',
       'D-386 — Programs to check: what leaders sent for Pam to look at, with Approve, Ask for changes and Discard',
       'D-189 — Reported places is a screen of its own, from Profile and the bell\'s "a place was reported" row, no longer only a chip on the old Places page',
       'D-444 — Requests are rows, and a request is a page with Approve and Deny at the foot; an invite is a page per kind (the city is picked there); Everyone lost its card of invite buttons',

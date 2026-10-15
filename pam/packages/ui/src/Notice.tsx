@@ -1,3 +1,6 @@
+'use client';
+
+import { createContext, useContext, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { Card } from '@astryxdesign/core/Card';
@@ -7,7 +10,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Icon } from '@astryxdesign/core/Icon';
 import { Button } from './Button.js';
-import { PhoneIcon } from './icons.js';
+import { HelpIcon } from './icons.js';
 import { textLinkLook } from './TextLink.js';
 import { pam } from './tokens.stylex.js';
 import { NOTICES, type NoticeKey } from '@pam/config';
@@ -37,19 +40,35 @@ import { NOTICES, type NoticeKey } from '@pam/config';
  * else has failed is the wrong place to spend that. What Banner gave us that
  * matters — the alert role, the status colour, the icon — is a few lines here.
  *
- * The support call is a real `tel:` anchor, not a handler, so it works with no
- * JavaScript, no network and no session — which is the state someone is most
- * likely to be in when they need it.
+ * The support action is "Contact Pam" (A28: Pam has no phone line). It is a plain
+ * link to the app's Help screen, the same place the HelpBar goes, so it works with
+ * no JavaScript and no session — which is the state someone is most likely to be
+ * in when they need it. From Help the person is led to the help desk first, and
+ * only after that to an email.
  */
+/**
+ * Where "Contact Pam" goes when a `Notice` is not told. The app puts the right place here once: Help when
+ * somebody is signed in, and the help desk on the website when they are not, because a sign-in error or a
+ * paused account shows the button to somebody who cannot get in (A28, Sage's words §1).
+ */
+const ContactHrefContext = createContext('/help/');
+
+export function ContactHrefProvider({ href, children }: { readonly href: string; readonly children: ReactNode }) {
+  return <ContactHrefContext.Provider value={href}>{children}</ContactHrefContext.Provider>;
+}
+
 export interface NoticeProps {
   notice: NoticeKey;
   /** Localised title and body, resolved by the caller through i18n. */
   title: string;
   body: string;
-  /** Pam's support line in E.164. Omit to hide the call action. */
-  supportPhone?: string | null;
-  /** Localised label for the call action, e.g. "Call Pam". */
-  callLabel?: string;
+  /**
+   * Localised label for the support action, "Contact Pam" (`help.contact.action`).
+   * Omit it to leave the action out. It opens Help (A28), never a dialler.
+   */
+  contactLabel?: string;
+  /** Where the support action goes. Help (or the help desk when signed out), unless a screen has a better page. */
+  contactHref?: string;
   /**
    * An admin's own note to this person, from `access_controls.user_facing_note`.
    * Shown instead of the generic body when present.
@@ -58,14 +77,14 @@ export interface NoticeProps {
    * subject sees a plain note, not the justification written about them.
    */
   userFacingNote?: string | null;
-  /** Optional extra action, e.g. "Try again". Rendered before the call button. */
+  /** Optional extra action, e.g. "Try again". Rendered before the Contact Pam button. */
   retry?: { label: string; onPress: () => void };
   /**
    * A calm card for something that is on purpose and has a reason, rather than
    * a fault (a limited account, D-432): more room round the words, the smallest
    * body text Pam allows (16px, A23) for the title and the message alike, and
-   * the call as a link, not a primary button. Everything else is the same: the
-   * `tel:` anchor, the 48px target, the alert role.
+   * the support action as a link, not a primary button. Everything else is the same:
+   * the 48px target, the alert role.
    */
   quiet?: boolean;
 }
@@ -112,14 +131,17 @@ export function Notice({
   notice,
   title,
   body,
-  supportPhone,
-  callLabel = 'Call Pam',
+  contactLabel,
+  contactHref: contactHrefProp,
   userFacingNote,
   retry,
   quiet = false,
 }: NoticeProps) {
   const definition = NOTICES[notice];
   const message = userFacingNote?.trim() || body;
+  const fromApp = useContext(ContactHrefContext);
+  const contactHref = contactHrefProp ?? fromApp;
+  const offersContact = definition.offersSupport && Boolean(contactLabel);
 
   const actions = (
     <>
@@ -131,21 +153,21 @@ export function Notice({
           xstyle={styles.action}
         />
       ) : null}
-      {definition.offersSupport && supportPhone ? (
+      {offersContact ? (
         quiet ? (
           <Button
-            label={callLabel}
+            label={contactLabel ?? ""}
             variant="ghost"
-            href={`tel:${supportPhone}`}
-            icon={<PhoneIcon />}
+            href={contactHref}
+            icon={<HelpIcon />}
             xstyle={[textLinkLook.link, styles.quietCall]}
           />
         ) : (
           <Button
-            label={callLabel}
+            label={contactLabel ?? ""}
             variant="primary"
-            href={`tel:${supportPhone}`}
-            icon={<PhoneIcon />}
+            href={contactHref}
+            icon={<HelpIcon />}
             xstyle={styles.action}
           />
         )
@@ -153,7 +175,7 @@ export function Notice({
     </>
   );
 
-  const hasActions = Boolean(retry) || (definition.offersSupport && Boolean(supportPhone));
+  const hasActions = Boolean(retry) || offersContact;
 
   if (definition.kind === 'empty') {
     return (
@@ -191,5 +213,59 @@ export function Notice({
         ) : null}
       </VStack>
     </Card>
+  );
+}
+
+/**
+ * The small alert (D-509): one row, a small icon and one line of words, no
+ * action. Same three tones as `Notice`, same alert role.
+ *
+ * **When to use which.** A compact alert is for a mistake the person fixes on
+ * the spot, where they already are: a wrong code, a field to correct. Whatever
+ * they must do next is the control they are already looking at, so it offers
+ * nothing of its own. `Notice` is for a state they are stuck in: the account is
+ * paused, the page cannot load, there is nobody to ask. It has a title, a
+ * reason, and somewhere to go. If you find yourself adding a button to the
+ * compact alert, you want `Notice`.
+ */
+export interface CompactNoticeProps {
+  /** The tone; the same colours as `Notice`'s `error`, `warning` and `info`. */
+  status?: 'error' | 'warning' | 'info';
+  /** One short sentence, already localised. */
+  text: string;
+  id?: string;
+}
+
+const compactStyles = stylex.create({
+  row: {
+    width: '100%',
+    boxSizing: 'border-box',
+    minHeight: '40px',
+    paddingBlock: '8px',
+    paddingInline: '12px',
+    borderInlineStartWidth: '4px',
+    borderInlineStartStyle: 'solid',
+    borderRadius: '8px',
+    backgroundColor: 'var(--color-background-sunken, transparent)',
+  },
+  text: { fontSize: '16px', lineHeight: 1.4 },
+  error: { borderInlineStartColor: 'var(--color-text-error, currentColor)' },
+  warning: { borderInlineStartColor: 'var(--color-text-warning, currentColor)' },
+  info: { borderInlineStartColor: 'var(--color-text-accent, currentColor)' },
+});
+
+export function CompactNotice({ status = 'error', text, id }: CompactNoticeProps) {
+  return (
+    <HStack
+      id={id}
+      gap={2}
+      align="center"
+      wrap="nowrap"
+      role={status === 'info' ? 'status' : 'alert'}
+      xstyle={[compactStyles.row, compactStyles[status]]}
+    >
+      <Icon icon={STATUS_ICON[status]} color={STATUS_ICON_COLOR[status]} size="sm" />
+      <Text xstyle={compactStyles.text}>{text}</Text>
+    </HStack>
   );
 }

@@ -1,15 +1,17 @@
 'use client';
 
-import { useId } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
-import { BigButton, TextField, TextLink } from '@pam/ui';
+import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { BigButton, CompactNotice, TextField, TextLink } from '@pam/ui';
 import { CodeBoxes } from '@pam/ui/CodeBoxes';
 import { useI18n } from '@/lib/i18n';
 import type { PhoneSignIn } from '@/lib/usePhoneSignIn';
+import { SITE_URL } from '@/lib/project';
 
 /**
  * Give us your number; type what we sent.
@@ -40,6 +42,8 @@ export interface PhoneSignInCardProps {
    * template above the card already says "Sign in" (D-217).
    */
   readonly hasTitle?: boolean;
+  /** Opened from an invite: the title is "Join Pam", not "Sign in" (W6, Will, 13 October). */
+  readonly isInvited?: boolean;
   /** 1 on the sign-in screen, 2 inside a flow that already has a title. */
   readonly headingLevel?: 1 | 2;
   /** The code step's button — "Sign in", or "Next" inside joining. */
@@ -48,12 +52,23 @@ export interface PhoneSignInCardProps {
   readonly isFlat?: boolean;
 }
 
+/** Supabase's phone codes are six digits; Sign in waits for all of them (D-532). */
+const CODE_LENGTH = 6;
+
 const styles = stylex.create({
-  title: { fontSize: '28px', lineHeight: 1.2 },
+  title: { fontSize: '28px', lineHeight: { default: 1.2, '@media (max-height: 640px)': 1.1 } },
   stepTitle: { fontSize: '20px', lineHeight: 1.3 },
   hint: { fontSize: '17px', lineHeight: 1.5 },
   consent: { fontSize: '14px', lineHeight: 1.35 },
-  card: { width: '100%' },
+  // Tighter on a short screen (D-564): less above the title and between the title, the field and the button.
+  card: {
+    width: '100%',
+    // The card's own room (padding 5) on a normal screen; less only on a short one. Never `null` here: a null default unsets what
+    // `padding={5}` gave, and it took the room out of every screen (Will, 14 October).
+    paddingBlockStart: { default: spacingVars['--spacing-5'], '@media (max-height: 640px)': '8px' },
+    paddingBlockEnd: { default: spacingVars['--spacing-5'], '@media (max-height: 640px)': '12px' },
+  },
+  stack: { rowGap: { default: spacingVars['--spacing-3'], '@media (max-height: 640px)': '8px' } },
   // Sign in's card sits on the white under the pictures and reads as part of
   // it (Will, 5 October, D-266): no lift, no outline.
   flat: { boxShadow: 'none', borderWidth: 0 },
@@ -75,6 +90,7 @@ export function PhoneSignInCard({
   onCodeChange,
   headingLevel = 1,
   hasTitle = true,
+  isInvited = false,
   codeAction,
   isFlat = false,
 }: PhoneSignInCardProps) {
@@ -82,9 +98,21 @@ export function PhoneSignInCard({
   const { state, sendCode, verifyCode } = flow;
   const phoneId = useId();
   const codeId = useId();
+  const codeField = useRef<HTMLInputElement | null>(null);
 
   const busy = state.step === 'sending' || state.step === 'verifying';
   const onCodeStep = state.step === 'code' || state.step === 'verifying';
+  const wrongCode = state.step === 'code' && state.error === 'verify';
+
+  // A wrong or expired code (D-510): the boxes are emptied and the cursor is back in them,
+  // so the next try is typing. Each failure is a new state, so this runs every time.
+  useEffect(() => {
+    if (!wrongCode) return;
+    onCodeChange('');
+    codeField.current?.focus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
+
   const titleStyle = headingLevel === 1 ? styles.title : styles.stepTitle;
 
   if (onCodeStep) {
@@ -98,17 +126,21 @@ export function PhoneSignInCard({
         <CodeBoxes
           id={codeId}
           label={t('signin.code.label')}
+          length={CODE_LENGTH}
           value={code}
           onChange={onCodeChange}
           onComplete={(full) => {
             if (!busy) void verifyCode(full);
           }}
           isDisabled={busy}
+          inputRef={codeField}
         />
+        {/* Right under the boxes it is about; gone as soon as they start typing again. */}
+        {wrongCode && code.length === 0 ? <CompactNotice text={t('signin.code.wrong')} /> : null}
         <BigButton
           label={busy ? t('signin.verifying') : codeAction ?? t('signin.code.action')}
           onPress={() => void verifyCode(code)}
-          isDisabled={busy || code.trim().length === 0}
+          isDisabled={busy || code.replace(/\D/g, '').length < CODE_LENGTH}
         />
         {/* Centred, Send again under the number (Will, 3 October, D-253). */}
         <VStack gap={0} align="center">
@@ -126,6 +158,12 @@ export function PhoneSignInCard({
             isDisabled={busy || flow.resendIn > 0}
             size="quiet"
           />
+          {/*
+            A way to a person on the code step (A26, A28; Iris CP1): a code that is wrong, expired or never came
+            left nobody to ask. Quiet, under Send again and outside the alert (D-510). This person is signed
+            out, so it goes to the help desk's post for it rather than to Help in the app.
+          */}
+          <TextLink label={t('help.needHelp')} href={`${SITE_URL}/support/cant-sign-in/`} size="quiet" />
         </VStack>
       </VStack>
     );
@@ -137,13 +175,13 @@ export function PhoneSignInCard({
     // the rest of the app's cards, since this is the one screen where the
     // card is the entire job rather than one of several things on the page.
     <Card padding={5} xstyle={[styles.card, isFlat && styles.flat]}>
-      <VStack gap={3}>
+      <VStack gap={3} xstyle={styles.stack}>
         {/*
           The heading sits inside the card with the field it names, so the
           task is one block rather than a title floating above a box.
         */}
         <Heading level={headingLevel} xstyle={titleStyle}>
-          {t('signin.title')}
+          {t(isInvited ? 'signin.title.invited' : 'signin.title')}
         </Heading>
         <TextField
           id={phoneId}

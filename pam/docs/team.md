@@ -45,6 +45,7 @@ when there is something he can see or try.
 | <img src="team/dot.svg" width="40" alt=""> | **Dot** | Design Systems Lead | Design system & Storybook | `session_01A3kdir46ErR2eyjDLFdzyW` |
 | <img src="team/wren.svg" width="40" alt=""> | **Wren** | Website & Help Centre Lead | Public website | `session_012vS6F7CMTwFn3u5UG66JWz` |
 | <img src="team/iris.svg" width="40" alt=""> | **Iris** | User Research & Testing Lead | User testing & research | `session_015bSW8g1AzsnhL9F4FXvcN1` |
+| <img src="team/sage.svg" width="40" alt=""> | **Sage** | Voice & UX Copy Lead | Voice & UX copy | `session_01MbEH7WeWBTtjxAPbJPvR42` |
 | <img src="team/gus.svg" width="40" alt=""> | **Gus** | Former Platform Engineer (retired) | — | `session_01NoLKA8RJRwhyDJUe8CAZVE` |
 
 **One specialist per lane.** Will, 10 October, asked why accounts and languages each
@@ -81,9 +82,10 @@ current (`docs/control-room.md`).
 | **Messages & notifications** (Nico) | Conversations, attachments, translation, the bell, texts and emails going out, blocking and reporting | its lane |
 | **Places & programs** (Piper) | The catalogue, a place, programs and their onboarding, saved places, trips, points, Home | its lane |
 | **Languages & legal** (Lena, Arabic included) | The seven languages and the ledger, privacy, terms, transparency, native review. **Weekly, on Friday** (below) | its lane |
-| **Design system & Storybook** (Dot) | Components, tokens, illustrations, every screen's story, the fit and accessibility audits, the Figma flow map. **The map: once a day, at about 2am Pacific** (below) | its lane |
+| **Design system & Storybook** (Dot) | Components, tokens, illustrations, every screen's story, the fit and accessibility audits, the Figma flow map. **The map: once a day, at about 2am Eastern** (below) | its lane |
 | **Website** (Wren) | The public site and the support centre (`pam-site`). **Weekly, on Friday** (below) | its own project |
 | **User testing & research** (Iris) | Walks each flow as the person using it and reports what gets in their way; research Will asks for. Finds, never fixes. **A first pass over every flow, then weekly, on Thursday** (below) | `docs/research/` |
+| **Voice & UX copy** (Sage) | Pam's tone of voice and the English words on screens, the website and support posts: proposes them, Will signs, the screen's lane builds. Refines the words in Will's Figma designs, beside his frames, never in them (below) | `docs/voice.md`, Storybook's Foundations › Writing |
 
 Which session is in which lane today, its id, and what it is doing and waiting on
 are on **the board** at the end of `docs/lanes.md`. The merge desk keeps it.
@@ -128,7 +130,7 @@ Will, 10 October 2026: "Let's also switch up the cadence for Figma flow updates 
 only, at 2am. Otherwise we run too many tokens, and changes may happen in a day that would
 require too many updates to flow."
 
-- **The design lane (Dot) redraws the map once a night**, at about 2am Pacific, from `main`.
+- **The design lane (Dot) redraws the map once a night**, at about 2am Eastern, from `main`.
   A scheduled message starts it. It reads what merged since the commit in
   `docs/user-flows/last-map.txt`; if no screen changed, it stops and sends nothing.
   Otherwise it redraws only the pages that changed and sends one READY. How: the
@@ -167,6 +169,27 @@ research." That is **Iris**, the User Research & Testing Lead.
   run's READY notes list them), so its findings are ready for Friday's language and
   website batch. Anything Will asks for, when he asks.
 
+## Voice and UX copy
+
+Will, 11 October 2026: "I have UX copy needs and need to onboard someone on how to create a
+tone of voice, and create impactful, yet very human UX copy that we can use to instill
+personality on certain pages, like the website. I'm working in design in Figma but need to
+hand this over to an agent so they can refine UX copy." That is **Sage**, the Voice & UX
+Copy Lead.
+
+- **The voice guide**, `docs/voice.md`, is Sage's: who Pam writes for, its voice traits with
+  real examples, how the voice warms up on the website and calms down in tasks and errors,
+  the word list, and writing that survives seven languages. It onboards any person or agent
+  who writes for Pam. Storybook's Foundations › Writing is its summary.
+- **From Will's Figma:** Will designs in "Pam — Website" and the other files. Sage never
+  edits his frames. Sage puts refined words on a "Copy proposals" page beside them, with the
+  old words, the new ones and why, and sends a QUESTION. Will picks; nothing is built until
+  he says "build it".
+- **Who does what with the words:** Sage proposes, Will signs, the screen's lane builds
+  (Wren for the website, the app's lanes for screens), and Lena turns signed English into
+  the other six languages. Texts and emails stay Nico's; promises (privacy, terms,
+  transparency, notices) change only with Lena. No justice terms, ever.
+
 ## Keeping the team light
 
 Will, 10 October 2026: "let's optimize some of our processes." Every message wakes a
@@ -185,6 +208,8 @@ message is the one not sent.
 - **The merge desk batches:** READY branches waiting together are merged together, with
   one run of checks and one wait for CI. The Control Room is brought up to date with each
   batch, and whenever Will has something to do, not after every teammate's note.
+- **No Vercel previews.** Branches don't deploy (10 October: they used half the daily
+  deploys). Show work in Storybook, which Chromatic builds for every push.
 - **Scheduled work is quiet when there is nothing to do:** the nightly map, the Friday
   batch and the Thursday test pass end without a message if nothing changed.
 
@@ -210,7 +235,21 @@ who and what:
 ```
 
 then a few short lines (the older `PAM · <Lane> → merge desk · …` first line still
-works). The kinds:
+works).
+
+**If `send_message` is not in your tools** (some sessions don't have it; Iris and Ava found
+this on 10 October, and Ava's question sat unseen for hours), send the same note as a
+one-time Routine: `create_trigger` with `persistent_session_id`
+`session_018wn7LF7RMsHnXSAzvk6s1p` and `run_once_at` a minute or two ahead. It arrives
+the same way. Never leave a question only in your own chat.
+
+**Waiting on Will's OK.** Before a step that will stop for Will's permission (sending an
+email or a text to a real person, anything outside Pam), say so first: in your note, or,
+for the merge desk, a card on the Control Room. A session stopped on a permission prompt
+can't tell anyone it is stuck. The Control Room also shows any session that is waiting on
+Will, with a button that opens it.
+
+The kinds:
 
 | Kind | Send it when | It carries |
 |---|---|---|
@@ -252,6 +291,12 @@ works). The kinds:
 - **Copies each READY's `Screens:` line into its merge commit**, for the nightly map.
 - **Runs the whole browser suite once per merge batch** before pushing, and messages a
   lane only when it has something to do.
+- **Checks the deploy, not just CI.** After a push to `main`, it confirms Vercel built it
+  (the "Vercel – web" and "Vercel – pam-site" statuses on the commit, or the deployment
+  list) and that the change is on app.joinpam.org. Vercel's plan allows about 100 deploys a
+  day. On 10 October the team used them up and two pushes never went live, while CI was
+  green. Branch previews are off for both projects since then, so only `main` deploys. A
+  refused deploy is redeployed from `main` once a slot frees.
 - **Answers within its next turn.**
 
 Its messages arrive in your chat as a turn that starts **"From the merge desk"**.

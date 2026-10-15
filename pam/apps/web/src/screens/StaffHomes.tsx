@@ -13,6 +13,8 @@ import { DashedRule } from '@pam/ui/DashedRule';
 import { SetupCard, type SetupCardProps } from '@pam/ui/SetupCard';
 import { SubPage } from '@pam/ui/SubPage';
 import { useProgramSetup, type ProgramSetup } from '@/lib/programSetup';
+import { useProgramVisits } from '@/lib/useProgramVisits';
+import { seedCheckIns } from '@/lib/checkIns';
 import { FloatingAction } from '@pam/ui/FloatingAction';
 import { openConversation } from '@/lib/openConversation';
 import { DUMMY_SELF_ID, dummyConversationIdBetween } from '@pam/config/dummy-conversations';
@@ -23,7 +25,6 @@ import { ScheduleView, type Appointment } from './ScheduleView';
 import { readAddedTrips, TRIPS_CHANGED, withMoves, type AddedTrip } from '@/lib/addedTrips';
 import { AddMenu } from './AddMenu';
 import { useI18n } from '@/lib/i18n';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useCaseload } from '@/lib/useCaseload';
 import { dummyChip, statusChip } from '@/lib/caseloadLabels';
@@ -35,7 +36,6 @@ import { PeopleHomeView, type HomePerson, type PeopleState } from './PeopleHomeV
 export function CaseloadHome() {
   const { t, tPlain } = useI18n();
   const router = useRouter();
-  const supportPhone = useSupportPhone();
   const { state: caseload, refresh } = useCaseload(true);
   const examplePeople = useExamplePeople();
 
@@ -120,14 +120,12 @@ export function CaseloadHome() {
       floating={<InviteFloating />}
       onRetry={refresh}
       onPick={(person) => person.href && router.push(person.href)}
-      supportPhone={supportPhone}
       empty={
         <Notice
           notice="no_caseload_members"
           title={t('admin.caseload.empty.title')}
           body={t('admin.caseload.empty.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       }
     />
@@ -155,9 +153,25 @@ export function ProgramHome() {
   const { state: session } = useSession();
   const setup = useProgramSetup(session);
   const booked = useBookedForMembers();
+  const realVisits = useProgramVisits(Boolean(setup.program?.isLive));
+  // What the database says about who has arrived (D-526) is what the circles show.
+  useEffect(() => {
+    if (realVisits.length > 0) seedCheckIns(realVisits);
+  }, [realVisits]);
   const appointments: Appointment[] = [
     ...(setup.isExample ? exampleAppointments(t) : []),
     // Visits the program booked for people (D-316), on its own schedule too.
+    // The visits members planned at the lead's own program (D-526): first names, from the database.
+    ...realVisits.map((v) => ({
+      id: v.id,
+      personId: v.memberId,
+      firstName: v.firstName,
+      startsAt: v.startsAt,
+      minutes: v.endsAt ? Math.max(15, Math.round((new Date(v.endsAt).getTime() - new Date(v.startsAt).getTime()) / 60000)) : 60,
+      kindLabel: v.serviceName ?? t('schedule.kind.visit'),
+      // The small card for a member linked to the program (D-542): first name and this program's visits, nothing else.
+      href: `/person/?id=${encodeURIComponent(v.memberId)}`,
+    })),
     ...booked.map((b) => ({
       id: b.id,
       personId: b.forMemberId!,
@@ -169,13 +183,16 @@ export function ProgramHome() {
     })),
   ];
   const cards = setupCards(setup, t);
+  // A lead with no program of their own leads with one thing to do (D-498): add it. The calendar of
+  // who is coming in is the program's, so it waits for it. Inviting someone works from day one (D-384).
+  const hasNoProgram = !setup.isLoading && !setup.isExample && !setup.hasProgram;
 
   if (appointments.length === 0) {
     return (
       <Page gap={4}>
         <LargeTitleHeader title={t('home.setup.title')} actions={<HeaderActions role="provider" hasHelp={false} />} />
         <StaffPeopleRow role="provider" />
-        <SetupCardList cards={[...cards, CALENDAR_CARD(t)]} />
+        <SetupCardList cards={hasNoProgram ? cards : [...cards, CALENDAR_CARD(t)]} />
         <ProgramActions canBook={setup.isLive} />
       </Page>
     );

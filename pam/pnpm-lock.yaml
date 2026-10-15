@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  next@15.5.25:
+    hash: c7822f71afae14cbee4505e245f15150ccc92818920cbfdaf7a9f8a3f293c2b6
+    path: patches/next@15.5.25.patch
+
 importers:
 
   .:
@@ -65,7 +70,7 @@ importers:
         version: 0.19.0
       next:
         specifier: 15.5.25
-        version: 15.5.25(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@22.20.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        version: 15.5.25(patch_hash=c7822f71afae14cbee4505e245f15150ccc92818920cbfdaf7a9f8a3f293c2b6)(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@22.20.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react:
         specifier: ^19.0.0
         version: 19.3.0
@@ -135,7 +140,7 @@ importers:
         version: 2.116.0
       next:
         specifier: 15.5.25
-        version: 15.5.25(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@22.20.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        version: 15.5.25(patch_hash=c7822f71afae14cbee4505e245f15150ccc92818920cbfdaf7a9f8a3f293c2b6)(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@22.20.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react:
         specifier: ^19.0.0
         version: 19.3.0
@@ -166,7 +171,7 @@ importers:
         version: 10.6.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(storybook@10.6.1(@types/react@19.3.0)(react@19.3.0))
       '@storybook/nextjs':
         specifier: 10.6.1
-        version: 10.6.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(next@15.5.25(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@22.20.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(storybook@10.6.1(@types/react@19.3.0)(react@19.3.0))(type-fest@2.19.0)(typescript@5.9.3)(webpack-hot-middleware@2.26.1)(webpack@5.111.1(postcss@8.5.28))
+        version: 10.6.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(next@15.5.25(patch_hash=c7822f71afae14cbee4505e245f15150ccc92818920cbfdaf7a9f8a3f293c2b6)(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@22.20.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(storybook@10.6.1(@types/react@19.3.0)(react@19.3.0))(type-fest@2.19.0)(typescript@5.9.3)(webpack-hot-middleware@2.26.1)(webpack@5.111.1(postcss@8.5.28))
       '@stylexjs/babel-plugin':
         specifier: ^0.19.0
         version: 0.19.0
@@ -6823,7 +6828,7 @@ snapshots:
     dependencies:
       react: 19.3.0
 
-  '@storybook/nextjs@10.6.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(next@15.5.25(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@22.20.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(storybook@10.6.1(@types/react@19.3.0)(react@19.3.0))(type-fest@2.19.0)(typescript@5.9.3)(webpack-hot-middleware@2.26.1)(webpack@5.111.1(postcss@8.5.28))':
+  '@storybook/nextjs@10.6.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(next@15.5.25(patch_hash=c7822f71afae14cbee4505e245f15150ccc92818920cbfdaf7a9f8a3f293c2b6)(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@22.20.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(storybook@10.6.1(@types/react@19.3.0)(react@19.3.0))(type-fest@2.19.0)(typescript@5.9.3)(webpack-hot-middleware@2.26.1)(webpack@5.111.1(postcss@8.5.28))':
     dependencies:
       '@babel/core': 7.29.7
       '@babel/plugin-syntax-bigint': 7.8.3(@babel/core@7.29.7)
@@ -6846,7 +6851,7 @@ snapshots:
       babel-loader: 9.2.1(@babel/core@7.29.7)(webpack@5.111.1(postcss@8.5.28))
       css-loader: 6.11.0(webpack@5.111.1(postcss@8.5.28))
       loader-utils: 3.3.1
-      next: 15.5.25(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@22.20.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      next: 15.5.25(patch_hash=c7822f71afae14cbee4505e245f15150ccc92818920cbfdaf7a9f8a3f293c2b6)(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@22.20.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       node-polyfill-webpack-plugin: 2.0.1(webpack@5.111.1(postcss@8.5.28))
       postcss: 8.5.28
       postcss-loader: 8.2.1(postcss@8.5.28)(typescript@5.9.3)(webpack@5.111.1(postcss@8.5.28))
@@ -8832,7 +8837,7 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  next@15.5.25(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@22.20.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
+  next@15.5.25(patch_hash=c7822f71afae14cbee4505e245f15150ccc92818920cbfdaf7a9f8a3f293c2b6)(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@22.20.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
     dependencies:
       '@next/env': 15.5.25
       '@swc/helpers': 0.5.15

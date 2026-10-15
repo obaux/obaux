@@ -7,6 +7,11 @@ import { settled } from './settled';
  * program and nobody is texted yet (the step before says so), so the end screen
  * must not say "Booked" or "Pam texted" (Lena's promise sweep, 10 October).
  */
+// These walk the example places, services and policies, which a demo asks for outright; a real account has none (D-509).
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => window.sessionStorage.setItem('pam.examples', '1'));
+});
+
 test('booking for a member ends on an example that says nothing was booked or texted', async ({ page }) => {
   await page.goto('/program/book/');
   await settled(page);

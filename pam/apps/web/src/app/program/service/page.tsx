@@ -2,6 +2,7 @@
 
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { NeedsOwnProgram } from '../../../screens/NeedsOwnProgram';
 import { ServiceEditView } from '../../../screens/ServiceEditView';
 
 /** A program lead adds or edits one of their services (D-313). */
@@ -13,8 +14,10 @@ function Service() {
 
 export default function ProgramServicePage() {
   return (
-    <Suspense fallback={null}>
-      <Service />
-    </Suspense>
+    <NeedsOwnProgram>
+      <Suspense fallback={null}>
+        <Service />
+      </Suspense>
+    </NeedsOwnProgram>
   );
 }

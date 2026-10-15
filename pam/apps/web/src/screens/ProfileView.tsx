@@ -15,6 +15,7 @@ import {
   PlacesIcon,
   ShieldIcon,
   SignOutIcon,
+  TripsIcon,
 } from '@pam/ui';
 import { Banner } from '@astryxdesign/core/Banner';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
@@ -40,24 +41,30 @@ import { useI18n } from '@/lib/i18n';
 export interface ProfileViewProps {
   readonly name: string;
   readonly role: Role;
-  readonly points: number;
-  readonly savedCount: number;
+  /** `null` while it is still arriving: the number is a pulse the size of the number, not a 0. */
+  readonly points: number | null;
+  readonly savedCount: number | null;
   readonly connectionsCount: number;
+  /**
+   * Nothing is known yet (Will, 11 October: "skeleton loaders for the image, stats and labels in profile hero card"):
+   * the hero card is drawn as pulses sized like the real card.
+   */
+  readonly isLoading?: boolean;
   /** Whether this account has said yes to text reminders. */
   readonly remindersOn: boolean;
   /** The bell and Help, from the caller — they read live data. */
   readonly headerActions: ReactNode;
   readonly onSignOut?: () => void;
   /**
-   * A super admin's own account, whatever role it is previewing — keeps the
-   * "See the app as" row, so a preview is never a one-way door (D-217).
-   */
-  readonly canViewAs?: boolean;
-  /**
    * A member who also works at a program (D-374): the "Use Pam as" row,
    * which opens its own page. Never shown to a single-role account.
    */
   readonly canUseAs?: boolean;
+  /**
+   * A member who has no program (D-525): the "Add my program" row, which opens the questions, and,
+   * once they are sent, where the request stands. Null for everybody else.
+   */
+  readonly addProgram?: { readonly status: 'none' | 'waiting' | 'denied' } | null;
   /** This account's photo (D-345). */
   readonly photoUrl?: string | null;
   /** Staff only: a photo was picked from the camera button. */
@@ -78,12 +85,13 @@ export function ProfileView({
   remindersOn,
   headerActions,
   onSignOut,
-  canViewAs = false,
   canUseAs = false,
+  addProgram = null,
   photoUrl = null,
   onPhotoPick,
   isPhotoBusy = false,
   photoNotice = null,
+  isLoading = false,
 }: ProfileViewProps) {
   const { t, locale } = useI18n();
   const number = (n: number) => new Intl.NumberFormat(intlLocale(locale)).format(n);
@@ -122,9 +130,6 @@ export function ProfileView({
     ...(role === 'admin' || role === 'super_admin'
       ? [{ id: 'reported', label: t('places.reported.title'), href: '/places/reported/', icon: <FlagIcon {...ICON} /> }]
       : []),
-    ...(canViewAs
-      ? [{ id: 'view-as', label: t('profile.menu.viewAs'), href: '/view-as/', icon: <GlobeIcon {...ICON} /> }]
-      : []),
   ];
 
   return (
@@ -142,12 +147,15 @@ export function ProfileView({
         stats={
           isMember
             ? [
-                { value: number(points), label: t('profile.stat.points') },
-                { value: number(savedCount), label: t('profile.stat.saved') },
+                { value: points === null ? null : number(points), label: t('profile.stat.points') },
+                { value: savedCount === null ? null : number(savedCount), label: t('profile.stat.saved') },
                 { value: number(connectionsCount), label: t('profile.stat.connections') },
               ]
             : []
         }
+        isLoading={isLoading}
+        loadingStatCount={isMember ? 3 : 0}
+        loadingLabel={t('common.loading')}
       />
       {photoNotice ? <Banner status="warning" title={photoNotice} /> : null}
 
@@ -165,11 +173,11 @@ export function ProfileView({
             opening Points. Past visits are still on Trips.
           */}
           <FeatureTile
-            label={t(badgeForPoints(points).labelKey)}
+            label={t(badgeForPoints(points ?? 0).labelKey)}
             hint={t('profile.tile.badgeHint')}
             href="/points/"
             // The level's own picture (D-295) — Rooted is a seedling.
-            art={<BadgeArt badgeKey={badgeForPoints(points).key} size={88} shape="square" />}
+            art={<BadgeArt badgeKey={badgeForPoints(points ?? 0).key} size={88} shape="square" />}
           />
           <FeatureTile label={t('profile.tile.connections')} href="/connections/" art={<ConnectionsArt size={88} />} />
         </FeatureTileRow>
@@ -229,6 +237,19 @@ export function ProfileView({
                   },
                 ]
               : []),
+            ...(addProgram
+              ? [
+                  {
+                    id: 'add-program',
+                    label: t('profile.menu.addProgram'),
+                    ...(addProgram.status === 'none'
+                      ? {}
+                      : { value: t(addProgram.status === 'waiting' ? 'addProgram.ask.waiting.title' : 'addProgram.ask.denied.title') }),
+                    href: '/profile/add-program/',
+                    icon: <PlacesIcon {...ICON} />,
+                  },
+                ]
+              : []),
             {
               id: 'language',
               label: t('profile.menu.language'),
@@ -238,6 +259,10 @@ export function ProfileView({
               href: '/language/',
               icon: <GlobeIcon {...ICON} />,
             },
+            // A member's visits in the calendar app they use, by a secret address (D-538).
+            ...(isMember
+              ? [{ id: 'calendar', label: t('profile.menu.calendar'), href: '/calendar/', icon: <TripsIcon {...ICON} /> }]
+              : []),
             ...(remindersOn
               ? [
                   {

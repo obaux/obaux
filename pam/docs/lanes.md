@@ -30,9 +30,10 @@ The short version:
 | **Messages & notifications** | Conversations, photos, documents, link previews, message translation; the bell, texts and emails going out; blocking and reporting | `app/{messages,notifications,alerts,reminders}`, `supabase/functions`, `lib/useThread.ts`, the dispatcher |
 | **Places & programs** | The catalogue and its imports; a place's profile and the maps drawer; programs and their onboarding; saved places, trips, points and badges; Home | `app/{place,places,saved,trips,program,programs,flag,interested,home,points}`, `services`, `programs` |
 | **Languages & legal** | The seven languages and the ledger; privacy, terms and the transparency contract; texts and emails in each language; native review. Works in a weekly batch on Friday from the merge desk's notes (`docs/team.md`, "The weekly update") | `packages/config/src/{locales,legal.ts,transparency.ts,notices.ts}`, `app/{privacy,terms,legal,help,about,language}`, `docs/copy-changes.md` |
-| **Design system & Storybook** | Components and tokens; illustrations; the story for every screen; the fit and accessibility audits; the Figma flow map, redrawn once a night at about 2am Pacific from the day's merges (`docs/team.md`, "The flow map, once a day") | `packages/ui`, `apps/web/src/stories`, `docs/user-flows` |
+| **Design system & Storybook** | Components and tokens; illustrations; the story for every screen; the fit and accessibility audits; the Figma flow map, redrawn once a night at about 2am Eastern from the day's merges (`docs/team.md`, "The flow map, once a day") | `packages/ui`, `apps/web/src/stories`, `docs/user-flows` |
 | **Public website** | The public site and the support centre (`pam-site` on Vercel). Works in a weekly batch on Friday from the merge desk's notes (`docs/team.md`, "The weekly update") | its own project; not the app |
 | **User testing & research** | Walking each flow as a member, case manager, program lead and super admin, and reporting what gets in their way; research Will asks for. Finds, never fixes: one FINDING note per pass. A first pass over every flow, then weekly on Thursday (`docs/team.md`, "User testing and research") | `docs/research/` |
+| **Voice & UX copy** | Pam's tone of voice; the English words on screens, the website and support posts, proposed for Will to sign and built by the screen's lane; refining the words in Will's Figma designs on a "Copy proposals" page beside his frames (`docs/team.md`, "Voice and UX copy") | `docs/voice.md`, `apps/web/src/stories/foundations/Writing.mdx` |
 | **Merge desk & platform** | Merging to main; applying migrations to the live project; releases; CI and deploys; the records tooling and this page | `.github/workflows`, `packages/db`, `scripts`, `docs/` |
 
 `apps/native` has no lane yet; the first session to work there adds one.
@@ -202,7 +203,8 @@ Will, 10 October: "Go ahead and decide, you're the CTO."
 | **Lena**, Languages & Legal Lead (covers Arabic) | PAM · Lena · Languages & Legal Lead | `session_01Hjv2RQuz5PJmxQ7tLGb5sW` | — | weekly; next batch Friday 16 October (`docs/weekly/2026-10-16.md`) | Friday |
 | **Dot**, Design Systems Lead | PAM · Dot · Design Systems Lead | `session_01A3kdir46ErR2eyjDLFdzyW` | `claude/pam-design-flow-map-3` | the Figma map: the staff Home card and a past visit on Trips; then the map once a night | — |
 | **Wren**, Website & Help Centre Lead | PAM · Wren · Website & Help Centre Lead | `session_012vS6F7CMTwFn3u5UG66JWz` | — | weekly; next batch Friday 16 October | Friday |
-| **Iris**, User Research & Testing Lead | PAM · Iris · User Research & Testing Lead | `session_015bSW8g1AzsnhL9F4FXvcN1` | new, from `main` | first pass: the Member flow | — |
+| **Iris**, User Research & Testing Lead | PAM · Iris · User Research & Testing Lead | `session_015bSW8g1AzsnhL9F4FXvcN1` | `claude/research-member-flow` | Member flow pass done (one stopper, six slow-downs, all handed out); next pass Thursday | Thursday |
+| **Sage**, Voice & UX Copy Lead | PAM · Sage · Voice & UX Copy Lead | `session_01MbEH7WeWBTtjxAPbJPvR42` | new, from `main` | first: the voice guide (`docs/voice.md`); then copy proposals beside Will's Figma website frames | — |
 
 **Retired** (archived; their work and session logs stay in the records, and either can
 be brought back):

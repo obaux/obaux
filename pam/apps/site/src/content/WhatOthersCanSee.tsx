@@ -1,6 +1,6 @@
 import { CompareTable } from '../components/CompareTable';
-import { Body, Lead, P, ReadMore, Section } from '../components/Prose';
-import { PRIVACY_URL } from '../lib/links';
+import { LegalLink } from '../components/LegalLink';
+import { Body, Lead, P, Section } from '../components/Prose';
 
 /**
  * Support post: What others can see (everyone; a table). Built from what Pam promises
@@ -9,6 +9,11 @@ import { PRIVACY_URL } from '../lib/links';
  * answer the reader could not stand behind (a phone number, the language you chose,
  * what Pam's own staff see, whether a program is sent a report) are left out; the
  * privacy policy covers the rest. "Your guide" is the case manager who invited you.
+ *
+ * What a program sees is said here the way the Privacy page says it (`privacy.s.sharing.p2`) and the
+ * "A program can see:" card says it (`transparency.program.*`): a program sees you only after you write to
+ * it, sign its rules, sign up or plan a visit, and before a visit only a first name and what you did
+ * (D-541). `program-sees-before-a-visit.test.ts` holds the three together.
  */
 export function WhatOthersCanSee() {
   return (
@@ -24,14 +29,18 @@ export function WhatOthersCanSee() {
           messages to other people, or what you share with your buddies. Your guide sees a message only if you
           write to them, or if someone says it is not safe.
         </P>
-        <P>A program sees you only after you sign up with them, and only what they need to help you.</P>
+        <P>
+          A program sees you only after you write to them, sign their rules, sign up with them or plan a visit
+          there, and only what they need to help you. Before a visit, they see your first name, what you write to
+          them, the day you signed their rules and, if you signed up, how that is going.
+        </P>
       </Section>
 
       <Section title="Who can see what">
         <CompareTable
-          label="What your guide, a program you joined and other members can see"
+          label="What your guide, a program and other members can see"
           rowHeading="What"
-          columns={['Your guide', 'A program you joined', 'Other members']}
+          columns={['Your guide', 'A program', 'Other members']}
           rows={[
             { label: 'What you want to work on', cells: ['Yes', 'No', 'No'] },
             {
@@ -52,7 +61,15 @@ export function WhatOthersCanSee() {
             { label: 'Who you connect with', cells: ['Yes', 'No', 'No'] },
             {
               label: 'Messages you write to them',
-              cells: ['Yes, if you write to them', 'Yes, if you write to them', 'Not applicable'],
+              cells: [
+                'Yes, if you write to them',
+                'Yes, if you write to them, even before you plan a visit',
+                'Not applicable',
+              ],
+            },
+            {
+              label: 'The day you signed a program’s rules',
+              cells: ['No', 'Yes, the day only. Never your signature', 'No'],
             },
             { label: 'Your messages with anyone else', cells: ['No', 'No', 'No'] },
             { label: 'What you share with your buddies', cells: ['No', 'No', 'No'] },
@@ -69,7 +86,7 @@ export function WhatOthersCanSee() {
 
       <Section title="If this ever changes">
         <P>If the list ever changes, Pam will tell you first.</P>
-        <ReadMore label="Read the full privacy policy" href={PRIVACY_URL} />
+        <LegalLink kind="privacy" label="Read the full privacy policy" variant="read-more" />
       </Section>
     </Body>
   );

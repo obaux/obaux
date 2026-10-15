@@ -34,11 +34,21 @@ wrong silently. (Why each piece exists: D-424, D-425.)
    English stretched about 40% and wrapped in ⟦ ⟧ — a string with no closing
    bracket was cut off, and a string with no accents never went through `t()`.
    Then `pnpm --filter @pam/web build-storybook && pnpm --filter @pam/web
-   audit:fit` measures every story in every language at 320px; the
+   audit:fit` measures every story in every language at 320px, and fails only on
+   a defect that is not in `apps/web/scripts/fit-known.json` (the script passes
+   `--known` itself; before 11 October it did not, so a clean `main` exited 1 with
+   the 13 accepted findings); the
    `PAM Language fit` workflow does it for Russian, Arabic, Simplified Chinese and
    the pseudo-language on a pull request that touches copy or UI.
    Text should wrap and grow (`@pam/ui` `Button`, `Badge`, `Segment`), never be
    trimmed; only a page title steps down in size (D-422).
+   **The check measures what a story shows, on screen, and nothing else.** A carousel,
+   a tab or anything that shows its text after a tap needs **one story per slide or
+   tab**: a story that opens on the first slide audits the first slide and the other
+   two stay "clean" because nobody looked (13 October: two changed welcome lines, on
+   Sign in and About Pam, had never been measured). `src/stories/support/showSlide.ts`
+   scrolls to a slide and chooses an About tab in a story's `play`; see the
+   `Onboarding` stories for the pattern.
    **If the check names a defect:** look at it in Storybook in that language at 320px
    first. A text that is really cut off or covered is fixed (let it wrap, or shorten
    the string). A line that is one line with an ellipsis *by design*, a list that
@@ -46,6 +56,19 @@ wrong silently. (Why each piece exists: D-424, D-425.)
    goes in `apps/web/scripts/fit-known.json` with the reason and the date, so it is
    not looked at twice (D-434). `node scripts/audit-language-fit.mjs --write-known
    out.json` writes the entries for you to give reasons to.
+
+## The "Last updated" date on Privacy and Terms
+
+The page says when it last changed, and that has to be true. `packages/config/src/legal-updated.json` holds, for each document, the
+day its newest paragraph went live and a fingerprint of its English words (title, introduction, section titles and paragraphs, as the
+page shows them: the section about translating messages counts only while `MESSAGE_TRANSLATION.enabled`). `legal-updated.test.ts` is red when the
+English of Privacy or the Terms changes and the fingerprint does not, and when `privacy.updated` / `terms.updated` in any of the seven
+languages is not that date (13 October 2026, the day the b25 text went live, was found to be on a page that still said 10 October: Iris, W2).
+**When you change a Privacy or Terms paragraph,** in the same change run
+`pnpm --filter @pam/config legal:date <privacy|terms> <YYYY-MM-DD>` with the day it goes live (merged to `main`, in UTC), then `copy:ack`
+and the tests. It writes the date, the fingerprint and the sentence in seven languages; do not edit the date line by hand. The date is
+a fact, not a promise, but it is English text, so Sage signs the sentence (A29). A translation corrected without changing the meaning
+does not move the date. A date never goes backwards (the script refuses).
 
 ## In a text message
 

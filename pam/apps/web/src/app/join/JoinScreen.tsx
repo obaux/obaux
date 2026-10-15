@@ -10,16 +10,19 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BellIcon, BigButton, Loading, Notice, Page, PointsBadge, StarIcon, TextField, TextLink, TripsIcon } from '@pam/ui';
+import { BellIcon, BigButton, Loading, Notice, Page, HelpIcon, PointsBadge, StarIcon, TextField, TextLink, TripsIcon } from '@pam/ui';
+import { MenuList } from '@pam/ui/MenuList';
 import { SubPageHeader } from '@pam/ui/SubPage';
-import { LANGUAGE_TAGS, SUPPORTED_LOCALES, TRANSPARENCY_SCREEN, badgeForPoints, type Locale, intlLocale } from '@pam/config';
+import { LANGUAGE_TAGS, SUPPORTED_LOCALES, TRANSPARENCY_SCREEN, badgeForPoints, type Locale, intlLocale, nameJoinerOf } from '@pam/config';
+import { LanguageField } from '@pam/ui/LanguageField';
 import { useI18n } from '@/lib/i18n';
+import { HELP_DESK_URL } from '@/lib/helpDesk';
 import { navigate } from '@/lib/navigate';
 import { forgetInvite, recallInvite, type Invite } from '@/lib/appUrl';
+import { takeNext } from '@/lib/signinNext';
 import { readAddedTrips, withMoves } from '@/lib/addedTrips';
-import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
+import { exampleTrips } from '@/lib/exampleTrips';
 import { Confetti } from '@pam/ui/SuccessScreen';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { TransparencyReading } from '@/screens/TransparencyReading';
 import { signOut, useSession } from '@/lib/useSession';
 import { usePoints } from '@/lib/usePoints';
@@ -36,7 +39,6 @@ import {
 import { NOTICES } from '@pam/config';
 import { markFreshAccount } from '@/lib/programSetup';
 import { SetupArt, type SetupArtKind } from '@pam/ui/SetupArt';
-import { ChoiceChips } from '@pam/ui/ChoiceChips';
 import { InfoTip } from '@pam/ui/InfoTip';
 import { Dropdown } from '@pam/ui/Dropdown';
 
@@ -152,7 +154,6 @@ export interface JoinPreview {
 export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview | null } = {}) {
   const { t, locale, pendingLocale, setLocale } = useI18n();
   const router = useRouter();
-  const supportPhone = useSupportPhone();
   const { state: session } = useSession();
 
   const [phase, setPhase] = useState<Phase | null>(null);
@@ -167,6 +168,9 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
    */
   const [inviteCode, setInviteCode] = useState('');
   const [inviteProblem, setInviteProblem] = useState<InviteProblem | null>(null);
+  // The code field is hidden until asked for; once shown it stays shown.
+  const [codeOpen, setCodeOpen] = useState(false);
+  const [focusCode, setFocusCode] = useState(false);
   /** Whether step 2 made an account, as opposed to recording a request. */
   const [hasAccount, setHasAccount] = useState(false);
   /**
@@ -203,6 +207,27 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
   const lastId = useId();
   const cityId = useId();
   const codeFieldId = useId();
+  const codeQuestionId = useId();
+  const codeShown = codeOpen || inviteCode !== '' || inviteProblem !== null;
+  useEffect(() => {
+    if (inviteCode !== '' || inviteProblem !== null) setCodeOpen(true);
+  }, [inviteCode, inviteProblem]);
+  // The link that opens it moves the person into the field it opened.
+  useEffect(() => {
+    if (!focusCode || !codeShown) return;
+    // A frame later: the link that was tapped is gone, and the press that removed it
+    // finishes first, so focusing now would be undone and land on the page.
+    const frame = requestAnimationFrame(() => {
+      // By name: the field makes its own id and does not take `codeFieldId`.
+      document.querySelector<HTMLInputElement>('input[name="inviteCode"]')?.focus();
+      setFocusCode(false);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [focusCode, codeShown]);
+  const revealCode = () => {
+    setCodeOpen(true);
+    setFocusCode(true);
+  };
 
   /**
    * Who is signed in, asked of the sign-in system rather than of the profile.
@@ -370,7 +395,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
     // was a tap that did nothing. Home opens on getting started (D-352).
     markFreshAccount();
     if (preview) navigate('/');
-    else router.replace('/');
+    else router.replace(recallInvite() ? '/' : (takeNext() ?? '/'));
   };
 
   const answerTexts = async (wants: boolean) => {
@@ -412,7 +437,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
   // The booked visit itself, from the example trips or the ones a program
   // added this session (D-322); null when the link carried none.
   const booked = bookedTrip
-    ? (withMoves([...DUMMY_TRIPS, ...readAddedTrips()]).find((trip) => trip.id === bookedTrip) ?? null)
+    ? (withMoves([...exampleTrips(), ...readAddedTrips()]).find((trip) => trip.id === bookedTrip) ?? null)
     : null;
   const bookedDay = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long', month: 'long', day: 'numeric' });
   const bookedTime = new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' });
@@ -444,6 +469,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
       <BigButton
         label={busy ? t('join.saving') : t('action.next')}
         badge={progress}
+        nameJoiner={nameJoinerOf(locale)}
         onPress={() => void submit()}
         isDisabled={busy}
       />
@@ -457,13 +483,14 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
         <TextLink label={t('join.waiting.skip')} href="/" />
       </VStack>
     ) : phase === 'privacy' && !isStaff ? (
-      <BigButton label={t(TRANSPARENCY_SCREEN.confirmKey)} badge={progress} onPress={() => setPhase('texts')} />
+      <BigButton label={t(TRANSPARENCY_SCREEN.confirmKey)} badge={progress} nameJoiner={nameJoinerOf(locale)} onPress={() => setPhase('texts')} />
     ) : phase === 'privacy' && isStaff ? (
       hasAccount ? (
         // Came in by code: the account exists, and this is the last step.
         <BigButton
           label={busy ? t('join.saving') : t(TRANSPARENCY_SCREEN.confirmKey)}
           badge={progress}
+          nameJoiner={nameJoinerOf(locale)}
           onPress={() => void finishStaff()}
           isDisabled={busy}
         />
@@ -477,6 +504,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
         <BigButton
           label={busy ? t('join.saving') : t('reminders.optIn')}
           badge={progress}
+          nameJoiner={nameJoinerOf(locale)}
           onPress={() => void answerTexts(true)}
           isDisabled={busy}
         />
@@ -512,8 +540,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
             notice="something_went_wrong"
             title={t('join.failed.title')}
             body={t('join.failed.body')}
-            supportPhone={supportPhone}
-            callLabel={t('help.callSupport')}
+            contactLabel={t('help.contact.action')}
           />
         ) : null}
 
@@ -613,17 +640,15 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 already send this locale as `language` — that part was here
                 before this control was; only the way to change it is new.
               */}
-              {/* Chips, as Plan a visit's days and times (D-359); the chosen one
-                  in the secondary green. English unless already switched. */}
-              <VStack gap={2}>
-                <Text xstyle={styles.chipsLabel}>{t('onboarding.language.title')}</Text>
-                <ChoiceChips
-                  label={t('onboarding.language.title')}
-                  options={SUPPORTED_LOCALES.map((code) => ({ value: code, label: t(`language.${code}`), tag: LANGUAGE_TAGS[code], lang: code }))}
-                  value={pendingLocale ?? locale}
-                  onChange={(code) => setLocale(code as Locale)}
-                />
-              </VStack>
+              {/* A dropdown again (Will, 13 October: "with all these languages ...
+                  the chips are taking up too much space"). Each language is named
+                  in itself, with its English tag in the list; Dot's control, D-561. */}
+              <LanguageField
+                label={t('onboarding.language.title')}
+                options={SUPPORTED_LOCALES.map((code) => ({ code, name: t(`language.${code}`), tag: LANGUAGE_TAGS[code] }))}
+                value={pendingLocale ?? locale}
+                onChange={(code) => setLocale(code as Locale)}
+              />
 
               {invitedAs ? null : (
                 <>
@@ -635,24 +660,40 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 {/* The hint behind an info tip on the label's line (D-369):
                     the form stays fields; the field keeps its own label for
                     screen readers, and the line you see is that label again. */}
-                <VStack gap={1}>
-                  <HStack gap={1} align="center" wrap="nowrap">
-                    <Text aria-hidden="true" xstyle={styles.chipsLabel}>
-                      {t('join.code.label')}
+                {/*
+                  Hidden until asked for (Will, 13 October: "otherwise let's hide it so
+                  it doesn't take up real estate"): most people join without a code.
+                  Open from the start when a code is already there, or when the code
+                  they gave needs fixing (`inviteProblem`).
+                */}
+                {codeShown ? (
+                  <VStack gap={1}>
+                    <HStack gap={1} align="center" wrap="nowrap">
+                      <Text aria-hidden="true" xstyle={styles.chipsLabel}>
+                        {t('join.code.label')}
+                      </Text>
+                      <InfoTip label={t('join.code.more')} content={t('join.code.hint')} />
+                    </HStack>
+                    <TextField
+                      id={codeFieldId}
+                      purpose="inviteCode"
+                      label={t('join.code.label')}
+                      isLabelHidden
+                      value={inviteCode}
+                      onChange={(next) => setInviteCode(next.toUpperCase())}
+                      width="100%"
+                      xstyle={styles.field}
+                    />
+                  </VStack>
+                ) : (
+                  <VStack gap={1} align="start">
+                    <Text id={codeQuestionId} xstyle={styles.body}>
+                      {t('join.code.question')}
                     </Text>
-                    <InfoTip label={t('join.code.more')} content={t('join.code.hint')} />
-                  </HStack>
-                  <TextField
-                    id={codeFieldId}
-                    purpose="inviteCode"
-                    label={t('join.code.label')}
-                    isLabelHidden
-                    value={inviteCode}
-                    onChange={(next) => setInviteCode(next.toUpperCase())}
-                    width="100%"
-                    xstyle={styles.field}
-                  />
-                </VStack>
+                    {/* Read with its question, so "Click here" is never heard alone (Iris, b32, P2). */}
+                    <TextLink label={t('join.code.reveal')} onClick={revealCode} isUnderlined describedBy={codeQuestionId} />
+                  </VStack>
+                )}
                 </>
               )}
 
@@ -661,8 +702,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                   notice={inviteProblem}
                   title={t(NOTICES[inviteProblem].titleKey)}
                   body={t(NOTICES[inviteProblem].bodyKey)}
-                  supportPhone={supportPhone}
-                  callLabel={t('help.callSupport')}
+                  contactLabel={t('help.contact.action')}
                 />
               ) : null}
 
@@ -717,7 +757,29 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
           three different people are reading it and only one of them is being
           asked to trust us with their life (Will, 14 September).
         */}
-        {phase === 'privacy' && !isStaff ? <TransparencyReading /> : null}
+        {phase === 'privacy' && !isStaff ? (
+          <>
+            <TransparencyReading />
+            {/*
+              The reading says "If something here worries you, call us. A person
+              answers." Here, before the account is set up, that has to be
+              somewhere they can tap (Iris, member flow W2, 10 October). Pam has
+              no phone line (D-512), so it is Contact Pam, opening the help desk
+              on the website: they are not signed in to the app's Help yet.
+            */}
+            <MenuList
+              label={t('help.contact.action')}
+              items={[
+                {
+                  id: 'contact',
+                  label: t('help.contact.action'),
+                  href: HELP_DESK_URL,
+                  icon: <HelpIcon width={26} height={26} />,
+                },
+              ]}
+            />
+          </>
+        ) : null}
 
         {phase === 'privacy' && isStaff ? (
           <>
@@ -757,8 +819,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                   notice="service_not_available"
                   title={t('join.staff.title')}
                   body={t('join.staff.body')}
-                  supportPhone={supportPhone}
-                  callLabel={t('help.callSupport')}
+                  contactLabel={t('help.contact.action')}
                 />
               </>
             )}
@@ -839,7 +900,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
               */}
               <PointsBadge points={points ?? 0} label={t('points.title')} />
               <Text xstyle={styles.body}>{t('join.done.body', { name: firstName.trim() || t('app.name') })}</Text>
-              <BigButton label={t('join.done.action')} onPress={() => (preview ? navigate('/') : router.replace('/'))} />
+              <BigButton label={t('join.done.action')} onPress={() => (preview ? navigate('/') : router.replace(recallInvite() ? '/' : (takeNext() ?? '/')))} />
             </VStack>
           </>
         ) : null}

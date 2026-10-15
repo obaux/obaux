@@ -143,3 +143,31 @@ test('the Signed tab lists who signed by first name and date, nothing more', asy
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
   expect(results.violations).toEqual([]);
 });
+
+test('ticking a policy on a service asks the database to make it only for that service', async ({ page }) => {
+  const CONF = 'a1b2c3d4-0000-4000-8000-000000000001';
+  const GED = 'b1b2c3d4-0000-4000-8000-0000000000aa';
+  const COMPUTERS = 'b1b2c3d4-0000-4000-8000-0000000000bb';
+  await signedInLead(page, [policy(CONF, 'Confidentiality')]);
+  await page.unroute('**/rest/v1/program_services*');
+  const svc = (id: string, name: string, policyIds: string[]) => ({
+    id, service_id: PROGRAM, name, description: null, phone: null, website: null, address: null, hours: null, sort_order: 0,
+    program_policy_services: policyIds.map((policy_id) => ({ policy_id })),
+  });
+  await page.route('**/rest/v1/program_services*', (route) => {
+    if (route.request().method() === 'GET') return route.fulfill(json([svc(GED, 'GED class', []), svc(COMPUTERS, 'Computer room', [CONF])]));
+    return route.fulfill(json([]));
+  });
+  const scoped: unknown[] = [];
+  await page.route('**/rest/v1/rpc/set_policy_services*', (route) => {
+    scoped.push(route.request().postDataJSON());
+    return route.fulfill(json(null));
+  });
+  await page.goto(`/program/service/?id=${GED}`);
+  await settled(page);
+  await page.getByRole('checkbox', { name: 'Confidentiality' }).check();
+  await page.getByRole('button', { name: /Save/ }).last().click();
+  await expect.poll(() => scoped.length).toBe(1);
+  // The policy was already only for the computer room; now it is for the GED class too.
+  expect(scoped[0]).toEqual({ p_policy_id: CONF, p_service_ids: [COMPUTERS, GED] });
+});

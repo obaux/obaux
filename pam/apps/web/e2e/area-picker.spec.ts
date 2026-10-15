@@ -1,19 +1,21 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { settled } from './settled';
+import { asMember } from './asMember';
+import en from '@pam/config/locales/en.json';
+import ar from '@pam/config/locales/ar.json';
 
 /**
  * Choosing where the list is measured from.
  *
  * The RPCs are stubbed, as everywhere else — this container cannot reach
- * Supabase — but the city address lookup is stubbed too, and deliberately: it
- * proves the enhancement is optional. A member whose network cannot reach
- * Philadelphia's API still gets the ZIP list.
+ * Supabase. What a member types goes to Pam's `search_areas` and nowhere else:
+ * the browser no longer asks the City of Philadelphia's API about a street
+ * address (D-536), and a test below watches for any call to it.
  */
 
 const AREAS = '**/rest/v1/rpc/search_areas*';
 const PLACES = '**/rest/v1/rpc/services_near*';
-const CARTO = 'https://phl.carto.com/**';
 
 const ZIPS = [
   { id: 'a1', kind: 'zip', label: '19104', lat: 39.963788, lon: -75.202914 },
@@ -36,7 +38,8 @@ const PLACE = {
   has_hours: false,
 };
 
-async function stub(page: import('@playwright/test').Page) {
+async function stub(page: import('@playwright/test').Page, language: string | null = null) {
+  await asMember(page, 'member', language);
   await page.route(AREAS, (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(ZIPS) }),
   );
@@ -48,37 +51,41 @@ async function stub(page: import('@playwright/test').Page) {
 test.describe('choosing an area', () => {
   test('the area is a control, not a label', async ({ page }) => {
     await stub(page);
-    await page.goto('/places/');
+    await page.goto('/');
 
     // Tapping the area itself opens the picker: a member should not have to
     // find the pencil to discover that this is theirs to set.
     await page.getByRole('button', { name: 'Near City Hall' }).click();
-    await expect(page.getByRole('textbox', { name: 'ZIP code or address' })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'ZIP code' })).toBeVisible();
+    // The search finds ZIP codes and neighborhoods, so the picker says what to type.
+    await expect(page.getByText('Like 19107, or Fishtown.')).toBeVisible();
   });
 
   test('the pencil beside it does the same thing, and says so', async ({ page }) => {
     // It is a picture with no word next to it, so its accessible name has to
     // carry the whole meaning — "Change the area", not "Edit".
     await stub(page);
-    await page.goto('/places/');
+    await page.goto('/');
 
     await page.getByRole('button', { name: 'Change the area' }).click();
-    await expect(page.getByRole('textbox', { name: 'ZIP code or address' })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'ZIP code' })).toBeVisible();
   });
 
   test('lives in the header, so the list starts at the top of the page', async ({ page }) => {
     await stub(page);
-    await page.goto('/places/');
+    await page.goto('/');
 
-    const inHeader = await page
-      .getByRole('button', { name: 'Near City Hall' })
-      .evaluate((el) => Boolean(el.closest('header')));
-    expect(inHeader, 'the area control is not in the header').toBe(true);
+    // On Explore the area control sits under the title, above the list (the old list's <header> is gone with the page): the list starts below it.
+    const chip = page.getByRole('button', { name: 'Near City Hall' });
+    await expect(chip).toBeVisible();
+    const box = await chip.boundingBox();
+    expect(box!.y, 'the area control is not at the top of the page').toBeLessThan(260);
+    await expect(page.getByRole('heading', { name: 'All programs' })).toBeVisible();
   });
 
   test('offers somewhere to start before anything is typed', async ({ page }) => {
     await stub(page);
-    await page.goto('/places/');
+    await page.goto('/');
     await page.getByRole('button', { name: 'Change the area' }).click();
 
     // No typing yet, and there are already options. Somebody who does not know
@@ -88,11 +95,11 @@ test.describe('choosing an area', () => {
 
   test('remembers the choice on this device', async ({ page }) => {
     await stub(page);
-    await page.goto('/places/');
+    await page.goto('/');
     await page.getByRole('button', { name: 'Change the area' }).click();
-    // A row picks; Done keeps it (D-275).
+    // A row picks, and the drawer closes by itself (Will, 14 October).
     await page.getByRole('button', { name: /^19122/ }).click();
-    await page.getByRole('button', { name: 'Done' }).click();
+    await expect(page.getByRole('textbox', { name: 'ZIP code' })).toHaveCount(0);
 
     await expect(page.getByRole('button', { name: 'Near 19122' })).toBeVisible();
 
@@ -100,43 +107,64 @@ test.describe('choosing an area', () => {
     await expect(page.getByRole('button', { name: 'Near 19122' })).toBeVisible();
   });
 
-  test('a street address still resolves when the city API answers', async ({ page }) => {
+  test('typing a street address asks only Pam: nothing goes to the City of Philadelphia (D-536)', async ({ page }) => {
     await stub(page);
-    await page.route(CARTO, (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          rows: [
-            { location: '1231-39 N BROAD ST', zip_code: '19122', lat: 39.9729, lon: -75.1586 },
-          ],
-        }),
-      }),
-    );
-    await page.goto('/places/');
+    const outside: string[] = [];
+    page.on('request', (request) => {
+      const url = request.url();
+      if (/carto\.com/.test(url)) outside.push(url);
+    });
+    const asked: unknown[] = [];
+    await page.route(AREAS, (route) => {
+      asked.push(route.request().postDataJSON());
+      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(ZIPS) });
+    });
+    await page.goto('/');
     await page.getByRole('button', { name: 'Change the area' }).click();
-    await page.getByRole('textbox', { name: 'ZIP code or address' }).fill('1231 N Broad');
+    await page.getByRole('textbox', { name: 'ZIP code' }).fill('1234 Market');
 
-    await expect(page.getByRole('button', { name: /1231-39 N Broad St, 19122/ })).toBeVisible();
-  });
-
-  test('the ZIP list still answers when the city API does not', async ({ page }) => {
-    await stub(page);
-    await page.route(CARTO, (route) => route.abort());
-    await page.goto('/places/');
-    await page.getByRole('button', { name: 'Change the area' }).click();
-    await page.getByRole('textbox', { name: 'ZIP code or address' }).fill('1231 N Broad');
-
-    // The address lookup failed and the screen says nothing about it, because
-    // there is nothing a member can do with that. The ZIPs are still there.
+    // The ZIP list answers, from Pam's own search, and the typed text went to it as a POST body.
     await expect(page.getByRole('button', { name: /^19104/ })).toBeVisible();
+    await expect.poll(() => asked.some((body) => (body as { p_query?: string }).p_query === '1234 Market')).toBe(true);
+    expect(outside).toEqual([]);
   });
 
-  test('closing without Done leaves the area as it was (D-275)', async ({ page }) => {
+  test('every kind of pick closes the drawer and sets the Near control (Will, 14 October)', async ({ page }) => {
+    await page.context().grantPermissions(['geolocation']);
+    await page.context().setGeolocation({ latitude: 39.9526, longitude: -75.1652 });
     await stub(page);
-    await page.goto('/places/');
+    await page.goto('/');
+    const drawerOpen = () => page.getByRole('textbox', { name: 'ZIP code' });
+    // A ZIP.
     await page.getByRole('button', { name: 'Change the area' }).click();
-    await page.getByRole('button', { name: /^19122/ }).click();
+    await page.getByRole('button', { name: /^19104/ }).click();
+    await expect(drawerOpen()).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Near 19104' })).toBeVisible();
+    // A landmark.
+    await page.getByRole('button', { name: 'Change the area' }).click();
+    await page.getByRole('button', { name: /^City Hall/ }).click();
+    await expect(drawerOpen()).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Near City Hall' })).toBeVisible();
+    // The phone's own position.
+    await page.getByRole('button', { name: 'Change the area' }).click();
+    await page.getByRole('button', { name: /^Use my current location/ }).click();
+    await expect(drawerOpen()).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Near your location' })).toBeVisible();
+  });
+
+  test('Cancel closes the drawer and changes nothing', async ({ page }) => {
+    await stub(page);
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Change the area' }).click();
+    await page.getByRole('button', { name: 'Cancel' }).click();
+    await expect(page.getByRole('textbox', { name: 'ZIP code' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Near City Hall' })).toBeVisible();
+  });
+
+  test('closing without picking leaves the area as it was (Cancel, Escape)', async ({ page }) => {
+    await stub(page);
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Change the area' }).click();
     await page.keyboard.press('Escape');
 
     await expect(page.getByRole('button', { name: 'Near City Hall' })).toBeVisible();
@@ -144,7 +172,7 @@ test.describe('choosing an area', () => {
 
   test('has no WCAG A/AA violations while open', async ({ page }) => {
     await stub(page);
-    await page.goto('/places/');
+    await page.goto('/');
     await page.getByRole('button', { name: 'Change the area' }).click();
     await expect(page.getByRole('button', { name: /^19104/ })).toBeVisible();
 
@@ -164,3 +192,25 @@ test.describe('choosing an area', () => {
     expect(results.violations).toEqual([]);
   });
 });
+
+/**
+ * The search field's name is read once and its hint is tied to it (Iris, b20: a screen reader heard
+ * "ZIP code or neighborhood" twice, once from the label and once from the placeholder, and the hint
+ * "Like 19107, or Fishtown." was not linked to the field).
+ */
+for (const [locale, words] of [['en', en], ['ar', ar]] as const) {
+  test(`${locale}: the area field is named once and its hint describes it`, async ({ page }) => {
+    await page.addInitScript((code) => localStorage.setItem('pam.locale', code), locale);
+    await stub(page, locale);
+    await page.goto('/');
+    await page.getByRole('button', { name: /City Hall/ }).first().click();
+
+    const field = page.getByRole('dialog').getByRole('textbox');
+    await expect(field).toHaveCount(1);
+    // Named by its label alone: no second copy of the words as a placeholder.
+    await expect(field).toHaveAccessibleName(words['places.areaLabel']);
+    await expect(field).not.toHaveAttribute('placeholder', /.+/);
+    // And the hint is its description.
+    await expect(field).toHaveAccessibleDescription(words['places.areaHint']);
+  });
+}

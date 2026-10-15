@@ -17,6 +17,7 @@ import {
   directionsHref,
   googlePlaceHref,
 } from '@pam/ui';
+import { usePlaceLead } from '@/lib/usePlaceHasLead';
 import { PlaceBarActions, leadMessageFor, messageHrefFor, newMessageFrom } from '../../screens/PlaceBarActions';
 import { PlaceDetailSkeleton } from '@pam/ui/Skeletons';
 import { SubPageHeader } from '@pam/ui/SubPage';
@@ -25,23 +26,25 @@ import { categoryLabelKey, displayPhone, distanceLabel, NOTICES, POINTS_RULES, t
 import { DUMMY_PLACES_BY_ID, isDummyPlaceId } from '@pam/config/dummy-places';
 import { useI18n } from '@/lib/i18n';
 import { addressActionsFor } from '@/lib/addressActions';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { logCall } from '@/lib/logCall';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { usePlaceStatus, weekLines } from '@/lib/usePlaceStatus';
 import { useRoleView } from '@/lib/useViewedRole';
-import { RoleSwitchControl } from '../RoleSwitchControl';
 import { sharePlace } from '@/lib/sharePlace';
 import { usePlacePolicies } from '@/lib/usePlacePolicies';
 import { useMySignatures } from '@/lib/useMySignatures';
 import { PolicyStatusCard } from '@pam/ui/PolicyStatusCard';
 import { countdown } from '@/lib/when';
 import { VisitCard } from '@pam/ui/VisitCard';
+import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
+import { examplesOn } from '@/lib/examples';
+import { exampleTrips } from '@/lib/exampleTrips';
 import { readAddedTrips, TRIPS_CHANGED, withMoves, withoutCancelled } from '@/lib/addedTrips';
-import { cancelSavedOrLocalTrip } from '@/lib/savedTrips';
+import { cancelSavedOrLocalTrip, isSavedPlace } from '@/lib/savedTrips';
+import { inMarkWindow } from '@/lib/imHere';
+import { ImHereCard } from '../../screens/ImHereCard';
 import { navigate } from '@/lib/navigate';
 import { ConfirmDialog } from '../../screens/ConfirmDialog';
 import { Banner } from '@astryxdesign/core/Banner';
@@ -90,7 +93,10 @@ const BACK_TARGETS = {
   // The redesign's Explore, which is the home screen there (D-212).
   explore: { href: '/', labelKey: 'nav.back.explore' },
   trips: { href: '/trips/', labelKey: 'nav.back.trips' },
-  places: { href: '/places/', labelKey: 'nav.back.places' },
+  // The old Places list is retired (Will, 13 October): an old `from=places` link goes to Explore.
+  places: { href: '/', labelKey: 'nav.back.explore' },
+  // The places somebody reported, for the people who review them (D-189).
+  reported: { href: '/places/reported/', labelKey: 'nav.back.reported' },
   saved: { href: '/saved/', labelKey: 'nav.back.saved' },
   // All programs, a staff member's secondary path (D-218).
   programs: { href: '/programs/', labelKey: 'nav.back.programs' },
@@ -106,7 +112,7 @@ function resolveBack(from: string | null, thread: string | null = null): { href:
   if (from === 'thread' && thread) {
     return { href: `/messages/thread/?id=${encodeURIComponent(thread)}`, labelKey: 'messages.options.back' };
   }
-  return BACK_TARGETS[from as keyof typeof BACK_TARGETS] ?? BACK_TARGETS.places;
+  return BACK_TARGETS[from as keyof typeof BACK_TARGETS] ?? BACK_TARGETS.explore;
 }
 
 interface Detail {
@@ -143,7 +149,7 @@ function useServiceDetail(id: string | null): State {
     // A dummy saved place never lived in `services` — see
     // `DUMMY_PLACES_BY_ID`'s own comment for what asking the network for it
     // used to do instead.
-    if (isDummyPlaceId(id)) {
+    if (isDummyPlaceId(id) && examplesOn()) {
       const dummy = DUMMY_PLACES_BY_ID[id];
       setState(
         dummy
@@ -219,7 +225,6 @@ function useServiceDetail(id: string | null): State {
 
 function PlaceScreen() {
   const { t, tPlain, locale } = useI18n();
-  const supportPhone = useSupportPhone();
   const params = useSearchParams();
   const id = params.get('id');
   const state = useServiceDetail(id);
@@ -228,10 +233,13 @@ function PlaceScreen() {
   const { state: session } = useSession();
   const signedIn = session.status === 'signed-in';
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const { demoRole, setViewAs } = useRoleView(trueRole);
+  const { demoRole } = useRoleView(trueRole);
   const { isSaved, save, unsave } = useSavedPlaces(signedIn, demoRole);
 
   const place = state.status === 'ready' ? state.place : null;
+  // A place with no program lead on Pam is not told about a visit (D-498).
+  const leadKnown = usePlaceLead(place?.id, place?.name);
+  const hasLead = leadKnown === true;
   const { forPlace: policiesAt } = usePlacePolicies();
   const { progress } = useMySignatures();
   const { forPlace } = useServices();
@@ -239,7 +247,7 @@ function PlaceScreen() {
   // to the top of the page (D-271). Opened from a trip card, the page is
   // about that visit (D-273): its day and time instead of "Plan a trip".
   const [hasTrip, setHasTrip] = useState(false);
-  const [visit, setVisit] = useState<{ id: string; startsAt: string; serviceId: string | null } | null>(null);
+  const [visit, setVisit] = useState<{ id: string; startsAt: string; serviceId: string | null; attendance: 'attended' | 'missed' | null } | null>(null);
   // Cancel this visit (asks first): the one thing here that takes a plan away.
   const [askingCancel, setAskingCancel] = useState(false);
   const [cancelFailed, setCancelFailed] = useState(false);
@@ -255,12 +263,12 @@ function PlaceScreen() {
   useEffect(() => {
     if (!place) return;
     const read = () => {
-      const here = withoutCancelled(withMoves([...DUMMY_TRIPS, ...readAddedTrips()]))
+      const here = withoutCancelled(withMoves([...exampleTrips(), ...readAddedTrips()]))
         .filter((trip) => trip.placeId === place.id)
         .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
       setHasTrip(here.length > 0);
       const found = here.find((trip) => trip.id === tripId) ?? (fromTrips ? here[0] : undefined);
-      setVisit(fromTrips && found ? { id: found.id, startsAt: found.startsAt, serviceId: found.serviceId ?? null } : null);
+      setVisit(fromTrips && found ? { id: found.id, startsAt: found.startsAt, serviceId: found.serviceId ?? null, attendance: ('attendance' in found ? found.attendance : null) ?? null } : null);
     };
     read();
     // A visit moved from here (D-281) shows its new time on the way back.
@@ -300,16 +308,14 @@ function PlaceScreen() {
    * in the bar instead (it was put here on 16 September so this screen would
    * not show less than its neighbours; that still holds).
    */
-  const header = (title: string, bar?: React.ReactNode) => (
+  const header = (title: string, bar?: React.ReactNode, isName = false) => (
     <SubPageHeader
       title={title}
+      isTitleData={isName}
       backHref={back.href}
       backLabel={t(back.labelKey)}
       actions={
         <>
-          {trueRole === 'super_admin' ? (
-            <RoleSwitchControl trueRole={trueRole} viewedRole={demoRole ?? trueRole} onChange={setViewAs} />
-          ) : null}
           {/*
             A place's own bar once it has loaded (D-224): Save and the ⋯ menu.
             Before that, Help (D-217).
@@ -333,13 +339,12 @@ function PlaceScreen() {
     const key = state.status === 'error' && state.offline ? 'offline' : 'something_went_wrong';
     return (
       <Page gap={4}>
-        {header(t('places.title'))}
+        {header(t('tab.explore'))}
         <Notice
           notice={state.status === 'missing' ? 'service_not_available' : key}
           title={state.status === 'missing' ? t('place.notFound.title') : t(NOTICES[key].titleKey)}
           body={state.status === 'missing' ? t('place.notFound.body') : t(NOTICES[key].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
         <BigButton label={t('help.place.action')} href="/" />
       </Page>
@@ -383,6 +388,14 @@ function PlaceScreen() {
   // always in reach (D-309, D-326). With a visit booked, nothing asks to
   // plan one (D-273).
   const plansVisit = (demoRole ?? trueRole) === 'member' && !visit;
+  // Said where a member plans or keeps a visit, only at a place with no lead (D-498).
+  const isMemberView = (demoRole ?? trueRole) === 'member';
+  const tellsNoLead = isMemberView && !hasLead;
+  // A place with a lead on Pam sees the visit (D-526): said before the member plans one.
+  const tellsLeadSees = isMemberView && hasLead;
+  // A member can message a place only if somebody on Pam runs it (Will, 12 October: programs gathered from
+  // the internet have no one to answer). Until that is known the entry points wait, not flash in and out (D-544).
+  const hidesMessage = isMemberView && leadKnown !== true;
   const services = forPlace(place!.id);
   const staff = programStaffFor(place!.id);
   // How the program takes people (D-313): a visit to plan, or a schedule
@@ -438,20 +451,24 @@ function PlaceScreen() {
         // Walk-ins plan a trip too (Will, D-333): a day it meets, so staff
         // see who is coming, then the same booked screen.
         plansVisit ? (
-          <BigButton
-            label={t('place.schedule')}
-            // Pick a service first, like a size before checkout (Will,
-            // D-313): the button waits until one is chosen.
-            isDisabled={services.length > 0 && !service}
-            href={`/trips/new/?${new URLSearchParams({
-              place: place!.id,
-              name: place!.name,
-              category: place!.category,
-              ...(place!.address ? { address: place!.address } : {}),
-              // The card they picked rides along (D-313): no "Which service?"
-              ...(service ? { service: service.id } : {}),
-            }).toString()}`}
-          />
+          <VStack gap={2}>
+            <BigButton
+              label={t('place.schedule')}
+              // Pick a service first, like a size before checkout (Will,
+              // D-313): the button waits until one is chosen.
+              isDisabled={services.length > 0 && !service}
+              href={`/trips/new/?${new URLSearchParams({
+                place: place!.id,
+                name: place!.name,
+                category: place!.category,
+                ...(place!.address ? { address: place!.address } : {}),
+                // The card they picked rides along (D-313): no "Which service?"
+                ...(service ? { service: service.id } : {}),
+              }).toString()}`}
+            />
+            {/* Why the button is waiting (Iris's member-flow pass, W3): said, not left grey. */}
+            {services.length > 0 && !service ? <Text type="supporting">{t('place.schedule.pickService')}</Text> : null}
+          </VStack>
         ) : footerIsDirections ? (
           // Everybody else's one action (§2.5) is how to get there, in the same
           // sticky footer rather than in the page (Will, 10 October 2026, D-440).
@@ -468,8 +485,10 @@ function PlaceScreen() {
           onSave={signedIn && (demoRole ?? trueRole) !== 'provider' ? toggleSave : undefined}
           onShare={() => void sharePlace(place!.name, place!.address)}
           flagHref={`/flag/?place=${encodeURIComponent(place!.id)}`}
-          messageHref={messageHrefFor(place!.name, place!.id)}
+          // A member can write to a program before booking, if it has a lead on Pam (D-541); none, no item (D-544).
+          messageHref={hidesMessage ? undefined : messageHrefFor(place!.name, place!.id)}
         />,
+        true,
       )}
 
       <PlaceDetail
@@ -502,7 +521,7 @@ function PlaceScreen() {
         addressFirst={visitWhen !== null}
         hoursHref={googleHref}
         notice={
-          visitWhen || policiesOnTop ? (
+          visitWhen || policiesOnTop || tellsNoLead || tellsLeadSees ? (
             <VStack gap={3}>
               {visitWhen ? (
                 // The visit, confirmed (D-273), as a small hero (D-281): only
@@ -526,6 +545,12 @@ function PlaceScreen() {
                   <TextLink label={t('place.visit.cancel')} onClick={() => setAskingCancel(true)} />
                 </>
               ) : null}
+              {/* "I'm here" (D-535): only a real visit, in its window, not yet marked, at a program with a lead on Pam (D-545). */}
+              {visit && hasLead && isSavedPlace(visit.id) && isMemberView && !visit.attendance && inMarkWindow(visit.startsAt) ? (
+                <ImHereCard visitId={visit.id} placeName={place!.name} />
+              ) : null}
+              {tellsNoLead ? <Banner status="info" title={t('place.noLead', { place: place!.name })} /> : null}
+              {tellsLeadSees ? <Banner status="info" title={t('place.lead.sees', { place: place!.name })} /> : null}
               {policiesOnTop ? (
                 <PolicyStatusCard
                   isDone={allSigned}
@@ -547,7 +572,7 @@ function PlaceScreen() {
         layout={visit ? 'default' : 'chooseFirst'}
         extra={
           <>
-            {isDropIn && !visit ? <DropInCard schedule={booking.schedule} /> : null}
+            {isDropIn && !visit ? <DropInCard schedule={booking.schedule} hasLead={hasLead} /> : null}
             {/* Booked: the service is in the visit card, not a picker (D-332). */}
             {visit ? null : (
               <ServiceCards services={services} selectedId={service?.id ?? null} onSelect={setPickedService} />
@@ -589,8 +614,8 @@ function PlaceScreen() {
                 // A message from the program waiting (D-305): the row says so,
                 // with a pink dot and their newest words, and opens that
                 // conversation.
-                unread
-                  ? {
+                ...(unread
+                  ? [{
                       id: 'message',
                       label: t('place.quick.newMessage'),
                       description: unread.preview,
@@ -600,14 +625,16 @@ function PlaceScreen() {
                       // One line, then "…" (Will, D-306): the row says there is a
                       // message, the conversation says the rest.
                       isDescriptionOneLine: true,
-                    }
-                  : {
+                    }]
+                  : hidesMessage
+                    ? []
+                    : [{
                       id: 'message',
                       label: t('place.quick.message'),
                       description: t('place.quick.message.body'),
                       icon: <MessagesIcon {...QUICK} />,
                       href: messageHrefFor(place!.name, place!.id),
-                    },
+                    }]),
               ]),
           ...(phone
             ? [

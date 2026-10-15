@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState, type Ref } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
@@ -30,7 +30,18 @@ export interface CodeBoxesProps {
   readonly onComplete?: (code: string) => void;
   readonly isDisabled?: boolean;
   readonly id?: string;
+  /** The real field, so a screen can put the cursor back in it (a wrong code, D-509). */
+  readonly inputRef?: Ref<HTMLInputElement>;
 }
+
+/**
+ * The digits an Arabic or Persian keyboard types (٠–٩, ۰–۹) become 0–9, so a
+ * person who can read the code is not stuck on boxes that drop them (Lena, D-530).
+ */
+const toLatinDigits = (text: string) =>
+  text
+    .replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 0x0660))
+    .replace(/[\u06F0-\u06F9]/g, (d) => String(d.charCodeAt(0) - 0x06f0));
 
 const styles = stylex.create({
   label: { fontSize: '15px', lineHeight: 1.4 },
@@ -87,20 +98,30 @@ export function CodeBoxes({
   onComplete,
   isDisabled = false,
   id,
+  inputRef,
 }: CodeBoxesProps) {
   const ownId = useId();
   const fieldId = id ?? ownId;
   const [focused, setFocused] = useState(false);
   const completed = useRef<string | null>(null);
-  const digits = value.replace(/\D/g, '').slice(0, length);
+  const digits = toLatinDigits(value).replace(/\D/g, '').slice(0, length);
   const active = Math.min(digits.length, length - 1);
+
+  // A code that was cleared (a wrong one) can be typed again: `onComplete` fires
+  // once per complete code, and the same six digits must count as new.
+  useEffect(() => {
+    if (digits.length < length) completed.current = null;
+  }, [digits.length, length]);
 
   return (
     <VStack gap={2} xstyle={styles.frame}>
       <Text type="supporting" xstyle={styles.label}>
         <label htmlFor={fieldId}>{label}</label>
       </Text>
-      <VStack data-pam-code="" xstyle={styles.frame}>
+      {/* dir="ltr" on the boxes and the field, like the phone number: a code is read
+          1234 in every language, so Arabic must not fill from the right (D-530).
+          The label above and any alerts keep the page's direction. */}
+      <div data-pam-code="" dir="ltr" {...stylex.props(styles.frame)}>
         <HStack gap={2} wrap="nowrap" aria-hidden xstyle={styles.row}>
           {Array.from({ length }, (_, i) => (
             <Text key={i} xstyle={[styles.box, focused && i === active && styles.boxActive]}>
@@ -110,6 +131,7 @@ export function CodeBoxes({
         </HStack>
         <input
           id={fieldId}
+          ref={inputRef}
           name="code"
           type="text"
           inputMode="numeric"
@@ -123,7 +145,7 @@ export function CodeBoxes({
           onBlur={() => setFocused(false)}
           onChange={(event) => {
             // Pasted "123 456" or "Your code is 123456" still lands as digits.
-            const next = event.target.value.replace(/\D/g, '').slice(0, length);
+            const next = toLatinDigits(event.target.value).replace(/\D/g, '').slice(0, length);
             onChange(next);
             if (next.length === length && completed.current !== next) {
               completed.current = next;
@@ -132,7 +154,7 @@ export function CodeBoxes({
           }}
           {...stylex.props(styles.input)}
         />
-      </VStack>
+      </div>
     </VStack>
   );
 }

@@ -35,14 +35,14 @@ import {
   type BadgeDefinition,
   type PointsReason,
 } from '@pam/config';
-import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
+import { useExamplesOn } from '@/lib/useExamplesOn';
 import { DUMMY_EARNED_BADGES } from '@pam/config/dummy-badges';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
 import { useSession } from '@/lib/useSession';
 import { usePoints } from '@/lib/usePoints';
 import { useRoleView } from '@/lib/useViewedRole';
-import { RoleSwitchControl } from '../RoleSwitchControl';
+import { useCountScreenOpen } from '@/lib/screenOpens';
 
 /**
  * What the points are for — a journey, not a table (D-278, Will, 5 October:
@@ -190,12 +190,14 @@ function Rung({ badge, points, t }: { badge: BadgeDefinition; points: number | n
 export default function PointsPage() {
   const { t, tPlain } = useI18n();
   const { state: session } = useSession();
+  // One more phone opened Your points today, counted once a day (a76, D-555).
+  useCountScreenOpen('points');
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const { demoRole, setViewAs } = useRoleView(trueRole);
+  const { demoRole } = useRoleView(trueRole);
   const points = usePoints(session.status === 'signed-in' ? session.session.userId : null);
   // Nothing awards a badge yet; the example member has earned Scholar
   // (D-307), shown where the rest of the example data is.
-  const earned: readonly string[] = USE_DUMMY_PEOPLE && (demoRole ?? trueRole) === 'member' ? DUMMY_EARNED_BADGES : [];
+  const earned: readonly string[] = useExamplesOn() && (demoRole ?? trueRole) === 'member' ? DUMMY_EARNED_BADGES : [];
   const [celebrate, setCelebrate] = useState(false);
 
   const current = points !== null ? badgeForPoints(points) : null;
@@ -298,9 +300,6 @@ export default function PointsPage() {
           backLabel={t('nav.back.profile')}
           actions={
             <>
-              {trueRole === 'super_admin' ? (
-                <RoleSwitchControl trueRole={trueRole} viewedRole={demoRole ?? trueRole} onChange={setViewAs} />
-              ) : null}
               <HelpButton />
             </>
           }

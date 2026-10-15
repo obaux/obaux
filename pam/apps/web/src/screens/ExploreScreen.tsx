@@ -5,15 +5,12 @@ import { useRouter } from 'next/navigation';
 import { EducationIcon, FamilyServicesIcon, Notice, PlaceCard, PlusIcon, ScrollReveal, WorkforceIcon, textLinkLook } from '@pam/ui';
 import { SearchLauncher, SearchPill, type SearchPillItem } from '@pam/ui/SearchPill';
 import { NextTripCard } from '@pam/ui/NextTripCard';
-import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
-import { readMoves } from '@/lib/addedTrips';
+import { useTrips } from '@/lib/useTrips';
 import { useNextVisits, visitTagLabel } from '@/lib/useNextVisits';
 import { CategoryPicture } from './CategoryPicture';
-import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { categoryLabelKey, distanceLabel, intlLocale } from '@pam/config';
 import type { SearchSource } from '@astryxdesign/core/Typeahead';
 import { useI18n } from '@/lib/i18n';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePlaces, searchPlaces, METRES_PER_MILE, type NearbyPlace } from '@/lib/usePlaces';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { placeStatus, useNow } from '@/lib/usePlaceStatus';
@@ -23,6 +20,7 @@ import { CITY_HALL, loadOrigin, saveOrigin, type AreaOption } from '@/lib/useAre
 import { AreaSearch, AreaTrigger } from '../app/places/AreaPicker';
 import { CATEGORY_ICONS, ExploreView, type ExploreCategory } from './ExploreView';
 import { HeaderActions } from './HeaderActions';
+import { useMessagingReach } from '@/lib/useMessagingReach';
 import { HelpButton } from './HelpButton';
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
@@ -67,14 +65,6 @@ function useDebounced(value: string, ms: number): string {
   return debounced;
 }
 
-/** The soonest example visit still ahead — what a member's Explore shows (D-265). */
-function upcomingTrip(moves: Readonly<Record<string, string>>) {
-  const now = Date.now();
-  return DUMMY_TRIPS.map((trip) => (moves[trip.id] ? { ...trip, startsAt: moves[trip.id]! } : trip))
-    .filter((trip) => new Date(trip.startsAt).getTime() > now)
-    .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0] ?? null;
-}
-
 /** "Tue, Oct 7 · 10:00 AM". */
 function tripWhen(iso: string, locale: string): string {
   const d = new Date(iso);
@@ -98,7 +88,6 @@ const TRIP_ICONS = {
 export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'programs' } = {}) {
   const { t, tPlain, locale } = useI18n();
   const router = useRouter();
-  const supportPhone = useSupportPhone();
   const { state: session } = useSession();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { demoRole } = useRoleView(trueRole);
@@ -170,13 +159,15 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
   // are on Profile), the search bar at rest is a centred launcher, and the
   // next visit sits above the list. Staff reach this screen as All programs.
   const isMember = mode === 'tab' && (demoRole ?? trueRole) === 'member';
+  // No one to message means no Messages tab (useMessagingReach); the bell then moves to this header.
+  const noMessagesTab = useMessagingReach(session.status === 'signed-in', '') === false;
   // A visit moved with "Change appointment" (D-281), read after mount.
-  const [moves, setMoves] = useState<Readonly<Record<string, string>>>({});
-  useEffect(() => setMoves(readMoves()), []);
-  const nextTrip = isMember && USE_DUMMY_PEOPLE ? upcomingTrip(moves) : null;
+  // The member's own next visit (saved ones, and the examples only in a demo, D-509), at its moved time.
+  const { all: allTrips } = useTrips();
+  const nextTrip = isMember ? (allTrips.find((trip) => new Date(trip.startsAt).getTime() > Date.now()) ?? null) : null;
   // A member's visits, so a place with one carries Saved's chip and opens as
   // the Visit profile (D-305) — the same wherever the place appears.
-  const visits = useNextVisits(isMember && USE_DUMMY_PEOPLE);
+  const visits = useNextVisits(isMember);
 
   return (
     <ExploreView
@@ -225,15 +216,17 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
             />
             <HelpButton />
           </>
-        ) : isMember ? undefined : (
-          <HeaderActions role={demoRole ?? trueRole} enabled={session.status === 'signed-in'} />
+        ) : isMember && !noMessagesTab ? undefined : (
+          // A member's Home has no header actions, unless the Messages tab is hidden (nobody to message):
+          // the bell lives there then, so notifications stay one tap away (Will, 11 October 2026).
+          <HeaderActions role={demoRole ?? trueRole} enabled={session.status === 'signed-in'} hasHelp={!isMember} />
         )
       }
       nextTrip={
         nextTrip ? (
           <NextTripCard
             categoryLabel={t(categoryLabelKey(nextTrip.category))}
-            categoryIcon={TRIP_ICONS[nextTrip.category]}
+            categoryIcon={TRIP_ICONS[nextTrip.category as keyof typeof TRIP_ICONS] ?? TRIP_ICONS.family_services}
             art={<CategoryPicture category={nextTrip.category} />}
             title={t('explore.nextTrip.title')}
             when={tripWhen(nextTrip.startsAt, locale)}
@@ -266,8 +259,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
             notice="something_went_wrong"
             title={t('saved.failed.title')}
             body={t('saved.failed.body')}
-            supportPhone={supportPhone}
-            callLabel={t('help.callSupport')}
+            contactLabel={t('help.contact.action')}
           />
         ) : null
       }
@@ -275,7 +267,6 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
       state={state}
       onRetry={() => setReload((n) => n + 1)}
       onClearSearch={() => setClearSignal((n) => n + 1)}
-      supportPhone={supportPhone}
       renderPlace={(place, index) => {
         const miles = distanceLabel(place.meters / METRES_PER_MILE, locale);
         const saved = isSaved(place.id);

@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -12,10 +12,12 @@ import { Avatar } from '@astryxdesign/core/Avatar';
 import { BigButton, BookmarkIcon, ConnectionsIcon, Loading, MessagesIcon, Notice, Page, SignIcon, TripsIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { signedBy, usePolicies } from '@/lib/usePolicies';
+import { rememberPersonName } from '@/lib/personNames';
 import { ProfileSummary } from '@pam/ui/ProfileCards';
 import { TripCard } from '@pam/ui/TripCard';
 import { useRouter } from 'next/navigation';
 import { dummyTripsFor } from '@pam/config/dummy-trips';
+import { useMemberTrips } from '@/lib/useMemberTrips';
 import { useCaseload, type CaseloadMember } from '@/lib/useCaseload';
 import { openConversation } from '@/lib/openConversation';
 import { CategoryPicture } from '../../screens/SavedView';
@@ -34,12 +36,12 @@ import { DUMMY_APPOINTMENTS } from '@pam/config/dummy-appointments';
 import { List, ListItem } from '@astryxdesign/core/List';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
+import { useExamplesOn } from '@/lib/useExamplesOn';
 import { useRoleView } from '@/lib/useViewedRole';
-import { RoleSwitchControl } from '../RoleSwitchControl';
 import { DUMMY_SELF_ID, dummyConversationIdBetween, dummyConversationsFor } from '@pam/config/dummy-conversations';
 import { ProgramBadge } from '../ProgramBadge';
+import { ProgramMemberCardView } from '../../screens/ProgramMemberCardView';
 
 /**
  * One person, for a case manager or a program to look at.
@@ -152,13 +154,17 @@ function whenLastActive(iso: string | null, locale: string): string | null {
 function PersonScreen() {
   const { t, tPlain, locale } = useI18n();
   const { policies } = usePolicies();
-  const supportPhone = useSupportPhone();
   const params = useSearchParams();
   const router = useRouter();
   const { state: session } = useSession();
+  // Connect recommends nothing yet (ConnectView: nothing is stored or sent), so a real
+  // account does not get the row (D-509: no examples for real accounts).
+  const examples = useExamplesOn();
 
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const { viewedRole, setViewAs } = useRoleView(trueRole);
+  const { viewedRole } = useRoleView(trueRole);
+  // A real member's planned visits, as their case manager (D-509): never made-up ones.
+  const realTrips = useMemberTrips(params.get('id'), viewedRole === 'admin' && !DUMMY_EVERYONE.some((p) => p.id === params.get('id')));
   // The same audience the three lists that link here already gate on.
   const canView = viewedRole === 'admin' || viewedRole === 'provider' || viewedRole === 'super_admin';
 
@@ -177,9 +183,6 @@ function PersonScreen() {
       backLabel={t('nav.back.home')}
       actions={
         <>
-          {trueRole === 'super_admin' ? (
-            <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-          ) : null}
           {/* Only the bell here (Will, 3 October): no Help on a member's page. */}
           <HeaderActions role={viewedRole} hasHelp={false} />
         </>
@@ -214,8 +217,7 @@ function PersonScreen() {
           notice={key}
           title={t(NOTICES[key].titleKey)}
           body={t(NOTICES[key].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       </Page>
     );
@@ -229,8 +231,7 @@ function PersonScreen() {
           notice="service_not_available"
           title={t('person.notAllowed.title')}
           body={t('admin.notAdmin.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       </Page>
     );
@@ -255,6 +256,12 @@ function PersonScreen() {
     );
   }
 
+  // A program lead tapping a real member linked to their program gets the small card (D-542): first name, their own program's
+  // visits and a way to message. Anybody else, or a member not linked, gets "not found".
+  if (!person && viewedRole === 'provider') {
+    return <ProgramMemberCardView id={id} header={header} />;
+  }
+
   if (!person) {
     return (
       <Page gap={4}>
@@ -263,8 +270,7 @@ function PersonScreen() {
           notice="service_not_available"
           title={t('person.notFound.title')}
           body={t('person.notFound.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
         <BigButton label={t('nav.back.home')} href="/" />
       </Page>
@@ -278,9 +284,11 @@ function PersonScreen() {
   // Trips (D-227): the visits they planned, coming up first, then the ones
   // already made. Example trips until something books one (D-172).
   const now = Date.now();
-  const trips = isMember ? dummyTripsFor(person.id) : [];
+  const trips = !isMember ? [] : person.isExample ? dummyTripsFor(person.id) : realTrips;
   const upcoming = trips.filter((trip) => new Date(trip.startsAt).getTime() >= now);
-  const past = trips.filter((trip) => new Date(trip.startsAt).getTime() < now).reverse();
+  // "Programs attended in the past" lists only visits the program marked them as there for: a missed or not-yet-marked visit is not one (W5).
+  // The example trips have no marks and keep their made-up past.
+  const past = trips.filter((trip) => new Date(trip.startsAt).getTime() < now && ('attended' in trip ? trip.attended : true)).reverse();
   // A program lead sees only their own program's visits with this person
   // (Will, 3 October, D-242): never trips to other programs, places already
   // gone, saved places or points — those are the case manager's (§4.1).
@@ -336,6 +344,7 @@ function PersonScreen() {
 
   return (
     <Page gap={4}>
+      <RememberPersonName id={person.id} name={person.firstName ?? ''} />
       {header(t('person.profile'))}
 
       {/*
@@ -420,11 +429,11 @@ function PersonScreen() {
                       total: policies.length,
                     }),
                     icon: <SignIcon width={26} height={26} />,
-                    href: `/person/policies/?${new URLSearchParams({ id: person.id, name: person.firstName ?? '' }).toString()}`,
+                    href: `/person/policies/?${new URLSearchParams({ id: person.id }).toString()}`,
                   },
                 ]
               : []),
-            ...(viewedRole === 'admin'
+            ...(viewedRole === 'admin' && examples
               ? [
                   {
                     id: 'connect',
@@ -512,14 +521,23 @@ function PersonScreen() {
         </VStack>
       ) : null}
 
-      <Text type="supporting" xstyle={styles.note}>
-        {t(person.isExample ? 'example.people.note' : 'person.trips.example')}
-      </Text>
+      {/* Said only of the made-up people; a real member's page shows real things and no note (D-509). */}
+      {person.isExample ? (
+        <Text type="supporting" xstyle={styles.note}>
+          {t('example.people.note')}
+        </Text>
+      ) : null}
     </Page>
   );
 }
 
 /** `useSearchParams` needs a Suspense boundary in an exported app (see `/place/`). */
+/** Leaves the first name in this tab for the pages about this person (D-536), so it need not ride in an address. */
+function RememberPersonName({ id, name }: { readonly id: string; readonly name: string }) {
+  useEffect(() => rememberPersonName(id, name), [id, name]);
+  return null;
+}
+
 export default function PersonPage() {
   const { t } = useI18n();
   return (

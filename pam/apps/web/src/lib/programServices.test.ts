@@ -13,6 +13,14 @@ const ROW: ProgramServiceRow = {
   sort_order: 0,
 };
 
+describe('serviceFromRow and the policies that are only for it (D-313 step 2)', () => {
+  it('names the policies a service is only for, and none when none is named', () => {
+    expect(serviceFromRow({ ...ROW, program_policy_services: [{ policy_id: 'p1' }, { policy_id: 'p2' }] }).policyIds).toEqual(['p1', 'p2']);
+    expect(serviceFromRow({ ...ROW, program_policy_services: [] }).policyIds).toEqual([]);
+    expect(serviceFromRow({ ...ROW, program_policy_services: null }).policyIds).toEqual([]);
+  });
+});
+
 describe('serviceFromRow', () => {
   it('reads a row in the shape the screens use, with the program as its place', () => {
     expect(serviceFromRow(ROW)).toEqual({

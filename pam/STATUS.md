@@ -928,6 +928,108 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Accounts & invites · Join Pam (W6), language dropdown, code behind a question (13 October) — live in b32
+
+`claude/pam-join-first-time-wording` (D-563, with Dot's D-561 and D-564 merged in). From an invite, Sign in
+says "Join Pam" with Will's signed lines; Join › About you has Dot's LanguageField and the code behind a
+question with an underlined link; Sage's signed fixes to the staff sign-up, the empty caseload and the
+expired link. The expired link offers an email only when `app_settings.invite_emails_live` is 'on'
+(migration 20261013070505, seeded 'on' to match the live sender; switched with the INVITE_EMAILS secret). Will signed a82 (13 October, 18:40) with his own code words; Lena's six languages are in. Live in b32.
+## Accounts & invites · no role switcher or "See the app as" for the super admin; sign-up Contact Pam (10–13 October) — READY
+
+`claude/pam-super-admin-no-switcher` (D-558). Will: the super admin no longer needs the role
+switcher icon (Storybook has a prototype for each journey), and "remove" for "See the app as".
+Both are gone, and the stored preview behind them is retired: a tab still holding one is
+cleared and lands as super admin. "Use Pam as" (two-role accounts, D-374) stays; no database
+change. Also Iris's W2: sign-up step 2 has a Contact Pam row (help desk; no phone line, D-512).
+Open with Will: W2's back arrow (recommended: none).
+
+## Voice & UX copy · English signed for b22, W6, the help form and street search (13 October)
+
+Ledger: `docs/signed-english.md` on `claude/sage-signs` (732e6650). Signed and checked against the code: the b22 visit lines, the website help form, street-search labels, the W6 Join lines and `nav.back.reported`. Will's a72, a77, a80, a81 and a82 are recorded as his. Still waiting: Will on the a65 24/7 line (until launch). Session log: `docs/sessions/2026-10-13-1925-voice-signing-a29-b22-w6-help-form.md`.
+
+## Voice & UX copy · marketing may reach, help stays true; help-post drafts (11 October)
+
+Will: the marketing pages may say what Pam is working towards; help posts, the app and anything legal say only what's
+true today (`docs/voice.md`). Help-post drafts are in `docs/help-drafts/` on one branch each: start-here, talking-to-pam
+and your-language are approved, and Wren builds them; is-the-place-told is waiting on Will. Open FINDINGs for Lena:
+attendance isn't recorded, though the transparency screen says it is, and `language.intro` promises texts.
+
+## Voice & UX copy · the website's own words; first copy pass in Will's component (11 October)
+
+Will chose the website's words: Residents / people looking for help, Providers / social services, Case
+managers / Guides. The app keeps member, program lead and case manager (D-505, `docs/voice.md`). His
+Callout card component in Figma (18:517) now carries a line and a sentence for each chip, written in
+place at his request. Website words get translated after a website change merges, not while they're in Figma.
+Next: the help-centre search phrases with Wren.
+
+## Voice & UX copy · Pam's voice guide; website Home proposals (11 October)
+
+A new lane (Sage, Will's brief of 11 October). **`docs/voice.md`** is how Pam sounds: who we write for, four
+traits (plain, warm, steady, respectful) with do/don't pairs from real `en.json` keys, a tone that flexes from
+the website (most personality) to errors and privacy (plainest), patterns, the word list, writing for seven
+languages and a checklist (D-503). Storybook's Foundations › Writing is a short summary linking to it. No app
+or site words changed. **Waiting on Will:** the Figma page "Copy proposals" in "Pam — Website" (node 31-290)
+has new words for each Home section beside his own; nothing is built until he says "build it", then it is
+Wren's. Open word: "program lead" vs "Program partner" for program staff.
+
+## Merge desk & platform · deploys: only `main`, and checked (10–11 October)
+
+On 10 October the web project hit Vercel's daily deploy limit: 3f0bb5e and 00bde97 were refused ("Deployment rate
+limited", seen only as a commit status) while CI was green. About half the day's 100 deploys were branch previews
+nobody opened. **Preview deployments are off** for `web` and `pam-site` (project setting
+`previewDeploymentsDisabled`); `main` was redeployed by hand at 00:20 UTC on 11 October (00bde97, READY on
+app.joinpam.org). Checked live: `/programs/new/` carries its own title and `og:image` (D-496), and on the old
+vercel.app host `/signin/index.txt` answers 200 instead of redirecting (D-495). The merge desk now checks the
+Vercel status after every push (`docs/team.md`). Emails link to app.joinpam.org: Will changed `APP_URL`.
+
+## Merge desk & platform · the night of 11 October: batches b1 to b13
+
+On `main` and live: D-498 (its migration `a_place_says_whether_a_program_lead_on_pam_runs_it` applied live), D-499, D-500, D-501, D-502, D-503 (Sage's voice guide), D-504 (Foundations match the code), Piper's pick-a-service line, Lena's D-498 review, and the Principles page in line with A24, A25 and A26. Each batch ran the full checks before its push; every push was confirmed READY on Vercel for `web` and `pam-site`. Sage joined (Voice & UX copy). Open with Will: "go on Ask Pam" for the help centre; a push word in Ava's session; a56 (attendance). **A28 (Will, a54):** Pam has no phone line; help goes problem → help desk → email to hello@joinpam.org. In progress in six lanes; the number is still on `main` until Dot's and Wren's changes merge. **Launch cleanup (a55):** real accounts see no example data: Trips done (D-509); Messages, places, Explore, Saved and Profile next. On `main` since: D-508 (legal Back to the website), D-510 (wrong code stays on the code step), D-509, D-513 (dark blue alert 10%), D-516 ("Saved" tip), D-511 (no example messages; no Messages tab with nobody to message). A29: Sage signs new sentences (`docs/signed-english.md`). Also on `main`: D-519 (alerts follow texts_live; the two account texts lose the number in the repo, live after Will refiles), one examples gate (`examples.ts`), D-521 (the help-request forward, deployed live as v1, off; its migration 20261011041940 is for Will to paste, card a62), and **A28 in batch b12**: D-512 (Contact Pam), D-514/D-515 (Lena, seven languages), D-522/D-517 (Wren's help desk: Still stuck? is email, the form behind the switch) and D-523 (a highlight on a script-moved focus only for text boxes). **b13 on main (e25e08f):** D-518/D-520 (Profile skeletons), D-527 (Need help? on the sign-in code step), D-525 (Add my program; migration live as 20261011092734), Wren's site follow-ups, Lena's two texts in six languages. Next: D-524 (Answer by text) as its own step, since its migration replaces claim_outbound_messages. Held for Will: attendance A to C (card a63) and the help form switch (a62). **b14 (07d8287):** D-524 (Answer by text, off; migration live as 20261011093720), Dot's website styles (D-528). **b15 (f0fb902):** Wren's new website from Will's Figma (D-531: Home, Support, a post, About, Still stuck?), Nico's thread header back (D-529), Arabic code boxes left to right (D-530), Explore's "Used for this search only." **b16 (4e0c32f):** Iris's b15 findings: names and messages keep their own direction in Arabic (D-533), Pause pictures is a real button on the first screen, and Sign in waits for six digits (D-532). **b17 (f62ba03):** names in headings keep their own direction (D-534, `@pam/ui/DataHeading`, `isTitleData`). **b18 (privacy):** D-536 (no typed address to the city; the current location is never saved; the Trips map opens on the city; no name in a URL), D-537 (example photos for examples only), the third-party host guard. **b19:** the area hint, `audit:fit` uses the known list, the host guard covers the edge functions, and the link-preview User-Agent says joinpam.org. Built and held: "I'm here" (D-535, a63 + a66), the calendar link (D-538, a68) and the Google sync (D-539, off, its own card). Open with Will: a69 (should Pam read calendars?), a70 (translation retention). Cards a66 and a67 carry the location, request-record and Google map lines. Held for Will: a65 (website words and two colours). **b20:** D-540 (159 Philadelphia neighbourhoods in the area search, credited under Legal > Data sources; every-word search, so "east germantown" finds "Germantown, East"; both migrations live), D-541 part 1 (enrollments: members read only, leads change status and notes on their own org's rows; live as 20261011203904), the City data licence record (docs/data-licences.md) and DB test 68. Built and held for Will: messaging a program before a visit (D-541 part 2, a63 line 1 re-sign, a72) with Piper's narrowing of the appointments read and the program's member card; texting people back (a61, pitch deck linked); a new phone number (a73, Ava). Street search from the City's centerlines is decided, and waits on card a74 (the ArcGIS hosts are blocked here). **b21:** the area picker's field is named once and described by its hint (shared SearchField, so all five search fields), es/pt-BR hint wording, and DB test 69 (nobody writes an appointment row directly). **b22 (8b20e7a8, 12 October 04:30), signed by Will on a63, a66 and a72:** a member can message a program before booking (D-541 part 2; a program starts a chat only with a member signed up or with a visit there, a72); a place nobody on Pam runs shows no Message (D-544) and no I'm here or I went (D-545, refused by the database as NO_LEAD_HERE); a program lead sees the visits planned at their program by first name, checks a member in and can take it back, and an unmarked visit becomes missed a day later (D-526 A to C); a member's own I'm here (position compared once, never kept) or I went (3 in 7 days) (D-535); the program's small card for a linked member (D-542); a lead reads no appointment row directly; the Privacy page says what a program sees before and after a visit (a63), the I'm here and location paragraphs (a66) and who can start a chat (a72), in seven languages; Sage signed every new app sentence and Lena translated every one (the checkin.* English-copy allow-list is gone, so the copy test now proves it); Wren's Messages in Pam post. Seven migrations live (20261012042222 to 20261012042427; thirteen function bodies match the files). **b23 (1f81924e):** "About this place" on every place page (Sage, seven languages), the unused checkin.notNow removed, Will's a72 signature in the ledger, Dot's stories behind the a72 user-flow map, Lena's records, and Messages in Pam dated 12 October. No migrations. Iris's b22 re-test: all three pass. **b24 (0a36ada1):** "Does the place know I'm coming?" says a program on Pam sees the visit (Sage's signed words), Home takes Will's a65 lines 1 and 3, Dot's website text colour examples (D-546, card a75) and the 12 October flow map, and a story for Answer by text. No migrations. The help form's rate-limit check is live (Will's paste, a62) and recorded as 20261011041940; the form switches on when Will adds HELP_REQUESTS_LIVE. Will signed a67 and a68 (the request-record, Google map and calendar link Privacy lines): Lena's texts and Piper's calendar link go in b25. Street search goes through Google from Pam's server (Will, a74), off until he enters a key and signs a Privacy line; the City-file plan is dropped. Next from Will's 12 October answers: Explore's bell only when a member has notifications (Nico), a new phone number (Ava, a73), the case manager request from the website (Ava, Wren), the rewards-screen count (Iris; a Privacy line first), the a65 lines 4 and 5 (Wren). **b25:** Home takes Will's a65 lines 4 and 5 ("Add your program" goes to Sign in); About Pam's carousel words back and "coming home" gone (D-548); Privacy a67, a68 and a70 in seven languages; two untrue staff carousel lines replaced; a member's Explore shows the bell only with notifications (D-549). Held: the calendar link (its migration is a paste for Will, card a79), the website phone layout (Will's a77), Ava's Connect fix (a78). **b26 (d8b7d37f):** the role chip keeps its words whole and the header corner gives way (D-551); Privacy and Terms carry the right "Last updated" date, and a test keeps it right; stories for every welcome slide; a host guard and test for the coming street search. Held: the website phone layout and moving green card (a80), Play restarting the carousels on a phone (D-554, b27), Ava's two branches (a78), the calendar link (a79). **b27:** a case manager sees a real member's real visits, never made-up ones (W4); Sign in can take a new program lead straight to Add my program (S1); Play restarts the carousels after a tap (D-554). The calendar link's database part is live (Will's paste, a79); the link ships in b28. **b28:** members can add their Pam visits to Apple, Google or Outlook through a private calendar link (D-538; the calendar-feed function is live); the website's Add your program goes to Sign in and on to Add my program. The a76 counter's database part is live; the app part ships in b29 with its Privacy line. Open: W5 (missed visits listed as attended, Piper, first) and W6. Will's 13 October decisions, each with its owner, are listed in the log ("Will's decisions, 13 October"). **b29:** the points-interest count goes live with its Privacy line (a76); Explore's bell no longer moves the page (W3); the website on phones and the moving green card (a77, a80); the help email says who wrote in. **b30:** the super admin works without a view-as switcher and real case managers see no Connect example (a78); "Programs attended in the past" lists only attended visits (W5); Sign in's way on is for members and used once (W6); street search is on main switched off, with its Privacy line in seven languages (a81), until Will's key, which waits for the ZIP-only button; the help email says "not using Pam yet". Held for Will's pictures: sign-up (a82) and the help form (a83). b30's CI is green (08:00), and Iris's run-through of it passes. The expired-link page's email switch is live as 'on' (20261013075601), matching the sender. **b31:** a Google address picked in the area search shows only its ZIP on Explore's chip (a81); street search is still off and waits on Will's logo files, then his key. **b32:** W6 sign-up (a82, Will's own words for the hidden code, in seven languages) and the website help form (a83: the form opens from Still stuck?, and every help page ends 60px / 120px above the footer). Next, b33: the old Places list retired (D-565, Will 18:18: members go to Explore, staff to All programs), and Iris's b32 polish (D-566, the reveal button described). With Will on a84: the new-number and case-manager plans and their Privacy lines. **b33:** the old Places list is retired (D-565: members go to Explore, staff to All programs, a place Pam cannot find says Go back to Explore), the Sign in bar and Next's name polished (D-566), the reveal link described for screen readers, and the help form moves focus to an error or the thank-you. Built and waiting on Will's a84: a new phone number (D-567, migration 20261013192951 and move-number) and case managers asking from the website (D-568, migration 20261013203725). (The staff sign-up text promise is true: staff-request decisions are texted whatever texts_live says.) **b34:** the Spanish staff Join screens in usted. Card a84 is final and waits on Will. Next (Will, 14 October): forms and DocuSign. A research and design round first (Iris, Lena, Piper, Dot), then a card for Will with pictures and choices; Pam does not keep what a member types into a form, and nothing is built before Will picks. **b35:** Google's logo where street search shows Google's addresses (D-557), and the forms research and records. Street search waits only on Will's key (a81). **b36:** the app's text boxes lose their ring and bring the keyboard up (D-569), and the website's help form follows suit, with "Write to us" as wide as its words from 900px (D-570) (Will a83). **b37 (9d91f3bd, CI green 06:26):** Sign in's spacing back on every phone (D-572, Will a87). Street search has its Google key (Will, 05:51). **b38 (a5fdfbdc, CI green 07:51):** picking an area closes the drawer and puts the new place on Explore (D-575; Done becomes Cancel; Will a81, 06:45). Street search is live, and Will tried it at 06:45. Built, waiting on Will's yes and his signature on one Privacy line: one search on Explore with no pop-up, where the list underneath filters as you type and an address lists Pam's programs nearest it (a86, Piper D-573, with the pill and one height, D-574, and `dir="auto"` from Dot). Forms are decided (a85): green confirmations, no Pause, "Leave for now?" in Pam's own ConfirmDialog, each program's own DocuSign account first, and Pam keeps no drawn signature. The DocuSign test (a88) waits on Will's consent link and on demo.docusign.net getting through. **b39:** the web e2e suite can no longer reach the live project (D-576). The run refuses a build made for it, and the test browser can't reach any host but this machine. Build for tests with `pnpm --filter @pam/web build:e2e`. Google Places setup, daily caps and costs (Will's doc, 13 October): `docs/google-places.md`. The Place Details cap of 30 a day binds; Will can raise it to 300. Log: `docs/sessions/2026-10-11-0115-merge-desk-night.md`.
+
+## Merge desk & platform · a failed in-app load opens the screen; texts link to app.joinpam.org (10 October)
+
+Will, from his phone: an invite link opened a page of raw code. Cause: Next 15.5.25, in static export,
+reloads `<screen>/index.txt` instead of the screen when an in-app load throws (D-495). Fixed with a pnpm
+patch to Next (`patches/next@15.5.25.patch`), the patches in the webpack cache key (`next.config.mjs`;
+without it the cached, unpatched Next shipped), a Vercel redirect for document requests to `…/index.txt`
+(tabs on older builds), and `e2e/failed-load.spec.ts` (fails before the fix, passes after). Texts link to https://app.joinpam.org:
+`app_settings.app_url`, migration `20261010190831_texts_link_to_app_joinpam_org` (data only), **applied live**
+10 October. Emails build their link from the Edge Function setting `APP_URL`, which Will set to app.joinpam.org the same evening.
+
+## Languages & legal · b22 is live: what a program sees, "I'm here", who starts a chat; b25 is live; street search and the counter wait on their code (13 October)
+
+**Live since b22 (main 8b20e7a8), all in seven languages:** a63 (`privacy.s.sharing.p2`: the four ways a program comes to see a member and what it sees before a visit; the new "A program can see:" card
+and one short-version line on the transparency screen; `transparency.canSee.signed` moved into the card, D-543), a66 (`what-we-keep.p9`/`p10`: "I'm here" asks the phone once and keeps no position), a72 (the last sentence of
+`sharing.p2`: a program can start a chat only with a member signed up with it or with a visit planned there). Every new app line that goes with them (`checkin.*`, `trips.booked.hasLead`, `place.lead.sees`,
+`trips.notMarked`, `messages.program.*`, `place.about`, `person.card.note`) was translated by me and went in through its owner's branch; the buttons are quoted word for word in Privacy p9
+(`im-here-location.test.ts` fails if a button and p9 drift apart in any language). Tests added: `program-sees-before-a-visit`, `program-starts-a-chat`, DB 68 (a message is a conversation, not a link) and
+69 (nobody writes an appointment row). Fit audit at 320px of the Privacy page and both transparency screens in seven languages: no findings. The calendar link screen (link made, both "are you sure" boxes)
+at 320px: no findings. Area picker wording (Iris, b20): "ZIP code" in pt-BR, no comma before o/ou, the Spanish picker in tú.
+**Lesson:** `copy:status` cannot see an English copy that was acknowledged as a translation, and `copy.test.ts` only notices keys not on its `MAY_MATCH_ENGLISH` list; eight `checkin.*` lines and `trips.notMarked` came within one merge of shipping as English
+copies behind that list. The desk now checks every batch for keys equal to the English.
+**The "Last updated" date follows the words (13 October, `claude/lena-legal-date`):** Privacy says 13 October 2026 and the Terms 11 October 2026 (they said 10 and 9 October after later changes); `legal-updated.json` + `legal-updated.test.ts` make the date move whenever the English of either document changes, and `pnpm --filter @pam/config legal:date <privacy|terms> <day>` is the one command (`docs/copy-changes.md`). The street-search line and the counter line each move the fingerprint, so the day each ships `legal:date privacy <day>` is run again (same day is fine; it re-pins).
+**In b25 (live, `e94250ee`), per the merge desk (13 October):** a67, a68 and a70 as one SHA (`92f81ff9`: the request log, the Trips map, the calendar link, Claude named by Anthropic), `about.intro` with `about.how.*` removed, and the carousel lines `onboarding.admin.2` and `onboarding.provider.3` (`ff2206ee`), all in seven languages. Stories now draw every welcome line on Sign in and About Pam (merged in b25 for the staff slides; `claude/lena-member-slide-stories` adds the member's own slides 2 and 3): the 320px audit measures only the slide on screen, so a carousel needs one story per slide (`docs/copy-changes.md`, the audit script's header, `src/stories/support/showSlide.ts`).
+**Street search (a74, D-552), signed by Will 13 October 05:02 (card a81), live in b30 (main `8f0af8d1`, 13 October 07:34):** `privacy.s.sharing.p7`, six sentences, in seven languages, dated 13 October. Piper's `places-search` and street-search code are off until Will adds `GOOGLE_MAPS_SERVER_KEY`, and **the key comes only after p7 is live in seven languages**, which it now is (`docs/before-launch.md`; the Google Maps Platform terms are still unread). Tests: `street-search-line.test.ts` holds the function to the line (typed words in a POST body, nothing logged, nothing sent about the member, nothing stored; every fetch but the sign-in check is inspected) and the phone to "a Google pick is kept nowhere"; the host guard names `places.googleapis.com` and `places-search`. Sage's two street strings (`places.areaHint.street`, `places.areaLabel.street`) went to Piper translated.
+**Counter (a76, D-555), live in b29 (main `96f27a77`, 13 October; migration live since 05:10 UTC):** `privacy.s.what-we-keep.p13` (how many phones open Your points and Profile) is on the Privacy page in all seven languages, with my pins on Nico's branch: DB test 71 (the counter cannot be used to see who) and `screen-opens-counter.test.ts` (the phone sends only the screen's name; the note holds only a date).
+**W6, Join Pam for invited newcomers (Ava, D-563; b32):** I translated Will's `signin.title.invited` and the three `signin.invited.*` lines, the signed `join.staff.body`, `admin.caseload.empty.body` and `invite.expired.sent.body` (Sage), and Will's two code lines `join.code.question` and `join.code.reveal` (card a82, his English kept; each language says the word for a tap, not "click", as the bundle does for "Tap"). "Join" is a different verb from "sign in" in every language (so a newcomer does not read "Sign in"). The audit was run at 320x568 as well as 320x760 (`audit-language-fit.mjs --height`), and `onboarding--expired-link-sent` was added so the page's sent state is drawn; `join.staff.body` still has no story. Iris's P4 (Spanish mixed usted with tú on the member Join screen) is fixed with the smallest change: the language label is the neutral "Elegir un idioma" (it is used on the Join screen only, for member and staff alike) and the booked-visit lines are tú (`join.booked.*`, member only). **Not fixed, found on the way:** the Spanish staff Join screens mix too (titles such as `join.privacy.title.provider` and `join.invited.as` are tú; `join.privacy.provider.*` and `join.program.*` are usted): a register decision for the staff Join (the rule is usted for staff), not a one-line fix.
+**Still held:** the Google Calendar card a71 (`claude/lena-google-sync-privacy` and `-strings`) until Will switches sync on; it renumbers to `sharing.p8` and `what-we-keep.p14`.
+**Open:** native readers for every translation (pt-BR "registrada" for "marked" first; "ZIP code"; the calendar screen's app-menu names); the retention in p11/p12 must change before the Supabase plan goes to Team
+(`docs/before-launch.md`); Twilio's retention (Nico); the Vercel plan; the City of Philadelphia licence read once (`docs/data-licences.md`).
+Logs: `docs/sessions/2026-10-11-2053-languages-legal-a63-line-1-program-card-test-68-and-the-city.md`, `docs/sessions/2026-10-12-0454-languages-legal-b22-translations.md`, `docs/sessions/2026-10-13-0229-languages-legal-b25-privacy-text-about-intro-carousel-lines-and.md`, `docs/sessions/2026-10-13-0513-languages-legal-street-address-search-the-counter-line-and-the.md`, and `docs/sessions/2026-10-13-1921-languages-legal-w6-words-and-the-spanish-register-of-the-join.md`.
+
+## Languages & legal · A28: no phone line in the Help screen, the privacy page or the terms (11 October)
+
+Branch `claude/lena-a28-help` (D-514, D-515), Will's words signed 03:37 UTC (card a59). Get help's first row is Contact Pam and opens the help desk on the
+website (`lib/helpDesk.ts`, `SITE_URL/support/`, new tab); What we can help with has "Still stuck?" and the same row; Your safety keeps Call 911, adds a one-tap
+"Call or text 988" row and "Talk to someone now" (opens `/support/` until Wren's "Your safety" post); Privacy › Copy and Delete end in Dot's Contact Pam.
+31 "call Pam" / privacy / terms lines, two labels and the wrong-code alert (Sage's A29 line) are signed English in place, in seven languages (`notices.ts` follows, pinned to `en.json`);
+`onboarding.phone.callInstead` removed. The two live texts that carried the number are Nico's D-519 for the English; my six translations are on `claude/lena-a28-texts` (one message each, in the b13 batch)
+— **the live `dispatch-sms` is still the old function** (Nico). The promise check found three lines untrue since D-481 (the saved-place text is
+held): `flag.done.body`, `reminders.today.member`, `profile.promo.reminders.body` now say what is true (Sage signed them), with restore lines in `docs/before-launch.md`.
+**Open:** the live texts (above), "Reply HELP to reach a person" (Sage), Ava's in-app copy/delete (the two privacy lines change then), the help-request line on the
+privacy page (the day Nico's form works), the public site's "call Pam" (Wren) — all listed in `docs/before-launch.md` › *A28*.
+
 ## Languages & legal · 10 October in one place; from now on, one batch a week (Friday)
 
 Done and on `main` today (each has its own section below): the promise sweep (D-474), Spanish "visita" (D-480), the privacy page on email and signatures (D-482, D-490: Will's three sentences, live),
@@ -1117,6 +1219,58 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · counting screen opens, and the bell not moving (13 October 2026)
+
+Live since b29 (13 October): `count_screen_open('points'|'profile')` adds one to a per-day count (no person, device, time or place), called once a day per phone from Your points and Profile for a real member (a69/a76, D-555); `screen_opens_weekly()` is the service-role report, a total under 5 shown as "under 5". The migration is live (20261013051051) and Lena's Privacy line `privacy.s.what-we-keep.p13` shipped with it. Separately, the Explore bell holds its place when the phone had it last time, so it no longer shifts the page (W3). Proof: DB test 70, unit and e2e (`screen-open-count`, `explore-bell-shift`).
+
+## Messages & notifications · texting people back is off for now (12 October 2026)
+
+Will (12 October, a61): "let's not turn on this for now. It's a nice to have not a must." Nothing is built or switched on for Pam answering people by text; the help form answers by email only (D-547). The pitch deck outline and example images are kept on `claude/messages-pitch-deck` (`docs/proposals/texting-pitch/`), not for merging. Not built: forwarding replies to hello@, the auto-answer, the form's phone field, the email's "Reply by text" link, a cap per number per day, a non-Latin length check; `sms-inbound` is still not deployed. `/reply/` (D-524) is unchanged.
+
+## Messages & notifications · message a program before booking (11 October 2026)
+
+A member can message a program from its place page without a visit or enrolment: `message_program(service)` opens or reuses a conversation with one lead of the place's org (D-541). A place with no lead on Pam shows Call/Website, no Message. The lead sees a first name and the words only, can reply, and can open a new conversation only with a member who wrote, has a non-cancelled visit, or is enrolled (`can_start_conversation`; `can_message` unchanged). Enrollments are no longer writable by members; leads change status/notes on their own rows only. **Built, held for merge** until Will signs the reworded Privacy line (a63 line 1); the lockdown migration is tightening only and goes first. Proof: DB tests 64 and 67, e2e `place-message-program.spec.ts`.
+
+## Messages & notifications · example photos stay with the examples (11 October 2026)
+
+Branch `claude/messages-example-photos-gated` (D-537). A name-matched example photo is looked up only under `examplesOn()`; a real person
+who shares an example's name gets initials and no request to the photo host.
+
+## Messages & notifications · Arabic direction in a conversation (11 October 2026)
+
+Branch `claude/messages-thread-direction` (D-533, Iris T1/T2). `dir="auto"` on the words people wrote and on names in a
+conversation, the pinned bar and the Messages list.
+
+## Messages & notifications · the thread header, small bar and scrolling info (11 October 2026)
+
+Branch `claude/messages-thread-header-back` (D-529). A conversation's header is the nested-page bar alone (`SubPageHeader variant="bar"`);
+who they are (photo, name, who, the visit card) scrolls with the messages, and the bar's name fades in when it has gone under the bar.
+
+## Messages & notifications · the help request forward (11 October 2026)
+
+Branch `claude/messages-help-request-forward` (D-521, A28). Edge function `help-request`, off behind `HELP_REQUESTS_LIVE`;
+guarded (origin, honeypot, caps, rate limit in the database, migration 20261011041940). Contract: `docs/help-request-contract.md`.
+Nothing is sent until Will says "test it". Text reply built off (D-524, migration 20261011042645, test 54, page `/reply/`): the
+forward of replies, the auto-answer and the form's phone field wait for Will (a61).
+
+## Messages & notifications · alerts truth and two texts without the number (11 October 2026)
+
+Branch `claude/messages-honest-alerts-and-texts` (D-519). Text alerts switches wait for `texts_live`. The denied-request and
+limited-account texts say "Visit joinpam.org/support"; not deployed (live is version 23; refile first). Account texts go out
+whatever `texts_live` says.
+
+## Messages & notifications · no examples on real accounts (11 October 2026)
+
+Branch `claude/messages-no-examples-real-accounts` (D-511). Examples show only in Storybook and on demo accounts
+(`lib/examples.ts`). The Messages tab hides for a member or provider with no one to message; the bell moves to Home then.
+Open: member Home's example "Your next visit" (Trips lane).
+
+## Messages & notifications · the invite email in Spam (11 October 2026)
+
+Branch `claude/messages-email-deliverability`. Docs only. The email itself has nothing a filter dislikes; the cause is the
+domain's standing (probably no DMARC record, a new sending domain, a test sent through the forwarding address), which is Will's
+to fix at DNS. Steps are in `docs/email-setup.md` › "If the email lands in Spam".
+
 ## Messages & notifications · why the email service refused (10 October 2026) — merged 10 October
 
 Merged by the merge desk from 0068bcf; deployed with the D-488 bundle. **Sending works (10 October, 17:15):** Resend had never verified `mail.joinpam.org` (its record said "not started" though the DNS was right); the merge desk started verification through the Resend connector, it turned Verified, and the test staff invite to Pam's own inbox was delivered at 17:15 (Resend: delivered). Will is checking the email (card a33).
@@ -1302,11 +1456,12 @@ Merged to `main` by the merge desk, 10 October, from `claude/places-programs-boo
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-lead-reads-review`. Migration `20261010135742` (`resend_program_submission`), expand only, **applied live at merge** (recorded as 20261010140904), read back: body identical to the file, for authenticated (checks inside for the program's own lead). With part 6 live too, "Ask for changes" is safe to use. Test `43_a_lead_sends_the_program_again_test.sql` (numbered 42 on its branch; Nico's alerts test took 42 first). Edit and send again resends the same submission; a program being checked is corrected through it. Land after part 6.
 
-## Places & programs · policies, part 3 of 4: a program sees who signed (10 October 2026) — READY, not merged (on top of part 2)
+## Places & programs · policies, part 3 of 4: a program sees who signed (10 October 2026) — merged 10 October
+
+Merged by the merge desk in the third stack of 10 October. Live: applied as 20261010153405.
 
 Branch `claude/places-programs-policies-p3` (D-485). Migration `20261010150922`, expand only: `program_policy_signers` (first name and date, never the picture). The Signed tab and the verified tick read it. Test `47_a_program_reads_who_signed_by_first_name_and_test.sql`.
 
-## Places & programs · policies, part 2 of 4: members sign (10 October 2026) — READY, not merged (on top of part 1)
 ## Places & programs · policies, part 2 of 4: members sign (10 October 2026) — merged 10 October
 
 Merged by the merge desk from 10b3f0b. Live: applied as 20261010151152; read back: both tables RLS on and forced, own-row select only, `program_policies_select_signed`, `can_read_policy_file` / `sign_policy` / `forget_my_signature` match the file by md5, authenticated only, anon nothing. For P3: `archive_policy` checks `is_active_account()`, `add_policy` leaves `p_replaces` out of the 30 cap, pin `reminder_is_quiet`'s search_path (advisor).
@@ -1356,6 +1511,110 @@ is sent; the four alert texts are signed by Will (D-461). A STOP shows as "Texts
 recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or "someone wants to
 connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
+
+
+## Design system & Storybook · text boxes show no ring (14 October)
+
+Text boxes draw no ring of ours in any mode; the keyboard still comes up when a screen opens with one ready (D-569, Will a83, supersedes D-523's text-box line). Buttons, links, tick boxes and selects keep the brand ring on Tab. The chat composer has no ring (none on Tab); the code boxes keep their 2px accent edge on purpose (D-251). On `claude/pam-design-text-box-no-ring`; not on `main`.
+
+## Design system & Storybook · Sign in's spacing is back (14 October)
+
+D-564's short-screen rules had unset Sign in's own gaps on every screen (a `null` default); fixed with the spacing tokens, and a 641–720px tier keeps 375×667 above the fold (D-572, Will a84). In b37.
+
+## Design system & Storybook · sign-in hand-over and name commas (13 October)
+
+The compact Sign in bar takes over when half the hero mark is gone, not all of it (D-566, Iris b32 P1); `BigButton`'s name joins label and count with the language's own comma via `nameJoinerOf` (P5). On `claude/pam-design-signin-polish`, off `mira/batch-b32`; not on `main`.
+
+## Design system & Storybook · Contact Pam replaces Call Pam (11 October)
+
+Branch `claude/pam-design-contact-pam` (D-512, A28). `Notice` offers Contact Pam (a link to Help); `useSupportPhone` and all `supportPhone` props are gone; the Help screen's first row opens the website's help desk; Privacy's data pages end in Contact Pam. `place.call` is untouched. About 33 English strings still say "call Pam": for Sage and Lena.
+
+## Design system & Storybook · a wrong code is a small alert (11 October)
+
+Branch `claude/pam-design-wrong-code-alert` (D-510). `CompactNotice` in `@pam/ui` (one row, no button) beside `Notice`; a wrong or expired sign-in code keeps the code step, empties and refocuses the boxes, and shows "That code did not work. Try again." (`signin.code.wrong`; `signin.failed.verify.*` removed). "We could not send the code" still uses the full Notice until the A28 job.
+
+## Design system & Storybook · legal pages go Back to the website (11 October)
+
+Branch `claude/pam-design-legal-back-to-site` (D-508). The website's Privacy and Terms links carry `?from=site&return=<path>`; the app's pages show "Back to the website" and go to `https://joinpam.org` + the path, only if it is a plain path on the site (no `//`, no scheme; otherwise Back to Legal as before). Tabs and the other-document link keep it. New string `nav.back.website` (six drafts for Lena). Tests: `siteReturn.test.ts`, `apps/site/test/legal-links.test.ts`, `e2e/legal-site.spec.ts`.
+
+## Design system & Storybook · Profile's hero card loads as skeletons (11 October)
+
+Branch `claude/pam-design-real-accounts-no-examples` (D-520). `ProfileSummary isLoading` and `ProfileStat.value: null`: the photo, name, role and stats are pulses the size of the real card (measured), on `/account/` while the account loads and on the numbers while they arrive; a failed call ends the pulse in a 0. CLS under 0.01 in `profile-skeleton.spec.ts`.
+
+## Design system & Storybook · a real account sees no examples on Profile, Points, Connections (11 October)
+
+Branch `claude/pam-design-real-accounts-no-examples` (D-518). The code landed on `main` first via D-511 (`lib/examples.ts`, `examplesOn()`) and Piper's gate; what is left is `e2e/no-examples-profile.spec.ts`, holding Profile, Points and Connections to it.
+
+## Design system & Storybook · Contact Pam replaces Call Pam (11 October)
+
+Branch `claude/pam-design-contact-pam` (D-512, A28). `Notice` offers Contact Pam (a link to Help); `useSupportPhone` and all `supportPhone` props are gone; the Help screen's first row opens the website's help desk; Privacy's data pages end in Contact Pam. `place.call` is untouched. About 33 English strings still say "call Pam": for Sage and Lena.
+
+## Design system & Storybook · a Saved tip when a place is saved (11 October)
+
+Branch `claude/pam-design-saved-tooltip` (D-516). `@pam/ui/ConfirmTip`: a small "Saved" by the bookmark for about two seconds, then a fade (none with reduce-motion), also announced politely. On the place bar and every place card; unsave says nothing. Uses the existing `places.saved`.
+
+## Design system & Storybook · the blue alert in dark mode is 10% (11 October)
+
+Branch `claude/pam-design-dark-info-alert` (D-513). One token, `--astryx-theme-neutral-color-status-muted-accent`, dark `#88bcff3D` → `#88bcff1A`; words 8.4:1, icon 7.3:1 on it. Light mode unchanged. Story: Foundations › Dark blue alert.
+
+## Design system & Storybook · focus ring only on text boxes (11 October)
+
+Branch `claude/pam-design-focus-text-boxes` (D-523, replaces D-411's focus line). Script-focused `tabindex=-1` non-controls, dialogs and sheets show no ring in any input mode; text boxes keep their field highlight; buttons and links ring on Tab. `e2e/focus-text-boxes.spec.ts`.
+
+## Design system & Storybook · the sign-in code step has a way to a person (11 October)
+
+Branch `claude/pam-design-signin-code-contact` (D-527, Iris CP1). A quiet "Need help? Contact Pam" link under Send again, to `SITE_URL/support/cant-sign-in/`; outside the D-510 alert.
+
+## Design system & Storybook · badge caption 12px (11 October) — on `main`
+
+Merged from `claude/pam-design-badge-caption` (3472970). The "Your badge" caption on the Profile badge tile is 12px, not 11px, following A27 (nothing under
+12px). Fit audit in 8 languages: nothing new.
+
+## Design system & Storybook · A27: legal and consent text (11 October) — on `main`
+
+Merged from `claude/pam-design-a27-legal` (b86562e). Will (a52): "leave it. Legal texts should always run smaller and less emphatic." A27 and Typography now
+say legal and consent text (the consent sentence, the footer's legal links, legal notes) runs smaller and quieter than the screen's
+content; Sign in's two 14px lines are decided, not a gap. Docs only.
+
+## Design system & Storybook · map: staff Home is live (10 October)
+
+Branch `claude/pam-design-flow-map-3`. The user-flow map shows the live staff Home (rings, and the empty
+state with a (+)) instead of the "Proposed (a22)" cards; the generator gets `drag` and `scroll` actions, and
+"Trips with a past visit" shows the past visit. Found on the way: dragging the Trips drawer's handle with a
+mouse stepped it on again (D-494, fixed; phones were not affected). Figma: Case manager, Program lead and
+Overview redrawn, one image replaced on Member; drawn from the branch, so redraw from `main` only after it merges.
+
+## Design system & Storybook · A27: text sizes (11 October)
+
+Branch `claude/pam-design-a27-text-size`. Will (a48): "Leave as is. Make exceptions. Update rules." A27 writes the sizes down as built:
+the page and typed text 16px, buttons and rows 17-18, reading text 16, labels 14, captions 12-13, nothing under 12; replaces A23's
+"nothing under 15px". CLAUDE.md, Typography and Principles say it. Docs only; no screen changes. Not done, noted in A27: the one 11px
+caption ("Your badge"), and Sign in's field label and consent line at 14px. D-504's old counts were wrong (corrected: 38% under 15px).
+
+## Design system & Storybook · tokens reconciled with Foundations (11 October)
+
+Branch `claude/pam-design-tokens`. Foundations now says what the code does for card radius (24px; sheets 28px), spacing (4px steps,
+half-steps inside components) and colour (all 146 tokens, generated from the theme, with a test); a decision records who was right
+for each of Wren's five items (D-504). Will has answered both visible items: body size left as is, with the exceptions written as A27
+(the "3 in 4 under 15px" figure was wrong, it is 38%; see A27 and D-504); dark `background-muted` is `#262626` now (a49, "yes go for it"; before and after in Storybook › Foundations › Dark muted ground).
+
+## Design system & Storybook · Sign in on a short phone, small targets (11 October) — on `main`
+
+Merged from `claude/pam-design-signin-short` (6de3cc2). Sign in's invite line is pinned and a compact mark bar appears under it once the
+hero has scrolled away (D-502; the code step's bar was already pinned). Sign in's Privacy / Terms / About links flow after the content instead of
+being pinned, so they never cover "Send me a code" at 320×568 (Iris S1, D-500); `TextLink` is 48px wide as well as tall
+(the Trips banner's "Sign", the signature sheet's "Clear"), and the policy header's "Done" too (W4). Needs Will: nothing.
+
+## Design system & Storybook · Principles page in line with A24 and A26 (11 October) — on `main`
+
+Merged from `claude/pam-design-principles` (98c87e9). Foundations › Principles (and Writing) now say seven languages (A24) and help where
+people get stuck, not on every screen (A26). Docs only.
+
+## Design system & Storybook · legal tabs follow the reader (10 October)
+
+Branch `claude/pam-design-legal-tabs`. Privacy and Terms: the highlighted tab is the section whose heading has reached the
+line under the bars (the top one wins), a tapped tab is held until the reader scrolls, the row of tabs moves to keep it in
+view, and a tap moves focus to the section heading (D-497). Needs Will: try it on the phone; not seen in WebKit.
 
 ## Design system & Storybook · secondary button edge (10 October)
 
@@ -1467,6 +1726,24 @@ fine and the fit audit was over-counting (D-448).
 ## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, merged 9 October (PR #29)
 
 ## Website · public site and help centre (10 October) — `apps/site`, on `main`
+
+**14 October (D-570).** The site's text boxes draw no focus ring, the keyboard comes up as the help form opens, "Write to us" is as wide as its words from 900px, and the space under Still stuck? is padding on the container.
+
+**13 October (held for Will, D-548/D-550).** About Pam shows its carousel words again and loses the line above its tabs (bd6d016a). The Home phone layout follows Figma 7:3 and the green card switches between three views; pictures to look at are in `docs/design/review/2026-10-13-website-phone/`. Not for `main` until Will says yes.
+
+**12 October (b25).** "Does the place know I'm coming?" now says programs on Pam see your visit and other places are not told (Sage's words, the day attendance went live). Home takes Will's a65 lines ("talk to a real person"; "you see who's coming on your calendar"); the 24/7 line stays held until launch and translation.
+
+**New website, stage 1 (11 October, D-531; branch).** Home, header and footer rebuilt from Will's Figma on Dot's Website tokens (D-528): hero with a tappable, flipping, floating picture stack (Pause/Play, reduced-motion safe), the Philadelphia band, three feature rows with real Pam screens, Privacy/Support callouts, deep-green footer. Words in `content/home-copy.ts`; untrue or promise lines are held with true fallbacks (`HELD`). Stages 2–4 (Support, post template, About, Still stuck) follow.
+
+**A28 on the help site (11 October, D-522; branch).** No phone on the site: "Still stuck?" says to write to hello@joinpam.org (Sage's signed words), at the end of every post and under an empty search; the form waits for Nico's switch (off). New posts `cant-sign-in` and `your-safety` (`/support/your-safety/`, the app's "Your safety" opens it). A site test fails on "call Pam" and on any `tel:` but 911 and 988. Section labels from Sage drive the menu. Iris's findings S1, S2, W1–W6 done (`scripts/usability.mjs`: focus rings, 48px targets, `?q=`, skip link, Esc, layout shift). The "Still stuck?" form is built to Nico's contract and shows only when `help-request` answers (off: the address). Held: the blocked-conversation picture (the app still says "Call Pam" there), Sage's line for the saved-place text.
+
+**On this page menu (11 October, D-517; branch).** Every help post has a scrollspy menu: a side column from 1180px, a bar at the top on a phone, built from the post's `Section` headings (`short` label optional; Sage writes them). `scripts/scrollspy.mjs` checks every link at 320, 390 and 1280px.
+
+**Three help posts (11 October; branch, signed by Will, card a51).** `start-here`, `talking-to-pam`, `your-language`, from Sage's drafts; the search puts them first for their phrases. 16 posts live. Waiting: "Is the place told about my visit?" (unsigned).
+
+**Carousel pause/play (11 October, D-501; on `main`).** Will approved "Pause" and "Play" and asked for it subtle, tucked in a corner: a 32px see-through disc in a 48px tap target, top start corner. Lena's six languages are in. `OnboardingSlides` has a pause/play button on Sign in, About Pam and the site hero; labels are required props.
+
+**Hero carousel (11 October, D-499; on `main`, live).** Home's hero has the About Pam picture carousel to the right of the headline from 900px, under it on a phone. In the app, About Pam's carousel shows pictures only (`OnboardingSlides showLines={false}`); Sign in is unchanged. Figma "Pam — Website" Home has the Hero carousel component.
 
 The public site, `joinpam.org` (Vercel project `pam-site`; the app is `app.joinpam.org`), is a static
 Next export on the app's theme (`pnpm --filter @pam/site dev|build|test`; no Supabase, no sign-in; D-433,
@@ -1893,8 +2170,143 @@ live project (it went live on 20 September — "What needs a human" row 24), and
 either session's migrations deployed — see the drift note under "What is
 live" and the "Live RLS fingerprint" row under "What is proven."
 
+## Places & programs · policies, part 4 of 4: only for this service (10 October 2026) — merged 10 October
+
+Merged by the merge desk from 803b80b. Live: Will pasted the migration in the SQL editor (10 October, 19:14; the connector's apply_migration timed out four times); `set_policy_services` and `add_policy` match the file by md5, `program_policy_services` has RLS forced, one select policy, select-only for signed-in users; recorded in the ledger as 20261010151302.
+
+Branch `claude/places-programs-policies-p4` (D-485). Migration `20261010151302`, expand only: `program_policy_services`, `set_policy_services`, `add_policy` keeps scope on a new version. The service editor now loads real services and saves the ticks. Test `49_a_policy_can_be_for_some_services_only_and_a_new_test.sql`.
+
 ## Places & programs · approving a request from someone who is already a member (10 October 2026) — merged 10 October
 
 Merged by the merge desk from b4534267 (713584b). Live: applied as 20261010171050; `review_staff_request`'s body matches the file by md5, search path pinned, anon cannot run it. The one waiting request (a program-lead request from someone who is now a member, the only city) can be approved; Will asked to tap Approve again (card a34).
 
 Branch `claude/places-programs-approve-existing-member` (D-491). Migration `20261010160818`: `review_staff_request` adds the provider role to an existing member's account (city kept; `ROLE_PAIR_NOT_ALLOWED` / `ACCOUNT_IN_OTHER_CITY` otherwise). The staff screen says what happened or why not, never "Call Pam". Test `50_approving_a_staff_request_for_an_existing_member_test.sql`; e2e `staff-request-approve.spec.ts`.
+
+## Places & programs · the approval text opens Add your program (10 October 2026) — merged 10 October
+
+Merged by the merge desk from 3953321. Live: applied as 20261010193915; `review_staff_request`'s body matches the file by md5, search path pinned, anon cannot run it, signed-in users can (the super-admin check is inside). Security advisors: nothing new.
+
+Branch `claude/places-programs-add-program-link` (D-496). Preview picture `public/og/add-program.jpg` and metadata for `/programs/new/`; migration `20261010192105` puts `<app_url>/programs/new/` in the approval text for a program lead with no program yet; `/programs/new/` is behind the tab gate (signed out → Sign in → Home). Test `51_the_approval_text_links_a_new_program_lead_to_test.sql`; e2e `add-program-link.spec.ts`.
+
+## Places & programs · lead-added vs gathered programs (11 October 2026) — on `main`, live
+
+Branch `claude/places-programs-lead-added-vs-gathered` (D-498). Migration `20261011002026`: `service_has_lead` / `places_with_leads` (a place has a lead when its organisation has an active provider account). A member planning a visit at a place with no lead is told the place is not told (English signed by Will on 11 October; the other six languages are Lena's drafts). A real lead with no program sees Add your program on Home and "Add your program first" on Policies and services, not the example. Test `52_which_places_have_a_program_lead_on_pam_test.sql`; e2e `places-without-a-lead.spec.ts`. Merged as f6a245d; the migration was **applied live** on 11 October as `a_place_says_whether_a_program_lead_on_pam_runs_it` (both functions match the file by md5, search path pinned, anon cannot run them, authenticated can; advisors: nothing new).
+
+## Places & programs · the pick-a-service line (11 October 2026) — on `main`
+
+Branch `claude/places-programs-pick-a-service-line` (Will's wording, 11 October). A place with services says "Pick a service above to plan a trip." under the greyed Plan a trip until one is picked (`place.schedule.pickService`). e2e `place-pick-a-service.spec.ts`.
+
+## Places & programs · Trips launch audit (11 October 2026) — on `main`
+
+Branch `claude/places-programs-trips-launch` (D-509). A real account sees only its own trips: the example trips, visits and policies are for Storybook, a demo and `pam.examples` only (`lib/exampleMode.ts`). The drawn map is never drawn over a real account's empty Trips; trips whose pins would overprint are one "2 trips" pin; empty drawer: "No trips yet / Plan a visit and it shows here." e2e `trips-real-account.spec.ts`.
+
+## Places & programs · places, Explore and Saved without examples (11 October 2026) — on `main`
+
+Branch `claude/places-programs-no-examples-places` (D-509 extended). The example services, policies, places, reports, people and program are for a demo or Storybook only; a lead's Book for a member and Add a person use their own program. e2e `no-examples-for-real-accounts.spec.ts`; the example-walking specs opt in with `pam.examples`.
+
+## Places & programs · attendance part A: leads see real visits (11 October 2026) — READY, not merged
+
+Branch `claude/places-programs-attendance-a-visits` (D-526). `my_program_visits` (migration `20261011050637`): a program lead's own program's visits, first names only; the lead's Home lists them. Test `56_a_program_lead_reads_the_visits_at_their_own_test.sql`; e2e `program-visits.spec.ts`. Parts B–D follow.
+
+## Places & programs · attendance part B: check-in and points (11 October 2026) — READY, not merged (on top of part A)
+
+Branch `claude/places-programs-attendance-b-checkin` (D-526). `check_in_visit` / `undo_check_in` (migration `20261011051257`): own-program lead only, 100 points once per visit, undo reverses once. The lead's circle asks the database for real visits. Test `57_a_program_lead_checks_in_a_visit_test.sql`; e2e in `program-visits.spec.ts`. No new strings. Parts C–D follow.
+
+## Places & programs · attendance part C: missed visits (11 October 2026) — READY, not merged (on top of part B)
+
+Branch `claude/places-programs-attendance-c-missed` (D-526). `sweep_missed_visits()` (migration `20261011053445`), nightly 04:20 UTC: a scheduled visit at a program with a lead, 24 h after it ended, becomes missed; pays and takes nothing, no text. Test `58_the_nightly_sweep_marks_unmarked_visits_missed_test.sql`. Part D follows.
+
+## Places & programs · Add my program (11 October 2026) — on `main`
+
+Branch `claude/places-programs-add-my-program` (D-525). A member taps Add my program on Profile, answers the lead's questions, and the request goes to Pam's team (`request_staff_access`); being checked / not approved + ask again / approved (gains the provider role next to the member side, D-491). Migration `20261011044654`: no second ask while waiting or approved; a denied one reopens. Test `55_asking_again_to_add_a_program_test.sql`; e2e `add-my-program.spec.ts`.
+
+## Design system · Arabic code boxes fill from the left (11 October 2026) — on `main`
+
+The sign-in code's six boxes were filling from the right in Arabic (typed 1234 showed 4321); they and the hidden field are now left to right in every language, like the phone number (D-530, from Iris's research). E2E in Arabic covers typing and paste. Log: `docs/sessions/2026-10-11-1010-arabic-sign-in-code-boxes.md`.
+
+## Design system · website-only styles (11 October 2026) — on `main`
+
+The website has its own colours and type, apart from the app's (D-528). In Figma (Pam — Website): a `Website` variable collection (23 colours, Light and Dark) and 32 text styles `Website/<Group>/<Name>`, bound across all pages. In `apps/site`: `lib/website.stylex.ts`, `lib/website-type.stylex.ts` and a contrast test. `packages/ui` and the app are untouched. Light-mode limits: Text/Muted not on Gray/Green/Purple; Accent/Success for icons and strokes only. Log: `docs/sessions/2026-10-11-0933-website-styles-in-figma-and-site-tokens.md`.
+
+## Design system · b15 polish (11 October 2026) — on `main`
+
+Sign in on the code step is off until all six digits are in (D-532). The Support search placeholder contrast (Iris H2) was not reproduced: 5.65:1 in dark, 0 axe findings; the pairing is now in the site's contrast test. Log: `docs/sessions/` newest `b15-polish-h2-and-c1`.
+
+## Design system · names in headings keep their own direction (11 October 2026) — on `main`
+
+`@pam/ui/DataHeading` and `SubPageHeader isTitleData` mark a heading's text as data, so a Latin name on an Arabic page (and the reverse) reads in its own direction while Pam's own headings follow the page (D-534). On place pages, profile cards, staff person rows and the conversation bar. Log: `docs/sessions/` newest `data-headings-keep`.
+
+## Places & programs · calendar link (11 October 2026) — READY soon, own branch off main
+
+Branch `claude/places-programs-calendar-link` (D-538). A member makes a secret calendar address (Profile > Calendar); Apple, Google or Outlook follow it. Discreet by default ("Pam visit" and the time), one switch for the place's name and address, no read time kept. Migration `20261011161548`, edge function `calendar-feed` (public), test 61, e2e `calendar-link.spec.ts`. Needs Will's Privacy line.
+
+## Places & programs · "I'm here" check-in (11 October 2026) — READY soon, held off main (on top of attendance C)
+
+Branch `claude/places-programs-im-here` (D-535). `i_am_here` (150 m, 100 points) and `i_went` (60, 3 a week), own visit, window, planned 2 h ahead; the position is compared and never kept. Test `59_a_member_says_i_m_here_or_i_went_test.sql`; e2e `im-here.spec.ts`. Waits for the Privacy line.
+
+## Places & programs · no street-address call to the city (11 October 2026) — on `main` (b18)
+
+Branch `claude/places-programs-no-city-call` (D-536). The browser no longer asks the City of Philadelphia about a typed address; the picker says ZIP code or neighborhood; a member's first name is out of the policies address; the Google map in Trips opens on the whole city, never fitted to the pins. No migration.
+
+## Places & programs · the program's small card for a member, and no direct read of a visit (11 October 2026)
+
+D-542, on `claude/places-programs-im-here` (held with "I'm here" and attendance until Will signs a63 line 1): a lead reads no appointment row directly (`…060000`, test 65), and opens a linked member (enrolled, a visit there, or a conversation with the program's staff) to a card of first name, this program's visits and Message (`program_member_card`, `…203852`, test 66). Log: `docs/sessions/2026-10-11-2045-places-programs-program-card.md`.
+
+## Places & programs · neighborhoods in the area search (11 October 2026)
+
+D-540, branch `claude/places-programs-neighborhoods`: 159 neighborhoods (a name and one point each, CC BY 4.0, Abaca Labs, pinned source and checksum) in `areas`, found by the existing search; credit under Legal › Data sources. Migration `20261011194237_the_area_search_knows_philadelphia_s_neighborhoods` for the merge desk to apply (public reference data, expand-only). Waiting on Sage ("or neighborhood" in the picker words) and Lena (seven languages). Log: `docs/sessions/2026-10-11-1942-neighborhoods-in-the-area-search.md`.
+
+## Design system · area search named once (11 October 2026) — READY, not merged
+
+A screen reader reads the Places area search field's name once and reads "Like 19107, or Fishtown." as its description (`SearchField`: empty inner label, optional placeholder, `describedBy`). Nothing looks different. Log: `docs/sessions/` newest `area-picker-screen-reader-fix`.
+
+## Design system · the map for a72 (12 October 2026) — READY, not merged
+
+"PAM — User flows" shows the b22 screens (a place on Pam and a place gathered from the internet, I'm here, a program's member card, the program-side New message). `flows.mjs` has them, and the stories they need (a member card, `hasLead`, `programMemberCard`) are in the code. Log: `docs/sessions/` newest `map-for-a72`.
+## Design system · search fields heard once (11 October 2026) — READY, not merged
+
+The New message sheet's search field no longer repeats its label as a placeholder. The other three search fields (Messages, Schedule, Connect) keep placeholders that add or rephrase words; see the session log. Log: `docs/sessions/` newest `search-fields-heard-once`.
+
+## Places & programs · a scraped place is not a program on Pam (12 October 2026)
+
+D-545, `claude/places-programs-scraped-vs-pam`: the audit table and `place-scraped-vs-pam.spec.ts`. Only the two message rows needed a change on `main` (Nico's D-541, merged into this branch); in the held I'm-here branch, "I'm here" and "I went" need a lead (hidden, and `NO_LEAD_HERE` in the database). Log: see `docs/sessions/`.
+
+## Design system & Storybook · text colour examples for Will (12 October)
+
+Will (a65) wants to see two website text colours before choosing. Story **Website / Text colours (Will to choose)** shows #666666 vs #595959 on the tinted cards and #0B991F vs #087A18 on white, at phone width, with live ratios. #666666 fails AA on Gray, Green and Purple; #0B991F fails on white. Site tokens are unchanged until Will decides (D-546).
+
+## Places & programs · street search through Google, off until the key (13 October 2026)
+
+D-552, `claude/places-programs-street-search`: the area search asks Google (Places New, from Pam's `places-search` function only) for an address, a corner or a place by name, below Pam's own ZIP and neighborhood rows, with Google's mark. Off until Will enters `GOOGLE_MAPS_SERVER_KEY`; no key, no change. Waiting: the key and quota (Will), the Privacy line (Lena, Sage, Will), Google's own mark (Dot). Log: see `docs/sessions/`.
+
+## Places & programs · the old Places list is retired (13 October 2026)
+
+D-565, `claude/places-programs-retire-old-places`: `/places/` forwards (members to `/`, case managers and programs to `/programs/`, `?filter=reported` to `/places/reported/` for admin and super admin). Reported places is unchanged and reachable from Profile and the bell. `nav.back.reported` signed by Sage and translated by Lena (merged).
+
+## Design system & Storybook · role chip keeps its words whole (13 October)
+## Design system & Storybook · Play restarts the carousels; the role chip keeps its words whole (13 October)
+
+Only keyboard focus holds a carousel; an explicit Play lets go, so Pause then Play works with a tap on a phone (D-554, Iris W1, b27).
+The role chip beside the mark no longer breaks inside a word, and the header gives way (corner on its own row) when it is too crowded, e.g. Spanish at 320 (D-551, b26).
+
+## Design system & Storybook · the green card transition (13 October)
+
+Crossfade 650ms, line out 160ms then in 320ms, no scale (D-556). Story: Website / Green card transition.
+
+## Design system & Storybook · the step count in the button is quiet text (13 October)
+
+No pill, 12px, level with the label, the label always centred (D-560).
+## Design system & Storybook · Sign in fits a short screen (13 October)
+
+Below 640px tall the hero slide is shorter; `TextLink` can be always underlined (D-564).
+## Design system & Storybook · Google logo under street suggestions: prepared (13 October)
+
+Component ready for Google's own logo files (18px, clear space, "Google Maps", light/dark, words as fallback); waiting for Will to download the files (D-557).
+
+## Design system & Storybook · the green card transition (13 October)
+
+Crossfade 650ms, line out 160ms then in 320ms, no scale (D-556). Story: Website / Green card transition.
+
+## Design system & Storybook · help dialog and dark link text (13 October)
+
+Spec for the help call-out and dialog, and a new `--website-text-link` token (dark: very light lime #EEF1C2) for Wren (D-562).

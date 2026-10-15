@@ -21,17 +21,15 @@ import {
 } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { emptyState } from '@pam/ui/emptyState';
-import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { isFreshAccount } from '@/lib/programSetup';
 import { DUMMY_NOTIFICATIONS } from '@pam/config/dummy-notifications';
+import { useExamplesOn } from '@/lib/useExamplesOn';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useNotifications, unreadCount } from '@/lib/useNotifications';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useDemoView } from '@/lib/useDemoView';
-import { RoleSwitchControl } from '../RoleSwitchControl';
 import { whenHappened } from '@/lib/when';
 
 /**
@@ -124,18 +122,19 @@ function kindOf(kind: string, t: (key: string) => string): { title?: string; ico
 
 export default function NotificationsPage() {
   const { t, locale } = useI18n();
-  const supportPhone = useSupportPhone();
   const { state: session } = useSession();
 
   const signedIn = session.status === 'signed-in';
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const { viewedRole, setViewAs } = useRoleView(trueRole);
+  const { viewedRole } = useRoleView(trueRole);
   const { state, markAllSeen } = useNotifications(signedIn);
   const unread = unreadCount(state);
   const isDemo = useDemoView(session);
 
+  // Example alerts are for Storybook and demo accounts only (lib/examples.ts).
+  const examplesOn = useExamplesOn();
   const showDummy =
-    USE_DUMMY_PEOPLE &&
+    examplesOn &&
     // Nothing yet for an account that has just signed up (D-361).
     !isFreshAccount() &&
     state.status === 'ready' &&
@@ -165,11 +164,6 @@ export default function NotificationsPage() {
           subtitle={shownUnread > 0 ? t('notify.unread', { count: shownUnread }) : undefined}
           backHref="/"
           backLabel={t('nav.back.home')}
-          actions={
-            trueRole === 'super_admin' ? (
-              <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-            ) : undefined
-          }
         />
 
         {session.status === 'signed-out' || session.status === 'no-profile' || session.status === 'suspended' ? (
@@ -187,8 +181,7 @@ export default function NotificationsPage() {
             notice="something_went_wrong"
             title={t('notice.something_went_wrong.title')}
             body={t('notice.something_went_wrong.body')}
-            supportPhone={supportPhone}
-            callLabel={t('help.callSupport')}
+            contactLabel={t('help.contact.action')}
           />
         ) : null}
 

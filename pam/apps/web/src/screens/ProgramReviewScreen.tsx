@@ -13,7 +13,6 @@ import { categoryLabelKey, intlLocale, type Category } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { goBack, navigate } from '@/lib/navigate';
 import { useSession } from '@/lib/useSession';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useRoleView } from '@/lib/useViewedRole';
 import {
   isLate,
@@ -49,7 +48,6 @@ const NOTE_MAX = 500;
 
 export function ProgramReviewScreen({ id }: { readonly id: string | null }) {
   const { t, locale } = useI18n();
-  const supportPhone = useSupportPhone();
   const { state: session } = useSession();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { viewedRole } = useRoleView(trueRole);
@@ -217,8 +215,7 @@ export function ProgramReviewScreen({ id }: { readonly id: string | null }) {
           notice="something_went_wrong"
           title={t('requests.failed.title')}
           body={t('requests.failed.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 

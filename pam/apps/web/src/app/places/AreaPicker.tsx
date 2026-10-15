@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
 import { sheet } from '@pam/ui/sheet';
@@ -15,6 +15,8 @@ import { MenuList } from '@pam/ui/MenuList';
 import { SearchField } from '@pam/ui/SearchPill';
 import { useI18n } from '@/lib/i18n';
 import { useAreaSearch, type AreaOption } from '@/lib/useAreaSearch';
+import { useStreetSearch } from '@/lib/useStreetSearch';
+import { PoweredByGoogle } from '@/screens/PoweredByGoogle';
 
 /**
  * Where the list is measured from, and how a member changes it.
@@ -24,8 +26,9 @@ import { useAreaSearch, type AreaOption } from '@/lib/useAreaSearch';
  * doesn't look like industry standard behavior for looking up a location"),
  * shaped like the location lookups people already know:
  *
- *   - a title and **Done** at the top; Done keeps the choice, a swipe down
- *     or the scrim leaves the area as it was;
+ *   - a title and **Cancel** at the top; a pick closes the drawer at once and
+ *     sets the area (14 October: no Done to press); Cancel, a swipe down or the
+ *     scrim leaves the area as it was;
  *   - **our search bar**, already focused, "ZIP code or address";
  *   - **Use my current location** first — the phone's own position, kept on
  *     this device like any other choice and never sent to Pam;
@@ -43,7 +46,7 @@ const styles = stylex.create({
   body: { width: '100%', paddingInline: '16px', paddingBlockStart: spacingVars['--spacing-6'], paddingBlockEnd: '24px' },
   top: { width: '100%' },
   title: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700 },
-  // "Done" — a word at the top right, in the accent, as on every phone.
+  // "Cancel" — a word at the top right, in the accent, as on every phone.
   done: {
     minHeight: '48px',
     paddingInline: '4px',
@@ -53,7 +56,8 @@ const styles = stylex.create({
     backgroundImage: { default: 'none', ':hover': 'none', ':active': 'none' },
   },
   hint: { fontSize: '15px', lineHeight: 1.5 },
-  privacy: { fontSize: '14px', lineHeight: 1.5 },
+    privacy: { fontSize: '14px', lineHeight: 1.5 },
+  privacyCentered: { textAlign: 'center', width: '100%' },
   list: { width: '100%' },
 });
 
@@ -83,7 +87,7 @@ function kindKey(option: AreaOption): string {
 }
 
 /**
- * The drawer: search, pick, Done (D-275). The choice is held here until Done,
+ * The drawer: search, pick (D-275; since 14 October a pick closes it, no Done). Nothing moves behind it until a pick,
  * so looking around never moves the list behind it.
  */
 export function AreaSearch({
@@ -98,23 +102,31 @@ export function AreaSearch({
   readonly onClose: () => void;
 }) {
   const { t } = useI18n();
+  const hintId = useId();
   const [query, setQuery] = useState('');
-  const [picked, setPicked] = useState<AreaOption>(current);
   const [locating, setLocating] = useState<'idle' | 'busy' | 'failed'>('idle');
-  const { options, isSearching } = useAreaSearch(query);
+  const { options, isSearching, answered } = useAreaSearch(query);
+  // Street addresses and corners from Google, through Pam's server, once Pam's own list has answered (D-552).
+  const street = useStreetSearch(query, { matches: options.length, settled: !isSearching && answered === query }, isOpen);
+  const [choosing, setChoosing] = useState(false);
 
   const body = useRef<HTMLDivElement | null>(null);
 
   // Each time it opens: the area as it stands, an empty search, and the
-  // cursor in it — the sheet itself would focus its first button (Done).
+  // cursor in it — the sheet itself would focus its first button (Cancel).
   useEffect(() => {
     if (!isOpen) return;
-    setPicked(current);
     setQuery('');
     setLocating('idle');
     const frame = requestAnimationFrame(() => body.current?.querySelector('input')?.focus());
     return () => cancelAnimationFrame(frame);
   }, [isOpen, current]);
+
+  // A pick is the answer (Will, 14 October): the drawer closes at once and the area is the one chosen. No Done to press.
+  const pick = (option: AreaOption) => {
+    onChange(option);
+    onClose();
+  };
 
   const useCurrentLocation = () => {
     if (!('geolocation' in navigator)) {
@@ -125,7 +137,7 @@ export function AreaSearch({
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setLocating('idle');
-        setPicked({
+        pick({
           id: 'here',
           kind: 'address',
           label: t('places.area.here'),
@@ -138,9 +150,9 @@ export function AreaSearch({
     );
   };
 
-  // The chosen area stays in the list while it is searched past, so the
+  // The area now in use stays in the list while it is searched past, so the
   // tick is never lost off the bottom of a result set.
-  const shown = [picked, ...options.filter((o) => o.id !== picked.id)];
+  const shown = [current, ...options.filter((o) => o.id !== current.id)];
 
   return (
     <BottomSheet
@@ -156,25 +168,22 @@ export function AreaSearch({
             <Heading level={2} xstyle={styles.title}>
               {t('places.area.title')}
             </Heading>
-            <Button
-              label={t('places.area.done')}
-              variant="ghost"
-              onClick={() => {
-                onChange(picked);
-                onClose();
-              }}
-              xstyle={styles.done}
-            />
+            {/* A way out that changes nothing; a pick closes it by itself. */}
+            <Button label={t('messages.search.cancel')} variant="ghost" onClick={onClose} xstyle={styles.done} />
           </HStack>
 
           <SearchField
-            label={t('places.areaLabel')}
-            placeholder={t('places.areaLabel')}
+            label={t(street.enabled ? 'places.areaLabel.street' : 'places.areaLabel')}
+            describedBy={hintId}
             value={query}
             onChange={setQuery}
             hasAutoFocus
             isSubtle
           />
+          {/* The search finds ZIP codes (and City Hall), so say what to type (D-536). */}
+          <Text id={hintId} type="supporting" xstyle={styles.hint}>
+            {t(street.enabled ? 'places.areaHint.street' : 'places.areaHint')}
+          </Text>
 
           <MenuList
             label={t('places.areaResults')}
@@ -197,30 +206,49 @@ export function AreaSearch({
                 label: option.id === 'here' ? t('places.area.hereRow') : option.label,
                 description: option.id === 'here' ? t('places.area.hereNote') : t(kindKey(option)),
                 icon: <PlacesIcon {...ICON} />,
-                onSelect: () => setPicked(option),
-                isSelected: option.id === picked.id,
+                onSelect: () => pick(option),
+                isSelected: option.id === current.id,
+              })),
+              // What Google found, below Pam's own: tapping one asks for where it is, then it is picked like any other.
+              ...street.suggestions.map((suggestion) => ({
+                id: `suggest:${suggestion.placeId}`,
+                label: suggestion.label,
+                // Used for this search only, as "Use my current location" says (Sage, 13 October): a Google pick is never kept.
+                description: t('places.area.hereNote'),
+                icon: <PlacesIcon {...ICON} />,
+                onSelect: () => {
+                  if (choosing) return;
+                  setChoosing(true);
+                  void street.choose(suggestion).then((option) => {
+                    setChoosing(false);
+                    if (option) pick(option);
+                  });
+                },
               })),
             ]}
           />
+
+          {/* Google's required mark, shown whenever its suggestions are (D-552). */}
+          {street.suggestions.length > 0 ? <PoweredByGoogle /> : null}
 
           {/*
             A live region, so a screen reader hears that results changed
             without the focus leaving the search somebody is still typing in.
           */}
           <div role="status" aria-live="polite">
-            {isSearching && options.length === 0 ? (
+            {(isSearching || street.isSearching) && options.length === 0 && street.suggestions.length === 0 ? (
               <Text type="supporting" xstyle={styles.hint}>
                 {t('places.areaSearching')}
               </Text>
             ) : null}
-            {!isSearching && query.trim() !== '' && options.length === 0 ? (
+            {!isSearching && !street.isSearching && query.trim() !== '' && options.length === 0 && street.suggestions.length === 0 ? (
               <Text type="supporting" xstyle={styles.hint}>
                 {t('places.areaNone')}
               </Text>
             ) : null}
           </div>
 
-          <Text type="supporting" xstyle={styles.privacy}>
+          <Text type="supporting" xstyle={[styles.privacy, street.suggestions.length > 0 && styles.privacyCentered]}>
             {t('places.areaPrivacy')}
           </Text>
         </VStack>

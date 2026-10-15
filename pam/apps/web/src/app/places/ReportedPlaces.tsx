@@ -7,13 +7,14 @@ import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@pam/ui/Button';
 import { Loading, Notice, PlaceCard } from '@pam/ui';
 import { NOTICES, type Category } from '@pam/config';
+import { examplesOn } from '@/lib/examples';
 import { DUMMY_FLAGS } from '@pam/config/dummy-places';
 import { useI18n } from '@/lib/i18n';
 import { placeStatus } from '@/lib/usePlaceStatus';
 import { resolveFlag, type FlaggedPlace, type FlaggedPlacesState } from '@/lib/useFlaggedPlaces';
 
 /**
- * The Reported filter on `/places/` (D-189): places somebody said are closed,
+ * The Reported places screen (D-189; it was a filter on the old `/places/` list, retired 13 October 2026): places somebody said are closed,
  * moved, full or wrong, for the people who review them. The same `PlaceCard`
  * as the rest of the list, with the reason on it and — for a super admin —
  * the two decisions `resolve_service_flag()` (0036) offers: keep it, or take
@@ -50,7 +51,6 @@ export function ReportedPlaces({
   useDummy,
   onResolved,
   now,
-  supportPhone,
 }: {
   readonly state: FlaggedPlacesState;
   readonly previewing: boolean;
@@ -58,14 +58,14 @@ export function ReportedPlaces({
   readonly useDummy: boolean;
   readonly onResolved: () => void;
   readonly now: Date | null;
-  readonly supportPhone: string;
 }) {
   const { t, locale } = useI18n();
   const [busy, setBusy] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
   const [decidedDummies, setDecidedDummies] = useState<readonly string[]>([]);
 
-  const showDummy = useDummy && (previewing || state.status === 'empty');
+  // Example reports for a demo or Storybook only: a real super admin with nothing reported sees none (D-509).
+  const showDummy = useDummy && examplesOn() && (previewing || state.status === 'empty');
 
   const rows: readonly Row[] = showDummy
     ? DUMMY_FLAGS.filter((f) => !decidedDummies.includes(f.id)).map((f) => ({
@@ -77,7 +77,7 @@ export function ReportedPlaces({
         reason: f.reason,
         count: f.count,
         hours: null,
-        href: `/place/?id=${encodeURIComponent(f.place.id)}&from=places`,
+        href: `/place/?id=${encodeURIComponent(f.place.id)}&from=reported`,
       }))
     : state.status === 'ready'
       ? state.places.map((p) => ({
@@ -89,7 +89,7 @@ export function ReportedPlaces({
           reason: p.reason,
           count: p.flagCount,
           hours: p.hours,
-          href: `/place/?id=${encodeURIComponent(p.id)}&from=places`,
+          href: `/place/?id=${encodeURIComponent(p.id)}&from=reported`,
         }))
       : [];
 
@@ -119,8 +119,7 @@ export function ReportedPlaces({
           notice={state.offline ? 'offline' : 'something_went_wrong'}
           title={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].titleKey)}
           body={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 
@@ -129,8 +128,7 @@ export function ReportedPlaces({
           notice="something_went_wrong"
           title={t('places.reported.failed.title')}
           body={t('places.reported.failed.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 

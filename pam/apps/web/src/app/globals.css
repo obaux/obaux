@@ -149,16 +149,30 @@
   }
 
   /*
-   * A text field is drawn as one box, so it should light up as one box.
-   *
-   * The ring belongs on the frame a person can see, not on the <input> inside
-   * it: the input is 48px tall inside a 56px frame, so focusing drew a second
-   * rectangle floating within the first — which reads as a stray element, and
-   * at the top of the sign-in screen it collided with the label above it.
-   *
-   * The ring is not weakened, only moved. It keeps the 3px width and follows
-   * the frame's own corner radius, so it is the same indicator around the shape
-   * that is actually there.
+   * Focus put somewhere so a screen reader lands in the right place is not a choice anybody made, so it
+   * shows no ring (Will, 11 October: "Modals and section links (from policy pages) are highlighted. That's
+   * not intended behavior. Let's rewrite the input field rule to only mean text boxes"; D-523, which
+   * replaces D-411's focus line). A visible highlight on programmatic focus belongs to a text box, and only
+   * to one (below). Everything else focused by script is `tabindex="-1"` and not a control: a dialog's or
+   * sheet's content (`landFocus`), the dialog or sheet itself, the photo viewer, and the section a contents
+   * link on Privacy or Terms jumps to. They get no ring in any input mode, mouse or keyboard. Buttons and
+   * links keep the brand ring above when somebody Tabs to them.
+   */
+  [tabindex='-1']:not(input, textarea, select, button, a[href], [contenteditable='true']):focus-visible,
+  dialog:focus-visible,
+  [role='dialog']:focus-visible,
+  [role='alertdialog']:focus-visible {
+    outline: none;
+  }
+
+  /*
+   * A text box shows no ring of ours, in any input mode, whether a script, a tap or Tab put the focus there
+   * (Will, 14 October, a83: "please undo any rules about text box being selected, I don't want that. All I
+   * want is for the keyboard to be active when a text box presents itself, for the user's convenience in
+   * typing"; D-569, which supersedes D-523's text-box line and the frame rings of D-195 and D-212). The
+   * blinking cursor shows where you are. A screen that opens with a text box ready still focuses it, so the
+   * keyboard is up; only the highlight is gone. Astryx's own field styling is left as it is. Buttons, links,
+   * tick boxes and selects keep the brand ring above when somebody Tabs to them.
    */
   :is(input, textarea):focus-visible {
     outline: none;
@@ -243,37 +257,6 @@
   }
   .astryx-lightbox .astryx-button svg {
     stroke-width: 2.5;
-  }
-
-  :has(> input:focus-visible),
-  :has(> textarea:focus-visible) {
-    outline: 3px solid currentColor;
-    outline-offset: 2px;
-    border-radius: 12px;
-  }
-
-  /*
-   * The sign-in code's boxes (D-251): the field is invisible over the row,
-   * and focus shows on the box the next digit goes in — a 2px accent edge —
-   * so the frame ring above would be a second indicator round all six.
-   */
-  [data-pam-code]:has(> input:focus-visible) {
-    outline: none;
-  }
-
-  /*
-   * The search bar (D-212) is one rounded shape with the field inside it; the
-   * rule above would ring the field's own inner box, a rectangle floating in
-   * a pill. Same ring, moved to the pill, following its round ends.
-   */
-  .astryx-input-group[data-size='lg'] :has(> input:focus-visible) {
-    outline: none;
-  }
-
-  .astryx-input-group[data-size='lg']:has(input:focus-visible) {
-    outline: 3px solid currentColor;
-    outline-offset: 2px;
-    border-radius: 999px;
   }
 
   /*

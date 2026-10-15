@@ -10,6 +10,7 @@ import JoinPage from '../../app/join/page';
 import MessagesPage from '../../app/messages/page';
 import MessageThreadPage from '../../app/messages/thread/page';
 import NotificationsPage from '../../app/notifications/page';
+import ReplyPage from '../../app/reply/page';
 import PersonPage from '../../app/person/page';
 import ConnectPage from '../../app/person/connect/page';
 import PastTripsPage from '../../app/person/past/page';
@@ -42,8 +43,8 @@ import { PrototypeProgramReview } from './PrototypeProgramReview';
 import { ProgramsToCheckScreen } from '../../screens/ProgramsToCheckScreen';
 import { InvitesLogScreen } from '../../screens/InvitesLogScreen';
 import TermsPage from '../../app/terms/page';
+import { AddMyProgramScreen } from '../../screens/AddMyProgramScreen';
 import { ProfileScreen } from '../../screens/ProfileScreen';
-import { ViewAsView } from '../../screens/ViewAsView';
 import { InviteView } from '../../screens/InviteView';
 import { PrototypeInviteNew } from './PrototypeInviteNew';
 import { BookForMemberView } from '../../screens/BookForMemberView';
@@ -58,6 +59,7 @@ import { ExploreScreen } from '../../screens/ExploreScreen';
 import { TripsScreen } from '../../screens/TripsView';
 import { HomeScreen } from '../../screens/HomeScreen';
 import { LegalView } from '../../screens/LegalView';
+import { CalendarLinkView } from '../../screens/CalendarLinkView';
 import { LanguageView } from '../../screens/LanguageView';
 import { DataCopyView, DeleteAccountView, PrivacyControlsView } from '../../screens/PrivacyViews';
 import { HelpReportPlaceView, HelpSafetyView, HelpTopicsView } from '../../screens/HelpViews';
@@ -111,6 +113,8 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/place/policies/view/': screen(() => <PlacePolicyPage />),
   '/saved/': screen(() => <SavedPage />),
   '/flag/': screen(() => <FlagPage />),
+  // The super admin's answer to a help request, opened from the email's link (A28, D-524).
+  '/reply/': screen(() => <ReplyPage />),
   '/points/': screen(() => <PointsPage />),
   '/notifications/': screen(() => <NotificationsPage />),
   '/messages/': screen(() => <MessagesPage />),
@@ -135,6 +139,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   // Added with the nested-page template (D-213) — real routes in the app.
   '/legal/': screen(() => <LegalView />),
   '/language/': screen(() => <LanguageView />),
+  '/calendar/': screen(() => <CalendarLinkView />),
   '/legal/privacy/': screen(() => <PrivacyControlsView />),
   '/legal/privacy/copy/': screen(() => <DataCopyView />),
   '/legal/privacy/delete/': screen(() => <DeleteAccountView />),
@@ -145,7 +150,6 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/messages/thread/options/': screen(() => <ThreadOptionsView />),
   '/messages/thread/report/': screen(() => <ThreadReportView />),
   '/messages/thread/files/': screen(() => <ThreadFilesView />),
-  '/view-as/': screen(() => <ViewAsView />),
   // D-218: Invite someone, All programs and Add a program, and a program
   // lead's own Program tab.
   '/invite/': screen(() => <InviteView />),
@@ -187,6 +191,7 @@ export const REDESIGN_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   // Profile for whoever is signed in (D-217); the Account screen is gone
   // from the redesign (D-213), so its old address opens Profile too.
   '/profile/': screen(() => <ProfileScreen />),
+  '/profile/add-program/': screen(() => <AddMyProgramScreen />),
   '/account/': screen(() => <ProfileScreen />),
   // A program's list is its Home now (D-212), so the old address opens it.
   '/interested/': screen(() => <HomeScreen />),

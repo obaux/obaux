@@ -13,15 +13,25 @@ wrong, however it looks.
    a 48px hit area. Token: `--pam-touch-target-min`.
 2. **One primary action per screen.** One filled `BigButton`. A second action is a
    `BigButton variant="secondary"`, a `TextLink`, or a row — never a second filled button.
-3. **Never dead-end.** Every screen has a visible way back (the round back button) and a visible way
-   to get help.
-4. **16px body text on phones** (Will, 9 October, SOP A23; it was 18px). Nothing a member has to read
-   is smaller than 15px; supporting lines are 15–17px. Token: `--pam-body-text-mobile`.
+3. **Never dead-end.** Every screen has a visible way back: the round back button, and on a tab
+   screen the tab bar. A visible way to get help is required **where a person can get stuck**:
+   signing in and joining, forms and their errors, anything that failed or is waiting on someone,
+   each step of a task with more than one step, and any screen that tells them to call. Screens for
+   looking around (the tabs, lists, a place's page) need none: help is one tap from Profile and on
+   Home (Will, 11 October, A26; it was "on every screen").
+4. **The page is 16px; nothing is under 12px** (Will, 11 October, A27; A23 had "nothing a member reads is under
+   15px"). Typed text and reading text (policies, the legal pages) are 16px, buttons and rows 17–18px, headings 20–34px.
+   Component labels are 14px and captions 12–13px. Smaller is fine for metadata, never for the only way to know what to
+   do next. Token: `--pam-body-text-mobile`. The sizes by role are on Typography.
 5. **Astryx only.** No other component library, no hand-rolled controls. Style through StyleX and
    tokens — never inline styles, never a raw hex or px where a token exists.
 6. **Never show justice terms.** Not "prisoner", "ex-offender", "inmate", or anything about a
    conviction — anywhere a person can see, including texts and exports.
-7. **English and Spanish, key for key.** Every string goes through i18n; nothing is hard-coded.
+7. **Seven languages, key for key.** English, Spanish, Brazilian Portuguese, Simplified and
+   Traditional Chinese, Russian and Arabic (Will, 9 October, A24; it was "English and Spanish").
+   Every string goes through i18n; nothing is hard-coded; a reworded English string is not finished
+   until the other six have it. A text or email goes out in the person's own language once that
+   language is signed for it, and in English until then (A25).
 
 ## How Pam feels
 

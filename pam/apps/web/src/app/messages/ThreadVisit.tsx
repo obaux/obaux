@@ -6,7 +6,7 @@ import { Icon } from '@astryxdesign/core/Icon';
 import { VStack } from '@astryxdesign/core/VStack';
 import { StatusCard } from '@pam/ui/PolicyStatusCard';
 import { DUMMY_PLACES_BY_ID } from '@pam/config/dummy-places';
-import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
+import { exampleTrips } from '@/lib/exampleTrips';
 import { useI18n } from '@/lib/i18n';
 import { readAddedTrips, TRIPS_CHANGED, withMoves } from '@/lib/addedTrips';
 import { intlLocale } from '@pam/config';
@@ -22,16 +22,16 @@ import { intlLocale } from '@pam/config';
  * time — with a chevron here, because here it goes somewhere: the place,
  * which shows the visit too, and whose Back returns to this conversation.
  *
- * Pinned above every message, it is the compact card (D-400, Will, 9
- * October: "should be smaller"), and the conversation fades out as it
- * scrolls up under it rather than stopping at a line (ThreadView).
+ * At the top of the conversation, with who they are, it is the compact card
+ * (D-400, Will, 9 October: "should be smaller") and scrolls away with the
+ * messages (D-526).
  *
  * Example trips only, as Trips itself is (D-213): the program is matched to
  * an example place by name, and the soonest visit there is shown. Nothing
  * when there is no visit, or no program.
  */
 const styles = stylex.create({
-  // Pinned with the header above the messages, never scrolled away.
+  // The last thing in the intro, above the first message.
   wrap: { width: '100%', flexShrink: 0, paddingBlockEnd: '8px' },
 });
 
@@ -55,7 +55,7 @@ export function ThreadVisit({
         return;
       }
       const now = Date.now();
-      const next = withMoves([...DUMMY_TRIPS, ...readAddedTrips()])
+      const next = withMoves([...exampleTrips(), ...readAddedTrips()])
         .filter((trip) => trip.placeId === place.id && new Date(trip.startsAt).getTime() >= now)
         .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0];
       setVisit(next ? { id: next.id, placeId: next.placeId, startsAt: next.startsAt } : null);

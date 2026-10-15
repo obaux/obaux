@@ -15,12 +15,14 @@ const PROFILES = '**/rest/v1/profiles*';
 const POINTS = '**/rest/v1/rpc/member_points*';
 const CONTROLS = '**/rest/v1/access_controls*';
 const NOTIFICATIONS = '**/rest/v1/notifications*';
+const SETTINGS = '**/rest/v1/app_settings*';
 const PREFS = '**/rest/v1/notification_preferences*';
 const ME = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
 
 const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
 
-async function signedInAs(page: import('@playwright/test').Page, role: 'provider' | 'admin' | 'member', prefs: Record<string, unknown> | null) {
+async function signedInAs(page: import('@playwright/test').Page, role: 'provider' | 'admin' | 'member', prefs: Record<string, unknown> | null, textsLive = ALERT_TEXTS_LIVE ? 'on' : 'off') {
+  await page.route(SETTINGS, (route) => route.fulfill(json({ value: textsLive })));
   await page.addInitScript((userId: string) => {
     const session = {
       access_token: 'test-access-token',
@@ -76,6 +78,24 @@ test.describe('Text alerts, held until the day (D-478)', () => {
     await expect(page.getByRole('switch', { name: 'Someone plans a trip' })).toBeDisabled();
     await expect(page.getByRole('switch', { name: 'Someone messages you' })).toBeDisabled();
     expect(writes).toHaveLength(0);
+  });
+});
+
+test.describe('The closed-place text follows the server\'s texts_live switch (D-481)', () => {
+  test('while texts_live is off, the switch says "Coming soon" and writes nothing', async ({ page }) => {
+    const writes = await signedInAs(page, 'member', null, 'off');
+    await page.goto('/alerts/');
+    await settled(page);
+    await expect(page.getByRole('switch', { name: 'A saved place closes or moves' })).toBeDisabled();
+    await expect(page.getByText('Coming soon. Pam does not send this text yet.').first()).toBeVisible();
+    expect(writes).toHaveLength(0);
+  });
+
+  test('once texts_live is on, it works, with no deploy', async ({ page }) => {
+    await signedInAs(page, 'member', null, 'on');
+    await page.goto('/alerts/');
+    await settled(page);
+    await expect(page.getByRole('switch', { name: 'A saved place closes or moves' })).toBeEnabled();
   });
 });
 

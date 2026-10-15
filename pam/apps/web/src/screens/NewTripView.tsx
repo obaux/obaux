@@ -24,12 +24,14 @@ import { readAddedTrips, withMoves } from '@/lib/addedTrips';
 import { asksForSavedTrips, bookTrip, isSavedPlace, moveSavedOrLocalTrip } from '@/lib/savedTrips';
 import { useTrips } from '@/lib/useTrips';
 import { useSession } from '@/lib/useSession';
-import { useSupportPhone } from '@/lib/useSupportPhone';
-import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
+import { examplesOn } from '@/lib/examples';
+import { exampleTrips } from '@/lib/exampleTrips';
+import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { friendLink } from '@/lib/appUrl';
 import { navigate } from '@/lib/navigate';
 import { countdown } from '@/lib/when';
 import { FRIEND_BANNER, FRIEND_BANNER_SRCSET } from '@/lib/friendBanner';
+import { usePlaceHasLead } from '@/lib/usePlaceHasLead';
 import { useServices } from '@/lib/useServices';
 import { HelpButton } from './HelpButton';
 import { BigCategoryIcon, CategoryPicture } from './SavedView';
@@ -183,7 +185,29 @@ export function NewTripView({
 }) {
   const { t, tPlain, locale } = useI18n();
   const router = useRouter();
-  const places = useMemo(() => Object.values(DUMMY_PLACES_BY_ID), []);
+  // The places to pick from (D-509): the member's own saved ones; the example set only in a demo or
+  // Storybook. A real account never plans a trip to a place that is only an example.
+  const [examples, setExamples] = useState(false);
+  useEffect(() => setExamples(examplesOn()), []);
+  const { state: savedState } = useSavedPlaces(true);
+  const places = useMemo<readonly DummySavedPlace[]>(
+    () =>
+      examples
+        ? Object.values(DUMMY_PLACES_BY_ID)
+        : savedState.status === 'ready'
+          ? savedState.places.map((p) => ({
+              id: p.id,
+              name: p.name,
+              category: p.category,
+              address: p.address ?? '',
+              phone: p.phone,
+              lat: p.lat ?? 0,
+              lon: p.lon ?? 0,
+              description: p.description ?? '',
+            }))
+          : [],
+    [examples, savedState],
+  );
   const { forPlace } = useServices();
   const { forPlace: policiesAt } = usePlacePolicies();
   const { progress } = useMySignatures();
@@ -191,13 +215,14 @@ export function NewTripView({
   // Opened on a booked trip (D-333): its place and slot, read once.
   const [bookedTrip] = useState(() => {
     if (!booked) return null;
-    const trip = withMoves([...DUMMY_TRIPS, ...readAddedTrips()]).find((x) => x.id === booked);
+    const trip = withMoves([...exampleTrips(), ...readAddedTrips()]).find((x) => x.id === booked);
     const at = trip ? DUMMY_PLACES_BY_ID[trip.placeId] : undefined;
     return trip && at ? { trip, place: at } : null;
   });
   const [place, setPlace] = useState<DummySavedPlace | null>(bookedTrip?.place ?? initial);
+  // A place with no program lead on Pam is not told about the visit, so the wording stops saying it is (D-498).
+  const hasLead = usePlaceHasLead(place?.id, place?.name);
   const { state: session } = useSession();
-  const supportPhone = useSupportPhone();
   // The trip is being saved, or could not be (D-454): say so rather than show it booked.
   const [isSaving, setIsSaving] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -290,7 +315,7 @@ export function NewTripView({
     return (
       <SuccessScreen
         title={t('trips.moved.title')}
-        body={t('trips.moved.body', { place: place.name, day: dayLong.format(movedTo), time: timeFmt.format(movedTo) })}
+        body={t(hasLead ? 'trips.moved.body' : 'trips.moved.body.self', { place: place.name, day: dayLong.format(movedTo), time: timeFmt.format(movedTo) })}
         action={<Button label={t('trips.moved.home')} variant="secondary" href="/" xstyle={styles.home} />}
         note={t('trips.moved.note')}
       />
@@ -309,6 +334,8 @@ export function NewTripView({
         title={t('trips.booked.example.title', { name: forMember.name })}
         body={t('trips.booked.example.body', vars)}
         action={<Button label={t('trips.moved.home')} variant="secondary" href="/" xstyle={styles.home} />}
+        // A place with no program lead on Pam is not told either way (D-498).
+        {...(hasLead ? {} : { note: t('trips.booked.noLead', { place: place.name }) })}
       />
     );
   }
@@ -323,7 +350,7 @@ export function NewTripView({
     const toSign = here.asks && forVisit.length > 0 ? progress(place.id, forVisit) : null;
     return (
       <SubPage
-        title={t('trips.confirm.title')}
+        title={t(hasLead ? 'trips.confirm.title' : 'trips.confirm.title.self')}
         // The end of the flow (Will, D-334): an × that closes to Trips, not
         // a way back into booking.
         backIcon="close"
@@ -351,6 +378,11 @@ export function NewTripView({
             change: confirmed.id,
           }).toString()}`}
         />
+        {hasLead ? (
+          forMember ? null : <Banner status="info" title={t('trips.booked.hasLead', { place: place.name })} />
+        ) : (
+          <Banner status="info" title={t('place.noLead', { place: place.name })} />
+        )}
         {/* Plain rows on the page, like a place's (D-337): no card around them. */}
         <MenuList
           label={t('trips.confirm.next')}
@@ -538,8 +570,7 @@ export function NewTripView({
           notice="something_went_wrong"
           title={t('join.failed.title')}
           body={t('join.failed.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
       {step === 'where' ? (
@@ -644,7 +675,12 @@ export function NewTripView({
             ]}
             countdown={countdown(at(day, time), t)}
           />
-          <TextArea label={t('trips.new.note')} value={note} onChange={setNote} rows={2} width="100%" />
+          <TextArea label={t(hasLead ? 'trips.new.note' : 'trips.new.note.self')} value={note} onChange={setNote} rows={2} width="100%" />
+          {forMember ? null : (
+            <Text type="supporting" xstyle={styles.note}>
+              {t(hasLead ? 'place.lead.sees' : 'place.noLead', { place: place.name })}
+            </Text>
+          )}
           {/* True only for an example place or a program booking: a trip to a real
               place is saved (D-454), and saying otherwise would be a lie. */}
           {asksForSavedTrips(session) !== null && isSavedPlace(place.id) && !forMember ? null : (

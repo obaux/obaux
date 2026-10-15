@@ -9,16 +9,18 @@ import { useEffect, useState } from 'react';
  * arrives by text, and the member types it. Nothing here decides who somebody
  * is — Supabase does that, and the database decides what they may see.
  *
- * The failure a member will actually hit is a code that never arrives, so that
- * state gets a way forward rather than a spinner: try again, or call for help.
+ * A code that never arrives gets a way forward rather than a spinner. A code that
+ * is wrong or has expired is a slip they fix on the spot: they stay on the code step
+ * with a small alert and try again (D-510).
  */
 export type SignInStep =
   | { step: 'phone' }
   | { step: 'sending' }
-  | { step: 'code'; phone: string }
+  // `error: 'verify'`: the code they typed did not work. They stay here and try again (D-510).
+  | { step: 'code'; phone: string; error?: 'verify' }
   | { step: 'verifying'; phone: string }
   | { step: 'done' }
-  | { step: 'failed'; reason: 'send' | 'verify'; phone: string | null };
+  | { step: 'failed'; reason: 'send'; phone: string | null };
 
 /**
  * Says why sign-in failed, to the console only.
@@ -125,10 +127,10 @@ export function usePhoneSignIn(): PhoneSignIn {
         type: 'sms',
       });
       if (error) reportSignInProblem('verify', error);
-      setState(error ? { step: 'failed', reason: 'verify', phone } : { step: 'done' });
+      setState(error ? { step: 'code', phone, error: 'verify' } : { step: 'done' });
     } catch (error) {
       reportSignInProblem('verify', error);
-      setState({ step: 'failed', reason: 'verify', phone });
+      setState({ step: 'code', phone, error: 'verify' });
     }
   };
 

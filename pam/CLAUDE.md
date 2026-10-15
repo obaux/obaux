@@ -138,7 +138,7 @@ than assuming a clean base.
 ## Two standing lists Will asked to be kept
 
 - **The user-flow map**, Figma "PAM — User flows", **updated once a day, at about
-  2am Pacific**, by the design lane's nightly run from that day's merges (Will,
+  2am Eastern**, by the design lane's nightly run from that day's merges (Will,
   10 October: "once a day only, at 2am. Otherwise we run too many tokens, and changes
   may happen in a day that would require too many updates to flow"). A lane job no
   longer edits `docs/user-flows/flows.mjs` or publishes to Figma: if it adds, removes
@@ -226,12 +226,17 @@ These come from the build SOP and are enforced by tests, not convention:
   appointment reminders, D-431), carry emoji, or send
   without a human recorded in `reviewedBy` **for that language**. A language
   nobody has signed is texted in English, never in a draft (A25).
-- **Never dead-end.** Every screen has a visible way back and a visible way to
-  get help. (The hero template's screens keep the way back but carry no help —
-  Will's exception, `docs/sop-amendments.md` A19.)
+- **Never dead-end.** Every screen has a visible way back. A visible way to get
+  help is required where a person can get stuck: sign-in and joining, forms and
+  their errors, anything failed or waiting, each step of a multi-step task, and any
+  screen that says to call. Screens for looking around (the tabs, lists, a place)
+  need none: help is one tap from Profile and on Home (Will, 11 October,
+  `docs/amendments/A26-…`; the hero template's exception is A19).
 - **One primary action per screen.** Two primary `BigButton`s means the screen
   is doing two things (a `variant="secondary"` one beside it is fine — D-239).
-- **48px minimum touch target, 56px primary buttons (secondary the same — D-239), 16px body text on mobile (A23).**
+- **48px minimum touch target, 56px primary buttons (secondary the same — D-239). Text: the page is 16px, components
+  say their own size by role (titles 28–34, buttons and rows 17–18, reading text 16, labels 14, captions 12–13), and
+  nothing is under 12px; the exceptions are in `docs/amendments/A27-…` (it replaces A23's "nothing under 15px").**
 - Every `security definer` function sets `search_path = public, extensions`.
 - Strings go through i18n from day one. Every language Pam offers (English,
   Spanish, Brazilian Portuguese, Simplified and Traditional Chinese, Russian,
@@ -252,6 +257,14 @@ These come from the build SOP and are enforced by tests, not convention:
   Texts and emails fill their own templates and never see them.
 
 ## Verify, don't assume
+
+**Web e2e: build for the stub project, then test.** `pnpm --filter @pam/web build:e2e` (it sets `NEXT_PUBLIC_SUPABASE_URL=https://stub.supabase.co`),
+then `pnpm --filter @pam/web test:a11y`. A plain `pnpm build` points at the live project, and the run refuses to start on it (D-576); the
+browser also cannot reach any host but this machine, so an unmocked request fails instead of leaving it.
+
+**Google Places: the field mask sets the price.** Read `docs/google-places.md` before adding or changing a call to Google.
+Ask only for Essentials or Pro fields, and never for contact fields: phone, website and hours come from Pam's own
+database. Every Places request type has a daily cap Will set; Place Details is 30 a day until he raises it.
 
 `pnpm --filter @pam/db test` is the highest-value check in the repo: it attacks
 the policies with one test user per role and is what stands between a policy

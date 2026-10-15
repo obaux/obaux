@@ -5,6 +5,7 @@ import {
   directionOf,
   fillTemplate,
   intlLocale,
+  nameJoinerOf,
   isSupportedLocale,
   matchLocale,
   pickTemplate,
@@ -37,6 +38,14 @@ describe('the language list', () => {
 
   it('reads right to left only in Arabic', () => {
     expect(SUPPORTED_LOCALES.filter((l) => directionOf(l) === 'rtl')).toEqual(['ar']);
+  });
+
+  it('joins the parts of a spoken name with the language\'s own comma (b32, P5)', () => {
+    expect(nameJoinerOf('en')).toBe(', ');
+    expect(nameJoinerOf('ar')).toBe('، ');
+    expect(nameJoinerOf('zh-CN')).toBe('，');
+    expect(nameJoinerOf('zh-HK')).toBe('，');
+    expect(nameJoinerOf('xx')).toBe(', ');
   });
 
   it('asks a phone to listen for the right language', () => {

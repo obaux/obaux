@@ -1,21 +1,22 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
+import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
-import { Notice, Page, TextLink } from '@pam/ui';
+import { AppHeader, Notice, Page, TextLink } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { OnboardingSlides } from '@pam/ui/OnboardingSlides';
 import { useI18n } from '@/lib/i18n';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePhoneSignIn, type PhoneSignIn } from '@/lib/usePhoneSignIn';
 import { useSession } from '@/lib/useSession';
 import { useAlertBanner } from '@/lib/alertBanner';
 import { LanguageSwitcher } from '../LanguageSwitcher';
 import { PhoneSignInCard } from './PhoneSignInCard';
-import { LegalFooter } from './LegalFooter';
+import { LegalLinks } from './LegalFooter';
+import { rememberNext, takeNext } from '@/lib/signinNext';
 import { recallInvite, rememberInvite, type Invite, type InviteRole } from '@/lib/appUrl';
 import { pendingInviteForMe, previewInvite } from '@/lib/useInviteLinks';
 import { navigate } from '@/lib/navigate';
@@ -49,12 +50,13 @@ const styles = stylex.create({
   invited: {
     display: 'block',
     width: '100%',
-    paddingBlock: '10px',
+    // A little tighter on a short screen, where the line can run to four lines (D-564).
+    paddingBlock: { default: '10px', '@media (max-height: 640px)': '6px' },
     paddingInline: '16px',
     boxSizing: 'border-box',
     textAlign: 'center',
     fontSize: '15px',
-    lineHeight: 1.4,
+    lineHeight: { default: 1.4, '@media (max-height: 640px)': 1.3 },
     fontWeight: 600,
     color: '#FFFFFF',
     backgroundColor: '#000000',
@@ -66,9 +68,28 @@ const styles = stylex.create({
   // isn't touching top of screen") — the hero is meant to run flush to the
   // very top of the viewport, the same reasoning `OnboardingSlides`' own
   // negative side margins already use to reach both edges.
+  // What stays at the top of the first step while the page scrolls (Will, 11 October: "we need the header of sign in
+  // screen to stay sticky on top as the user scrolls down, otherwise they lose context"): the invite line, which
+  // is the reason they are here, and, once the hero has scrolled away, a compact bar with the mark and the language
+  // switch. The bar is drawn over the content below the invite line, not in the flow, so it takes no room from the
+  // button on a short screen (D-502).
+  pinned: { position: 'sticky', top: 0, zIndex: 12, width: '100%' },
+  pinBar: {
+    position: 'absolute',
+    top: '100%',
+    insetInline: 0,
+    paddingInline: '16px',
+    backgroundColor: colorVars['--color-background-body'],
+    boxShadow: '0 1px 0 var(--color-border), 0 6px 16px light-dark(oklch(0 0 0 / 6%), oklch(0 0 0 / 40%))',
+    opacity: 0,
+    visibility: 'hidden',
+    transitionProperty: 'opacity',
+    transitionDuration: '150ms',
+  },
+  pinBarShown: { opacity: 1, visibility: 'visible' },
   heroGroup: { width: '100%', marginBlockStart: '-24px' },
   heroHeader: { position: 'relative', width: '100%' },
-  heroBrand: { width: 'fit-content', marginInline: 'auto' },
+  heroBrand: { width: 'fit-content', marginInline: 'auto', rowGap: { default: spacingVars['--spacing-4'], '@media (max-height: 640px)': '8px' } },
   // Larger and always white (Will, 16 September) — the themed mark
   // `AppHeader` renders elsewhere picks dark or light ink to sit on the
   // page's own background, which is the wrong call directly over art, in
@@ -125,8 +146,7 @@ export function SignInScreen({
    */
   readonly audience?: InviteRole | null;
 } = {}) {
-  const { t } = useI18n();
-  const supportPhone = useSupportPhone();
+  const { t, tPlain } = useI18n();
   const live = usePhoneSignIn();
   const flow = preview?.flow ?? live;
   const { state, startOver } = flow;
@@ -147,6 +167,12 @@ export function SignInScreen({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // A way on after Sign in (S1): the website's "Add your program" arrives as ?next=/profile/add-program/. Only a listed screen is kept.
+  useEffect(() => {
+    if (preview) return;
+    rememberNext(new URLSearchParams(window.location.search).get('next'));
+  }, [preview]);
+
   /**
    * Somebody who is already in does not get asked for their phone again.
    *
@@ -161,7 +187,7 @@ export function SignInScreen({
     if (preview) return;
     if (state.step !== 'phone') return;
     if (session.status === 'signed-in') {
-      router.replace(session.session.isOnboarded ? '/' : '/join/');
+      router.replace(session.session.isOnboarded ? (takeNext(session.session.role) ?? '/') : '/join/');
     } else if (session.status === 'no-profile') {
       router.replace('/join/');
     }
@@ -238,7 +264,7 @@ export function SignInScreen({
 
         const { data: profile } = await supabase
           .from('profiles')
-          .select('id, onboarded_at')
+          .select('id, onboarded_at, role')
           .eq('id', auth.user.id)
           .maybeSingle();
         if (cancelled) return;
@@ -258,6 +284,10 @@ export function SignInScreen({
           router.replace('/join/');
           return;
         }
+
+        // An account that exists decides about the way on (S1) now, and the stored one is forgotten either way: it is taken only if
+        // nothing below needs the person first (an invite to add), and never left to fire on a later visit to Sign in (W6).
+        const next = takeNext((profile as { role?: string | null }).role ?? null);
 
         // Already a member, with a program invite for this number and city:
         // ask whether to add the program to their account (D-374).
@@ -280,7 +310,8 @@ export function SignInScreen({
         const asked = await getReminderConsent(auth.user.id);
         if (cancelled) return;
 
-        router.replace(asked === null ? '/reminders/' : '/');
+        // A listed way on (S1) goes first, ahead of the reminders question, which waits for next time (W6).
+        router.replace(next ?? (asked === null ? '/reminders/' : '/'));
       } catch {
         // A redirect that cannot decide still has to go somewhere.
         if (!cancelled) router.replace('/');
@@ -300,8 +331,7 @@ export function SignInScreen({
         notice="something_went_wrong"
         title={t(`signin.failed.${state.reason}.title`)}
         body={state.phone === null ? t('signin.phone.invalid') : t(`signin.failed.${state.reason}.body`)}
-        supportPhone={supportPhone}
-        callLabel={t('help.callSupport')}
+        contactLabel={t('help.contact.action')}
       />
     ) : null;
 
@@ -316,6 +346,7 @@ export function SignInScreen({
         code={code}
         onCodeChange={setCode}
         hasTitle={onFirstStep}
+        isInvited={invite !== null}
         isFlat
       />
     );
@@ -325,6 +356,8 @@ export function SignInScreen({
       <TextLink label={t('signin.phone.label')} onClick={startOver} />
     ) : null;
 
+  const pinnedRef = useRef<HTMLDivElement | null>(null);
+  const markRef = useRef<HTMLImageElement | null>(null);
   /*
    * The mark, the region, and the locale switcher, overlaid on the hero
    * rather than in a header row above it (Will, 16 September, matching the
@@ -337,7 +370,7 @@ export function SignInScreen({
   const heroHeader = (
     <div {...stylex.props(styles.heroHeader)}>
       <VStack gap={4} align="center" xstyle={styles.heroBrand}>
-        <img src="/pam-wordmark-white.svg" alt="Pam" {...stylex.props(styles.heroMark)} />
+        <img ref={markRef} src="/pam-wordmark-white.svg" alt="Pam" {...stylex.props(styles.heroMark)} />
         <Text xstyle={styles.heroCity}>{t('signin.city')}</Text>
       </VStack>
       <div {...stylex.props(styles.heroGlobe)}>
@@ -346,27 +379,78 @@ export function SignInScreen({
     </div>
   );
 
+  // Past the hero's own mark and globe: the compact bar takes over (see `pinned`). When the mark has gone from view, not at a
+  // fixed distance (D-564): a short phone's page scrolls only 72px in some languages, and a fixed 72 never fired. The mark is
+  // "gone" once it is behind the pinned invite line as well as off the top, so the observer's top edge is that line's height.
+  const [pinBarShown, setPinBarShown] = useState(false);
+  useEffect(() => {
+    const mark = markRef.current;
+    if (!mark) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      const read = () => setPinBarShown(window.scrollY > 72);
+      read();
+      window.addEventListener('scroll', read, { passive: true });
+      return () => window.removeEventListener('scroll', read);
+    }
+    let io: IntersectionObserver | null = null;
+    const watch = () => {
+      io?.disconnect();
+      const top = Math.round(pinnedRef.current?.getBoundingClientRect().height ?? 0);
+      // Half the mark gone is the hand-over: at 0 the last sliver of it showed for a few pixels before the bar did (Iris, b32).
+      io = new IntersectionObserver(([entry]) => setPinBarShown(entry ? entry.intersectionRatio < 0.5 : false), { rootMargin: `-${top}px 0px 0px 0px`, threshold: [0, 0.5, 1] });
+      io.observe(mark);
+    };
+    watch();
+    const resize = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(watch);
+    if (pinnedRef.current) resize?.observe(pinnedRef.current);
+    return () => {
+      io?.disconnect();
+      resize?.disconnect();
+    };
+  }, [onFirstStep]);
+
   return (
     <>
       {/*
         Who invited them to be what (D-254): a thin black line across the top,
         above the pictures, on both steps — the reason they are here should
-        not scroll away or vanish once they have typed their number.
+        not scroll away or vanish once they have typed their number. On the
+        first step it is pinned, with the compact mark bar under it once the hero has gone
+        (D-502). The code step's own bar (`SubPageHeader`) is already pinned.
       */}
-      {invite ? (
-        <Text role="note" xstyle={styles.invited}>
-          {t(`signin.invited.${invite.role}`)}
-        </Text>
-      ) : null}
+      <div ref={pinnedRef} {...stylex.props(onFirstStep ? styles.pinned : undefined)}>
+        {invite ? (
+          <Text role="note" xstyle={styles.invited}>
+            {t(`signin.invited.${invite.role}`)}
+          </Text>
+        ) : null}
+        {onFirstStep ? (
+          <VStack xstyle={[styles.pinBar, pinBarShown && styles.pinBarShown]}>
+            <AppHeader homeHref={null} trailing={<LanguageSwitcher />} />
+          </VStack>
+        ) : null}
+      </div>
       {/* Centred under the hero; the code step is a nested page, left-aligned
           like every other (D-253), with only "Sent to" centred. */}
-      <Page align={onFirstStep ? 'center' : 'start'} gap={3}>
+      <Page
+        align={onFirstStep ? 'center' : 'start'}
+        gap={3}
+        // Privacy and Terms (D-251), last in the page and in the flow, never over the button (D-500).
+        footer={<LegalLinks from="signin" />}
+        isFooterInFlow
+      >
         {onFirstStep ? (
           // Somebody waiting on a code has already decided what Pam is: the
           // hero belongs to the first step only, and the card rides up over
           // its bottom edge instead of sitting in a header-then-card stack.
           <VStack gap={0} align="center" xstyle={styles.heroGroup}>
-            <OnboardingSlides slides={slides} label={t('onboarding.label')} header={heroHeader} />
+            <OnboardingSlides
+              slides={slides}
+              label={t('onboarding.label')}
+              header={heroHeader}
+              pauseLabel={tPlain('carousel.pause')}
+              playLabel={tPlain('carousel.play')}
+            />
             <VStack gap={3} align="center" xstyle={styles.overlapCard}>
               {failedNotice}
               {card}
@@ -393,8 +477,6 @@ export function SignInScreen({
           </>
         )}
       </Page>
-      {/* Privacy and Terms, pinned to the foot of the screen (D-251). */}
-      <LegalFooter from="signin" />
     </>
   );
 }

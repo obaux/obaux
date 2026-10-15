@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
+import { exampleTrips } from '@/lib/exampleTrips';
 import { readAddedTrips, savedTripsStatus, TRIPS_CHANGED, withMoves, withoutCancelled, type AddedTrip, type SavedTripsStatus } from './addedTrips';
 
 /**
@@ -30,7 +30,7 @@ export function useTrips(): TripsNow {
   const [now, setNow] = useState<TripsNow>({ examples: [], added: [], all: [], status: 'idle' });
   useEffect(() => {
     const read = () => {
-      const examples = withoutCancelled(withMoves(DUMMY_TRIPS.map((trip): AddedTrip => ({ ...trip, note: '' })))).sort(bySoonest);
+      const examples = withoutCancelled(withMoves(exampleTrips().map((trip): AddedTrip => ({ ...trip, note: '' })))).sort(bySoonest);
       const added = withoutCancelled(withMoves(readAddedTrips())).sort(bySoonest);
       setNow({ examples, added, all: [...examples, ...added].sort(bySoonest), status: savedTripsStatus() });
     };

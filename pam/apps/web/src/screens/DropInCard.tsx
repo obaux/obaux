@@ -27,7 +27,8 @@ const styles = stylex.create({
   body: { fontSize: '16px', lineHeight: 1.5 },
 });
 
-export function DropInCard({ schedule }: { readonly schedule: DropInSchedule }) {
+/** `hasLead`: the program is on Pam with a lead, so they know you are coming (D-498); otherwise the plan is only yours. */
+export function DropInCard({ schedule, hasLead = true }: { readonly schedule: DropInSchedule; readonly hasLead?: boolean }) {
   const { t, locale } = useI18n();
   const next = nextDropIn(schedule);
   const day = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long' }).format(next);
@@ -44,7 +45,7 @@ export function DropInCard({ schedule }: { readonly schedule: DropInSchedule }) 
         <Text type="supporting" xstyle={styles.next}>
           {t('place.dropin.next', { date })}
         </Text>
-        <Text xstyle={styles.body}>{t('place.dropin.body')}</Text>
+        <Text xstyle={styles.body}>{t(hasLead ? 'place.dropin.body' : 'place.dropin.body.self')}</Text>
       </VStack>
     </Card>
   );

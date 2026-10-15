@@ -22,6 +22,18 @@ export interface TextLinkProps {
   readonly isDisabled?: boolean;
   /** `quiet` is for legal small print, which should not compete with an action. */
   readonly size?: 'default' | 'quiet';
+  /**
+   * Underlined all the time, not only on hover. For a link in running text or among words, where the colour alone does not
+   * tell it from them (the text colour is the link's own: a link by itself in a row, such as Back, needs no line).
+   * D-564, after D-562 on the website.
+   */
+  readonly isUnderlined?: boolean;
+  /**
+   * The id of the words this link belongs to, read with it as its description (`aria-describedby`). For a link whose own
+   * words only make sense beside a question, such as Join's "Click here" under "Did someone invite you via code?": a
+   * screen reader listing links would otherwise say "Click here" alone (Iris, b32, P2). Nothing changes on screen.
+   */
+  readonly describedBy?: string;
 }
 
 /*
@@ -39,8 +51,12 @@ const linkLook = {
 } as const;
 
 const styles = stylex.create({
-  link: { minHeight: pam['--pam-touch-target-min'], fontSize: pam['--pam-link-size'], ...linkLook },
-  quiet: { minHeight: pam['--pam-touch-target-min'], fontSize: '15px', ...linkLook },
+  // The line is always there (the hover keeps the accent colour).
+  underlined: { textDecorationLine: 'underline' },
+  // 48px both ways (§2.5): a short word ("Sign", "Clear", "تم") was as wide as its letters, 25 to 40px, and a thumb
+  // 20px from the centre missed it (Iris's member pass, W4; D-500).
+  link: { minHeight: pam['--pam-touch-target-min'], minWidth: pam['--pam-touch-target-min'], fontSize: pam['--pam-link-size'], ...linkLook },
+  quiet: { minHeight: pam['--pam-touch-target-min'], minWidth: pam['--pam-touch-target-min'], fontSize: '15px', ...linkLook },
 });
 
 /**
@@ -51,7 +67,7 @@ const styles = stylex.create({
  */
 export const textLinkLook = stylex.create({ link: linkLook });
 
-export function TextLink({ label, href, onClick, isDisabled, size = 'default' }: TextLinkProps) {
+export function TextLink({ label, href, onClick, isDisabled, size = 'default', isUnderlined = false, describedBy }: TextLinkProps) {
   return (
     <Button
       label={label}
@@ -59,7 +75,8 @@ export function TextLink({ label, href, onClick, isDisabled, size = 'default' }:
       href={href}
       onClick={onClick}
       isDisabled={isDisabled}
-      xstyle={size === 'quiet' ? styles.quiet : styles.link}
+      aria-describedby={describedBy}
+      xstyle={[size === 'quiet' ? styles.quiet : styles.link, isUnderlined ? styles.underlined : null]}
     />
   );
 }

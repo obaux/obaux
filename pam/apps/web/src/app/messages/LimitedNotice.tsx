@@ -11,17 +11,16 @@ import { useI18n } from '@/lib/i18n';
  *
  * A limited account can still read (0031): the messages stay on the screen and
  * this stands where the composer or the New message button would be. It says
- * what is off and carries the call button, the way every notice does.
+ * what is off and carries the Contact Pam button, the way every notice does.
  */
-export function LimitedNotice({ supportPhone }: { readonly supportPhone: string }) {
+export function LimitedNotice() {
   const { t } = useI18n();
   return (
     <Notice
       notice="account_limited"
       title={t(NOTICES.account_limited.titleKey)}
       body={t(NOTICES.account_limited.bodyKey)}
-      supportPhone={supportPhone}
-      callLabel={t('help.callSupport')}
+      contactLabel={t('help.contact.action')}
       quiet
     />
   );

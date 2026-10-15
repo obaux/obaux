@@ -13,8 +13,9 @@ import { useI18n } from '@/lib/i18n';
  * D-417).
  *
  * Top to bottom: who "your guide" is (said once, small), the short version, and
- * — where `detail` is on — the whole list as two cards, "can see" in three short
- * groups and "cannot see".
+ * — where `detail` is on — the whole list as three cards: what your guide can see, in
+ * three short groups; what your guide cannot see; and what a program can see (D-541),
+ * its own card because a fact only a program reads cannot stand under "Your guide can see".
  *
  * - **The last step of signing up shows the detail.** That screen is the
  *   contract's: SOP §4.1 requires it to list every line, so it cannot be
@@ -51,6 +52,7 @@ export function TransparencyReading({ detail = true }: { readonly detail?: boole
     { text: t('transparency.summary.see'), mark: 'yes', icon: <EyeIcon /> },
     { text: t('transparency.summary.cannot'), mark: 'no', icon: <EyeOffIcon /> },
     { text: t('transparency.summary.reported'), mark: 'yes', icon: <MessagesIcon /> },
+    { text: t('transparency.summary.program'), mark: 'yes', icon: <PeopleIcon /> },
     { text: t('privacy.s.contact.p1'), mark: 'call', icon: <PhoneIcon /> },
   ];
 
@@ -82,6 +84,15 @@ export function TransparencyReading({ detail = true }: { readonly detail?: boole
               {TRANSPARENCY_SCREEN.cannotSee.map((line) => {
                 const { lead, detail: more } = splitLine(t(line.key));
                 return <FactRow key={line.key} lead={lead} detail={more} mark="no" />;
+              })}
+            </FactGroup>
+          </ReadCard>
+
+          <ReadCard title={asTitle(t(TRANSPARENCY_SCREEN.programHeadingKey))} icon={<PeopleIcon />}>
+            <FactGroup>
+              {TRANSPARENCY_SCREEN.program.map((line) => {
+                const { lead, detail: more } = splitLine(t(line.key));
+                return <FactRow key={line.key} lead={lead} detail={more} mark="yes" />;
               })}
             </FactGroup>
           </ReadCard>

@@ -20,8 +20,8 @@
   }
 
   body {
-    background-color: var(--color-background-body);
-    color: var(--color-text-primary);
+    background-color: var(--website-surface-page, var(--color-background-body));
+    color: var(--website-text-primary, var(--color-text-primary));
     font-family: var(--font-family-body);
     font-size: 16px;
     line-height: 1.55;
@@ -32,6 +32,75 @@
   /* A support post is read on white (Will, 10 October 2026): the card colour, which is white in light mode
      and the theme's own raised dark in dark mode, so contrast follows the theme. */
   body:has([data-page='post']) {
-    background-color: var(--color-background-card);
+    background-color: var(--website-surface-page, var(--color-background-card));
   }
+
+  /* Support's search suggestions (the app's search bar): the list never runs past the screen, and a long question or
+     title wraps onto a second line instead of being cut with "…" (a question somebody has to read to choose). */
+  .astryx-typeahead-dropdown {
+    max-width: calc(100vw - 48px);
+  }
+  .astryx-typeahead-dropdown * {
+    white-space: normal;
+    text-overflow: clip;
+  }
+
+  /* Where a link to a section of a post lands its heading: clear of whatever is stuck to the top of the screen.
+     From 1180px the "On this page" menu is a side column and nothing is stuck there; narrower, it is a bar of 57px. */
+  :root {
+    --post-scroll-offset: 80px;
+  }
+  @media (min-width: 1180px) {
+    :root {
+      --post-scroll-offset: 24px;
+    }
+  }
+
+  /* A visible ring on everything you can reach with Tab (Iris's finding S2, 11 October: the header links, search box,
+     topic and post links, Open Pam and the footer showed none). Astryx's own focus rule loses to an
+     `outline-style: none` that its link, nav and button styles also set, so it is drawn here, from the same tokens.
+     Text boxes are not in this list and draw no ring in any mode (Will, 14 October: "undo any rules about text box being
+     selected, I don't want that": the cursor shows where you are; the keyboard comes up when a box appears). Buttons,
+     links, tick boxes, selects and summary keep theirs. */
+  a:focus-visible,
+  button:focus-visible,
+  input[type='checkbox']:focus-visible,
+  input[type='radio']:focus-visible,
+  input[type='button']:focus-visible,
+  input[type='submit']:focus-visible,
+  select:focus-visible,
+  summary:focus-visible,
+  [role='button']:focus-visible,
+  [role='combobox']:not(input, textarea):focus-visible,
+  [role='tab']:focus-visible,
+  [tabindex]:not([tabindex='-1']):not(textarea):not(input[type='text'], input[type='email'], input[type='search'], input[type='tel'], input[type='url'], input[type='number'], input[type='password'], input:not([type])):focus-visible {
+    outline: var(--focus-outline-width, 2px) var(--focus-outline-style, solid) var(--focus-outline-color, currentColor) !important;
+    outline-offset: var(--focus-outline-offset, 3px) !important;
+  }
+
+  /* A section a link of "On this page" moves focus to (so a screen reader follows) is not a control: no outline, in
+     any input mode (Will, 04:17). Links, buttons and fields keep their ring when someone Tabs to them. */
+  [tabindex='-1']:focus,
+  [tabindex='-1']:focus-visible {
+    outline: none !important;
+  }
+
+  /* Reveal on scroll (components/Reveal.tsx): hidden only after script has run, only below the fold, only for a reader who
+     has not asked for less motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-reveal='pending'] {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
+
+  /* About Pam is a grey page that runs down to the footer: no white strip between them. */
+  body:has([data-page='about']) footer {
+    margin-block-start: 0;
+  }
+}
+
+/* The help form's dialog is open: the page behind does not scroll (iOS ignores the dialog's own lock). */
+html[data-dialog-open] body {
+  overflow: hidden;
 }

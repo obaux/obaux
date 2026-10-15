@@ -9,11 +9,9 @@ import { useI18n } from '@/lib/i18n';
 import { useFlaggedPlaces } from '@/lib/useFlaggedPlaces';
 import { useNow } from '@/lib/usePlaceStatus';
 import { useSession } from '@/lib/useSession';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useRoleView } from '@/lib/useViewedRole';
 import { NotIn } from '../app/NotIn';
 import { ReportedPlacesLazy } from '../app/places/ReportedPlacesLazy';
-import { RoleSwitchControl } from '../app/RoleSwitchControl';
 import { HelpButton } from './HelpButton';
 
 /**
@@ -32,11 +30,10 @@ import { HelpButton } from './HelpButton';
  */
 export function ReportedPlacesScreen() {
   const { t } = useI18n();
-  const supportPhone = useSupportPhone();
   const params = useSearchParams();
   const { state: session } = useSession();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const { demoRole, setViewAs } = useRoleView(trueRole);
+  const { demoRole } = useRoleView(trueRole);
   const viewedRole = demoRole ?? trueRole;
   const canReview = viewedRole === 'admin' || viewedRole === 'super_admin';
   const realCanReview = trueRole === 'admin' || trueRole === 'super_admin';
@@ -51,7 +48,6 @@ export function ReportedPlacesScreen() {
 
   const actions = (
     <>
-      {trueRole === 'super_admin' ? <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} /> : null}
       <HelpButton />
     </>
   );
@@ -80,8 +76,7 @@ export function ReportedPlacesScreen() {
           notice={key}
           title={t(NOTICES[key].titleKey)}
           body={t(NOTICES[key].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       </SubPage>
     );
@@ -90,7 +85,7 @@ export function ReportedPlacesScreen() {
   if (!canReview) {
     return (
       <SubPage title={t('places.reported.title')} {...back} actions={actions}>
-        <Notice notice="something_went_wrong" title={t('admin.notAdmin.title')} body={t('admin.notAdmin.body')} supportPhone={supportPhone} callLabel={t('help.callSupport')} />
+        <Notice notice="something_went_wrong" title={t('admin.notAdmin.title')} body={t('admin.notAdmin.body')} contactLabel={t('help.contact.action')} />
       </SubPage>
     );
   }
@@ -104,7 +99,6 @@ export function ReportedPlacesScreen() {
         useDummy={USE_DUMMY_PEOPLE}
         onResolved={refresh}
         now={now}
-        supportPhone={supportPhone}
       />
     </SubPage>
   );

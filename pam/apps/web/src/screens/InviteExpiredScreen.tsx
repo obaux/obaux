@@ -10,7 +10,9 @@ import { SubPageHeader } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import type { Invite } from '@/lib/appUrl';
 import { isEmailAddress, previewInvite, requestInviteLink, type InvitePreview } from '@/lib/useInviteLinks';
-import { LegalFooter } from '../app/signin/LegalFooter';
+import { LegalLinks } from '../app/signin/LegalFooter';
+import { useSettingOn } from '@/lib/useSettingOn';
+import { HELP_DESK_URL } from '@/lib/helpDesk';
 
 /**
  * An expired invite link (Will, 4 October, D-258; reworked by D-263).
@@ -49,6 +51,8 @@ export function InviteExpiredScreen({ invite }: { readonly invite: Invite | null
   const [isInvalid, setIsInvalid] = useState(false);
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
+  // The offer to email a new link only while invite emails really go out (Sage, 13 October; D-563).
+  const emailsLive = useSettingOn('invite_emails_live');
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
@@ -91,16 +95,22 @@ export function InviteExpiredScreen({ invite }: { readonly invite: Invite | null
     <>
       {state === 'expired' || state === 'valid' ? (
         <Text role="note" xstyle={styles.invited}>
-          {t(`signin.invited.${role}`)}
+          {t(`invite.expired.invited.${role}`)}
         </Text>
       ) : null}
-      <Page gap={4}>
+      <Page gap={4} footer={<LegalLinks from="signin" />} isFooterInFlow>
         <SubPageHeader title={title} backHref="/signin/" backLabel={t('nav.back.signInScreen')} />
         {state === 'loading' ? <Loading label={t('common.loading')} variant="inline" /> : null}
 
         {state === 'expired' || state === 'valid' ? (
           sent ? (
             <Text xstyle={styles.body}>{t('invite.expired.sent.body', { email: email.trim() })}</Text>
+          ) : !emailsLive ? (
+            <>
+              <Text xstyle={styles.body}>{t(`invite.expired.body.${role}`, { name })}</Text>
+              {/* Emails are off, so nothing is offered that would not arrive; the help desk is the way on. */}
+              <TextLink label={t('help.contact.action')} href={HELP_DESK_URL} />
+            </>
           ) : (
             <>
               <Text xstyle={styles.body}>{t(`invite.expired.body.${role}`, { name })}</Text>
@@ -145,7 +155,6 @@ export function InviteExpiredScreen({ invite }: { readonly invite: Invite | null
 
         <TextLink label={t('invite.expired.signin')} href="/signin/" />
       </Page>
-      <LegalFooter from="signin" />
     </>
   );
 }
