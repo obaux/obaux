@@ -1008,6 +1008,25 @@
   Checks: one-search, area-picker, focus-text-boxes and street-search on all three projects 132/132; ui 124; config
   1312; tsc clean. Screens: none. Cost: the list re-sorts for a typed address about 1 s later than before; the
   finished screen is unchanged.
+- **Iris, 15 October 13:18: Member flow, second pass** (`docs/research/2026-10-15-member-flow.md`; the 10 October
+  report reaches main with it). Run on Storybook from main dc3789e9, every other host refused. Nothing stops anyone.
+  Routed by the merge desk at 13:23:
+  - **Piper (Places & programs):**
+    - Rules first: W4 (no Help on New trip step 1 or the policy screens, A26), P3 (long place names cut on Trips,
+      not wrapped), P7 (Copy address 32px wide and "View all places to visit" 24px tall, under 48px).
+    - Then the bugs: W1 (the sign sheet's Sign is lit over an empty box) and W2 (Ways to earn leaves out I'm here
+      +100 and I went +60; `AWARDED_TODAY`).
+    - Then P6 (Cancel this visit offered after the visit is marked) and P8 (no `member_signatures` or
+      `policy_signatures` fixture, so the prototype asks for a new drawing on every policy).
+    - Any new or changed words go through Sage and Lena. P1 ("Pick a day and a time.") and P2 (the trip card's
+      spoken name ends in "with") are wording first.
+  - **Dot:** W3 (at 320×568 the services sit under the sticky Plan a trip) and W5 (on the visit day, Get directions
+    is below I'm here). Both change a layout, so pictures go to Will first.
+  - **Sage and Lena:** P1 and P2's words. P5: are badge names English on purpose? P4, the Spanish usted/tú mix, is
+    Lena's Friday batch.
+  - **Will's phone:** W6 (I went locked while the location prompt is open) joins the 10-minute phone check with the
+    DocuSign keyboard test.
+  - **Iris next:** a first pass over the Case manager flow.
 - **One send-invite-emails 500 at 06:25:01** (`claim_staff_invite_emails: 401`). The 21 runs either side of it all
   returned 200. Not acted on. Watch only.
 
