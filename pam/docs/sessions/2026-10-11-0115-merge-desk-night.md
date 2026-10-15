@@ -1044,6 +1044,12 @@
   - Sage flagged "Craftsman" as gendered, the thing D-109 fixed once already. It went to Will as card a90 (13:33):
     Maker is the merge desk's advice, Crafter is Sage's other choice, or he keeps it. Lena holds badge.craftsman until
     he picks.
+- **Dot, 15 October 13:34: Iris's W3 and W5 as pictures** (claude/pam-design-member-w3-w5 @ cc35508c, pictures and a
+  6-line proposal.patch, nothing built). They went to Will as card a91 (13:34; assets b18e4ccf… and 791cde74…).
+  - W3: the "will see your visit" note moves below the service cards on a place with services.
+  - W5: until the visit is marked, a secondary "How to get there" button sits under the visit card, and the Get
+    directions row is hidden.
+  Advice: yes to both; they are independent. Piper builds what Will picks.
 - **One send-invite-emails 500 at 06:25:01** (`claim_staff_invite_emails: 401`). The 21 runs either side of it all
   returned 200. Not acted on. Watch only.
 
