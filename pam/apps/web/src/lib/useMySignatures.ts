@@ -250,5 +250,6 @@ export function useMySignatures(): {
     void rsForget();
   }, []);
 
-  return { signature: userId !== null && realNow.userId === userId ? realNow.saved : kept.signature, signedAt, signedWith, progress, sign, unsign, forgetSignature };
+  // An example place keeps its drawing on this browser, so a signed-in member's account drawing is not the only one (P8).
+  return { signature: userId !== null && realNow.userId === userId ? (realNow.saved ?? kept.signature) : kept.signature, signedAt, signedWith, progress, sign, unsign, forgetSignature };
 }

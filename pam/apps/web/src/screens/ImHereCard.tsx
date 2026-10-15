@@ -16,7 +16,16 @@ import { loadSavedTrips } from '@/lib/savedTrips';
  */
 type Step = 'idle' | 'locating' | 'sending' | 'not-yet' | 'no-location' | 'limit' | 'too-late' | 'failed' | 'done';
 
-export function ImHereCard({ visitId, placeName }: { readonly visitId: string; readonly placeName: string }) {
+export function ImHereCard({
+  visitId,
+  placeName,
+  onMarked,
+}: {
+  readonly visitId: string;
+  readonly placeName: string;
+  /** The visit is marked: the page can stop offering what only an unmarked visit needs (Cancel this visit). */
+  readonly onMarked?: () => void;
+}) {
   const { t } = useI18n();
   const [step, setStep] = useState<Step>('idle');
   const [points, setPoints] = useState(0);
@@ -27,6 +36,7 @@ export function ImHereCard({ visitId, placeName }: { readonly visitId: string; r
   const done = (earned: number) => {
     setPoints(earned);
     setStep('done');
+    onMarked?.();
     // Trips and this page read the visit again: it is marked now.
     void loadSavedTrips();
   };

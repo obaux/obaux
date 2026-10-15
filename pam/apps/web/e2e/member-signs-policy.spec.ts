@@ -81,3 +81,28 @@ test('a place whose program has put no policy asks for nothing, never the exampl
   await expect(page.getByText('Liability disclaimer')).toHaveCount(0);
   await expect(page.getByText('Confidentiality and disclosure')).toHaveCount(0);
 });
+
+test('the policy screens have Help, like every step of a form (A26)', async ({ page }) => {
+  await signedInMember(page, [policy(CONF, 'Confidentiality')]);
+  await page.goto(view(CONF));
+  await settled(page);
+  await expect(page.getByRole('link', { name: 'Help' }).or(page.getByRole('button', { name: 'Help' }))).toBeVisible();
+  await page.goto(`/place/policies/?id=${PLACE}&name=Riverside%20Job%20Center`);
+  await settled(page);
+  await expect(page.getByRole('link', { name: 'Help' }).or(page.getByRole('button', { name: 'Help' }))).toBeVisible();
+});
+
+test('the sheet opens empty every time: Sign is greyed until something is drawn (W1)', async ({ page }) => {
+  await signedInMember(page, [policy(CONF, 'Confidentiality')]);
+  await page.goto(view(CONF));
+  await settled(page);
+  await page.getByRole('button', { name: 'Sign', exact: true }).click();
+  await page.getByRole('button', { name: 'Type my name instead' }).click();
+  await page.getByLabel('Your full name').fill('Marcus Reed');
+  const sign = page.getByRole('dialog').getByRole('button', { name: 'Sign', exact: true });
+  await expect(sign).toBeEnabled();
+  await page.getByRole('dialog').getByRole('button', { name: 'Cancel' }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Sign', exact: true }).click();
+  await expect(page.getByRole('dialog').getByRole('button', { name: 'Sign', exact: true })).toBeDisabled();
+});
