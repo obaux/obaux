@@ -44,9 +44,13 @@ The merge desk routed Iris's case manager first pass to this lane (15 October, 1
 
 ## Left undone
 
-- W2 (Sage's words). The six languages for the new keys (Lena, after Sage).
+- P5's list (item 11): waits for Sage's new admin.seeing / join.privacy.admin keys and Lena's languages.
+- person.connect.distanceFrom is not signed yet. The six languages for the new and reworded keys (Lena).
 
 ## Needs a human
 
 - Sage: `person.connect.distanceFrom`, `join.details.city.work`, W2's body, and whether W3 should read "Marcus's
   profile" rather than the name.
+
+- 14:30: Sage signed W2, W3 and P7 (ledger 8710a563). W2's body and P7's missing line are wired. Item 10: the
+  "Programs saved by" link, the /person/saved/ page, its story and its route are removed (test in case-manager-pass).

@@ -44,7 +44,18 @@
   does. The members search is now named once.
 - **P9:** the invite form lists every missing field at once, in screen order, in one alert. The words are the existing
   `invite.who.need.*`.
-- **W2:** waits on Sage's words for `admin.caseload.empty.body`.
+- **W2:** `admin.caseload.empty.body` as Sage signed it (A29, ledger 8710a563): "…To invite someone, tap Invite someone
+  below." It stays true only while the Invite someone row is under the empty list; if the row moves, tell Sage.
+- **W3, signed:** the title is the member's name alone, with no wrapper word (Sage). `person.profile` stays wherever it
+  labels a tab or a link.
+- **P7, signed:** "City you work in", and its missing line "Tell us the city you work in." (`join.details.need.city.work`).
+- **10. No "Programs saved by {name}" anywhere** (the merge desk, 13:57, from Lena's check against `transparency.ts`):
+  a case manager learns that a member saved something new, never which place. Only the example member page had
+  the link (D-243). It's gone, and so is the page it led to (`/person/saved/`, `SavedByView`), its Storybook story
+  and its prototype route, so Will's review surface keeps the contract too. The `person.savedPlaces.*` keys stay for
+  now; removing them touches all seven languages.
+- **11. P5's list:** Sage is signing new words for `admin.seeing.body` and `join.privacy.admin.1–4`. Home will show
+  them as a short list at reading size once they arrive.
 
 ## Proof
 

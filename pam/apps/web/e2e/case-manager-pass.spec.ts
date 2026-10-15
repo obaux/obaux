@@ -10,6 +10,7 @@ import { settled } from './settled';
  *   P5  "What you can see" on Home is at reading size.
  *   P8  the members search is named once.
  *   P9  an empty invite form names every missing field at once.
+ *   10  an example member's page offers no "Programs saved by" (transparency.ts: a new save, not which one).
  * (W1, the way back from joining step 2, is in join.spec.ts.)
  */
 const CATEGORY = 'education';
@@ -65,6 +66,14 @@ test.describe('a case manager after joining (Iris, 15 October)', () => {
     await settled(page);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Marcus');
     await expect(page.getByRole('heading', { name: 'Profile', level: 1 })).toHaveCount(0);
+  });
+
+  test('10: an example member\'s page offers no "Programs saved by" (a new save, never which place)', async ({ page }) => {
+    await caseManager(page, { examples: true });
+    await page.goto('/person/?id=dummy-m1');
+    await settled(page);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Jordan');
+    await expect(page.getByText(/Programs saved by/)).toHaveCount(0);
   });
 
   test('P3 and P4: Connect says where the miles are from; after recommending, back to the member or Home', async ({ page }) => {

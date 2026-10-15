@@ -647,7 +647,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
 
               {invalid ? (
                 <Text type="supporting" xstyle={styles.body}>
-                  {t(`join.details.need.${invalid}`)}
+                  {t(invalid === 'city' && cityLabel !== 'join.details.city' ? 'join.details.need.city.work' : `join.details.need.${invalid}`)}
                 </Text>
               ) : null}
 

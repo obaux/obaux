@@ -9,7 +9,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@pam/ui/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
-import { BigButton, BookmarkIcon, ConnectionsIcon, Loading, MessagesIcon, Notice, Page, SignIcon, TripsIcon } from '@pam/ui';
+import { BigButton, ConnectionsIcon, Loading, MessagesIcon, Notice, Page, SignIcon, TripsIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { signedBy, usePolicies } from '@/lib/usePolicies';
 import { rememberPersonName } from '@/lib/personNames';
@@ -31,7 +31,6 @@ import { useConversations } from '@/lib/useConversations';
 import { PersonDetailSkeleton } from '@pam/ui/Skeletons';
 import { NOTICES, intlLocale } from '@pam/config';
 import { DUMMY_EVERYONE, type DummyPerson } from '@pam/config/dummy-people';
-import { DUMMY_SAVED_BY_PERSON } from '@pam/config/dummy-places';
 import { DUMMY_APPOINTMENTS } from '@pam/config/dummy-appointments';
 import { List, ListItem } from '@astryxdesign/core/List';
 import { useI18n } from '@/lib/i18n';
@@ -278,7 +277,6 @@ function PersonScreen() {
   }
 
   const when = whenLastActive(person.lastActiveAt, locale);
-  const saved = person.isExample ? (DUMMY_SAVED_BY_PERSON[person.id] ?? []) : [];
   const isMember = person.role === 'member';
   const canMessage = isMember && (viewedRole === 'admin' || viewedRole === 'provider');
   // Trips (D-227): the visits they planned, coming up first, then the ones
@@ -504,19 +502,8 @@ function PersonScreen() {
                 href: `/person/past/?id=${encodeURIComponent(person.id)}`,
                 ...(past.length > 0 ? { value: String(past.length) } : {}),
               },
-              // Their saved programs, on their own page like the past ones
-              // (Will, 3 October, D-243). A case manager's to see only.
-              ...(person.isExample
-                ? [
-                    {
-                      id: 'saved',
-                      label: t('person.savedPlaces.link', { name: person.firstName }),
-                      icon: <BookmarkIcon width={26} height={26} />,
-                      href: `/person/saved/?id=${encodeURIComponent(person.id)}`,
-                      ...(saved.length > 0 ? { value: String(saved.length) } : {}),
-                    },
-                  ]
-                : []),
+              // No "Programs saved by {name}", not even on an example page (D-243 had it): a case manager sees that
+              // a member saved something new, never which place (transparency.ts; Lena, via the merge desk, 15 October).
             ]}
           />
         </VStack>
