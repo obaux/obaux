@@ -101,6 +101,11 @@ export interface MockOptions {
   readonly hasLead?: boolean;
   /** Street search is on (D-552): the pretend function has a key and answers two suggestions, so the area sheet draws its street label, hint and Google row. */
   readonly streetSearch?: boolean;
+  /**
+   * How the database answers a super admin's decision on a staff request, so a story can show each refusal
+   * (D-491) or the "already has an account" line. Unset: the decision goes through.
+   */
+  readonly staffReview?: 'pair' | 'city' | 'decided' | 'other' | 'addedToExisting';
 }
 
 /** A real place of the catalogue, to plan a trip to in a story (the examples' ids are not real). */
@@ -402,6 +407,21 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
       programsToCheck = programsToCheck.filter((row) => row.id !== args.p_id);
       return { body: { id: args.p_id } };
     }),
+    // A staff request's decision (D-491): through, or refused the way the database says it.
+    on('/rpc/review_staff_request', () => {
+      const refusal = {
+        pair: 'ROLE_PAIR_NOT_ALLOWED',
+        city: 'ACCOUNT_IN_OTHER_CITY',
+        decided: 'REQUEST_ALREADY_DECIDED',
+      }[options.staffReview as 'pair' | 'city' | 'decided'];
+      if (refusal) return { status: 400, body: { code: 'P0001', message: refusal } };
+      if (options.staffReview === 'other') return { status: 500, body: { message: 'storybook: the decision failed' } };
+      return { body: null };
+    }),
+    // After an approval the screen reads the account's roles: member and provider means it was added to an account that existed.
+    on('/rest/v1/profile_roles', () => ({
+      body: options.staffReview === 'addedToExisting' ? [{ role: 'member' }, { role: 'provider' }] : [{ role: 'admin' }],
+    })),
     on('/rpc/log_call', () => ({ body: true })),
     on('/rpc/my_trips', () => ({ body: savedTrips })),
     on('/rpc/my_trip_services', () => ({ body: [] })),
