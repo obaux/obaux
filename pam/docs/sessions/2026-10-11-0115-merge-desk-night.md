@@ -1242,6 +1242,16 @@
 - **b47 green (07:36).** Dot and Piper told.
 - **Friday weekly notes (16 October, 14:04 to 14:20).** `docs/weekly/2026-10-16.md` brought up to date against
   912f3871 and sent to Lena and Wren; `docs/weekly/2026-10-23.md` started; the next Friday reminder set.
+- **Batch b48 (16 October, 14:29 to 14:35).** Lena's privacy guard (f7f01867, D-587), item 1 of her weekly list:
+  `packages/config/src/data-collected.ts` lists every field, picker, signature pad, microphone and location request
+  the app has, with the Privacy line that covers it, and `privacy-guard.test.ts` fails when one is added without an
+  entry, when a covering line stops saying what it was chosen for, or when VoiceInput is used before the page says
+  what it sends. Lena broke it four ways first and each failed with a message saying what to do. Its first run
+  records five gaps for Will: a last name and a city (members and staff), the "Text me when Pam opens" tick, a
+  place report, a staff photo, and a program's details (a84's `sharing.p8`). Lena is drafting the English for the
+  first four, checked against the code; Sage signs; then one card to Will. From b48, a branch that adds a field
+  adds its entry in `data-collected.ts`, or the config tests fail. The held a84 and a86 branches add fields, so
+  they need entries when they are released. Weekly notes: nothing new for Lena or Wren.
 ## What was wrong, and what missed it
 
 - **The weekly notes were not kept between 10 and 16 October.** `docs/team.md` says the merge desk adds to
@@ -1577,6 +1587,8 @@
 | b46 main CI (cba16885) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (06:37); Vercel web and pam-site success |
 | b47, Piper's spec against the old row code (RequestsScreen.tsx from cba16885): reported-places-pass "Home has a Reported places row", iphone-se | failed as it should: the badge locator found 1, expected 0 |
 | Batch b47, full run (76fb8057): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard | 1311 passed, 1 skipped / in step / 124 / 0 / 100 / 0 / 0 / 0 / 186 / 11.5 kB spare / 2003 passed, 19 skipped, exit 0 / built; "no bundle names the live one"; grep 0 files |
+| b47 main CI (912f3871) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (07:36); Vercel web and pam-site success |
+| Batch b48 (79d5e156, Lena's privacy guard): install / config / config tsc / site test / site tsc / web tsc | 0 / 1319 passed, 1 skipped (8 new) / 0 / 100 / 0 / 0 |
 | Control Room v24 harness (390 and 1280) | reply about a card: section lands at 76px under the tabs, card folded, button "Replied" (aria "Replied. Reply again"); pressing it restores the card's prefix; a general message leaves scrollY unchanged; a data push mid-glide doesn't stop it; 0 page errors |
 
 ## Left undone
