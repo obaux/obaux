@@ -928,6 +928,12 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Accounts & invites · No "Text me when Pam opens" tick (16 October) — HELD for Will (A or B)
+
+`claude/pam-waiting-city-no-tick` (D-587 build 3, option A). The waiting-list step saves the city and offers no text,
+and the line after says only that the city is saved. No new words. Pictures are in
+`docs/design/review/2026-10-16-waiting-city/`.
+
 ## Accounts & invites · Days waiting goes after a decision (15 October) — on main in b45
 
 `claude/pam-days-waiting-decided`. This is Iris's re-test note on the super admin pass, which is live in b44.

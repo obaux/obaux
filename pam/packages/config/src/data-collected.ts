@@ -60,11 +60,11 @@ export const DATA_COLLECTED: readonly CollectedData[] = [
   },
   {
     id: 'waiting-list-text',
-    what: 'In a city Pam is not in yet: the city, and a tick for "Text me when Pam opens in {city}" (`join_waiting_city`).',
+    what:
+      'In a city Pam is not in yet: the city (`join_waiting_city`). The "Text me when Pam opens in {city}" tick is gone ' +
+      '(D-587 build 3, held for Will): nothing sent that text, so nobody is asked for it.',
     covers: null,
-    gap:
-      'texts.p1 says Pam texts a sign-in code and "reminders and updates about your account"; a text that Pam has ' +
-      'opened in your city is neither. For Will.',
+    gap: 'No Privacy line names the waiting list yet; Lena is drafting it with Sage. For Will.',
   },
   {
     id: 'typed-for-someone-new',
@@ -170,7 +170,7 @@ export interface InputFile {
 
 export const INPUT_FILES: readonly InputFile[] = [
   { file: 'apps/web/src/app/signin/PhoneSignInCard.tsx', fields: 1, collects: ['phone'] },
-  { file: 'apps/web/src/app/join/JoinScreen.tsx', fields: 5, collects: ['first-name', 'last-name-and-city', 'waiting-list-text'] },
+  { file: 'apps/web/src/app/join/JoinScreen.tsx', fields: 4, collects: ['first-name', 'last-name-and-city', 'waiting-list-text'] },
   { file: 'apps/web/src/screens/AddPersonView.tsx', fields: 2, collects: ['typed-for-someone-new'] },
   { file: 'apps/web/src/screens/InviteForWho.tsx', fields: 3, collects: ['typed-for-someone-new', 'email'] },
   { file: 'apps/web/src/screens/InviteExpiredScreen.tsx', fields: 1, collects: ['email'] },
