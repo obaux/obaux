@@ -132,7 +132,8 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
             label: t('places.reported.title'),
             href: '/places/reported/',
             icon: <ShieldIcon {...ICON} />,
-            ...(reportedCount > 0 ? { badge: String(reportedCount), badgeLabel: t('places.reported.count', { count: reportedCount }) } : {}),
+            // A plain number (D-586): the red badge is for what is new since you looked, not for a count of what is waiting.
+            ...(reportedCount > 0 ? { value: String(reportedCount) } : {}),
           },
         ]}
       />
