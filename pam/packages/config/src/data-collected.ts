@@ -52,7 +52,8 @@ export const DATA_COLLECTED: readonly CollectedData[] = [
     id: 'last-name-and-city',
     what:
       'A last name (optional) and a city (required), typed or picked on About you by everyone, member or staff. ' +
-      'Both are written to the profile (`updateMyDetails`, `redeem_invite`: `last_name`, `home_city`).',
+      'Both are written to the profile (`updateMyDetails`, `redeem_invite`: `last_name`, `home_city`). Only the ' +
+      'Pam team reads them: nobody signed in can select either column, their own included (20261016145411, test 74).',
     covers: null,
     gap:
       'what-we-keep.p1 names only the first name, the phone number and the language. The a84-h short form of p7 ' +

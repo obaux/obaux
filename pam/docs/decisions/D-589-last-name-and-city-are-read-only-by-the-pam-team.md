@@ -1,10 +1,6 @@
-# D-589 — Last name and city are read only by the Pam team
+# D-589 — Not used (a second claim made by mistake)
 
 **Date:** 2026-10-16 · **Branch:** `claude/pam-last-name-city-private`
 
-<!--
-Claimed with `pnpm claim decision`. Replace this comment with the decision:
-what was decided and who decided it (Will's own words, dated), why, what it
-replaces, and what a later session would reasonably want to reverse. Cite it
-from code and copy as D-589.
--->
+`pnpm claim decision` was run twice for the same decision, and both claims were pushed. The decision is D-588. This
+number decides nothing. It stays so that no other branch takes it.
