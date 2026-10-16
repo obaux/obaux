@@ -12,6 +12,11 @@
  *
  * Returns the new URL, or null with nothing changed when anything fails —
  * the screen says so and the old photo stays.
+ *
+ * Once the new photo is saved, the old file goes (Lena's privacy guard, D-587):
+ * every other file in the person's folder is removed, so a replaced photo is not
+ * kept. If that fails, the new photo still stands, and the nightly sweep
+ * (`sweep-staff-photos`) removes whatever no account uses.
  */
 const SIDE = 512;
 
@@ -47,10 +52,22 @@ export async function uploadStaffPhoto(userId: string, file: File): Promise<stri
     const url = data.publicUrl;
     const { error } = await supabase.from('profiles').update({ photo_url: url }).eq('id', userId);
     if (error) return null;
+    try {
+      const { data: files } = await supabase.storage.from('staff-photos').list(userId);
+      const old = olderPhotos(userId, (files ?? []).map((f) => f.name), path);
+      if (old.length > 0) await supabase.storage.from('staff-photos').remove(old);
+    } catch {
+      // The new photo is saved; the sweep removes what is left.
+    }
     return url;
   } catch {
     return null;
   }
+}
+
+/** The paths in a person's folder other than the photo just saved: the ones to remove. */
+export function olderPhotos(userId: string, names: readonly string[], keep: string): string[] {
+  return names.map((name) => `${userId}/${name}`).filter((p) => p !== keep);
 }
 
 /** The shrunk picture as a local URL, to show at once while it uploads. */

@@ -928,7 +928,13 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Accounts & invites · Last name and city read only by the Pam team (16 October) — READY, migration for Mira
+## Accounts & invites · Staff photos no account uses are removed (16 October) — in b50
+
+`claude/pam-staff-photo-cleanup` (D-590; Lena's privacy guard, D-587).
+- Changing a photo removes the old file. Each night, `sweep-staff-photos` removes every file no profile points at,
+  including a deleted account's. Migration `20261016150353` schedules it.
+
+## Accounts & invites · Last name and city read only by the Pam team (16 October) — live in b49 (migration live as 20261016151253)
 
 `claude/pam-last-name-city-private` (D-588; Lena's privacy guard, D-587).
 - Migration `20261016145411` takes `profiles.last_name` and `home_city` out of the select grant. Case managers,

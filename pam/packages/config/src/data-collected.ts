@@ -149,7 +149,10 @@ export const DATA_COLLECTED: readonly CollectedData[] = [
   },
   {
     id: 'staff-photo',
-    what: 'A staff member\'s own profile photo, picked on Profile (D-345); members see it.',
+    what:
+      'A staff member\'s own profile photo, picked on Profile (D-345); members see it. Only the current one is kept: ' +
+      'the old file is removed when a new photo is saved, and each night `sweep-staff-photos` removes every file no ' +
+      'account points at, so a deleted account\'s photo is gone by the next morning (D-587 build 2).',
     covers: null,
     gap:
       'Signed by Sage for Will (ledger 2430f52f): what-we-keep.p18. Its last two sentences (the old file is deleted ' +
