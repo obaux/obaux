@@ -8,6 +8,9 @@
 
 - Sage signed the two additions (ledger fef92f08, A29): Staff requests (a draft, so not on the live site) gets step 5 (“Pam asks you to confirm. Tap “Yes, approve” or “Yes, deny”, or tap “Not yet” to go back.”) and a paragraph on what the screen says after, in her wording; Is the place told gets “After a check, the place may be taken off Pam’s list.”
 
+- 10 October check against the D-531 rebuild: no post was wrong. Three lines added where a post was silent on something live (staff invite emails, "Email me a new link" on an expired link; both live since b32), signed by Sage (ledger 99d52a7f): Sending an invite (two lines) and Joining as staff (one). No post describes the staff Home rings or invite circle, and the D-491 approval is only in the Staff requests draft, which says nothing wrong.
+- Signing a program's rules: two pictures of the member's signing screens (the "Policies to sign" list and one policy with Sign), English only, with alt text and captions signed by Sage (ledger 80730eb5). The other six languages get no pictures.
+
 ## What was wrong, and what missed it
 - Nothing new. The picture had been stale since D-578.
 
@@ -18,7 +21,7 @@ None new; D-493 already decided the button.
 Fresh build with the stub env: tsc 0, site tests 0 (100), build 0, a11y 0 (120 scans, 0 problems), usability 0, scrollspy 0. Before and after pictures in `docs/design/review/2026-10-16-weekly/`.
 
 ## Left undone
-- Carried: "Adding your program's policies" post (part 4 waits for card a31), the rules post pictures, the 10 October posts.
+- Carried: "Adding your program's policies" post (part 4 waits for card a31).
 - Held for Will: the new-number post (D-571, patch 92db83ab) and Join as a case manager (patch 48528f05), both for a84.
 
 ## Needs a human
