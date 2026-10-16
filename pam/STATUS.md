@@ -928,6 +928,13 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Accounts & invites · Last name and city read only by the Pam team (16 October) — READY, migration for Mira
+
+`claude/pam-last-name-city-private` (D-588; Lena's privacy guard, D-587).
+- Migration `20261016145411` takes `profiles.last_name` and `home_city` out of the select grant. Case managers,
+  buddies and mentors can no longer read them, and nor can the person. Only the service role and definer functions
+  read them. The person still writes them. No screen changes. Test 74.
+
 ## Accounts & invites · Days waiting goes after a decision (15 October) — on main in b45
 
 `claude/pam-days-waiting-decided`. This is Iris's re-test note on the super admin pass, which is live in b44.
