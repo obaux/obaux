@@ -928,6 +928,12 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Accounts & invites · Staff photos no account uses are removed (16 October) — READY, function and migration for Mira
+
+`claude/pam-staff-photo-cleanup` (D-590; Lena's privacy guard, D-587).
+- Changing a photo removes the old file. Each night, `sweep-staff-photos` removes every file no profile points at,
+  including a deleted account's. Migration `20261016150353` schedules it.
+
 ## Accounts & invites · Days waiting goes after a decision (15 October) — on main in b45
 
 `claude/pam-days-waiting-decided`. This is Iris's re-test note on the super admin pass, which is live in b44.

@@ -162,6 +162,7 @@ interface FunctionEntry {
 const FUNCTIONS: Record<string, FunctionEntry> = {
   'dispatch-sms': { reaches: ['api.twilio.com'], why: 'sends the texts' },
   'sms-inbound': { reaches: [], why: 'Twilio calls it with a reply; it asks only Pam’s own database' },
+  'sweep-staff-photos': { reaches: [], why: 'each night removes staff photos no account uses; asks only Pam’s own database and storage (D-587)' },
   'send-invite-emails': { reaches: ['api.resend.com'], why: 'sends the invite email' },
   'help-request': { reaches: ['api.resend.com'], why: 'forwards a help request by email, behind a switch' },
   'translate-messages': { reaches: ['api.anthropic.com'], why: 'translates a message the member asked to read in their language' },
