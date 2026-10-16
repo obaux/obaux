@@ -54,7 +54,7 @@ export const SHOT_SIZES: Record<string, { w: number; h: number }> = {
   },
   "points-and-badges/points.png": {
     "w": 390,
-    "h": 655
+    "h": 770
   },
   "messages-in-pam/options.png": {
     "w": 390,

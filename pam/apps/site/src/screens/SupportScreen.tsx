@@ -11,12 +11,13 @@ import { Section } from '@astryxdesign/core/Section';
 import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
+import { Button } from '@pam/ui/Button';
 import { SearchPill } from '@pam/ui/SearchPill';
 import type { SearchSource } from '@astryxdesign/core/Typeahead';
+import { tap } from '../lib/tap';
 import { website } from '../lib/website.stylex';
 import { type } from '../lib/website-type.stylex';
 import { PostRow } from '../components/PostRow';
-import { SecondaryButton } from '../components/SecondaryButton';
 import { Link } from '@astryxdesign/core/Link';
 import { POSTS, type SupportPost } from '../content/posts';
 import { TOPICS } from '../content/topics';
@@ -273,7 +274,7 @@ export function SupportScreen() {
                 <Text as="p">Did you mean:</Text>
                 <HStack gap={2} xstyle={styles.meant}>
                   {meant.map((m) => (
-                    <SecondaryButton key={m.id} label={m.label} onClick={() => setPicked(m.query)} />
+                    <Button key={m.id} variant="secondary" label={m.label} onClick={() => setPicked(m.query)} xstyle={tap.target} />
                   ))}
                 </HStack>
               </VStack>
