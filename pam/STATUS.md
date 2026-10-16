@@ -1790,7 +1790,7 @@ fine and the fit audit was over-counting (D-448).
 
 **14 October (D-570).** The site's text boxes draw no focus ring, the keyboard comes up as the help form opens, "Write to us" is as wide as its words from 900px, and the space under Still stuck? is padding on the container.
 **14 October (D-571).** "Got a new phone number?" is built and held as a patch (`docs/design/review/2026-10-14-new-phone-number/`) until the app's new-number page ships.
-**16 October.** The Points and badges picture shows the six Ways to earn, and the site's own secondary-button border is gone (the design system's ring, D-493). Staff-requests confirm words and the "taken off the list" sentence wait for Sage.
+**16 October.** The Points and badges picture shows the six Ways to earn, and the site's own secondary-button border is gone (the design system's ring, D-493). The Staff requests confirm step and the "taken off Pam's list" sentence are in, signed by Sage (ledger fef92f08).
 
 **13 October (held for Will, D-548/D-550).** About Pam shows its carousel words again and loses the line above its tabs (bd6d016a). The Home phone layout follows Figma 7:3 and the green card switches between three views; pictures to look at are in `docs/design/review/2026-10-13-website-phone/`. Not for `main` until Will says yes.
 
