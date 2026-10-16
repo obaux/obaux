@@ -75,7 +75,7 @@ export function PointsAndBadges() {
       <Section title="See your points">
         <HowTo
           steps={['Tap Profile.', 'Tap the badge with your level on it. It says “Your badge”.', 'Scroll to see the ladder and your badges.']}
-          shots={[{ name: 'points-and-badges/points.png', alt: "The top of the “Your points” screen: your badge, the level name, the number of points and a bar showing how many more points to the next level. Under it, the “Ways to earn” list: Plan a trip to a place, Call a place, Save a place and Finish setting up Pam.", caption: "“Your points”, for an example person." }]}
+          shots={[{ name: 'points-and-badges/points.png', alt: "The top of the “Your points” screen: your badge, the level name, the number of points and a bar showing how many more points to the next level. Under it, the “Ways to earn” list: I’m here, I went, Plan a trip to a place, Call a place, Save a place and Finish setting up Pam.", caption: "“Your points”, for an example person." }]}
         />
       </Section>
     </Body>
