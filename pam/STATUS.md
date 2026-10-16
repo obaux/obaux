@@ -1558,6 +1558,10 @@ connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merge
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
 
+## Design system & Storybook · counts on a row (16 October)
+
+A count at the end of a row is a plain number (`value`); the red badge is for what is new (D-586). The super admin Home's two rows follow it: Reported places changes (Piper), Programs to check stays (Ava). On `claude/pam-design-count-style`.
+
 ## Design system & Storybook · a mark for "signed every policy", proposal (15 October)
 
 The green pen means "to sign" elsewhere (D-270) and reads as "edit"; a tick in a circle is taken by the check-in circle. Decided A (merge desk, 14:58), built by Piper on the lead pass; pictures (`docs/design/review/2026-10-15-signed-mark/`): a green document with a tick, and nothing for people who haven't signed. Built by Piper as SignedDocIcon (4a52fdb0, b43). On `claude/pam-design-signed-mark`.
