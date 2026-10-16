@@ -1224,6 +1224,12 @@
   - Every finding the desk sent back from Iris's four first passes has now been re-tested. Still open: Dot (member W3
     and W5), Will's phone (W6), Will (program lead P3 and P10, card a92) and a84 (super admin W2).
   - Dot's single count style for the super admin Home goes in a later batch.
+- **b45 green (18:22).** Ava, Piper and Iris told at 18:22.
+- **Batch b46 (16 October, 06:04 to 06:10).** Dot's nightly flow map (4efbcbe4): the Case manager page loses
+  "Programs they saved" (`/person/saved/`, removed in D-580), and the Overview's counts and latest changes are
+  redrawn. `last-map.txt` is ffd77327. Answer by text (`/reply/`) has no node, because a text message opens it, not a
+  tap. Dot was holding the count-style call until b44 was live; told at 06:06 that b44 and b45 are, with Ava's and
+  Piper's rows to change once she picks.
 ## What was wrong, and what missed it
 
 - **Sign in's spacing was squeezed on every phone for a night.** A `default: null` meant for short screens removed the
@@ -1548,10 +1554,14 @@
 | b44 main CI (12d788ae) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (17:14); Vercel web and pam-site success |
 | Batch b45, full run (23d38bb3; Iris's 2930f230 merged during e2e, before the Storybook step): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard | 1311 passed, 1 skipped / in step / 124 / 0 / 100 / 0 / 0 / 0 / 186 / 11.5 kB spare / 2003 passed, 19 skipped, exit 0 / built; "no bundle names the live one"; grep 0 files |
 | Batch b45, after Ava's e267fbe1 (6f91431a): build:e2e / tsc / web unit / e2e (programs-review, super-admin-pass, a11y, case-manager-pass) / storybook + guard | 0 / 0 / 186 / 96 passed, exit 0 / built; "no bundle names the live one"; grep 0 files |
+| b45 main CI (ffd77327) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (18:22); Vercel web and pam-site success |
+| Batch b46 (6582f908, Dot's flow map): install / config / flows.mjs loads | 0 / 1311 passed, 1 skipped / 5 flows, UPDATED 2026-10-16 |
 | Control Room v24 harness (390 and 1280) | reply about a card: section lands at 76px under the tabs, card folded, button "Replied" (aria "Replied. Reply again"); pressing it restores the card's prefix; a general message leaves scrollY unchanged; a data push mid-glide doesn't stop it; 0 page errors |
 
 ## Left undone
 
+- **As of b46 (16 October, 06:10):** Dot: one count style on the super admin Home (asked 06:06), then Ava's and
+  Piper's rows. Wren, Will and the Cloud Console items as b45 below.
 - **As of b45 (15 October, 17:47):** Dot: one count style on the super admin Home, then the builders' rows. Wren: re-shoot the Points and badges picture and its alt text. With
   Will: a84, a86, a88, a90, a91, a92, a93, a94, a95, and the Cloud Console items below.
 - **As of b39 (14 October, 09:45):** as b38 below, less the dir="auto" and token-refresh items (done: one
