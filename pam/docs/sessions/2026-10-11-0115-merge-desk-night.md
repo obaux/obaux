@@ -1239,7 +1239,16 @@
   `badge` + `badgeLabel` became `value`. The badge's spoken label had said "2 reports" for a count of places, so the
   plain number is also more accurate. Ava's Programs to check row already used `value`. Piper's new assertion was run
   against the old row code first and failed there (it found the badge), so it really guards the change.
+- **b47 green (07:36).** Dot and Piper told.
+- **Friday weekly notes (16 October, 14:04 to 14:20).** `docs/weekly/2026-10-16.md` brought up to date against
+  912f3871 and sent to Lena and Wren; `docs/weekly/2026-10-23.md` started; the next Friday reminder set.
 ## What was wrong, and what missed it
+
+- **The weekly notes were not kept between 10 and 16 October.** `docs/team.md` says the merge desk adds to
+  `docs/weekly/<Friday>.md` as it merges; from b7 to b47 it added nothing, and Friday's file had to be rebuilt
+  from STATUS, the session logs and the site's code. Most of the week's language and website work had gone in with
+  the batches anyway, so little was lost. From b48, each batch's records step adds that batch's Lena and Wren items
+  to the next Friday's file, or says there are none.
 
 - **Sign in's spacing was squeezed on every phone for a night.** A `default: null` meant for short screens removed the
   component's own spacing everywhere; the tests only measured 320×568, where tight is right. Will saw it in a picture.
