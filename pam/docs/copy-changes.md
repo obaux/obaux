@@ -128,6 +128,16 @@ Privacy, Terms and the legal pages. A line that has no "su" or "usted" in it can
 usted ("Aprendió un oficio", "Toque", "Elija"): read the verb. The drafting brief
 (`LOCALE_BRIEFS.es`) says the same.
 
+## A new field, a photo, a signature, a location (the privacy guard, D-587)
+
+If a screen starts asking a person for something (a field, a file, a signature, a microphone, their
+location), `privacy-guard.test.ts` fails until `packages/config/src/data-collected.ts` knows: the
+file's count goes up, and the thing it gathers is an entry that names the Privacy line that covers it
+and the words that line must still say. If no line covers it, add the entry with a `gap` that says
+"For Will" (or the card) and tell the merge desk: the page is Will's signed text, and a new line is
+his to approve. The same test fails if a covering line is reworded so that it no longer says what it
+was chosen to say; read the new wording, then change the words in the list.
+
 ## When somebody says a translation is wrong
 
 We shipped the new languages on a "fail first, then fix" footing (D-430), so
