@@ -28,8 +28,11 @@ test('Home has a Reported places row with how many are waiting (W4)', async ({ p
   await settled(page);
   const row = page.getByRole('link', { name: /Reported places/ });
   await expect(row).toBeVisible();
-  // The count rides in the same row (a badge, spoken as "2 reports").
-  await expect(page.getByRole('listitem').filter({ hasText: 'Reported places' })).toContainText('2');
+  // The count rides in the same row as a plain number (D-586), not a badge: the red badge is for what is new.
+  const item = page.getByRole('listitem').filter({ hasText: 'Reported places' });
+  await expect(item).toContainText('2');
+  await expect(item.getByText('2', { exact: true })).toBeVisible();
+  await expect(item.locator('[class*="badge" i], [data-variant="error"]')).toHaveCount(0);
   await row.click();
   await expect(page).toHaveURL(/\/places\/reported\//);
 });
