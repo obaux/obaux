@@ -1230,6 +1230,15 @@
   redrawn. `last-map.txt` is ffd77327. Answer by text (`/reply/`) has no node, because a text message opens it, not a
   tap. Dot was holding the count-style call until b44 was live; told at 06:06 that b44 and b45 are, with Ava's and
   Piper's rows to change once she picks.
+- **b46 green (06:37).**
+- **D-586 decided (06:20).** Dot's pick, accepted as written: a count at the end of a row is a plain number (`value`),
+  and the red `badge` is only for something new since you looked (unread messages). The super admin's two counts are a
+  standing queue, so two red badges would sit on the Home all day. Pictures at 390 and 320, light and dark
+  (`docs/design/review/2026-10-16-count-style/`). Not Will's call: no words or promises change.
+- **Batch b47 (16 October, 06:31 to 06:34).** Dot's D-586 (573d106e) and Piper's Reported places row (a3151ab6):
+  `badge` + `badgeLabel` became `value`. The badge's spoken label had said "2 reports" for a count of places, so the
+  plain number is also more accurate. Ava's Programs to check row already used `value`. Piper's new assertion was run
+  against the old row code first and failed there (it found the badge), so it really guards the change.
 ## What was wrong, and what missed it
 
 - **Sign in's spacing was squeezed on every phone for a night.** A `default: null` meant for short screens removed the
@@ -1556,10 +1565,15 @@
 | Batch b45, after Ava's e267fbe1 (6f91431a): build:e2e / tsc / web unit / e2e (programs-review, super-admin-pass, a11y, case-manager-pass) / storybook + guard | 0 / 0 / 186 / 96 passed, exit 0 / built; "no bundle names the live one"; grep 0 files |
 | b45 main CI (ffd77327) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (18:22); Vercel web and pam-site success |
 | Batch b46 (6582f908, Dot's flow map): install / config / flows.mjs loads | 0 / 1311 passed, 1 skipped / 5 flows, UPDATED 2026-10-16 |
+| b46 main CI (cba16885) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (06:37); Vercel web and pam-site success |
+| b47, Piper's spec against the old row code (RequestsScreen.tsx from cba16885): reported-places-pass "Home has a Reported places row", iphone-se | failed as it should: the badge locator found 1, expected 0 |
+| Batch b47, full run (76fb8057): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard | 1311 passed, 1 skipped / in step / 124 / 0 / 100 / 0 / 0 / 0 / 186 / 11.5 kB spare / 2003 passed, 19 skipped, exit 0 / built; "no bundle names the live one"; grep 0 files |
 | Control Room v24 harness (390 and 1280) | reply about a card: section lands at 76px under the tabs, card folded, button "Replied" (aria "Replied. Reply again"); pressing it restores the card's prefix; a general message leaves scrollY unchanged; a data push mid-glide doesn't stop it; 0 page errors |
 
 ## Left undone
 
+- **As of b47 (16 October, 06:40):** Wren: re-shoot the Points and badges picture and its alt text. With Will: a84,
+  a86, a88, a90, a91, a92, a93, a94, a95, and the Cloud Console items below.
 - **As of b46 (16 October, 06:10):** Dot: one count style on the super admin Home (asked 06:06), then Ava's and
   Piper's rows. Wren, Will and the Cloud Console items as b45 below.
 - **As of b45 (15 October, 17:47):** Dot: one count style on the super admin Home, then the builders' rows. Wren: re-shoot the Points and badges picture and its alt text. With
