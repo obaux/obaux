@@ -120,5 +120,15 @@
     "id": "case-manager-screens--conversation",
     "out": "../home/conversation.png",
     "name": "Home page: a case manager conversation"
+  },
+  {
+    "id": "member-created--place-policies",
+    "out": "signing-a-programs-rules/place-policies.png",
+    "name": "Policies to sign: the program's list, 0 of 4 signed, and Start signing"
+  },
+  {
+    "id": "member-created--place-policy",
+    "out": "signing-a-programs-rules/place-policy.png",
+    "name": "One policy to read, with the Sign button"
   }
 ]

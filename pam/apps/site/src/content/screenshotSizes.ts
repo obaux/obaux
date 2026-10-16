@@ -91,5 +91,17 @@ export const SHOT_SIZES: Record<string, { w: number; h: number }> = {
   "../home/conversation.png": {
     "w": 390,
     "h": 844
+  },
+  "signing-a-programs-rules/place-policies.png": {
+    "w": 390,
+    "h": 844
+  },
+  "signing-a-programs-rules/place-policy.png": {
+    "w": 390,
+    "h": 844
+  },
+  "signing-a-programs-rules/sign.png": {
+    "w": 390,
+    "h": 844
   }
 };
