@@ -57,9 +57,9 @@ export const DATA_COLLECTED: readonly CollectedData[] = [
     covers: null,
     gap:
       'Signed by Sage for Will (ledger 2430f52f, 16 October): what-we-keep.p1 widened to name both and to say only ' +
-      'the Pam team sees them. True only if a migration takes last_name and home_city out of the select grant for ' +
-      'anon AND authenticated (0075; regional case managers, buddies and public mentors read them today): Will ' +
-      'picks that (A) or puts both on the guide\'s list (B). a84 (h) is withdrawn; p7 is the email alone. For Will.',
+      'the Pam team sees them. That is true once 20261016145411 (D-588) is live: it takes last_name and home_city ' +
+      'out of the select grant for anon and authenticated (option A on card a96). With B, both go on the guide\'s ' +
+      'list instead. a84 (h) is withdrawn; p7 is the email alone. For Will.',
   },
   {
     id: 'waiting-list-text',
