@@ -6,8 +6,10 @@
  * writes the real ones (A29).
  */
 import { Suspense } from 'react';
+import { ConfirmDialog } from '@/screens/ConfirmDialog';
 import { useSearchParams } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
+import { Banner } from '@astryxdesign/core/Banner';
 import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
@@ -16,7 +18,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { Badge } from '@pam/ui/Badge';
-import { BigButton, CheckIcon, ClockIcon, EyeOffIcon, ShieldIcon, SignIcon, SubPage, TextField, TextLink } from '@pam/ui';
+import { BigButton, Page as PamPage, CheckIcon, ClockIcon, EyeOffIcon, ShieldIcon, SignIcon, SubPage, TextField, TextLink } from '@pam/ui';
 
 const styles = stylex.create({
   frame: { width: '390px', minHeight: '844px' },
@@ -28,7 +30,12 @@ const styles = stylex.create({
     borderRadius: '999px',
     backgroundColor: colorVars['--color-text-accent'],
   }),
-  calm: { width: '100%', borderInlineStartWidth: '4px', borderInlineStartStyle: 'solid', borderInlineStartColor: colorVars['--color-text-accent'] },
+  // The place page's confirmed-booking card (VisitCard, D-273/D-281): an Astryx Card on the green background, no edge border,
+  // with a white disc carrying a green mark and a bold line beside it.
+  calm: { width: '100%', backgroundColor: colorVars['--color-background-green'], borderColor: 'transparent' },
+  disc40: { width: '40px', height: '40px', flexShrink: 0, borderRadius: '50%', backgroundColor: colorVars['--color-background-card'], color: colorVars['--color-icon-green'] },
+  noteTitle: { fontSize: '16px', lineHeight: 1.3, fontWeight: 700, color: colorVars['--color-text-primary'] },
+  noteBody: { fontSize: '16px', lineHeight: 1.4, fontWeight: 400, color: colorVars['--color-text-primary'] },
   // The one careful field: a heavier edge, set apart from the rest.
   careful: {
     width: '100%',
@@ -87,6 +94,8 @@ const styles = stylex.create({
   dsBody: { width: '100%', padding: '16px', backgroundColor: '#F3F3F5', color: '#1B1B1F' },
   dsTag: { backgroundColor: '#FFD84D', color: '#1B1B1F', padding: '6px 10px', borderRadius: '4px', fontWeight: 700, fontSize: '14px' },
   pad: { padding: '16px' },
+  scrim: { position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 4 },
+  leave: { position: 'fixed', left: '16px', right: '16px', bottom: '150px', padding: '20px', borderRadius: '24px', backgroundColor: colorVars['--color-background-card'], boxShadow: '0 12px 40px rgba(0,0,0,0.35)', zIndex: 6 },
   glyph: { fontSize: '24px', width: '24px', height: '24px', flexShrink: 0, color: colorVars['--color-text-accent'] },
   foot: { padding: '16px', position: 'sticky', bottom: 0, backgroundColor: colorVars['--color-background-body'] },
   row: { width: '100%' },
@@ -109,20 +118,10 @@ function Progress({ pct, label }: { readonly pct: number; readonly label: string
   );
 }
 
-function Calm({ icon, title, body }: { readonly icon: React.ReactNode; readonly title: string; readonly body: string }) {
-  return (
-    <Card padding={4} xstyle={styles.calm}>
-      <HStack gap={3} align="start" wrap="nowrap">
-        <HStack align="center" justify="center" xstyle={styles.glyph}>
-          {icon}
-        </HStack>
-        <VStack gap={1} xstyle={styles.grow}>
-          <Text weight="bold">{title}</Text>
-          <Text type="supporting">{body}</Text>
-        </VStack>
-      </HStack>
-    </Card>
-  );
+/** Every note is Astryx's `Banner`: a confirmation (something is done) is `success`, green (Will, 06:28: "good news in green"); an informational note stays the subtle blue `info` one the place page uses. */
+let CONFIRM_AS: 'info' | 'success' = 'success';
+function Calm({ title, body, confirm }: { readonly icon?: unknown; readonly confirm?: boolean; readonly title?: string; readonly body: string }) {
+  return <Banner status={confirm ? CONFIRM_AS : 'info'} title={title ?? body} description={title ? body : undefined} />;
 }
 
 /** One line of a form as it sits on the paper: the field's name small, its filled-in value under it. */
@@ -183,7 +182,6 @@ function BackBar({ title, sub, pct }: { readonly title: string; readonly sub: st
           <Text weight="bold">{title}</Text>
           <Text type="supporting">{sub}</Text>
         </VStack>
-        <TextLink label="Pause" />
       </HStack>
       <Progress pct={pct} label="Form 3 of 112" />
     </VStack>
@@ -197,7 +195,6 @@ function Screen({ which }: { readonly which: string }) {
       return (
         <SubPage title="Your details, once" subtitle="For the forms you sign today" backLabel="Back" backHref="#" footer={<BigButton label="Start signing" />}>
           <Calm
-            icon={<ClockIcon />}
             title="Pam doesn't keep these"
             body="They stay on this phone while you sign, and are cleared when you finish or close Pam."
           />
@@ -248,7 +245,6 @@ function Screen({ which }: { readonly which: string }) {
             </VStack>
           </Card>
           <Calm
-            icon={<ShieldIcon />}
             title="Gone when you are done"
             body="Closing Pam, or finishing the last form, clears all of this. Coming back later means entering it again."
           />
@@ -257,41 +253,43 @@ function Screen({ which }: { readonly which: string }) {
     // 2 · Sign many.
     case 'sign':
       return (
-        <VStack gap={4} xstyle={styles.frame}>
-          <VStack gap={4} xstyle={styles.pad}>
-            <BackBar title="Intake and consent" sub="Example Food Pantry" pct={3} />
-            <FormPaper signed={false} />
-            <Text type="supporting">Your details are filled in. Check them, then sign.</Text>
-          </VStack>
-          <VStack gap={2} xstyle={styles.foot}>
-            <BigButton label="Sign this form" />
-            <TextLink label="Skip this one for now" />
-          </VStack>
-        </VStack>
+        <PamPage gap={4} footer={<VStack gap={2}><TextLink label="Skip this one for now" /><BigButton label="Sign this form" /></VStack>}>
+          <BackBar title="Intake and consent" sub="Example Food Pantry" pct={3} />
+          <FormPaper signed={false} />
+          <Text type="supporting">Your details are filled in. Check them, then sign.</Text>
+        </PamPage>
       );
     case 'signed':
       return (
-        <VStack gap={4} xstyle={styles.frame}>
-          <VStack gap={4} xstyle={styles.pad}>
-            <BackBar title="Intake and consent" sub="Example Food Pantry" pct={3} />
-            <FormPaper signed />
-            <HStack gap={2} align="center" wrap="nowrap">
-              <CheckIcon />
-              <Text weight="bold">Signed and sent to Example Food Pantry</Text>
-            </HStack>
-          </VStack>
-          <VStack gap={2} xstyle={styles.foot}>
-            <BigButton label="Next form" badge="4 of 112" />
-            <TextLink label="Undo this signature" />
-          </VStack>
-        </VStack>
+        <PamPage gap={4} footer={<VStack gap={2}><TextLink label="Undo this signature" /><BigButton label="Next form" /></VStack>}>
+          <BackBar title="Intake and consent" sub="Example Food Pantry" pct={3} />
+          <FormPaper signed />
+          <Calm confirm body="Signed and sent to Example Food Pantry" />
+        </PamPage>
+      );
+    case 'leave':
+      return (
+        <PamPage gap={4} footer={<VStack gap={2}><TextLink label="Skip this one for now" /><BigButton label="Sign this form" /></VStack>}>
+          <BackBar title="Intake and consent" sub="Example Food Pantry" pct={3} />
+          <FormPaper signed={false} />
+          <Text type="supporting">Your details are filled in. Check them, then sign.</Text>
+          {/* Pam's own confirmation dialog (ConfirmDialog, D-234, D-255): the action is the one big button, the quiet way out below. */}
+          <ConfirmDialog
+            isOpen
+            title="Leave for now?"
+            body="Pam keeps the 3 forms you signed. Your details are cleared, so you will type them again when you come back."
+            confirmLabel="Leave for now"
+            onConfirm={() => {}}
+            cancelLabel="Keep signing"
+            onCancel={() => {}}
+          />
+        </PamPage>
       );
     case 'pause':
       return (
-        <SubPage title="Paused" subtitle="3 of 112 signed" backLabel="Back to the form" backHref="#" footer={<BigButton label="Carry on with form 4" />}>
+        <SubPage title="Welcome back" subtitle="3 of 112 signed" backLabel="Back" backHref="#" footer={<BigButton label="Carry on with form 4" />}>
           <Progress pct={3} label="3 signed · 109 to go" />
           <Calm
-            icon={<ClockIcon />}
             title="Pick up whenever you like"
             body="Pam remembers which forms are signed. It does not remember your details, so you will enter them again, Social Security number included."
           />
@@ -318,8 +316,8 @@ function Screen({ which }: { readonly which: string }) {
     // 3 · The DocuSign route.
     case 'docusign':
       return (
-        <VStack gap={4} xstyle={styles.frame}>
-          <VStack gap={4} xstyle={styles.pad}>
+        <PamPage gap={4} footer={<TextLink label="Need help with this form?" />}>
+          <VStack gap={4}>
             <BackBar title="Intake and consent" sub="Example Food Pantry" pct={3} />
             <VStack gap={0} xstyle={styles.ds}>
               <HStack justify="between" align="center" wrap="nowrap" xstyle={styles.dsBar}>
@@ -343,17 +341,14 @@ function Screen({ which }: { readonly which: string }) {
             </VStack>
             <Text type="supporting">DocuSign's own window. What you type here goes to DocuSign, not to Pam.</Text>
           </VStack>
-          <VStack gap={2} xstyle={styles.foot}>
-            <TextLink label="Need help with this form?" />
-          </VStack>
-        </VStack>
+        </PamPage>
       );
     case 'handoff':
       return (
-        <SubPage title="Signed" subtitle="Form 3 of 112" backLabel="Back" backHref="#" footer={<BigButton label="Next form" badge="4 of 112" />}>
+        <SubPage title="Signed" subtitle="Form 3 of 112" backLabel="Back" backHref="#" footer={<BigButton label="Next form" />}>
           <Progress pct={3} label="3 signed · 109 to go" />
           <Calm
-            icon={<SignIcon />}
+            confirm
             title="DocuSign has it"
             body="You are back in Pam. DocuSign sends the signed form to Example Food Pantry. Pam only knows that it is done."
           />
@@ -363,7 +358,6 @@ function Screen({ which }: { readonly which: string }) {
               <Text type="supporting">Example Food Pantry</Text>
             </VStack>
           </Card>
-          <TextLink label="Pause here" />
         </SubPage>
       );
     // 4 · Done.
@@ -371,11 +365,10 @@ function Screen({ which }: { readonly which: string }) {
       return (
         <SubPage title="All 112 signed" subtitle="Nothing left to sign" backLabel="Back to Home" backHref="#" footer={<BigButton label="Save my copies" />}>
           <Progress pct={100} label="112 of 112" />
-          <Calm
-            icon={<CheckIcon />}
-            title="Sent to the programs"
-            body="Each program has its own signed form: 9 programs, 112 forms."
-          />
+          <VStack gap={2} xstyle={styles.row}>
+            <Calm confirm title="Sent to the programs" body="Each program has its own signed form: 9 programs, 112 forms." />
+            <Calm confirm title="Not stored in Pam" body="The name, birth date and Social Security number you typed for this form are no longer stored in Pam." />
+          </VStack>
           <Card padding={4}>
             <VStack gap={2}>
               <Text weight="bold">Your copies</Text>
@@ -385,11 +378,22 @@ function Screen({ which }: { readonly which: string }) {
               <TextLink label="Send them to my email" />
             </VStack>
           </Card>
-          <Calm
-            icon={<ShieldIcon />}
-            title="Your details are cleared"
-            body="Your name, birth date and Social Security number are gone from this phone."
-          />
+        </SubPage>
+      );
+    case 'done-docusign':
+      return (
+        <SubPage title="All 112 signed" subtitle="Nothing left to sign" backLabel="Back to Home" backHref="#" footer={<BigButton label="Back to Home" />}>
+          <Progress pct={100} label="112 of 112" />
+          <VStack gap={2} xstyle={styles.row}>
+            <Calm confirm title="Sent to the programs" body="DocuSign sent each program its signed form: 9 programs, 112 forms." />
+            <Calm confirm title="Not stored in Pam" body="Pam never had the name, birth date and Social Security number you gave for this form. They went straight to DocuSign." />
+          </VStack>
+          <Card padding={4}>
+            <VStack gap={2}>
+              <Text weight="bold">Your copies</Text>
+              <Text type="supporting">DocuSign sends you a copy of each form. Pam does not have them, so look for them in the email you gave DocuSign.</Text>
+            </VStack>
+          </Card>
         </SubPage>
       );
     default:
@@ -398,8 +402,8 @@ function Screen({ which }: { readonly which: string }) {
 }
 
 function Page() {
-  const which = useSearchParams().get('s') ?? 'fill';
-  return <Screen which={which} />;
+  const raw = useSearchParams().get('s') ?? 'fill';
+  return <Screen which={raw.replace('-success', '')} />;
 }
 
 export default function DesignSign() {

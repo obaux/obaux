@@ -63,6 +63,18 @@ const EXAMPLE_WORKFORCE_CENTER: DummySavedPlace = {
   description: 'Job training, help with a resume and openings posted every week.',
 };
 
+// A long, real-looking name, so a story shows how a place's name sits in a title or a banner (Lena's fit audit).
+const EXAMPLE_REENTRY: DummySavedPlace = {
+  id: 'dummy-place-reentry',
+  name: 'Example Reentry Employment and Housing Resource Center of North Philadelphia',
+  category: 'workforce',
+  address: '2100 N Broad St, Philadelphia, PA 19121',
+  phone: null,
+  lat: 39.9862,
+  lon: -75.1557,
+  description: 'Help finding work and a place to live after release. Walk-ins welcome on weekdays.',
+};
+
 /*
  * Six more (Will, 5 October, D-304): Explore had one place per category, all
  * three with a visit booked. Three of each kind now, and most with nothing
@@ -166,6 +178,7 @@ export const DUMMY_PLACES_BY_ID: Readonly<Record<string, DummySavedPlace>> = Obj
     EXAMPLE_LEARNING_CENTER,
     EXAMPLE_FOOD_PANTRY,
     EXAMPLE_WORKFORCE_CENTER,
+    EXAMPLE_REENTRY,
     EXAMPLE_LIBRARY,
     EXAMPLE_TRADES,
     EXAMPLE_FAMILY,
@@ -213,5 +226,13 @@ export const DUMMY_FLAGS: readonly DummyFlag[] = [
     note: null,
     count: 1,
     flaggedAt: new Date(Date.now() - 3 * 3_600_000).toISOString(),
+  },
+  {
+    id: 'dummy-flag-3',
+    place: EXAMPLE_REENTRY,
+    reason: 'moved',
+    note: 'They are on the second floor of the new building on Broad Street now.',
+    count: 1,
+    flaggedAt: new Date(Date.now() - 5 * 3_600_000).toISOString(),
   },
 ];

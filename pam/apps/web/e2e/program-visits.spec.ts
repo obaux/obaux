@@ -132,6 +132,11 @@ test('a program lead opening a linked member sees a small card: first name, this
   await page.goto('/person/?id=m1');
   await settled(page);
   await expect(page.getByRole('heading', { name: 'Tanya', level: 1 })).toBeVisible();
+  // The name is the one title, not "Profile" (Iris, program lead pass, 15 October).
+  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+  // Said once: no second heading with the name (Iris re-test, 15 October).
+  await expect(page.getByRole('heading', { name: 'Tanya' })).toHaveCount(1);
+  await expect(page.getByRole('heading', { name: 'Profile', level: 1 })).toHaveCount(0);
   await expect(page.getByText('GED class')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Message Tanya' })).toBeVisible();
   // Nothing else of the member: no points, last active, policies, trips or saved places.

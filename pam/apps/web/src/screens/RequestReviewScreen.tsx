@@ -11,11 +11,12 @@ import { BigButton, Loading, MessagesIcon, Notice, PlacesIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
-import { goBack, navigate } from '@/lib/navigate';
+import { goBack } from '@/lib/navigate';
 import { useSession } from '@/lib/useSession';
 import { reviewStaffRequest, useStaffRequests, type ReviewFailure } from '@/lib/useStaffRequests';
 import { listRegions } from '@/lib/useCaseload';
 import { useRoleView } from '@/lib/useViewedRole';
+import { ConfirmDialog } from './ConfirmDialog';
 import { HelpButton } from './HelpButton';
 import { useTextRequester } from './TextRequesterButton';
 
@@ -60,6 +61,9 @@ export function RequestReviewScreen({ userId }: { readonly userId: string | null
   const [busy, setBusy] = useState<'approved' | 'denied' | null>(null);
   const [failed, setFailed] = useState<ReviewFailure | null>(null);
   const [addedAsLead, setAddedAsLead] = useState(false);
+  // Every decision is asked first, and said after (Iris, super admin W1): both text the person.
+  const [confirming, setConfirming] = useState<'approved' | 'denied' | null>(null);
+  const [decided, setDecided] = useState<'approved' | 'denied' | null>(null);
 
   useEffect(() => {
     if (!isSuperAdmin) return;
@@ -98,20 +102,28 @@ export function RequestReviewScreen({ userId }: { readonly userId: string | null
 
   const first = row.firstName ?? t('invite.expired.someone');
 
-  const decide = async (decision: 'approved' | 'denied') => {
+  // A tap asks first. Approve still needs the city before it asks.
+  const ask = (decision: 'approved' | 'denied') => {
     if (decision === 'approved' && !regionId) {
       setNeedsCity(true);
       return;
     }
     setNeedsCity(false);
+    setConfirming(decision);
+  };
+
+  const decide = async (decision: 'approved' | 'denied') => {
+    setConfirming(null);
     setFailed(null);
     setBusy(decision);
     const result = await reviewStaffRequest(row.userId, decision, regionId || undefined);
     setBusy(null);
     if (!result.ok) setFailed(result.reason);
     else if (result.addedToExisting) setAddedAsLead(true);
-    else navigate('/requests/');
+    // Said on this screen, then back to the list the way they came (not a new page on top: P2).
+    else setDecided(decision);
   };
+  const done = addedAsLead || decided !== null;
 
   return (
     <SubPage
@@ -121,20 +133,20 @@ export function RequestReviewScreen({ userId }: { readonly userId: string | null
       actions={<HelpButton />}
       footer={
         <VStack gap={2} xstyle={styles.actions}>
-          {addedAsLead ? (
-            <BigButton label={t('nav.back.requests')} onPress={() => navigate('/requests/')} />
+          {done ? (
+            <BigButton label={t('nav.back.requests')} onPress={() => goBack('/requests/')} />
           ) : (
             <>
               <BigButton
                 label={busy === 'approved' ? t('requests.saving') : t('requests.approve')}
                 isDisabled={busy !== null}
-                onPress={() => void decide('approved')}
+                onPress={() => ask('approved')}
               />
               <BigButton
                 label={busy === 'denied' ? t('requests.saving') : t('requests.deny')}
                 variant="secondary"
                 isDisabled={busy !== null}
-                onPress={() => void decide('denied')}
+                onPress={() => ask('denied')}
               />
             </>
           )}
@@ -194,7 +206,25 @@ export function RequestReviewScreen({ userId }: { readonly userId: string | null
 
       {addedAsLead ? (
         <Notice notice="admin_out_of_region" title={t('requests.done.title', { name: first })} body={t('requests.done.body')} />
+      ) : decided ? (
+        <Notice
+          notice="admin_out_of_region"
+          title={t(`requests.decided.${decided}.title`, { name: first })}
+          body={t(`requests.decided.${decided}.body`, { name: first })}
+        />
       ) : null}
+
+      <ConfirmDialog
+        isOpen={confirming !== null}
+        title={t(confirming === 'denied' ? 'requests.confirm.deny.title' : 'requests.confirm.approve.title', { name: first })}
+        body={t(confirming === 'denied' ? 'requests.confirm.deny.body' : 'requests.confirm.approve.body', { name: first })}
+        confirmLabel={t(confirming === 'denied' ? 'requests.confirm.deny.yes' : 'requests.confirm.approve.yes')}
+        onConfirm={() => {
+          if (confirming) void decide(confirming);
+        }}
+        cancelLabel={t('requests.confirm.no')}
+        onCancel={() => setConfirming(null)}
+      />
 
       {/* The reader here is Pam's own super admin: say what is wrong and what to do, never "call Pam" (D-491). */}
       {failed === 'other' ? (

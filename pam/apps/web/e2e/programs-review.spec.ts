@@ -85,9 +85,19 @@ test.describe('programs to check', () => {
     await expect(page.getByText('1234 Market St')).toBeVisible();
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
     expect(results.violations).toEqual([]);
+    // The address opens in Maps, so it can be checked from here (Iris, super admin P4).
+    await expect(page.getByRole('link', { name: '1234 Market St' })).toHaveAttribute('href', /google\.com\/maps\/dir\/.*1234%20Market%20St/);
+    // Four days is late, so it says how long it has waited while it waits.
+    await expect(page.getByText('Days waiting: 4')).toBeVisible();
     await page.getByRole('button', { name: 'Approve' }).click();
-    await expect(page).toHaveURL(/\/programs\/review\/$/);
+    // Asked first, then said after (Iris, super admin W1).
+    expect(asked).toEqual([]);
+    await page.getByRole('dialog').getByRole('button', { name: 'Yes, approve' }).click();
+    await expect(page.getByText('Hearth Kitchen Training is approved')).toBeVisible();
     expect(asked).toEqual([{ p_id: 'sub-1', p_decision: 'approved' }]);
+    // Decided, so it is no longer waiting (Iris, re-test of b44).
+    await expect(page.getByText(/Days waiting/)).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Programs to check' }).last()).toBeVisible();
   });
 
   test('Ask for changes needs a note, then sends it', async ({ page }) => {
@@ -107,8 +117,9 @@ test.describe('programs to check', () => {
 
     await page.getByLabel('What should they change?').fill('Please add the street address.');
     await page.getByRole('button', { name: 'Send to the leader' }).click();
-    await expect(page).toHaveURL(/\/programs\/review\/$/);
+    await expect(page.getByText('Your note is sent')).toBeVisible();
     expect(asked).toEqual([{ p_id: 'sub-1', p_decision: 'changes_asked', p_note: 'Please add the street address.' }]);
+    await expect(page.getByText(/Days waiting/)).toHaveCount(0);
   });
 
   test('a withdrawn request can only be discarded, and asks first', async ({ page }) => {
@@ -126,15 +137,18 @@ test.describe('programs to check', () => {
     await expect(page.getByRole('button', { name: 'Ask for changes' })).toHaveCount(0);
     await page.getByRole('button', { name: 'Discard' }).click();
     await page.getByRole('dialog').getByRole('button', { name: 'Yes, discard it' }).click();
-    await expect(page).toHaveURL(/\/programs\/review\/$/);
+    await expect(page.getByText('Discarded', { exact: true })).toBeVisible();
     expect(asked).toEqual([{ p_id: 'sub-3', p_decision: 'discarded' }]);
+    await expect(page.getByText(/Days waiting/)).toHaveCount(0);
   });
 
   test('one waiting on the leader offers no decision', async ({ page }) => {
-    await signedInAsSuperAdmin(page, [row({ status: 'changes_asked' })]);
+    await signedInAsSuperAdmin(page, [row({ status: 'changes_asked', days_waiting: 9 })]);
     await page.goto('/programs/review/item/?id=sub-1');
     await settled(page);
     await expect(page.getByText('Waiting for the leader to send it again')).toBeVisible();
+    // It waits on the leader, not on a decision: no days counted.
+    await expect(page.getByText(/Days waiting/)).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Approve' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Discard' })).toHaveCount(0);
   });

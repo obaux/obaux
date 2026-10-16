@@ -43,7 +43,10 @@ export function asRole(
       ),
     ],
     parameters: {
-      nextjs: { appDirectory: true, navigation: { pathname, query, ...prototypeRouter } },
+      // `router` is where Storybook 10 reads the app router's push/replace/back (`navigation` only sets where the story is), so the
+      // prototype's own router must go there: under `navigation` it was ignored, and a tap that moves from script ("Message Marcus")
+      // went nowhere (Iris's P1).
+      nextjs: { appDirectory: true, navigation: { pathname, query }, router: { ...prototypeRouter } },
     },
   };
 }

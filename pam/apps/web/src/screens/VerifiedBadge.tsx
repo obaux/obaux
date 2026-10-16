@@ -3,7 +3,7 @@
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Icon } from '@astryxdesign/core/Icon';
-import { InfoTip, SignIcon } from '@pam/ui';
+import { InfoTip, SignedDocIcon } from '@pam/ui';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
@@ -19,17 +19,9 @@ import { isVerified, signedBy, usePolicies } from '@/lib/usePolicies';
  * not a half one.
  */
 const styles = stylex.create({
-  // The one mark for "signed every policy" (D-316, D-324): a light-green
-  // circle with the signing pen, the same beside a name on Home and here.
-  mark: {
-    width: '22px',
-    height: '22px',
-    borderRadius: '50%',
-    flexShrink: 0,
-    backgroundColor: colorVars['--color-success-muted'],
-    color: colorVars['--color-success'],
-  },
-  markIcon: { width: '14px', height: '14px' },
+  // The one mark for "signed every policy" (D-316, D-324; P5, D-582): a green document with a tick,
+  // the same beside a name on Home and here.
+  mark: { width: '24px', height: '24px', flexShrink: 0, color: colorVars['--color-success'] },
   // Each signed policy (Will, 7 October, D-369): a tick in the mark's own
   // light-green circle, so the list reads as done at a glance.
   tick: {
@@ -91,11 +83,11 @@ export function VerifiedBadge({ personId, name }: { readonly personId: string; r
   );
 }
 
-/** The light-green pen on its own — decorative; the caller names it. */
+/**
+ * "Signed every policy": a document with a tick, in the success green, no circle behind it (Dot's A, decided 15 October;
+ * Iris's program lead pass P5). The pen read as "edit". Nothing marks people still to sign: no mark is the mark.
+ * Decorative; the caller names it.
+ */
 export function SignedMark() {
-  return (
-    <HStack align="center" justify="center" xstyle={styles.mark} aria-hidden>
-      <SignIcon {...stylex.props(styles.markIcon)} aria-hidden />
-    </HStack>
-  );
+  return <SignedDocIcon {...stylex.props(styles.mark)} aria-hidden />;
 }

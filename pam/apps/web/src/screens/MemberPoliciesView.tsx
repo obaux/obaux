@@ -1,6 +1,7 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { HelpButton } from './HelpButton';
 import * as stylex from '@stylexjs/stylex';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
 import { sheet } from '@pam/ui/sheet';
@@ -227,6 +228,16 @@ function DoneButton({ steps, placeId }: { readonly steps: number; readonly place
   );
 }
 
+/** Help on every policy screen (A26: help on each step of a form), beside Done when there is one. */
+function PolicyActions({ done }: { readonly done: ReactNode }) {
+  return (
+    <HStack gap={2} align="center" wrap="nowrap">
+      {done}
+      <HelpButton />
+    </HStack>
+  );
+}
+
 export { policiesHref };
 
 export function MemberPoliciesScreen({
@@ -263,7 +274,7 @@ export function MemberPoliciesScreen({
       {...(trip
         ? { backHref: tripsHref(trip), backLabel: t('nav.back.trips') }
         : { backHref: `/place/?id=${encodeURIComponent(placeId)}`, backLabel: t('nav.back.place') })}
-      actions={trip ? undefined : <DoneButton steps={1} placeId={placeId} />}
+      actions={<PolicyActions done={trip ? null : <DoneButton steps={1} placeId={placeId} />} />}
       // The one button rides the foot of the screen (D-326), on every
       // screen that has one — the same place as a place's Plan a trip.
       footer={
@@ -371,7 +382,7 @@ export function MemberPolicyScreen({
               backHref: `${policiesHref(placeId, placeName, service?.id ?? null)}${trip ? `&trip=${encodeURIComponent(trip)}` : ''}`,
               backLabel: t('nav.back.policiesToSign'),
             })}
-        actions={trip ? undefined : <DoneButton steps={via === 'list' ? 2 : 1} placeId={placeId} />}
+        actions={<PolicyActions done={trip ? null : <DoneButton steps={via === 'list' ? 2 : 1} placeId={placeId} />} />}
         // Sign, Next and Done stay under the same thumb from the first
         // policy to the last (D-279), at the foot of the screen like every
         // screen's one button (D-326).
@@ -540,6 +551,17 @@ function SignSheet({
   const [isDrawing, setDrawing] = useState(false);
   const [isTyping, setTyping] = useState(false);
   const [name, setName] = useState('');
+
+  // The pad unmounts with the sheet and starts empty on the next open, so
+  // what we remember about it must too: otherwise Sign stays lit over an
+  // empty box ("Clear signature and sign again", then Sign).
+  useEffect(() => {
+    if (isOpen) return;
+    setHasInk(false);
+    setDrawing(false);
+    setTyping(false);
+    setName('');
+  }, [isOpen]);
 
   return (
     <BottomSheet

@@ -226,6 +226,9 @@ function ownProgramRow(state: 'review' | 'live') {
 function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[] {
   const profile = ROLES[journeyRole].profile;
   const role = profile?.role ?? null;
+  // What this story's member has signed, and the drawing kept on their account.
+  const signed: Record<string, { at: string; image: string | null }> = {};
+  let savedSignature: string | null = null;
   // A program sent from Add a program in this story is on file from then on.
   let ownProgram: 'review' | 'live' | undefined = options.ownProgram;
   // What is waiting for Pam on it (D-462): a first send, or a live program's change.
@@ -285,6 +288,25 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
   // Programs waiting for Pam (D-386): a first send that has waited four days, a change to a live
   // program, and one a leader deleted to start over (with the new one after it).
   let programsToCheck: Array<Record<string, unknown>> = [
+    // A long name and a long lead name, for the decision states' fit audit (Lena; D-584).
+    {
+      id: 'check-5', service_id: 'p-5', kind: 'new', status: 'in_review', sent_at: onTheHour(-2, 11), days_waiting: 2,
+      program_name: 'Northwest Philadelphia Community Reentry and Workforce Training Center',
+      details: { name: 'Northwest Philadelphia Community Reentry and Workforce Training Center', category: 'workforce', description: 'Job training, résumé help and a weekly hiring hall.', address: '4500 Germantown Ave, Philadelphia, PA 19144' },
+      lead_name: 'Bartholomew', replaces_id: null, replaced_by: null, withdrawn_at: null,
+    },
+    {
+      id: 'check-6', service_id: 'p-6', kind: 'new', status: 'withdrawn', sent_at: onTheHour(-3, 9), days_waiting: 3,
+      program_name: 'Southwest Philadelphia Neighborhood Family Services and Food Pantry',
+      details: { name: 'Southwest Philadelphia Neighborhood Family Services and Food Pantry', category: 'family_services', address: '6000 Woodland Ave, Philadelphia, PA 19142' },
+      lead_name: 'Bartholomew', replaces_id: null, replaced_by: null, withdrawn_at: onTheHour(-2, 9),
+    },
+    {
+      id: 'check-7', service_id: 'p-7', kind: 'new', status: 'in_review', sent_at: onTheHour(-1, 15), days_waiting: 1,
+      program_name: 'Germantown Avenue Returning Citizens Housing Navigation and Legal Clinic',
+      details: { name: 'Germantown Avenue Returning Citizens Housing Navigation and Legal Clinic', category: 'family_services', address: '5500 Germantown Ave, Philadelphia, PA 19144' },
+      lead_name: null, replaces_id: null, replaced_by: null, withdrawn_at: null,
+    },
     {
       id: 'check-1', service_id: 'p-1', kind: 'new', status: 'in_review', sent_at: onTheHour(-4, 10), days_waiting: 4,
       program_name: 'Hearth Kitchen Training',
@@ -606,6 +628,23 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     // The member's three (D-304): the rest of Explore is not saved.
     on('/rpc/saved_places_mine', () => ({ body: PLACES.slice(0, 3) })),
     on('/rest/v1/saved_places', () => ({ body: [] })),
+    // Signatures (D-270, D-271): nothing signed and no saved drawing until the story signs, so the
+    // prototype's screens do not log "no fixture"; signing and "Clear signature" are remembered for
+    // the story's life, and a read after a write agrees with it.
+    on('/rest/v1/policy_signatures', () => ({
+      body: Object.entries(signed).map(([policy_id, row]) => ({ policy_id, signed_at: row.at, image: row.image })),
+    })),
+    on('/rest/v1/member_signatures', () => ({ body: savedSignature ? [{ image: savedSignature }] : [] })),
+    on('/rpc/sign_policy', (_url, _method, body) => {
+      const args = (body ?? {}) as { p_policy_id?: string; p_image?: string };
+      if (args.p_image) savedSignature = args.p_image;
+      if (args.p_policy_id) signed[args.p_policy_id] = { at: new Date().toISOString(), image: args.p_image ?? savedSignature };
+      return { body: null };
+    }),
+    on('/rpc/forget_my_signature', () => {
+      savedSignature = null;
+      return { body: null };
+    }),
     on('/rpc/flag_service', () => ({ body: { id: 'flag-1' } })),
     // An example code (D-218's Invite someone); the real one is made by the database.
     on('/rpc/create_invite', (_url, _method, body) => ({
@@ -698,6 +737,17 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     // A fictional 555 number: a requester's phone, read on "Text Andre" (D-262).
     on('/rpc/staff_request_phone', () => ({ body: '+12155550177' })),
     on('/rest/v1/enrollments', () => ({ body: [] })),
+    // A real member's visits, read by their case manager on the member's page (D-509): Marcus (`m1`, on the example caseload) has
+    // one coming up, one the program marked him at and one it did not, so "Trips coming up" and "Programs attended" have something to show.
+    on('/rest/v1/appointments', (url) => ({
+      body: url.includes('member_id=eq.m1')
+        ? [
+            { id: 'a1', starts_at: onTheHour(-9, 13), status: 'missed', service_id: SAVED_PLACE.id, services: { name: SAVED_PLACE.name, category: SAVED_PLACE.category } },
+            { id: 'a2', starts_at: onTheHour(-5, 9), status: 'attended', service_id: SAVED_PLACE.id, services: { name: SAVED_PLACE.name, category: SAVED_PLACE.category } },
+            { id: 'a3', starts_at: onTheHour(2, 10), status: 'scheduled', service_id: SAVED_PLACE.id, services: { name: SAVED_PLACE.name, category: SAVED_PLACE.category } },
+          ]
+        : [],
+    })),
     // The people a case manager or a program lead may message are the caseload the list shows, so the row of
     // rings above it (D-198) agrees with it (a member's and a super admin's own list is empty).
     on('/rpc/messageable_people', () => ({

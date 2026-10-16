@@ -763,9 +763,503 @@
   Three choices on the card with my advice: chips on Programs only, full screen, and a ZIP typed on Programs switches
   to Area. Sage signed the "Got a new phone number?" post (e708a7e8). Her "We may call your new number" line follows
   a84 (i). Correction to the 04:15 entry: the ZIP-only chip rule is D-552, not D-561.
+- **Will, 04:39 (a86, chat w20261014043914e19d): one box, like Google Maps.** In his words: "Let's talk about this
+  before we push anything. If I'm in Google Maps I can type either a program name or an address and it will just show
+  me the list. I don't have to select whether it's a service or an area. Why do we need to make a distinction? Also I
+  don't like the subtitle under 'Search program' inside the search bar. It feels too crowded. Can we just streamline
+  this and merge everything into one?" Merge desk, 04:39: agreed, no switch. The bar has one line ("Search programs
+  or places"), and one list comes back with programs first, Pam's areas next and addresses last. **Google is asked
+  only when the text looks like an address** (a house number, a street suffix, an "X and Y" corner) or when the
+  person taps an explicit "Search addresses" row, so what people search for ("food pantry", "rehab") never leaves Pam.
+  That keeps the signed a74/a81 Privacy line true and Google's bill down; Piper checks whether the line's "a place
+  Pam's own list of areas doesn't have" clause is broader than this. Piper redraws it (v2, pictures only).
+- **Will, 04:40 (a81, chat w20261014044028qel6): keep "Near 19102".** The area control on the right of "All programs"
+  (or a category) stays as it is today, for people who browse rather than type. Picking an area or address in the one
+  box updates the same control. Piper's v2 includes it.
+- **Will, 04:43 (a85, chat w20261014044303piq9): the banner he meant is the blue one.** "That green card in the places
+  profile isn't even an alert banner. I'm talking about the more subtle blue banner" — the place page's
+  `<Banner status="info">` ("This is only to help you plan. Pam does not tell {place} you are coming."). The merge
+  desk's 04:31 brief had sent Dot to the green VisitCard. Dot redraws every note as the blue info Banner and shows
+  the two confirmations once in Banner success beside them, so Will can pick.
+- **Will, 04:47 (a84, chat w20261014044728k4y4): Sign in's spacing is off.** In Ava's picture the heading sits against
+  the hero and the field, button and line are packed together. Ava's branch changed no gaps (it is based on b32), so Dot
+  checks main at 390×844 and 375×667 and gives it room with spacing tokens, keeping the short-phone fit, with before and
+  after pictures for Will.
+- **Will, 04:48 (chat w202610140448305pq6): the Control Room loses his place and his reply.** Merge desk, 04:53,
+  Control Room v23 (version 42): every picture publish had reloaded the page on his screen (six in the hour). The page
+  now declares `assets`, and card pictures go to its asset store (`/_blob/<id>`), which needs no new version. A data
+  change keeps the card or picture at the top of the screen where it was (`keepPlace`). A reload restores the card he
+  was on, which cards were open, the picture he had open, and the reply being written (kept on his device until sent).
+  Tested in a harness at 390: a new card plus longer text above held the picture within a pixel, and the draft and the
+  open picture came back after a reload. The forms pictures (Dot 3b76742c, blue info banners with a green version to
+  compare) were the first to arrive through the asset store.
+- **Will, 04:50 (a83, chat w20261014045002p6tc): the help form "looks good. Approved".** D-569 (app) and D-570
+  (website) ship in b36 once the full checks pass. Sage signed Wren's "More: Got a new phone number?" link (0344f23b).
+  That post stays held for a84.
+- **Merge desk, 04:55: a86 shows Piper's take three (ec5195b0).** One-line bar "Search programs or places"; the "Near
+  City Hall ✎" control kept; typing "food" lists programs and asks Google for nothing unless the explicit "Search
+  addresses for 'food'" row is tapped; typing "1500 Market" shows areas, then Google's addresses. Piper's privacy check
+  found that today's rule (`wantsGoogle`: ask when Pam's own areas find nothing) would have sent "food" from a merged
+  box. So the box asks Google only for address-like text that matches no program, or on the explicit tap, and fails safe.
+  The drawer keeps today's rule, so the signed p7 stays true. Decided, and Will can change them: all digits put Areas
+  first; a street picked in the box shows only its ZIP (D-552).
+- **Merge desk, 05:03: Sign in's spacing, D-572 (Dot c0ed1c8d), card a87.** It was live since b32. D-564's short-screen
+  rules used `default: null` for the stack gap, the card padding and the brand gap, and in StyleX that unsets the
+  component's own `gap`/`padding` on every screen: title 4px under the picture, field, button and consent line 0px
+  apart at 390×844. The defaults are now the tokens (--spacing-3/5/4), and the tight values apply only under 640px tall;
+  641 to 720px gets a 46vh slide so 375×667 still fits. All 42 fit cases still fit, and a new signin-short case covers
+  390×844 and 375×667. It restores the look Will signed, so it ships as b37 after b36.
+- **Will, 05:18 (a85, chat w20261014051828ivdx): "Undo this signature" goes above the main button, and send the
+  DocuSign steps.** "Let's move undo this signature button to top of Primary action, so primary button is placed at
+  same place across all. Please send Docusign instructions." Dot redraws the forms pictures so the main button sits in
+  the same place, fixed at the bottom, on every screen. Asking for the steps is a yes to question 2 (a free DocuSign
+  developer account that he makes). Merge desk, 05:31: card a88 has the steps.
+  - The developer account at developers.docusign.com. It is free and never expires, and it is demo only: forms are
+    watermarked, not binding, and deleted after 30 days.
+  - Apps and Keys: an app called "Pam test", Generate RSA, and the redirect URI https://joinpam.org.
+  - Four Supabase Edge Function secrets that Will enters himself: `DOCUSIGN_PRIVATE_KEY`, `DOCUSIGN_INTEGRATION_KEY`,
+    `DOCUSIGN_USER_ID` and `DOCUSIGN_ACCOUNT_ID`.
+  - He then gives the integration key, which is not a secret, and the merge desk sends the one-time consent link
+    (account-d.docusign.com/oauth/auth, scope `signature impersonation`).
 
+  Piper writes a spike plan: the function, how it is locked, demo hosts only, and the cleanup. Iris checks the pages
+  only, under her rules. Questions 1, 3 and 4, and blue or green, are still open.
+- **Will, 05:21 (a86, chat w20261014052112b61d): the placeholder is "Search programs", with no helper line.** "Search
+  placeholder 'Search programs" simple. NO need for explainer text below use my location [...] Too much info. Keep
+  placeholders text simple." The merge desk takes this as a go on take three, with his words. "Search programs" is
+  his own wording, so it counts as signed, and the line under "Use my current location" goes. Sage writes the other
+  lines as short as they can be, and the box's accessible name starts with "Search programs". Piper builds it, Dot
+  places the bar on the staff's All programs page, and Lena does the seven languages. Pictures of the built screens go
+  to Will before it ships.
+- **Will, 05:22 (chat w20261014052207fmmj and w20261014052243dva7): two Control Room changes.** A card he has
+  answered says "Replied" on its button, and pressing it still starts a reply. After he sends a reply about a card, the
+  page goes back to the top of "Waiting on you". Merge desk, 05:34, Control Room v24 (version 43):
+  - A message that isn't about a card leaves the page where it is, so the answer arrives where he is reading.
+  - In Listen, the next card is read as before.
+  - A data redraw no longer stops a tab's or a reply's glide halfway: `keepPlace` waits for the jump to finish, and
+    the fold's nudge to the next card stays out of the way.
+
+  Harness at 390 and 1280:
+  - the section landed under the tabs;
+  - the card folded and showed "Replied", and pressing it put the card's prefix back;
+  - a general message left the page where it was;
+  - no page errors.
+- **Will, 05:23 (a87, chat w2026101405230857qn): Sign in "Approved".** D-572 ships as b37 after b36's CI.
+- **Will, 05:51 (a81, chat w20261014055126vnjb): the Google key is in.** He made the key and added it in Supabase as
+  `GOOGLE_MAPS_SERVER_KEY`. `places-search` (v2, JWT on) answers `{ enabled: false }` only while the key is unset, so
+  street search is on from here. The merge desk can't check it from here: the proxy refuses
+  shobqzuhicoiymtumiaz.supabase.co. Card a81 is now "try one address": Explore, "Near City Hall ✎", "1500 Market",
+  then pick one and see "Near 19102". Afterwards the merge desk reads the function's logs for errors.
+- **Merge desk, 05:40: DocuSign's demo hosts are blocked here.** Iris found it and the merge desk confirmed it: the
+  proxy refuses account-d.docusign.com, demo.docusign.net and apps-d.docusign.com (403). Card a88 step 7 asks Will to
+  add them under the environment's Network access › Allowed domains. Until he does, Piper runs Iris's checks for her;
+  no made-up results. Iris's plan, da15074e, is in b37.
+- **Will, 05:55 (a86, chat w20261014055553bfbe): the search bar's dark pill comes back, one height for the bar.**
+  "Also please bring back the selected dark pill outline around search bar when user selects it. And make search bar on
+  homepage match the height of search when active, they should feel as one. not disconnected." That makes search fields
+  the exception to D-569: an active search field shows the ink pill again, while other text boxes keep no ring. The
+  resting bar on Explore and on staff All programs is the same height as the active box (one token). Dot does both in
+  the shared SearchField, and Piper builds a86 on top. His "extra text under use my current location" was take three's
+  old picture 2. The build already drops the "Type a program..." line. The two privacy notes ("Used for this search
+  only.", "Pam remembers the area you pick on this phone only.") stay unless he says otherwise; he was asked.
+- **Merge desk, 06:07: a86 built (Piper D-573, 96952804) and held.** Pictures go to Will only after Dot's SearchField
+  change (the dark pill, one height), re-shot with it. Piper left "Pam remembers the area you pick on this phone only."
+  out of the box (the drawer keeps it), which is not what Will was told at 05:56. Lena was asked whether the box needs
+  it, and Will hears her answer with the pictures.
+- **Lena, 06:12: the box is fine without "Pam remembers the area…".** Privacy never promises it, and under Google's rows
+  ("Used for this search only.", with `saveOrigin` skipping `here` and `google:` picks) it would read as if the address
+  were kept. Piper takes it out of the box; the drawer keeps its own line. Will was told at 06:13, correcting the
+  05:56 note.
+- **Merge desk, 06:16: D-574 take two (Dot 1918d84c).** The outline is back on active search fields (3px ink, white
+  at night), and `--pam-search-height` is 60px for every search box. The heights already matched. What makes the
+  resting bar and the active box feel apart is width and alignment, since the resting bar is full width with centred
+  words. Decided: the resting bar's magnifier and words sit at the left, as in the active box. A tap changes nothing
+  but the outline and the right edge drawing in for Cancel (no transition under reduced motion), with at least 12px
+  between the outline and Cancel. D-574 merges together with a86, and Will sees both in one set of pictures.
+- **Will, 06:28 (a85, chat w202610140628228h1g): confirmations in green.** "Good news in green is a nice touch." The
+  forms' "Signed and sent to [program]" and the done screens use `Banner status="success"`. Informational notes stay
+  the blue `Banner status="info"` (his 04:43). Dot redraws the set with green only. Still open: questions 1, 3 and 4,
+  and whether "Skip this one for now" stays above the main button.
+- **06:24 (a88): which RSA key.** Will asked which of the two keys goes into Supabase: the private one, BEGIN to END,
+  as DOCUSIGN_PRIVATE_KEY. The public key stays with the app in DocuSign.
+- **Will, 06:30 (a85, chat w20261014063039evnz): "Also why pause button?"** Merge desk: Pause goes. The bar's close
+  (X) does the same job, because Pam always remembers which forms are signed. The bar is close, the form's name, "Form 3
+  of 112" and progress. 2c becomes the coming-back screen. Dot redraws it with the green change, and draws a "Leave
+  now?" step only if one is needed.
+- **Will, 06:39 (a88, chat w20261014063907oeyq): the DocuSign setup is done.** He has the APIs, the four Supabase
+  secrets, the integration key (not a secret, d2446c11-…) and the environment's allowed domains. The consent link was
+  sent at 06:39. Checked from the merge desk: account-d.docusign.com and apps-d.docusign.com answer, and Pam's
+  Supabase host is now reachable. demo.docusign.net still gets a 403, and Will was asked to check its spelling.
+  Street search confirmed on: `places-search` answered a GET with 405 "POST only", which it can only do once
+  `GOOGLE_MAPS_SERVER_KEY` is set, and nothing went to Google.
+- **Dot 2a2b4e32 (merged, pictures only): forms in green, no Pause.** The × asks "Leave for now?" once on the
+  Pam-only way, because leaving clears the details typed in. On DocuSign's way it just closes. 2d is "Welcome back".
+  Card a85 shows the new set and is back in Waiting.
+- **Will, 06:45 (a81, chat w20261014064551ywtf): street search tried live; the main search changes shape.** "I tried
+  it, but when I select a result, it should close the drawer with the new zipcode input into place. Now we need to map
+  our database with the google map address, so when users use the main search on app, no pop up opens, and instead they
+  see the programs listed by the address or name they're curious. The goal here is to provide a superior search
+  experience, but only show what we have in database, mapped to google. Remove the dropdown, and instead only show our
+  list of places." The function logs (06:41 to 06:45) show POST 200s and no "places-search failed", plus 401s from 06:38
+  to 06:40 (refused as not signed in; Piper checks the app's token refresh). Decided:
+  1. A live fix, on its own branch: picking anything in the area drawer closes it and sets Near (ZIP only for a
+     street, D-552).
+  2. a86 is reworked as an inline search. There is no full-screen view and no dropdown, and typing filters Explore's
+     list in place. Only Pam's programs show: by name, or nearest a typed address, which is geocoded server-side and
+     only for address-like text that matches no program. One quiet line names the point by ZIP. A clear (×) replaces
+     Cancel, and D-574's outline and height stay. The main search leaves Near alone.
+
+  "Map our database with the google map address" is read as distance from the geocoded point, since Pam's places
+  already have coordinates. Piper says whether he means more. Lena re-checks p7, since Google is now asked without a
+  tap. Sage signs the new line and the clear button's label.
+- **Will, 06:49 (a85, chat w20261014064937lxxq): "Great, approved."** Read as a yes to the pictures (green, no Pause,
+  Leave for now, Welcome back) and to the advice on questions 1, 3 and 4: DocuSign on each program's own account first,
+  Pam stops keeping the drawn signature, and a program's own words are allowed. Skip stays above. He was told this
+  reading and asked to say if any part is a no. Nothing is built on it before the build plan.
+  - His questions: the member's signature, and fields beyond "Your details, once" (household size, income).
+  - Answer: the signature is adopted once in DocuSign and stamped on every form in that sitting. Pam keeps "signed, on
+    this day" only.
+  - Each form asks its own questions through DocuSign's guided "Next", field by field. Programs label each blank
+    plainly at setup, and the same labels fill across one sitting.
+  - Plan B, if guided mode is clumsy on a phone: Pam asks the non-sensitive questions first, one per screen, and
+    passes the answers to DocuSign. The SSN never does this.
+  - The spike adds household-size and income fields shared across forms, to test exactly this.
+- **Will, 06:51 (a85, chat w20261014065116kirm): no count inside "Next form".** "it's already on top." The count
+  stays in the bar only, on 2c and 3b. This overrides D-560's in-button count for the forms screens.
+- **Will, 06:54 (a85, chat w20261014065418gzbo): the forms answers, explicitly.** "1) Yes. 3) Agree. 4) Allow it. And
+  'Skip above button is good'".
+  - 1: DocuSign on each program's own account first, the Pam-only way later.
+  - 3: Pam stops keeping the drawn-signature picture and keeps the date only.
+  - 4: a program's own words are allowed in its form.
+  - "Screen 2: This is not our confirmation modal design. Please stay consistent with our DS." So "Leave for now?" uses
+    the app's own ConfirmDialog (apps/web/src/screens/ConfirmDialog.tsx). Dot redraws it.
+- **Sage, 06:53 (ledger 9e5001e7): the inline search words.** "Nearest to {zip}" (new), "Clear search", the accessible
+  name "Search programs by name or address", and the placeholder and "Nothing matched that." as before. Merge desk:
+  there is no on-screen line saying address-like text goes to Google, since Will asked for less text and p7 covers it.
+  This goes to Will with Sage's p7 edit, which he signs.
+- **Piper 7bf7e92c (full-screen take, finished before the 06:45 reshape):** not shown to Will. It is the base for the
+  inline build, carrying Lena's words, the four fixes and Dot's token and outline.
+- **Piper, 07:00: D-575 (15d967e1), the area drawer closes on a pick.** Merged as b38 (623a8668). Done becomes Cancel,
+  and this replaces D-275's held-until-Done. Targeted checks: config 1311 passed and 1 skipped; copy in step; build,
+  tsc and web unit (177) clean; budget 12.0 kB spare; e2e (area-picker, street-search, focus-text-boxes, explore-bell,
+  places, place) 231 passed, exit 0; Storybook built. It is held for before-and-after pictures for Will, since the
+  Done → Cancel change is visible.
+- **Piper, 07:13: a86 inline (886bb762, D-573).** One inline SearchField with no pop-up, and the list filters in place.
+  For a typed address the bar makes the same two places-search calls (suggest, then choose the first), the point stays
+  in memory only, and the drawer keeps its own pick flow. Seven keys drop. Merge desk, 07:14: one fix before Will
+  sees it. The address picture said "Nearest to 19102", "All programs" and "Near City Hall ✎" while the list was
+  measured from 19102. Now the address case reads like the "food" case: the heading is Results for "…", the control
+  shows "Near 19102" for display only, the "Nearest to {zip}" line goes, and Google's mark sits small under the
+  heading.
+- **Merge desk, 06:08: Piper's DocuSign spike plan (4076102e) approved, with changes.**
+  - No live Pam account for the spike: the gateway JWT is the anon key, and the caller-id list is dropped.
+  - The spike key never travels. Piper keeps it, and only its SHA-256 is set (`DOCUSIGN_SPIKE_KEY_SHA256`), with a
+    48-hour `DOCUSIGN_SPIKE_UNTIL`.
+  - `DOCUSIGN_CONNECT_KEY` comes from Will's DocuSign account, so he enters it when the Connect step is reached.
+  - The proxy also refuses Pam's own Supabase host from the containers, so a88 step 7 now lists it with DocuSign's
+    three.
+  - The merge desk deploys both spike functions after consent and deletes them, and the spike secrets, at cleanup.
+- **Merge desk, 07:37: card a86 posted ("One search on Explore: the list changes as you type").** Eight pictures of
+  Piper's 5084c0dc, plus Sage's p7 edit for Will to sign (the bar no longer offers a list of Google suggestions). The
+  build waits for his yes and the signature. Lena: the p7 edit ships in the same batch as the inline search, with its
+  six translations and the Privacy date for that day.
+- **Lena, about 07:40: no recut of her pin.** Piper merged claude/lena-explore-nearest before the 07:14 call and then
+  removed `explore.search.nearest` everywhere. So 5084c0dc already carries Lena's street-search-line pin (fdfde536 is an
+  ancestor) and none of the "Nearest to" translations. The "Near …" control is `places.near` and the heading is
+  `explore.results`, both already translated: no new string. claude/lena-explore-nearest is superseded.
+- **Merge desk, 07:48: one `dir="auto"` in SearchField, Dot's.** Both Dot (fbe93cba, 07:43, on
+  claude/pam-design-searchfield-dir) and Piper (8933ff49, 07:45, on the inline branch) added `dir="auto"` to the shared
+  SearchField's input, so a Latin address typed in the Arabic app reads "1500 Market", not "Market 1500" (Lena's
+  finding). Only one can ship, since both edit the same function in packages/ui/src/SearchPill.tsx. Dot's is taken:
+  the design system is Dot's, and it sets `dir="auto"` only while the field has words. Empty, the attribute is off, so
+  the Arabic placeholder follows the page, right to left. Piper's set it once on mount, the empty field included, and
+  an empty `auto` input can resolve to left to right. Piper drops their effect, merges fbe93cba into the inline branch,
+  and keeps their Arabic test without the empty-box `dir` check (Dot's focus-text-boxes test covers the empty case).
+  It ships inside the a86 batch, since the field only matters once a86 lands.
+- **Merge desk, 07:52: b38 live.** a89 and a81 answered, Will told in chat, Piper told.
+- **Piper, 08:06: a86 at 04ad2ce5.** Dot's fbe93cba merged and Piper's duplicate effect dropped (00e538f6, 07:51), Dot's
+  Arabic test aimed at the drawer's field with `.last()` (Dot told 07:52), and tokens.css regenerated. Screens: none
+  since 5084c0dc. It still waits on Will's yes and the p7 signature.
+- **Piper, 08:31: D-576 (29b202d4), the web e2e suite never reaches the live project.** Two layers: e2e/global-setup.ts
+  refuses a build in out/ that names `shobqzuhicoiymtumiaz` or doesn't name `stub.supabase.co` (new script
+  `build:e2e`), and every Playwright project launches Chromium with a dead proxy for all hosts but loopback. Piper's
+  proof: a live build is refused before any test; with the check off, 861 attempted requests to the live host, 0
+  answered; never-live.spec.ts in all three projects; full suite 1859 passed, 19 skipped. Merged as b39 (39481be0),
+  Screens: none.
+- **Ava, 10:16: both held a84 branches carry main f8cf7a2e and pass with D-576's guard.** D-567 is now 6a2c19f5 (one
+  en.json conflict, keys added at the end on both sides, both kept): db all pass, ui 124, e2e 405 on three projects.
+  D-568 is now 3c9c929e (clean): db all pass, ui 124, e2e 474. No missing mocks. Config is red only on the
+  untranslated newNumber.* (60) and case-manager (23) keys, which come with Lena's branches in the a84 release.
+- **Will, 20:03 (chat): "Store this info in our documentation and memory".** The info is his Claude doc "PAM — Google
+  Places API (New) setup & cost guardrails" (13 October). It is now `docs/google-places.md`, without the key's value
+  or the Google Cloud project's id. The merge desk checked it against the code:
+  - places-search makes Autocomplete calls, and Place Details calls with `location,formattedAddress` (Essentials).
+    No contact fields. Over a cap it answers `unavailable` and Pam's own areas still work.
+  - The Place Details cap of 30 a day is the one that binds. It can go to 300 (Will).
+  - a86 looks up the first suggestion after every typing pause, so it should come down to about one Place Details call
+    per search before it ships (Piper).
+  - pam/CLAUDE.md now points every session at the doc. The before-launch street-search item is closed.
+  - Will's question on his doc (does Pam's own database hold contact details?): yes. It is answered in the repo doc;
+    the doc's thread was not replied to.
+- **Piper, 20:21: a86 at 5d6353b3, about one Place Details call per search.** The first suggestion is resolved only
+  after the words stand still for 1 s (`SETTLE_MS`, separate from the 400 ms suggest pause). A place already resolved
+  on this screen is reused (in memory only, so Lena's no-storage pin holds). Nothing is resolved for words that aren't
+  an address. A new spec counts the calls: three typed bursts give 1 choose and 2 to 4 suggests, with the same result.
+  Checks: one-search, area-picker, focus-text-boxes and street-search on all three projects 132/132; ui 124; config
+  1312; tsc clean. Screens: none. Cost: the list re-sorts for a typed address about 1 s later than before; the
+  finished screen is unchanged.
+- **Iris, 15 October 13:18: Member flow, second pass** (`docs/research/2026-10-15-member-flow.md`; the 10 October
+  report reaches main with it). Run on Storybook from main dc3789e9, every other host refused. Nothing stops anyone.
+  Routed by the merge desk at 13:23:
+  - **Piper (Places & programs):**
+    - Rules first: W4 (no Help on New trip step 1 or the policy screens, A26), P3 (long place names cut on Trips,
+      not wrapped), P7 (Copy address 32px wide and "View all places to visit" 24px tall, under 48px).
+    - Then the bugs: W1 (the sign sheet's Sign is lit over an empty box) and W2 (Ways to earn leaves out I'm here
+      +100 and I went +60; `AWARDED_TODAY`).
+    - Then P6 (Cancel this visit offered after the visit is marked) and P8 (no `member_signatures` or
+      `policy_signatures` fixture, so the prototype asks for a new drawing on every policy).
+    - Any new or changed words go through Sage and Lena. P1 ("Pick a day and a time.") and P2 (the trip card's
+      spoken name ends in "with") are wording first.
+  - **Dot:** W3 (at 320×568 the services sit under the sticky Plan a trip) and W5 (on the visit day, Get directions
+    is below I'm here). Both change a layout, so pictures go to Will first.
+  - **Sage and Lena:** P1 and P2's words. P5: are badge names English on purpose? P4, the Spanish usted/tú mix, is
+    Lena's Friday batch.
+  - **Will's phone:** W6 (I went locked while the location prompt is open) joins the 10-minute phone check with the
+    DocuSign keyboard test.
+  - **Iris next:** a first pass over the Case manager flow.
+- **Merge desk, 15 October 13:31: the Spanish register rule (Lena, P4).** Lena's scan found about 200 member-side
+  lines in usted, not Iris's nine. The approved rule, the same principle as b34 (one register per screen):
+  - screens only members see: tú;
+  - screens both roles use (sign-in, the Join code, Messages, reminders, alerts, notifications, flag, Profile,
+    Help): tú for every key, the staff variants included;
+  - screens only staff see: usted, including b34's six join.staff.* strings;
+  - Privacy, Terms and legal.*: usted.
+  transparency.* moves to tú, so it now differs from the Privacy page. That's for Will later, since Privacy is his
+  signed text. trips.booked.sms is not touched. Only es.json and the ledger change. The English is unchanged, so it
+  needs no Sage signature and no Will.
+- **Sage, 15 October 13:32 (ledger 5259382d): Iris's P1, P2 and P5 signed.**
+  - P1: "Pick a day and a time." / "Pick a day." / "Pick a time."
+  - P2: a new form, "{place}, {when}", for a trip with no companion.
+  - P5: the badge names are translated, except Sankofa and Griot, which are borrowed words and stay as they are.
+  - Sage flagged "Craftsman" as gendered, the thing D-109 fixed once already. It went to Will as card a90 (13:33):
+    Maker is the merge desk's advice, Crafter is Sage's other choice, or he keeps it. Lena holds badge.craftsman until
+    he picks.
+- **Dot, 15 October 13:34: Iris's W3 and W5 as pictures** (claude/pam-design-member-w3-w5 @ cc35508c, pictures and a
+  6-line proposal.patch, nothing built). They went to Will as card a91 (13:34; assets b18e4ccf… and 791cde74…).
+  - W3: the "will see your visit" note moves below the service cards on a place with services.
+  - W5: until the visit is marked, a secondary "How to get there" button sits under the visit card, and the Get
+    directions row is hidden.
+  Advice: yes to both; they are independent. Piper builds what Will picks.
+- **Iris, 15 October 13:47: Case manager flow, first pass** (`docs/research/2026-10-15-case-manager-flow.md`).
+  Storybook from main 7b58b1f9 plus one build:e2e check; no account made, nothing sent. Nothing stops anyone.
+  Routed by the merge desk at 13:51:
+  - **Ava (Accounts & invites):**
+    - W1: joining step 2 ("What you will see") has no way back and no Help (never dead-end, A26).
+    - W3: a member's page is titled "Profile", not their name.
+    - P3: "Connect Marcus" distances say nothing about where they're measured from.
+    - P4: after a recommendation, the only way on is "Return home".
+    - P5: "What you can see" is 12px on Home.
+    - P7: About you asks a case manager for "City you live in".
+    - P8: the search box's spoken name is said twice.
+    - P9: invite errors show one at a time.
+    - Ava also wires W2's words.
+  - **Sage:** the words for W2 (the empty Home points at Profile, but Invite someone is on the same screen), W3's
+    title and P7.
+  - **Lena:** P6 (Spanish staff screens mix tú and usted; under the 13:31 rule staff-only screens are usted) and the
+    P5 list mismatch (Home's "What you can see" list differs from the joining step's): check both against
+    transparency.ts, without widening it.
+  - **Dot:**
+    - Storybook's build ignores NEXT_PUBLIC_SUPABASE_URL, so 8 bundles name the live project. Nothing reached it,
+      but D-576 doesn't cover Storybook, so the stub and a guard are needed there too.
+    - Two prototype gaps on the surface Will reviews: P1 (Message does nothing in the case manager prototype) and
+      P2 (no appointments fixture, so a member shows no visits).
+    - W4 (Home doesn't say who has a visit, went or missed one, though the sign-in slide says "Know who showed up"):
+      a design proposal with pictures for Will.
+  - **Iris next:** a first pass over the Program lead flow.
+- **Batch b40 (15 October): Lena's a9d875ff, Spanish member lines to tú (D-577, Iris P4).** 195 es lines move to
+  tú under the 13:31 rule. es.json and the ledger only; the other five languages and English are byte-identical.
+  Privacy changes by one quoted screen name ("Tus puntos"), which a test pins to the screen. Also Lena's 13 October
+  records (22a5f434). Screens: none. For Will later: transparency.* is tú, while the Privacy page beside it stays
+  usted.
+- **Sage, 13:58 (ledger 8710a563) and 14:02 (ledger 4269f020): the case manager words.**
+  - W2: "To invite someone, tap Invite someone below."
+  - W3: the title is the member's name alone.
+  - P7: "City you work in".
+  - The staff "what you can see" lists now match the member's list and ADMIN_CAN_SEE item by item. Nothing shown
+    changes.
+- **Lena, 13:57: the case manager answers.**
+  - "About you" is a shared screen, so it stays tú.
+  - 30 staff-only lines move to usted (9f717ec1, next batch).
+  - The joining step's list told a case manager less than they see; Home's left out connections and the two
+    exceptions. Sage signed both fixes.
+  - The prototype's example member page offered "Programs saved by {name}", which is more than the contract allows.
+    That went to Ava to remove.
+- **Piper, 14:06: the member flow pass is ready at 975cb919 (D-578).** The merge desk asked for one guard before it
+  ships (13:55): the browser-kept drawing is offered only where examples show, and sign-out clears it. A demo
+  account's drawing could otherwise have been offered to the next person on a shared tab. Lena's fc9b6ca4 adds the
+  translations on top and redoes four languages' "must choose" lines as instructions. Queued as b42.
+- **Dot, 14:01: D-579 (1001fdc7), Storybook builds against the stub project, with a guard.** Storybook's build
+  ignored NEXT_PUBLIC_SUPABASE_URL, so 8 bundles named the live project. Now 0. Queued as b41 with Lena's badge names
+  (748dabac; Craftsman held for Will, a90).
+- **Iris, 14:11: Program lead flow, first pass** (`docs/research/2026-10-15-program-lead-flow.md`). **S1 stops
+  someone:** BookForMemberView fills "People who have written to your program" only from example data, so a real lead
+  always sees nobody. Live has one provider account (counts only, 14:18). Routed at 14:18:
+  - Piper: S1 first, then W1 (no Help on the lead's Home), W3 (Day/Week/Month 30px, the week opening on past days),
+    W4 (two unlabelled faces for a new lead) and P1, P2, P4–P7, P9.
+  - Ava: W2 and P8, for both staff roles.
+  - Lena: P10 (the "A program can see" card leaves out saves, D-199).
+  - P3, how long a program's review takes, is a timing promise for Will.
+  - Iris next: Super admin.
+- **Batch b41 (15 October).**
+  - Dot's D-579 (1001fdc7, then 4e4d0276): Storybook builds against the stub project, and a guard fails the build
+    if any bundle names the live one. The guard was 8 bundles before, 0 now.
+  - Lena's badge names (748dabac, Iris P5): 16 names in the six other languages. Sankofa and Griot are kept;
+    Craftsman is held for Will (a90). copy.test now refuses an English badge name outside those three.
+  - Screens: none.
+  - The merge desk's run caught one failure before the push. Lena's host guard (third-party-hosts.test.ts) found
+    `stub.supabase.co` in .storybook/main.ts, unlisted. Dot hadn't run the config tests, so Dot added it as
+    'example'.
+- **Lesson: a branch that names a new host anywhere runs the config tests.** The host guard scans more than app
+  source, so a tooling-only change (Storybook config) can trip it. CI's unit step would have gone red after a push.
+  The merge desk's targeted checks run config on every batch, and a builder's READY now does too when it adds a URL.
+- **One send-invite-emails 500 at 06:25:01** (`claim_staff_invite_emails: 401`). The 21 runs either side of it all
+  returned 200. Not acted on. Watch only.
+- **b40 green, b41 on main (15 October).** b40's CI went 4/4 green at 14:50, so b41 (cb7932bc) went to main at
+  14:51.
+- **Batch b42 (15 October), built while b40's CI ran.**
+  - Lena's 80721a97: Spanish staff-only screens say usted (Iris case manager P6), 33 lines.
+  - Lena's fc9b6ca4, carrying Piper's D-578 member pass (975cb919): Help on every step of New trip and signing, a
+    trip card's name wraps instead of ending in "…", 48px targets, the signature sheet starts empty, "I'm here" and
+    "I went" first in Ways to earn, Cancel this visit hidden once marked, and the tab's drawing only where examples
+    show (sign-out clears it). Plus Sage's New trip prompts and `trips.card.label.alone` in seven languages. The
+    ledger conflict on trips.new.missing.* took the trips branch's hashes: same Spanish, newer English source.
+  - Piper's S1 (87776c94): a real program lead's Book a visit lists the members who wrote to the program, from the
+    lead's own conversations (first name and last message only; staff left out).
+  - Iris's super admin first pass (280c8ba7), docs only.
+  - a2eff85e, the merge desk's: the stray `node_modules` link out, and the ignore rule widened (below).
+  - Two of Will's earlier calls change here: a trip card's name was one line (3 October), and New trip's "When?" had
+    no Help (D-235's note). Card a95 (14:59) shows both before and after, before b42 ships; b43's three (D-355 tabs,
+    D-368 info tip, D-486 the (+) row) are added to it before b43 ships.
+  - The lighter "1:51 PM" in Piper's after-p3 shot is MapDrawer's foot fade (D-403, edgeFade.inScroll): the taller
+    card's last line sits in it while the drawer is half open. By design; not a bug.
+- **Signed mark decided (14:58, P5 of Iris's program lead pass):** Dot's A, a green document with a tick
+  (262444c2); nothing marks people still to sign (D-261 stands). The pen means "still to sign" elsewhere (D-270) and
+  a ticked circle means a check-in (D-316, D-369). Piper builds SignedDocIcon on the lead pass branch; it goes on
+  a95 with b43.
+- **More READYs for b43 (14:57 to 15:09).** Sage signed "people" → "members" on four lead lines (7fa02388) and the
+  Reported places lines without the saver clause (7cfbcb03; the clause waits for texts_live in before-launch.md).
+  Dot's 320 before/after of the 48px Day/Week/Month tabs (e80bd14a). Lena's lead P2/P4 words (65a83a33, off Piper's
+  028588e7). Her check found that the "participants" → "members" titles kept with copy:ack --keep still said
+  "participants" in five languages, so she fixed them. She also made rowBody.one "{count} policy", because pt-BR
+  picks "one" for 0 and ru for 21. Ava's case manager pass is final (f80de52d); with Lena's 5e1f5603 on top it drops
+  the stray link. The example "Programs saved by {name}" page is gone: it showed which places a member saved, and
+  members are told a case manager sees only when.
+- **Super admin words (14:58):** Piper's Reported places stand-ins went to Sage with a truth check. "Anyone who saved
+  it is told" is false today: the notice is a text (queue_saved_place_closed), the app never shows it, and
+  texts_live is off.
+  - Not in b42: Lena's records ed5eb187. Its "case manager lists" changelog fragment describes a change that ships
+    with Ava's case manager pass, so it rides with that.
+- **Afternoon READYs queued for b43 (14:40 to 14:46).** Dot's D-581 (6c8654ae): the prototype's router was a bare
+  spy in every story, so "Message Marcus" didn't open the conversation; also Marcus's three visits. Piper's program
+  lead pass (b76d4b35, D-582). Ava's case manager pass (D-580, f80de52d) waits on Lena's three keys, Sage's
+  "Distances are from City Hall." and dropping the stray link (merge 450f8eb3). Sage signed lead P2, P4 and P6
+  (a575a9ae). Wren checked Lena's held P10 site cell at 320 and 1280: fine. Lena's P10 fit audit: 0 findings.
+- **Card a93 (14:52): a case manager's Home shows visits instead of points** (Dot's W4 proposal, 91fcdaac, pictures
+  only). One line under each name: next visit, else "Went", else a dark "Missed" chip. It replaces "400 points".
+  Nothing new is shown (transparency.canSee.appointments). Will's two questions: re-sort whoever missed to the top,
+  and points off Home or kept as a second line. The merge desk advised one line, points off, no re-sort for now.
+- **Card a94 (14:57): should a program book a visit for a member?** Piper's plan (0b09e618,
+  `docs/research/2026-10-15-program-books-a-visit.md`): A, book for real (a security definer function, provider_id
+  set, a bell notice, one new Privacy sentence for Will); B, suggest by message with "Add to my trips"; C, take
+  "Create new booking" out of the + menu. Piper picks A. The merge desk advised B: an unmarked visit becomes missed
+  a day later (D-526 C) and a case manager sees missed visits, so under A a member could carry a "missed" for a visit
+  they never agreed to. If Will picks A, a program-booked visit never shows as missed unless the member said yes.
+
+- **b41 green, b42 on main and red (15:20 to 15:33).** b41's CI went 4/4 green at 15:20, and b42 (772f14b5) went
+  to main at 15:21. Its "Types, unit tests, build" step failed at 15:22 on apps/site's about.test (below). Fix
+  991d8e18 at 15:33: two rows on the Points and badges post in Sage's signed words (ledger 30eecd88), and the test
+  expects six. The live app was never affected; the website post had been short since D-535.
+- **Batch b43 (15 October), assembled 15:18 to 15:29.** Dot's D-581 (6c8654ae) with the W4, signed-mark and tabs
+  pictures (91fcdaac, 262444c2, e80bd14a). Piper's program lead pass (4a52fdb0, D-582, with Lena's 65a83a33) and
+  Reported places (87e2c488, D-585). Ava's case manager pass (99f84302, D-580) with Lena's 4b5a9a93. Lena's records
+  (1b00fe1f), lead "members" words (2a70bf88) and Reported places words (353f156d). Conflicts: es.json/ledger on
+  program.service.policies.hint/.none (b42's usted for hint, "miembros" for none); every locale file and copy.test.ts
+  where two branches appended at the same place (both kept; Piper's temporary allow-list dropped once Lena
+  translated). Card a95 now shows all five of Will's earlier calls that b42 and b43 change, with pictures.
+- **Decisions, 15:29 to 15:34.**
+  - Lena: "City Hall" stays in each language's own word.
+  - Ava: super admin P5 rows stay unlinked. A super admin page for a real person would widen what staff see, so it
+    needs Will's sign-off first. Sage signed the super admin pass (08637d18) with two edits.
+  - Nico's D-583 (b83080e0): take the Answer by text screen ("They wrote", the number as a person reads it, words
+    only after the # so no server sees them). Hold the phone→name lookup (profile_first_name_for_phone) until
+    texting people back (a61) goes on: it is a new capability that Privacy doesn't describe, for a screen that is
+    off.
+- **b42 green (16:05), b43 on main (16:06) and green (16:38).** Team told at 16:39. Iris is re-testing the member,
+  case manager and program lead passes, and the Reported places part of the super admin pass, from Storybook and the
+  prototype built from main.
+- **Batch b44 (15 October), assembled 16:17 to 16:31.**
+  - Ava's super admin pass (06580818, D-584): ConfirmDialog before Approve and Deny, a short "what happened" after,
+    Home's Programs to check count, P1 to P7. Sage signed it (08637d18) with two edits. Ava checked both promises
+    against the code: staff-request texts are account texts, so they're sent while texts_live is off, and approving a
+    program clears needs_review. It includes Lena's six languages (67558940) and nine decision-state stories.
+  - Nico's Answer by text context (29dea226, D-583): the number as a person reads it, and "They wrote:" with the words
+    after the # only. The phone→name lookup is held for a61.
+  - Lena: "They wrote:" in the singular in es, pt-BR and zh-HK (59825d7b), and her evening records (04635dd8).
+  - Conflict: RequestsScreen.tsx, where b43's Reported places row met Ava's Programs to check count. Both rows kept.
+    Their counts now use two styles (value and badge), and Dot is asked to pick one.
+  - Lena's fit audits at each SHA: 0 new findings. Only two spoken keys are drawn by no story.
+- **b44 green (17:14).** Team told at 17:15. Iris asked to re-test the super admin pass.
+- **Batch b45 (15 October), assembled 17:19 to 17:47.**
+  - Iris's re-test of b42 and b43 (43c92c1b): PASS on all four flows, with two polish notes, both in this batch.
+  - Piper (7493c78e): a real program lead whose program isn't loaded, or doesn't exist, no longer gets rows linking to
+    the example place. They wait, or see the empty state with no link. The example program is for examples only.
+  - Ava (edab444d): a member's page says the name once. The title is the name; the profile card shows it as text, not
+    a second heading (`ProfileSummary` `isNameInTitle`). Same look. The merge desk moved one story note back above
+    its story (23d38bb3).
+  - Iris's re-test of b44, the super admin pass (2930f230): PASS on W1, W3 and P1 to P7. The words after the # in an
+    Answer by text link reached none of the page's 55 requests. One new polish note: "Days waiting" still showed
+    after a program was approved.
+  - Ava (e267fbe1, merged after the full run): "Days waiting" shows only while a program waits for a decision, and is
+    gone after approve, changes asked or discard. Conflict: STATUS.md, her two sections at the same place; both kept.
+  - Every finding the desk sent back from Iris's four first passes has now been re-tested. Still open: Dot (member W3
+    and W5), Will's phone (W6), Will (program lead P3 and P10, card a92) and a84 (super admin W2).
+  - Dot's single count style for the super admin Home goes in a later batch.
+- **b45 green (18:22).** Ava, Piper and Iris told at 18:22.
+- **Batch b46 (16 October, 06:04 to 06:10).** Dot's nightly flow map (4efbcbe4): the Case manager page loses
+  "Programs they saved" (`/person/saved/`, removed in D-580), and the Overview's counts and latest changes are
+  redrawn. `last-map.txt` is ffd77327. Answer by text (`/reply/`) has no node, because a text message opens it, not a
+  tap. Dot was holding the count-style call until b44 was live; told at 06:06 that b44 and b45 are, with Ava's and
+  Piper's rows to change once she picks.
+- **b46 green (06:37).**
+- **D-586 decided (06:20).** Dot's pick, accepted as written: a count at the end of a row is a plain number (`value`),
+  and the red `badge` is only for something new since you looked (unread messages). The super admin's two counts are a
+  standing queue, so two red badges would sit on the Home all day. Pictures at 390 and 320, light and dark
+  (`docs/design/review/2026-10-16-count-style/`). Not Will's call: no words or promises change.
+- **Batch b47 (16 October, 06:31 to 06:34).** Dot's D-586 (573d106e) and Piper's Reported places row (a3151ab6):
+  `badge` + `badgeLabel` became `value`. The badge's spoken label had said "2 reports" for a count of places, so the
+  plain number is also more accurate. Ava's Programs to check row already used `value`. Piper's new assertion was run
+  against the old row code first and failed there (it found the badge), so it really guards the change.
+- **b47 green (07:36).** Dot and Piper told.
+- **Friday weekly notes (16 October, 14:04 to 14:20).** `docs/weekly/2026-10-16.md` brought up to date against
+  912f3871 and sent to Lena and Wren; `docs/weekly/2026-10-23.md` started; the next Friday reminder set.
 ## What was wrong, and what missed it
 
+- **The weekly notes were not kept between 10 and 16 October.** `docs/team.md` says the merge desk adds to
+  `docs/weekly/<Friday>.md` as it merges; from b7 to b47 it added nothing, and Friday's file had to be rebuilt
+  from STATUS, the session logs and the site's code. Most of the week's language and website work had gone in with
+  the batches anyway, so little was lost. From b48, each batch's records step adds that batch's Lena and Wren items
+  to the next Friday's file, or says there are none.
+
+- **Sign in's spacing was squeezed on every phone for a night.** A `default: null` meant for short screens removed the
+  component's own spacing everywhere; the tests only measured 320×568, where tight is right. Will saw it in a picture.
+  Rule (D-572): never `default: null` over a component's own prop; give the token instead.
+- **Every picture added to a card reloaded Will's page.** Publishing files with the page makes a new version, and every
+  open view reloads to it, so his scroll, his open picture and his half-written reply went each time. Nothing showed it
+  from this side. Pictures now go to the asset store; publish the page only when the page itself changes.
+- **"Booking Confirmed" read as the green booked card.** Will named a style by the words he remembered on it. The merge
+  desk picked the component with those words (VisitCard) without checking which of the place page's two notices he
+  meant, and Dot redrew ten screens on it. Next time a style is named by a remembered label, put a picture of each
+  candidate in the reply and ask, or have the redraw show both.
 - **A live finding went out to three people before it was checked.** Ava reported join.staff.* promising an unsent
   text; I sent Sage, Lena and Ava to fix it without reading claim_outbound_messages or outbound_messages. Sage
   checked the code and was right: those texts are exempt. Check a reported live fault against the live system (one
@@ -883,6 +1377,43 @@
 - **Twelve new sentences reached the batch unsigned.** Under A29 the desk does not merge an unsigned sentence, and
   only a key-by-key check against Sage's ledger found them. Sage signed all twelve and reworded seven. The check
   stays part of the desk's gate.
+- **Merge commits carried no `Screens:` lines (Dot's nightly map, 06:07).** team.md says the merge desk copies each
+  READY's `Screens:` line into its merge commit for the nightly map. Tonight's merges didn't, so Dot rebuilt the map
+  from diffs and subjects. From 06:10 every merge commit carries the READY's `Screens:` line, or `Screens: none` when
+  the READY says so.
+- **The web e2e suite reached the live project (Piper's finding, 07:54; the merge desk's log check, 07:56).** From
+  06:38 to 07:51, Playwright runs in our containers sent about 3,500 requests to the live Supabase project. All were
+  refused (401 or 403, the stub token 't' is not a valid JWT), apart from OPTIONS preflights. There were no
+  auth/v1/otp or help-request calls and no 2xx on anything that writes, so no text, no email and no data was touched.
+  What missed it: CI builds with the stub URL, and until Will allowed the Supabase host for street search (about
+  06:39) the containers couldn't reach live, so a container build without the stub env never mattered. Fix: the team
+  was told at 07:56 to build with the stub env, and D-576 (b39) makes it structural. The run refuses a build that names
+  the live project, and the test browser cannot reach any host but loopback. Lena re-ran her 59 audited stories with
+  every outside request refused: 0 tried to leave. Wren: no site script calls the live help-request function.
+- **Targeted checks skipped @pam/ui's own tests (the a86 trial, 07:57).** D-574 (1918d84c) added
+  `--pam-search-height` to tokens.css by hand, in a different place from the generator. So tokens.test.tsx and the
+  @pam/ui build both failed. Neither Piper's targeted run nor the merge desk's targeted template ran
+  `pnpm --filter @pam/ui test` (CI's unit step does, so it would have gone red after a push). Piper regenerated the
+  file (04ad2ce5, one line moved). From now on, any branch or batch that touches packages/ui runs the ui tests.
+- **A `node_modules` link was committed in three of Lena's branches (b42's config run, 14:42).**
+  fc9b6ca4, 445936b2 and b7366b52 each carried `pam/packages/config/node_modules`, a link to one worktree's own
+  folder. On any other checkout it points nowhere, and the config tests die with ENOTDIR before reporting (1311
+  passed, then exit 1). What missed it: pam/.gitignore said `node_modules/`, which matches folders only, and
+  `git add -A` took the link. Lena didn't read `git diff --stat` for non-source files before READY. Fix: a2eff85e
+  drops it and makes the rule `node_modules`. Lena re-cut her branches with one deletion each (3a258bc9, 450f8eb3,
+  d0872818). Ava's case manager branch still carries it until it merges 450f8eb3. Lesson: read the exit code, not
+  only the pass count, and read every READY's file list.
+
+- **b42's local run skipped the website's tests, and CI caught it (15:22).** b42 touched no apps/site file, so the
+  desk's run left out `pnpm --filter @pam/site test`. But apps/site/test/about.test.ts reads
+  packages/config/src/points.ts (AWARDED_TODAY), which D-578 changed. Lesson: any batch that touches packages/config
+  runs the site tests and the site tsc too. The b43 run adds them.
+
+- **A words-only change broke an e2e spec (b43's full run, 15:50).** Sage's signed Reported places words made two keys
+  the same sentence, one in a closed dialog, so a getByText found two and failed strict mode. Piper swapped in the
+  words without re-running the spec that reads them. Fixed in 1d5df9ee (visible text only). Lesson: after a words-only
+  change, re-run the specs that read those words. And Lena's: an audit's "0" says nothing about a state no story draws,
+  so a READY names the keys no story reaches.
 
 ## Decisions
 
@@ -1014,9 +1545,55 @@
 | Batch b34, targeted run: config / copy / web build / tsc / web unit / budget / e2e (join, account, consent, signin-short, signin-next, staff-request, invite) / storybook | 1311 passed, 1 skipped / in step / 0 / 0 / 173 passed / 12.0 kB spare / 311 passed, 1 skipped, exit 0 / 0 |
 | b34 main CI (afee3198) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (22:43); Vercel web and pam-site READY (22:16) |
 | Still stuck gap, live code (b33's `out/` = main's site, served as https://joinpam.org in Chromium, probe answering 400 so the call-out shows) | card to footer 60px at 390 and 120px at 1280 on /support/joining-pam/, /support/cant-sign-in/ and /support/; "Write to us" fills its column (292 of 292px at 390, 720 of 720px at 1280) |
+| Batch b35, targeted run: config / copy / web build / tsc / web unit / budget / e2e (street) / storybook | 1311 passed, 1 skipped / in step / 0 / 0 / 177 passed / 12.0 kB spare / 84 passed, exit 0 / 0 |
+| b35 main CI (36cd4651) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (05:08); Vercel web and pam-site success |
+| Batch b36, full run (8269b4c6): db / config / ui / web unit / site / site a11y / usability / scrollspy / e2e full / storybook | 1579 ok / 1311 / 124 / 177 / 100 / 120 scans 0 / all clear / 306 links 0 / 1835 passed, 19 skipped, e2e exit 0 / builds; tsc 0 (web and site); 12.0 kB spare |
+| b36 main CI (8269b4c6) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (05:54); Vercel web and pam-site success |
+| Batch b37, targeted run (7823702f): config / copy / web build / tsc / web unit / budget / e2e (signin-short, consent, signin-next, signin-wrong-code, join, focus-text-boxes, theme) / storybook | 1311 passed, 1 skipped / in step / 0 / 0 / 177 passed / 12.0 kB spare / 267 passed, exit 0 / 0 |
+| b37 main CI (9d91f3bd) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (06:26); Vercel web and pam-site success |
+| Batch b38, targeted run (623a8668): config / copy / web build / tsc / web unit / budget / e2e (area-picker, street-search, focus-text-boxes, explore-bell, places, place) / storybook | 1311 passed, 1 skipped / in step / 0 / 0 / 177 passed / 12.0 kB spare / 231 passed, exit 0 / 0 |
+| b38 main CI (a5fdfbdc) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (07:51); Vercel web and pam-site success |
+| a86 trial full run (main a5fdfbdc + 00e538f6, local only): db / config / ui / web unit / site / site a11y / usability / scrollspy / e2e full / storybook | 1579 ok / 1312 / 123 of 124 (tokens.css order, fixed in 04ad2ce5; ui build failed for the same reason) / 182 / 100 / 120 scans 0 / all clear / 306 links 0 / 1895 passed, 19 skipped, exit 0 / builds; tsc 0 (web and site); 11.7 kB spare |
+| Live project logs, 06:00 to 07:57 (edge_logs, function_edge_logs; counts only) | from Anthropic's network: about 3,500 requests since 06:38:25, all 401/403 except OPTIONS; no auth/v1/otp, no help-request, no 2xx writes. Will's street search 06:41 to 06:43: 11 POST 200 |
+| Batch b39 (39481be0, D-576): config / copy / ui / web build:e2e / tsc / web unit / budget / e2e full / storybook / refusal proof | 1311 passed, 1 skipped / in step / 124 / 0 / 0 / 177 / 12.0 kB spare / 1859 passed, 19 skipped, exit 0 / 0 / a plain (live) build is refused before any test: "The e2e suite will not run: _next/static/chunks/1529….js names the live project", exit 1 |
+| b39 main CI (f8cf7a2e) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (09:45); Vercel web and pam-site success |
+| Live project logs, 07:50 to 09:48 (edge_logs, counts only) | from Anthropic's network: the last requests at 07:51, none since, after the 07:56 stub-build rule and before D-576 |
+| Batch b40 (ccb2f8d8, Lena P4): config / copy / ui / web build:e2e / tsc / web unit / budget / e2e full / storybook | 1311 passed, 1 skipped / in step / 124 / 0 / 0 / 177 / 12.0 kB spare / 1859 passed, 19 skipped, exit 0 / 0 |
+| Batch b41 (ba89508e: Dot D-579 + 4e4d0276, Lena 748dabac): config / copy / ui / build:e2e / tsc / web unit / budget / e2e (points, languages, profile-skeleton, no-examples-profile, role-badge-fit, never-live) / storybook + guard | 1311 passed, 1 skipped (after 4e4d0276; 1 failed before) / in step / 124 / 0 / 0 / 180 / 12.0 kB spare / 354 passed, exit 0 / built; "no bundle names the live one"; grep 0 files |
+| b40 main CI (7f850755) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (14:50); Vercel web and pam-site success |
+| Batch b42, full run (06bcdef3: Lena 80721a97 and fc9b6ca4 with Piper 975cb919, Piper S1 87776c94, a2eff85e, Iris 280c8ba7): config / copy / ui / ui build / build:e2e / tsc / web unit / budget / e2e full / storybook + guard | 1311 passed, 1 skipped (exit 1 before a2eff85e: ENOTDIR on the committed link) / in step / 124 / 0 / 0 / 0 / 180 / 12.0 kB spare / 1901 passed, 19 skipped, exit 0 / built; "no bundle names the live one"; grep 0 files |
+| b41 main CI (cb7932bc) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (15:20); Vercel web and pam-site success |
+| b42 main CI (772f14b5) | Types/unit/build FAILED at 15:22: apps/site about.test, AWARDED_TODAY has 6 and the Points post named 4. Migrations and RLS and Publish Storybook green; Accessibility skipped |
+| b42 fix (991d8e18): site test / site tsc / site build / site a11y / config | 100 passed / 0 / 0 / 120 scans, 0 problems / 1311 passed, 1 skipped |
+| Batch b43, full run (e6488b23): config / copy / ui / ui build / build:e2e / tsc / web unit / budget / e2e full / storybook + guard | 1311 passed, 1 skipped / in step / 124 / 0 / 0 / 0 / 180 / 11.7 kB spare / 1964 passed, 19 skipped, 3 failed (reported-places-pass:47 on three projects: strict mode, the signed remove.hint and the closed dialog's body are one sentence) / built; "no bundle names the live one"; grep 0 files |
+| Batch b43, after Piper's 3606792a, main's 991d8e18 and 1d5df9ee: config / copy / ui / site test / site tsc / build:e2e / tsc / web unit / budget / e2e (reported-places-pass, admin, flag, messages, places, places-retired, a11y, never-live, points, lead-flow-pass) / storybook + guard | 1311 passed, 1 skipped / in step / 124 / 100 / 0 / 0 / 0 / 180 / 11.7 kB spare / 507 passed, exit 0 / built; "no bundle names the live one"; grep 0 files |
+| b43 main CI (9b9d31b2) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (16:38); Vercel web and pam-site success. b42's fix 991d8e18: all four green (16:05) |
+| Batch b44, full run (92320c5c, then stories and records merged before the Storybook step): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard | 1311 passed, 1 skipped / in step / 124 / 0 / 100 / 0 / 0 / 0 / 186 / 11.5 kB spare / 1997 passed, 19 skipped, exit 0 / built; "no bundle names the live one"; grep 0 files |
+| b44 main CI (12d788ae) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (17:14); Vercel web and pam-site success |
+| Batch b45, full run (23d38bb3; Iris's 2930f230 merged during e2e, before the Storybook step): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard | 1311 passed, 1 skipped / in step / 124 / 0 / 100 / 0 / 0 / 0 / 186 / 11.5 kB spare / 2003 passed, 19 skipped, exit 0 / built; "no bundle names the live one"; grep 0 files |
+| Batch b45, after Ava's e267fbe1 (6f91431a): build:e2e / tsc / web unit / e2e (programs-review, super-admin-pass, a11y, case-manager-pass) / storybook + guard | 0 / 0 / 186 / 96 passed, exit 0 / built; "no bundle names the live one"; grep 0 files |
+| b45 main CI (ffd77327) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (18:22); Vercel web and pam-site success |
+| Batch b46 (6582f908, Dot's flow map): install / config / flows.mjs loads | 0 / 1311 passed, 1 skipped / 5 flows, UPDATED 2026-10-16 |
+| b46 main CI (cba16885) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (06:37); Vercel web and pam-site success |
+| b47, Piper's spec against the old row code (RequestsScreen.tsx from cba16885): reported-places-pass "Home has a Reported places row", iphone-se | failed as it should: the badge locator found 1, expected 0 |
+| Batch b47, full run (76fb8057): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard | 1311 passed, 1 skipped / in step / 124 / 0 / 100 / 0 / 0 / 0 / 186 / 11.5 kB spare / 2003 passed, 19 skipped, exit 0 / built; "no bundle names the live one"; grep 0 files |
+| Control Room v24 harness (390 and 1280) | reply about a card: section lands at 76px under the tabs, card folded, button "Replied" (aria "Replied. Reply again"); pressing it restores the card's prefix; a general message leaves scrollY unchanged; a data push mid-glide doesn't stop it; 0 page errors |
 
 ## Left undone
 
+- **As of b47 (16 October, 06:40):** Wren: re-shoot the Points and badges picture and its alt text. With Will: a84,
+  a86, a88, a90, a91, a92, a93, a94, a95, and the Cloud Console items below.
+- **As of b46 (16 October, 06:10):** Dot: one count style on the super admin Home (asked 06:06), then Ava's and
+  Piper's rows. Wren, Will and the Cloud Console items as b45 below.
+- **As of b45 (15 October, 17:47):** Dot: one count style on the super admin Home, then the builders' rows. Wren: re-shoot the Points and badges picture and its alt text. With
+  Will: a84, a86, a88, a90, a91, a92, a93, a94, a95, and the Cloud Console items below.
+- **As of b39 (14 October, 09:45):** as b38 below, less the dir="auto" and token-refresh items (done: one
+  `dir="auto"`, Dot's; the 401s were our own e2e runs, now stopped by D-576). a86 is at 04ad2ce5.
+- **As of b38 (14 October, 07:51):** with Will: a86 (one search on Explore: his yes, and his signature on the p7
+  Privacy line), a88 (the DocuSign consent link, and demo.docusign.net in Allowed domains), a84 (unchanged). Piper:
+  drop the second `dir="auto"`, merge Dot's fbe93cba into the inline branch, and send a new READY. Lena: the p7
+  translations and the Privacy date on Will's signature, in the same batch as a86. Piper: the 401s at 06:38 to 06:40
+  (token refresh). Then the DocuSign spike: deploy, Iris's phone run, and cleanup.
 - **As of b34 (14 October, 04:10):** with Will: a84 (the new number and the case manager request, with their
   Privacy lines; the release is ready the moment he signs), a81 (Google's logo files, then the key), and the forms
   and DocuSign questions (a) to (c). Research round on forms and DocuSign: Iris, Lena, Piper and Dot; then a card
@@ -1047,9 +1624,14 @@
 
 ## Needs a human
 
-- Will: forms and DocuSign. (a) Which programs use DocuSign, and on whose account; (b) where a signed form has to
-  end up; (c) a few blank forms in a Drive folder "Pam forms". And card a85's four questions (the order, a free
-  DocuSign developer account he makes, the drawn signature picture, a program's own words).
+- Will, Google Cloud Console (`docs/google-places.md`, "Open items"):
+  - Raise the Place Details (GetPlaceRequest) cap from 30 to 300 a day before a86 ships.
+  - Add a billing budget alert.
+  - Confirm the key's display name.
+  - Decide on the older "Maps Platform API Key" (the Trips map may use it).
+- Will: card a86, his yes to the inline search and his signature on the p7 Privacy line. Card a88: open the DocuSign
+  consent link (sent 06:40) and check demo.docusign.net in Allowed domains (still refused at 07:49). Card a85 is
+  fully decided (06:28 to 06:54).
 - Will: card a62, step 3 only: HELP_REQUESTS_LIVE = on in Supabase's secrets, then one test from "Still stuck?"
   (his paste and the salt are in and checked; 041940 is recorded).
 - Will: card a75 (website text colours, Dot's examples linked). Later cards: the Google street search (a key and a

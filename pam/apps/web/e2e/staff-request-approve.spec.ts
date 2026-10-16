@@ -55,6 +55,7 @@ test('approving someone who is already a member says they are now a program lead
   await page.goto(`/requests/review/?id=${WHO}`);
   await settled(page);
   await page.getByRole('button', { name: 'Approve' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Yes, approve' }).click();
   await expect(page.getByText('Pia is now a program lead too')).toBeVisible();
   await expect(page.getByText(/They keep that, and can switch/)).toBeVisible();
   await expect(page.getByRole('button', { name: 'Approve' })).toHaveCount(0);
@@ -70,6 +71,7 @@ test('a role pair Pam does not allow is explained in staff words, with no call t
   await settled(page);
   await expect(page.getByText('Wants to be a case manager')).toBeVisible();
   await page.getByRole('button', { name: 'Approve' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Yes, approve' }).click();
   await expect(page.getByText('Pia already has a different kind of account')).toBeVisible();
   await expect(page.getByText(/Deny this request, or text Pia first/)).toBeVisible();
   await expect(page.getByText(/This is not your fault/)).toHaveCount(0);
@@ -84,6 +86,7 @@ test('any other failure says nothing changed, and does not send a super admin to
   await page.goto(`/requests/review/?id=${WHO}`);
   await settled(page);
   await page.getByRole('button', { name: 'Approve' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Yes, approve' }).click();
   await expect(page.getByText('We could not save that')).toBeVisible();
   await expect(page.getByText(/Nothing was changed/)).toBeVisible();
   await expect(page.getByRole('link', { name: /Contact Pam/ })).toHaveCount(0);

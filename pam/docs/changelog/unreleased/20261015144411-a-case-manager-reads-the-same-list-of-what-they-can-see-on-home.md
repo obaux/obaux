@@ -1,0 +1,3 @@
+# A case manager reads the same list of what they can see on Home and when they join
+
+A case manager is told what they can see about the people they invite in two places: on Home, and on the second step of joining. The two lists now name the same things in the same words: what the person wants to work on, the programs they sign up for and how they are going, their visits and whether they went, their points, level and badges, the last day they used Pam, the people they connect with, and when they save a new place (not which one). Both also say what a case manager cannot see, and they match what members are told. Words only, in all seven languages.

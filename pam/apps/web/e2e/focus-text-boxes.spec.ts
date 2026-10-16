@@ -8,8 +8,9 @@ import { settled } from './settled';
  *
  * Focus is moved so a screen reader lands in the right place: a dialog's content, a sheet, the photo viewer, the
  * section a contents link on Privacy or Terms jumps to. Those are `tabindex="-1"` and not controls, so they show
- * no ring in any input mode. Buttons and links keep the brand ring when somebody Tabs to them, and a search box
- * focused on arrival still shows its field highlight. Supabase is stubbed at the network.
+ * no ring in any input mode. Buttons and links keep the brand ring when somebody Tabs to them. A text box shows no ring
+ * of ours at all, whatever put the focus there, and is still focused on arrival so the keyboard is up (Will, 14 October,
+ * a83, reversing his 11 October rule: D-569). Supabase is stubbed at the network.
  */
 const ME = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
 const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
@@ -189,7 +190,7 @@ test.describe('a confirm dialog', () => {
   }
 });
 
-test.describe('a search box focused on arrival still shows its field highlight', () => {
+test.describe('a search box focused on arrival is focused, so the keyboard is up, and shows no ring (D-569)', () => {
   test('the area drawer on Explore', async ({ page }) => {
     await signedIn(page);
     await page.route('**/rest/v1/rpc/services_near*', (route) => route.fulfill(json([])));
@@ -199,8 +200,14 @@ test.describe('a search box focused on arrival still shows its field highlight',
     const box = page.getByRole('searchbox').or(page.getByRole('textbox', { name: 'ZIP code' })).first();
     await expect(box).toBeVisible();
     await expect(box).toBeFocused();
-    // The field's frame is drawn once the drawer has finished opening: wait for it rather than read it at once.
-    await expect.poll(async () => (await focused(page)).ring).toBe(true);
+    // No ring on the field or the frame round it (Will, 14 October, a83), once the drawer has finished opening.
+    await page.waitForTimeout(600);
+    expect((await focused(page)).ring).toBe(false);
+    // A tap into a text box draws none either, and nor does Tab onto one.
+    await page.getByRole('button', { name: 'Cancel' }).focus();
+    await page.keyboard.press('Tab');
+    await expect(box).toBeFocused();
+    expect((await focused(page)).ring).toBe(false);
   });
 });
 

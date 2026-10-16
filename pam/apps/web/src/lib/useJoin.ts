@@ -201,6 +201,32 @@ export async function servedCities(): Promise<string[]> {
 }
 
 /**
+ * Fixing the name or city typed on About you, after the account was already made (Iris, case manager W1,
+ * 15 October): going back from What you will see to About you must not redeem the invite again (it is used)
+ * or start a second membership. A person may update their own name and city (`profiles_update_self`, and the
+ * column grant on them); the role, the region and everything else stay as they are.
+ */
+export async function updateMyDetails(
+  userId: string,
+  details: { readonly firstName: string; readonly lastName: string; readonly city: string },
+): Promise<boolean> {
+  try {
+    const { createClient } = await import('./supabase');
+    const { error } = await createClient()
+      .from('profiles')
+      .update({
+        first_name: details.firstName.trim(),
+        last_name: details.lastName.trim() || null,
+        home_city: details.city.trim(),
+      })
+      .eq('id', userId);
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Marks setup finished, and records that the transparency screen was read.
  *
  * Writing `onboarded_at` is what earns the first 25 points — the trigger in
