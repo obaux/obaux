@@ -1708,11 +1708,11 @@
   "person.trip.bookedBy": "由{program}預約",
   "notify.visit_booked_for_you": "{place}已為您預約：{when}",
   "notify.kind.visit_booked_for_you": "已為您預約的到訪",
-  "trips.new.refused.member": "Pam cannot book a visit for {name} right now.",
-  "trips.new.refused.already": "{name} already has a visit here around that time. Pick a different time.",
-  "trips.new.refused.limit": "No more visits can be booked today, for this member or for your program. Try again tomorrow.",
-  "trips.new.refused.past": "That time has already passed. Pick a later time.",
-  "trips.new.refused.far": "Visits can be booked up to about six months ahead. Pick an earlier day.",
-  "trips.new.refused.place": "You cannot book a visit at {place} right now.",
-  "trips.new.refused.service": "You cannot book that service right now. Pick another one."
+  "trips.new.refused.member": "Pam暫時無法為{name}預約到訪。",
+  "trips.new.refused.already": "{name}在這裏已有時間相近的到訪。請選擇其他時間。",
+  "trips.new.refused.limit": "今天不能再為這位會員或您的計劃預約到訪了。請明天再試。",
+  "trips.new.refused.past": "該時間已經過去。請選擇較後的時間。",
+  "trips.new.refused.far": "最多可提前約六個月預約。請選擇較早的日子。",
+  "trips.new.refused.place": "您暫時無法在{place}預約到訪。",
+  "trips.new.refused.service": "您暫時無法預約該服務。請選擇其他服務。"
 }
