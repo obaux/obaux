@@ -360,6 +360,21 @@ test.describe('signing up', () => {
     expect(calls.profileWrites.some((w) => w['first_name'] === 'Dana')).toBe(true);
   });
 
+  test('a program lead\'s What to expect has five rows, the fifth on a member\'s new saves (a92)', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.sessionStorage.setItem('pam.invite', JSON.stringify({ code: 'PAM7Q4KY', role: 'provider' }));
+    });
+    await newcomer(page);
+    await page.route('**/rest/v1/rpc/redeem_invite*', (route) => route.fulfill(json({ id: NEWCOMER, role: 'provider' })));
+    await page.goto('/join/');
+    await page.getByLabel('First name').fill('Pat');
+    await page.getByRole('button', { name: 'Next' }).click();
+    await expect(page.getByRole('heading', { name: 'What to expect' })).toBeVisible();
+    const rows = page.getByRole('list').filter({ hasText: 'Pam never tells you why' }).getByRole('listitem');
+    await expect(rows).toHaveCount(5);
+    await expect(rows.nth(4)).toHaveText('When a member who signed up with your program saves a new place, you see when. Never which place.');
+  });
+
   test('a program lead\'s step 2 also goes back, with Contact Pam (Iris, program lead pass)', async ({ page }) => {
     await page.addInitScript(() => {
       window.sessionStorage.setItem('pam.invite', JSON.stringify({ code: 'PAM7Q4KY', role: 'provider' }));

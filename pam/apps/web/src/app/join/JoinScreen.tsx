@@ -96,7 +96,8 @@ const STEP: Record<Phase, number> = {
 };
 
 /** What to expect, for a program lead (D-354): one picture per line. */
-const PROVIDER_EXPECT: readonly SetupArtKind[] = ['calendar', 'message', 'policy', 'private'];
+// Row 5 (a92, signed by Will; Sage's ledger d05f9d80): a member's new save is seen as "when", never which place.
+const PROVIDER_EXPECT: readonly SetupArtKind[] = ['calendar', 'message', 'policy', 'private', 'alerts'];
 
 /** The small print at the foot of the city list: shown, never chosen. */
 const CITY_NOTE = '__note';
@@ -811,7 +812,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
               <VStack gap={3}>
                 <Text xstyle={styles.intro}>{t(`join.privacy.${kind}.intro`)}</Text>
                 {kind === 'provider' ? (
-                  // Four things to scan, each with a small picture (Will,
+                  // Five things to scan, each with a small picture (Will,
                   // 7 October, D-354): how Pam works for a program now.
                   <VStack gap={4} role="list">
                     {PROVIDER_EXPECT.map((art, i) => (
