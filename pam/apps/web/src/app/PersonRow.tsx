@@ -86,8 +86,9 @@ const styles = stylex.create({
     borderBlockEndStyle: 'solid',
     borderBlockEndColor: colorVars['--color-border'],
   },
-  // Dot's AA red is to come; until then the theme's own error red, AA in light and dark.
-  alert: { color: colorVars['--color-error'] },
+  // Dot's red (a93): 11.8:1 on the page in light, 9.6:1 in dark, and the red of a destructive label (PrivacyViews). The line
+  // wraps like the others in Russian and Arabic at 320, never cut.
+  alert: { color: colorVars['--color-text-red'] },
   link: {
     color: 'inherit',
     textDecoration: 'none',

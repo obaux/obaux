@@ -35,8 +35,8 @@ Will: "I don't like that you wrapped those items inside white background cards w
   drawn (Astryx: "Dense data = rows … never Card-wrapped list items"). Invite someone and What you can see are rows
   the same way, under the members, flush with the page (D-439). Rows keep 64px, the message button its 48px.
 - **The unmarked visit is a line, not a chip.** "Not marked as there: Oct 15" (`caseload.visit.missed`), in red, the
-  same size and place as "Marked as there". The red is the theme's `--color-error` (AA in light and dark) until Dot's
-  token lands. The words say it on their own; the red only draws the eye, so it isn't colour alone.
+  same size and place as "Marked as there", and it wraps like them rather than being cut (Mira). The red is Dot's:
+  `--color-text-red` (11.8:1 on the page in light, 9.6:1 in dark), the red of PrivacyViews' destructive labels. The words say it on their own; the red only draws the eye, so it isn't colour alone.
   `caseload.visit.missed.chip` is no longer used (Lena removes it), and so neither are the chip's `detail` and
   `spoken`, which came out of `PersonRow`.
 - **The What you can see sheet stays as it is** until Dot's standard drawer.

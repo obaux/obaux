@@ -13,7 +13,7 @@ Built on `main` 2de80122 (merged first; one conflict in STATUS.md, this lane's t
 
 - `PersonRow`'s compact form (only the case manager Home uses it) is a row, not a `Card`: the page behind it, 64px
   tall, a `--color-border` line under it. `PeopleHomeView` puts the rows in a `role="list"`, so each is a listitem.
-- `PersonRow` takes `isMetaAlert`: the line under the name in `--color-error`. `HomePerson` carries it.
+- `PersonRow` takes `isMetaAlert`: the line under the name in `--color-text-red` (Dot, 15:20). `HomePerson` carries it.
 - `CaseloadHome`: `lineAndChip` is gone; `visitLine` gives the one line and sets `isMetaAlert` for a missed visit. The
   status chip (switched off) is unchanged and independent of the visit line.
 - Invite someone and What you can see: the `MenuList` without its `Card` and without `isInset`, so it is flush with the
@@ -31,8 +31,8 @@ Built on `main` 2de80122 (merged first; one conflict in STATUS.md, this lane's t
 
 - None new: amended D-596 (unmerged) with "Changed after Will saw it". Read "those items" as everything on the list,
   as Mira did.
-- The red is the theme's `--color-error` (light #76000c, dark #ffc4be, both AA) until Dot sends the token; one line in
-  `PersonRow` changes when it does.
+- The red is Dot's `--color-text-red` (11.8:1 light, 9.6:1 dark). The line wraps like the next-visit line; no nowrap,
+  no cut (Mira, 15:18).
 
 ## Verified
 
@@ -40,13 +40,12 @@ Built on `main` 2de80122 (merged first; one conflict in STATUS.md, this lane's t
 - `admin.spec` a93 test now checks: the unmarked line is one line, "Not marked as there: Oct 15" style, a different
   colour from "Marked as there"; no listitem on the list has a shadow or a background; each is at least 48px tall.
 - Full e2e: see the READY.
-- Storybook built; pictures at 390 and 320 (top and scrolled), light and dark, English and Arabic, in
+- Storybook built; pictures at 390 and 320 (top and scrolled), light and dark, English and Arabic, and Russian at 320 (the red line wraps to two, uncut), in
   `docs/design/review/2026-10-17-cm-home-rows/`. Measured in the story: member rows 73px, the two rows 64px, no
   shadows, transparent backgrounds.
 
 ## Left undone
 
-- Dot's red token, then one line in `PersonRow` (`alert`).
 - What you can see moves to Dot's standard drawer later.
 
 ## Needs a human
