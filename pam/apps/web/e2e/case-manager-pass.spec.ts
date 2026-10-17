@@ -112,7 +112,7 @@ test.describe('a case manager after joining (Iris, 15 October)', () => {
       expect(size).toBeGreaterThanOrEqual(16);
     }
     await expect(page.getByText('They were told exactly this.')).toBeVisible();
-    await expect(page.getByRole('combobox', { name: 'Search your members by name', exact: true })).toBeVisible();
+    await expect(page.getByRole('combobox', { name: 'Search members by name', exact: true })).toBeVisible();
   });
 
   test('P9: an empty invite names every missing field at once', async ({ page }) => {

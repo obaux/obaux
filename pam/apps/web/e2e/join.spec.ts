@@ -360,6 +360,21 @@ test.describe('signing up', () => {
     expect(calls.profileWrites.some((w) => w['first_name'] === 'Dana')).toBe(true);
   });
 
+  test('a program lead\'s What to expect has five rows, the fifth on a member\'s new saves (a92)', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.sessionStorage.setItem('pam.invite', JSON.stringify({ code: 'PAM7Q4KY', role: 'provider' }));
+    });
+    await newcomer(page);
+    await page.route('**/rest/v1/rpc/redeem_invite*', (route) => route.fulfill(json({ id: NEWCOMER, role: 'provider' })));
+    await page.goto('/join/');
+    await page.getByLabel('First name').fill('Pat');
+    await page.getByRole('button', { name: 'Next' }).click();
+    await expect(page.getByRole('heading', { name: 'What to expect' })).toBeVisible();
+    const rows = page.getByRole('list').filter({ hasText: 'Pam never tells you why' }).getByRole('listitem');
+    await expect(rows).toHaveCount(5);
+    await expect(rows.nth(4)).toHaveText('When a member who signed up with your program saves a new place, you see when. Never which place.');
+  });
+
   test('a program lead\'s step 2 also goes back, with Contact Pam (Iris, program lead pass)', async ({ page }) => {
     await page.addInitScript(() => {
       window.sessionStorage.setItem('pam.invite', JSON.stringify({ code: 'PAM7Q4KY', role: 'provider' }));
@@ -390,30 +405,18 @@ test.describe('signing up', () => {
     await expect(page.getByText('Right now Pam is in Philadelphia.')).toBeVisible();
     await expect(page.getByText('Pam is not in Scranton yet.')).toBeVisible();
 
-    // Unticked, and it stays unticked unless somebody ticks it (A2P 30925).
-    const optIn = page.getByRole('checkbox', { name: /Text me when Pam opens/ });
-    await expect(optIn).not.toBeChecked();
+    // No tick asks to be texted when Pam opens there: nothing sends that text (D-587 build 3, held for Will).
+    await expect(page.getByRole('checkbox')).toHaveCount(0);
+    await expect(page.getByText(/Text me when Pam opens/)).toHaveCount(0);
 
     await page.getByRole('button', { name: 'Save my city' }).click();
     await expect.poll(() => calls.waiting.length).toBe(1);
-    expect(calls.waiting[0]!['p_wants_updates'], 'an untouched box sent a yes').toBe(false);
+    expect(calls.waiting[0]!['p_city']).toBe('Scranton');
+    expect(calls.waiting[0]!['p_wants_updates'], 'nobody is signed up for a text that is never sent').toBe(false);
 
     await expect(page.getByRole('heading', { name: 'We have your city' })).toBeVisible();
     await expect(page.getByText(/Your city is on our list/)).toBeVisible();
-  });
-
-  test('ticking the box is what sends the yes', async ({ page }) => {
-    const calls = await newcomer(page, { cityServed: false });
-    await page.goto('/join/');
-    await fillDetails(page, 'Scranton');
-    await page.getByRole('button', { name: 'Next' }).click();
-
-    await page.getByRole('checkbox', { name: /Text me when Pam opens/ }).check();
-    await page.getByRole('button', { name: 'Save my city' }).click();
-
-    await expect.poll(() => calls.waiting.length).toBe(1);
-    expect(calls.waiting[0]!['p_wants_updates']).toBe(true);
-    await expect(page.getByText(/We saved your city and that you want to hear when Pam opens there/)).toBeVisible();
+    await expect(page.getByText(/want to hear when Pam opens|Pam cannot text you/)).toHaveCount(0);
   });
 
   test('a name is asked for before anything is sent', async ({ page }) => {

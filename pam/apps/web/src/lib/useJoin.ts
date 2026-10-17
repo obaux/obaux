@@ -175,13 +175,16 @@ export async function redeemInvite(
   }
 }
 
-/** Leave a name for a city Pam is not in yet. `wantsUpdates` is their choice. */
-export async function joinWaitingCity(city: string, wantsUpdates: boolean): Promise<boolean> {
+/**
+ * Leave a name for a city Pam is not in yet. Nobody is asked to be texted about it (D-587 build 3): nothing sends
+ * that text, so the request always says no.
+ */
+export async function joinWaitingCity(city: string): Promise<boolean> {
   try {
     const { createClient } = await import('./supabase');
     const { error } = await createClient().rpc('join_waiting_city', {
       p_city: city.trim(),
-      p_wants_updates: wantsUpdates,
+      p_wants_updates: false,
     });
     return !error;
   } catch {

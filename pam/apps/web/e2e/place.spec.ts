@@ -151,10 +151,15 @@ test.describe("a place's own screen", () => {
       logged.push(route.request().postDataJSON());
       return route.fulfill(json(true));
     });
+    // Holding the dialler back from the start of the document, not after the page has loaded: a tap that came first would try to follow tel:.
+    await page.addInitScript(() => document.addEventListener('click', (e) => (e.target as HTMLElement).closest?.('a[href^="tel:"]') && e.preventDefault(), true));
     await page.goto(`/place/?id=${real.id}`);
-    await page.evaluate(() => document.addEventListener('click', (e) => (e.target as HTMLElement).closest('a[href^="tel:"]') && e.preventDefault(), true));
     const call = page.getByRole('link', { name: /^Call/ });
     await expect(call).toHaveAttribute('href', 'tel:+12155550100');
+    // The call is told to the database only for a signed-in member, and who is signed in is read a moment after the row is drawn
+    // (logCall ignores a tap before that, on purpose). Wait for something only a signed-in member has, so the tap is never earlier than it.
+    // Without this the test hung 30s on a loaded machine, when the tap came first.
+    await expect(page.getByRole('button', { name: 'Save this place' })).toBeVisible();
     await call.click();
     await expect.poll(() => logged.length).toBe(1);
     expect(logged[0]).toMatchObject({ p_service_id: real.id });

@@ -43,11 +43,12 @@ const visit = (id: string, first: string, days: number) => ({
 });
 const help = (page: Page) => page.getByRole('link', { name: 'Help' }).or(page.getByRole('button', { name: 'Help' }));
 
-test('a lead\'s Home has Help beside the bell (W1), and the header fits the phone', async ({ page }) => {
+// Will took Help off the lead's Home again (a95, 17 October), against A26 and Iris's program lead pass W1.
+test('a lead\'s Home has no Help beside the bell (a95), and the header fits the phone', async ({ page }) => {
   await liveLead(page, [visit('a1', 'Tanya', 0)]);
   await page.goto('/');
   await settled(page);
-  await expect(help(page)).toBeVisible();
+  await expect(help(page)).toHaveCount(0);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
   expect(overflow, 'sideways scroll').toBe(false);
 });

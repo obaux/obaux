@@ -37,6 +37,8 @@ export function PrototypeJoin() {
         ...(startAt ? { startAt } : {}),
         // About you with the city empty and its line showing (Lena's fit audit).
         ...(params?.get('missing') === 'city' ? { isCityMissing: true } : {}),
+        // A city Pam is not in yet, for the waiting list's two steps.
+        ...(params?.get('city') ? { city: params.get('city')! } : {}),
       }}
     />
   );

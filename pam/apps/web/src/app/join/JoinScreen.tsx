@@ -8,7 +8,6 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { Banner } from '@astryxdesign/core/Banner';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
-import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BellIcon, BigButton, Loading, Notice, Page, HelpIcon, PointsBadge, StarIcon, TextField, TextLink, TripsIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
@@ -96,7 +95,8 @@ const STEP: Record<Phase, number> = {
 };
 
 /** What to expect, for a program lead (D-354): one picture per line. */
-const PROVIDER_EXPECT: readonly SetupArtKind[] = ['calendar', 'message', 'policy', 'private'];
+// Row 5 (a92, signed by Will; Sage's ledger d05f9d80): a member's new save is seen as "when", never which place.
+const PROVIDER_EXPECT: readonly SetupArtKind[] = ['calendar', 'message', 'policy', 'private', 'alerts'];
 
 /** The small print at the foot of the city list: shown, never chosen. */
 const CITY_NOTE = '__note';
@@ -152,6 +152,8 @@ export interface JoinPreview {
   readonly startAt?: JoinPhase;
   /** Open About you with the city left empty and its line showing, so the words can be checked (Lena's fit audit). */
   readonly isCityMissing?: boolean;
+  /** The city typed on About you, when the story is about one Pam is not in yet (the waiting list). */
+  readonly city?: string;
 }
 
 export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview | null } = {}) {
@@ -200,7 +202,6 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
     if (fromLink) setInviteCode(fromLink.toUpperCase());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const [wantsUpdates, setWantsUpdates] = useState(false);
   const [cities, setCities] = useState<readonly string[]>([]);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -271,7 +272,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
       // The preview starts at the door, whoever the story is signed in as.
       setKind(preview.kind);
       setFirstName(preview.firstName);
-      setCity(preview.isCityMissing ? '' : 'Philadelphia');
+      setCity(preview.isCityMissing ? '' : (preview.city ?? 'Philadelphia'));
       if (preview.isCityMissing) setInvalid('city');
       // Approved, as if invited: staff finish on "I understand" and go Home
       // rather than on the waiting-for-review notice.
@@ -439,7 +440,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
 
   const leaveName = async () => {
     setBusy(true);
-    const saved = await joinWaitingCity(city, wantsUpdates);
+    const saved = await joinWaitingCity(city);
     setBusy(false);
     setFailed(!saved);
     if (saved) setPhase('waitingDone');
@@ -749,18 +750,9 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 </Text>
               ) : null}
               {/*
-                Unticked, and it stays unticked unless somebody ticks it. Consent
-                that arrives pre-selected is not consent, and this is the exact
-                thing a carrier audit looks for.
+                No "Text me when Pam opens" tick (D-587 build 3, held for Will): nothing sends that text, so the
+                step saves the city and promises nothing.
               */}
-              <CheckboxInput
-                label={t('join.waiting.optIn', { city: city.trim() })}
-                value={wantsUpdates}
-                onChange={(next) => setWantsUpdates(next)}
-              />
-              <Text type="supporting" xstyle={styles.small}>
-                {t('reminders.how')}
-              </Text>
             </VStack>
           </>
         ) : null}
@@ -770,7 +762,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
             <Notice
               notice="service_not_available"
               title={t('join.waitingDone.heading')}
-              body={t(wantsUpdates ? 'join.waitingDone.yes' : 'join.waitingDone.no')}
+              body={t('join.waitingDone.no')}
             />
             <BigButton label={t('action.done')} href="/" />
           </>
@@ -811,7 +803,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
               <VStack gap={3}>
                 <Text xstyle={styles.intro}>{t(`join.privacy.${kind}.intro`)}</Text>
                 {kind === 'provider' ? (
-                  // Four things to scan, each with a small picture (Will,
+                  // Five things to scan, each with a small picture (Will,
                   // 7 October, D-354): how Pam works for a program now.
                   <VStack gap={4} role="list">
                     {PROVIDER_EXPECT.map((art, i) => (
