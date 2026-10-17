@@ -1611,6 +1611,11 @@
   merges main, before either starts.
 - **A worktree path reused (Lena, 17 October).** `git worktree add -b … /tmp/wt/x` failed because x was an old worktree,
   and the chained commands ran there anyway. Nothing was pushed. Lesson: check the path before chaining.
+- **A placeholder pushed in the records (b59 records 4cd061a6, 17:24).** The b59 verified row was written with
+  "SITEA11Y" to fill in once the site a11y run finished; the sed that swapped in the result matched nothing, and
+  `grep -c` printed 1 before the commit without anyone reading it. Fixed in 0abe850e ("125 scans, 0 problems"),
+  pushed after b59's CI. Lesson: a placeholder in a record is checked to be gone (the grep must print 0) before the
+  commit, and a records commit is written after its numbers exist, not before.
 
 ## Decisions
 
@@ -1819,9 +1824,15 @@
 | b58 main CI (a8f72680) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (17:04); Vercel web and pam-site success |
 | Proofs (16:33 to 16:45): main a8f72680 with drawers.spec (fbab33a9) and mail-icon.spec (9c8d5753); 5d32da07 with admin.spec (cef097f1) | 15 failed (drawers 4 tests × 3 projects, mail icon 1 × 3) / 6 failed (a93's row test and the caseload contract, × 3), 60 passed |
 | Batch b59, full run (1011b112: Dot 9c8d5753, Wren 33b74c70, Sage 15977c8b): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1375 passed, 1 skipped / in step / 124 / 0 / 124 / 0 / 0 / 0 / 188 / 10.7 kB spare / 2066 passed, 19 skipped, 0 failed / built; "no bundle names the live one"; grep 0 files / 0 / 125 scans, 0 problems |
+| b59 main CI (4cd061a6) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (17:57); Vercel web and pam-site success |
+| a97 rebuilt, corner tucked in (Dot bb2f0c6e): main 4cd061a6 with drawers.spec and trip-booked.spec from bb2f0c6e, --retries=0 | 18 failed (drawers 5 tests × 3 projects; trip-booked:34, Bring a friend's round X in the corner, × 3), 3 passed (trip-booked:15, unchanged) |
 
 ## Left undone
 
+- **As of b59 green (17 October, 17:58):** the drawers proof is done (above). Lena's six-language refusals
+  (claude/lena-refused-words @ 8d100f0a) are READY on Piper's branch; b60 takes Piper's tip and then Lena's, the merge
+  desk merging main (neither of them). Piper's READY is owed. Will's "Approved", passed on by Dot with no item named,
+  is being confirmed on the a97 thread before a97 ships.
 - **As of b59 (17 October, 17:25):** Piper: Book a visit's list and refusal messages (Iris's b58 finding), with
   Sage's seven lines and Lena's six languages; Iris's report (cafb4b20) rides with it. The merge desk owes the proof
   of Dot's rebuilt drawers.spec and the Bring a friend check on main. With Will: a86 (yes and the p7 line), a91 (the
