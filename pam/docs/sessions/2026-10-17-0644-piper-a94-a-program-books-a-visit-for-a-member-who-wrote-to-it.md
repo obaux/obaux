@@ -5,7 +5,7 @@
 ## What changed
 
 - Database (three migrations, each its own commit, plus test 76): `appointments.booked_by_org`; `book_visit_for_member`
-  (eligibility = wrote, rate limit, one place per program); `my_trip_booked_by()` for the member; the `visit_booked_for_you`
+  (eligibility = wrote, signed rules, signed up or planned a visit there, per Mira's 06:11 correction; rate limit, one place per program); `my_trip_booked_by()` for the member; the `visit_booked_for_you`
   bell kind. A contract line was added to the first migration afterwards (a test demands one when a check is dropped).
 - App: `bookTrip` calls the real function for a real lead and member (the example path stays for demos); the lead's
   confirmation says "Booked for {name}!" and the "Example trips only for now" ending is gone for a real booking; Trips and

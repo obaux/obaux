@@ -76,17 +76,36 @@ begin
     raise exception 'SERVICE_NOT_FOUND';
   end if;
 
-  -- The member: an active member who has a conversation with a lead of this organisation. The same message for every way of
-  -- not qualifying, so a lead cannot probe who has an account.
+  -- The member: an active member this program may already see (Will's option A, 17 October, and the Privacy sentence "a program you
+  -- have written to": a member who has written to it, signed its rules, signed up with it or planned a visit there). Not somebody
+  -- who has done none of those. The same message for every way of not qualifying, so a lead cannot probe who has an account.
   if not exists (
     select 1 from public.profiles m
     where m.id = p_member_id and m.role = 'member' and m.access_status = 'active'
-  ) or not exists (
-    select 1
-    from public.conversation_members mine
-    join public.conversation_members theirs on theirs.conversation_id = mine.conversation_id
-    join public.profiles staff on staff.id = theirs.profile_id
-    where mine.profile_id = p_member_id and staff.org_id = org and staff.role = 'provider' and staff.access_status = 'active'
+  ) or not (
+    exists (
+      select 1
+      from public.conversation_members mine
+      join public.conversation_members theirs on theirs.conversation_id = mine.conversation_id
+      join public.profiles staff on staff.id = theirs.profile_id
+      where mine.profile_id = p_member_id and staff.org_id = org and staff.role = 'provider' and staff.access_status = 'active'
+    )
+    or exists (
+      select 1 from public.policy_signatures sg
+      join public.program_policies pp on pp.id = sg.policy_id
+      join public.services own on own.id = pp.service_id and own.org_id = org
+      where sg.member_id = p_member_id
+    )
+    or exists (
+      select 1 from public.enrollments en
+      join public.services own on own.id = en.service_id and own.org_id = org
+      where en.member_id = p_member_id and en.status in ('requested', 'enrolled', 'active', 'completed')
+    )
+    or exists (
+      select 1 from public.appointments ap
+      join public.services own on own.id = ap.service_id and own.org_id = org
+      where ap.member_id = p_member_id and ap.status <> 'cancelled'
+    )
   ) then
     raise exception 'MEMBER_NOT_LINKED';
   end if;
