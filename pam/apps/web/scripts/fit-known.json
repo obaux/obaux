@@ -842,5 +842,37 @@
   {
     "key": "zh-HK|cut|program-lead-states-home--folded|M",
     "reason": "The folded week on Home shows a fixed height and fades the rest, with 'Show the whole calendar' under it, so the third row's avatar is only half there in every language (English too, in the screenshot). The detector flags it in the languages where the row wraps one line taller. The rest is one tap away. Looked at 17 October 2026 at 320×760 with screenshots (English and pseudo). Same as the entry for the avatar letter D, which the story no longer shows."
+  },
+  {
+    "key": "es|cut|member-created--trips|miércoles, 14 oct ·",
+    "reason": "The Trips drawer scrolls and fades out at its foot; the second trip card sits under that fade, so the detector sees its date line partly hidden (partial=true, 0 in, 0 out). Since b55 the TripCard keeps the time after the last \" · \" in its own no-wrap span, so the date line's text node is \"miércoles, 14 oct ·\" and the older entries that name \"… · 13:00\" no longer match. Reached by scrolling; nothing is lost. Looked at 17 October 2026 at 320×760 with a screenshot (Spanish, the second card half under the fade). Found on b56 (2421ff80), three runs, the same each time."
+  },
+  {
+    "key": "es|cut|member-created-states-trips--upcoming|miércoles, 14 oct ·",
+    "reason": "The Trips drawer scrolls and fades out at its foot; the second trip card sits under that fade, so the detector sees its date line partly hidden (partial=true, 0 in, 0 out). Since b55 the TripCard keeps the time after the last \" · \" in its own no-wrap span, so the date line's text node is \"miércoles, 14 oct ·\" and the older entries that name \"… · 13:00\" no longer match. Reached by scrolling; nothing is lost. Looked at 17 October 2026 at 320×760 with a screenshot (Spanish, the second card half under the fade). Found on b56 (2421ff80), three runs, the same each time."
+  },
+  {
+    "key": "es|cut|member-created-states-trips--spanish|miércoles, 14 oct ·",
+    "reason": "The Trips drawer scrolls and fades out at its foot; the second trip card sits under that fade, so the detector sees its date line partly hidden (partial=true, 0 in, 0 out). Since b55 the TripCard keeps the time after the last \" · \" in its own no-wrap span, so the date line's text node is \"miércoles, 14 oct ·\" and the older entries that name \"… · 13:00\" no longer match. Reached by scrolling; nothing is lost. Looked at 17 October 2026 at 320×760 with a screenshot (Spanish, the second card half under the fade). Found on b56 (2421ff80), three runs, the same each time."
+  },
+  {
+    "key": "zh-HK|cut|member-created-states-trips--spanish|miércoles, 14 oct ·",
+    "reason": "The Trips drawer scrolls and fades out at its foot; the second trip card sits under that fade, so the detector sees its date line partly hidden (partial=true, 0 in, 0 out). Since b55 the TripCard keeps the time after the last \" · \" in its own no-wrap span, so the date line's text node is \"miércoles, 14 oct ·\" and the older entries that name \"… · 13:00\" no longer match. Reached by scrolling; nothing is lost. Looked at 17 October 2026 at 320×760 with a screenshot (Spanish, the second card half under the fade). Found on b56 (2421ff80), three runs, the same each time."
+  },
+  {
+    "key": "es|cut|member-created-states-saved-trips--one-trip-saved|Riverside Job Center",
+    "reason": "The Trips drawer scrolls and fades out at its foot; the second saved trip's name (\"Riverside Job Center\", two lines then \"…\" since b54) sits under that fade, so the detector sees it partly hidden (partial=true, 1 in, 0 out). In English the same name is cut the same way, which is why a run that includes English never reports it; it shows only in a run without English as the baseline (for example --locales es,zh-HK). Reached by scrolling; nothing is lost. Looked at 17 October 2026 at 320×760 with a screenshot (Spanish) and with Mira's run of --locales es,zh-HK --match trips on b55."
+  },
+  {
+    "key": "es|cut|member-created-states-saved-trips--one-trip-saved-spanish|Riverside Job Center",
+    "reason": "The Trips drawer scrolls and fades out at its foot; the second saved trip's name (\"Riverside Job Center\", two lines then \"…\" since b54) sits under that fade, so the detector sees it partly hidden (partial=true, 1 in, 0 out). In English the same name is cut the same way, which is why a run that includes English never reports it; it shows only in a run without English as the baseline (for example --locales es,zh-HK). Reached by scrolling; nothing is lost. Looked at 17 October 2026 at 320×760 with a screenshot (Spanish) and with Mira's run of --locales es,zh-HK --match trips on b55."
+  },
+  {
+    "key": "zh-HK|cut|member-created-states-saved-trips--one-trip-saved-spanish|Riverside Job Center",
+    "reason": "The Trips drawer scrolls and fades out at its foot; the second saved trip's name (\"Riverside Job Center\", two lines then \"…\" since b54) sits under that fade, so the detector sees it partly hidden (partial=true, 1 in, 0 out). In English the same name is cut the same way, which is why a run that includes English never reports it; it shows only in a run without English as the baseline (for example --locales es,zh-HK). Reached by scrolling; nothing is lost. Looked at 17 October 2026 at 320×760 with a screenshot (Spanish) and with Mira's run of --locales es,zh-HK --match trips on b55."
+  },
+  {
+    "key": "es|cut|member-created-states-saved-trips--trips-with-a-past-visit|Riverside Job Center",
+    "reason": "The Trips drawer scrolls and fades out at its foot; the second saved trip's name (\"Riverside Job Center\", two lines then \"…\" since b54) sits under that fade, so the detector sees it partly hidden (partial=true, 1 in, 0 out). In English the same name is cut the same way, which is why a run that includes English never reports it; it shows only in a run without English as the baseline (for example --locales es,zh-HK). Reached by scrolling; nothing is lost. Looked at 17 October 2026 at 320×760 with a screenshot (Spanish) and with Mira's run of --locales es,zh-HK --match trips on b55."
   }
 ]
