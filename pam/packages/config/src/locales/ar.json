@@ -1847,11 +1847,11 @@
   "person.trip.bookedBy": "تم الحجز بواسطة {program}",
   "notify.visit_booked_for_you": "قام {place} بحجز زيارة لك: {when}",
   "notify.kind.visit_booked_for_you": "زيارة محجوزة لك",
-  "trips.new.refused.member": "Pam cannot book a visit for {name} right now.",
-  "trips.new.refused.already": "{name} already has a visit here around that time. Pick a different time.",
-  "trips.new.refused.limit": "No more visits can be booked today, for this member or for your program. Try again tomorrow.",
-  "trips.new.refused.past": "That time has already passed. Pick a later time.",
-  "trips.new.refused.far": "Visits can be booked up to about six months ahead. Pick an earlier day.",
-  "trips.new.refused.place": "You cannot book a visit at {place} right now.",
-  "trips.new.refused.service": "You cannot book that service right now. Pick another one."
+  "trips.new.refused.member": "لا يستطيع Pam حجز زيارة لـ {name} حاليا.",
+  "trips.new.refused.already": "لدى {name} زيارة هنا بالفعل في وقت قريب من هذا الوقت. اختر وقتا آخر.",
+  "trips.new.refused.limit": "لا يمكن حجز المزيد من الزيارات اليوم، لهذا العضو أو لبرنامجك. حاول مرة أخرى غدا.",
+  "trips.new.refused.past": "هذا الوقت مضى بالفعل. اختر وقتا لاحقا.",
+  "trips.new.refused.far": "يمكن حجز الزيارات قبل موعدها بنحو ستة أشهر كحد أقصى. اختر يوما أقرب.",
+  "trips.new.refused.place": "لا يمكنك حجز زيارة في {place} حاليا.",
+  "trips.new.refused.service": "لا يمكنك حجز هذه الخدمة حاليا. اختر خدمة أخرى."
 }
