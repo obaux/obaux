@@ -874,5 +874,9 @@
   {
     "key": "es|cut|member-created-states-saved-trips--trips-with-a-past-visit|Riverside Job Center",
     "reason": "The Trips drawer scrolls and fades out at its foot; the second saved trip's name (\"Riverside Job Center\", two lines then \"…\" since b54) sits under that fade, so the detector sees it partly hidden (partial=true, 1 in, 0 out). In English the same name is cut the same way, which is why a run that includes English never reports it; it shows only in a run without English as the baseline (for example --locales es,zh-HK). Reached by scrolling; nothing is lost. Looked at 17 October 2026 at 320×760 with a screenshot (Spanish) and with Mira's run of --locales es,zh-HK --match trips on b55."
+  },
+  {
+    "key": "ru|cut|case-manager-states-home--what-you-can-see|Когда они сохраняют новое место — но не какое именно.",
+    "reason": "What you can see is a sheet that scrolls: at 320×568 the Russian words of its first three paragraphs fill the sheet, so the fourth (\"Когда они сохраняют новое место — но не какое именно.\") starts at the foot of the screen with its first line half in view (partial=true, 0 in, 0 out). It is reached by scrolling and nothing is lost; at 320×760 it is whole. Looked at 17 October 2026 at 320×568 with a screenshot (Russian, the sheet open)."
   }
 ]
