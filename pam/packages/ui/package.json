@@ -41,6 +41,7 @@
     "./ProgramVisitCard": "./src/ProgramVisitCard.tsx",
     "./BringFriend": "./src/BringFriend.tsx",
     "./sheet": "./src/sheet.ts",
+    "./tapRows": "./src/tapRows.ts",
     "./share": "./src/share.ts",
     "./PolicyUploadCard": "./src/PolicyUploadCard.tsx",
     "./StaffBadge": "./src/StaffBadge.tsx",
