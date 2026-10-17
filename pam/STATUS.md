@@ -928,6 +928,11 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Accounts & invites · Program lead's What to expect, row 5 (17 October) — READY for b51 with Lena's words
+
+`claude/pam-lead-expect-row5-a92`, stacked on `claude/lena-program-saves-held`. a92 is signed. The fifth row says
+a member's new save is seen as "when", never which place, with the bell picture.
+
 ## Accounts & invites · Staff photos no account uses are removed (16 October) — in b50
 
 `claude/pam-staff-photo-cleanup` (D-590; Lena's privacy guard, D-587).

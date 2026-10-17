@@ -118,7 +118,7 @@ const SETUP_NOTES: Readonly<Record<SetupArtKind, string>> = {
   message: 'What to expect, programs (D-354)',
   policy: 'What to expect, programs (D-354)',
   private: 'What to expect, programs (D-354)',
-  alerts: 'Profile: text alerts card (D-360)',
+  alerts: 'Profile: text alerts card (D-360); Join, a program lead\'s What to expect, row 5 (a92)',
   switch: 'Hero of Add your program to your account (D-376)',
   review: 'Hero of Sent to Pam — a program under review (D-379)',
 };
