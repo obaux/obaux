@@ -38,7 +38,6 @@
     "./SignaturePad": "./src/SignaturePad.tsx",
     "./PolicyStatusCard": "./src/PolicyStatusCard.tsx",
     "./VisitCard": "./src/VisitCard.tsx",
-    "./VisitWidget": "./src/VisitWidget.tsx",
     "./ProgramVisitCard": "./src/ProgramVisitCard.tsx",
     "./BringFriend": "./src/BringFriend.tsx",
     "./sheet": "./src/sheet.ts",
