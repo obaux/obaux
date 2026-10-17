@@ -77,6 +77,7 @@ export {
   PdfIcon,
   PhoneIcon,
   SyncIcon,
+  RefreshIcon,
   CalendarAddIcon,
   MailIcon,
   PlacesIcon,

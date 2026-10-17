@@ -7,7 +7,7 @@ import { IconButton } from '@astryxdesign/core/IconButton';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BigButton, CalendarAddIcon, CheckIcon, CrossIcon, EditIcon, SyncIcon, TripsIcon } from '@pam/ui';
+import { BigButton, CalendarAddIcon, CheckIcon, CrossIcon, RefreshIcon, SyncIcon, TripsIcon } from '@pam/ui';
 import { Button } from '@pam/ui/Button';
 import { MenuList } from '@pam/ui/MenuList';
 import { PamSheet } from '@pam/ui/PamSheet';
@@ -37,7 +37,7 @@ const WORDS = {
     time: '10:00 AM',
     countdown: 'In 2 days',
     change: 'Change appointment',
-    addToCalendar: 'Add to my calendar',
+    addToCalendar: 'Add to calendar',
     sync: 'Sync all future trip details?',
     sheetTitle: 'Add to calendar',
     done: 'Done',
@@ -74,7 +74,7 @@ const WORDS = {
     time: '10:00 ص',
     countdown: 'بعد يومين',
     change: 'غيّر الموعد',
-    addToCalendar: 'أضف إلى تقويمي',
+    addToCalendar: 'أضف إلى التقويم',
     sync: 'مزامنة تفاصيل كل رحلاتك القادمة؟',
     sheetTitle: 'أضف إلى التقويم',
     done: 'تم',
@@ -132,7 +132,8 @@ const styles = stylex.create({
     backgroundColor: colorVars['--color-background-card'],
     color: colorVars['--color-icon-green'],
   },
-  fine: { alignSelf: 'center', minHeight: '48px', fontSize: '15px', fontWeight: 600, color: colorVars['--color-text-secondary'] },
+  // 48px high (the global button floor), so the whole line is the tap, not only its words.
+  fine: { alignSelf: 'center', minHeight: '48px', paddingInline: '12px', fontSize: '15px', fontWeight: 600, color: colorVars['--color-text-secondary'] },
   tick: { width: '28px', height: '28px', borderRadius: '50%', backgroundColor: colorVars['--color-background-green'], color: colorVars['--color-icon-green'], flexShrink: 0 },
   on: { fontSize: '17px', fontWeight: 700, color: colorVars['--color-text-accent'] },
   sheet: { width: '100%', paddingInline: '20px', paddingBlockEnd: '28px' },
@@ -168,7 +169,7 @@ function AddSheet() {
   return (
     <>
       <BookedScreen />
-      <PamSheet isOpen={open} onOpenChange={setOpen} label={w.sheetTitle} kind="review" actionLabel={w.done}>
+      <PamSheet isOpen={open} onOpenChange={setOpen} label={w.sheetTitle} kind="act" actionLabel={w.close}>
         <VStack gap={2} xstyle={styles.sheet}>
           <Text type="supporting" xstyle={styles.small}>
             {w.sheetHint}
@@ -241,7 +242,7 @@ function CalendarScreen({ which }: { readonly which: 'none' | 'apple' | 'google'
               label={w.manage}
               hasDividers
               items={[
-                { id: 'new', label: w.newLink, description: w.newLinkHint, icon: <EditIcon width={26} height={26} />, onSelect: () => {} },
+                { id: 'new', label: w.newLink, description: w.newLinkHint, icon: <RefreshIcon width={26} height={26} />, onSelect: () => {} },
                 {
                   id: 'off',
                   label: which === 'apple' ? w.disconnectApple : w.disconnectGoogle,

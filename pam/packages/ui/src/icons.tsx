@@ -189,6 +189,16 @@ export function CalendarAddIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/** One arrow round a circle: do it again, afresh ("Get a new link"). */
+export function RefreshIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} data-icon="refresh" {...props}>
+      <path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3" />
+      <path d="M19.5 4v4.5H15" />
+    </svg>
+  );
+}
+
 /** Two arrows chasing round a circle. Keep something up to date by itself: "Sync all future trip details?". */
 export function SyncIcon(props: SVGProps<SVGSVGElement>) {
   return (
