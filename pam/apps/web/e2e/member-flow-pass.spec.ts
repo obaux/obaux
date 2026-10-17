@@ -3,7 +3,7 @@ import { settled } from './settled';
 import { asMember } from './asMember';
 
 /**
- * Iris's second Member flow pass (15 October 2026): W4 (Help on New trip's first step), P3 (a long place name
+ * Iris's second Member flow pass (15 October 2026): W4 (Help on New trip's first step, taken off again in a95), P3 (a long place name
  * wraps on Trips, never cut), P7 (Copy address and "View all places to visit" are 48px). Supabase is stubbed.
  */
 const PLACE = '4c0f6b64-3a0e-4b8e-9d6c-7a1f0f3c2b11';
@@ -27,25 +27,35 @@ async function withTrip(page: Page, language: 'en' | 'ar') {
 }
 
 for (const language of ['en', 'ar'] as const) {
-  test(`a long place name wraps on Trips and is not cut off, ${language}`, async ({ page }) => {
+  test(`a long place name wraps to two lines at most on Trips, then ends in "…"; the whole name is the card's name, ${language}`, async ({ page }) => {
     await withTrip(page, language);
     await page.goto('/trips/');
     await settled(page);
     const name = page.getByRole('heading', { name: LONG });
     await expect(name).toBeVisible();
-    const box = await name.boundingBox();
-    expect(box!.height, 'more than one line').toBeGreaterThan(30);
-    const cut = await name.evaluate((el) => el.scrollWidth > el.clientWidth || getComputedStyle(el).textOverflow === 'ellipsis');
-    expect(cut, 'the name is cut').toBe(false);
+    const look = await name.evaluate((el) => {
+      const cs = getComputedStyle(el);
+      return { clamp: cs.webkitLineClamp, overflow: cs.overflow, lineHeight: parseFloat(cs.lineHeight), height: el.getBoundingClientRect().height, cut: el.scrollHeight > el.clientHeight + 1 };
+    });
+    expect(look.clamp).toBe('2');
+    expect(look.overflow).toBe('hidden');
+    // Two lines of 17px type, not four, and the name really is longer than that (it was cut).
+    expect(look.height).toBeLessThanOrEqual(look.lineHeight * 2 + 2);
+    expect(look.cut).toBe(true);
+    // Nothing is lost to a screen reader: the card is named with the whole name.
+    await expect(page.getByRole('link', { name: new RegExp(LONG) }).first()).toBeVisible();
   });
 }
 
-test('New trip has Help on its first step, When, as on Check (W4)', async ({ page }) => {
+// Will took Help off When again (a95, 17 October), against A26 and Iris's second member pass W4: the first step is the dates and the times.
+test('New trip\'s first step, When, has no Help, and offers the next six weekdays (a95)', async ({ page }) => {
   await asMember(page);
   await page.goto('/trips/new/?place=dummy-place-learning&name=Example%20Learning%20Center&category=education');
   await settled(page);
   await expect(page.getByRole('heading', { name: 'When?' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Help' }).or(page.getByRole('button', { name: 'Help' }))).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Help' }).or(page.getByRole('button', { name: 'Help' }))).toHaveCount(0);
+  const days = page.getByRole('button', { name: /^(Mon|Tue|Wed|Thu|Fri), / });
+  await expect(days).toHaveCount(6);
 });
 
 test('"View all places to visit" on New trip is 48px or more (P7)', async ({ page }) => {

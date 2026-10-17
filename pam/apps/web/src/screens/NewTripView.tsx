@@ -89,16 +89,27 @@ const styles = stylex.create({
   placeName: { fontSize: '17px', lineHeight: 1.3, fontWeight: 700 },
   label: { fontSize: '18px', fontWeight: 600 },
   choices: { width: '100%' },
+  // Air under the last row (Dot, b54): scrolled to the end, the last time is 72px above the Next bar: its 56px fade (the sticky footer's top, already
+  // in the page) and 16px more, so the chip's whole 48px target is clear of the fade and not flush with it.
+  endAir: { paddingBlockEnd: '16px' },
   // Day and time choices (Will, 3 October, D-235): smaller, white pills
   // with a grey outline like the round header buttons; the chosen one fills
-  // green. Still the 48px touch floor (§2.5).
+  // green. The pill is 40px (Will, a95: the chips were too tall); the touch floor (§2.5) stays 48px, by 4px
+  // of invisible hit area above and below that count as the button's own. Rows are 8px apart, so they never overlap.
+  // The hit area is placed from the PADDING edge, so a chip with a 1px border (the unselected one) needs 5px to reach 4px past
+  // its outline: with 4 it was 46px tall, 3px above the pill and only 2px below it (Iris, b54).
   choice: {
-    minHeight: '48px',
+    minHeight: '40px',
     paddingInline: '16px',
     fontSize: '15px',
     borderRadius: '999px',
+    // The global 48px floor on every button reads this; the pill is 40, its hit area below is the other 8.
+    '--pam-touch-target-min': '40px',
+    position: 'relative',
+    '::after': { content: '""', position: 'absolute', insetBlock: '-4px', insetInline: 0 },
   },
   choiceOff: {
+    '::after': { insetBlock: '-5px' },
     backgroundColor: colorVars['--color-background-body'],
     borderWidth: '1px',
     borderStyle: 'solid',
@@ -118,7 +129,7 @@ const styles = stylex.create({
   note: { fontSize: '15px', lineHeight: 1.5 },
 });
 
-/** The next `count` weekdays, from tomorrow. */
+/** The next `count` weekdays, from tomorrow (six: the rest were too many chips, and pushed the time out of view, a95). */
 function nextWeekdays(count: number): Date[] {
   const out: Date[] = [];
   const d = new Date();
@@ -236,6 +247,17 @@ export function NewTripView({
   const fromPlace = initial !== null && !changing;
   const placeHref = initial ? `/place/?id=${encodeURIComponent(initial.id)}` : '/trips/';
   const [step, setStep] = useState<Step>(initial ? 'when' : 'where');
+  // Tabbing to the last day or time must scroll it clear of the Next bar and its fade, not leave it under them: the page keeps this much
+  // of the bottom of the screen out of what "in view" means while this step is open (the fade 56 + the button 48 + its 16 below + 16 of air
+  // + the chip's 4px of hit area). Only this step: another screen's focus is as it was.
+  useEffect(() => {
+    if (step !== 'when') return;
+    const root = document.documentElement;
+    root.style.scrollPaddingBottom = '140px';
+    return () => {
+      root.style.scrollPaddingBottom = '';
+    };
+  }, [step]);
   const [day, setDay] = useState<Date | null>(null);
   const [time, setTime] = useState<readonly [number, number] | null>(null);
   const [note, setNote] = useState('');
@@ -287,12 +309,12 @@ export function NewTripView({
     return () => clearTimeout(timer);
   }, [movedTo]);
 
-  // A walk-in (D-333): the days it meets, at its set time; otherwise any
-  // weekday in the next two weeks, at one of four times.
+  // A walk-in (D-333): the days it meets, at its set time; otherwise the next six
+  // weekdays, at one of four times.
   const booking = place ? bookingFor(place.id) : null;
   const walkIn = booking?.kind === 'dropin' ? booking.schedule : null;
   const days = useMemo(
-    () => (walkIn ? nextDropIns(walkIn, WALK_IN_DAYS) : nextWeekdays(10)),
+    () => (walkIn ? nextDropIns(walkIn, WALK_IN_DAYS) : nextWeekdays(6)),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- the schedule is a lookup by place.
     [place?.id],
   );
@@ -475,9 +497,9 @@ export function NewTripView({
         : step === 'check'
           ? { onBack: () => setStep('when') }
           : {})}
-      // Plan a trip (D-235): search where Help was on the first step. When
-      // has Help too (Iris's second member pass, W4; A26: help on each step
-      // of a multi-step task), as Check and Done do.
+      // Plan a trip (D-235): search where Help was on the first step; no
+      // Help on When either (Will, a95, 17 October: he took it off again, against A26 and Iris's second member pass W4,
+      // so the six dates and the times are in view). Check and Done keep Help.
       // The step's one button at the foot of the screen (D-326), like a
       // place's Plan a trip: Next on When, Add this trip on Check.
       footer={
@@ -560,7 +582,7 @@ export function NewTripView({
             href="/"
             xstyle={styles.round}
           />
-        ) : (
+        ) : step === 'when' ? undefined : (
           <HelpButton />
         )
       }
@@ -643,7 +665,7 @@ export function NewTripView({
               ))}
             </HStack>
           </VStack>
-          <VStack gap={2}>
+          <VStack gap={2} xstyle={styles.endAir}>
             <Heading level={2} xstyle={styles.label}>
               {t('trips.new.time')}
             </Heading>
