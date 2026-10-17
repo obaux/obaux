@@ -662,5 +662,149 @@
   {
     "key": "ar|cut|member-created-states-street-search--results-showing|العمل والمال",
     "reason": "The Places screen behind the open area sheet has a row of category filters (Work and money) whose label is partly under the sheet and its dimmed scrim, so the detector sees it partly hidden (partial=true, 0 in, 0 out). The sheet is a drawer over the page: nothing in it is cut, and the filter is fully visible once it closes. Looked at 13 October 2026 at 320px with a screenshot of the sheet open."
+  },
+  {
+    "key": "es|cut|member-created--trips-just-booked|miércoles, 14 oct · 13:00",
+    "reason": "At 320×568 the Trips drawer scrolls and fades out at its foot, and the second trip card sits half under the tab bar, so the detector sees whichever words land on that edge (the date line, the avatar letter, the chip) partly hidden (partial=true, 0 in, 0 out); which of them it reports changes from run to run and with the language. It is reached by scrolling and nothing is lost. Looked at 17 October 2026 at 320×568 with a screenshot (Spanish); the fit job runs 760, where this does not show."
+  },
+  {
+    "key": "es|cut|member-created--trips-just-booked|M",
+    "reason": "At 320×568 the Trips drawer scrolls and fades out at its foot, and the second trip card sits half under the tab bar, so the detector sees whichever words land on that edge (the date line, the avatar letter, the chip) partly hidden (partial=true, 0 in, 0 out); which of them it reports changes from run to run and with the language. It is reached by scrolling and nothing is lost. Looked at 17 October 2026 at 320×568 with a screenshot (Spanish); the fit job runs 760, where this does not show."
+  },
+  {
+    "key": "es|cut|member-created--trips-just-booked|Faltan firmas",
+    "reason": "At 320×568 the Trips drawer scrolls and fades out at its foot, and the second trip card sits half under the tab bar, so the detector sees whichever words land on that edge (the date line, the avatar letter, the chip) partly hidden (partial=true, 0 in, 0 out); which of them it reports changes from run to run and with the language. It is reached by scrolling and nothing is lost. Looked at 17 October 2026 at 320×568 with a screenshot (Spanish); the fit job runs 760, where this does not show."
+  },
+  {
+    "key": "zh-CN|cut|member-created--trips-just-booked|M",
+    "reason": "At 320×568 the Trips drawer scrolls and fades out at its foot, and the second trip card sits half under the tab bar, so the detector sees whichever words land on that edge (the date line, the avatar letter, the chip) partly hidden (partial=true, 0 in, 0 out); which of them it reports changes from run to run and with the language. It is reached by scrolling and nothing is lost. Looked at 17 October 2026 at 320×568 with a screenshot (Spanish); the fit job runs 760, where this does not show."
+  },
+  {
+    "key": "zh-CN|cut|member-created--trips-just-booked|需要签名",
+    "reason": "At 320×568 the Trips drawer scrolls and fades out at its foot, and the second trip card sits half under the tab bar, so the detector sees whichever words land on that edge (the date line, the avatar letter, the chip) partly hidden (partial=true, 0 in, 0 out); which of them it reports changes from run to run and with the language. It is reached by scrolling and nothing is lost. Looked at 17 October 2026 at 320×568 with a screenshot (Spanish); the fit job runs 760, where this does not show."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created--explore|⟦Šéééááŕçĥ þŕóóóĝŕáááɱš⟧",
+    "reason": "Explore's search pill is one line and trims long words with an ellipsis, by design; the pseudo-language (\"Search programs\" made far longer) is where it trims, and English, Russian, Arabic and Simplified Chinese fit. Looked at 17 October 2026 at 320px with screenshots of Explore in English and pseudo."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-explore--live|⟦Šéééááŕçĥ þŕóóóĝŕáááɱš⟧",
+    "reason": "Explore's search pill is one line and trims long words with an ellipsis, by design; the pseudo-language (\"Search programs\" made far longer) is where it trims, and English, Russian, Arabic and Simplified Chinese fit. Looked at 17 October 2026 at 320px with screenshots of Explore in English and pseudo."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-profile--loading-hero-card|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English far longer than any real language) runs past the edge. The real languages fit (Russian, the tightest, fills the bar edge to edge); the same label is already accepted on Explore and Trips. Looked at 17 October 2026 at 320px with a screenshot (the Program lead's Home, pseudo)."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-profile--numbers-arriving|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English far longer than any real language) runs past the edge. The real languages fit (Russian, the tightest, fills the bar edge to edge); the same label is already accepted on Explore and Trips. Looked at 17 October 2026 at 320px with a screenshot (the Program lead's Home, pseudo)."
+  },
+  {
+    "key": "pseudo|overlap|member-created-states-profile--numbers-arriving|⟦Ŕéééţúúŕñééð⟧ ⟷ ⟦Çóóóññéééçţííóóñš⟧",
+    "reason": "Stat columns share one row, each a number over a one-word label, and a word is never broken. The pseudo-language's longest label is wider than its third; the real languages' labels fit. The same pair is accepted on Profile › New member; this is the Numbers arriving story. Looked at 17 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-street-search--sheet-open|⟦Šéééááŕçĥ þŕóóóĝŕáááɱš⟧",
+    "reason": "Explore's search pill is one line and trims long words with an ellipsis, by design; the pseudo-language (\"Search programs\" made far longer) is where it trims, and English, Russian, Arabic and Simplified Chinese fit. Looked at 17 October 2026 at 320px with screenshots of Explore in English and pseudo."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-street-search--sheet-open|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English far longer than any real language) runs past the edge. The real languages fit (Russian, the tightest, fills the bar edge to edge); the same label is already accepted on Explore and Trips. Looked at 17 October 2026 at 320px with a screenshot (the Program lead's Home, pseudo)."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-street-search--results-showing|⟦Šéééááŕçĥ þŕóóóĝŕáááɱš⟧",
+    "reason": "Explore's search pill is one line and trims long words with an ellipsis, by design; the pseudo-language (\"Search programs\" made far longer) is where it trims, and English, Russian, Arabic and Simplified Chinese fit. Looked at 17 October 2026 at 320px with screenshots of Explore in English and pseudo."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-street-search--results-showing|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English far longer than any real language) runs past the edge. The real languages fit (Russian, the tightest, fills the bar edge to edge); the same label is already accepted on Explore and Trips. Looked at 17 October 2026 at 320px with a screenshot (the Program lead's Home, pseudo)."
+  },
+  {
+    "key": "pseudo|placeholder|case-manager-screens--home|⟦Šéééááŕçĥ ɱéééɱƀéééŕš⟧",
+    "reason": "The case manager Home's search pill has 128px of room for its words at 320 and a placeholder never wraps. \"Search members\" fits in English (123px) and in every real language (es 126, pt-BR 122, ru «Поиск людей» 107, ar 114, zh 64), and the placeholder check now fails any that would not. The pseudo-language (English far longer) cannot fit any placeholder wider than about half the room. Looked at 17 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|placeholder|case-manager-states-home--caseload|⟦Šéééááŕçĥ ɱéééɱƀéééŕš⟧",
+    "reason": "The case manager Home's search pill has 128px of room for its words at 320 and a placeholder never wraps. \"Search members\" fits in English (123px) and in every real language (es 126, pt-BR 122, ru «Поиск людей» 107, ar 114, zh 64), and the placeholder check now fails any that would not. The pseudo-language (English far longer) cannot fit any placeholder wider than about half the room. Looked at 17 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|placeholder|case-manager-states-home--empty|⟦Šéééááŕçĥ ɱéééɱƀéééŕš⟧",
+    "reason": "The case manager Home's search pill has 128px of room for its words at 320 and a placeholder never wraps. \"Search members\" fits in English (123px) and in every real language (es 126, pt-BR 122, ru «Поиск людей» 107, ar 114, zh 64), and the placeholder check now fails any that would not. The pseudo-language (English far longer) cannot fit any placeholder wider than about half the room. Looked at 17 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|program-lead-states-home--folded|1:00 PM",
+    "reason": "The folded Home lets its list fade out into \"See the whole calendar\" on purpose: the third visit is only half there in English too. In the pseudo-language the words wrap one line taller, so the detector sees the 1:00 PM row's words partly hidden (partial=true). The rest of the list is one tap away and nothing is lost. Looked at 17 October 2026 at 320×760 with screenshots in English and pseudo."
+  },
+  {
+    "key": "pseudo|cut|program-lead-states-home--folded|Miguel",
+    "reason": "The folded Home lets its list fade out into \"See the whole calendar\" on purpose: the third visit is only half there in English too. In the pseudo-language the words wrap one line taller, so the detector sees the 1:00 PM row's words partly hidden (partial=true). The rest of the list is one tap away and nothing is lost. Looked at 17 October 2026 at 320×760 with screenshots in English and pseudo."
+  },
+  {
+    "key": "pseudo|cut|program-lead-states-home--folded|M",
+    "reason": "The folded Home lets its list fade out into \"See the whole calendar\" on purpose: the third visit is only half there in English too. In the pseudo-language the words wrap one line taller, so the detector sees the 1:00 PM row's words partly hidden (partial=true). The rest of the list is one tap away and nothing is lost. Looked at 17 October 2026 at 320×760 with screenshots in English and pseudo."
+  },
+  {
+    "key": "pseudo|clamp|super-admin-screens--reported-places-kept|Groceries to take home, no appointment. Bring a bag if you h",
+    "reason": "A place card clamps its name and its description to two lines on purpose (the English story clamps the same sentence); the pseudo-language is about 40% longer, so it clamps a few words sooner. The full text is on the place page one tap away and nothing is lost. Same cards as the Case manager's reported places; this is the Super admin's. Looked at 17 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|clamp|super-admin-screens--reported-places-kept|Example Reentry Employment and Housing Resource Center of No",
+    "reason": "A place card clamps its name and its description to two lines on purpose (the English story clamps the same sentence); the pseudo-language is about 40% longer, so it clamps a few words sooner. The full text is on the place page one tap away and nothing is lost. Same cards as the Case manager's reported places; this is the Super admin's. Looked at 17 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|clamp|super-admin-screens--reported-places-removed|Groceries to take home, no appointment. Bring a bag if you h",
+    "reason": "A place card clamps its name and its description to two lines on purpose (the English story clamps the same sentence); the pseudo-language is about 40% longer, so it clamps a few words sooner. The full text is on the place page one tap away and nothing is lost. Same cards as the Case manager's reported places; this is the Super admin's. Looked at 17 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|clamp|super-admin-screens--reported-places-removed|Example Reentry Employment and Housing Resource Center of No",
+    "reason": "A place card clamps its name and its description to two lines on purpose (the English story clamps the same sentence); the pseudo-language is about 40% longer, so it clamps a few words sooner. The full text is on the place page one tap away and nothing is lost. Same cards as the Case manager's reported places; this is the Super admin's. Looked at 17 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|cut|onboarding--about-members-second-slide|⟦Þŕóóóĝŕáááɱš⟧",
+    "reason": "A segment of the control never breaks a word (D-422), and three share one row, so the pseudo-language's single long word is wider than a third of it. The longest word in each real language fits; a language with longer words would need two rows or a different control. The same control is accepted on About Pam; this is its other slides and tabs. Looked at 17 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|scroll|onboarding--about-members-second-slide|(page)",
+    "reason": "A segment of the control never breaks a word (D-422), and three share one row, so the pseudo-language's single long word is wider than a third of it. The longest word in each real language fits; a language with longer words would need two rows or a different control. The same control is accepted on About Pam; this is its other slides and tabs. Looked at 17 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|cut|onboarding--about-members-third-slide|⟦Þŕóóóĝŕáááɱš⟧",
+    "reason": "A segment of the control never breaks a word (D-422), and three share one row, so the pseudo-language's single long word is wider than a third of it. The longest word in each real language fits; a language with longer words would need two rows or a different control. The same control is accepted on About Pam; this is its other slides and tabs. Looked at 17 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|scroll|onboarding--about-members-third-slide|(page)",
+    "reason": "A segment of the control never breaks a word (D-422), and three share one row, so the pseudo-language's single long word is wider than a third of it. The longest word in each real language fits; a language with longer words would need two rows or a different control. The same control is accepted on About Pam; this is its other slides and tabs. Looked at 17 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|cut|onboarding--about-case-managers|⟦Þŕóóóĝŕáááɱš⟧",
+    "reason": "A segment of the control never breaks a word (D-422), and three share one row, so the pseudo-language's single long word is wider than a third of it. The longest word in each real language fits; a language with longer words would need two rows or a different control. The same control is accepted on About Pam; this is its other slides and tabs. Looked at 17 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|scroll|onboarding--about-case-managers|(page)",
+    "reason": "A segment of the control never breaks a word (D-422), and three share one row, so the pseudo-language's single long word is wider than a third of it. The longest word in each real language fits; a language with longer words would need two rows or a different control. The same control is accepted on About Pam; this is its other slides and tabs. Looked at 17 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|cut|onboarding--about-case-managers-second-slide|⟦Þŕóóóĝŕáááɱš⟧",
+    "reason": "A segment of the control never breaks a word (D-422), and three share one row, so the pseudo-language's single long word is wider than a third of it. The longest word in each real language fits; a language with longer words would need two rows or a different control. The same control is accepted on About Pam; this is its other slides and tabs. Looked at 17 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|scroll|onboarding--about-case-managers-second-slide|(page)",
+    "reason": "A segment of the control never breaks a word (D-422), and three share one row, so the pseudo-language's single long word is wider than a third of it. The longest word in each real language fits; a language with longer words would need two rows or a different control. The same control is accepted on About Pam; this is its other slides and tabs. Looked at 17 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|cut|onboarding--about-programs|⟦Þŕóóóĝŕáááɱš⟧",
+    "reason": "A segment of the control never breaks a word (D-422), and three share one row, so the pseudo-language's single long word is wider than a third of it. The longest word in each real language fits; a language with longer words would need two rows or a different control. The same control is accepted on About Pam; this is its other slides and tabs. Looked at 17 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|scroll|onboarding--about-programs|(page)",
+    "reason": "A segment of the control never breaks a word (D-422), and three share one row, so the pseudo-language's single long word is wider than a third of it. The longest word in each real language fits; a language with longer words would need two rows or a different control. The same control is accepted on About Pam; this is its other slides and tabs. Looked at 17 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|cut|onboarding--about-programs-third-slide|⟦Þŕóóóĝŕáááɱš⟧",
+    "reason": "A segment of the control never breaks a word (D-422), and three share one row, so the pseudo-language's single long word is wider than a third of it. The longest word in each real language fits; a language with longer words would need two rows or a different control. The same control is accepted on About Pam; this is its other slides and tabs. Looked at 17 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|scroll|onboarding--about-programs-third-slide|(page)",
+    "reason": "A segment of the control never breaks a word (D-422), and three share one row, so the pseudo-language's single long word is wider than a third of it. The longest word in each real language fits; a language with longer words would need two rows or a different control. The same control is accepted on About Pam; this is its other slides and tabs. Looked at 17 October 2026 at 320px."
   }
 ]
