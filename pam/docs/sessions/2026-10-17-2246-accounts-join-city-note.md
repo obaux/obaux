@@ -35,7 +35,7 @@ the city list, like a choice, and tapping it did nothing.
 - The new test fails on main's JoinScreen (narrow-320: the note is hidden until the list is opened).
 - e2e grep for anything counting the city list's rows: none. The only `getByRole('option')` uses are the language list
   (join.spec), Español (account.spec) and Programs (directory.spec).
-- Full e2e: see the READY.
+- Full e2e: 2084 passed, 19 skipped, 0 failed (27.4m).
 - Pictures at 320, before (`main`) and after, closed and open: `docs/design/review/2026-10-17-join-city-note/`.
 
 ## Left undone
