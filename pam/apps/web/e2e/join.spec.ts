@@ -419,6 +419,25 @@ test.describe('signing up', () => {
     await expect(page.getByText(/want to hear when Pam opens|Pam cannot text you/)).toHaveCount(0);
   });
 
+  test('the city list holds only cities; "only in these cities" is a line under it, not a row (Iris\'s run-through, P5)', async ({ page }) => {
+    await newcomer(page);
+    await page.goto('/join/');
+    const list = page.getByRole('combobox', { name: 'City you live in' });
+    await expect(list).toContainText('Philadelphia');
+    const note = page.getByText('Pam is only in these cities for now.');
+    // On the page, under the field, before the list is opened.
+    await expect(note).toBeVisible();
+    expect((await note.boundingBox())!.y).toBeGreaterThan((await list.boundingBox())!.y);
+    await settled(page);
+    await list.click();
+    // Every row is a city that can be chosen: nothing in the list that looks tappable and isn't.
+    const rows = page.getByRole('option');
+    await expect(rows).toHaveCount(1);
+    await expect(rows).toHaveText('Philadelphia');
+    await expect(page.getByRole('option', { disabled: true })).toHaveCount(0);
+    await expect(page.getByRole('listbox').getByText('Pam is only in these cities for now.')).toHaveCount(0);
+  });
+
   test('a name is asked for before anything is sent', async ({ page }) => {
     const calls = await newcomer(page);
     await page.goto('/join/');
