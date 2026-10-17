@@ -176,7 +176,11 @@ export function ScrollReveal({ children, index = 0 }: { children: ReactNode; ind
  * member will feel hundreds of times.
  */
 export function Press({ children }: { children: ReactNode }) {
-  return <div {...stylex.props(styles.press)}>{children}</div>;
+  return (
+    <div data-pam-press="" {...stylex.props(styles.press)}>
+      {children}
+    </div>
+  );
 }
 
 /** A list whose items leave under a mask rather than blinking out. */
