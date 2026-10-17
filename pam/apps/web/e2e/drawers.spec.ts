@@ -65,20 +65,17 @@ test.describe('the drawer standard', () => {
     const box = (await panel(page).boundingBox())!;
     const button = page.locator('dialog[open]').getByRole('button', { name: 'Done' });
     await expect(button).toBeVisible();
+    // The button is the 48px tap target; the circle drawn in it is 36px, tucked 16px in from the top and the side (inside the rounded corner).
     const b = (await button.boundingBox())!;
-    // A 36px circle tucked 16px in from the top and the side (inside the sheet's rounded corner), with a 48px tap target.
-    expect(b.width).toBeGreaterThanOrEqual(34);
-    expect(b.width).toBeLessThanOrEqual(40);
-    expect(box.x + box.width - (b.x + b.width)).toBeGreaterThanOrEqual(12);
-    expect(box.x + box.width - (b.x + b.width)).toBeLessThanOrEqual(20);
-    expect(b.y - box.y).toBeGreaterThanOrEqual(12);
-    expect(b.y - box.y).toBeLessThanOrEqual(20);
-    const cx = b.x + b.width / 2;
-    const cy = b.y + b.height / 2;
-    for (const [dx, dy] of [[-23, 0], [23, 0], [0, 23], [0, -23]] as const) {
-      const hit = await page.evaluate(([x, y]) => document.elementFromPoint(x!, y!)?.closest('[data-sheet-action]') !== null, [cx + dx, cy + dy]);
-      expect(hit, `48px target at ${dx},${dy}`).toBe(true);
-    }
+    expect(b.width).toBeGreaterThanOrEqual(48);
+    expect(b.height).toBeGreaterThanOrEqual(48);
+    const c = (await button.locator('xpath=.//*[contains(@class,"astryx-stack")][1]').boundingBox())!;
+    expect(Math.abs(c.width - 36)).toBeLessThan(1);
+    expect(Math.abs(c.height - c.width), 'a circle, not an oval').toBeLessThan(1);
+    expect(box.x + box.width - (c.x + c.width)).toBeGreaterThanOrEqual(12);
+    expect(box.x + box.width - (c.x + c.width)).toBeLessThanOrEqual(20);
+    expect(c.y - box.y).toBeGreaterThanOrEqual(12);
+    expect(c.y - box.y).toBeLessThanOrEqual(20);
     // A checkmark for a drawer you pick in or only read: not an X.
     expect(await button.evaluate((el) => el.querySelector('svg path')?.getAttribute('d'))).toBe('M5 13l4 4L19 7');
     // In document order the heading comes first and the button is the next control after it (the notch is hidden from both).
@@ -100,9 +97,10 @@ test.describe('the drawer standard', () => {
     const box = (await panel(page).boundingBox())!;
     const button = page.locator('dialog[open] [data-sheet-action]');
     const b = (await button.boundingBox())!;
-    expect(b.x - box.x).toBeGreaterThanOrEqual(12);
-    expect(b.x - box.x).toBeLessThanOrEqual(20);
-    expect(b.y - box.y).toBeLessThanOrEqual(20);
+    // The 48px box is 10px in, so its 36px circle is 16px in.
+    expect(b.x - box.x).toBeGreaterThanOrEqual(8);
+    expect(b.x - box.x).toBeLessThanOrEqual(12);
+    expect(b.y - box.y).toBeLessThanOrEqual(12);
   });
 
   test('Done and Escape both close it, and the focus goes back to where it came from', async ({ page }) => {

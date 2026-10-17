@@ -4,6 +4,7 @@ import { useRef, type ReactNode, type RefObject } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
 import { Heading } from '@astryxdesign/core/Heading';
+import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { Icon } from '@astryxdesign/core/Icon';
@@ -77,24 +78,30 @@ const styles = stylex.create({
   // 48px of notch, then 8px of air, before the title row; the title leaves room for the corner button.
   header: { width: '100%', paddingBlockStart: '56px', paddingInlineStart: '20px', paddingInlineEnd: '64px', paddingBlockEnd: '8px' },
   title: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700, minWidth: 0 },
-  // The round button, tucked into the top corner (the end corner: left in Arabic): a 36px circle 16px from the top and from the side,
-  // so it sits inside the sheet's rounded corner instead of floating by it. Its tap target is 48px: an invisible 6px margin all round.
+  // The round button, tucked into the top corner (the end corner: left in Arabic): a 36px circle 16px in from the top and from the side,
+  // so it sits inside the sheet's rounded corner instead of floating by it. The button itself is the 48px tap target (the global
+  // 48px floor on every button, globals.css) and has no fill; the circle is drawn inside it.
   action: {
     position: 'absolute',
-    insetBlockStart: '16px',
-    insetInlineEnd: '16px',
+    insetBlockStart: '10px',
+    insetInlineEnd: '10px',
     zIndex: 3,
+    width: pam['--pam-touch-target-min'],
+    height: pam['--pam-touch-target-min'],
+    backgroundColor: 'transparent',
+    backgroundImage: { default: 'none', ':hover': 'none', ':active': 'none' },
+    boxShadow: 'none',
+  },
+  circle: {
     width: '36px',
     height: '36px',
     minWidth: '36px',
-    minHeight: '36px',
+    flexShrink: 0,
     borderRadius: '50%',
     backgroundColor: colorVars['--color-background-muted'],
-    boxShadow: 'none',
-    '::after': { content: '""', position: 'absolute', inset: '-6px' },
   },
   // Over Bring a friend's picture: the white circle with a soft shadow it always had (D-338).
-  actionOnPicture: {
+  circleOnPicture: {
     backgroundColor: colorVars['--color-background-body'],
     boxShadow: '0 1px 4px oklch(0 0 0 / 18%)',
   },
@@ -146,10 +153,14 @@ export function PamSheet({
           <IconButton
             label={actionLabel}
             variant="ghost"
-            icon={<Icon icon={kind === 'review' ? 'check' : 'close'} size="sm" />}
+            icon={
+              <HStack align="center" justify="center" xstyle={[styles.circle, title === null ? styles.circleOnPicture : null]}>
+                <Icon icon={kind === 'review' ? 'check' : 'close'} size="sm" />
+              </HStack>
+            }
             onClick={close}
             data-sheet-action={kind}
-            xstyle={[styles.action, title === null ? styles.actionOnPicture : null]}
+            xstyle={styles.action}
           />
           {children}
         </VStack>

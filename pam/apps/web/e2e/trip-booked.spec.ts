@@ -51,11 +51,15 @@ test('Bring a friend: the picture touches the drawer’s top edge, with a round 
   // An X (something is done in here: the link is copied), named Close, a round 36px circle tucked into the top-right corner.
   const close = page.locator('dialog[open]').getByRole('button', { name: 'Close' });
   const b = (await close.boundingBox())!;
-  expect(b.width).toBeGreaterThanOrEqual(34);
-  expect(box.x + box.width - (b.x + b.width)).toBeGreaterThanOrEqual(12);
-  expect(box.x + box.width - (b.x + b.width)).toBeLessThanOrEqual(20);
-  expect(b.y - box.y).toBeGreaterThanOrEqual(12);
-  expect(b.y - box.y).toBeLessThanOrEqual(20);
+  expect(b.width).toBeGreaterThanOrEqual(48);
+  expect(b.height).toBeGreaterThanOrEqual(48);
+  const c = (await close.locator('xpath=.//*[contains(@class,"astryx-stack")][1]').boundingBox())!;
+  expect(Math.abs(c.width - 36)).toBeLessThan(1);
+  expect(Math.abs(c.height - c.width), 'a circle, not an oval').toBeLessThan(1);
+  expect(box.x + box.width - (c.x + c.width)).toBeGreaterThanOrEqual(12);
+  expect(box.x + box.width - (c.x + c.width)).toBeLessThanOrEqual(20);
+  expect(c.y - box.y).toBeGreaterThanOrEqual(12);
+  expect(c.y - box.y).toBeLessThanOrEqual(20);
   expect(await close.evaluate((el) => el.querySelector('svg path')?.getAttribute('d') ?? '')).not.toBe('M5 13l4 4L19 7');
   await close.click();
   await expect(page.locator('dialog[open]')).toHaveCount(0);
