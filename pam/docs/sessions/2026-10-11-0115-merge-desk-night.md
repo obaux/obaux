@@ -1385,6 +1385,20 @@
   re-shot, which also replaced a stale "call us"). Lena's afternoon records d3e20ed8. Members are told on the Privacy
   page in the same batch, as Will ruled for D-413. Five migrations live: 20261017062631 as `20261017162826`, 062632 as
   `162851`, 062633 as `162859`, 065103 as `162920`, 065125 as `162927`.
+- **b58 pushed (16:31, a8f72680).** Main CI green 17:04; Vercel web and pam-site success. Card a94 says live; the
+  team and Iris told 17:05.
+- **Will on a97 (16:37).** Keep Bring a friend's picture to the edge with its round X; every other drawer gets a round
+  icon button in the top-right corner; a checkmark when you pick or only read, an X when something is done inside.
+  The merge desk sorted the drawers (checkmark: Opening hours, What you can see, Location, New message, Open in…; X:
+  Bring a friend, Sign a policy); Dot rebuilt it (09c7c9ce) and the new pictures are on a97.
+- **Iris's b58 re-test (17:19): items 2 to 6 PASS, one finding.** Book a visit also listed conversation partners, so a
+  member who wrote but is blocked was listed, and booking them ended on a generic "Try again" (MEMBER_NOT_LINKED).
+  Piper is fixing it (claude/places-programs-book-list: the list only from `my_program_bookable_members`, a true
+  message per refusal; Sage signs seven new lines, Lena translates).
+- **Batch b59 (17 October, 16:55 to 17:25).** Dot's 9c8d5753 (an envelope, not a phone, on the write-to-us line of
+  What others can see and the Legal contact; a row that dials keeps the phone). Wren's 33b74c70 (Texts from Pam says
+  "A reminder before each visit"; Planning a visit and Is the place told name a visit a program booked; a new post,
+  "When a program books a visit for you"; Who is my guide's picture with the envelope). Sage's ledger 15977c8b.
 
 ## What was wrong, and what missed it
 
@@ -1802,9 +1816,16 @@
 | Batch b58 with Wren's two patches and Lena's records (43089440): posts:date what-others-can-see=2026-10-17 / site test / site tsc / config / site build / site a11y | no change / 123 passed / 0 / 1375 passed / 0 / 120 scans, 0 problems |
 | Batch b58 with Lena's consent.spec fix (7e396f27): consent, program-books-for-member, person-real-trips on three projects | 114 passed |
 | a94's five migrations live (`20261017162826`, `162851`, `162859`, `162920`, `162927`) | list_migrations first (last live 20261017083423, no drift); the five files' md5 = Piper's a01972c8; appointments.booked_by_org and its index exist; notifications_kind_known = the old five kinds + visit_booked_for_you; book_visit_for_member (one overload, the widened body and comment), my_trip_booked_by, my_program_bookable_members: security definer, search_path = public, extensions, no execute for anon or public, execute for authenticated; booked rows: 0; get_advisors: only the by-design SECURITY DEFINER classes |
+| b58 main CI (a8f72680) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (17:04); Vercel web and pam-site success |
+| Proofs (16:33 to 16:45): main a8f72680 with drawers.spec (fbab33a9) and mail-icon.spec (9c8d5753); 5d32da07 with admin.spec (cef097f1) | 15 failed (drawers 4 tests × 3 projects, mail icon 1 × 3) / 6 failed (a93's row test and the caseload contract, × 3), 60 passed |
+| Batch b59, full run (1011b112: Dot 9c8d5753, Wren 33b74c70, Sage 15977c8b): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1375 passed, 1 skipped / in step / 124 / 0 / 124 / 0 / 0 / 0 / 188 / 10.7 kB spare / 2066 passed, 19 skipped, 0 failed / built; "no bundle names the live one"; grep 0 files / 0 / SITEA11Y |
 
 ## Left undone
 
+- **As of b59 (17 October, 17:25):** Piper: Book a visit's list and refusal messages (Iris's b58 finding), with
+  Sage's seven lines and Lena's six languages; Iris's report (cafb4b20) rides with it. The merge desk owes the proof
+  of Dot's rebuilt drawers.spec and the Bring a friend check on main. With Will: a86 (yes and the p7 line), a91 (the
+  button word and "sign 1" or "sign 2"), a93 (yes), a97 (yes on the round buttons), a84, a88.
 - **As of b58 (17 October, 16:30):** b59 takes Dot's mail icon (9c8d5753) and Wren's re-shot guide picture after it;
   Wren matches Texts from Pam's "A reminder before a visit you planned" to the signed "before each visit" (Sage signs
   any sentence), and the held post on a program booking a visit is now due. Proofs owed by the merge desk: a93's
