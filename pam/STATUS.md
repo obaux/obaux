@@ -1291,6 +1291,10 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · the audit purge reaches rows that name a person only in meta (17 October 2026)
+
+Built, not live: `purge_erased_audit()` also deletes a row when a top-level `meta` value is the erased person's id, so the `with`/`lead`/`by` rows no longer outlast the six months (D-599, migration `20261017075451`, test 77). Writers unchanged. Mira applies it after the batch's CI.
+
 ## Messages & notifications · Answer by text shows what they wrote (15 October 2026)
 
 Built, not live: the super admin's Answer by text screen shows the number as a person reads it and a "They wrote" card with the words and time, read from the link's `#` fragment (D-583). Answering by text stays off (D-524, D-547); nothing builds the link yet. The number→first-name lookup was built and then held by Mira for a61 (SQL in D-583); no migration. One new string awaits Sage and Lena (`supportReply.theyWrote`). Proof: `answer-by-text.spec.ts`, `replyContext.test.ts`.
