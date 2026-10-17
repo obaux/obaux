@@ -1400,6 +1400,24 @@
   "A reminder before each visit"; Planning a visit and Is the place told name a visit a program booked; a new post,
   "When a program books a visit for you"; Who is my guide's picture with the envelope). Sage's ledger 15977c8b.
 
+- **Will on the Calendar screen (19:08).** A phone picture of Profile › Calendar after a link was made: "It's too
+  confusing." Iris researched how other apps do it (6259d308, in b60): seven feed products show the link again, none
+  claims "connected", appointment apps add one visit at a time. The merge desk decided: show the link again (rebuilt
+  from one key in Supabase Vault plus the member's id and a version; no copy and no hash stored) and say only "On since
+  {date}". Lena and Sage drafted the Privacy lines (Sage's ledger 03a2ed14); Dot drew the "before" (3a8ce877) and draws
+  options A (per-visit add plus the feed) and B (feed only) for card a98. One calendar link exists live (a count, 19:24).
+- **Will on taps (19:13).** Rows under Profile's hero card didn't open with a simple tap, and nothing pressed in. The
+  merge desk measured it: Astryx draws a list row's link only around its label (296x24 inside a 358x64 row, 31%;
+  Language 22%), about 54 uses in 35 files; and iOS shows `:active` only on a page with a touchstart listener, which
+  Pam had none of. Dot fixed both (bug A); the press-in layer (B) goes to card a99 with a clip; Iris runs an
+  interaction pass of every screen once A is live.
+- **Control Room v25 (19:05, version 44).** Will can paste, pick or drop pictures into the chat; they go up to the
+  page's own picture store and reach the merge desk as `/_blob/<id>`.
+- **Batch b60 (17 October, 20:05 to 21:12).** Dot's 6e9b59de (one handler in the app shell clicks a row's own link on a
+  plain tap anywhere on the row; links, buttons, fields and switches inside keep their own taps; an empty passive
+  touchstart listener for iOS `:active`; Storybook's preview the same; MenuList's comment corrected; e2e
+  row-taps.spec.ts and unit tap-rows.test.tsx). Iris's calendar research 6259d308 (docs only).
+
 ## What was wrong, and what missed it
 
 - **A flaky test's evidence was wiped before anyone read it (b55).** The merge desk re-ran invite.spec.ts:178 fifteen
@@ -1617,6 +1635,16 @@
   pushed after b59's CI. Lesson: a placeholder in a record is checked to be gone (the grep must print 0) before the
   commit, and a records commit is written after its numbers exist, not before.
 
+- **Rows that opened only from their words (live until b60).** Every Astryx list row with a link, on every screen,
+  opened only from the 24px strip of its label. MenuList's own comment said the whole row was the target, and no test
+  tapped a row anywhere but its middle, so nothing caught it until Will's thumb did. Lesson: a hit-area test measures
+  every side it claims (b60's row-taps.spec.ts taps four corners, the icon and the chevron).
+- **A proof that failed on its own wait (b60, 20:10).** The first proof of row-taps.spec.ts on main showed 15 failures,
+  but every one was the spec waiting for `html[data-row-taps]`, a marker only the new code sets, so it proved nothing
+  about taps. Re-run with that wait removed, on the same main build: 15 failures, each "a tap on the top-left of the
+  row … did not open it". Lesson: read a proof's failure messages, not its count; a proof must fail on the assertion
+  it claims, not on setup that only the new code satisfies.
+
 ## Decisions
 
 - Will's answer on a card goes to the teammate waiting on it the same turn. If that teammate needs Will's own
@@ -1826,9 +1854,16 @@
 | Batch b59, full run (1011b112: Dot 9c8d5753, Wren 33b74c70, Sage 15977c8b): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1375 passed, 1 skipped / in step / 124 / 0 / 124 / 0 / 0 / 0 / 188 / 10.7 kB spare / 2066 passed, 19 skipped, 0 failed / built; "no bundle names the live one"; grep 0 files / 0 / 125 scans, 0 problems |
 | b59 main CI (4cd061a6) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (17:57); Vercel web and pam-site success |
 | a97 rebuilt, corner tucked in (Dot bb2f0c6e): main 4cd061a6 with drawers.spec and trip-booked.spec from bb2f0c6e, --retries=0 | 18 failed (drawers 5 tests × 3 projects; trip-booked:34, Bring a friend's round X in the corner, × 3), 3 passed (trip-booked:15, unchanged) |
+| Row taps proof on main cffe1c68 (row-taps.spec.ts from 6e9b59de, --retries=0) | run 1: 15 failed, all on the `data-row-taps` wait (hollow); run 2 without that wait: 15 failed (5 tests × 3 projects), each a top-left tap that didn't open its row |
+| Batch b60, full run (24257e53: Dot 6e9b59de): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1375 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 188 / 10.4 kB spare / 2081 passed, 19 skipped, 0 failed / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
+| Calendar links live (19:24, a count) | 1 |
 
 ## Left undone
 
+- **As of b60 (17 October, 21:12):** b61 takes Piper's Book a visit list and refusals (READY owed) with Lena's six
+  languages (8d100f0a) on top. Dot: calendar options A and B for card a98, then the press-in layer for card a99. Iris:
+  the interaction run-through once b60 is live. With Will: a86, a91, a93, a97 ("Approved" passed on by Dot with no
+  item named; asked on the a97 thread), a98 (when drawn), a84, a88.
 - **As of b59 green (17 October, 17:58):** the drawers proof is done (above). Lena's six-language refusals
   (claude/lena-refused-words @ 8d100f0a) are READY on Piper's branch; b60 takes Piper's tip and then Lena's, the merge
   desk merging main (neither of them). Piper's READY is owed. Will's "Approved", passed on by Dot with no item named,
