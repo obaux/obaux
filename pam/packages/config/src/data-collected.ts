@@ -187,7 +187,8 @@ export const INPUT_FILES: readonly InputFile[] = [
   { file: 'apps/web/src/screens/AddPersonView.tsx', fields: 2, collects: ['typed-for-someone-new'] },
   { file: 'apps/web/src/screens/InviteForWho.tsx', fields: 3, collects: ['typed-for-someone-new', 'email'] },
   { file: 'apps/web/src/screens/InviteExpiredScreen.tsx', fields: 1, collects: ['email'] },
-  { file: 'apps/web/src/screens/ExploreScreen.tsx', fields: 1, collects: ['address-typed'] },
+  // The search field now lives in the shared bar (Explore's one search, D-573): the words may be an address, which Pam's server turns into a point.
+  { file: 'packages/ui/src/SearchPill.tsx', fields: 1, collects: ['address-typed'] },
   { file: 'apps/web/src/app/places/AreaPicker.tsx', fields: 2, collects: ['address-typed', 'location-near'] },
   { file: 'apps/web/src/lib/imHere.ts', fields: 2, collects: ['location-here'] },
   { file: 'apps/web/src/app/messages/ThreadView.tsx', fields: 5, collects: ['messages'] },

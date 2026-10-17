@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { settled } from './settled';
+import { launcherOf } from './searchBar';
 
 /**
  * A member's Explore shows the Notifications bell only once there is something in the list it opens
@@ -53,11 +54,11 @@ test.describe("a member's Explore and the bell", () => {
     await signedIn(page, 'member', [], true);
     await page.goto('/');
     await settled(page);
-    const field = page.getByRole('textbox', { name: /Search programs/ });
+    const field = launcherOf(page);
     await expect(field).toBeVisible();
     await expect(bell(page)).toHaveCount(0);
     // The search field takes the whole line, so room held for a bell would show as a narrower field.
-    const box = await page.locator('.astryx-input-group[data-size="lg"]').first().boundingBox();
+    const box = await field.boundingBox();
     const vw = page.viewportSize()!.width;
     expect(Math.abs(box!.x - 16)).toBeLessThan(3);
     expect(Math.abs(box!.width - (vw - 32))).toBeLessThan(3);

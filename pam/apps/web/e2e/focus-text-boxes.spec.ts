@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { settled } from './settled';
+import { launcherOf } from './searchBar';
 import { asMember } from './asMember';
 
 /**
@@ -231,28 +232,42 @@ test.describe('a search bar is the exception: focused, it shows the dark pill ou
     await expect(page.getByRole('button', { name: 'Clear search' })).toBeVisible();
   });
 
-  test('the search bar is one field, at rest and in use: one height, the words in place, a clear button inside it, no Cancel (D-574, a86)', async ({ page }) => {
+  test('the search bar is one height at rest and open: centred at rest, the words slide left when tapped, Cancel beside it, a clear button inside (D-574, a86)', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await signedIn(page);
     await page.route('**/rest/v1/rpc/services_near*', (route) => route.fulfill(json([])));
     await page.goto('/');
     await settled(page);
+    // At rest: the launcher, 60px, its magnifier and words in the middle of the bar.
+    const launcher = launcherOf(page);
+    const rest = await launcher.evaluate((b) => {
+      const r = b.getBoundingClientRect();
+      const i = b.querySelector('svg')!.getBoundingClientRect();
+      return { height: Math.round(r.height), top: Math.round(r.top), width: Math.round(r.width), iconX: Math.round(i.x) };
+    });
+    expect(rest.height).toBe(60);
+    expect(rest.iconX).toBeGreaterThan(rest.width / 4);
+    // A tap opens the field in the same place and the same height; Cancel draws in on its right and the bar narrows to make room.
+    await launcher.click();
+    await page.waitForTimeout(600);
     const group = page.locator('.astryx-input-group[data-size="lg"]').first();
     const where = () =>
       group.evaluate((g) => ({
         height: Math.round(g.getBoundingClientRect().height),
         top: Math.round(g.getBoundingClientRect().top),
+        width: Math.round(g.getBoundingClientRect().width),
         icon: Math.round(g.querySelector('svg')!.getBoundingClientRect().x),
         text: Math.round(g.querySelector('input')!.getBoundingClientRect().x),
         size: getComputedStyle(g.querySelector('input')!).fontSize,
       }));
     const resting = await where();
     expect(resting.height).toBe(60);
-    // A tap focuses it in place: nothing opens, nothing moves, and the only change is the outline.
-    await page.getByRole('textbox', { name: /Search programs/ }).click();
-    await page.waitForTimeout(400);
-    expect(await where()).toEqual(resting);
-    expect(await page.getByRole('button', { name: 'Cancel' }).count()).toBe(0);
+    expect(resting.top).toBe(rest.top);
+    expect(resting.width).toBeLessThan(rest.width);
+    expect(resting.icon).toBeLessThan(rest.iconX);
+    const cancel = page.getByRole('button', { name: 'Cancel' });
+    await expect(cancel).toHaveCount(1);
+    expect((await cancel.boundingBox())!.x - (resting.width + 16)).toBeGreaterThanOrEqual(11);
     // Typing puts a clear button inside the field, 48px, and keeps the bar where it was.
     await page.keyboard.type('food');
     const clear = group.getByRole('button', { name: /^Clear/ });

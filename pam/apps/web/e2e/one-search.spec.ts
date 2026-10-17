@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { settled } from './settled';
+import { launcherOf, openSearch } from './searchBar';
 import { asMember } from './asMember';
 
 /**
@@ -63,18 +64,25 @@ async function open(page: Page, opts: { language?: string; areas?: unknown[]; en
   });
   await page.goto(path);
   await settled(page);
-  return { asked, nearAsked, outside, box: page.getByRole('textbox', { name: /Search programs/ }) };
+  // At rest the bar is the centred launcher; the tap opens the field, focused (Will, 17 October, a86).
+  return { asked, nearAsked, outside, box: await openSearch(page) };
 }
 
 test.describe('one search field', () => {
-  test('is inline: nothing opens, no dropdown, no Cancel; the chips and the Near control stay', async ({ page }) => {
+  test('is inline: a tap opens the field in place, with Cancel; no dialog, no dropdown; the chips and the Near control stay', async ({ page }) => {
     const { box } = await open(page);
     await expect(box).toHaveAttribute('placeholder', 'Search programs');
     await expect(box).toHaveAccessibleName('Search programs by name or address');
-    await box.click();
+    await expect(box).toBeFocused();
     await expect(page.getByRole('dialog')).toHaveCount(0);
     await expect(page.getByRole('listbox')).toHaveCount(0);
-    await expect(page.getByRole('button', { name: 'Cancel' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Cancel' })).toHaveCount(1);
+    // Cancel empties the words and puts the centred bar back.
+    await box.fill('food');
+    await page.getByRole('button', { name: 'Cancel' }).click();
+    await expect(launcherOf(page)).toBeVisible();
+    await expect(page.getByRole('textbox', { name: /Search programs/ })).toHaveCount(0);
+    await openSearch(page);
     await expect(page.getByRole('button', { name: 'School and training' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Near City Hall' })).toBeVisible();
     await box.fill('food');

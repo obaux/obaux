@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { launcherOf } from './searchBar';
 
 /**
  * Iris's W3: for a member WITH notifications the Explore bell arrives about a second after load, and
@@ -50,7 +51,7 @@ const NOTE = 'pam.explore.bell';
 async function open(page: Page) {
   await page.goto('/');
   // A member's Explore has its search field under the title (inline, D-573); it is what must not move when the bell arrives.
-  const search = page.getByRole('textbox', { name: /Search programs/ });
+  const search = launcherOf(page);
   await expect(search).toBeVisible();
   // The area chip is drawn once the session is known; measure after it, so what moves is the bell.
   await page.getByRole('button', { name: /Near City Hall/ }).first().waitFor();
