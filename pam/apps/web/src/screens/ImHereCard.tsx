@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Banner } from '@astryxdesign/core/Banner';
 import { VStack } from '@astryxdesign/core/VStack';
 import { BigButton, TextLink } from '@pam/ui';
@@ -16,7 +16,12 @@ import { loadSavedTrips } from '@/lib/savedTrips';
  */
 type Step = 'idle' | 'locating' | 'sending' | 'not-yet' | 'no-location' | 'limit' | 'too-late' | 'failed' | 'done';
 
-export function ImHereCard({
+/**
+ * The check-in itself, for any screen that draws its own buttons (a91 part 3: the visit widget's Check in view). `onHere` asks the
+ * phone where it is, once; `onWent` sends no position. `result` is what to show in the card after a tap: a Banner when it did not
+ * work, or the success; null before anything was tapped.
+ */
+export function useCheckIn({
   visitId,
   placeName,
   onMarked,
@@ -31,7 +36,7 @@ export function ImHereCard({
   const [points, setPoints] = useState(0);
   const locating = step === 'locating';
   // "I went" sends no position, so it never says it is checking where you are.
-  const busy = locating || step === 'sending';
+  const isBusy = locating || step === 'sending';
 
   const done = (earned: number) => {
     setPoints(earned);
@@ -40,35 +45,49 @@ export function ImHereCard({
     // Trips and this page read the visit again: it is marked now.
     void loadSavedTrips();
   };
-  const here = async () => {
+  const onHere = async () => {
     setStep('locating');
     const result = await markHere(visitId);
     if (result.kind === 'there') return done(result.points);
     setStep(result.kind === 'error' ? 'failed' : result.kind);
   };
-  const went = async () => {
+  const onWent = async () => {
     setStep('sending');
     const result = await markWent(visitId);
     if (result.kind === 'went') return done(result.points);
     setStep(result.kind === 'error' ? 'failed' : result.kind);
   };
 
-  if (step === 'done') {
-    return <Banner status="success" title={t('checkin.done')} description={points > 0 ? t('checkin.points', { points }) : undefined} />;
-  }
+  const result: ReactNode =
+    step === 'done' ? (
+      <Banner status="success" title={t('checkin.done')} description={points > 0 ? t('checkin.points', { points }) : undefined} />
+    ) : step === 'not-yet' ? (
+      <Banner status="info" title={t('checkin.notYet', { place: placeName })} />
+    ) : step === 'no-location' ? (
+      <Banner status="info" title={t('checkin.noLocation', { place: placeName })} />
+    ) : step === 'limit' ? (
+      <Banner status="info" title={t('checkin.limit')} />
+    ) : step === 'too-late' ? (
+      <Banner status="info" title={t('checkin.tooLate')} />
+    ) : step === 'failed' ? (
+      <Banner status="error" title={t('join.failed.title')} />
+    ) : null;
+  return { onHere: () => void onHere(), onWent: () => void onWent(), isBusy, isLocating: locating, isDone: step === 'done', points, result };
+}
+
+export function ImHereCard(props: {
+  readonly visitId: string;
+  readonly placeName: string;
+  readonly onMarked?: () => void;
+}) {
+  const { t } = useI18n();
+  const { onHere, onWent, isBusy, isLocating, isDone, result } = useCheckIn(props);
+  if (isDone) return <>{result}</>;
   return (
     <VStack gap={3}>
-      {step === 'not-yet' ? <Banner status="info" title={t('checkin.notYet', { place: placeName })} /> : null}
-      {step === 'no-location' ? <Banner status="info" title={t('checkin.noLocation', { place: placeName })} /> : null}
-      {step === 'limit' ? <Banner status="info" title={t('checkin.limit')} /> : null}
-      {step === 'too-late' ? <Banner status="info" title={t('checkin.tooLate')} /> : null}
-      {step === 'failed' ? <Banner status="error" title={t('join.failed.title')} /> : null}
-      <BigButton
-        label={t(locating ? 'checkin.locating' : 'checkin.here')}
-        isDisabled={busy}
-        onPress={() => void here()}
-      />
-      <TextLink label={t('checkin.went')} onClick={() => void went()} isDisabled={busy} />
+      {result}
+      <BigButton label={t(isLocating ? 'checkin.locating' : 'checkin.here')} isDisabled={isBusy} onPress={onHere} />
+      <TextLink label={t('checkin.went')} onClick={onWent} isDisabled={isBusy} />
     </VStack>
   );
 }

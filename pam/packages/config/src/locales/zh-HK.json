@@ -1699,5 +1699,8 @@
   "places.reported.remove.confirm.title": "要把{place}從列表中移除嗎？",
   "places.reported.remove.confirm.body": "會員在Pam中將不會再找到它。",
   "places.reported.done.keep": "{place}會繼續留在列表中。",
-  "places.reported.done.remove": "{place}已從列表中移除。"
+  "places.reported.done.remove": "{place}已從列表中移除。",
+  "place.visit.whoSees": "誰看得到這次到訪",
+  "place.visit.changeDate": "更改日期和時間",
+  "place.visit.checkIn": "我到了"
 }

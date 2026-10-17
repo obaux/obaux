@@ -120,6 +120,7 @@ test.describe('past visits and cancelling', () => {
 
     await page.goto(`/place/?id=${PLACE}&from=trips&trip=${NEXT}`);
     await settled(page);
+    await page.getByRole('button', { name: 'Change', exact: true }).click();
     await page.getByRole('button', { name: 'Cancel this visit' }).click();
     await page.getByRole('dialog').getByRole('button', { name: 'Yes, cancel it' }).click();
 

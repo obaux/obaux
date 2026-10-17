@@ -1699,5 +1699,8 @@
   "places.reported.remove.confirm.title": "Tirar {place} da lista?",
   "places.reported.remove.confirm.body": "Os membros não vão mais encontrá-lo em Pam.",
   "places.reported.done.keep": "{place} continua na lista.",
-  "places.reported.done.remove": "{place} saiu da lista."
+  "places.reported.done.remove": "{place} saiu da lista.",
+  "place.visit.whoSees": "Quem vê esta visita",
+  "place.visit.changeDate": "Mudar data e horário",
+  "place.visit.checkIn": "Cheguei"
 }

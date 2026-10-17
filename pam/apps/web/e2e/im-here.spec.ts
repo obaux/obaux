@@ -37,6 +37,12 @@ async function signedIn(page: Page, startsAt: string, hasLead = true) {
   await page.route('**/rest/v1/rpc/service_has_lead*', (route) => route.fulfill(json(hasLead)));
 }
 
+/** The widget's footer first, then the view it opens (a91 part 3): its buttons are "I'm here" and "I went". */
+const openCheckIn = async (page: Page) => {
+  await page.getByRole('button', { name: "I'm here" }).click();
+  await expect(page.getByRole('button', { name: 'I went' })).toBeVisible();
+};
+
 const open = async (page: Page) => {
   await page.goto(`/place/?id=${PLACE}&from=trips&trip=${VISIT}`);
   await settled(page);
@@ -53,14 +59,19 @@ test('tapping I\'m here sends the position to the database once, and a yes says 
   });
   await open(page);
   expect(asked).toHaveLength(0); // Nothing is asked of the phone until the tap.
-  await expect(page.getByText('Cancel this visit')).toBeVisible();
+  // Cancel is in the widget's Change view.
+  await page.getByRole('button', { name: 'Change', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Cancel this visit' })).toBeVisible();
+  await page.getByRole('button', { name: 'Back' }).click();
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
   expect(results.violations).toEqual([]);
+  await openCheckIn(page);
   await page.getByRole('button', { name: "I'm here" }).click();
   await expect(page.getByText("Your visit is marked.")).toBeVisible();
   await expect(page.getByText('You earned 100 points.')).toBeVisible();
   // A marked visit is not cancelled (Iris's second member pass, P6).
-  await expect(page.getByText('Cancel this visit')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Cancel this visit' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: "I'm here" })).toHaveCount(0);
   expect(asked).toHaveLength(1);
   expect(asked[0]).toMatchObject({ p_appointment_id: VISIT, p_lat: 39.95, p_lon: -75.16 });
 });
@@ -71,6 +82,7 @@ test('too far: it says so and the button stays for another try', async ({ page, 
   await signedIn(page, hoursFromNow(0.5));
   await page.route('**/rest/v1/rpc/i_am_here*', (route) => route.fulfill(json([{ appointment_id: VISIT, there: false, points: 0 }])));
   await open(page);
+  await openCheckIn(page);
   await page.getByRole('button', { name: "I'm here" }).click();
   await expect(page.getByText(/You don't seem to be at Riverside Job Center yet/)).toBeVisible();
   await expect(page.getByRole('button', { name: "I'm here" })).toBeVisible();
@@ -93,6 +105,7 @@ test('no location given: nothing is sent, and I went earns 60 without a position
     return route.fulfill(json([{ appointment_id: VISIT, points: 60 }]));
   });
   await open(page);
+  await openCheckIn(page);
   await page.getByRole('button', { name: "I'm here" }).click();
   await expect(page.getByText(/Pam can't check where you are/)).toBeVisible();
   expect(here).toBe(0);
@@ -108,6 +121,7 @@ test('a refusal for the weekly limit is said plainly', async ({ page, context })
     route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ message: 'SELF_REPORT_LIMIT' }) }),
   );
   await open(page);
+  await openCheckIn(page);
   await page.getByRole('button', { name: 'I went' }).click();
   await expect(page.getByText(/you have used them/)).toBeVisible();
 });

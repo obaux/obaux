@@ -36,7 +36,7 @@ import { usePlacePolicies } from '@/lib/usePlacePolicies';
 import { useMySignatures } from '@/lib/useMySignatures';
 import { PolicyStatusCard } from '@pam/ui/PolicyStatusCard';
 import { countdown } from '@/lib/when';
-import { VisitCard } from '@pam/ui/VisitCard';
+import { VisitCard, VisitWidget } from '@pam/ui/VisitCard';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { examplesOn } from '@/lib/examples';
@@ -44,7 +44,7 @@ import { exampleTrips } from '@/lib/exampleTrips';
 import { readAddedTrips, TRIPS_CHANGED, withMoves, withoutCancelled } from '@/lib/addedTrips';
 import { cancelSavedOrLocalTrip, isSavedPlace } from '@/lib/savedTrips';
 import { inMarkWindow } from '@/lib/imHere';
-import { ImHereCard } from '../../screens/ImHereCard';
+import { useCheckIn } from '../../screens/ImHereCard';
 import { navigate } from '@/lib/navigate';
 import { ConfirmDialog } from '../../screens/ConfirmDialog';
 import { Banner } from '@astryxdesign/core/Banner';
@@ -253,6 +253,8 @@ function PlaceScreen() {
   // Cancel this visit (asks first): the one thing here that takes a plan away.
   const [askingCancel, setAskingCancel] = useState(false);
   const [cancelFailed, setCancelFailed] = useState(false);
+  // "I'm here" / "I went" (D-535), run from the visit widget's Check in view (a91 part 3).
+  const checkIn = useCheckIn({ visitId: visit?.id ?? '', placeName: place?.name ?? '', onMarked: () => setJustMarked(true) });
   // The service a member has picked from the cards (D-313): what Plan a
   // trip is for, and what the rows say. With a visit booked, the visit's.
   const [pickedService, setPickedService] = useState<string | null>(null);
@@ -397,11 +399,12 @@ function PlaceScreen() {
   const tellsLeadSees = isMemberView && hasLead;
   // What the program sees of a visit, or that it is not on Pam (D-498): a banner below the services while a member picks one, so they
   // are told before they book (a91, Will 17 October); once booked it stays where it was until the visit card takes it (a91 part 3).
-  const programNote = tellsNoLead ? (
-    <Banner status="info" title={t('place.noLead', { place: place!.name })} />
-  ) : tellsLeadSees ? (
-    <Banner status="info" title={t('place.lead.sees', { place: place!.name })} />
-  ) : null;
+  const programNoteText = tellsNoLead
+    ? t('place.noLead', { place: place!.name })
+    : tellsLeadSees
+      ? t('place.lead.sees', { place: place!.name })
+      : null;
+  const programNote = programNoteText ? <Banner status="info" title={programNoteText} /> : null;
   // A member can message a place only if somebody on Pam runs it (Will, 12 October: programs gathered from
   // the internet have no one to answer). Until that is known the entry points wait, not flash in and out (D-544).
   const hidesMessage = isMemberView && leadKnown !== true;
@@ -426,6 +429,11 @@ function PlaceScreen() {
   const visitWhen = visit ? visitDay.format(new Date(visit.startsAt)) : null;
   const visitHour = visit ? visitTime.format(new Date(visit.startsAt)) : '';
   const visitAhead = visit ? new Date(visit.startsAt).getTime() > Date.now() : false;
+  // The visit as one widget (a91 part 3): a member's own visit, whose program note has words to say. "Check in" is in it only for a real
+  // visit in its window at a program with a lead on Pam, not yet marked (D-535, D-545); marked, it says so and has no buttons.
+  const isMarkedNow = Boolean(visit && (visit.attendance || justMarked));
+  const canCheckIn = Boolean(visit && hasLead && isSavedPlace(visit.id) && isMemberView && !isMarkedNow && inMarkWindow(visit.startsAt));
+  const usesWidget = Boolean(visit && visitWhen && isMemberView && programNoteText && (visitAhead || isMarkedNow || canCheckIn));
   // Change appointment (D-281): the Plan a visit steps, at When, for this
   // trip — saving moves it rather than adding a second one.
   const changeHref = visit
@@ -532,33 +540,61 @@ function PlaceScreen() {
         notice={
           visitWhen || policiesOnTop || (visit && programNote) ? (
             <VStack gap={3}>
-              {visitWhen ? (
+              {usesWidget ? (
+                // One card for the visit and what can be done with it (a91 part 3): Check in and Change are views of it, and
+                // who sees the visit is behind the eye, not a banner under it.
+                <VisitWidget
+                  eyebrow={t(visitAhead ? 'place.visit.next' : 'place.visit.last')}
+                  day={visitWhen!}
+                  time={visitHour}
+                  service={service ? service.name : null}
+                  countdown={visitAhead ? countdown(new Date(visit!.startsAt), t) : null}
+                  hasLead={hasLead}
+                  noteLabel={tPlain('place.visit.whoSees')}
+                  note={programNoteText!}
+                  closeNoteLabel={t('trips.confirm.close')}
+                  checkInLabel={t('place.visit.checkIn')}
+                  showsCheckIn={canCheckIn}
+                  changeLabel={t('trips.new.change')}
+                  backLabel={t('action.back')}
+                  hereLabel={t(checkIn.isLocating ? 'checkin.locating' : 'checkin.here')}
+                  wentLabel={t('checkin.went')}
+                  changeDateLabel={t('place.visit.changeDate')}
+                  cancelVisitLabel={t('place.visit.cancel')}
+                  {...(changeHref ? { changeDateHref: changeHref } : {})}
+                  onHere={checkIn.onHere}
+                  onWent={checkIn.onWent}
+                  onCancelVisit={() => setAskingCancel(true)}
+                  checkInResult={
+                    <>
+                      {cancelFailed ? <Banner status="error" title={t('place.visit.cancel.failed')} /> : null}
+                      {checkIn.isDone ? null : checkIn.result}
+                    </>
+                  }
+                  isMarked={isMarkedNow}
+                  markedTitle={t(visit!.attendance === 'missed' ? 'trips.notMarked' : 'checkin.done')}
+                  {...(checkIn.isDone && checkIn.points > 0 ? { markedDetail: t('checkin.points', { points: checkIn.points }) } : {})}
+                />
+              ) : visitWhen ? (
                 // The visit, confirmed (D-273), as a small hero (D-281): only
                 // "Change appointment" is a link, the card itself is not.
                 <VisitCard
                   eyebrow={t(visitAhead ? 'place.visit.next' : 'place.visit.last')}
                   day={visitWhen}
                   time={visitHour}
-                  // The service rides with the time (Will, 6 October, D-332):
-                  // the picker is gone once the visit is booked.
                   service={visit && service ? service.name : null}
-                  // How soon (D-337), like the booked screen's card.
                   countdown={visitAhead && visit ? countdown(new Date(visit.startsAt), t) : null}
                   changeLabel={visitAhead ? t('place.visit.change') : undefined}
                   changeHref={visitAhead ? changeHref : null}
                 />
               ) : null}
-              {visit && visitAhead && !visit.attendance && !justMarked ? (
+              {!usesWidget && visit && visitAhead && !visit.attendance && !justMarked ? (
                 <>
                   {cancelFailed ? <Banner status="error" title={t('place.visit.cancel.failed')} /> : null}
                   <TextLink label={t('place.visit.cancel')} onClick={() => setAskingCancel(true)} />
                 </>
               ) : null}
-              {/* "I'm here" (D-535): only a real visit, in its window, not yet marked, at a program with a lead on Pam (D-545). */}
-              {visit && hasLead && isSavedPlace(visit.id) && isMemberView && !visit.attendance && inMarkWindow(visit.startsAt) ? (
-                <ImHereCard visitId={visit.id} placeName={place!.name} onMarked={() => setJustMarked(true)} />
-              ) : null}
-              {visit ? programNote : null}
+              {usesWidget ? null : visit ? programNote : null}
               {policiesOnTop ? (
                 <PolicyStatusCard
                   isDone={allSigned}
