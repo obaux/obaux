@@ -121,14 +121,6 @@ export const NarrowChange: Story = { args: { view: 'change' }, globals: { viewpo
 export const NarrowMarked: Story = { args: { marked: true }, globals: { viewport: { value: 'narrow320', isRotated: false } } };
 export const NarrowNote: Story = { args: { noteOpen: true }, globals: { viewport: { value: 'narrow320', isRotated: false } } };
 
-const LANGS = [
-  ['Spanish', 'es'],
-  ['Portuguese', 'pt-BR'],
-  ['ChineseSimplified', 'zh-CN'],
-  ['ChineseTraditional', 'zh-HK'],
-  ['Russian', 'ru'],
-  ['Arabic', 'ar'],
-] as const;
 const language = (locale: string, args: Partial<Args> = {}): Story => ({ args: { onPam: true, ...args }, globals: { locale } });
 /** Every view in the six other languages (the footer, Check in, Change, Marked and the note). */
 export const Spanish: Story = language('es');
@@ -161,4 +153,3 @@ export const ArabicCheckIn: Story = language('ar', { view: 'checkin' });
 export const ArabicChange: Story = language('ar', { view: 'change' });
 export const ArabicMarked: Story = language('ar', { marked: true });
 export const ArabicNote: Story = language('ar', { noteOpen: true });
-void LANGS;

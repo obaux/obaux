@@ -341,6 +341,7 @@ export function VisitWidget(props: VisitWidgetProps) {
     ref: viewRefs[v],
     inert: !shown(v),
     'aria-hidden': !shown(v),
+    'data-visit-view': v,
     ...stylex.props(widgetStyles.view, shown(v) ? widgetStyles.shown : widgetStyles.hidden),
   });
 
