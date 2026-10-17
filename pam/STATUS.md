@@ -1583,6 +1583,10 @@ connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merge
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
 
+## Design system & Storybook · the visit card as a widget (17 October)
+
+`VisitWidget` is built in `packages/ui/src/VisitCard.tsx` (a91 part 3; `VisitWidget.tsx` and its export are gone). Three views in one grid cell (visit, Check in, Change), a 160ms fade, none under reduced motion, hidden views inert; footer "Check in" | "Change" (one prop each, so Will's footer word is one line); the eye button opens the blue note in an Astryx Popover; marked shows a banner and no buttons; `showsCheckIn={false}` leaves Change alone; Escape returns to the visit; the check-in result has a polite live region. Stories for every view, seven languages and 320 (non-English words are stand-ins for Lena). Piper wires `place/page.tsx` (mark window, `hasLead`, the existing cancel confirm). Unit test `packages/ui/test/visit-widget.test.tsx`. On `claude/pam-design-visit-widget`; pictures in `docs/design/review/2026-10-17-visit-widget/`.
+
 ## Design system & Storybook · counts on a row (16 October)
 
 A count at the end of a row is a plain number (`value`); the red badge is for what is new (D-586). The super admin Home's two rows follow it: Reported places changes (Piper), Programs to check stays (Ava). On `claude/pam-design-count-style`.
