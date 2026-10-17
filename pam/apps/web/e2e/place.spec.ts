@@ -151,10 +151,15 @@ test.describe("a place's own screen", () => {
       logged.push(route.request().postDataJSON());
       return route.fulfill(json(true));
     });
+    // Holding the dialler back from the start of the document, not after the page has loaded: a tap that came first would try to follow tel:.
+    await page.addInitScript(() => document.addEventListener('click', (e) => (e.target as HTMLElement).closest?.('a[href^="tel:"]') && e.preventDefault(), true));
     await page.goto(`/place/?id=${real.id}`);
-    await page.evaluate(() => document.addEventListener('click', (e) => (e.target as HTMLElement).closest('a[href^="tel:"]') && e.preventDefault(), true));
     const call = page.getByRole('link', { name: /^Call/ });
     await expect(call).toHaveAttribute('href', 'tel:+12155550100');
+    // The call is told to the database only for a signed-in member, and who is signed in is read a moment after the row is drawn
+    // (logCall ignores a tap before that, on purpose). Wait for something only a signed-in member has, so the tap is never earlier than it.
+    // Without this the test hung 30s on a loaded machine, when the tap came first.
+    await expect(page.getByRole('button', { name: 'Save this place' })).toBeVisible();
     await call.click();
     await expect.poll(() => logged.length).toBe(1);
     expect(logged[0]).toMatchObject({ p_service_id: real.id });
@@ -260,11 +265,15 @@ test.describe("a place's own screen", () => {
     await page.goto('/place/?id=nope');
 
     await expect(page.getByRole('heading', { name: 'We could not find that place' })).toBeVisible();
-    // §0: never dead-end. The list, and Contact Pam, both on the screen (A28: Pam
+    // §0: never dead-end. Explore, and Contact Pam, both on the screen (A28: Pam
     // has no phone line, so Contact Pam opens Help). "Not on Pam right now" is an
     // empty state rather than an alarm — nothing went wrong, the place is simply
     // not there — so the way out is a link on the card, not inside a banner.
-    await expect(page.getByRole('link', { name: 'Places' }).first()).toBeVisible();
+    // The list is Explore now (D-565): the round back and "Find the place" both go there.
+    await expect(page.getByRole('link', { name: 'Back to Explore' })).toHaveAttribute('href', '/');
+    await expect(page.getByRole('link', { name: 'Find the place' })).toHaveAttribute('href', '/');
+    await expect(page.getByText(/Go back to Explore/)).toBeVisible();
+    await expect(page.getByText(/Go back to Places/)).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'Contact Pam' }).first()).toHaveAttribute('href', '/help/');
     await expect(page.locator('a[href^="tel:"]')).toHaveCount(0);
   });

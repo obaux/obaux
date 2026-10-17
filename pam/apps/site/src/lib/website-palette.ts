@@ -25,4 +25,5 @@ export const websiteColors = {
   'accent-success': { light: '#0B991F', dark: '#0B991F' },
   'text-muted-strong': { light: '#595959', dark: '#A6A6A6' },
   'text-success': { light: '#087A18', dark: '#0B991F' },
+  'text-link': { light: '#0F5847', dark: '#EEF1C2' },
 } as const;

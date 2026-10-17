@@ -32,7 +32,12 @@ export function WhatOthersCanSee() {
         <P>
           A program sees you only after you write to them, sign their rules, sign up with them or plan a visit
           there, and only what they need to help you. Before a visit, they see your first name, what you write to
-          them, the day you signed their rules and, if you signed up, how that is going.
+          them, the day you signed their rules and, if you signed up, how that is going and when you save a new
+          place, but not which one.
+        </P>
+        <P>
+          If you have written to a program, signed up with it or planned a visit there, it can book a visit for
+          you. It shows in your Trips with the program’s name, and you can cancel it.
         </P>
       </Section>
 
@@ -51,11 +56,15 @@ export function WhatOthersCanSee() {
               label: 'Your visits, and whether you went or missed one',
               cells: ['Yes', 'Yes, but only visits to their own program', 'No'],
             },
+            {
+              label: 'Which of your visits a program booked for you',
+              cells: ['Yes', 'Yes, but only visits to their own program', 'No'],
+            },
             { label: 'Your points, your level and your badges', cells: ['Yes', 'No', 'No'] },
             { label: 'The last day you used Pam', cells: ['Yes', 'No', 'No'] },
             {
               label: 'That you saved a new place (not which one)',
-              cells: ['Yes', 'Yes', 'No'],
+              cells: ['Yes', 'Yes, but only once you sign up with them', 'No'],
             },
             { label: 'Which place you saved', cells: ['No', 'No', 'No'] },
             { label: 'Who you connect with', cells: ['Yes', 'No', 'No'] },

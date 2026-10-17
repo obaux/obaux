@@ -20,6 +20,8 @@ import { SubPage } from '@pam/ui/SubPage';
 import { readAddedTrips, TRIPS_CHANGED, withMoves } from '@/lib/addedTrips';
 import { examplesOn } from '@/lib/examples';
 import { useI18n } from '@/lib/i18n';
+import { useBookableMembers } from '@/lib/useBookableMembers';
+import { useConversations } from '@/lib/useConversations';
 import { useProgramSetup } from '@/lib/programSetup';
 import { useSession } from '@/lib/useSession';
 import { whenHappened } from '@/lib/when';
@@ -61,11 +63,19 @@ const styles = stylex.create({
   words: { minWidth: 0 },
 });
 
+/** One person a program may book for, from an example, a real conversation or the bookable list. */
+export interface Person {
+  readonly id: string;
+  readonly firstName: string;
+  readonly lastMessageAt: string | null;
+  readonly preview: { readonly body: string; readonly mine: boolean } | null;
+}
+
 const EXAMPLE_PROGRAM_ID = 'dummy-place-learning';
 const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
 
 /** The soonest visit still ahead at this program, per person, example and booked alike. */
-function useNextVisitHere(programId: string): Readonly<Record<string, string>> {
+function useNextVisitHere(programId: string | null): Readonly<Record<string, string>> {
   const [next, setNext] = useState<Readonly<Record<string, string>>>({});
   useEffect(() => {
     const read = () => {
@@ -88,7 +98,7 @@ function useNextVisitHere(programId: string): Readonly<Record<string, string>> {
   return next;
 }
 
-export function BookForMemberView() {
+export function BookForMemberView({ people: shown }: { readonly people?: readonly Person[] } = {}) {
   const { t, locale } = useI18n();
   // The lead's own program (D-509); the example one only in a demo or Storybook, with its example people.
   const { state: session } = useSession();
@@ -96,16 +106,54 @@ export function BookForMemberView() {
   const [examples, setExamples] = useState(false);
   useEffect(() => setExamples(examplesOn()), []);
   const own = setup.program;
-  const programId = own ? own.id : EXAMPLE_PROGRAM_ID;
+  // A real lead with no program loaded has none to book into, and never the example one (a55): no list, no links.
+  const programId = own ? own.id : examples ? EXAMPLE_PROGRAM_ID : null;
   const place = own
     ? { name: own.details.name, category: own.details.category, address: own.details.address }
     : examples
       ? DUMMY_PLACES_BY_ID[EXAMPLE_PROGRAM_ID]
       : undefined;
   const nextHere = useNextVisitHere(programId);
-  const people = (examples ? dummyConversationsFor('provider') : [])
-    .map((c) => ({ convo: c, person: DUMMY_MEMBERS.find((m) => m.id === c.otherId) }))
-    .filter((x): x is { convo: (typeof x)['convo']; person: NonNullable<(typeof x)['person']> } => Boolean(x.person));
+  // Who wrote to the program (S1, Iris's program lead pass): a real lead's own conversations with members,
+  // first name and last message only (D-541 part 2, D-542); the example people only in a demo or Storybook.
+  const { state: conversations } = useConversations(!examples && session.status === 'signed-in');
+  // Who else may be booked for (D-595): signed up with the program or planned a visit there, who have not written.
+  const bookable = useBookableMembers(!examples && session.status === 'signed-in');
+  const fromConversations: readonly Person[] = examples
+    ? dummyConversationsFor('provider').flatMap((c) => {
+        const member = DUMMY_MEMBERS.find((m) => m.id === c.otherId);
+        return member
+          ? [{ id: member.id, firstName: member.firstName, lastMessageAt: c.lastMessageAt ?? null, preview: c.preview ?? null }]
+          : [];
+      })
+    : conversations.status === 'ready' && programId !== null
+      ? // One conversation per pair is the rule, but a repeat would collide on the list key: the first (newest) wins.
+        conversations.conversations
+          .filter((c, i, all) => c.otherProfileId === null || all.findIndex((o) => o.otherProfileId === c.otherProfileId) === i)
+          .flatMap((c) =>
+          c.otherRole === 'member' && c.otherProfileId
+            ? [
+                {
+                  id: c.otherProfileId,
+                  firstName: c.otherName ?? '',
+                  lastMessageAt: c.lastMessageAt,
+                  preview: c.lastMessageBody ? { body: c.lastMessageBody, mine: c.lastMessageMine } : null,
+                },
+              ]
+            : [],
+        )
+      : [];
+  // Those who wrote come first, with what they said; the others follow by name, once each.
+  const people: readonly Person[] =
+    shown ??
+    (examples || conversations.status !== 'ready' || programId === null
+      ? fromConversations
+      : [
+          ...fromConversations,
+          ...bookable
+            .filter((m) => !fromConversations.some((p) => p.id === m.id))
+            .map((m) => ({ id: m.id, firstName: m.firstName, lastMessageAt: null, preview: null })),
+        ]);
 
   const when = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
   const clock = new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' });
@@ -116,7 +164,7 @@ export function BookForMemberView() {
   };
   const hrefFor = (id: string, name: string) =>
     `/trips/new/?${new URLSearchParams({
-      place: programId,
+      place: programId ?? '',
       ...(place ? { name: place.name, category: place.category, address: place.address } : {}),
       for: id,
       forName: name,
@@ -145,13 +193,13 @@ export function BookForMemberView() {
       <Heading level={2} xstyle={styles.heading}>
         {t('book.people')}
       </Heading>
-      {people.length === 0 ? (
+      {people.length === 0 && !shown && !examples && (conversations.status === 'loading' || setup.isLoading) ? null : people.length === 0 ? (
         <Text type="supporting" xstyle={styles.empty}>
           {t('book.empty')}
         </Text>
       ) : (
         <List aria-label={t('book.people')}>
-          {people.map(({ convo, person }) => {
+          {people.map((person) => {
             const next = nextHere[person.id];
             return (
               <ListItem
@@ -160,19 +208,18 @@ export function BookForMemberView() {
                 label={<Text xstyle={styles.name}>{person.firstName}</Text>}
                 description={
                   <VStack gap={0} xstyle={styles.words}>
-                    <HStack gap={1} align="center" wrap="wrap">
-                      <Text type={next ? 'body' : 'supporting'} xstyle={[styles.meta, Boolean(next) && styles.booked]}>
-                        {next ? t('book.booked', { when: when.format(new Date(next)) }) : t('book.notBooked')}
+                    <Text type={next ? 'body' : 'supporting'} xstyle={[styles.meta, Boolean(next) && styles.booked]}>
+                      {next ? t('book.booked', { when: when.format(new Date(next)) }) : t('book.notBooked')}
+                    </Text>
+                    {/* On a line of its own: a separator dot at the start of a wrapped line read as a stray mark. */}
+                    {person.lastMessageAt ? (
+                      <Text type="supporting" xstyle={styles.meta}>
+                        {t('book.wrote', { when: wrote(person.lastMessageAt) })}
                       </Text>
-                      {convo.lastMessageAt ? (
-                        <Text type="supporting" xstyle={styles.meta}>
-                          · {t('book.wrote', { when: wrote(convo.lastMessageAt) })}
-                        </Text>
-                      ) : null}
-                    </HStack>
-                    {convo.preview ? (
+                    ) : null}
+                    {person.preview ? (
                       <Text type="supporting" xstyle={styles.snippet}>
-                        {convo.preview.mine ? t('messages.preview.you', { text: convo.preview.body }) : convo.preview.body}
+                        {person.preview.mine ? t('messages.preview.you', { text: person.preview.body }) : person.preview.body}
                       </Text>
                     ) : null}
                   </VStack>

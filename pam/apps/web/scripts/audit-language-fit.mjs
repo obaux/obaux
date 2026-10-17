@@ -10,6 +10,7 @@
  *
  *   pnpm --filter @pam/web build-storybook
  *   node apps/web/scripts/audit-language-fit.mjs [--locales ru,ar] [--match Cards/] [--out file.json]
+ *     [--width 320] [--height 760]   the window (320 by 568 is the shortest phone: heroes are a share of the height)
  *     [--from earlier.json]   re-check only the stories that run found defects in
  *     [--known scripts/fit-known.json]   defects somebody has looked at and accepted; only others fail the run
  *     [--write-known file.json]          write what this run found as that list (then say why each is accepted)
@@ -23,14 +24,26 @@
  *   spill    text runs past the edge of the button / link / field it sits in
  *   overlap  two different elements' text lines cover each other
  *   scroll   the page itself scrolls sideways
+ *   placeholder  the words a field shows while it is empty, wider than the room inside it (17 October: the case
+ *            manager Home's search pill said "Search your mem"; a placeholder is painted by the browser from an
+ *            attribute, not laid out as a text node, so none of the other checks can see it)
  *   isolate  an invisible bidi isolate (U+2068/U+2069, which `t` puts round a value in
  *            Arabic) in a place nobody reads it off the screen: an attribute such as
  *            `aria-label` or `alt`, or text a screen reader speaks and no eye sees (D-435). A label
  *            built with `tPlain` has none; this is what notices one that was not.
  *
+ * What it cannot see: a carousel shows one slide at a time, and the other slides are scrolled away (a
+ * line wholly outside its scroller is not measured, on purpose). So a carousel needs **one story per
+ * slide**: a story that opens on slide 1 audits slide 1 and nothing else. `src/stories/support/showSlide.ts`
+ * scrolls to a slide (and `chooseAboutTab` picks a tab) in a play function; the welcome slides on Sign in
+ * and in About Pam are the example (`Onboarding` stories, 13 October: slides 2 and 3 of every kind of
+ * person were never measured until they had stories). The same holds for any tab, drawer or step that
+ * shows its text only after a tap.
+ *
  * English is the baseline: a defect that is already there in English is the
  * design's, not the translation's, and is listed apart. Only defects that are
- * NEW in a language are what the run fails on.
+ * NEW in a language are what the run fails on. The one exception is a placeholder,
+ * which is words, not layout: it fails in English too.
  */
 import http from 'node:http';
 import fs from 'node:fs';
@@ -50,6 +63,8 @@ const opt = (name, fallback) => {
 const LOCALES = opt('locales', 'en,es,pt-BR,zh-CN,zh-HK,ru,ar').split(',');
 const MATCH = opt('match', '');
 const WIDTH = Number(opt('width', '320'));
+/** The window's height: 760 by default; 568 is the shortest phone Pam supports (an iPhone SE), where a hero that is half the window is shorter. */
+const HEIGHT = Number(opt('height', '760'));
 const WORKERS = Number(opt('workers', '4'));
 const OUT = opt('out', '');
 const FROM = opt('from', '');
@@ -86,7 +101,7 @@ if (FROM) {
   const again = new Set(JSON.parse(fs.readFileSync(FROM, 'utf8')).fresh.map((f) => f.id));
   for (let i = stories.length - 1; i >= 0; i--) if (!again.has(stories[i].id)) stories.splice(i, 1);
 }
-console.error(`${stories.length} stories × ${LOCALES.length} languages at ${WIDTH}px`);
+console.error(`${stories.length} stories × ${LOCALES.length} languages at ${WIDTH}×${HEIGHT}px`);
 
 /** Runs in the page. Returns [{kind, key, text, detail}]. */
 function measure() {
@@ -270,7 +285,50 @@ function measure() {
     push('scroll', document.body, '(page)', `${document.documentElement.scrollWidth} > ${vw}`);
   }
 
-  // 6. An isolate where nobody is looking at the screen: an attribute a screen reader speaks
+  // 6. A placeholder wider than its field. The browser paints it from the attribute, so it is no text node and no range
+  // rect ever measured it: a field can cut "Search your members" to "Search your mem" and every check above is clean.
+  // Measure the words in the font the placeholder is drawn in against the room the field leaves inside its padding.
+  // (A textarea wraps its placeholder, so only a one-line input can cut one.)
+  for (const field of document.body.querySelectorAll('input[placeholder]')) {
+    if (hidden(field) || field.value) continue;
+    const type = (field.getAttribute('type') ?? 'text').toLowerCase();
+    if (['hidden', 'checkbox', 'radio', 'range', 'color', 'file', 'button', 'submit', 'reset', 'image'].includes(type)) continue;
+    const words = field.getAttribute('placeholder') ?? '';
+    if (!words.trim()) continue;
+    const r = field.getBoundingClientRect();
+    if (r.width < 1 || r.height < 1) continue;
+    const own = style(field);
+    // The pseudo-element carries the placeholder's own size and weight where the theme sets them there.
+    let ph = own;
+    try {
+      ph = getComputedStyle(field, '::placeholder');
+    } catch {
+      ph = own;
+    }
+    const probe = document.createElement('span');
+    probe.textContent = words;
+    probe.setAttribute('aria-hidden', 'true');
+    Object.assign(probe.style, {
+      position: 'absolute',
+      visibility: 'hidden',
+      whiteSpace: 'pre',
+      fontFamily: ph.fontFamily || own.fontFamily,
+      fontSize: ph.fontSize || own.fontSize,
+      fontWeight: ph.fontWeight || own.fontWeight,
+      fontStyle: ph.fontStyle || own.fontStyle,
+      fontStretch: ph.fontStretch || own.fontStretch,
+      letterSpacing: ph.letterSpacing || own.letterSpacing,
+      textTransform: ph.textTransform || own.textTransform,
+      direction: own.direction,
+    });
+    document.body.appendChild(probe);
+    const need = probe.getBoundingClientRect().width;
+    probe.remove();
+    const room = field.clientWidth - (parseFloat(own.paddingLeft) || 0) - (parseFloat(own.paddingRight) || 0);
+    if (need > room + 1) push('placeholder', field, words, `${Math.ceil(need)} > ${Math.floor(room)}`);
+  }
+
+  // 7. An isolate where nobody is looking at the screen: an attribute a screen reader speaks
   // (`aria-*`, `alt`), or text in the visually-hidden idiom. On screen they are zero width and
   // wanted, which is why a `title` (a tooltip is drawn) or a `placeholder` is not looked at here;
   // anywhere else they are an invisible character in a string.
@@ -306,7 +364,7 @@ async function run() {
   const failures = [];
   await Promise.all(
     Array.from({ length: WORKERS }, async () => {
-      const ctx = await browser.newContext({ viewport: { width: WIDTH, height: 760 }, reducedMotion: 'reduce' });
+      const ctx = await browser.newContext({ viewport: { width: WIDTH, height: HEIGHT }, reducedMotion: 'reduce' });
       // The example visits are "in 2 days", "in 5 days": their dates move with the calendar, and so
       // did the text a defect is recorded under — the accepted list went stale overnight (10 October,
       // "Wednesday, Oct 14" became "Thursday, Oct 15"). Every story sees the same day, which then
@@ -349,14 +407,20 @@ async function run() {
 const { results, failures } = await run();
 
 // ── English is the baseline; only what is new in a language counts ──
+// Except a placeholder: it is words, not layout, so one wider than its field is wrong in English too and is never "the
+// design's own" (17 October: English "Search your members" was cut in the case manager Home's pill, so a rule that only
+// failed what is new in a language let the pill through in all seven).
+const isWords = (f) => f.kind === 'placeholder';
 const baseline = new Set();
-for (const r of results) if (r.locale === 'en') for (const f of r.found) baseline.add(`${r.id}|${f.key}`);
+for (const r of results) if (r.locale === 'en') for (const f of r.found) if (!isWords(f)) baseline.add(`${r.id}|${f.key}`);
 const fresh = [];
 for (const r of results) {
-  if (r.locale === 'en') continue;
-  for (const f of r.found) if (!baseline.has(`${r.id}|${f.key}`)) fresh.push({ id: r.id, title: r.title, name: r.name, locale: r.locale, ...f });
+  for (const f of r.found) {
+    const isNew = isWords(f) || (r.locale !== 'en' && !baseline.has(`${r.id}|${f.key}`));
+    if (isNew) fresh.push({ id: r.id, title: r.title, name: r.name, locale: r.locale, ...f });
+  }
 }
-const existing = results.filter((r) => r.locale === 'en').flatMap((r) => r.found.map((f) => ({ id: r.id, title: r.title, ...f })));
+const existing = results.filter((r) => r.locale === 'en').flatMap((r) => r.found.filter((f) => !isWords(f)).map((f) => ({ id: r.id, title: r.title, ...f })));
 
 if (OUT) fs.writeFileSync(OUT, JSON.stringify({ fresh, existing, failures }, null, 2));
 

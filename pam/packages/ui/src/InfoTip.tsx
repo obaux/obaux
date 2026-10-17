@@ -15,11 +15,11 @@ import { pam } from './tokens.stylex.js';
  * or a name that, tapped, opens a popover of explanation. A phone has no
  * hover, so it is a tap, not a tooltip.
  *
- * **The smaller target is the rule here, on purpose.** Pam's floor is 48px
- * (§2.5); an info tip is 36px (`--pam-touch-target-tip`), a true circle,
- * because it explains and never acts — missing it costs nothing, and at 48px
- * it outweighs the words beside it. Anything that *does* something stays at
- * 48px. The site-wide floor (globals.css) is lowered for this button only.
+ * **The mark is small on purpose, the target is not.** An info tip is drawn 36px
+ * (`--pam-touch-target-tip`), a true circle, because it explains and never acts
+ * and at 48px it would outweigh the words beside it (D-368). Its tap target is
+ * the 48px floor all the same (§2.5, D-582): the button has no fill, so the
+ * extra room is invisible, and a negative margin keeps the layout.
  *
  * The popover has 20px of padding all round, a realistic shadow (globals.css), and its text is a
  * block, so a wrapped paragraph lines up on the left.
@@ -37,12 +37,14 @@ export interface InfoTipProps {
 }
 
 const styles = stylex.create({
+  // The tip is drawn 36px (D-368) but is 48px to tap (§2.5, Iris's program lead pass P9, D-582): the button has
+  // no fill, so the extra 6px a side is invisible, and the negative margin keeps the room it took before.
   trigger: {
-    '--pam-touch-target-min': pam['--pam-touch-target-tip'],
-    width: pam['--pam-touch-target-tip'],
-    height: pam['--pam-touch-target-tip'],
-    minWidth: pam['--pam-touch-target-tip'],
-    minHeight: pam['--pam-touch-target-tip'],
+    width: pam['--pam-touch-target-min'],
+    height: pam['--pam-touch-target-min'],
+    minWidth: pam['--pam-touch-target-min'],
+    minHeight: pam['--pam-touch-target-min'],
+    margin: '-6px',
     padding: 0,
     borderRadius: '50%',
     flexShrink: 0,

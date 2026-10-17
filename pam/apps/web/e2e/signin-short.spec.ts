@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import en from '@pam/config/locales/en.json';
 import es from '@pam/config/locales/es.json';
 import ar from '@pam/config/locales/ar.json';
+import zhCN from '@pam/config/locales/zh-CN.json';
 
 /**
  * Sign in on a short phone (Iris's member flow pass, S1; D-500). On a 320×568 screen (an iPhone SE, or a
@@ -12,7 +13,7 @@ import ar from '@pam/config/locales/ar.json';
  * Supabase is stubbed at the network. The tap is a raw mouse click on the button's centre, so whatever is on top
  * of the button receives it, as it does under a thumb.
  */
-const LOCALES = { en, es, ar } as const;
+const LOCALES = { en, es, ar, 'zh-CN': zhCN } as const;
 const NUMBER = '2155550100';
 
 async function open(page: Page, locale: keyof typeof LOCALES, invited: boolean) {
@@ -68,7 +69,7 @@ for (const locale of ['en', 'es', 'ar'] as const) {
  * switch once the hero has scrolled away. The bar is drawn over the content, not in the flow, so the tap test above
  * (the button whole and tappable at 320×568 with the bar in the page) is the proof it takes no room.
  */
-for (const locale of ['en', 'es', 'ar'] as const) {
+for (const locale of ['en', 'es', 'ar', 'zh-CN'] as const) {
   for (const invited of [true, false]) {
     test(`320×568, ${invited ? 'invited' : 'not invited'}, ${locale}: the header stays on top as the page scrolls`, async ({ page }) => {
       await open(page, locale, invited);
@@ -80,19 +81,24 @@ for (const locale of ['en', 'es', 'ar'] as const) {
             .map((img) => Math.round(img.getBoundingClientRect().top))
             .filter((top) => top >= 0 && top < 130).length,
         );
-      await page.evaluate(() => window.scrollTo({ top: 300, behavior: 'instant' }));
-      await page.waitForTimeout(400);
+      // As far as the page goes (D-564): on a short phone the page is only a little taller than the screen, so there is no
+      // fixed distance to scroll. At the end of it, whatever the language, the mark and the language button are in view at
+      // the top (the hero's own have gone by then), and an invite line is still pinned at 0.
+      await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
+      await page.waitForTimeout(500);
 
       const pinned = await page.evaluate(() => {
         const note = document.querySelector('[role="note"]');
-        const marks = [...document.querySelectorAll('img[alt="Pam"]')].filter((img) => {
-          const r = img.getBoundingClientRect();
-          return r.top >= 0 && r.bottom <= 130 && getComputedStyle(img.parentElement!).visibility !== 'hidden';
-        });
-        const buttons = [...document.querySelectorAll('button')].filter((b) => {
-          const r = b.getBoundingClientRect();
-          return r.top >= 0 && r.bottom <= 140 && getComputedStyle(b).visibility !== 'hidden';
-        });
+        // The bar sits under the invite line, whatever height the language gives it: measure against the note's bottom
+        // (0 when not invited), plus the bar's own height, not a fixed 140.
+        const noteBottom = note ? Math.round(note.getBoundingClientRect().bottom) : 0;
+        const limit = noteBottom + 56;
+        const inTop = (el: Element) => {
+          const r = el.getBoundingClientRect();
+          return r.top >= 0 && r.bottom <= limit && r.width > 0 && getComputedStyle(el.parentElement!).visibility !== 'hidden' && getComputedStyle(el).visibility !== 'hidden';
+        };
+        const marks = [...document.querySelectorAll('img[alt="Pam"]')].filter(inTop);
+        const buttons = [...document.querySelectorAll('button')].filter(inTop);
         return {
           scrolled: window.scrollY,
           noteTop: note ? Math.round(note.getBoundingClientRect().top) : null,
@@ -100,10 +106,10 @@ for (const locale of ['en', 'es', 'ar'] as const) {
           buttons: buttons.length,
         };
       });
-      expect(pinned.scrolled).toBeGreaterThan(100);
+      expect(pinned.scrolled).toBeGreaterThan(0);
       if (invited) expect(pinned.noteTop).toBe(0);
-      expect(pinned.marks).toBeGreaterThanOrEqual(1);
-      expect(pinned.buttons).toBeGreaterThanOrEqual(1);
+      expect(pinned.marks, 'a Pam mark in view at the top').toBeGreaterThanOrEqual(1);
+      expect(pinned.buttons, 'the language button in view at the top').toBeGreaterThanOrEqual(1);
       void barMarks;
 
       // Back at the top the bar is gone again and the button is where it was, whole.
@@ -146,5 +152,39 @@ for (const locale of ['en', 'es', 'ar'] as const) {
     // The legal links come after it, as on the first step.
     const privacy = await page.getByRole('link', { name: LOCALES[locale]['legal.privacy'] }).first().boundingBox();
     expect(privacy!.y).toBeGreaterThanOrEqual(box.y + box.height - 1);
+  });
+}
+
+/**
+ * Sign in keeps its room on a normal phone (Will, 14 October: "what happened to the gap spacing in the sign-in screen?").
+ * D-564's short-screen rules set `rowGap` and the card's padding with a `null` default, which unset the card's own room on
+ * every screen, not just short ones: the title sat 4px under the picture and the label, field, button and consent line
+ * touched. The room is back, and on a 375×667 phone (not short, but small) it still fits above the fold.
+ */
+for (const [width, height] of [
+  [390, 844],
+  [375, 667],
+] as const) {
+  test(`${width}×${height}: the title, label, field, button and consent line have room, and all of it is above the fold`, async ({ page }) => {
+    await page.setViewportSize({ width, height });
+    await page.goto('/signin/');
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(500);
+
+    const box = async (locator: ReturnType<Page['locator']>) => (await locator.first().boundingBox())!;
+    const hero = await box(page.locator('section'));
+    const heading = await box(page.getByRole('heading', { name: en['signin.title'] }));
+    const label = await box(page.getByText(en['signin.phone.label'], { exact: true }));
+    const field = await box(page.locator('input[type="tel"]'));
+    const button = await box(page.getByRole('button', { name: en['signin.phone.action'] }));
+    const note = await box(page.getByText(/^Pam texts you a code/));
+    const legal = await box(page.getByRole('link', { name: 'Privacy' }));
+
+    expect(heading.y - (hero.y + hero.height), 'picture to title').toBeGreaterThanOrEqual(16);
+    expect(label.y - (heading.y + heading.height), 'title to label').toBeGreaterThanOrEqual(8);
+    expect(field.y - (label.y + label.height), 'label to field').toBeGreaterThanOrEqual(4);
+    expect(button.y - (field.y + field.height) , 'field to button').toBeGreaterThanOrEqual(8);
+    expect(note.y - (button.y + button.height), 'button to consent line').toBeGreaterThanOrEqual(8);
+    expect(legal.y + legal.height, 'the legal links are above the fold').toBeLessThanOrEqual(height);
   });
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { Loading, Notice, Page, PeopleIcon, PlacesIcon, ShieldIcon } from '@pam/ui';
+import { GlobeIcon, Loading, Notice, Page, PeopleIcon, PlacesIcon, ShieldIcon } from '@pam/ui';
 import { FloatingAction } from '@pam/ui/FloatingAction';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPageHeader } from '@pam/ui/SubPage';
@@ -11,9 +11,11 @@ import { NOTICES, intlLocale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../app/NotIn';
 import { useSession } from '@/lib/useSession';
+import { useFlaggedPlaces } from '@/lib/useFlaggedPlaces';
 import { useStaffRequests } from '@/lib/useStaffRequests';
+import { toLookAt, useProgramsToCheck } from '@/lib/programsToCheck';
+import { peopleWaiting, useWaitingCities } from '@/lib/useWaitingCities';
 import { useRoleView } from '@/lib/useViewedRole';
-import { RoleSwitchControl } from '../app/RoleSwitchControl';
 
 /**
  * Deciding who becomes a case manager or a program lead, for real (0054).
@@ -50,16 +52,21 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
   const { state: session } = useSession();
 
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const { viewedRole, setViewAs } = useRoleView(trueRole);
+  const { viewedRole } = useRoleView(trueRole);
   const isSuperAdmin = viewedRole === 'super_admin';
 
   const { state: requests } = useStaffRequests(isSuperAdmin);
+  // Reported places reach Home like Programs to check, with how many are waiting (Iris's super admin pass, W4).
+  const { state: reported } = useFlaggedPlaces(isSuperAdmin);
+  const reportedCount = reported.status === 'ready' ? reported.places.length : 0;
+  const { state: programs } = useProgramsToCheck(isSuperAdmin);
+  const toCheck = programs.status === 'ready' ? toLookAt(programs.programs) : 0;
+  // How many people wait for a city Pam is not in yet (D-593, card a96): where to open next.
+  const waiting = useWaitingCities(isSuperAdmin);
+  const waitingCount = waiting.status === 'ready' ? peopleWaiting(waiting.cities) : 0;
 
   const tools = (
     <>
-      {trueRole === 'super_admin' ? (
-        <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-      ) : null}
       {isHome ? <HeaderActions role="super_admin" /> : <HelpButton />}
     </>
   );
@@ -115,7 +122,31 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
       {/* The programs leaders have sent for Pam to check, beside the people asking to be staff (D-386). */}
       <MenuList
         label={t('review.title')}
-        items={[{ id: 'programs-to-check', label: t('review.title'), href: '/programs/review/', icon: <PlacesIcon {...ICON} /> }]}
+        items={[
+          {
+            id: 'programs-to-check',
+            label: t('review.title'),
+            href: isHome ? '/programs/review/?from=home' : '/programs/review/',
+            icon: <PlacesIcon {...ICON} />,
+            // How many wait for a decision, like the requests below (Iris, super admin P1).
+            ...(toCheck > 0 ? { value: String(toCheck) } : {}),
+          },
+          {
+            id: 'reported-places',
+            label: t('places.reported.title'),
+            href: '/places/reported/',
+            icon: <ShieldIcon {...ICON} />,
+            // A plain number (D-586): the red badge is for what is new since you looked, not for a count of what is waiting.
+            ...(reportedCount > 0 ? { value: String(reportedCount) } : {}),
+          },
+          {
+            id: 'waiting-cities',
+            label: t('waitingCities.title'),
+            href: isHome ? '/cities/waiting/?from=home' : '/cities/waiting/',
+            icon: <GlobeIcon {...ICON} />,
+            ...(waitingCount > 0 ? { value: String(waitingCount) } : {}),
+          },
+        ]}
       />
 
       {requests.status === 'loading' ? <Loading label={t('common.loading')} variant="inline" /> : null}

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { ALLOWED_ORIGINS, LIMITS, TO, handle, type Deps } from '../../../supabase/functions/help-request/handler.ts';
+import { ALLOWED_ORIGINS, LIMITS, TO, WHO, handle, rolesOf, saysTheyAre, type Deps } from '../../../supabase/functions/help-request/handler.ts';
 import type { Emailer, Outgoing } from '../../../supabase/functions/help-request/provider.ts';
 
 /**
@@ -75,6 +75,115 @@ describe('the help request forward', () => {
     for (const part of ['I cannot find my program.', 'ana@example.org', '/support/posts/x', 'es', 'member', 'Ana']) {
       expect(mail.text, part).toContain(part);
     }
+  });
+
+  describe('who they say they are (roles, Will 13 October)', () => {
+    it('"I don\'t use Pam yet" is said in the email as it is', async () => {
+      const w = world();
+      await w.post({ ...GOOD, roles: ['not_yet'] });
+      expect(w.sent[0]!.text).toContain('Says they are: not using Pam yet');
+      expect(w.sent[0]!.text).not.toContain('not said');
+      expect(saysTheyAre(['not_yet'])).toBe('not using Pam yet');
+    });
+
+    it('ticked beside a role it is dropped and the roles are kept', async () => {
+      expect(rolesOf({ roles: ['not_yet', 'member'] })).toEqual(['member']);
+      expect(rolesOf({ roles: ['case_manager', 'not_yet', 'program'] })).toEqual(['program', 'case_manager']);
+      expect(rolesOf({ roles: ['not_yet', 'not_yet'] })).toEqual(['not_yet']);
+      expect(rolesOf({ roles: ['not_yet', 'nonsense'] })).toEqual(['not_yet']);
+      const w = world();
+      await w.post({ ...GOOD, roles: ['not_yet', 'member', 'case_manager'] });
+      expect(w.sent[0]!.text).toContain('Says they are: a member and a case manager');
+      expect(w.sent[0]!.text).not.toContain('not using Pam yet');
+    });
+
+    it('shows the Role row only when a role was sent', async () => {
+      const without = world();
+      await without.post({ message: GOOD.message, email: GOOD.email, roles: ['member'] });
+      expect(without.sent[0]!.text).not.toMatch(/^Role:/m);
+      expect(without.sent[0]!.text).not.toContain('not known');
+      expect(without.sent[0]!.html).not.toContain('Role');
+      const withRole = world();
+      await withRole.post({ ...GOOD, role: 'member, case manager' });
+      expect(withRole.sent[0]!.text).toMatch(/^Role: member, case manager$/m);
+    });
+
+    it('is optional: without it the email says "not said" and everything else is as before', async () => {
+      const w = world();
+      expect((await w.post(GOOD)).status).toBe(200);
+      expect(w.sent[0]!.text).toContain('Says they are: not said');
+    });
+
+    it('names them in plain words near the top, in the same order whatever order they came in', async () => {
+      const w = world();
+      await w.post({ ...GOOD, roles: ['case_manager', 'member'] });
+      const text = w.sent[0]!.text;
+      expect(text).toContain('Says they are: a member and a case manager');
+      expect(text.indexOf('Says they are')).toBeLessThan(text.indexOf('Page:'));
+      expect(text.indexOf('From:')).toBeLessThan(text.indexOf('Says they are'));
+      expect(w.sent[0]!.html).toContain('a member and a case manager');
+    });
+
+    it('says all three, and one', async () => {
+      expect(saysTheyAre(['member', 'program', 'case_manager'])).toBe('a member, a program and a case manager');
+      expect(saysTheyAre(['program'])).toBe('a program');
+      expect(saysTheyAre([])).toBe('not said');
+    });
+
+    it('reads a spaced or capitalised value, drops repeats and anything that is not one of the three', () => {
+      expect(rolesOf({ roles: ['Case manager', 'case-manager', 'MEMBER', 'member', 'admin', '<b>x</b>', 7, null, ''] })).toEqual([
+        'member',
+        'case_manager',
+      ]);
+      expect(rolesOf({ roles: ['super_admin', 'provider'] })).toEqual([]);
+      expect(rolesOf({})).toEqual([]);
+      expect(rolesOf({ roles: null })).toEqual([]);
+      expect(WHO).toEqual(['member', 'program', 'case_manager', 'not_yet']);
+    });
+
+    it('refuses what is not a list, or an absurd list, and names the field', async () => {
+      const w = world();
+      for (const roles of ['member', { member: true }, 5, Array.from({ length: 11 }, () => 'member')]) {
+        const res = await w.post({ ...GOOD, roles });
+        expect(res.status).toBe(400);
+        expect(await res.json()).toEqual({ error: 'invalid', field: 'roles' });
+      }
+      expect(w.sent).toHaveLength(0);
+    });
+
+    it('an unknown label does not cost the person their message', async () => {
+      const w = world();
+      const res = await w.post({ ...GOOD, roles: ['member', 'something new'] });
+      expect(res.status).toBe(200);
+      expect(w.sent[0]!.text).toContain('Says they are: a member');
+      expect(w.sent[0]!.text).not.toContain('something new');
+    });
+
+    it('is nothing but words in the email: not in the subject, the duplicate check, or the limit call', async () => {
+      const a = world();
+      const b = world();
+      await a.post({ ...GOOD, roles: ['member'] });
+      await b.post({ ...GOOD, roles: ['program', 'case_manager'] });
+      expect(a.sent[0]!.subject).toBe('Pam help request');
+      expect(b.sent[0]!.subject).toBe('Pam help request');
+      expect(a.sent[0]!.idempotencyKey).toBe(b.sent[0]!.idempotencyKey);
+      expect(a.calls.join(' ')).not.toMatch(/member|program|case/);
+    });
+
+    it('is not stored or logged: the only database call is the limit check, and nothing is written to the log', async () => {
+      const logged: string[] = [];
+      const original = console.error;
+      console.error = (...args: unknown[]) => void logged.push(args.join(' '));
+      try {
+        const w = world();
+        await w.post({ ...GOOD, roles: ['member', 'case_manager'] });
+        expect(w.calls).toHaveLength(1);
+        expect(w.calls[0]).toContain('help_request_allowed');
+      } finally {
+        console.error = original;
+      }
+      expect(logged).toEqual([]);
+    });
   });
 
   it('asks for the limit with a salted hash, never the address', async () => {

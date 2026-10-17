@@ -8,14 +8,17 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { Banner } from '@astryxdesign/core/Banner';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
-import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BellIcon, BigButton, Loading, Notice, Page, PointsBadge, StarIcon, TextField, TextLink, TripsIcon } from '@pam/ui';
+import { BellIcon, BigButton, Loading, Notice, Page, HelpIcon, PointsBadge, StarIcon, TextField, TextLink, TripsIcon } from '@pam/ui';
+import { MenuList } from '@pam/ui/MenuList';
 import { SubPageHeader } from '@pam/ui/SubPage';
-import { LANGUAGE_TAGS, SUPPORTED_LOCALES, TRANSPARENCY_SCREEN, badgeForPoints, type Locale, intlLocale } from '@pam/config';
+import { LANGUAGE_TAGS, SUPPORTED_LOCALES, TRANSPARENCY_SCREEN, badgeForPoints, type Locale, intlLocale, nameJoinerOf } from '@pam/config';
+import { LanguageField } from '@pam/ui/LanguageField';
 import { useI18n } from '@/lib/i18n';
+import { HELP_DESK_URL } from '@/lib/helpDesk';
 import { navigate } from '@/lib/navigate';
 import { forgetInvite, recallInvite, type Invite } from '@/lib/appUrl';
+import { takeNext } from '@/lib/signinNext';
 import { readAddedTrips, withMoves } from '@/lib/addedTrips';
 import { exampleTrips } from '@/lib/exampleTrips';
 import { Confetti } from '@pam/ui/SuccessScreen';
@@ -29,13 +32,13 @@ import {
   redeemInvite,
   servedCities,
   submitDetails,
+  updateMyDetails,
   type InviteProblem,
   type JoinKind,
 } from '@/lib/useJoin';
 import { NOTICES } from '@pam/config';
 import { markFreshAccount } from '@/lib/programSetup';
 import { SetupArt, type SetupArtKind } from '@pam/ui/SetupArt';
-import { ChoiceChips } from '@pam/ui/ChoiceChips';
 import { InfoTip } from '@pam/ui/InfoTip';
 import { Dropdown } from '@pam/ui/Dropdown';
 
@@ -92,7 +95,8 @@ const STEP: Record<Phase, number> = {
 };
 
 /** What to expect, for a program lead (D-354): one picture per line. */
-const PROVIDER_EXPECT: readonly SetupArtKind[] = ['calendar', 'message', 'policy', 'private'];
+// Row 5 (a92, signed by Will; Sage's ledger d05f9d80): a member's new save is seen as "when", never which place.
+const PROVIDER_EXPECT: readonly SetupArtKind[] = ['calendar', 'message', 'policy', 'private', 'alerts'];
 
 /** The small print at the foot of the city list: shown, never chosen. */
 const CITY_NOTE = '__note';
@@ -146,6 +150,10 @@ export interface JoinPreview {
   readonly invite?: Invite;
   /** Open on this step (D-319): one story per screen, not one per flow. */
   readonly startAt?: JoinPhase;
+  /** Open About you with the city left empty and its line showing, so the words can be checked (Lena's fit audit). */
+  readonly isCityMissing?: boolean;
+  /** The city typed on About you, when the story is about one Pam is not in yet (the waiting list). */
+  readonly city?: string;
 }
 
 export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview | null } = {}) {
@@ -165,6 +173,9 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
    */
   const [inviteCode, setInviteCode] = useState('');
   const [inviteProblem, setInviteProblem] = useState<InviteProblem | null>(null);
+  // The code field is hidden until asked for; once shown it stays shown.
+  const [codeOpen, setCodeOpen] = useState(false);
+  const [focusCode, setFocusCode] = useState(false);
   /** Whether step 2 made an account, as opposed to recording a request. */
   const [hasAccount, setHasAccount] = useState(false);
   /**
@@ -191,7 +202,6 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
     if (fromLink) setInviteCode(fromLink.toUpperCase());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const [wantsUpdates, setWantsUpdates] = useState(false);
   const [cities, setCities] = useState<readonly string[]>([]);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -201,6 +211,27 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
   const lastId = useId();
   const cityId = useId();
   const codeFieldId = useId();
+  const codeQuestionId = useId();
+  const codeShown = codeOpen || inviteCode !== '' || inviteProblem !== null;
+  useEffect(() => {
+    if (inviteCode !== '' || inviteProblem !== null) setCodeOpen(true);
+  }, [inviteCode, inviteProblem]);
+  // The link that opens it moves the person into the field it opened.
+  useEffect(() => {
+    if (!focusCode || !codeShown) return;
+    // A frame later: the link that was tapped is gone, and the press that removed it
+    // finishes first, so focusing now would be undone and land on the page.
+    const frame = requestAnimationFrame(() => {
+      // By name: the field makes its own id and does not take `codeFieldId`.
+      document.querySelector<HTMLInputElement>('input[name="inviteCode"]')?.focus();
+      setFocusCode(false);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [focusCode, codeShown]);
+  const revealCode = () => {
+    setCodeOpen(true);
+    setFocusCode(true);
+  };
 
   /**
    * Who is signed in, asked of the sign-in system rather than of the profile.
@@ -241,7 +272,8 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
       // The preview starts at the door, whoever the story is signed in as.
       setKind(preview.kind);
       setFirstName(preview.firstName);
-      setCity('Philadelphia');
+      setCity(preview.isCityMissing ? '' : (preview.city ?? 'Philadelphia'));
+      if (preview.isCityMissing) setInvalid('city');
       // Approved, as if invited: staff finish on "I understand" and go Home
       // rather than on the waiting-for-review notice.
       setHasAccount(true);
@@ -293,6 +325,8 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
   }, [phase]);
 
   const isStaff = kind !== 'member';
+  // Staff are asked for the city they work in, not the one they live in (Iris, case manager P7).
+  const cityLabel = (invitedAs ?? kind) === 'member' ? 'join.details.city' : 'join.details.city.work';
   // A program is added from Home once the account exists (D-353), not asked
   // for here: staff finish on What to expect, step 2 of 2 (D-359).
   const total = kind === 'member' ? 3 : 2;
@@ -310,6 +344,22 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
 
     // The preview moves on as if the database had said yes (D-249).
     if (preview) {
+      setPhase('privacy');
+      return;
+    }
+
+    // Back from step 2 to fix a typo (Iris, case manager W1): the account exists, so this saves the name
+    // and city on it rather than redeeming the invite again or starting a second account.
+    if (hasAccount) {
+      if (!userId) return;
+      setBusy(true);
+      setFailed(false);
+      const saved = await updateMyDetails(userId, { firstName, lastName, city });
+      setBusy(false);
+      if (!saved) {
+        setFailed(true);
+        return;
+      }
       setPhase('privacy');
       return;
     }
@@ -368,7 +418,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
     // was a tap that did nothing. Home opens on getting started (D-352).
     markFreshAccount();
     if (preview) navigate('/');
-    else router.replace('/');
+    else router.replace(recallInvite() ? '/' : (takeNext() ?? '/'));
   };
 
   const answerTexts = async (wants: boolean) => {
@@ -390,7 +440,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
 
   const leaveName = async () => {
     setBusy(true);
-    const saved = await joinWaitingCity(city, wantsUpdates);
+    const saved = await joinWaitingCity(city);
     setBusy(false);
     setFailed(!saved);
     if (saved) setPhase('waitingDone');
@@ -426,8 +476,9 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
   const back: { readonly backLabel: string; readonly backHref?: string; readonly onBack?: () => void } =
     phase === 'details'
         ? { backLabel: t('nav.back.signInScreen'), onBack: toSignIn }
-        : phase === 'waiting'
-          ? { backLabel: t('trips.new.back'), onBack: () => setPhase('details') }
+        : phase === 'waiting' || phase === 'privacy'
+          ? // Step 2 goes back to step 1, so a mistyped name can be fixed (Iris, case manager W1, 15 October).
+            { backLabel: t('trips.new.back'), onBack: () => setPhase('details') }
           : phase === 'texts'
             ? { backLabel: t('trips.new.back'), onBack: () => setPhase('privacy') }
             : { backLabel: t('trips.new.back') };
@@ -442,6 +493,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
       <BigButton
         label={busy ? t('join.saving') : t('action.next')}
         badge={progress}
+        nameJoiner={nameJoinerOf(locale)}
         onPress={() => void submit()}
         isDisabled={busy}
       />
@@ -455,13 +507,14 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
         <TextLink label={t('join.waiting.skip')} href="/" />
       </VStack>
     ) : phase === 'privacy' && !isStaff ? (
-      <BigButton label={t(TRANSPARENCY_SCREEN.confirmKey)} badge={progress} onPress={() => setPhase('texts')} />
+      <BigButton label={t(TRANSPARENCY_SCREEN.confirmKey)} badge={progress} nameJoiner={nameJoinerOf(locale)} onPress={() => setPhase('texts')} />
     ) : phase === 'privacy' && isStaff ? (
       hasAccount ? (
         // Came in by code: the account exists, and this is the last step.
         <BigButton
           label={busy ? t('join.saving') : t(TRANSPARENCY_SCREEN.confirmKey)}
           badge={progress}
+          nameJoiner={nameJoinerOf(locale)}
           onPress={() => void finishStaff()}
           isDisabled={busy}
         />
@@ -475,6 +528,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
         <BigButton
           label={busy ? t('join.saving') : t('reminders.optIn')}
           badge={progress}
+          nameJoiner={nameJoinerOf(locale)}
           onPress={() => void answerTexts(true)}
           isDisabled={busy}
         />
@@ -490,8 +544,9 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
           Plan a trip (Will, 3 October, D-251) — no progress bar. Back goes one
           step back while there is one: from the phone or the code, to Sign in;
           from About you, to the phone; from the waiting list, to About you; from Text messages, to the screen before.
-          Once the account exists (What others can see, and the end) there is
-          nothing to go back to, so there is no back: the way out is the step.
+          From What others can see (step 2) back to About you, even once the account exists, so a mistyped name
+          can be fixed: Next then saves the name on the account (Iris, case manager W1, 15 October). Only the
+          last screen has no back: the way out is the step.
         */}
         <SubPageHeader
           title={
@@ -561,7 +616,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                   can still say where they live. */}
               {cities.length > 0 ? (
                 <Dropdown
-                  label={t('join.details.city')}
+                  label={t(cityLabel)}
                   width="100%"
                   value={city}
                   options={[
@@ -586,7 +641,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 <TextField
                   id={cityId}
                   purpose="city"
-                  label={t('join.details.city')}
+                  label={t(cityLabel)}
                   value={city}
                   onChange={setCity}
                   width="100%"
@@ -596,7 +651,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
 
               {invalid ? (
                 <Text type="supporting" xstyle={styles.body}>
-                  {t(`join.details.need.${invalid}`)}
+                  {t(invalid === 'city' && cityLabel !== 'join.details.city' ? 'join.details.need.city.work' : `join.details.need.${invalid}`)}
                 </Text>
               ) : null}
 
@@ -610,17 +665,15 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 already send this locale as `language` — that part was here
                 before this control was; only the way to change it is new.
               */}
-              {/* Chips, as Plan a visit's days and times (D-359); the chosen one
-                  in the secondary green. English unless already switched. */}
-              <VStack gap={2}>
-                <Text xstyle={styles.chipsLabel}>{t('onboarding.language.title')}</Text>
-                <ChoiceChips
-                  label={t('onboarding.language.title')}
-                  options={SUPPORTED_LOCALES.map((code) => ({ value: code, label: t(`language.${code}`), tag: LANGUAGE_TAGS[code], lang: code }))}
-                  value={pendingLocale ?? locale}
-                  onChange={(code) => setLocale(code as Locale)}
-                />
-              </VStack>
+              {/* A dropdown again (Will, 13 October: "with all these languages ...
+                  the chips are taking up too much space"). Each language is named
+                  in itself, with its English tag in the list; Dot's control, D-561. */}
+              <LanguageField
+                label={t('onboarding.language.title')}
+                options={SUPPORTED_LOCALES.map((code) => ({ code, name: t(`language.${code}`), tag: LANGUAGE_TAGS[code] }))}
+                value={pendingLocale ?? locale}
+                onChange={(code) => setLocale(code as Locale)}
+              />
 
               {invitedAs ? null : (
                 <>
@@ -632,24 +685,40 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 {/* The hint behind an info tip on the label's line (D-369):
                     the form stays fields; the field keeps its own label for
                     screen readers, and the line you see is that label again. */}
-                <VStack gap={1}>
-                  <HStack gap={1} align="center" wrap="nowrap">
-                    <Text aria-hidden="true" xstyle={styles.chipsLabel}>
-                      {t('join.code.label')}
+                {/*
+                  Hidden until asked for (Will, 13 October: "otherwise let's hide it so
+                  it doesn't take up real estate"): most people join without a code.
+                  Open from the start when a code is already there, or when the code
+                  they gave needs fixing (`inviteProblem`).
+                */}
+                {codeShown ? (
+                  <VStack gap={1}>
+                    <HStack gap={1} align="center" wrap="nowrap">
+                      <Text aria-hidden="true" xstyle={styles.chipsLabel}>
+                        {t('join.code.label')}
+                      </Text>
+                      <InfoTip label={t('join.code.more')} content={t('join.code.hint')} />
+                    </HStack>
+                    <TextField
+                      id={codeFieldId}
+                      purpose="inviteCode"
+                      label={t('join.code.label')}
+                      isLabelHidden
+                      value={inviteCode}
+                      onChange={(next) => setInviteCode(next.toUpperCase())}
+                      width="100%"
+                      xstyle={styles.field}
+                    />
+                  </VStack>
+                ) : (
+                  <VStack gap={1} align="start">
+                    <Text id={codeQuestionId} xstyle={styles.body}>
+                      {t('join.code.question')}
                     </Text>
-                    <InfoTip label={t('join.code.more')} content={t('join.code.hint')} />
-                  </HStack>
-                  <TextField
-                    id={codeFieldId}
-                    purpose="inviteCode"
-                    label={t('join.code.label')}
-                    isLabelHidden
-                    value={inviteCode}
-                    onChange={(next) => setInviteCode(next.toUpperCase())}
-                    width="100%"
-                    xstyle={styles.field}
-                  />
-                </VStack>
+                    {/* Read with its question, so "Click here" is never heard alone (Iris, b32, P2). */}
+                    <TextLink label={t('join.code.reveal')} onClick={revealCode} isUnderlined describedBy={codeQuestionId} />
+                  </VStack>
+                )}
                 </>
               )}
 
@@ -681,18 +750,9 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 </Text>
               ) : null}
               {/*
-                Unticked, and it stays unticked unless somebody ticks it. Consent
-                that arrives pre-selected is not consent, and this is the exact
-                thing a carrier audit looks for.
+                No "Text me when Pam opens" tick (D-587 build 3, held for Will): nothing sends that text, so the
+                step saves the city and promises nothing.
               */}
-              <CheckboxInput
-                label={t('join.waiting.optIn', { city: city.trim() })}
-                value={wantsUpdates}
-                onChange={(next) => setWantsUpdates(next)}
-              />
-              <Text type="supporting" xstyle={styles.small}>
-                {t('reminders.how')}
-              </Text>
             </VStack>
           </>
         ) : null}
@@ -702,7 +762,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
             <Notice
               notice="service_not_available"
               title={t('join.waitingDone.heading')}
-              body={t(wantsUpdates ? 'join.waitingDone.yes' : 'join.waitingDone.no')}
+              body={t('join.waitingDone.no')}
             />
             <BigButton label={t('action.done')} href="/" />
           </>
@@ -713,7 +773,29 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
           three different people are reading it and only one of them is being
           asked to trust us with their life (Will, 14 September).
         */}
-        {phase === 'privacy' && !isStaff ? <TransparencyReading /> : null}
+        {phase === 'privacy' && !isStaff ? (
+          <>
+            <TransparencyReading />
+            {/*
+              The reading says "If something here worries you, call us. A person
+              answers." Here, before the account is set up, that has to be
+              somewhere they can tap (Iris, member flow W2, 10 October). Pam has
+              no phone line (D-512), so it is Contact Pam, opening the help desk
+              on the website: they are not signed in to the app's Help yet.
+            */}
+            <MenuList
+              label={t('help.contact.action')}
+              items={[
+                {
+                  id: 'contact',
+                  label: t('help.contact.action'),
+                  href: HELP_DESK_URL,
+                  icon: <HelpIcon width={26} height={26} />,
+                },
+              ]}
+            />
+          </>
+        ) : null}
 
         {phase === 'privacy' && isStaff ? (
           <>
@@ -721,7 +803,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
               <VStack gap={3}>
                 <Text xstyle={styles.intro}>{t(`join.privacy.${kind}.intro`)}</Text>
                 {kind === 'provider' ? (
-                  // Four things to scan, each with a small picture (Will,
+                  // Five things to scan, each with a small picture (Will,
                   // 7 October, D-354): how Pam works for a program now.
                   <VStack gap={4} role="list">
                     {PROVIDER_EXPECT.map((art, i) => (
@@ -742,7 +824,20 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 )}
               </VStack>
             </>
-            {hasAccount ? null : (
+            {hasAccount ? (
+              // Help on each step of joining (A26), as on the member's step 2 (Iris, case manager W1).
+              <MenuList
+                label={t('help.contact.action')}
+                items={[
+                  {
+                    id: 'contact',
+                    label: t('help.contact.action'),
+                    href: HELP_DESK_URL,
+                    icon: <HelpIcon width={26} height={26} />,
+                  },
+                ]}
+              />
+            ) : (
               <>
                 {/*
                   Nothing was created, and saying so is the whole screen. Somebody
@@ -834,7 +929,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
               */}
               <PointsBadge points={points ?? 0} label={t('points.title')} />
               <Text xstyle={styles.body}>{t('join.done.body', { name: firstName.trim() || t('app.name') })}</Text>
-              <BigButton label={t('join.done.action')} onPress={() => (preview ? navigate('/') : router.replace('/'))} />
+              <BigButton label={t('join.done.action')} onPress={() => (preview ? navigate('/') : router.replace(recallInvite() ? '/' : (takeNext() ?? '/')))} />
             </VStack>
           </>
         ) : null}

@@ -150,7 +150,8 @@ export function AddProgramView({
           ? { backHref: '/program/', backLabel: t('nav.back.program') }
           : { backHref: '/programs/', backLabel: t('nav.back.programs') })}
       // Back goes one question back while there is one (D-347).
-      {...(step > 0 ? { onBack: () => setStep(step - 1) } : {})}
+      // And it is named for that (Iris's program lead pass, P1): "Back a step", not "Back to Home".
+      {...(step > 0 ? { onBack: () => setStep(step - 1), backLabel: t('trips.new.back') } : {})}
       actions={<HelpButton />}
       // Next stays at the foot of the screen, whatever the question (D-357);
       // as the Program tab too, now that it covers the bar (D-383).

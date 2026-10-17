@@ -1,0 +1,34 @@
+diff --git a/pam/apps/web/src/screens/RequestsScreen.tsx b/pam/apps/web/src/screens/RequestsScreen.tsx
+index 63761bb7..037564c5 100644
+--- a/pam/apps/web/src/screens/RequestsScreen.tsx
++++ b/pam/apps/web/src/screens/RequestsScreen.tsx
+@@ -125,14 +125,14 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
+             href: isHome ? '/programs/review/?from=home' : '/programs/review/',
+             icon: <PlacesIcon {...ICON} />,
+             // How many wait for a decision, like the requests below (Iris, super admin P1).
+-            ...(toCheck > 0 ? { value: String(toCheck) } : {}),
++            ...(toCheck > 0 ? (new URLSearchParams(window.location.search).get('counts') === 'badge' ? { badge: String(toCheck), badgeLabel: `${toCheck} programs` } : { value: String(toCheck) }) : {}),
+           },
+           {
+             id: 'reported-places',
+             label: t('places.reported.title'),
+             href: '/places/reported/',
+             icon: <ShieldIcon {...ICON} />,
+-            ...(reportedCount > 0 ? { badge: String(reportedCount), badgeLabel: t('places.reported.count', { count: reportedCount }) } : {}),
++            ...(reportedCount > 0 ? (new URLSearchParams(window.location.search).get('counts') === 'value' ? { value: String(reportedCount) } : { badge: String(reportedCount), badgeLabel: t('places.reported.count', { count: reportedCount }) }) : {}),
+           },
+         ]}
+       />
+diff --git a/pam/apps/web/src/stories/journeys/mockSupabase.ts b/pam/apps/web/src/stories/journeys/mockSupabase.ts
+index 1de2ad0b..b9a4a30e 100644
+--- a/pam/apps/web/src/stories/journeys/mockSupabase.ts
++++ b/pam/apps/web/src/stories/journeys/mockSupabase.ts
+@@ -667,7 +667,7 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
+     // One account, two roles (0078): a story never really switches.
+     on('/rpc/switch_role', () => ({ body: {} })),
+     on('/rpc/add_role_from_invite', () => ({ body: {} })),
+-    on('/rpc/flagged_services', () => ({ body: [] })),
++    on('/rpc/flagged_services', () => ({ body: [{ id: 'f1', name: 'Example Library Tech Lab', lookup_name: null, category: 'education', address: '1 Main St', phone: null, place_id: null, lat: 39.95, lon: -75.16, has_hours: false, hours: null, description_plain: null, website: null, audience: null, flag_id: 'g1', reason: 'closed', note: null, flag_count: 1, flagged_at: new Date().toISOString() }, { id: 'f2', name: 'Example Food Pantry', lookup_name: null, category: 'education', address: '1 Main St', phone: null, place_id: null, lat: 39.95, lon: -75.16, has_hours: false, hours: null, description_plain: null, website: null, audience: null, flag_id: 'g2', reason: 'closed', note: null, flag_count: 1, flagged_at: new Date().toISOString() }] })),
+     on('/rpc/served_cities', () => ({ body: [{ city: 'Philadelphia' }] })),
+     on('/rest/v1/conversation_members', (url, method) => {
+       if (method === 'PATCH') return { body: [] };

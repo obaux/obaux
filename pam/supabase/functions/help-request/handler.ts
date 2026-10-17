@@ -14,8 +14,10 @@
 //   3. Abuse: CORS and an Origin check for joinpam.org only, a honeypot, hard length caps, a body
 //      size cap, and a limit per caller and overall (`help_request_allowed`, migration
 //      20261011041940) keyed on a salted hash of the caller's address, never the address.
-//   4. What goes in the email: what they typed, how to answer them, the page they came from, the
-//      language, and their role if known. No member records: it reads none.
+//   4. What goes in the email: what they typed, how to answer them, who they say they are (member,
+//      program, case manager: any of them, asked on the form), the page they came from, the language,
+//      and their role if known. No member records: it reads none. Who they say they are is in the
+//      email only: it is not stored, logged, or part of the duplicate check.
 //   5. It never logs a word of the request, an address or a name: statuses and counts.
 
 import type { Emailer } from './provider.ts';
@@ -32,6 +34,45 @@ export const LIMITS = {
   role: 40,
   body: 12_000,
 } as const;
+
+/** Who the form lets a person say they are (Will, 13 October; not_yet from Sage's fourth choice). Anything else in `roles` is dropped. */
+export const WHO = ['member', 'program', 'case_manager', 'not_yet'] as const;
+export type Who = (typeof WHO)[number];
+const WHO_WORDS: Record<Who, string> = {
+  member: 'a member',
+  program: 'a program',
+  case_manager: 'a case manager',
+  not_yet: 'not using Pam yet',
+};
+const MAX_ROLES = 10;
+
+/**
+ * `roles`: an array of the values above, any of them, in any order. Each is lower-cased and spaces or hyphens
+ * read as underscores ("Case manager" is `case_manager`). Repeats and anything that is not one of the three are
+ * dropped, not refused: a label the site has not been told about must not cost the person their message. Not an
+ * array (when given at all), or an absurd number of entries, is refused. Always returned in the same order.
+ */
+export function rolesOf(input: Record<string, unknown>): Who[] {
+  const raw = input['roles'];
+  if (raw === undefined || raw === null) return [];
+  if (!Array.isArray(raw) || raw.length > MAX_ROLES) throw new Invalid('roles');
+  const seen = new Set<Who>();
+  for (const item of raw) {
+    if (typeof item !== 'string') continue;
+    const value = item.replace(CONTROL, '').trim().toLowerCase().replace(/[\s-]+/g, '_');
+    if ((WHO as readonly string[]).includes(value)) seen.add(value as Who);
+  }
+  // "I don't use Pam yet" ticked beside a role is the role: the role says more.
+  if (seen.size > 1) seen.delete('not_yet');
+  return WHO.filter((w) => seen.has(w));
+}
+
+/** "a member", "a member and a case manager", "a member, a program and a case manager". */
+export function saysTheyAre(roles: readonly Who[]): string {
+  const words = roles.map((w) => WHO_WORDS[w]);
+  if (words.length <= 1) return words[0] ?? 'not said';
+  return `${words.slice(0, -1).join(', ')} and ${words[words.length - 1]}`;
+}
 
 export interface Deps {
   readonly get: (name: string) => string | undefined;
@@ -122,15 +163,18 @@ export interface Request_ {
   page: string | null;
   lang: string | null;
   role: string | null;
+  roles?: readonly Who[];
 }
 
 export function render(input: Request_): { subject: string; text: string; html: string } {
   const rows: [string, string][] = [
     ['From', input.name ? `${input.name} <${input.email}>` : input.email],
+    ['Says they are', saysTheyAre(input.roles ?? [])],
     ['Answer by', `Reply to this email (it goes to ${input.email})`],
     ['Page', input.page ?? 'not given'],
     ['Language', input.lang ?? 'not given'],
-    ['Role', input.role ?? 'not known'],
+    // Only when the site sent one: the form asks "Says they are" now, and "Role: not known" beside it would confuse.
+    ...(input.role ? ([['Role', input.role]] as [string, string][]) : []),
   ];
   const text = `${rows.map(([k, v]) => `${k}: ${v}`).join('\n')}\n\n${input.message}\n`;
   const html =
@@ -183,6 +227,7 @@ export async function handle(request: Request, deps: Deps): Promise<Response> {
       page: field(input, 'page', false),
       lang: field(input, 'lang', false),
       role: field(input, 'role', false),
+      roles: rolesOf(input),
     };
   } catch (error) {
     if (error instanceof Invalid) return reply(400, { error: 'invalid', field: error.fieldName }, origin);

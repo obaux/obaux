@@ -7,7 +7,8 @@
     "build": "next build && node scripts/preload-font.mjs",
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run --passWithNoTests",
-    "lint": "next lint"
+    "lint": "next lint",
+    "posts:date": "node scripts/post-date.mjs"
   },
   "dependencies": {
     "@astryxdesign/core": "^0.6.0",

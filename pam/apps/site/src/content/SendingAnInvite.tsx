@@ -47,7 +47,7 @@ export function SendingAnInvite() {
           shots={[{ name: 'sending-an-invite/invite.png', alt: "The invite screen. Three rows: “Invite a member”, “Invite a program” and “Invite a case manager”.", caption: "Choose who you are inviting." }, { name: 'sending-an-invite/invite-form.png', alt: "The invite form with boxes for their first name and their mobile number, and a button that says “Create link”.", caption: "First name and mobile number." }]}
         />
         <P>
-          Pam does not text the link for you. You send it. The screen also gives a code, in case the person is on
+          Pam does not text the link for you. You send it. When you invite a case manager or a program lead, Pam also emails them the link at the address you typed. The screen also gives a code, in case the person is on
           the phone with you: “Read them this code instead.”
         </P>
       </Section>
@@ -57,7 +57,10 @@ export function SendingAnInvite() {
           If the person signs in to Pam with that number, Pam finds the invite even without the link. A link
           works once, for one person, and it lasts 30 days.
         </Needs>
-        <P>If a link has expired, make a new invite. Tap “Make another”.</P>
+        <P>
+          If a link has expired, make a new invite. Tap “Make another”. The person can also tap “Email me a new link” on the
+          page that says the link has expired.
+        </P>
         <P>
           A phone number that already has a staff account cannot take a staff invite. The person will see “This
           number is already in Pam”.

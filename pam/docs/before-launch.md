@@ -11,6 +11,18 @@ STATUS row too.
 
 ## Open
 
+- [ ] **Google Calendar sync: waiting until Will wants it on** (a71, 12 October 2026: "wait until we switch sync on. Not now."). It is built and held on the branch `claude/places-programs-google-sync` (head 5f1e70ae; D-539): not merged, not deployed, no migration applied. When Will asks for it, its two Privacy lines come back on a card with the Google Cloud checklist (the full checklist is in that branch's `docs/before-launch.md`). The calendar link (D-538) is separate and does not need it.
+
+- [ ] **Calendar link: someone taps it on a real phone** (Piper, 11 October 2026, D-538). (1) On an Android phone, make a link on
+  Profile > Calendar and tap "Open Google Calendar on the web": it should reach Google Calendar's "add by URL" page in the
+  phone's browser; if Google sends the phone to its app or a sign-in that loses the page, the line above the button
+  ("ask for the desktop site") is the only way, so say so on the page more plainly. (2) Paste the link into Apple Calendar,
+  Google Calendar (on a computer) and Outlook, and check a visit shows, moves and goes, with the place's name off and on.
+  (3) Deploy `calendar-feed` with JWT verification off and fetch a made-up address: a bare 404. (4) A native reader for
+  `calendar.others` in the six languages (it names buttons in Google Calendar and Outlook).
+
+- [x] **Street search: Will makes the Google key, then it goes on** (Piper, 13 October 2026, D-552). Done 14 October: the key is restricted to Places API (New), every request type has a daily cap, and the key has been in `GOOGLE_MAPS_SERVER_KEY` since 05:51. The setup, caps, costs and what is still open are in `docs/google-places.md`. The function `places-search` is built and OFF: with no `GOOGLE_MAPS_SERVER_KEY` the area search is just ZIP codes and neighborhoods. To turn it on: (1) in Google Cloud Console, on the same project as the Trips map or a new one, enable **Places API (New)**; (2) make an API key for the server only, restrict it to the Places API (New) and set a **daily quota cap** (check Google's live price list: each SKU has a free monthly amount, and Autocomplete requests are billed per call); (3) enter it as the function secret `GOOGLE_MAPS_SERVER_KEY`; (4) deploy `places-search` with JWT verification ON; (5) once the Privacy line is signed (Lena, Sage, Will), Dot adds Google's own mark, and Sage words the hint under the field. No value goes in the repository.
+
 - [ ] **Read the City of Philadelphia licence once** (Lena for Mira, 11 October 2026; Will, or anyone with open web access).
   Pam copies four City of Philadelphia open-data layers (City Facilities, Parks & Recreation program sites and properties, DBHIDS
   provider locations) and a ZIP-code centre computed from the City's property points, and Piper's street centerlines are next.
@@ -22,6 +34,15 @@ STATUS row too.
   and then: (1) tick this, with the date; (2) write in `docs/data-licences.md` what the licence really says (credit? a
   commercial-use limit? who is "the user" if Pam passes places on to members?); (3) tell Mira if it asks for a credit line, which would go
   on the About page. No Privacy line is needed: none of this data is about members.
+
+- [ ] **Street-address search: the line is signed before the key is set, and the Google Maps terms are read once** (Lena for Mira, 13 October 2026; Will).
+  Piper's `places-search` function (a74) sends what a member typed (an address, a corner, anything Pam's own list of areas lacks) from Pam's
+  server to Google Places, and the place they pick. It is off until Will adds the secret `GOOGLE_MAPS_SERVER_KEY`. (1) **Do not add the key until
+  `privacy.s.sharing.p7` is signed by Will and live in seven languages**: the host guard lets the function reach `main` with that line still
+  pending (it is off), so the key is the gate; the Privacy page must say it before the first word goes to Google. (2) **Read Google's Maps Platform
+  terms for Places once** (what may be stored beyond a place id, the required "powered by Google" mark, which Dot draws): nobody on the team has read
+  them (not reachable from the sessions' sandbox), and the Privacy line says Pam keeps neither the words nor the answer, so the day anyone wants to
+  save a picked address the terms and the line both have to be looked at first. Then tick this with the date.
 
 - [ ] **The native apps ask for location with Pam's own reason** (Lena, 11 October 2026; Mira asked for this to be listed). Pam
   asks the phone for where it is in two places: "Use my current location" in Explore's area picker, and "I'm here" on a visit
@@ -41,6 +62,21 @@ STATUS row too.
      item: write it from Piper's answer.
   4. Seven languages: the system shows the string in the phone's language, so each of the six translations goes in the
      native project's per-language strings the day those exist (signed by Will with the Privacy page, as it repeats it).
+
+- [ ] **The request log: keep `privacy.s.what-we-keep.p11` true** (Lena, 11 October 2026, a66; facts from Piper's read-only check).
+  Privacy says the servers that run Pam write down, for each request, when, what was asked for, which account, the IP
+  address and the kind of phone or browser, plus the phone number at sign-in; that messages and searches are not written
+  down; and that the record "is deleted within a week". True today because: Supabase is on the **Free** plan (logs kept 1
+  day; the oldest row was 25 hours old), Vercel's plan could not be read from the API (the deploy limit the team hit is
+  Hobby's, whose request logs last about an hour; Pro a day). Will can read Vercel's plan in Settings › Billing.
+  1. **Before the Supabase plan goes to Team (28 days) or Enterprise (90), or Vercel to Enterprise,** change p11 and
+     `privacy.s.what-we-keep.p12` (the calendar link's request record, which has the same "within a week") and their six
+     translations first. Pro (7 days) is still "within a week". Moving to Pro before launch is likely (the Free plan has
+     no backups to restore from); nothing to change for it.
+  2. **Do not add a log drain or an error tracker** (Sentry, an analytics tool, a Vercel Speed Insights switch) without
+     reading p11 first: a copy elsewhere has its own retention. None exists today (Piper searched the code and package.json).
+  3. `no-typed-text-in-urls.test.ts` keeps "what you search for" out of the logged URL: a new GET filter must be on an id,
+     a state or a setting, and typed words go in a POST body (an rpc).
 
 - [ ] **Read Twilio's own record of every text before texts go on** (Lena for Nico, 11 October 2026, from Piper's log check; Mira).
   Twilio keeps, for each text Pam sends, the number, the text, the time and the status. Nobody has read its retention
@@ -90,6 +126,7 @@ STATUS row too.
      | `profile.promo.reminders.body` | Coming soon: texts about your visits and the places you saved. (A28 check, 11 October: was "We can text you if a place you saved closes or moves."; the saved-place text is held with the rest, D-481) | We can text you the day before a visit, or if a place you saved closes or moves. |
      | `reminders.today.member` (the Text reminders screen) | Pam does not send any of these yet. They are coming. (was "Today Pam sends only one of these: a note when a place you saved closes or moves. The others are coming.") | Say which of the three are sent that day: Pam sends these. |
      | `flag.done.body` (A28 check, 11 October) | Somebody at Pam looks at every one of these. | Somebody at Pam looks at every one of these. If the place comes off the list, anyone who saved it and said yes to texts is told. |
+     | Reported places, "Take it off the list" (the super admin's confirm and the line under the button; Piper's W1/W4, Sage's ledger 7cfbcb03, 15 October) | Members won't find it in Pam anymore. | Revisit then, for example: Members won't find it in Pam anymore. People who saved it and get texts from Pam are told. |
 
      `flag.done.body` lost its second sentence because the only way a person who saved a place hears that it was
      removed is the held saved-place text (D-481; no bell row is made for them, only for super admins and the
@@ -202,6 +239,24 @@ STATUS row too.
   the two invitations) can leave Pam: every reminder and alert stays scheduled. Only the merge desk sets it, on
   the day Will finishes the Twilio filing and says go — together with `ALERT_TEXTS_LIVE` and
   `claude/messages-reply-start`; the order is the runbook at the top of `docs/sms-setup.md`.
+
+- [ ] **Widen the registered SMS campaign before `texts_live` goes on** (a94, 17 October 2026). Will decided that a
+  program can book real visits for members who have written to it; the member hears through the bell, and, once texts
+  are on, by the usual appointment reminders. The campaign description on file with the carrier covers reminders only for
+  "an appointment they scheduled in the app". **Will files:** in the Twilio campaign (A2P 10DLC → the Oba brand → the
+  campaign), change that sentence in the **description** to "a reminder the day before an appointment they or a program
+  scheduled" (the whole description is then 1,017 of 1,024 characters; the ready-to-paste text is in
+  `docs/sms-campaign-samples.md`, "The campaign description"). This rides the refiling already needed (the "Re-file the
+  campaign" step under the `dispatch-sms` deploy): if the refiling goes first, paste the updated block and nothing
+  more is needed. Also for Sage and Lena to decide, not Will: the Text reminders screen says Pam can text "about the
+  things you plan" (`reminders.intro`); the carrier reads that screen as the opt-in, so it may want to say visits
+  too. Nothing is sent today (`texts_live` is off), so nothing is wrong yet.
+  **Update, 17 October (Sage signed new opt-in words, ledger 6b4e546f; they ship with card a94):** the Text reminders
+  screen will say `reminders.intro` "Pam can text you the reminders and notes listed below. It is your choice, and you
+  can change it whenever you want." and list `reminders.what.1` "A reminder before each visit, with the address."
+  **The opt-in description Will files with the carrier must match `reminders.intro` and its list once those ship**
+  (paste the answer under "How do end-users consent…" in `docs/sms-campaign-samples.md` only after it says the same).
+  No booking text goes to members (the bell only), so there is no `reminders.what.4`.
 
 - [x] **Merge and deploy 0068 and 0069** — done 8 October as 0075/0076 (D-388) (readiness fixes and blocking, on
   branch `claude/hopeful-thompson-07nj7n`, not yet on this one). 0068 is what
@@ -443,6 +498,21 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   forwarding, a test and Will's go, D-450). Six translations each by Claude, with no native reader: promises, so the same
   native readers as below. The English says "rules" where the app says "policy"; the translations follow the app's word.
 
+- [ ] **A native reader for the calendar link screen (D-538, 11 October 2026).** The 27 `calendar.*` strings are six translations by
+  Claude with no native reader. Two things a reader must check against the real apps, in their own language, because the apps can
+  rename them: **`calendar.others`** names buttons in Google Calendar ("Other calendars" › "From URL") and Outlook ("Add calendar" ›
+  "Subscribe from web"); each translation uses what the app shows in that language, written from memory (es "Otros calendarios" ›
+  "Desde URL"; pt-BR Google Agenda "Outras agendas" › "Do URL"; ru "Другие календари" › "По URL"; ar «تقاويم أخرى» › «من عنوان URL»;
+  zh-CN “其他日历” › “通过网址”; zh-HK 「其他日曆」›「透過網址」; Outlook "Subscribe from web" is "Suscribirse desde la web", "Assinar da Web",
+  “从 Web 订阅”, 「從 Web 訂閱」, «Подписаться из Интернета», «الاشتراك من الويب»). And **"Pam visit"** stays English inside the quotes in
+  `calendar.details.hint`, because the event's text is English whatever the member's language (D-538, "Not done"): if the event text
+  is ever translated, change both together.
+  **`calendar.google.phone`** names a switch in the phone's browser, "Desktop site"; each translation uses Chrome's name for it in that
+  language, from memory (es "Sitio para computadoras"; pt-BR "Site para computador"; zh-CN “桌面版网站”; zh-HK 「電腦版網站」; ru «Версия для
+  компьютера»; ar «موقع سطح المكتب», where the Arabic says "choose" rather than "turn on" to avoid a vowel mark). Safari on an iPhone
+  calls it "Request Desktop Website" in its "aA" menu and other browsers differ, so a native reader should check the wording against
+  the browsers their members use.
+
 - [ ] **A native reader for what D-465 reworded (10 October).** The last-day line on the
   transparency screen (`transparency.canSee.lastActive`), the privacy page's "What you can do"
   blocking sentence and the terms' blocking sentence now say only what is true (a guide, not a
@@ -456,6 +526,16 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   translations are Claude's, and this is a promise: a native reader of Spanish,
   Brazilian Portuguese, Simplified and Traditional Chinese, Russian and Arabic should
   confirm it says exactly that and no more.
+
+- [ ] **A native reader for three new things of 17 October (Lena; Mira asked 10:25).** Six translations each, written by Claude, none read by a native speaker.
+  (1) **The case manager's search pill** (`home.caseload.search.placeholder` and `.label`, D-600): the words must fit 128px, so they are short: es "Buscar miembros" / "Buscar miembros por nombre"; pt-BR "Buscar membros" / "Buscar membros pelo nome"; zh-CN 搜索成员 / 搜索成员（按姓名）; zh-HK 搜尋會員 / 搜尋會員（按姓名）; ru «Поиск людей» / «Поиск людей по имени»; ar "ابحث في الأعضاء" / "ابحث في الأعضاء بالاسم". The label has to begin with the pill's words (voice control says them, WCAG 2.5.3). Check: does each read naturally, spoken aloud as the label; is Russian «людей» (people) acceptable where the rest of the app says «участники» for members (the pill has no room for «участников»); do 成员 and 會員 match the word the app uses for members.
+  (2) **The short version's second sentence** (`transparency.summary.program`): "It sees more once you sign up, sign its rules or plan a visit there." Check that each language's word for "rules"/"policies" is the one its Privacy page uses (`sharing.p2`), and that the sentence says a program sees more, not that it must.
+  (3) **The case manager's visit line** (`caseload.visit.*`, Ava's a93, ships with her branch): "Marked as there" and "Not marked as there" say what the *program* marked, not whether the member went. es "Presencia marcada / sin marcar", pt-BR "Presença registrada / não registrada", zh 标记为已到场 / 未标记为已到场 (zh-HK 標記為已到場 / 未標記為已到場), ru «Присутствие отмечено / не отмечено», ar "تم تسجيل الحضور / لم يسجل الحضور". Check that none of them reads as "the member was absent".
+
+- [ ] **A native reader for what Will signed on card a94 (17 October; Lena).** Six translations each, written by Claude, none read by a native speaker; the Privacy lines are promises.
+  (1) **Privacy** (usted, você, 您, вы): `privacy.s.sharing.p9` ("If you have written to a program, signed up with it or planned a visit there, it can book a visit for you. It shows in your Trips with the program's name, and you can cancel it.") and the clause in `privacy.s.who-can-see.p1` ("…your visits and which ones a program booked for you…"). Check that each names the same three ways in as `book.intro` and `book.empty`, and that "Trips" is the word on the app's own tab (es/pt-BR "Visitas", zh-CN 预约, zh-HK 到訪, ru «Визиты», ar «الزيارات»). In zh-CN 预约 is both the verb and the tab: does "该项目就可以为您预约。预约会连同项目名称显示在“预约”中" read clearly?
+  (2) **The member's screens** (tú in Spanish): `trips.bookedForYou` "Booked for you" (es "Reservada para ti": is the feminine right under a card titled with a place?), `transparency.canSee.bookedBy`, `transparency.program.visits`, and `reminders.intro` / `reminders.what.1` (the opt-in the carrier reads: "reminders and notes listed below"; check "notes" is the word each language uses on the list).
+  (3) **The guide's side:** `person.trip.bookedBy` ("Booked by {program}"; es/pt-BR "Reservada por") and `join.privacy.admin.2` ("…which ones a program booked and if they went or missed one…").
 
 - [ ] **Hear the language tags with a screen reader (10 October, D-455).** Every list
   of languages now starts each name with an English tag (EN, ES, PT-BR, ZH-CN, ZH-HK,
@@ -629,9 +709,16 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   1. 0084 is live (9 October); deploy `translate-messages` (`supabase functions deploy
      translate-messages`), and read `get_advisors`.
   2. Set `ANTHROPIC_API_KEY` as a function secret — never in this repo — on an
-     account whose terms say what is sent is **not kept and not used to
-     train**. Get that in writing; the privacy page says it ("It keeps
-     nothing and does not learn from them").
+     account whose terms Will has read against the privacy page. The page says
+     what Anthropic's published terms say (card a70): the words are deleted within
+     30 days and not used to train; a message its safety checks flag may be kept
+     up to two years; a message may also be kept if the law requires it. It no
+     longer says "keeps nothing", which is not true of any model Pam can call.
+     Re-read Anthropic's data-retention page (platform.claude.com › Manage
+     Claude › API and data retention) the day the switch goes on, and change the
+     page if it changed. Pam calls `claude-haiku-5-5`; the Covered Models (Fable
+     5/5.1, Mythos 5/5.1) are held 30 days for everyone, so a change of model in
+     `supabase/functions/translate-messages/anthropic.ts` needs the page re-read too.
   3. A native speaker reads `privacy.s.translation.*` in all seven languages
      (it appears on the privacy page the moment the switch is on).
   4. **Tell members first** (the transparency promise): translation sends the

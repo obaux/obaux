@@ -51,11 +51,18 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
         // a focus ring drawn by a child or an ancestor wrapper (a search pill) counts
         const wrap = el.closest('[data-focus-within],[class*="focus"]');
         const label = (el.getAttribute('aria-label') || el.textContent || el.tagName).trim().slice(0, 40);
+        // Will, 14 October: a text box draws no ring in any mode (the cursor shows where you are); everything else does
+        const textBox = el.tagName === 'TEXTAREA' || (el.tagName === 'INPUT' && !['checkbox', 'radio', 'button', 'submit', 'reset', 'file', 'range', 'color'].includes(el.type));
+        if (textBox) return { label: `${el.tagName.toLowerCase()} “${label}”`, textBox: true, drawsRing: cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) > 0, key: `${el.tagName}|${label}|${Math.round(el.getBoundingClientRect().top)}` };
         return { label: `${el.tagName.toLowerCase()} “${label}”`, ring: !!ring || (wrap && getComputedStyle(wrap).boxShadow !== 'none'), key: `${el.tagName}|${label}|${Math.round(el.getBoundingClientRect().top)}` };
       });
       if (!r) break;
       if (stops.has(r.key)) break;
       stops.add(r.key);
+      if (r.textBox) {
+        if (r.drawsRing) fail(`focus ring: ${path} ${r.label} draws an outline, text boxes draw none (Will, 14 October)`);
+        continue;
+      }
       if (!r.ring) fail(`focus ring: ${path} ${r.label} shows none when reached with Tab`);
     }
   }
@@ -154,8 +161,8 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
 // "Still stuck?": the address while the help-request function is off (503), the form when it is on (400 to an empty
 // probe), then Sent or That did not send. The function is stood in for here (Nico's contract, D-521).
 {
-  const run = async (probe, submit) => {
-    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const run = async (probe, submit, width = 390) => {
+    const ctx = await browser.newContext({ viewport: { width, height: width === 390 ? 844 : 800 } });
     // The form only asks the function from the real site's origin, so the page is served as https://joinpam.org
     await ctx.route('https://joinpam.org/**', async (route) => {
       const u = new URL(route.request().url());
@@ -229,13 +236,40 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
   ]) {
     const { page, ctx, calls } = await run([400, { error: 'invalid', field: 'body' }], submit);
     const box = page.getByRole('textbox', { name: /What’s wrong/ });
-    if (!(await box.count())) {
-      fail(`help form (${label}): not shown when the function is on`);
+    const opener = page.getByRole('button', { name: 'Write to us' });
+    if (!(await opener.count())) {
+      fail(`help form (${label}): no call-out button when the function is on`);
+    } else if (await box.isVisible()) {
+      fail(`help form (${label}): the form is on the page itself, it should only open from the call-out (Will, 13 October)`);
     } else {
+      await opener.click();
+      await page.waitForTimeout(500);
+      if (!(await box.isVisible())) fail(`help form (${label}): the call-out did not open the form`);
+      if (!(await page.evaluate(() => !!document.activeElement?.closest('dialog')))) fail(`help form (${label}): focus did not go into the form`);
+      if (!(await page.evaluate(() => document.activeElement?.tagName === 'TEXTAREA'))) fail(`help form (${label}): the message box should have focus as the form opens, so the keyboard comes up`);
+      // Esc closes it and focus goes back to the button; then open it again to fill it in.
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(400);
+      if (await box.isVisible()) fail(`help form (${label}): Esc did not close the form`);
+      if (!(await page.evaluate(() => document.activeElement?.textContent?.includes('Write to us')))) fail(`help form (${label}): focus did not return to the call-out button after Esc`);
+      await opener.click();
+      await page.waitForTimeout(500);
       if (label === 'on, sends') {
         await page.getByRole('button', { name: 'Send to Pam' }).click();
         await page.waitForTimeout(200);
         if (!(await page.getByText('Tell us what happened, in a few words.').count())) fail('help form: an empty message says nothing about what to do');
+        // Iris W1: an empty Send puts focus in the first field in error, and the field's description is its error
+        const described = (name) =>
+          page.evaluate((n) => {
+            const el = document.activeElement;
+            const label = el?.getAttribute('aria-label') ?? el?.labels?.[0]?.textContent ?? '';
+            const text = (el?.getAttribute('aria-describedby') ?? '').split(/\s+/).map((id) => document.getElementById(id)?.textContent ?? '').join(' ');
+            return { tag: el?.tagName, invalid: el?.getAttribute('aria-invalid'), label, text, n };
+          }, name);
+        const w1 = await described('message');
+        const ringless = () => page.evaluate(() => { const cs = getComputedStyle(document.activeElement); return cs.outlineStyle === 'none' || parseFloat(cs.outlineWidth) === 0; });
+        if (!(await ringless())) fail('help form: the focused message box draws an outline, text boxes draw none (Will, 14 October)');
+        if (w1.tag !== 'TEXTAREA' || w1.invalid !== 'true' || !/Tell us what happened, in a few words\./.test(w1.text)) fail(`help form (W1): an empty Send should focus the message box and describe it with its error, focus is on ${JSON.stringify(w1)}`);
         await box.fill('x y z');
         await page.getByRole('textbox', { name: /How should we answer you/ }).fill('nope');
         await page.getByRole('button', { name: 'Send to Pam' }).click();
@@ -243,17 +277,41 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
         const wrong = await page.getByText('That email does not look right. Check it and try again.').count();
         const empty = await page.getByText('Add your email so we can write back.').count();
         if (!wrong && !empty) fail('help form: a wrong email says nothing about what to do');
+        const w1b = await described('email');
+        if (!(await ringless())) fail('help form: the focused email box draws an outline, text boxes draw none');
+        if (w1b.tag !== 'INPUT' || w1b.invalid !== 'true' || !/email/i.test(w1b.text)) fail(`help form (W1): a wrong email should focus the email box and describe it with its error, focus is on ${JSON.stringify(w1b)}`);
       }
       await box.fill('I cannot get the code');
+      await page.getByRole('checkbox', { name: 'I run a program' }).check();
+      await page.getByRole('checkbox', { name: 'I’m a case manager' }).check();
       await page.getByRole('textbox', { name: /How should we answer you/ }).fill('a@example.org');
       await page.getByRole('button', { name: 'Send to Pam' }).click();
       await page.waitForTimeout(400);
       if (!(await page.getByText(expected).count())) fail(`help form (${label}): did not say “${expected}”`);
+      if (label === 'on, sends') {
+        // Iris P2: after a successful Send focus goes to the thank-you, not the page
+        const onThanks = await page.evaluate(() => document.activeElement?.id === 'help-sent' && /Sent\. Thank you\./.test(document.activeElement.textContent ?? ''));
+        if (!onThanks) fail('help form (P2): after Send, focus should be on the thank-you block');
+      }
       const sent = calls.find((c) => c !== '{}');
       if (!sent || JSON.parse(sent).website !== '' || JSON.parse(sent).page !== '/support/start-here/') fail(`help form (${label}): the request is wrong: ${sent}`);
+      if (sent && (JSON.stringify(JSON.parse(sent).roles) !== '["program","case_manager"]' || 'role' in JSON.parse(sent))) fail(`help form (${label}): how-you-use-Pam did not go as roles: ${sent}`);
       if (expected.startsWith('That') && !(await page.getByRole('link', { name: 'hello@joinpam.org' }).count())) fail('help form: a failed send does not show the address');
     }
     await ctx.close();
+  }
+  {
+    for (const [width, check] of [[390, (b, f) => Math.abs(b.width - f.width) <= 2], [1280, (b, f) => b.width < 360 && Math.abs(b.x - f.left) <= 2]]) {
+      const { page, ctx } = await run([400, { error: 'invalid', field: 'body' }], [200, { ok: true }], width);
+      const btn = page.getByRole('button', { name: 'Write to us' });
+      if (!(await btn.count())) fail(`help call-out at ${width}px: no button`);
+      else {
+        const b = await btn.boundingBox();
+        const f = await page.locator('#still-stuck > div').first().evaluate((el) => { const r = el.querySelector('p')?.getBoundingClientRect(); return { left: r.left, width: r.width }; });
+        if (!check(b, f)) fail(`"Write to us" at ${width}px is ${Math.round(b.width)}px wide (left ${Math.round(b.x)}), the line above is ${Math.round(f.width)}px wide (left ${Math.round(f.left)})`);
+      }
+      await ctx.close();
+    }
   }
 }
 
@@ -299,6 +357,86 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
       if (cls > 0.1) fail(`layout shift: /support/${slug} at ${width}px shifts ${cls.toFixed(3)} while loading`);
       await page.close();
     }
+  }
+}
+
+// The green card on Home (Will, 13 October, a77): no arrows, it moves on by itself with a fill behind the active name, a tap
+// stops it, Pause / Play works, reduced motion stops it all, and a screen reader is not told about the timer's changes.
+{
+  const selected = (page) => page.locator('[data-band] [role="tab"][aria-selected="true"]').innerText();
+  const open = async (opts) => {
+    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, ...opts });
+    const page = await ctx.newPage();
+    await page.goto(base + '/', { waitUntil: 'networkidle' });
+    await page.locator('[data-band]').scrollIntoViewIfNeeded();
+    return { ctx, page };
+  };
+  {
+    const { ctx, page } = await open({});
+    if (await page.locator('[data-band] [role="tab"] svg').count()) fail('green card: the names still carry an arrow');
+    if (!(await page.locator('[data-band-fill]').count())) fail('green card: no fill behind the active name');
+    if ((await selected(page)).trim() !== 'Residents') fail('green card: it should start on Residents');
+    await page.waitForTimeout(6800);
+    if ((await selected(page)).trim() !== 'Program Providers') fail(`green card: it should move on to Program Providers by itself, it shows ${(await selected(page)).trim()}`);
+    if ((await page.locator('[data-band] [role="status"]').first().innerText()).trim()) fail('green card: the timer’s change was spoken to a screen reader');
+    await page.getByRole('tab', { name: 'Case managers' }).click();
+    await page.mouse.move(0, 0);
+    if ((await selected(page)).trim() !== 'Case managers') fail('green card: a tap should show that name');
+    if (!(await page.locator('[data-band] [role="status"]').allInnerTexts()).join(' ').includes('Their plans')) fail('green card: a person’s choice should be spoken');
+    if (await page.locator('[data-band-fill]').count()) fail('green card: the fill keeps running after a tap');
+    await page.waitForTimeout(6800);
+    if ((await selected(page)).trim() !== 'Case managers') fail('green card: it kept moving after a tap');
+    await page.getByRole('button', { name: 'Play card' }).click();
+    await page.mouse.move(0, 0); // the pointer in the card holds the cycle, so take it away
+    await page.waitForTimeout(6800);
+    if ((await selected(page)).trim() !== 'Residents') fail(`green card: Play should start it again (Case managers goes round to Residents), it shows ${(await selected(page)).trim()}`);
+    await page.getByRole('button', { name: 'Pause card' }).click();
+    await page.mouse.move(0, 0);
+    await page.waitForTimeout(6800);
+    if ((await selected(page)).trim() !== 'Residents') fail('green card: Pause did not stop it');
+    await ctx.close();
+  }
+  {
+    // A finger: tap Pause, then Play, without leaving the button. The button keeps focus, and that must not hold the cycle.
+    const { ctx, page } = await open({ hasTouch: true });
+    const before = (await selected(page)).trim();
+    await page.getByRole('button', { name: 'Pause card' }).tap();
+    await page.waitForTimeout(6800);
+    if ((await selected(page)).trim() !== before) fail('green card: it moved on while paused (touch)');
+    await page.getByRole('button', { name: 'Play card' }).tap();
+    await page.waitForTimeout(6800);
+    if ((await selected(page)).trim() === before) fail('green card: after Pause then Play with a finger, the next name never arrived (a tapped button holds focus)');
+    await ctx.close();
+  }
+  {
+    const { ctx, page } = await open({ reducedMotion: 'reduce' });
+    await page.waitForTimeout(6800);
+    if ((await selected(page)).trim() !== 'Residents') fail('green card: it moves on under reduced motion');
+    if (await page.locator('[data-band-fill]').count()) fail('green card: a fill under reduced motion');
+    if (await page.getByRole('button', { name: /^(Pause|Play) card$/ }).count()) fail('green card: a Pause button under reduced motion (nothing moves)');
+    await page.getByRole('tab', { name: 'Program Providers' }).focus();
+    await page.keyboard.press('ArrowRight');
+    if ((await selected(page)).trim() !== 'Case managers') fail('green card: the arrow keys should move between the names');
+    await ctx.close();
+  }
+}
+
+// a83 (Will, 13 October): the grey Still stuck? card is 60px above the footer on a phone and 120px from 900px.
+{
+  for (const [width, want] of [[390, 60], [1280, 120]]) {
+    const ctx = await browser.newContext({ viewport: { width, height: 800 } });
+    const page = await ctx.newPage();
+    for (const path of ['/support/', '/support/cant-sign-in/', '/support/start-here/', '/support/your-safety/']) {
+      await page.goto(base + path, { waitUntil: 'load' });
+      const gap = await page.evaluate(() => {
+        // a post that ends without the Still stuck? card (Your safety) ends the same way, measured from its article
+        const card = document.querySelector('#still-stuck') ?? document.querySelector('article[data-page="post"]').lastElementChild;
+        const foot = document.querySelector('footer');
+        return Math.round(foot.getBoundingClientRect().top - card.getBoundingClientRect().bottom);
+      });
+      if (Math.abs(gap - want) > 1) fail(`${path} at ${width}px: ${gap}px between the Still stuck? card and the footer, expected ${want}`);
+    }
+    await ctx.close();
   }
 }
 

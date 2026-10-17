@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { LANGUAGE_TAGS, SUPPORTED_LOCALES } from '@pam/config';
 import en from '@pam/config/locales/en.json';
+import ar from '@pam/config/locales/ar.json';
 import { settled } from './settled';
 
 /**
@@ -142,30 +143,70 @@ test.describe('signing up', () => {
     await expect(page.getByRole('progressbar')).toHaveCount(0);
   });
 
-  for (const locale of ['en', 'ar'] as const) {
-    test(`${locale}: the language chips lead with their English tag, in the page's direction, and read as the name alone (D-451, D-455)`, async ({ page }) => {
-      // Will, 10 October 2026: the tag says which language a chip is before the chip says it in itself.
-      // Always English; hidden from a screen reader; first at the start of the chip, so on an English page
-      // the Arabic chip reads "AR  العربية" and on an Arabic page the English chip "EN  English".
+  // Will, 13 October (D-560): the count in the button is quiet text, no pill, level with the label, and the label stays centred.
+  for (const locale of SUPPORTED_LOCALES) {
+    test(`${locale}: the step count is plain 12px text level with the label, and the label stays centred in the button`, async ({ page }) => {
       await page.addInitScript((code) => localStorage.setItem('pam.locale', code), locale);
       await newcomer(page);
       await page.goto('/join/');
       await expect(page.locator('html')).toHaveAttribute('lang', locale);
-      const group = page.getByRole('group').filter({ has: page.locator('[aria-pressed]') }).last();
-      await expect(group).toBeVisible();
-      // Positions are read below: wait for the page a member reads, with its fonts, not the load (`settled.ts`).
       await settled(page);
+      const button = page.locator('button:has([data-count])').first();
+      await expect(button).toBeVisible();
+      const m = await button.evaluate((btn) => {
+        const box = btn.getBoundingClientRect();
+        const ghost = btn.querySelector('[data-count]') as HTMLElement;
+        const leaves = [...btn.querySelectorAll('*')].filter((e) => e.children.length === 0 && (e.textContent ?? '').trim() !== '' && e !== ghost);
+        const [count, label] = leaves as HTMLElement[];
+        const c = count!.getBoundingClientRect();
+        const l = label!.getBoundingClientRect();
+        const cs = getComputedStyle(count!);
+        const rtl = getComputedStyle(btn).direction === 'rtl';
+        return {
+          buttonCentre: box.left + box.width / 2,
+          labelCentre: l.left + l.width / 2,
+          countMid: c.top + c.height / 2,
+          labelMid: l.top + l.height / 2,
+          size: parseFloat(cs.fontSize),
+          fill: cs.backgroundColor,
+          overlap: rtl ? c.left < l.right : c.right > l.left,
+          inside: c.left >= box.left && c.right <= box.right,
+        };
+      });
+      expect(Math.abs(m.labelCentre - m.buttonCentre), 'label centred').toBeLessThanOrEqual(1.5);
+      expect(Math.abs(m.countMid - m.labelMid), 'count level with the label').toBeLessThanOrEqual(1.5);
+      expect(m.size).toBeLessThanOrEqual(12);
+      expect(m.fill, 'no pill').toBe('rgba(0, 0, 0, 0)');
+      expect(m.overlap, 'the count does not run into the label').toBe(false);
+      expect(m.inside, 'inside the button').toBe(true);
+    });
+  }
+
+  for (const locale of ['en', 'ar'] as const) {
+    test(`${locale}: the language dropdown's rows lead with their English tag, in the page's direction, and read as the name alone (D-451, D-455, D-561)`, async ({ page }) => {
+      // Will, 13 October 2026: "with all these languages, let's bring back the dropdown, the chips are taking up too much
+      // space". Dot's LanguageField (D-561) keeps what the chips had (Will, 10 October): in the open list the tag says which
+      // language a row is before the row says it in itself. Always English; hidden from a screen reader; first at the start
+      // of the row, so on an English page the Arabic row reads "AR  العربية" and on an Arabic page the English row "EN  English".
+      await page.addInitScript((code) => localStorage.setItem('pam.locale', code), locale);
+      await newcomer(page);
+      await page.goto('/join/');
+      await expect(page.locator('html')).toHaveAttribute('lang', locale);
+      // No chips any more.
+      await expect(page.locator('[aria-pressed]')).toHaveCount(0);
+      const strings: Record<string, string> = locale === 'ar' ? ar : en;
+      const language = page.getByRole('combobox', { name: strings['onboarding.language.title'] });
+      await expect(language).toContainText(strings[`language.${locale}`] ?? '');
+      await settled(page);
+      await language.click();
       for (const code of SUPPORTED_LOCALES) {
         const name = en[`language.${code}` as keyof typeof en] as string;
-        const chip = group.getByRole('button', { name, exact: true });
-        await expect(chip, `${code} chip`).toHaveCount(1);
-        const tag = chip.locator('[aria-hidden="true"]', { hasText: LANGUAGE_TAGS[code] });
+        const row = page.getByRole('option', { name, exact: true });
+        await expect(row, `${code} row`).toHaveCount(1);
+        const tag = row.locator('[aria-hidden="true"]', { hasText: LANGUAGE_TAGS[code] });
         await expect(tag).toHaveText(LANGUAGE_TAGS[code]);
-        // The name is spoken in its own voice (`lang` on the chip) and is drawn in its own direction (on the words),
-        // while the chip itself is not turned round.
-        await expect(chip).toHaveAttribute('lang', code);
-        await expect(chip).not.toHaveAttribute('dir');
-        const words = chip.locator(`span[lang="${code}"]`);
+        // The name is in its own voice and its own direction, on the words.
+        const words = row.locator(`span[lang="${code}"]`);
         await expect(words).toHaveText(name);
         await expect(words).toHaveAttribute('dir', code === 'ar' ? 'rtl' : 'ltr');
         const tagBox = (await tag.boundingBox())!;
@@ -173,6 +214,20 @@ test.describe('signing up', () => {
         if (locale === 'ar') expect(tagBox.x, `${code}: tag on the right of the name`).toBeGreaterThan(wordsBox.x);
         else expect(tagBox.x, `${code}: tag on the left of the name`).toBeLessThan(wordsBox.x);
       }
+    });
+  }
+
+  for (const locale of ['en', 'ar'] as const) {
+    test(`${locale}: the link that opens the code field is read with its question (Iris, b32, P2)`, async ({ page }) => {
+      // Out of reading order (a screen reader's list of buttons), "Click here" alone says nothing: its description is
+      // the question beside it. Nothing changes on screen, and Will's words stay as they are (card a82).
+      await page.addInitScript((code) => localStorage.setItem('pam.locale', code), locale);
+      await newcomer(page);
+      await page.goto('/join/');
+      const strings: Record<string, string> = locale === 'ar' ? ar : en;
+      const reveal = page.getByRole('button', { name: strings['join.code.reveal'], exact: true });
+      await expect(reveal).toBeVisible();
+      await expect(reveal).toHaveAccessibleDescription(strings['join.code.question'] ?? '');
     });
   }
 
@@ -197,6 +252,9 @@ test.describe('signing up', () => {
 
     // Step 3: what is visible, and what is not.
     await expect(page.getByRole('heading', { name: 'What others can see' })).toBeVisible();
+    // W2 (Iris, 10 October): the step says "call us", so it has somewhere to tap; no phone line (D-512).
+    await expect(page.getByRole('link', { name: /Contact Pam/ })).toHaveAttribute('href', /\/support\/$/);
+    await expect(page.locator('a[href^="tel:"]')).toHaveCount(0);
     await expect(page.getByText('What you say or send to someone else')).toBeVisible();
     // D-394, D-399: photos and documents are named, not left to "message" meaning all.
     await expect(page.getByText('A message, photo or document only if someone says it is not safe')).toBeVisible();
@@ -258,6 +316,81 @@ test.describe('signing up', () => {
     await expect(page.getByRole('radio', { name: 'Parole Officer or Case Manager' })).toHaveCount(0);
   });
 
+  test('a member can go back from step 2 to fix their name; it is saved on the account, not a second one (Iris W1)', async ({ page }) => {
+    const calls = await newcomer(page);
+    await page.goto('/join/');
+    await fillDetails(page);
+    await page.getByLabel('First name').fill('Marcsu');
+    await page.getByRole('button', { name: 'Next' }).click();
+    await expect(page.getByRole('heading', { name: 'What others can see' })).toBeVisible();
+
+    await page.getByRole('button', { name: 'Back a step' }).click();
+    await expect(page.getByLabel('First name')).toHaveValue('Marcsu');
+    await page.getByLabel('First name').fill('Marcus');
+    await page.getByRole('button', { name: 'Next' }).click();
+    await expect(page.getByRole('heading', { name: 'What others can see' })).toBeVisible();
+    expect(calls.start, 'a second membership was started').toHaveLength(1);
+    expect(calls.profileWrites.some((w) => w['first_name'] === 'Marcus')).toBe(true);
+  });
+
+  test('a case manager is asked the city they work in; step 2 has a way back and Contact Pam, and the invite is used once (Iris W1, P7)', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.sessionStorage.setItem('pam.invite', JSON.stringify({ code: 'PAM7Q4KX', role: 'admin' }));
+    });
+    const calls = await newcomer(page);
+    const redeemed: Record<string, unknown>[] = [];
+    await page.route('**/rest/v1/rpc/redeem_invite*', (route) => {
+      redeemed.push(route.request().postDataJSON() as Record<string, unknown>);
+      return route.fulfill(json({ id: NEWCOMER, role: 'admin' }));
+    });
+    await page.goto('/join/');
+    await page.getByLabel('First name').fill('Dnaa');
+    await page.getByLabel('Last name').fill('Lee');
+    await expect(page.getByRole('combobox', { name: 'City you work in' })).toContainText('Philadelphia');
+    await expect(page.getByRole('combobox', { name: 'City you live in' })).toHaveCount(0);
+    await page.getByRole('button', { name: 'Next' }).click();
+
+    await expect(page.getByRole('heading', { name: 'What you will see' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Contact Pam' })).toBeVisible();
+    await page.getByRole('button', { name: 'Back a step' }).click();
+    await page.getByLabel('First name').fill('Dana');
+    await page.getByRole('button', { name: 'Next' }).click();
+    await expect(page.getByRole('heading', { name: 'What you will see' })).toBeVisible();
+    expect(redeemed, 'the invite was redeemed twice').toHaveLength(1);
+    expect(calls.profileWrites.some((w) => w['first_name'] === 'Dana')).toBe(true);
+  });
+
+  test('a program lead\'s What to expect has five rows, the fifth on a member\'s new saves (a92)', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.sessionStorage.setItem('pam.invite', JSON.stringify({ code: 'PAM7Q4KY', role: 'provider' }));
+    });
+    await newcomer(page);
+    await page.route('**/rest/v1/rpc/redeem_invite*', (route) => route.fulfill(json({ id: NEWCOMER, role: 'provider' })));
+    await page.goto('/join/');
+    await page.getByLabel('First name').fill('Pat');
+    await page.getByRole('button', { name: 'Next' }).click();
+    await expect(page.getByRole('heading', { name: 'What to expect' })).toBeVisible();
+    const rows = page.getByRole('list').filter({ hasText: 'Pam never tells you why' }).getByRole('listitem');
+    await expect(rows).toHaveCount(5);
+    await expect(rows.nth(4)).toHaveText('When a member who signed up with your program saves a new place, you see when. Never which place.');
+  });
+
+  test('a program lead\'s step 2 also goes back, with Contact Pam (Iris, program lead pass)', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.sessionStorage.setItem('pam.invite', JSON.stringify({ code: 'PAM7Q4KY', role: 'provider' }));
+    });
+    await newcomer(page);
+    await page.route('**/rest/v1/rpc/redeem_invite*', (route) => route.fulfill(json({ id: NEWCOMER, role: 'provider' })));
+    await page.goto('/join/');
+    await page.getByLabel('First name').fill('Pat');
+    await expect(page.getByRole('combobox', { name: 'City you work in' })).toContainText('Philadelphia');
+    await page.getByRole('button', { name: 'Next' }).click();
+    await expect(page.getByRole('heading', { name: 'What to expect' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Contact Pam' })).toBeVisible();
+    await page.getByRole('button', { name: 'Back a step' }).click();
+    await expect(page.getByLabel('First name')).toHaveValue('Pat');
+  });
+
   test('a city Pam does not serve is an offer, not an error', async ({ page }) => {
     const calls = await newcomer(page, { cityServed: false });
     await page.goto('/join/');
@@ -272,30 +405,18 @@ test.describe('signing up', () => {
     await expect(page.getByText('Right now Pam is in Philadelphia.')).toBeVisible();
     await expect(page.getByText('Pam is not in Scranton yet.')).toBeVisible();
 
-    // Unticked, and it stays unticked unless somebody ticks it (A2P 30925).
-    const optIn = page.getByRole('checkbox', { name: /Text me when Pam opens/ });
-    await expect(optIn).not.toBeChecked();
+    // No tick asks to be texted when Pam opens there: nothing sends that text (D-587 build 3, held for Will).
+    await expect(page.getByRole('checkbox')).toHaveCount(0);
+    await expect(page.getByText(/Text me when Pam opens/)).toHaveCount(0);
 
     await page.getByRole('button', { name: 'Save my city' }).click();
     await expect.poll(() => calls.waiting.length).toBe(1);
-    expect(calls.waiting[0]!['p_wants_updates'], 'an untouched box sent a yes').toBe(false);
+    expect(calls.waiting[0]!['p_city']).toBe('Scranton');
+    expect(calls.waiting[0]!['p_wants_updates'], 'nobody is signed up for a text that is never sent').toBe(false);
 
     await expect(page.getByRole('heading', { name: 'We have your city' })).toBeVisible();
     await expect(page.getByText(/Your city is on our list/)).toBeVisible();
-  });
-
-  test('ticking the box is what sends the yes', async ({ page }) => {
-    const calls = await newcomer(page, { cityServed: false });
-    await page.goto('/join/');
-    await fillDetails(page, 'Scranton');
-    await page.getByRole('button', { name: 'Next' }).click();
-
-    await page.getByRole('checkbox', { name: /Text me when Pam opens/ }).check();
-    await page.getByRole('button', { name: 'Save my city' }).click();
-
-    await expect.poll(() => calls.waiting.length).toBe(1);
-    expect(calls.waiting[0]!['p_wants_updates']).toBe(true);
-    await expect(page.getByText(/We saved your city and that you want to hear when Pam opens there/)).toBeVisible();
+    await expect(page.getByText(/want to hear when Pam opens|Pam cannot text you/)).toHaveCount(0);
   });
 
   test('a name is asked for before anything is sent', async ({ page }) => {

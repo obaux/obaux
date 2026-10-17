@@ -258,6 +258,14 @@ These come from the build SOP and are enforced by tests, not convention:
 
 ## Verify, don't assume
 
+**Web e2e: build for the stub project, then test.** `pnpm --filter @pam/web build:e2e` (it sets `NEXT_PUBLIC_SUPABASE_URL=https://stub.supabase.co`),
+then `pnpm --filter @pam/web test:a11y`. A plain `pnpm build` points at the live project, and the run refuses to start on it (D-576); the
+browser also cannot reach any host but this machine, so an unmocked request fails instead of leaving it.
+
+**Google Places: the field mask sets the price.** Read `docs/google-places.md` before adding or changing a call to Google.
+Ask only for Essentials or Pro fields, and never for contact fields: phone, website and hours come from Pam's own
+database. Every Places request type has a daily cap Will set; Place Details is 30 a day until he raises it.
+
 `pnpm --filter @pam/db test` is the highest-value check in the repo: it attacks
 the policies with one test user per role and is what stands between a policy
 edit and a privacy breach. Run it after touching anything in `packages/db`.

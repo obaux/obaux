@@ -198,11 +198,24 @@ test.describe('who may be staff, one request to a page (D-444)', () => {
     await page.getByRole('button', { name: 'Approve' }).click();
     await expect(page.getByText('Pick a city first.')).toBeVisible();
     expect(decided).toHaveLength(0);
-    await page.getByRole('radio', { name: 'Philadelphia' }).check();
+    // Tap the city once the page has settled, and see it taken before Approve: this check once failed at the iPhone SE
+    // size and passed on retry ("did not change its state"). The line above does not move the radios (it sits under them,
+    // measured), so the wait is for the page itself, not for that line.
+    await settled(page);
+    const philly = page.getByRole('radio', { name: 'Philadelphia' });
+    await philly.check();
+    await expect(philly).toBeChecked();
     await page.getByRole('button', { name: 'Approve' }).click();
+    // Asked first, and nothing is sent until the yes (Iris, super admin W1).
+    const ask = page.getByRole('dialog');
+    await expect(ask.getByRole('heading', { name: 'Approve Andre?' })).toBeVisible();
+    expect(decided).toHaveLength(0);
+    await ask.getByRole('button', { name: 'Yes, approve' }).click();
     await expect.poll(() => decided.length).toBe(1);
     expect(decided[0]).toMatchObject({ p_user_id: REQUEST.user_id, p_decision: 'approved', p_region_id: PHILLY });
-    await expect(page).toHaveURL(/\/requests\/$/);
+    // Said after, on the same page, then back the way they came.
+    await expect(page.getByText('Andre is in')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Approve' })).toHaveCount(0);
   });
 
   test('Deny needs no city', async ({ page }) => {
@@ -215,7 +228,13 @@ test.describe('who may be staff, one request to a page (D-444)', () => {
     });
     await page.goto(`/requests/review/?id=${REQUEST.user_id}`);
     await page.getByRole('button', { name: 'Deny' }).click();
+    // The confirm says plainly that the person will be texted (Iris, super admin W1).
+    const ask = page.getByRole('dialog');
+    await expect(ask.getByText('Pam will text Andre that the answer is no. They can ask again later.')).toBeVisible();
+    expect(decided).toHaveLength(0);
+    await ask.getByRole('button', { name: 'Yes, deny' }).click();
     await expect.poll(() => decided.length).toBe(1);
+    await expect(page.getByText('Request denied')).toBeVisible();
     expect(decided[0]).toMatchObject({ p_user_id: REQUEST.user_id, p_decision: 'denied' });
     expect(decided[0]).not.toHaveProperty('p_region_id');
   });

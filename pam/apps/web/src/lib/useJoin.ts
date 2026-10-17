@@ -175,13 +175,16 @@ export async function redeemInvite(
   }
 }
 
-/** Leave a name for a city Pam is not in yet. `wantsUpdates` is their choice. */
-export async function joinWaitingCity(city: string, wantsUpdates: boolean): Promise<boolean> {
+/**
+ * Leave a name for a city Pam is not in yet. Nobody is asked to be texted about it (D-587 build 3): nothing sends
+ * that text, so the request always says no.
+ */
+export async function joinWaitingCity(city: string): Promise<boolean> {
   try {
     const { createClient } = await import('./supabase');
     const { error } = await createClient().rpc('join_waiting_city', {
       p_city: city.trim(),
-      p_wants_updates: wantsUpdates,
+      p_wants_updates: false,
     });
     return !error;
   } catch {
@@ -197,6 +200,32 @@ export async function servedCities(): Promise<string[]> {
     return Array.isArray(data) ? data.map((row: { city: string }) => row.city) : [];
   } catch {
     return [];
+  }
+}
+
+/**
+ * Fixing the name or city typed on About you, after the account was already made (Iris, case manager W1,
+ * 15 October): going back from What you will see to About you must not redeem the invite again (it is used)
+ * or start a second membership. A person may update their own name and city (`profiles_update_self`, and the
+ * column grant on them); the role, the region and everything else stay as they are.
+ */
+export async function updateMyDetails(
+  userId: string,
+  details: { readonly firstName: string; readonly lastName: string; readonly city: string },
+): Promise<boolean> {
+  try {
+    const { createClient } = await import('./supabase');
+    const { error } = await createClient()
+      .from('profiles')
+      .update({
+        first_name: details.firstName.trim(),
+        last_name: details.lastName.trim() || null,
+        home_city: details.city.trim(),
+      })
+      .eq('id', userId);
+    return !error;
+  } catch {
+    return false;
   }
 }
 

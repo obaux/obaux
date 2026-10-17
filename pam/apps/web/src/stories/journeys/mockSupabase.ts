@@ -90,12 +90,24 @@ export interface MockOptions {
   readonly savedTrip?: boolean;
   /** Also a saved trip whose day has passed, so Trips shows its Past visits section. */
   readonly pastTrip?: boolean;
+  /** The calendar link is already on (D-538): the page shows the switch and "make a new link" / "turn it off". */
+  readonly calendarOn?: boolean;
+
   /** Also a saved trip that is on now, so its page offers "I'm here" (D-535). */
   readonly tripNow?: boolean;
   /** A program lead's small card for a member linked to their program (D-542), so the story can show it. */
   readonly programMemberCard?: boolean;
   /** The catalogue place in the story has a program on Pam (D-498), so its page offers Message and I'm here (D-541, D-545). */
   readonly hasLead?: boolean;
+  /** Street search is on (D-552): the pretend function has a key and answers two suggestions, so the area sheet draws its street label, hint and Google row. */
+  readonly streetSearch?: boolean;
+  /**
+   * How the database answers a super admin's decision on a staff request, so a story can show each refusal
+   * (D-491) or the "already has an account" line. Unset: the decision goes through.
+   */
+  readonly staffReview?: 'pair' | 'city' | 'decided' | 'other' | 'addedToExisting';
+  /** Nobody waiting for a city yet (D-593): the list's empty state. */
+  readonly noWaitingCities?: boolean;
 }
 
 /** A real place of the catalogue, to plan a trip to in a story (the examples' ids are not real). */
@@ -221,6 +233,9 @@ function ownProgramRow(state: 'review' | 'live') {
 function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[] {
   const profile = ROLES[journeyRole].profile;
   const role = profile?.role ?? null;
+  // What this story's member has signed, and the drawing kept on their account.
+  const signed: Record<string, { at: string; image: string | null }> = {};
+  let savedSignature: string | null = null;
   // A program sent from Add a program in this story is on file from then on.
   let ownProgram: 'review' | 'live' | undefined = options.ownProgram;
   // What is waiting for Pam on it (D-462): a first send, or a live program's change.
@@ -280,6 +295,25 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
   // Programs waiting for Pam (D-386): a first send that has waited four days, a change to a live
   // program, and one a leader deleted to start over (with the new one after it).
   let programsToCheck: Array<Record<string, unknown>> = [
+    // A long name and a long lead name, for the decision states' fit audit (Lena; D-584).
+    {
+      id: 'check-5', service_id: 'p-5', kind: 'new', status: 'in_review', sent_at: onTheHour(-2, 11), days_waiting: 2,
+      program_name: 'Northwest Philadelphia Community Reentry and Workforce Training Center',
+      details: { name: 'Northwest Philadelphia Community Reentry and Workforce Training Center', category: 'workforce', description: 'Job training, résumé help and a weekly hiring hall.', address: '4500 Germantown Ave, Philadelphia, PA 19144' },
+      lead_name: 'Bartholomew', replaces_id: null, replaced_by: null, withdrawn_at: null,
+    },
+    {
+      id: 'check-6', service_id: 'p-6', kind: 'new', status: 'withdrawn', sent_at: onTheHour(-3, 9), days_waiting: 3,
+      program_name: 'Southwest Philadelphia Neighborhood Family Services and Food Pantry',
+      details: { name: 'Southwest Philadelphia Neighborhood Family Services and Food Pantry', category: 'family_services', address: '6000 Woodland Ave, Philadelphia, PA 19142' },
+      lead_name: 'Bartholomew', replaces_id: null, replaced_by: null, withdrawn_at: onTheHour(-2, 9),
+    },
+    {
+      id: 'check-7', service_id: 'p-7', kind: 'new', status: 'in_review', sent_at: onTheHour(-1, 15), days_waiting: 1,
+      program_name: 'Germantown Avenue Returning Citizens Housing Navigation and Legal Clinic',
+      details: { name: 'Germantown Avenue Returning Citizens Housing Navigation and Legal Clinic', category: 'family_services', address: '5500 Germantown Ave, Philadelphia, PA 19144' },
+      lead_name: null, replaces_id: null, replaced_by: null, withdrawn_at: null,
+    },
     {
       id: 'check-1', service_id: 'p-1', kind: 'new', status: 'in_review', sent_at: onTheHour(-4, 10), days_waiting: 4,
       program_name: 'Hearth Kitchen Training',
@@ -348,18 +382,69 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     // Pam's server, which is never asked for real from a story.
     on('/rest/v1/message_link_previews', () => ({ body: linkPreviewsFor(role) })),
     on('/functions/v1/link-preview', () => ({ body: { made: 0 } })),
+    // Street addresses from Google (D-552): off in a story, as with no key; the area search is Pam's own list.
+    on('/functions/v1/places-search', (_url, _method, body) => {
+      if (!options.streetSearch) return { body: { enabled: false } };
+      const action = ((body ?? {}) as { action?: string }).action;
+      if (action === 'suggest') {
+        return {
+          body: {
+            enabled: true,
+            suggestions: [
+              { placeId: 'ChIJstorybook1500market', label: '1500 Market St, Philadelphia, PA' },
+              { placeId: 'ChIJstorybook1500marketb', label: '1500 Market St Unit B, Philadelphia, PA' },
+            ],
+          },
+        };
+      }
+      if (action === 'choose') return { body: { enabled: true, place: { label: '1500 Market St, Philadelphia, PA 19102', lat: 39.9526, lon: -75.1664 } } };
+      return { body: { enabled: true } };
+    }),
     on('/rpc/report_photos_for_review', () => ({ body: [] })),
     on('/rpc/report_files_for_review', () => ({ body: [] })),
     // The programs a super admin has still to check (D-386, part 6): a decision takes one off the list.
     on('/rpc/programs_to_check', () => ({ body: programsToCheck })),
+    // How many wait for each city Pam is not in (D-593): counts only, biggest first. A long one for the fit audit.
+    on('/rpc/waiting_city_counts', () => ({
+      body: options.noWaitingCities ? [] : [
+        { place: 'Camden, NJ', people: 14 },
+        { place: 'Chester', people: 9 },
+        { place: 'Wilmington, DE', people: 6 },
+        { place: 'Upper Darby Township, Delaware County', people: 2 },
+        { place: 'Norristown', people: 1 },
+      ],
+    })),
     on('/rpc/review_program_submission', (_url, _method, body) => {
       const args = (body ?? {}) as { p_id: string };
       programsToCheck = programsToCheck.filter((row) => row.id !== args.p_id);
       return { body: { id: args.p_id } };
     }),
+    // A staff request's decision (D-491): through, or refused the way the database says it.
+    on('/rpc/review_staff_request', () => {
+      const refusal = {
+        pair: 'ROLE_PAIR_NOT_ALLOWED',
+        city: 'ACCOUNT_IN_OTHER_CITY',
+        decided: 'REQUEST_ALREADY_DECIDED',
+      }[options.staffReview as 'pair' | 'city' | 'decided'];
+      if (refusal) return { status: 400, body: { code: 'P0001', message: refusal } };
+      if (options.staffReview === 'other') return { status: 500, body: { message: 'storybook: the decision failed' } };
+      return { body: null };
+    }),
+    // After an approval the screen reads the account's roles: member and provider means it was added to an account that existed.
+    on('/rest/v1/profile_roles', () => ({
+      body: options.staffReview === 'addedToExisting' ? [{ role: 'member' }, { role: 'provider' }] : [{ role: 'admin' }],
+    })),
     on('/rpc/log_call', () => ({ body: true })),
     on('/rpc/my_trips', () => ({ body: savedTrips })),
     on('/rpc/my_trip_services', () => ({ body: [] })),
+    // The calendar link (D-538): off, then a made-up address once made. Nothing leaves the story.
+    on('/rpc/calendar_link_status', () => ({
+      body: [{ is_on: Boolean(options.calendarOn), show_details: false, made_at: options.calendarOn ? '2026-10-10T15:00:00Z' : null }],
+    })),
+    on('/rpc/calendar_link_make', () => ({ body: 'storybook-example-address-not-a-real-secret' })),
+    on('/rpc/calendar_link_set_details', () => ({ body: true })),
+    on('/rpc/calendar_link_off', () => ({ body: null })),
+
     // A program lead's own visits (D-526): none in a story.
     on('/rpc/my_program_visits', () => ({ body: [] })),
     on('/rpc/service_has_lead', () => ({ body: options.hasLead === true })),
@@ -575,6 +660,23 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     // The member's three (D-304): the rest of Explore is not saved.
     on('/rpc/saved_places_mine', () => ({ body: PLACES.slice(0, 3) })),
     on('/rest/v1/saved_places', () => ({ body: [] })),
+    // Signatures (D-270, D-271): nothing signed and no saved drawing until the story signs, so the
+    // prototype's screens do not log "no fixture"; signing and "Clear signature" are remembered for
+    // the story's life, and a read after a write agrees with it.
+    on('/rest/v1/policy_signatures', () => ({
+      body: Object.entries(signed).map(([policy_id, row]) => ({ policy_id, signed_at: row.at, image: row.image })),
+    })),
+    on('/rest/v1/member_signatures', () => ({ body: savedSignature ? [{ image: savedSignature }] : [] })),
+    on('/rpc/sign_policy', (_url, _method, body) => {
+      const args = (body ?? {}) as { p_policy_id?: string; p_image?: string };
+      if (args.p_image) savedSignature = args.p_image;
+      if (args.p_policy_id) signed[args.p_policy_id] = { at: new Date().toISOString(), image: args.p_image ?? savedSignature };
+      return { body: null };
+    }),
+    on('/rpc/forget_my_signature', () => {
+      savedSignature = null;
+      return { body: null };
+    }),
     on('/rpc/flag_service', () => ({ body: { id: 'flag-1' } })),
     // An example code (D-218's Invite someone); the real one is made by the database.
     on('/rpc/create_invite', (_url, _method, body) => ({
@@ -625,6 +727,8 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/open_direct_conversation', () => ({ body: CONVO_ID })),
     // A place's Message button opens the member's conversation with the program's lead (D-541).
     on('/rpc/message_program', () => ({ body: CONVO_ID })),
+    // Counting a screen open (a76): a story never writes, and does not count either.
+    on('/rpc/count_screen_open', () => ({ body: null })),
     on('/rpc/conversation_partners', () => ({ body: [partnerFor(role)] })),
     on('/rpc/conversation_block_state', () => ({
       body: [{ i_blocked: options.blocked === 'mine', blocked_me: options.blocked === 'theirs' }],
@@ -665,6 +769,17 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     // A fictional 555 number: a requester's phone, read on "Text Andre" (D-262).
     on('/rpc/staff_request_phone', () => ({ body: '+12155550177' })),
     on('/rest/v1/enrollments', () => ({ body: [] })),
+    // A real member's visits, read by their case manager on the member's page (D-509): Marcus (`m1`, on the example caseload) has
+    // one coming up, one the program marked him at and one it did not, so "Trips coming up" and "Programs attended" have something to show.
+    on('/rest/v1/appointments', (url) => ({
+      body: url.includes('member_id=eq.m1')
+        ? [
+            { id: 'a1', starts_at: onTheHour(-9, 13), status: 'missed', service_id: SAVED_PLACE.id, services: { name: SAVED_PLACE.name, category: SAVED_PLACE.category } },
+            { id: 'a2', starts_at: onTheHour(-5, 9), status: 'attended', service_id: SAVED_PLACE.id, services: { name: SAVED_PLACE.name, category: SAVED_PLACE.category } },
+            { id: 'a3', starts_at: onTheHour(2, 10), status: 'scheduled', service_id: SAVED_PLACE.id, services: { name: SAVED_PLACE.name, category: SAVED_PLACE.category } },
+          ]
+        : [],
+    })),
     // The people a case manager or a program lead may message are the caseload the list shows, so the row of
     // rings above it (D-198) agrees with it (a member's and a super admin's own list is empty).
     on('/rpc/messageable_people', () => ({

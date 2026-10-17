@@ -9,7 +9,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@pam/ui/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
-import { BigButton, BookmarkIcon, ConnectionsIcon, Loading, MessagesIcon, Notice, Page, SignIcon, TripsIcon } from '@pam/ui';
+import { BigButton, ConnectionsIcon, Loading, MessagesIcon, Notice, Page, SignIcon, TripsIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { signedBy, usePolicies } from '@/lib/usePolicies';
 import { rememberPersonName } from '@/lib/personNames';
@@ -17,6 +17,8 @@ import { ProfileSummary } from '@pam/ui/ProfileCards';
 import { TripCard } from '@pam/ui/TripCard';
 import { useRouter } from 'next/navigation';
 import { dummyTripsFor } from '@pam/config/dummy-trips';
+import { showsBookedBy } from '@/lib/bookedByLine';
+import { useMemberTrips } from '@/lib/useMemberTrips';
 import { useCaseload, type CaseloadMember } from '@/lib/useCaseload';
 import { openConversation } from '@/lib/openConversation';
 import { CategoryPicture } from '../../screens/SavedView';
@@ -30,14 +32,13 @@ import { useConversations } from '@/lib/useConversations';
 import { PersonDetailSkeleton } from '@pam/ui/Skeletons';
 import { NOTICES, intlLocale } from '@pam/config';
 import { DUMMY_EVERYONE, type DummyPerson } from '@pam/config/dummy-people';
-import { DUMMY_SAVED_BY_PERSON } from '@pam/config/dummy-places';
 import { DUMMY_APPOINTMENTS } from '@pam/config/dummy-appointments';
 import { List, ListItem } from '@astryxdesign/core/List';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
 import { useSession } from '@/lib/useSession';
+import { useExamplesOn } from '@/lib/useExamplesOn';
 import { useRoleView } from '@/lib/useViewedRole';
-import { RoleSwitchControl } from '../RoleSwitchControl';
 import { DUMMY_SELF_ID, dummyConversationIdBetween, dummyConversationsFor } from '@pam/config/dummy-conversations';
 import { ProgramBadge } from '../ProgramBadge';
 import { ProgramMemberCardView } from '../../screens/ProgramMemberCardView';
@@ -156,9 +157,14 @@ function PersonScreen() {
   const params = useSearchParams();
   const router = useRouter();
   const { state: session } = useSession();
+  // Connect recommends nothing yet (ConnectView: nothing is stored or sent), so a real
+  // account does not get the row (D-509: no examples for real accounts).
+  const examples = useExamplesOn();
 
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const { viewedRole, setViewAs } = useRoleView(trueRole);
+  const { viewedRole } = useRoleView(trueRole);
+  // A real member's planned visits, as their case manager (D-509): never made-up ones.
+  const realTrips = useMemberTrips(params.get('id'), viewedRole === 'admin' && !DUMMY_EVERYONE.some((p) => p.id === params.get('id')));
   // The same audience the three lists that link here already gate on.
   const canView = viewedRole === 'admin' || viewedRole === 'provider' || viewedRole === 'super_admin';
 
@@ -170,16 +176,15 @@ function PersonScreen() {
   const { state: caseload } = useCaseload(viewedRole === 'admin');
   // Unread from this person, for the count on "Message {name}" (D-231).
   const { state: conversations } = useConversations(viewedRole === 'admin' || viewedRole === 'provider');
-  const header = (title: string) => (
+  // A person's name as the title is data: it keeps its own direction (D-534).
+  const header = (title: string, isName = false) => (
     <SubPageHeader
       title={title}
+      isTitleData={isName}
       backHref="/"
       backLabel={t('nav.back.home')}
       actions={
         <>
-          {trueRole === 'super_admin' ? (
-            <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-          ) : null}
           {/* Only the bell here (Will, 3 October): no Help on a member's page. */}
           <HeaderActions role={viewedRole} hasHelp={false} />
         </>
@@ -275,15 +280,16 @@ function PersonScreen() {
   }
 
   const when = whenLastActive(person.lastActiveAt, locale);
-  const saved = person.isExample ? (DUMMY_SAVED_BY_PERSON[person.id] ?? []) : [];
   const isMember = person.role === 'member';
   const canMessage = isMember && (viewedRole === 'admin' || viewedRole === 'provider');
   // Trips (D-227): the visits they planned, coming up first, then the ones
   // already made. Example trips until something books one (D-172).
   const now = Date.now();
-  const trips = isMember ? dummyTripsFor(person.id) : [];
+  const trips = !isMember ? [] : person.isExample ? dummyTripsFor(person.id) : realTrips;
   const upcoming = trips.filter((trip) => new Date(trip.startsAt).getTime() >= now);
-  const past = trips.filter((trip) => new Date(trip.startsAt).getTime() < now).reverse();
+  // "Programs attended in the past" lists only visits the program marked them as there for: a missed or not-yet-marked visit is not one (W5).
+  // The example trips have no marks and keep their made-up past.
+  const past = trips.filter((trip) => new Date(trip.startsAt).getTime() < now && ('attended' in trip ? trip.attended : true)).reverse();
   // A program lead sees only their own program's visits with this person
   // (Will, 3 October, D-242): never trips to other programs, places already
   // gone, saved places or points — those are the case manager's (§4.1).
@@ -307,6 +313,8 @@ function PersonScreen() {
       href={`/place/?id=${encodeURIComponent(trip.placeId)}`}
       art={<CategoryPicture category={trip.category} />}
       label={`${trip.placeName}, ${tripWhen(trip.startsAt)}`}
+      // A program booked it for them (D-595): the case manager is told which, behind one setting (lib/bookedByLine).
+      mark={'bookedByProgram' in trip && showsBookedBy(trip) ? t('person.trip.bookedBy', { program: trip.placeName }) : null}
     />
   );
   const exampleThread =
@@ -340,7 +348,8 @@ function PersonScreen() {
   return (
     <Page gap={4}>
       <RememberPersonName id={person.id} name={person.firstName ?? ''} />
-      {header(t('person.profile'))}
+      {/* Their name is the title, not "Profile", the word on the viewer's own tab (Iris, case manager W3). */}
+      {header(person.firstName || t('person.profile'), Boolean(person.firstName))}
 
       {/*
         The profile card (D-231): the member profile's own card — face, name,
@@ -349,6 +358,8 @@ function PersonScreen() {
       */}
       <ProfileSummary
         name={person.firstName}
+        // The title above already says it; the card shows it without a second heading.
+        isNameInTitle={Boolean(person.firstName)}
         // A program sees whether a member has signed all its policies (D-261).
         {...(isProgramView && isMember
           ? { nameAddon: <VerifiedBadge personId={person.id} name={person.firstName ?? ''} /> }
@@ -367,7 +378,7 @@ function PersonScreen() {
                     : t('person.stat.never'),
                   label: t('person.stat.nextVisit'),
                 },
-                { value: String(pastVisits.length), label: t('person.stat.visits') },
+                { value: String(pastVisits.length), label: t('trips.past.title') },
                 { value: when ?? t('person.stat.never'), label: t('person.stat.lastUsed') },
               ]
             : [
@@ -428,7 +439,7 @@ function PersonScreen() {
                   },
                 ]
               : []),
-            ...(viewedRole === 'admin'
+            ...(viewedRole === 'admin' && examples
               ? [
                   {
                     id: 'connect',
@@ -498,27 +509,19 @@ function PersonScreen() {
                 href: `/person/past/?id=${encodeURIComponent(person.id)}`,
                 ...(past.length > 0 ? { value: String(past.length) } : {}),
               },
-              // Their saved programs, on their own page like the past ones
-              // (Will, 3 October, D-243). A case manager's to see only.
-              ...(person.isExample
-                ? [
-                    {
-                      id: 'saved',
-                      label: t('person.savedPlaces.link', { name: person.firstName }),
-                      icon: <BookmarkIcon width={26} height={26} />,
-                      href: `/person/saved/?id=${encodeURIComponent(person.id)}`,
-                      ...(saved.length > 0 ? { value: String(saved.length) } : {}),
-                    },
-                  ]
-                : []),
+              // No "Programs saved by {name}", not even on an example page (D-243 had it): a case manager sees that
+              // a member saved something new, never which place (transparency.ts; Lena, via the merge desk, 15 October).
             ]}
           />
         </VStack>
       ) : null}
 
-      <Text type="supporting" xstyle={styles.note}>
-        {t(person.isExample ? 'example.people.note' : 'person.trips.example')}
-      </Text>
+      {/* Said only of the made-up people; a real member's page shows real things and no note (D-509). */}
+      {person.isExample ? (
+        <Text type="supporting" xstyle={styles.note}>
+          {t('example.people.note')}
+        </Text>
+      ) : null}
     </Page>
   );
 }

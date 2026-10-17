@@ -88,6 +88,8 @@ the compact card — everything that must be read stays in the central square.
 
 ## 4. Record and ship
 
+- **Move the date with the words (D-598).** `apps/site/test/post-dates.test.tsx` fingerprints each post's words beside `updated`. When you change a post's words or add one, run `pnpm --filter @pam/site posts:date <slug>=<the day it goes live>`; it records the fingerprint and writes `updated` in `posts.ts`. The test fails until you do.
+
 - Extend `apps/site/test/content.test.ts` if the post has structured data.
 - Session log in `pam/docs/sessions/`, a line in `pam/STATUS.md` (public site
   section), `pam/CHANGELOG.md` if user-visible. A `DECISIONS.md` entry only for a

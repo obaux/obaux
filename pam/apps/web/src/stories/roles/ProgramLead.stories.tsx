@@ -3,6 +3,7 @@ import { screen, screenWithControls } from './screen';
 import { asRole } from '../journeys/journey';
 import { REDESIGN_ROUTES } from '../prototype/routes';
 import { withSetup } from '../journeys/journey';
+import { BookForMemberView } from '../../screens/BookForMemberView';
 
 /**
  * A program lead's app, screen by screen (D-217, D-218). Their bar is Home
@@ -98,7 +99,9 @@ export const CalendarPreview: Story = withSetup(screen('provider', 'Home — cal
 export const Program: Story = screen('provider', 'Program', '/program/');
 export const EditService: Story = screen('provider', 'Program — edit a service', '/program/service/', { id: 'service-ged' });
 export const NewService: Story = screen('provider', 'Program — new service', '/program/service/');
-export const Policies: Story = screen('provider', 'Policies for participants', '/program/policies/');
+export const Policies: Story = screen('provider', 'Policies for members', '/program/policies/');
+/** The members who told Pam they are interested in the program (Sage's "Members interested in your program"). */
+export const Interested: Story = screen('provider', 'Members interested in your program', '/interested/');
 export const Policy: Story = screen('provider', 'A policy', '/program/policies/view/', { id: 'policy-confidentiality' });
 export const Messages: Story = screen('provider', 'Messages', '/messages/');
 export const Profile: Story = screen('provider', 'Profile', '/profile/');
@@ -106,6 +109,15 @@ export const Member: Story = screen('provider', 'A member', '/person/', { id: 'd
 export const MemberPolicies: Story = screen('provider', 'A member — policies signed', '/person/policies/', { id: 'dummy-m2' });
 export const Invite: Story = screen('provider', 'Invite someone', '/invite/');
 export const BookForMember: Story = screen('provider', 'Book a visit for a member', '/program/book/');
+/**
+ * Nobody to pick yet (D-595): nobody has written to the program, signed up with it or planned a visit there. The sentence says all
+ * three, and the list is not a blank. Drawn here so the language fit audit measures it.
+ */
+export const BookForMemberNobody: Story = {
+  ...asRole('provider', '/program/book/'),
+  name: 'Book a visit for a member — nobody to pick',
+  render: () => <BookForMemberView people={[]} />,
+};
 export const AddPerson: Story = screen('provider', 'Add a person', '/program/book/new/');
 export const AllPrograms: Story = screen('provider', 'All programs', '/programs/');
 export const AddProgram: Story = screen('provider', 'Add a program', '/programs/new/');
@@ -138,3 +150,11 @@ export const SignUp: Story = screenWithControls<SignUpArgs>(
   },
   (args) => ({ kind: 'provider', invite: 'PAM-7Q4K', step: SIGN_UP_STEPS[args.step] }),
 );
+
+/** About you with no city: the staff line, "Tell us the city you work in." (Iris P7; for Lena's fit audit). */
+export const SignUpCityMissing: Story = screen('provider', 'Sign up — no city', '/prototype/join/', {
+  kind: 'provider',
+  invite: 'PAM-7Q4K',
+  step: 'details',
+  missing: 'city',
+});

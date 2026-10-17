@@ -14,7 +14,6 @@ import ReplyPage from '../../app/reply/page';
 import PersonPage from '../../app/person/page';
 import ConnectPage from '../../app/person/connect/page';
 import PastTripsPage from '../../app/person/past/page';
-import SavedByPage from '../../app/person/saved/page';
 import PlacePage from '../../app/place/page';
 import PlacesPage from '../../app/places/page';
 import ReportedPlacesPage from '../../app/places/reported/page';
@@ -41,11 +40,11 @@ import { PrototypeRequestProgram } from './PrototypeRequestProgram';
 import { PrototypeRequestReview } from './PrototypeRequestReview';
 import { PrototypeProgramReview } from './PrototypeProgramReview';
 import { ProgramsToCheckScreen } from '../../screens/ProgramsToCheckScreen';
+import { WaitingCitiesScreen } from '../../screens/WaitingCitiesScreen';
 import { InvitesLogScreen } from '../../screens/InvitesLogScreen';
 import TermsPage from '../../app/terms/page';
 import { AddMyProgramScreen } from '../../screens/AddMyProgramScreen';
 import { ProfileScreen } from '../../screens/ProfileScreen';
-import { ViewAsView } from '../../screens/ViewAsView';
 import { InviteView } from '../../screens/InviteView';
 import { PrototypeInviteNew } from './PrototypeInviteNew';
 import { BookForMemberView } from '../../screens/BookForMemberView';
@@ -60,6 +59,7 @@ import { ExploreScreen } from '../../screens/ExploreScreen';
 import { TripsScreen } from '../../screens/TripsView';
 import { HomeScreen } from '../../screens/HomeScreen';
 import { LegalView } from '../../screens/LegalView';
+import { CalendarLinkView } from '../../screens/CalendarLinkView';
 import { LanguageView } from '../../screens/LanguageView';
 import { DataCopyView, DeleteAccountView, PrivacyControlsView } from '../../screens/PrivacyViews';
 import { HelpReportPlaceView, HelpSafetyView, HelpTopicsView } from '../../screens/HelpViews';
@@ -125,13 +125,13 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/requests/program/': screen(() => <PrototypeRequestProgram />),
   '/requests/review/': screen(() => <PrototypeRequestReview />),
   '/programs/review/': screen(() => <ProgramsToCheckScreen />),
+  '/cities/waiting/': screen(() => <WaitingCitiesScreen />),
   '/programs/review/item/': screen(() => <PrototypeProgramReview />),
   '/invites/': screen(() => <InvitesLogScreen />),
   '/interested/': screen(() => <InterestedPage />),
   '/person/': screen(() => <PersonPage />),
   '/person/connect/': screen(() => <ConnectPage />),
   '/person/past/': screen(() => <PastTripsPage />),
-  '/person/saved/': screen(() => <SavedByPage />),
   '/account/': screen(() => <AccountPage />),
   '/help/': screen(() => <HelpPage />),
   '/privacy/': screen(() => <PrivacyPage />),
@@ -139,6 +139,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   // Added with the nested-page template (D-213) — real routes in the app.
   '/legal/': screen(() => <LegalView />),
   '/language/': screen(() => <LanguageView />),
+  '/calendar/': screen(() => <CalendarLinkView />),
   '/legal/privacy/': screen(() => <PrivacyControlsView />),
   '/legal/privacy/copy/': screen(() => <DataCopyView />),
   '/legal/privacy/delete/': screen(() => <DeleteAccountView />),
@@ -149,7 +150,6 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/messages/thread/options/': screen(() => <ThreadOptionsView />),
   '/messages/thread/report/': screen(() => <ThreadReportView />),
   '/messages/thread/files/': screen(() => <ThreadFilesView />),
-  '/view-as/': screen(() => <ViewAsView />),
   // D-218: Invite someone, All programs and Add a program, and a program
   // lead's own Program tab.
   '/invite/': screen(() => <InviteView />),

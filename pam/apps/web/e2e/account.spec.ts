@@ -79,7 +79,7 @@ test.describe('the way out', () => {
     // The account button in the old header is the bar's Profile tab now (D-217, D-456): the same link,
     // in the same place, under every tab screen. Points left this list at D-217: it is a nested screen,
     // reached from Profile, with no bar.
-    for (const path of ['/', '/saved/', '/messages/', '/places/']) {
+    for (const path of ['/', '/saved/', '/messages/']) {
       await page.goto(path);
       const tab = page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: /Profile/ });
       await expect(tab, `${path} has no Profile tab`).toBeVisible();
@@ -287,11 +287,31 @@ test.describe('a code from the person who invited you', () => {
     await page.goto('/join/');
     await page.getByLabel('First name').fill('Kim');
     await page.getByLabel('City you live in').fill('Philadelphia');
+    // The field is hidden until asked for (Will, 13 October); the link opens it and moves
+    // the person into it.
+    await expect(page.getByLabel('Code from the person who invited you')).toHaveCount(0);
+    await expect(page.getByText('Did someone invite you via code?')).toBeVisible();
+    await page.getByRole('button', { name: 'Click here' }).click();
+    await expect(page.getByLabel('Code from the person who invited you')).toBeFocused();
     await page.getByLabel('Code from the person who invited you').fill('QQQQQQQQ');
     await page.getByRole('button', { name: 'Next' }).click();
 
     await expect(page.getByRole('heading', { name: 'That code did not work' })).toBeVisible();
-    // Still on step 2, with everything they typed still there.
+    // Still on step 2, with everything they typed still there, and the code open to fix.
     await expect(page.getByLabel('First name')).toHaveValue('Kim');
+    await expect(page.getByLabel('Code from the person who invited you')).toHaveValue('QQQQQQQQ');
+  });
+
+  test('the language is a dropdown, and choosing one changes the screen at once', async ({ page }) => {
+    await signedIn(page, null);
+    await page.route('**/rest/v1/rpc/served_cities*', (route) => route.fulfill(json([])));
+    await page.goto('/join/');
+    // Will, 13 October: "the chips are taking up too much space".
+    await expect(page.getByRole('radio', { name: 'Español' })).toHaveCount(0);
+    const language = page.getByRole('combobox', { name: 'Choose a language' });
+    await expect(language).toContainText('English');
+    await language.click();
+    await page.getByRole('option', { name: 'Español' }).click();
+    await expect(page.getByRole('combobox', { name: 'Elegir un idioma' })).toContainText('Español');
   });
 });

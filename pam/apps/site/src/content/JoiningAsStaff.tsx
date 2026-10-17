@@ -37,8 +37,8 @@ export function JoiningAsStaff() {
           one. If you do not know who to ask, contact Pam.
         </P>
         <Needs title="A link works once, for one person.">
-          It only works on the phone number it was made for, and it lasts 30 days. If it has expired, ask for a
-          new one.
+          It only works on the phone number it was made for, and it lasts 30 days. If it has expired, tap “Email me a
+          new link” on the page that says so, or ask for a new one.
         </Needs>
       </Section>
 

@@ -31,7 +31,6 @@ import { logCall } from '@/lib/logCall';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { usePlaceStatus, weekLines } from '@/lib/usePlaceStatus';
 import { useRoleView } from '@/lib/useViewedRole';
-import { RoleSwitchControl } from '../RoleSwitchControl';
 import { sharePlace } from '@/lib/sharePlace';
 import { usePlacePolicies } from '@/lib/usePlacePolicies';
 import { useMySignatures } from '@/lib/useMySignatures';
@@ -94,7 +93,10 @@ const BACK_TARGETS = {
   // The redesign's Explore, which is the home screen there (D-212).
   explore: { href: '/', labelKey: 'nav.back.explore' },
   trips: { href: '/trips/', labelKey: 'nav.back.trips' },
-  places: { href: '/places/', labelKey: 'nav.back.places' },
+  // The old Places list is retired (Will, 13 October): an old `from=places` link goes to Explore.
+  places: { href: '/', labelKey: 'nav.back.explore' },
+  // The places somebody reported, for the people who review them (D-189).
+  reported: { href: '/places/reported/', labelKey: 'nav.back.reported' },
   saved: { href: '/saved/', labelKey: 'nav.back.saved' },
   // All programs, a staff member's secondary path (D-218).
   programs: { href: '/programs/', labelKey: 'nav.back.programs' },
@@ -110,7 +112,7 @@ function resolveBack(from: string | null, thread: string | null = null): { href:
   if (from === 'thread' && thread) {
     return { href: `/messages/thread/?id=${encodeURIComponent(thread)}`, labelKey: 'messages.options.back' };
   }
-  return BACK_TARGETS[from as keyof typeof BACK_TARGETS] ?? BACK_TARGETS.places;
+  return BACK_TARGETS[from as keyof typeof BACK_TARGETS] ?? BACK_TARGETS.explore;
 }
 
 interface Detail {
@@ -231,7 +233,7 @@ function PlaceScreen() {
   const { state: session } = useSession();
   const signedIn = session.status === 'signed-in';
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const { demoRole, setViewAs } = useRoleView(trueRole);
+  const { demoRole } = useRoleView(trueRole);
   const { isSaved, save, unsave } = useSavedPlaces(signedIn, demoRole);
 
   const place = state.status === 'ready' ? state.place : null;
@@ -245,6 +247,8 @@ function PlaceScreen() {
   // to the top of the page (D-271). Opened from a trip card, the page is
   // about that visit (D-273): its day and time instead of "Plan a trip".
   const [hasTrip, setHasTrip] = useState(false);
+  // Marked from this page just now (I'm here / I went): the stored visit may not have been read again yet.
+  const [justMarked, setJustMarked] = useState(false);
   const [visit, setVisit] = useState<{ id: string; startsAt: string; serviceId: string | null; attendance: 'attended' | 'missed' | null } | null>(null);
   // Cancel this visit (asks first): the one thing here that takes a plan away.
   const [askingCancel, setAskingCancel] = useState(false);
@@ -314,9 +318,6 @@ function PlaceScreen() {
       backLabel={t(back.labelKey)}
       actions={
         <>
-          {trueRole === 'super_admin' ? (
-            <RoleSwitchControl trueRole={trueRole} viewedRole={demoRole ?? trueRole} onChange={setViewAs} />
-          ) : null}
           {/*
             A place's own bar once it has loaded (D-224): Save and the ⋯ menu.
             Before that, Help (D-217).
@@ -340,7 +341,7 @@ function PlaceScreen() {
     const key = state.status === 'error' && state.offline ? 'offline' : 'something_went_wrong';
     return (
       <Page gap={4}>
-        {header(t('places.title'))}
+        {header(t('tab.explore'))}
         <Notice
           notice={state.status === 'missing' ? 'service_not_available' : key}
           title={state.status === 'missing' ? t('place.notFound.title') : t(NOTICES[key].titleKey)}
@@ -394,6 +395,13 @@ function PlaceScreen() {
   const tellsNoLead = isMemberView && !hasLead;
   // A place with a lead on Pam sees the visit (D-526): said before the member plans one.
   const tellsLeadSees = isMemberView && hasLead;
+  // What the program sees of a visit, or that it is not on Pam (D-498): a banner below the services while a member picks one, so they
+  // are told before they book (a91, Will 17 October); once booked it stays where it was until the visit card takes it (a91 part 3).
+  const programNote = tellsNoLead ? (
+    <Banner status="info" title={t('place.noLead', { place: place!.name })} />
+  ) : tellsLeadSees ? (
+    <Banner status="info" title={t('place.lead.sees', { place: place!.name })} />
+  ) : null;
   // A member can message a place only if somebody on Pam runs it (Will, 12 October: programs gathered from
   // the internet have no one to answer). Until that is known the entry points wait, not flash in and out (D-544).
   const hidesMessage = isMemberView && leadKnown !== true;
@@ -522,7 +530,7 @@ function PlaceScreen() {
         addressFirst={visitWhen !== null}
         hoursHref={googleHref}
         notice={
-          visitWhen || policiesOnTop || tellsNoLead || tellsLeadSees ? (
+          visitWhen || policiesOnTop || (visit && programNote) ? (
             <VStack gap={3}>
               {visitWhen ? (
                 // The visit, confirmed (D-273), as a small hero (D-281): only
@@ -540,7 +548,7 @@ function PlaceScreen() {
                   changeHref={visitAhead ? changeHref : null}
                 />
               ) : null}
-              {visit && visitAhead ? (
+              {visit && visitAhead && !visit.attendance && !justMarked ? (
                 <>
                   {cancelFailed ? <Banner status="error" title={t('place.visit.cancel.failed')} /> : null}
                   <TextLink label={t('place.visit.cancel')} onClick={() => setAskingCancel(true)} />
@@ -548,10 +556,9 @@ function PlaceScreen() {
               ) : null}
               {/* "I'm here" (D-535): only a real visit, in its window, not yet marked, at a program with a lead on Pam (D-545). */}
               {visit && hasLead && isSavedPlace(visit.id) && isMemberView && !visit.attendance && inMarkWindow(visit.startsAt) ? (
-                <ImHereCard visitId={visit.id} placeName={place!.name} />
+                <ImHereCard visitId={visit.id} placeName={place!.name} onMarked={() => setJustMarked(true)} />
               ) : null}
-              {tellsNoLead ? <Banner status="info" title={t('place.noLead', { place: place!.name })} /> : null}
-              {tellsLeadSees ? <Banner status="info" title={t('place.lead.sees', { place: place!.name })} /> : null}
+              {visit ? programNote : null}
               {policiesOnTop ? (
                 <PolicyStatusCard
                   isDone={allSigned}
@@ -578,6 +585,7 @@ function PlaceScreen() {
             {visit ? null : (
               <ServiceCards services={services} selectedId={service?.id ?? null} onSelect={setPickedService} />
             )}
+            {visit ? null : programNote}
           </>
         }
         quickActionsLabel={t('place.quick.label')}

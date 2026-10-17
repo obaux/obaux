@@ -28,13 +28,27 @@ export const HOME = {
   },
   band: {
     label: 'Who is Pam for?',
-    chips: [
-      { label: 'Residents', href: '/support/#topic-members' },
-      { label: 'Program Providers', href: '/support/#topic-programs' },
-      { label: 'Case managers', href: '/support/#topic-case-managers' },
+    // The green card is a switcher (Will, 12 October, Figma "Callout card" 18:517): each name shows its own picture and line.
+    views: [
+      {
+        id: 'residents',
+        label: 'Residents',
+        line: 'Find help, plan your visit, and talk to a real person.',
+        alt: 'An isometric picture of Philadelphia with City Hall at the centre and map pins on the buildings.',
+      },
+      {
+        id: 'providers',
+        label: 'Program Providers',
+        line: 'Your policies, signed before they arrive. Check in and go!',
+        alt: 'A person walks through the warm, lit doorway of a city building.',
+      },
+      {
+        id: 'managers',
+        label: 'Case managers',
+        line: 'Their plans, your guidance, in one place.',
+        alt: 'A smiling person with a duffel bag looks at a phone in a bright community room.',
+      },
     ],
-    line: 'Find help, plan your visit, and talk to a real person.',
-    alt: 'An isometric picture of Philadelphia with City Hall at the centre and map pins on the buildings.',
   },
   rows: [
     {
@@ -50,14 +64,14 @@ export const HOME = {
       id: 'programs',
       head: 'Your services, built around people.',
       body: 'Residents find your program and plan a visit. They sign your policies before they visit, and you see who’s coming on your calendar.',
-      cta: { label: 'Add your program', href: '/support/cant-sign-in/' },
+      cta: { label: 'Add your program', href: 'add-program' },
       image: 'calendar',
       alt: 'A program lead’s calendar in Pam: the week by day, with each person who is coming and a check-in button.',
     },
     {
       id: 'case-managers',
       head: 'Walk with them, one visit at a time.',
-      body: 'Invite the people you work with, and message them in Pam along the way.',
+      body: 'Invite the people you work with, cheer on every step, and message them in Pam along the way.',
       cta: { label: 'Join as a case manager', href: '/support/cant-sign-in/' },
       image: 'conversation',
       alt: 'A conversation in Pam between a case manager and the person they work with, with documents shared in the chat.',
@@ -67,7 +81,7 @@ export const HOME = {
   callouts: [
     {
       eyebrow: 'Privacy first',
-      text: 'Before you join, Pam shows you who can see what. A text from Pam never says anything about your past.',
+      text: 'Pam was designed for privacy, so anyone, regardless of background or history can feel safe using it.',
       cta: { label: 'Read Privacy & Terms', href: 'privacy' },
     },
     {
@@ -76,7 +90,7 @@ export const HOME = {
       cta: { label: 'Go to Support', href: '/support/' },
     },
   ],
-  nav: { support: 'Get help', signIn: 'Sign in' },
+  nav: { support: 'Support', signIn: 'Sign in' },
   footer: {
     links: ['Support', 'About Pam', 'Privacy', 'Terms', 'Contact'],
     copyright: '© 2026 Pam. All rights reserved.',
@@ -92,15 +106,9 @@ export const HELD: readonly HeldLine[] = [
     reason: 'Will, 12 October (a65): hold until launch, because the website has to be translated first. Today the help desk is email with no hours.',
   },
   {
-    id: 'privacy-promise',
-    wanted: 'Pam was designed for privacy, so anyone, regardless of background or history can feel safe using it.',
-    shown: HOME.callouts[0].text,
-    reason: 'A promise, and it names “history”. Needs Will; Sage signs the replacement.',
-  },
-  {
-    id: 'cheer',
-    wanted: 'Invite the people you work with, cheer on every step, and message them in Pam along the way.',
-    shown: HOME.rows[2].body,
-    reason: '“cheer on every step” promises something Pam does not do for a case manager today.',
+    id: 'case-manager-link',
+    wanted: 'Join as a case manager, sending the person to sign in.',
+    shown: HOME.rows[2].cta.label,
+    reason: 'Will, 12 October (a65): the middle buttons go to sign in. Not this one yet: signing in would make a case manager a member account. It stays on the help post until Ava’s case-manager request page exists, then points there.',
   },
 ];

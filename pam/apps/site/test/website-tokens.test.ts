@@ -74,6 +74,25 @@ describe('website colours: AA in both themes', () => {
   });
 });
 
+describe('website link text (D-562)', () => {
+  it('passes AA on every surface a link sits on, in both themes, and on the row hover', () => {
+    for (const mode of ['light', 'dark'] as Mode[])
+      for (const s of ['surface-page', 'surface-muted', 'surface-gray', 'surface-brand-soft'] as const)
+        expect(ratio('text-link', s, mode), `${mode} text-link on ${s}`).toBeGreaterThanOrEqual(4.5);
+  });
+  it('light is the brand green; dark is not the lime brand colour (that stays for icons and fills)', () => {
+    expect(c['text-link'].light).toBe(c['brand-primary'].light);
+    expect(c['text-link'].dark).not.toBe(c['brand-primary'].dark);
+  });
+  it('dark: close to white text, so a link needs more than colour (under 1.3:1 apart)', () => {
+    const white = parse(c['text-primary'].dark).slice(0, 3);
+    const link = parse(c['text-link'].dark).slice(0, 3);
+    const hi = Math.max(lum(white), lum(link));
+    const lo = Math.min(lum(white), lum(link));
+    expect((hi + 0.05) / (lo + 0.05)).toBeLessThan(1.3);
+  });
+});
+
 describe('Support search pill (Iris H2)', () => {
   // Placeholder colours as the built /support/ page computes them (measured in Chromium, 11 October):
   // the theme's secondary text on SearchPill's own fill (`light-dark(#FFFFFF, #262626)`). The scan
@@ -103,5 +122,34 @@ describe('website tokens: files agree', () => {
   it('has the 32 Figma text styles', () => {
     const t = readFileSync(new URL('../src/lib/website-type.stylex.ts', import.meta.url), 'utf8');
     expect((t.match(/^ {2}\w+: \{$/gm) ?? []).length).toBe(32);
+  });
+});
+
+// a83 (Will, 13 October): the grey "Still stuck?" card is 60px above the footer on a phone and 120px from 900px.
+describe('website spacing: the space under the Still stuck? card', () => {
+  const source = (p: string) => readFileSync(new URL(p, import.meta.url), 'utf8');
+  it('names 60px for a phone and 120px for desktop, and the footer gap it counts', () => {
+    const s = source('../src/lib/website-space.stylex.ts');
+    expect(s).toMatch(/stillStuckGapPhone: '60px'/);
+    expect(s).toMatch(/stillStuckGapDesktop: '120px'/);
+    expect(s).toMatch(/footerGapDesktop: '64px'/);
+  });
+  it('is used by the containers that end the page, as padding, from the one place at the one breakpoint', () => {
+    const gap = source('../src/lib/last-block-gap.ts');
+    const post = source('../src/screens/PostScreen.tsx');
+    const support = source('../src/screens/SupportScreen.tsx');
+    const foot = source('../src/components/SiteFooter.tsx');
+    expect(gap).toMatch(/space\.stillStuckGapPhone/);
+    expect(gap).toMatch(/space\.stillStuckGapDesktop/);
+    expect(gap).toMatch(/space\.footerGapDesktop/);
+    expect(gap).toMatch(/min-width: 900px/);
+    // padding on the container, never a margin an engine can drop (Will, 14 October)
+    expect(gap).toMatch(/paddingBlockEnd/);
+    expect(gap).not.toMatch(/marginBlockEnd:/);
+    expect(foot).toMatch(/space\.footerGapDesktop/);
+    // a post (with the card or without it, like Your safety) and the Support page end the same way
+    expect(post).toMatch(/styles\.column, lastBlockGap\.end/);
+    expect(support).toMatch(/lastBlockGap\.end/);
+    expect(gap + post + support + foot).not.toMatch(/!important/);
   });
 });

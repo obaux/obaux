@@ -58,7 +58,7 @@ export function PlaceTold() {
       <Section title="If the place was wrong">
         <P>
           If the place has closed, moved, or is not what Pam says, open it in Pam and tap “Something is wrong here”.
-          Somebody at Pam checks every report.
+          Somebody at Pam checks every report. After a check, the place may be taken off Pam’s list.
         </P>
       </Section>
 

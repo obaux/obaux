@@ -101,23 +101,17 @@ test.describe('the case manager screen', () => {
     await expect(page.getByText(/permission|denied|forbidden/i)).toHaveCount(0);
   });
 
-  test('a super admin previewing "Case manager" sees this screen, not a closed door', async ({ page }) => {
-    // Profile › See the app as writes the choice to sessionStorage (D-108); any
-    // screen that reads it should agree with the header about who it is
-    // drawing for (Will, 16 September — "make sure all pages are properly
-    // showing based on the user's permissions").
+  test('a super admin with an old "Case manager" preview in the tab still gets their own Home', async ({ page }) => {
+    // The preview (D-108) and its switcher are gone (D-558): a value left in sessionStorage
+    // from before decides nothing, so the caseload is not drawn for them.
     await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));
     await signedInAs(page, 'super_admin', [], [], [], true);
     await page.goto('/');
-
-    // An empty caseload on a demo account shows the example roster (Will, 16 September)
-    // rather than the real "Nobody on your list yet" notice — either way,
-    // this is the case manager's own screen, not a closed door.
-    await expect(page.getByRole('heading', { name: 'Jordan' })).toBeVisible();
-    await expect(page.getByText('This screen is for case managers')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'Requests', level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Jordan' })).toHaveCount(0);
   });
 
-  test('without a preview, a super admin meets the same closed door as anybody else', async ({ page }) => {
+  test('a super admin meets the same closed door to the caseload as anybody else', async ({ page }) => {
     await signedInAs(page, 'super_admin');
     await page.goto('/');
 
@@ -303,7 +297,7 @@ test.describe('the case manager screen', () => {
     // §4.1: members agree to this list at onboarding. An admin should be looking
     // at the same words, so the promise is visible from both sides.
     await expect(page.getByRole('heading', { name: 'What you can see' })).toBeVisible();
-    await expect(page.getByText(/Not their messages/)).toBeVisible();
+    await expect(page.getByText(/Not what they say or send to other people/)).toBeVisible();
   });
 
   test('nothing outside the caseload contract is on the page', async ({ page }) => {

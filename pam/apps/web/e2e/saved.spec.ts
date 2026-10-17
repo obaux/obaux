@@ -83,7 +83,7 @@ async function signedIn(page: import('@playwright/test').Page, saved: unknown[])
 test.describe('keeping a place', () => {
   test('saving writes it down, and the card says so without saying it', async ({ page }) => {
     const writes = await signedIn(page, []);
-    await page.goto('/places/');
+    await page.goto('/');
     // Hydrated and the saved list loaded before tapping: a tap on the
     // pre-rendered button before then was lost, a flake seen twice (D-299).
     await settled(page);

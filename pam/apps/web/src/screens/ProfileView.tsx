@@ -15,6 +15,7 @@ import {
   PlacesIcon,
   ShieldIcon,
   SignOutIcon,
+  TripsIcon,
 } from '@pam/ui';
 import { Banner } from '@astryxdesign/core/Banner';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
@@ -55,11 +56,6 @@ export interface ProfileViewProps {
   readonly headerActions: ReactNode;
   readonly onSignOut?: () => void;
   /**
-   * A super admin's own account, whatever role it is previewing — keeps the
-   * "See the app as" row, so a preview is never a one-way door (D-217).
-   */
-  readonly canViewAs?: boolean;
-  /**
    * A member who also works at a program (D-374): the "Use Pam as" row,
    * which opens its own page. Never shown to a single-role account.
    */
@@ -89,7 +85,6 @@ export function ProfileView({
   remindersOn,
   headerActions,
   onSignOut,
-  canViewAs = false,
   canUseAs = false,
   addProgram = null,
   photoUrl = null,
@@ -98,7 +93,7 @@ export function ProfileView({
   photoNotice = null,
   isLoading = false,
 }: ProfileViewProps) {
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   const number = (n: number) => new Intl.NumberFormat(intlLocale(locale)).format(n);
   const isMember = role === 'member';
 
@@ -134,9 +129,6 @@ export function ProfileView({
     // a nested screen, also reached from the bell's "a place was reported" row.
     ...(role === 'admin' || role === 'super_admin'
       ? [{ id: 'reported', label: t('places.reported.title'), href: '/places/reported/', icon: <FlagIcon {...ICON} /> }]
-      : []),
-    ...(canViewAs
-      ? [{ id: 'view-as', label: t('profile.menu.viewAs'), href: '/view-as/', icon: <GlobeIcon {...ICON} /> }]
       : []),
   ];
 
@@ -225,7 +217,8 @@ export function ProfileView({
         */}
         {staffRows.length > 0 ? (
           <>
-            <MenuList label={t('profile.menu.label')} items={staffRows} />
+            {/* Named for what it is, not "Settings" (Iris, super admin P6). */}
+            <MenuList label={tPlain('profile.menu.work')} items={staffRows} />
             <Divider />
           </>
         ) : null}
@@ -267,6 +260,10 @@ export function ProfileView({
               href: '/language/',
               icon: <GlobeIcon {...ICON} />,
             },
+            // A member's visits in the calendar app they use, by a secret address (D-538).
+            ...(isMember
+              ? [{ id: 'calendar', label: t('profile.menu.calendar'), href: '/calendar/', icon: <TripsIcon {...ICON} /> }]
+              : []),
             ...(remindersOn
               ? [
                   {
