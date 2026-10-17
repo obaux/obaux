@@ -178,7 +178,9 @@ test.describe('the case manager screen', () => {
     // Each name is followed by its own line, in the list's order.
     const main = page.locator('main');
     await expect(main).toContainText(/Dante\s*Next visit: \w+ \d/);
-    await expect(main).toContainText(/Tanya\s*Not marked as there: \w+ \d/);
+    // The chip holds only its words with the date under it (Dot), and a screen reader hears one phrase (Sage).
+    await expect(main).toContainText(/Tanya[\s\S]*Not marked as there\s*\w+ \d/);
+    await expect(page.getByText(/^Not marked as there: \w+ \d+$/)).toHaveCount(1);
     await expect(main).toContainText(/Rosa\s*Marked as there: \w+ \d/);
     await expect(main).not.toContainText(/Kofi\s*(Next visit|Marked|Not marked)/);
     await expect(page.getByText(/points/i)).toHaveCount(0);

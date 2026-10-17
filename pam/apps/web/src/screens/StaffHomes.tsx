@@ -50,15 +50,27 @@ export function CaseloadHome() {
   // marked one. "Not marked as there" is a chip, unless the card already has one for what is switched off: that one wins and
   // the visit says itself as the line instead.
   const day = (iso: string) => new Intl.DateTimeFormat(intlLocale(locale), { month: 'short', day: 'numeric' }).format(new Date(iso));
+  // The time stays on one line ("10:00 AM", not "10:00" then "AM"), as on the member's page.
   const when = (iso: string) =>
-    `${new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'short' }).format(new Date(iso))} ${new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' }).format(new Date(iso))}`;
+    `${new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'short' }).format(new Date(iso))} ${new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' }).format(new Date(iso)).replace(/\s/g, '\u00a0')}`;
   const visitWords = (visit: CaseloadVisit): string =>
     visit.kind === 'next'
       ? t('caseload.visit.next', { when: when(visit.at) })
       : t(visit.kind === 'went' ? 'caseload.visit.went' : 'caseload.visit.missed', { date: day(visit.at) });
   const lineAndChip = (visit: CaseloadVisit | null, chip: HomePerson['chip']): Pick<HomePerson, 'meta' | 'chip'> => {
     if (!visit) return { meta: [], chip };
-    if (visit.kind === 'missed' && !chip) return { meta: [], chip: { label: visitWords(visit), tone: 'warning' } };
+    // The chip holds only its words, the date is the line under it (Dot), and a screen reader hears both as one phrase (Sage,
+    // ledger e520eb54).
+    if (visit.kind === 'missed' && !chip)
+      return {
+        meta: [],
+        chip: {
+          label: t('caseload.visit.missed.chip'),
+          tone: 'warning',
+          detail: day(visit.at),
+          spoken: tPlain('caseload.visit.missed', { date: day(visit.at) }),
+        },
+      };
     return { meta: [visitWords(visit)], chip };
   };
   // The example people have planned visits but no marks: they show their next one.

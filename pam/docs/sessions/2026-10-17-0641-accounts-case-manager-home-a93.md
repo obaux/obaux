@@ -43,6 +43,17 @@
     people-strip, person-real-trips, a11y and languages passed in the rerun.
 - I also ran `pkill -f` once and killed my own shell again; use the port.
 
+## Then: the chip split (Dot, Sage ledger e520eb54)
+
+- `PersonRow`'s chip can carry a `detail` line under it and a `spoken` phrase. When `spoken` is set, the visible chip
+  and line are hidden from screen readers, and one VisuallyHidden phrase is read instead: "Not marked as there: Oct
+  15", from the full `caseload.visit.missed` through `tPlain`. New key `caseload.visit.missed.chip`: "Not marked as
+  there".
+- The time in "Next visit" keeps its spaces unbroken, so "10:00 AM" doesn't split at 320.
+- admin.spec checks the chip and the date under it, and that the spoken phrase exists exactly once. With
+  case-manager-pass, connect-examples-only, staff-home, people-strip and a11y: 168 passed on 3 projects.
+- Pictures retaken: Home en 390, en 320 and ar 320, and the sheet at the same three.
+
 ## Left undone
 
 - Lena's six languages for the three visit lines. Config is red on them until then.

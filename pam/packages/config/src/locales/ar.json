@@ -1835,5 +1835,6 @@
   "places.reported.done.remove": "تمت إزالة {place} من القائمة.",
   "caseload.visit.next": "Next visit: {when}",
   "caseload.visit.went": "Marked as there: {date}",
-  "caseload.visit.missed": "Not marked as there: {date}"
+  "caseload.visit.missed": "Not marked as there: {date}",
+  "caseload.visit.missed.chip": "Not marked as there"
 }

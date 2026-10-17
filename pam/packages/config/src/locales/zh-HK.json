@@ -1696,5 +1696,6 @@
   "places.reported.done.remove": "{place}已從列表中移除。",
   "caseload.visit.next": "Next visit: {when}",
   "caseload.visit.went": "Marked as there: {date}",
-  "caseload.visit.missed": "Not marked as there: {date}"
+  "caseload.visit.missed": "Not marked as there: {date}",
+  "caseload.visit.missed.chip": "Not marked as there"
 }

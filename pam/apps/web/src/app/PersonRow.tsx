@@ -1,5 +1,6 @@
 'use client';
 
+import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
 import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
@@ -33,7 +34,17 @@ import { ProgramBadge } from './ProgramBadge';
 export interface PersonRowProps {
   readonly firstName: string | null;
   readonly href?: string;
-  readonly chip?: { readonly label: string; readonly tone: 'error' | 'warning' } | null;
+  readonly chip?: {
+    readonly label: string;
+    readonly tone: 'error' | 'warning';
+    /**
+     * A short line under the chip, not inside it (Dot, a93: "Not marked as there" with the date under it, so the chip is
+     * never cut at 320 or in Arabic).
+     */
+    readonly detail?: string;
+    /** What a screen reader hears for the chip and its line together, as one phrase (Sage, a93): built with `tPlain`. */
+    readonly spoken?: string;
+  } | null;
   /** Extra facts, in order — points, an org name, last active, and so on. */
   readonly meta: readonly string[];
   /**
@@ -77,6 +88,30 @@ const styles = stylex.create({
   },
 });
 
+/** The chip, and its line under it when it has one; heard as one phrase when `spoken` is given. */
+function ChipBlock({ chip }: { readonly chip: NonNullable<PersonRowProps['chip']> }) {
+  const shown = (
+    <VStack gap={0.5} {...(chip.spoken ? { 'aria-hidden': true } : {})}>
+      <HStack>
+        <Badge variant={chip.tone} label={chip.label} />
+      </HStack>
+      {chip.detail ? (
+        <Text type="supporting" xstyle={styles.compactMeta}>
+          {chip.detail}
+        </Text>
+      ) : null}
+    </VStack>
+  );
+  return chip.spoken ? (
+    <>
+      <VisuallyHidden>{chip.spoken}</VisuallyHidden>
+      {shown}
+    </>
+  ) : (
+    shown
+  );
+}
+
 export function PersonRow({ firstName, href, chip, meta, programBadge, trailing, isCompact = false }: PersonRowProps) {
   if (isCompact) {
     return (
@@ -100,7 +135,7 @@ export function PersonRow({ firstName, href, chip, meta, programBadge, trailing,
             ) : null}
             {chip || programBadge ? (
               <HStack gap={2} wrap="wrap" align="center">
-                {chip ? <Badge variant={chip.tone} label={chip.label} /> : null}
+                {chip ? <ChipBlock chip={chip} /> : null}
                 {programBadge ? <ProgramBadge name={programBadge.name} serviceId={programBadge.serviceId} /> : null}
               </HStack>
             ) : null}
@@ -129,7 +164,7 @@ export function PersonRow({ firstName, href, chip, meta, programBadge, trailing,
           {trailing ? <HStack xstyle={styles.trailing}>{trailing}</HStack> : null}
         </HStack>
         <HStack gap={2} wrap="wrap" align="center">
-          {chip ? <Badge variant={chip.tone} label={chip.label} /> : null}
+          {chip ? <ChipBlock chip={chip} /> : null}
           {programBadge ? <ProgramBadge name={programBadge.name} serviceId={programBadge.serviceId} /> : null}
           {meta.map((line) => (
             <Text key={line} type="supporting" xstyle={styles.meta}>

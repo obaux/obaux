@@ -18,7 +18,7 @@ import { SearchPill, type SearchPillItem } from '@pam/ui/SearchPill';
 import type { SearchSource } from '@astryxdesign/core/Typeahead';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
-import { PersonRow } from '../app/PersonRow';
+import { PersonRow, type PersonRowProps } from '../app/PersonRow';
 import { ConfirmDialog } from './ConfirmDialog';
 
 /**
@@ -41,7 +41,7 @@ export interface HomePerson {
   /** Opens the person; omitted for a row with nowhere to go yet. */
   readonly href?: string;
   readonly meta: readonly string[];
-  readonly chip?: { readonly label: string; readonly tone: 'error' | 'warning' } | null;
+  readonly chip?: PersonRowProps['chip'];
   readonly programBadge?: { readonly name: string; readonly serviceId: string } | null;
 }
 
