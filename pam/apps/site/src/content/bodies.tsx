@@ -7,6 +7,7 @@ import { MessagesInPam } from './MessagesInPam';
 import { OnePhoneTwoSides } from './OnePhoneTwoSides';
 import { PamWords } from './PamWords';
 import { PlanningAVisit } from './PlanningAVisit';
+import { ProgramBooksVisit } from './ProgramBooksVisit';
 import { PointsAndBadges } from './PointsAndBadges';
 import { SendingAnInvite } from './SendingAnInvite';
 import { SigningProgramRules } from './SigningProgramRules';
@@ -36,6 +37,7 @@ export const BODIES: Record<string, () => JSX.Element> = {
   'who-is-my-guide': WhoIsMyGuide,
   'texts-from-pam': TextsFromPam,
   'planning-a-visit': PlanningAVisit,
+  'program-books-a-visit': ProgramBooksVisit,
   'signing-a-programs-rules': SigningProgramRules,
   'what-others-can-see': WhatOthersCanSee,
   'joining-pam': JoiningPam,
