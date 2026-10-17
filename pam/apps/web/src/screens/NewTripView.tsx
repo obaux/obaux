@@ -89,6 +89,9 @@ const styles = stylex.create({
   placeName: { fontSize: '17px', lineHeight: 1.3, fontWeight: 700 },
   label: { fontSize: '18px', fontWeight: 600 },
   choices: { width: '100%' },
+  // Air under the last row (Dot, b54): scrolled to the end, the last time is 72px above the Next bar: its 56px fade (the sticky footer's top, already
+  // in the page) and 16px more, so the chip's whole 48px target is clear of the fade and not flush with it.
+  endAir: { paddingBlockEnd: '16px' },
   // Day and time choices (Will, 3 October, D-235): smaller, white pills
   // with a grey outline like the round header buttons; the chosen one fills
   // green. The pill is 40px (Will, a95: the chips were too tall); the touch floor (§2.5) stays 48px, by 4px
@@ -244,6 +247,17 @@ export function NewTripView({
   const fromPlace = initial !== null && !changing;
   const placeHref = initial ? `/place/?id=${encodeURIComponent(initial.id)}` : '/trips/';
   const [step, setStep] = useState<Step>(initial ? 'when' : 'where');
+  // Tabbing to the last day or time must scroll it clear of the Next bar and its fade, not leave it under them: the page keeps this much
+  // of the bottom of the screen out of what "in view" means while this step is open (the fade 56 + the button 48 + its 16 below + 16 of air
+  // + the chip's 4px of hit area). Only this step: another screen's focus is as it was.
+  useEffect(() => {
+    if (step !== 'when') return;
+    const root = document.documentElement;
+    root.style.scrollPaddingBottom = '140px';
+    return () => {
+      root.style.scrollPaddingBottom = '';
+    };
+  }, [step]);
   const [day, setDay] = useState<Date | null>(null);
   const [time, setTime] = useState<readonly [number, number] | null>(null);
   const [note, setNote] = useState('');
@@ -465,9 +479,6 @@ export function NewTripView({
   return (
     <SubPage
       title={title}
-      // When is tighter (8px between its blocks, not 16): at 320×568 the four times must sit above the Next bar, not half under it
-      // (Iris, b54; Will's a95 point was that the times be in view). Where and Check keep the room they had.
-      gap={step === 'when' ? 2 : 4}
       // For a member (D-316), the subtitle says who, since the steps are
       // the same ones the member would see.
       subtitle={
@@ -654,7 +665,7 @@ export function NewTripView({
               ))}
             </HStack>
           </VStack>
-          <VStack gap={2}>
+          <VStack gap={2} xstyle={styles.endAir}>
             <Heading level={2} xstyle={styles.label}>
               {t('trips.new.time')}
             </Heading>

@@ -1,4 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
+import { asMember } from './asMember';
 import { settled } from './settled';
 
 /**
@@ -61,14 +62,35 @@ for (const [what, pick] of [
   });
 }
 
-test('at 320×568 all four times sit clear of the Next bar (Will: the time must be in view)', async ({ page }) => {
-  await page.setViewportSize({ width: 320, height: 568 });
-  await open(page);
-  await expect(times(page)).toHaveCount(4);
-  const last = (await times(page).nth(3).boundingBox())!;
-  const next = (await page.getByRole('button', { name: 'Next', exact: true }).boundingBox())!;
-  // The whole 48px target, not just the pill, ends above the button.
-  expect(last.y + last.height + 4, "the last time's target ends above Next").toBeLessThanOrEqual(next.y);
-  const first = (await times(page).nth(0).boundingBox())!;
-  expect(first.y + first.height, 'and the first row too').toBeLessThanOrEqual(next.y);
-});
+// At 320×568 the step scrolls (the fade covers what is under the Next bar until it does). Dot's check, in English and Arabic: scrolled to
+// the end, and tabbing to the last time, the 3:30 PM chip's whole 48px target is clear of the fade and of Next.
+for (const lang of ['en', 'ar'] as const) {
+  test(`at 320×568 (${lang}) the last time scrolls clear of the fade and Next, by scrolling and by Tab`, async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 568 });
+    await asMember(page, 'member', lang === 'en' ? null : lang);
+    await open(page);
+    const chips = page.locator('button').filter({ hasText: /[0-9\u0660-\u0669]+[:\u066b][0-9\u0660-\u0669]+/ });
+    await expect(chips).toHaveCount(4);
+    const last = chips.nth(3);
+    // The sticky footer is the Next bar and the fade above it: its top is where the fade starts.
+    const room = () =>
+      last.evaluate((el) => {
+        let footer: Element | null = null;
+        for (const d of document.querySelectorAll('div')) if (getComputedStyle(d).position === 'sticky' && d.querySelector('button')) footer = d;
+        const r = el.getBoundingClientRect();
+        return { targetBottom: r.bottom + 4, fadeTop: footer!.getBoundingClientRect().top };
+      });
+    // Scrolled to the end.
+    await page.evaluate(() => window.scrollTo(0, 99999));
+    const atEnd = await room();
+    expect(atEnd.targetBottom, 'scrolled to the end, the last time\'s 48px target ends above the fade').toBeLessThanOrEqual(atEnd.fadeTop);
+    // Tabbing to it from the first time (no mouse: the browser scrolls what it must).
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await chips.nth(0).focus();
+    for (let i = 0; i < 3; i++) await page.keyboard.press('Tab');
+    await expect(last).toBeFocused();
+    await page.waitForTimeout(300);
+    const tabbed = await room();
+    expect(tabbed.targetBottom, 'tabbed to, the last time is scrolled to above the fade').toBeLessThanOrEqual(tabbed.fadeTop);
+  });
+}
