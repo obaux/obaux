@@ -1327,8 +1327,35 @@
   reaches it; Lena's finding) came in; pictures for a91, a93 and a95 went on their cards. Dot found the case
   manager's search pill cut at 320 on main ("Search your mem"); Sage signed "Search members" and the spoken
   "Search members by name" (WCAG 2.5.3), Lena builds it.
+- **b53 pushed (07:27, a32c07ab).** Main CI green at 08:00. `20261017055932` live as `20261017080113` (08:01).
+- **Batch b54 (17 October, 07:28 to 08:02).** a95 and a91 part 1: Piper's 9eeb3b9e (D-594): trip names two lines then
+  "…"; When? shows six weekdays as 40px pills with a 48px hit area and no Help; no Help on the lead's Coming in (both
+  Help removals against A26, by Will's choice); before booking, the visit note sits below the services. Sage's ledger
+  to b09c3bcd. Piper's 984b5c65: the Call test waits for sign-in before it taps (the b53 timeout: a tap before the
+  session resolves is ignored on purpose; shown with the auth calls delayed). Wren's 90b8a860 (D-598): a website
+  post's Updated date follows its words, pinned by a fingerprint test; eleven dates moved (Iris's b52 note). Iris's
+  654ac4c2: the b51 and b52 re-test, PASS. Nico's fa8d3c6a (D-599): the audit purge also removes a row when a
+  top-level meta value is the erased person (Lena's sweep found three writers naming a person only in meta; rows like
+  that are already live). Main CI green 08:34; `20261017075451` live as `20261017083423`. Two branch-internal merges of main
+  (Piper's c282154f and a2986606) carry no Screens: line; the batch's own six merges do.
+  The same half hour: Lena's a93 words (fbcffd46) and the search branch (seven languages; the audit now measures
+  placeholders and fails a cut English one); Sage signed a second sentence for the member's short "What others can
+  see" (3c526500); Russian «Поиск людей» chosen because no form with «участников» fits 128px.
 
 ## What was wrong, and what missed it
+
+- **A person named only in an audit row's meta outlived the six months (D-443 to b54).** `purge_erased_audit()`
+  matched actor_id and target_id only; `conversation.open` ('with', D-541), `message_program` (the lead) and
+  `account.delete` ('by') name a person only in meta. Nothing tested the purge against a meta-only row, and a94's new
+  booking row repeated the shape before Lena caught it in review. Fixed in the purge (D-599, test 77), so rows
+  already written are covered. Rule: an audit row names its person in actor_id or target_id; anywhere else, the
+  purge has to read it, with a test.
+- **The fit audit could not see a placeholder, and let a cut English line through (b50 to b54).** It measured text
+  nodes only, and it failed only what was new in another language, so "Search your mem" on the case manager's Home
+  passed in every language. Dot saw it in a93's pictures. The audit now measures an empty field's placeholder and
+  fails it in English too (Lena, on the search branch).
+- **A website post's date did not move when its words did (b42 to b52).** Nothing tied them; Iris saw "Updated
+  October 10" on a post b52 changed. D-598 pins each post's words to its date.
 
 - **The weekly notes were not kept between 10 and 16 October.** `docs/team.md` says the merge desk adds to
   `docs/weekly/<Friday>.md` as it merges; from b7 to b47 it added nothing, and Friday's file had to be rebuilt
@@ -1692,9 +1719,19 @@
 | b52 main CI (4e5827c3) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (07:27); Vercel web and pam-site success |
 | Batch b53, full run (1dd888f0): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1351 passed, 1 skipped / in step / 124 / 0 / 100 / 0 / 0 / 0 / 188 / 11.0 kB spare / 2014 passed, 19 skipped, 1 flaky, exit 0 / built; "no bundle names the live one"; grep 0 files / 0 / 120 scans, 0 problems |
 | b53's flaky test: place.spec.ts:143 "tapping Call tells the database once" at narrow-320 | timed out at 30s once in the full run, passed on retry; alone, `--repeat-each=15 --retries=0`: 15 passed. Not b53's code (super admin only). Sent to Piper to root-cause under load |
+| b53 main CI (a32c07ab) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (08:00); Vercel web and pam-site success |
+| `20261017055932` live (`20261017080113`) | list_migrations first (last live 20261016155130); waiting_city_counts: security definer, search_path = public, extensions; anon no execute, authenticated execute; signed-out call refused ("Sign in first"); waiting_cities rows: 0 |
+| Batch b54, full run (4fa56ba3: a95 + Sage's ledger): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1351 passed, 1 skipped / in step / 124 / 0 / 100 / 0 / 0 / 0 / 188 / 11.0 kB spare / 2021 passed, 19 skipped, 0 flaky / built; "no bundle names the live one"; grep 0 files / 0 / 120 scans, 0 problems |
+| Batch b54, the three branches added after (7ee38470: Call test, D-598, Iris's report): site test / site tsc / place.spec, three projects / site build / site a11y | 123 passed / 0 / 33 passed / 0, "October 17, 2026" on What others can see / 120 scans, 0 problems |
+| Batch b54 with D-599 (f4dbff9e): @pam/db | 1626 ok, 0 not ok; test 77: a person named only in meta is purged six months on, others' rows stay, someone erased today stays, the guard is back on |
+| b54 main CI (f4dbff9e) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (08:34); Vercel web and pam-site success |
+| `20261017075451` live (`20261017083423`) | list_migrations first (last live 20261017080113); main's file = the reviewed fa8d3c6a (same md5); purge_erased_audit: same oid as before (the append-only guard's exception still names it), owner postgres, security definer, search_path = public, extensions, reads meta (jsonb_each_text), flag kept; no execute for anon or authenticated; its nightly cron job active |
 
 ## Left undone
 
+- **As of b54 (17 October, 08:35):** D-599 is live; Lena pins it. With Will: a91 (the button word and "sign 1" or "sign 2"), a93 (his yes; Ava's merge and full run), a94
+  (the Privacy paragraph, the opt-in, every visit or only a missed one), a86, a84, a88. Lena: the search branch
+  READY, the short program line (3c526500), the Arabic no-lead note with a91. Wren: none. Iris: none.
 - **As of b53 (17 October, 07:25):** b54 takes Piper's a95 (9eeb3b9e) and Sage's ledger (fa7c1c9b, b09c3bcd). With
   Will: a91 (the button word, "Check in" or "I made it", and "sign 1" or "sign 2" for the note; built at a438d296),
   a93 (his yes; Ava owes a main merge, a clean full run and Lena's four lines), a94 (the Privacy paragraph, the
