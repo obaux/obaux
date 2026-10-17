@@ -40,13 +40,48 @@ test('a lead books for a member who wrote: the database is asked, and the screen
   expect(asked).toMatchObject({ p_member_id: JORDAN, p_service_id: PROGRAM });
 });
 
-test('a lead whose booking the database refuses is not told it was booked', async ({ page }) => {
+// Every refusal book_visit_for_member can raise says what is true (Iris, b58): not "Try again", which can never work for a refusal.
+const REFUSED = [
+  ['MEMBER_NOT_LINKED', 'Pam cannot book a visit for Jordan right now.'],
+  ['ALREADY_BOOKED', 'Jordan already has a visit here around that time. Pick a different time.'],
+  ['RATE_LIMIT', 'No more visits can be booked today, for this member or for your program. Try again tomorrow.'],
+  ['TRIP_IN_THE_PAST', 'That time has already passed. Pick a later time.'],
+  ['TRIP_TOO_FAR', 'Visits can be booked up to about six months ahead. Pick an earlier day.'],
+  ['PLACE_NOT_FOUND', 'You cannot book a visit at Fresh Start Kitchen right now.'],
+  ['SERVICE_NOT_FOUND', 'You cannot book that service right now. Pick another one.'],
+] as const;
+for (const [code, words] of REFUSED) {
+  test(`a lead whose booking is refused (${code}) is told why, and not told it was booked or to try again`, async ({ page }) => {
+    await asMember(page, 'provider');
+    await page.route('**/rest/v1/profiles*', (route) =>
+      route.fulfill(json({ id: MEMBER, org_id: ORG, role: 'provider', first_name: 'Lou', region_id: null, regions: null, access_status: 'active', onboarded_at: '2026-09-14T00:00:00Z' })),
+    );
+    await page.route('**/rest/v1/rpc/book_visit_for_member*', (route) =>
+      route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ message: code }) }),
+    );
+    await page.goto(
+      `/trips/new/?${new URLSearchParams({ place: PROGRAM, name: 'Fresh Start Kitchen', category: 'workforce', address: '1 Main St', for: JORDAN, forName: 'Jordan' })}`,
+    );
+    await settled(page);
+    await page.getByRole('button', { name: /^\w{3}, / }).first().click();
+    await page.getByRole('button', { name: '10:30 AM' }).click();
+    await page.getByRole('button', { name: 'Next' }).click();
+    await page.getByRole('button', { name: 'Book for Jordan' }).click();
+    await expect(page.getByText(words, { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /^Booked for/ })).toHaveCount(0);
+    // Not the generic message, and no way to ask Pam about something only a different choice fixes.
+    await expect(page.getByText(/Try again\. If it keeps happening/)).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Contact Pam' })).toHaveCount(0);
+  });
+}
+
+test('any other failure keeps the generic message: it may work on a second try', async ({ page }) => {
   await asMember(page, 'provider');
   await page.route('**/rest/v1/profiles*', (route) =>
     route.fulfill(json({ id: MEMBER, org_id: ORG, role: 'provider', first_name: 'Lou', region_id: null, regions: null, access_status: 'active', onboarded_at: '2026-09-14T00:00:00Z' })),
   );
   await page.route('**/rest/v1/rpc/book_visit_for_member*', (route) =>
-    route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ message: 'MEMBER_NOT_LINKED' }) }),
+    route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ message: 'something else' }) }),
   );
   await page.goto(
     `/trips/new/?${new URLSearchParams({ place: PROGRAM, name: 'Fresh Start Kitchen', category: 'workforce', address: '1 Main St', for: JORDAN, forName: 'Jordan' })}`,
@@ -56,6 +91,7 @@ test('a lead whose booking the database refuses is not told it was booked', asyn
   await page.getByRole('button', { name: '10:30 AM' }).click();
   await page.getByRole('button', { name: 'Next' }).click();
   await page.getByRole('button', { name: 'Book for Jordan' }).click();
+  await expect(page.getByText(/Try again\. If it keeps happening/)).toBeVisible();
   await expect(page.getByRole('heading', { name: /^Booked for/ })).toHaveCount(0);
 });
 

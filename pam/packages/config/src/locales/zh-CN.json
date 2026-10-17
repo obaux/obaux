@@ -1707,5 +1707,12 @@
   "trips.bookedForYou": "已为您预约",
   "person.trip.bookedBy": "由{program}预约",
   "notify.visit_booked_for_you": "{place}已为您预约：{when}",
-  "notify.kind.visit_booked_for_you": "已为您预约"
+  "notify.kind.visit_booked_for_you": "已为您预约",
+  "trips.new.refused.member": "Pam cannot book a visit for {name} right now.",
+  "trips.new.refused.already": "{name} already has a visit here around that time. Pick a different time.",
+  "trips.new.refused.limit": "No more visits can be booked today, for this member or for your program. Try again tomorrow.",
+  "trips.new.refused.past": "That time has already passed. Pick a later time.",
+  "trips.new.refused.far": "Visits can be booked up to about six months ahead. Pick an earlier day.",
+  "trips.new.refused.place": "You cannot book a visit at {place} right now.",
+  "trips.new.refused.service": "You cannot book that service right now. Pick another one."
 }
