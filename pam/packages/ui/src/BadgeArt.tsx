@@ -169,7 +169,7 @@ function Griot() {
   );
 }
 
-/** Craftsman: a wrench and a bolt. */
+/** `craftsman` (the key is an id; the badge is called Maker since 17 October): a wrench and a bolt. */
 function Craftsman() {
   return (
     <>
