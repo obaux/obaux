@@ -51,8 +51,13 @@ test.describe('the drawer standard', () => {
   test('the title starts below the band, with room over it', async ({ page }) => {
     await open(page);
     const box = (await panel(page).boundingBox())!;
-    const title = (await page.locator('dialog[open] h2').first().boundingBox())!;
-    expect(title.y - box.y).toBeGreaterThanOrEqual(52);
+    // The words themselves, not the heading's padding box.
+    const textTop = await page.locator('dialog[open] h2').first().evaluate((el) => {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      return range.getBoundingClientRect().top;
+    });
+    expect(textTop - box.y).toBeGreaterThanOrEqual(52);
   });
 
   test('one round 48px button in the top corner says Done and has a checkmark; it is the first control after the title for a screen reader', async ({ page }) => {
@@ -67,7 +72,7 @@ test.describe('the drawer standard', () => {
     expect(box.x + box.width - (b.x + b.width)).toBeLessThan(24);
     expect(b.y - box.y).toBeLessThan(16);
     // A checkmark for a drawer you pick in or only read: not an X.
-    console.log('ICON', await button.evaluate((el) => el.querySelector('svg')?.outerHTML ?? ''));
+    expect(await button.evaluate((el) => el.querySelector('svg path')?.getAttribute('d'))).toBe('M5 13l4 4L19 7');
     // In document order the heading comes first and the button is the next control after it (the notch is hidden from both).
     const heading = page.locator('dialog[open] h2').first();
     const next = await heading.evaluate((el) => {

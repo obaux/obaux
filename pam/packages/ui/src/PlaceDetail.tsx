@@ -409,8 +409,8 @@ export function PlaceDetail({
         isOpen={isMapsOpen}
         onOpenChange={setMapsOpen}
         label={addressActions.labels.openInTitle}
-        kind="read"
-        actionLabel={labels.close}
+        kind="review"
+        actionLabel={labels.done}
       >
         {isMapsOpen ? (
           <VStack gap={2} xstyle={styles.sheet}>
