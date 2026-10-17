@@ -6,7 +6,7 @@
 
 ## What
 
-`@pam/ui/PamSheet` (on Astryx `BottomSheet`), the one drawer. In order: a 48px band across the top that closes it on a tap (above Astryx's 24px decorative strip, which still draws the grip and still drags); the title starting 56px from the top edge; one round 48px button in the top-right corner (top-left in Arabic), the circle Bring a friend always had; then the content. Swipe and Escape still close it. Focus goes back to whatever had it when the drawer opened.
+`@pam/ui/PamSheet` (on Astryx `BottomSheet`), the one drawer. In order: a 48px band across the top that closes it on a tap (above Astryx's 24px decorative strip, which still draws the grip and still drags); the title starting 56px from the top edge; one round button tucked into the top-right corner (top-left in Arabic): a 36px circle 16px in from the top and the side, so it sits inside the sheet's rounded corner, with a 48px tap target (an invisible 6px margin). Muted grey on a sheet; over Bring a friend's picture it is the white circle with a soft shadow it always had (Will, 17 October, after seeing the first version: "not neatly tucked away in that corner"); then the content. Swipe and Escape still close it. Focus goes back to whatever had it when the drawer opened.
 
 **The icon is a rule about what the drawer is for** (`kind`, written in PamSheet's comment too):
 - **`review` → a checkmark, named "Done"** (`action.done`; the area drawer keeps `places.area.done`, the same word). You pick in the drawer, or you only read it: Location, Opening hours, Open in…, New message, What you can see.

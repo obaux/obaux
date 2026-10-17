@@ -75,17 +75,26 @@ const styles = stylex.create({
     WebkitTapHighlightColor: 'transparent',
   },
   // 48px of notch, then 8px of air, before the title row; the title leaves room for the corner button.
-  header: { width: '100%', paddingBlockStart: '56px', paddingInlineStart: '20px', paddingInlineEnd: '72px', paddingBlockEnd: '8px' },
+  header: { width: '100%', paddingBlockStart: '56px', paddingInlineStart: '20px', paddingInlineEnd: '64px', paddingBlockEnd: '8px' },
   title: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700, minWidth: 0 },
-  // The round button, in the top corner (the end corner: left in Arabic). The circle Bring a friend always had (D-338).
+  // The round button, tucked into the top corner (the end corner: left in Arabic): a 36px circle 16px from the top and from the side,
+  // so it sits inside the sheet's rounded corner instead of floating by it. Its tap target is 48px: an invisible 6px margin all round.
   action: {
     position: 'absolute',
-    insetBlockStart: '8px',
-    insetInlineEnd: '12px',
+    insetBlockStart: '16px',
+    insetInlineEnd: '16px',
     zIndex: 3,
-    width: pam['--pam-touch-target-min'],
-    height: pam['--pam-touch-target-min'],
+    width: '36px',
+    height: '36px',
+    minWidth: '36px',
+    minHeight: '36px',
     borderRadius: '50%',
+    backgroundColor: colorVars['--color-background-muted'],
+    boxShadow: 'none',
+    '::after': { content: '""', position: 'absolute', inset: '-6px' },
+  },
+  // Over Bring a friend's picture: the white circle with a soft shadow it always had (D-338).
+  actionOnPicture: {
     backgroundColor: colorVars['--color-background-body'],
     boxShadow: '0 1px 4px oklch(0 0 0 / 18%)',
   },
@@ -137,10 +146,10 @@ export function PamSheet({
           <IconButton
             label={actionLabel}
             variant="ghost"
-            icon={<Icon icon={kind === 'review' ? 'check' : 'close'} size="md" />}
+            icon={<Icon icon={kind === 'review' ? 'check' : 'close'} size="sm" />}
             onClick={close}
             data-sheet-action={kind}
-            xstyle={styles.action}
+            xstyle={[styles.action, title === null ? styles.actionOnPicture : null]}
           />
           {children}
         </VStack>

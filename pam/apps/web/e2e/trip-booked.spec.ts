@@ -48,12 +48,14 @@ test('Bring a friend: the picture touches the drawer’s top edge, with a round 
   const picture = (await page.locator('dialog[open] img').first().boundingBox())!;
   expect(Math.abs(picture.y - box.y)).toBeLessThan(2);
   expect(picture.width).toBeGreaterThanOrEqual(box.width - 2);
-  // An X (something is done in here: the link is copied), named Close, round, 48px, in the top-right corner.
+  // An X (something is done in here: the link is copied), named Close, a round 36px circle tucked into the top-right corner.
   const close = page.locator('dialog[open]').getByRole('button', { name: 'Close' });
   const b = (await close.boundingBox())!;
-  expect(b.width).toBeGreaterThanOrEqual(48);
-  expect(box.x + box.width - (b.x + b.width)).toBeLessThan(24);
-  expect(b.y - box.y).toBeLessThan(16);
+  expect(b.width).toBeGreaterThanOrEqual(34);
+  expect(box.x + box.width - (b.x + b.width)).toBeGreaterThanOrEqual(12);
+  expect(box.x + box.width - (b.x + b.width)).toBeLessThanOrEqual(20);
+  expect(b.y - box.y).toBeGreaterThanOrEqual(12);
+  expect(b.y - box.y).toBeLessThanOrEqual(20);
   expect(await close.evaluate((el) => el.querySelector('svg path')?.getAttribute('d') ?? '')).not.toBe('M5 13l4 4L19 7');
   await close.click();
   await expect(page.locator('dialog[open]')).toHaveCount(0);

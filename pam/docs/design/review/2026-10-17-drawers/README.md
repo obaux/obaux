@@ -4,7 +4,7 @@ Each sheet is before (top row) and after (bottom row): Bring a friend, Opening h
 
 ## The rule (Will, a97)
 
-Round button in the top-right corner (top-left in Arabic), 48px, with the extra room above the title.
+Round button tucked into the top-right corner (top-left in Arabic): a 36px circle, 16px in from the top and the side so it sits inside the sheet's rounded corner, with a 48px tap target. The extra room above the title stays. Muted grey on a sheet; white with a soft shadow over Bring a friend's picture. `corner-closeup.png` shows it.
 - **Checkmark, "Done"**: you pick in the drawer, or only read it.
 - **X, "Close"**: something is done inside the drawer.
 

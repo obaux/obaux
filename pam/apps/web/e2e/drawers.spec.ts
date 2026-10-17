@@ -66,11 +66,19 @@ test.describe('the drawer standard', () => {
     const button = page.locator('dialog[open]').getByRole('button', { name: 'Done' });
     await expect(button).toBeVisible();
     const b = (await button.boundingBox())!;
-    expect(b.width).toBeGreaterThanOrEqual(48);
-    expect(b.height).toBeGreaterThanOrEqual(48);
-    // In the top-right corner, near the edge.
-    expect(box.x + box.width - (b.x + b.width)).toBeLessThan(24);
-    expect(b.y - box.y).toBeLessThan(16);
+    // A 36px circle tucked 16px in from the top and the side (inside the sheet's rounded corner), with a 48px tap target.
+    expect(b.width).toBeGreaterThanOrEqual(34);
+    expect(b.width).toBeLessThanOrEqual(40);
+    expect(box.x + box.width - (b.x + b.width)).toBeGreaterThanOrEqual(12);
+    expect(box.x + box.width - (b.x + b.width)).toBeLessThanOrEqual(20);
+    expect(b.y - box.y).toBeGreaterThanOrEqual(12);
+    expect(b.y - box.y).toBeLessThanOrEqual(20);
+    const cx = b.x + b.width / 2;
+    const cy = b.y + b.height / 2;
+    for (const [dx, dy] of [[-23, 0], [23, 0], [0, 23], [0, -23]] as const) {
+      const hit = await page.evaluate(([x, y]) => document.elementFromPoint(x!, y!)?.closest('[data-sheet-action]') !== null, [cx + dx, cy + dy]);
+      expect(hit, `48px target at ${dx},${dy}`).toBe(true);
+    }
     // A checkmark for a drawer you pick in or only read: not an X.
     expect(await button.evaluate((el) => el.querySelector('svg path')?.getAttribute('d'))).toBe('M5 13l4 4L19 7');
     // In document order the heading comes first and the button is the next control after it (the notch is hidden from both).
@@ -92,8 +100,9 @@ test.describe('the drawer standard', () => {
     const box = (await panel(page).boundingBox())!;
     const button = page.locator('dialog[open] [data-sheet-action]');
     const b = (await button.boundingBox())!;
-    expect(b.x - box.x).toBeLessThan(24);
-    expect(b.y - box.y).toBeLessThan(16);
+    expect(b.x - box.x).toBeGreaterThanOrEqual(12);
+    expect(b.x - box.x).toBeLessThanOrEqual(20);
+    expect(b.y - box.y).toBeLessThanOrEqual(20);
   });
 
   test('Done and Escape both close it, and the focus goes back to where it came from', async ({ page }) => {
