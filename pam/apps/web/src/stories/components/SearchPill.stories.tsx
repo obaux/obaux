@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import { useState } from 'react';
-import { fn, userEvent, within } from 'storybook/test';
+import { fn } from 'storybook/test';
 import { Page } from '@pam/ui';
-import { SearchBar, SearchPill, type SearchPillItem } from '@pam/ui/SearchPill';
+import { SearchPill, type SearchPillItem } from '@pam/ui/SearchPill';
 import type { SearchSource } from '@astryxdesign/core/Typeahead';
 import { CATEGORY_ICONS } from '../../screens/ExploreView';
 import { useStoryText } from '../support/useStoryText';
@@ -62,37 +61,3 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
 export const Spanish: Story = { globals: { locale: 'es' } };
 export const Narrow: Story = { globals: { viewport: { value: 'narrow320', isRotated: false } } };
-
-
-/**
- * Explore's search bar (Will, 17 October, a86): at rest the pill, its magnifier and words centred; tapped, it narrows with
- * Cancel on its right and the words at the left. Cancel clears and closes.
- */
-function Bar({ startOpen, startText }: { readonly startOpen: boolean; readonly startText: string }) {
-  const tr = useStoryText();
-  const [isOpen, setOpen] = useState(startOpen);
-  const [value, setValue] = useState(startText);
-  return (
-    <SearchBar
-      label={tr('explore.search.label')}
-      placeholder={tr('explore.search.placeholder')}
-      clearLabel={tr('explore.search.clear')}
-      cancelLabel={tr('messages.search.cancel')}
-      value={value}
-      onChange={setValue}
-      isOpen={isOpen}
-      onOpenChange={setOpen}
-    />
-  );
-}
-
-export const BarAtRest: Story = { render: () => <Bar startOpen={false} startText="" /> };
-export const BarOpen: Story = {
-  render: () => <Bar startOpen={false} startText="" />,
-  play: async ({ canvasElement }) => {
-    await userEvent.click(within(canvasElement).getByRole('button'));
-  },
-};
-export const BarTyped: Story = { render: () => <Bar startOpen startText="1500 Market St" /> };
-export const BarOpenNarrow: Story = { ...BarOpen, globals: { viewport: { value: 'narrow320', isRotated: false } } };
-export const BarOpenArabic: Story = { ...BarOpen, globals: { locale: 'ar' } };
