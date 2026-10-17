@@ -24,6 +24,9 @@
  *   spill    text runs past the edge of the button / link / field it sits in
  *   overlap  two different elements' text lines cover each other
  *   scroll   the page itself scrolls sideways
+ *   placeholder  the words a field shows while it is empty, wider than the room inside it (17 October: the case
+ *            manager Home's search pill said "Search your mem"; a placeholder is painted by the browser from an
+ *            attribute, not laid out as a text node, so none of the other checks can see it)
  *   isolate  an invisible bidi isolate (U+2068/U+2069, which `t` puts round a value in
  *            Arabic) in a place nobody reads it off the screen: an attribute such as
  *            `aria-label` or `alt`, or text a screen reader speaks and no eye sees (D-435). A label
@@ -281,7 +284,50 @@ function measure() {
     push('scroll', document.body, '(page)', `${document.documentElement.scrollWidth} > ${vw}`);
   }
 
-  // 6. An isolate where nobody is looking at the screen: an attribute a screen reader speaks
+  // 6. A placeholder wider than its field. The browser paints it from the attribute, so it is no text node and no range
+  // rect ever measured it: a field can cut "Search your members" to "Search your mem" and every check above is clean.
+  // Measure the words in the font the placeholder is drawn in against the room the field leaves inside its padding.
+  // (A textarea wraps its placeholder, so only a one-line input can cut one.)
+  for (const field of document.body.querySelectorAll('input[placeholder]')) {
+    if (hidden(field) || field.value) continue;
+    const type = (field.getAttribute('type') ?? 'text').toLowerCase();
+    if (['hidden', 'checkbox', 'radio', 'range', 'color', 'file', 'button', 'submit', 'reset', 'image'].includes(type)) continue;
+    const words = field.getAttribute('placeholder') ?? '';
+    if (!words.trim()) continue;
+    const r = field.getBoundingClientRect();
+    if (r.width < 1 || r.height < 1) continue;
+    const own = style(field);
+    // The pseudo-element carries the placeholder's own size and weight where the theme sets them there.
+    let ph = own;
+    try {
+      ph = getComputedStyle(field, '::placeholder');
+    } catch {
+      ph = own;
+    }
+    const probe = document.createElement('span');
+    probe.textContent = words;
+    probe.setAttribute('aria-hidden', 'true');
+    Object.assign(probe.style, {
+      position: 'absolute',
+      visibility: 'hidden',
+      whiteSpace: 'pre',
+      fontFamily: ph.fontFamily || own.fontFamily,
+      fontSize: ph.fontSize || own.fontSize,
+      fontWeight: ph.fontWeight || own.fontWeight,
+      fontStyle: ph.fontStyle || own.fontStyle,
+      fontStretch: ph.fontStretch || own.fontStretch,
+      letterSpacing: ph.letterSpacing || own.letterSpacing,
+      textTransform: ph.textTransform || own.textTransform,
+      direction: own.direction,
+    });
+    document.body.appendChild(probe);
+    const need = probe.getBoundingClientRect().width;
+    probe.remove();
+    const room = field.clientWidth - (parseFloat(own.paddingLeft) || 0) - (parseFloat(own.paddingRight) || 0);
+    if (need > room + 1) push('placeholder', field, words, `${Math.ceil(need)} > ${Math.floor(room)}`);
+  }
+
+  // 7. An isolate where nobody is looking at the screen: an attribute a screen reader speaks
   // (`aria-*`, `alt`), or text in the visually-hidden idiom. On screen they are zero width and
   // wanted, which is why a `title` (a tooltip is drawn) or a `placeholder` is not looked at here;
   // anywhere else they are an invisible character in a string.
