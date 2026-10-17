@@ -68,8 +68,22 @@ const styles = stylex.create({
     unicodeBidi: 'plaintext', // its own direction, not the screen's (D-422)
   },
   when: { fontSize: '16px', lineHeight: 1.35 },
+  // The time stays whole: "10:00 AM" never splits across two lines (Iris, b54, a95 polish).
+  time: { whiteSpace: 'nowrap' },
   token: { maxWidth: '100%' },
 });
+
+/** "Tuesday, Oct 20 · 10:00 AM": the day may wrap, the time after the last " · " never does (in any language). */
+function WhenLine({ when }: { readonly when: string }) {
+  const at = when.lastIndexOf(' · ');
+  if (at === -1) return <>{when}</>;
+  return (
+    <>
+      {when.slice(0, at + 3)}
+      <span {...stylex.props(styles.time)}>{when.slice(at + 3)}</span>
+    </>
+  );
+}
 
 const TOKEN_ICON = { width: 14, height: 14, 'aria-hidden': true } as const;
 
@@ -96,7 +110,7 @@ export function TripCard({
               {placeName}
             </Heading>
             <Text type="supporting" xstyle={styles.when}>
-              {when}
+              <WhenLine when={when} />
             </Text>
             {mark ? (
               <Text type="supporting" xstyle={styles.when}>

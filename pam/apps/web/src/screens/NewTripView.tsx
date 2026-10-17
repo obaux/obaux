@@ -93,6 +93,8 @@ const styles = stylex.create({
   // with a grey outline like the round header buttons; the chosen one fills
   // green. The pill is 40px (Will, a95: the chips were too tall); the touch floor (§2.5) stays 48px, by 4px
   // of invisible hit area above and below that count as the button's own. Rows are 8px apart, so they never overlap.
+  // The hit area is placed from the PADDING edge, so a chip with a 1px border (the unselected one) needs 5px to reach 4px past
+  // its outline: with 4 it was 46px tall, 3px above the pill and only 2px below it (Iris, b54).
   choice: {
     minHeight: '40px',
     paddingInline: '16px',
@@ -104,6 +106,7 @@ const styles = stylex.create({
     '::after': { content: '""', position: 'absolute', insetBlock: '-4px', insetInline: 0 },
   },
   choiceOff: {
+    '::after': { insetBlock: '-5px' },
     backgroundColor: colorVars['--color-background-body'],
     borderWidth: '1px',
     borderStyle: 'solid',
@@ -462,6 +465,9 @@ export function NewTripView({
   return (
     <SubPage
       title={title}
+      // When is tighter (8px between its blocks, not 16): at 320×568 the four times must sit above the Next bar, not half under it
+      // (Iris, b54; Will's a95 point was that the times be in view). Where and Check keep the room they had.
+      gap={step === 'when' ? 2 : 4}
       // For a member (D-316), the subtitle says who, since the steps are
       // the same ones the member would see.
       subtitle={
