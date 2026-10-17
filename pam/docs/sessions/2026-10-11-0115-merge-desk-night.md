@@ -1363,6 +1363,10 @@
   Checks: invite.spec on three projects, 24 passed. A fit run (es, zh-HK, Trips stories) on this build found 8 that
   the new entries miss: b55's TripCard put the time in its own span, so the date line's text changed, and the
   saved-trips place name is now two lines. Lena re-keys them.
+- **b56 pushed (10:41, 2421ff80).** Main CI green 11:12.
+- **Iris's b55 re-test (10:48): PASS on all six.** Russian «людей» beside «участники» is on Lena's native-reader list.
+- **Batch b57 (17 October, 11:15 to 11:20).** Lena's 8effdeb6: the eight Trips fit keys re-keyed after b55's TripCard
+  (the card under the drawer's fade; they show only in a run without English). Iris's d2198a66 (the b55 re-test).
 
 ## What was wrong, and what missed it
 
@@ -1760,9 +1764,12 @@
 | b55 fit audit, website stories (en, ru, ar, zh-CN, pseudo at 320×760, fit-known) | 24 stories × 5 languages: 0 new, 0 in English; the Support placeholder no longer cut |
 | b55 main CI (97e5fd27) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (10:38); Vercel web and pam-site success |
 | Batch b56 (docs, test and fit-known only): invite.spec, three projects / audit:fit es and zh-HK, --match trips, 320×760 | 24 passed / 8 unaccepted, all partial=true, 0 out (keys shifted by b55's TripCard; sent to Lena) |
+| b56 main CI (2421ff80) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (11:12); Vercel web and pam-site success |
+| Batch b57 (fit-known and research only): audit:fit es and zh-HK, --match trips, 320×760 | 8 found, 8 accepted, 0 not |
 
 ## Left undone
 
+- **As of b57 (17 October, 11:20):** nothing open in the lanes but what waits on Will: a91, a93, a94, a86, a84, a88.
 - **As of b56 (17 October, 10:44):** Iris re-checks b55. Lena: re-key the Trips fit entries for b55's TripCard.
 - **As of b55 (17 October, 10:06):** Iris re-checks When? (hit area both sides, the times at 320×568). Ava: the
   invite.spec timeout under load. Lena: fit-known entries for es, pt-BR and zh-HK (same two classes). With Will: a91,
