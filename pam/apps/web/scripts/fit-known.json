@@ -806,5 +806,41 @@
   {
     "key": "pseudo|scroll|onboarding--about-programs-third-slide|(page)",
     "reason": "A segment of the control never breaks a word (D-422), and three share one row, so the pseudo-language's single long word is wider than a third of it. The longest word in each real language fits; a language with longer words would need two rows or a different control. The same control is accepted on About Pam; this is its other slides and tabs. Looked at 17 October 2026 at 320px."
+  },
+  {
+    "key": "es|cut|member-created--trips|miércoles, 14 oct · 13:00",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade (at 320×568 under the tab bar), so the detector sees whichever of its words land on that edge partly hidden (partial=true, 0 in, 0 out); which of them it reports changes from run to run and with the language. It is reached by scrolling and nothing is lost. Looked at 17 October 2026 at 320×568 with a screenshot (Spanish). Spanish, Portuguese and Traditional Chinese are not in the fit job's languages, so these were found by the all-language run."
+  },
+  {
+    "key": "es|cut|member-created-states-trips--upcoming|miércoles, 14 oct · 13:00",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade (at 320×568 under the tab bar), so the detector sees whichever of its words land on that edge partly hidden (partial=true, 0 in, 0 out); which of them it reports changes from run to run and with the language. It is reached by scrolling and nothing is lost. Looked at 17 October 2026 at 320×568 with a screenshot (Spanish). Spanish, Portuguese and Traditional Chinese are not in the fit job's languages, so these were found by the all-language run."
+  },
+  {
+    "key": "es|cut|member-created--trips|S",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade (at 320×568 under the tab bar), so the detector sees whichever of its words land on that edge partly hidden (partial=true, 0 in, 0 out); which of them it reports changes from run to run and with the language. It is reached by scrolling and nothing is lost. Looked at 17 October 2026 at 320×568 with a screenshot (Spanish). Spanish, Portuguese and Traditional Chinese are not in the fit job's languages, so these were found by the all-language run."
+  },
+  {
+    "key": "es|cut|member-created-states-saved-trips--one-trip-saved|S",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade (at 320×568 under the tab bar), so the detector sees whichever of its words land on that edge partly hidden (partial=true, 0 in, 0 out); which of them it reports changes from run to run and with the language. It is reached by scrolling and nothing is lost. Looked at 17 October 2026 at 320×568 with a screenshot (Spanish). Spanish, Portuguese and Traditional Chinese are not in the fit job's languages, so these were found by the all-language run."
+  },
+  {
+    "key": "es|cut|member-created-states-saved-trips--trips-with-a-past-visit|S",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade (at 320×568 under the tab bar), so the detector sees whichever of its words land on that edge partly hidden (partial=true, 0 in, 0 out); which of them it reports changes from run to run and with the language. It is reached by scrolling and nothing is lost. Looked at 17 October 2026 at 320×568 with a screenshot (Spanish). Spanish, Portuguese and Traditional Chinese are not in the fit job's languages, so these were found by the all-language run."
+  },
+  {
+    "key": "es|cut|member-created-states-trips--upcoming|S",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade (at 320×568 under the tab bar), so the detector sees whichever of its words land on that edge partly hidden (partial=true, 0 in, 0 out); which of them it reports changes from run to run and with the language. It is reached by scrolling and nothing is lost. Looked at 17 October 2026 at 320×568 with a screenshot (Spanish). Spanish, Portuguese and Traditional Chinese are not in the fit job's languages, so these were found by the all-language run."
+  },
+  {
+    "key": "zh-HK|cut|member-created--trips-just-booked|M",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade (at 320×568 under the tab bar), so the detector sees whichever of its words land on that edge partly hidden (partial=true, 0 in, 0 out); which of them it reports changes from run to run and with the language. It is reached by scrolling and nothing is lost. Looked at 17 October 2026 at 320×568 with a screenshot (Spanish). Spanish, Portuguese and Traditional Chinese are not in the fit job's languages, so these were found by the all-language run."
+  },
+  {
+    "key": "zh-HK|cut|member-created--trips-just-booked|需要簽名",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade (at 320×568 under the tab bar), so the detector sees whichever of its words land on that edge partly hidden (partial=true, 0 in, 0 out); which of them it reports changes from run to run and with the language. It is reached by scrolling and nothing is lost. Looked at 17 October 2026 at 320×568 with a screenshot (Spanish). Spanish, Portuguese and Traditional Chinese are not in the fit job's languages, so these were found by the all-language run."
+  },
+  {
+    "key": "zh-HK|cut|program-lead-states-home--folded|M",
+    "reason": "The folded week on Home shows a fixed height and fades the rest, with 'Show the whole calendar' under it, so the third row's avatar is only half there in every language (English too, in the screenshot). The detector flags it in the languages where the row wraps one line taller. The rest is one tap away. Looked at 17 October 2026 at 320×760 with screenshots (English and pseudo). Same as the entry for the avatar letter D, which the story no longer shows."
   }
 ]
