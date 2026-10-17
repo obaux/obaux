@@ -53,15 +53,13 @@ const styles = stylex.create({
     overflow: 'hidden',
   },
   body: { minWidth: 0, flexGrow: 1 },
-  // One line, ending in "…" — a long program name no longer pushes the
-  // date down (Will, 3 October). The full name is in the card's label.
+  // Wraps, never cut (Iris's second member pass, P3): a long program name
+  // takes a second line rather than ending in "…".
   name: {
     fontSize: '17px',
     lineHeight: 1.3,
     fontWeight: 700,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+    overflowWrap: 'anywhere',
     unicodeBidi: 'plaintext', // its own direction, not the screen's (D-422)
   },
   when: { fontSize: '16px', lineHeight: 1.35 },

@@ -20,7 +20,14 @@ export const EN = BUNDLES.en;
 export const OTHER_LOCALES = SUPPORTED_LOCALES.filter((l): l is Exclude<Locale, 'en'> => l !== 'en');
 
 /** `{count}` strings that need no plural forms: a symbol, a fixed 0.1, or a key already chosen for "one". */
-export const NO_PLURAL_VARIANTS = new Set(['points.way.plus', 'places.mile', 'places.milesUnder']);
+export const NO_PLURAL_VARIANTS = new Set([
+  'points.way.plus',
+  'places.mile',
+  'places.milesUnder',
+  // English picks this one itself for a count of 1 ("{count} policy"); it keeps {count} so that Portuguese (which
+  // uses "one" for 0 as well as 1) and Russian (21, 31...) can write the number instead of a fixed "1" (D-582).
+  'program.policies.rowBody.one',
+]);
 export const COUNT_KEYS = Object.keys(EN).filter((k) => EN[k]!.includes('{count}') && !NO_PLURAL_VARIANTS.has(k));
 
 const CATEGORY = /\.(zero|one|two|few|many)$/;

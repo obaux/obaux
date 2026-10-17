@@ -51,7 +51,7 @@ test.describe('Answer by text', () => {
     });
     await page.goto('/reply/?to=%2B12675559601');
     await settled(page);
-    await expect(page.getByText('To +12675559601')).toBeVisible();
+    await expect(page.getByText('To (267) 555-9601')).toBeVisible();
     const send = page.getByRole('button', { name: 'Send text' });
     await expect(send).toBeDisabled();
     await page.getByLabel('Your answer').fill('We can help. Write to hello@joinpam.org.');

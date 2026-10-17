@@ -9,7 +9,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@pam/ui/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
-import { BigButton, BookmarkIcon, ConnectionsIcon, Loading, MessagesIcon, Notice, Page, SignIcon, TripsIcon } from '@pam/ui';
+import { BigButton, ConnectionsIcon, Loading, MessagesIcon, Notice, Page, SignIcon, TripsIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { signedBy, usePolicies } from '@/lib/usePolicies';
 import { rememberPersonName } from '@/lib/personNames';
@@ -31,7 +31,6 @@ import { useConversations } from '@/lib/useConversations';
 import { PersonDetailSkeleton } from '@pam/ui/Skeletons';
 import { NOTICES, intlLocale } from '@pam/config';
 import { DUMMY_EVERYONE, type DummyPerson } from '@pam/config/dummy-people';
-import { DUMMY_SAVED_BY_PERSON } from '@pam/config/dummy-places';
 import { DUMMY_APPOINTMENTS } from '@pam/config/dummy-appointments';
 import { List, ListItem } from '@astryxdesign/core/List';
 import { useI18n } from '@/lib/i18n';
@@ -176,9 +175,11 @@ function PersonScreen() {
   const { state: caseload } = useCaseload(viewedRole === 'admin');
   // Unread from this person, for the count on "Message {name}" (D-231).
   const { state: conversations } = useConversations(viewedRole === 'admin' || viewedRole === 'provider');
-  const header = (title: string) => (
+  // A person's name as the title is data: it keeps its own direction (D-534).
+  const header = (title: string, isName = false) => (
     <SubPageHeader
       title={title}
+      isTitleData={isName}
       backHref="/"
       backLabel={t('nav.back.home')}
       actions={
@@ -278,7 +279,6 @@ function PersonScreen() {
   }
 
   const when = whenLastActive(person.lastActiveAt, locale);
-  const saved = person.isExample ? (DUMMY_SAVED_BY_PERSON[person.id] ?? []) : [];
   const isMember = person.role === 'member';
   const canMessage = isMember && (viewedRole === 'admin' || viewedRole === 'provider');
   // Trips (D-227): the visits they planned, coming up first, then the ones
@@ -345,7 +345,8 @@ function PersonScreen() {
   return (
     <Page gap={4}>
       <RememberPersonName id={person.id} name={person.firstName ?? ''} />
-      {header(t('person.profile'))}
+      {/* Their name is the title, not "Profile", the word on the viewer's own tab (Iris, case manager W3). */}
+      {header(person.firstName || t('person.profile'), Boolean(person.firstName))}
 
       {/*
         The profile card (D-231): the member profile's own card — face, name,
@@ -354,6 +355,8 @@ function PersonScreen() {
       */}
       <ProfileSummary
         name={person.firstName}
+        // The title above already says it; the card shows it without a second heading.
+        isNameInTitle={Boolean(person.firstName)}
         // A program sees whether a member has signed all its policies (D-261).
         {...(isProgramView && isMember
           ? { nameAddon: <VerifiedBadge personId={person.id} name={person.firstName ?? ''} /> }
@@ -372,7 +375,7 @@ function PersonScreen() {
                     : t('person.stat.never'),
                   label: t('person.stat.nextVisit'),
                 },
-                { value: String(pastVisits.length), label: t('person.stat.visits') },
+                { value: String(pastVisits.length), label: t('trips.past.title') },
                 { value: when ?? t('person.stat.never'), label: t('person.stat.lastUsed') },
               ]
             : [
@@ -503,19 +506,8 @@ function PersonScreen() {
                 href: `/person/past/?id=${encodeURIComponent(person.id)}`,
                 ...(past.length > 0 ? { value: String(past.length) } : {}),
               },
-              // Their saved programs, on their own page like the past ones
-              // (Will, 3 October, D-243). A case manager's to see only.
-              ...(person.isExample
-                ? [
-                    {
-                      id: 'saved',
-                      label: t('person.savedPlaces.link', { name: person.firstName }),
-                      icon: <BookmarkIcon width={26} height={26} />,
-                      href: `/person/saved/?id=${encodeURIComponent(person.id)}`,
-                      ...(saved.length > 0 ? { value: String(saved.length) } : {}),
-                    },
-                  ]
-                : []),
+              // No "Programs saved by {name}", not even on an example page (D-243 had it): a case manager sees that
+              // a member saved something new, never which place (transparency.ts; Lena, via the merge desk, 15 October).
             ]}
           />
         </VStack>

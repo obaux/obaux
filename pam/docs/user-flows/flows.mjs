@@ -29,7 +29,7 @@
  *   changes  — the newest decisions this flow shows, newest first
  */
 
-export const UPDATED = '2026-10-14';
+export const UPDATED = '2026-10-16';
 
 /**
  * Where each screen opens live: Chromatic's build of `main`, `https://main--<app id>.chromatic.com`.
@@ -488,7 +488,6 @@ export const flows = [
       },
       member: { title: 'A member', story: 'case-manager-screens--member', path: '/person/' },
       past: { title: 'Past trips', story: 'case-manager-screens--member-past-trips', path: '/person/past/' },
-      memberSaved: { title: 'Programs they saved', story: 'case-manager-screens--member-saved', path: '/person/saved/' },
       connect: { title: 'Connect to a program', story: 'case-manager-screens--connect-member', path: '/person/connect/' },
       invite: {
         title: 'Invite someone',
@@ -547,7 +546,6 @@ export const flows = [
     edges: [
       ['home', 'member', 'A member'],
       ['member', 'past', 'Past trips'],
-      ['member', 'memberSaved', 'Saved programs'],
       ['member', 'connect', 'Connect'],
       ['home', 'invite', 'Invite someone (floating)'],
       ['home', 'homeEmpty', 'Nobody on the list yet', { dashed: true }],
@@ -560,7 +558,7 @@ export const flows = [
       ['profile', 'alerts', 'Text alerts'],
       ['profile', 'reported', 'Reported places'],
     ],
-    changes: ['D-486 — Home is the redesigned one with the rings of people with something new; with nobody on the list, faint circles and a (+) that starts an invite (Will, card a22)', 'D-189 — Reported places is a screen of its own, from Profile and the bell\'s "a place was reported" row, no longer only a chip on the old Places page', 'D-464 — Messages: a case manager and a super admin see Conversations | Reported (reported messages), and the bell\'s reported-message row opens Reported', 'D-463 — a conversation: ⋯ has Block this person (asks first; Unblock once blocked); after a block the composer says who blocked, and everything said stays readable and reportable', 'D-441 — inviting a program or a case manager asks for their email, required: it lands on their account when they sign in with that number; a member is never asked', "D-411 — a conversation: back and ⋯ where every nested screen has them, the name large, no fade; ⋯ outlined; Messages rows start at the page edge; dialogs open with no button chosen", 'D-400–401 — a conversation: a smaller visit card and a blurred fade under the header; one line under the name; an even frame round photos; the send button tucked into a rounder corner; photos open on near-black', 'D-399 — a conversation: send a PDF or Word file (the document button, or drop it on), opened when tapped; a Google Docs link shows as a card that opens it in Google', 'D-395 — a conversation: under the name, who they are in full (Program lead at Example Food Pantry; Case manager), not a cut-off tag', 'D-394 — a conversation: send a photo (the picture button beside the mic), tap one to see it full size; only the two people see it, and whoever checks a report about it', 'D-390 — a conversation: mine light green, theirs grey, no name or time on a bubble; drag sideways to see the times; closer to the edges; bolder mic and send', "D-389 — a conversation: one divider per day (Today, Yesterday, a weekday, a date), each bubble just its time; the composer one rounded box, mic left, round send grey until there is text, then dark green", 'D-347 — Add a program asks one question a screen, then a review', 'D-315 — a case manager can invite a case manager', 'D-263 — Invite someone makes the link straight away', 'D-260 — text alert switches'],
+    changes: ['D-580 — no "Programs they saved" page: a case manager learns that a member saved a new place, never which one (the member\'s page loses that link)', 'D-486 — Home is the redesigned one with the rings of people with something new; with nobody on the list, faint circles and a (+) that starts an invite (Will, card a22)', 'D-189 — Reported places is a screen of its own, from Profile and the bell\'s "a place was reported" row, no longer only a chip on the old Places page', 'D-464 — Messages: a case manager and a super admin see Conversations | Reported (reported messages), and the bell\'s reported-message row opens Reported', 'D-463 — a conversation: ⋯ has Block this person (asks first; Unblock once blocked); after a block the composer says who blocked, and everything said stays readable and reportable', 'D-441 — inviting a program or a case manager asks for their email, required: it lands on their account when they sign in with that number; a member is never asked', "D-411 — a conversation: back and ⋯ where every nested screen has them, the name large, no fade; ⋯ outlined; Messages rows start at the page edge; dialogs open with no button chosen", 'D-400–401 — a conversation: a smaller visit card and a blurred fade under the header; one line under the name; an even frame round photos; the send button tucked into a rounder corner; photos open on near-black', 'D-399 — a conversation: send a PDF or Word file (the document button, or drop it on), opened when tapped; a Google Docs link shows as a card that opens it in Google', 'D-395 — a conversation: under the name, who they are in full (Program lead at Example Food Pantry; Case manager), not a cut-off tag', 'D-394 — a conversation: send a photo (the picture button beside the mic), tap one to see it full size; only the two people see it, and whoever checks a report about it', 'D-390 — a conversation: mine light green, theirs grey, no name or time on a bubble; drag sideways to see the times; closer to the edges; bolder mic and send', "D-389 — a conversation: one divider per day (Today, Yesterday, a weekday, a date), each bubble just its time; the composer one rounded box, mic left, round send grey until there is text, then dark green", 'D-347 — Add a program asks one question a screen, then a review', 'D-315 — a case manager can invite a case manager', 'D-263 — Invite someone makes the link straight away', 'D-260 — text alert switches'],
   },
   {
     key: 'program-lead',

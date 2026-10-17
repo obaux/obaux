@@ -228,12 +228,14 @@ export function useSession(): { state: SessionState; refresh: () => void } {
  * Signs out, and forgets what this browser knew about the person.
  *
  * The view-as choice (D-108) goes with them: it is a super admin's setting, and
- * the next person to sign in on this phone is not one.
+ * the next person to sign in on this phone is not one. So does a signature drawn in this tab.
  */
 export async function signOut(): Promise<void> {
   const { createClient } = await import('./supabase');
   try {
     sessionStorage.removeItem('pam.view-as');
+    // A drawn signature kept in this tab (D-270) is the last thing to leave on a borrowed phone.
+    sessionStorage.removeItem('pam.mySignatures');
   } catch {
     // Storage off, or private mode. Nothing to forget.
   }

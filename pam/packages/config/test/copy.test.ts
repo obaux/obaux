@@ -77,11 +77,14 @@ describe('plural forms', () => {
 });
 
 describe('every other language is actually translated', () => {
-  // Names, brands and badge names Spanish also leaves alone, plus the role label
-  // kept short in Portuguese (like English "Super admin" is already a coinage).
+  // Names and brands Spanish also leaves alone, plus the role label kept short in Portuguese (like English
+  // "Super admin" is already a coinage). Badge names are translated (Sage, 15 October: the words become how a person sees themselves);
+  // only Sankofa and Griot are left as they are, because they are borrowed words and their descriptions explain them, and Craftsman waits
+  // for Will (a90).
   const MAY_MATCH_ENGLISH = new Set(
-    Object.keys(EN).filter((k) => EN[k] === es[k] || k.startsWith('badge.') || k.startsWith('language.')),
+    Object.keys(EN).filter((k) => (EN[k] === es[k] && !k.startsWith('badge.')) || k.startsWith('language.')),
   );
+  for (const k of ['badge.sankofa', 'badge.griot', 'badge.craftsman']) MAY_MATCH_ENGLISH.add(k);
   MAY_MATCH_ENGLISH.add('directory.filter.super_admin');
   MAY_MATCH_ENGLISH.add('role.super_admin');
   // "Link" is the Brazilian word for a link (the bundle says "Link aberto" too).
@@ -91,6 +94,8 @@ describe('every other language is actually translated', () => {
   MAY_MATCH_ENGLISH.add('places.kind.zip');
   // A place, a day and a time and no word of its own: Chinese and Russian have nothing to translate in it (D-498).
   MAY_MATCH_ENGLISH.add('trips.moved.body.self');
+  // The same for a trip card's spoken name when nobody comes along: a place and a day, no word of its own (D-578; the comma is the language's).
+  MAY_MATCH_ENGLISH.add('trips.card.label.alone');
 
   it.each(OTHER_LOCALES)('%s differs from English except where a name or a symbol should not change', (locale) => {
     const same = Object.keys(EN).filter((k) => BUNDLES[locale][k] === EN[k] && /[A-Za-z]{3}/.test(EN[k]!));

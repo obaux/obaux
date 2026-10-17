@@ -3,10 +3,10 @@ import { Body, Lead, P, Section } from '../components/Prose';
 import { HowTo } from '../components/HowTo';
 
 /**
- * Support post: Points and badges today (members). Only what is live: four ways to earn
- * points, the same four as `AWARDED_TODAY` in packages/config/src/points.ts and the Points
+ * Support post: Points and badges today (members). Only what is live: six ways to earn
+ * points, the same six as `AWARDED_TODAY` in packages/config/src/points.ts and the Points
  * screen's "Ways to earn" list (docs/points-awarding.md; save a place and finish setup, plus
- * plan a trip, D-468, and call a place, D-472), the ladder by points, and that nothing is
+ * plan a trip, D-468, call a place, D-472, and I'm here / I went, D-535, D-578), the ladder by points, and that nothing is
  * bought with points (REWARDS_ENABLED false). When a rule ships, add it here and to
  * AWARDED_TODAY in the same change. Category badges (Scholar, Griot, ...) are not awarded to real members yet, so they
  * are not named here.
@@ -26,13 +26,15 @@ export function PointsAndBadges() {
           columns={['Points']}
           rows={[
             { label: 'Plan a trip to a place', cells: ['25 points, once for each place. Up to three new places a day.'] },
+            { label: 'Tap I’m here at a visit', cells: ['100 points, once for each visit. Tap it at the place, from 2 hours before your visit until 3 hours after it ends. The program can also mark you there.'] },
+            { label: 'Tap I went after a visit', cells: ['60 points, once for each visit, in the same hours, up to 3 times in 7 days. If the program marks you there too, you get the other 40.'] },
             { label: 'Call a place', cells: ['10 points, the first time you tap Call on that place. Up to five new places a day.'] },
             { label: 'Save a place', cells: ['5 points, once for each place.'] },
             { label: 'Finish setting up', cells: ['25 points, once.'] },
           ]}
         />
         <P>
-          The “Ways to earn” list on the Points screen shows these four. Pam cannot tell whether a call
+          The “Ways to earn” list on the Points screen shows these six. Pam cannot tell whether a call
           connected, so it counts the tap on Call.
         </P>
       </Section>
@@ -73,7 +75,7 @@ export function PointsAndBadges() {
       <Section title="See your points">
         <HowTo
           steps={['Tap Profile.', 'Tap the badge with your level on it. It says “Your badge”.', 'Scroll to see the ladder and your badges.']}
-          shots={[{ name: 'points-and-badges/points.png', alt: "The top of the “Your points” screen: your badge, the level name, the number of points and a bar showing how many more points to the next level. Under it, the “Ways to earn” list: Plan a trip to a place, Call a place, Save a place and Finish setting up Pam.", caption: "“Your points”, for an example person." }]}
+          shots={[{ name: 'points-and-badges/points.png', alt: "The top of the “Your points” screen: your badge, the level name, the number of points and a bar showing how many more points to the next level. Under it, the “Ways to earn” list: I’m here, I went, Plan a trip to a place, Call a place, Save a place and Finish setting up Pam.", caption: "“Your points”, for an example person." }]}
         />
       </Section>
     </Body>

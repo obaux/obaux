@@ -11,7 +11,9 @@ import { NOTICES, intlLocale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../app/NotIn';
 import { useSession } from '@/lib/useSession';
+import { useFlaggedPlaces } from '@/lib/useFlaggedPlaces';
 import { useStaffRequests } from '@/lib/useStaffRequests';
+import { toLookAt, useProgramsToCheck } from '@/lib/programsToCheck';
 import { useRoleView } from '@/lib/useViewedRole';
 
 /**
@@ -53,6 +55,11 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
   const isSuperAdmin = viewedRole === 'super_admin';
 
   const { state: requests } = useStaffRequests(isSuperAdmin);
+  // Reported places reach Home like Programs to check, with how many are waiting (Iris's super admin pass, W4).
+  const { state: reported } = useFlaggedPlaces(isSuperAdmin);
+  const reportedCount = reported.status === 'ready' ? reported.places.length : 0;
+  const { state: programs } = useProgramsToCheck(isSuperAdmin);
+  const toCheck = programs.status === 'ready' ? toLookAt(programs.programs) : 0;
 
   const tools = (
     <>
@@ -111,7 +118,24 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
       {/* The programs leaders have sent for Pam to check, beside the people asking to be staff (D-386). */}
       <MenuList
         label={t('review.title')}
-        items={[{ id: 'programs-to-check', label: t('review.title'), href: '/programs/review/', icon: <PlacesIcon {...ICON} /> }]}
+        items={[
+          {
+            id: 'programs-to-check',
+            label: t('review.title'),
+            href: isHome ? '/programs/review/?from=home' : '/programs/review/',
+            icon: <PlacesIcon {...ICON} />,
+            // How many wait for a decision, like the requests below (Iris, super admin P1).
+            ...(toCheck > 0 ? { value: String(toCheck) } : {}),
+          },
+          {
+            id: 'reported-places',
+            label: t('places.reported.title'),
+            href: '/places/reported/',
+            icon: <ShieldIcon {...ICON} />,
+            // A plain number (D-586): the red badge is for what is new since you looked, not for a count of what is waiting.
+            ...(reportedCount > 0 ? { value: String(reportedCount) } : {}),
+          },
+        ]}
       />
 
       {requests.status === 'loading' ? <Loading label={t('common.loading')} variant="inline" /> : null}

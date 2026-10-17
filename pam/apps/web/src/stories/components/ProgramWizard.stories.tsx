@@ -55,6 +55,14 @@ export const KindOther: Story = {
   args: { start: 1, value: { ...EMPTY, name: 'Example Reentry Hub', category: 'other', categoryOther: 'Legal help' } },
 };
 
+/** The review with no address: the warning that says what that costs (Iris, program lead P2; Sage's words). */
+export const ReviewNoAddress: Story = {
+  args: {
+    start: 6,
+    value: { ...EMPTY, name: 'Example Reentry Hub', subcategory: 'ged', phone: '(215) 555-0144', services: ['GED classes'] },
+  },
+};
+
 /** The review: every answer, each a way back to change it. */
 export const Review: Story = {
   args: {

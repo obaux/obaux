@@ -57,7 +57,7 @@ test.describe('Connect is for examples only', () => {
     await caseManager(page);
     await page.goto('/person/?id=m1');
     await settled(page);
-    await expect(page.getByRole('heading', { name: 'Marcus', level: 2 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Marcus', level: 1 })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Message Marcus' })).toBeVisible();
     await expect(page.getByRole('link', { name: /Connect Marcus to/ })).toHaveCount(0);
   });

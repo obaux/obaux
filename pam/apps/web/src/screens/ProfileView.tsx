@@ -93,7 +93,7 @@ export function ProfileView({
   photoNotice = null,
   isLoading = false,
 }: ProfileViewProps) {
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   const number = (n: number) => new Intl.NumberFormat(intlLocale(locale)).format(n);
   const isMember = role === 'member';
 
@@ -217,7 +217,8 @@ export function ProfileView({
         */}
         {staffRows.length > 0 ? (
           <>
-            <MenuList label={t('profile.menu.label')} items={staffRows} />
+            {/* Named for what it is, not "Settings" (Iris, super admin P6). */}
+            <MenuList label={tPlain('profile.menu.work')} items={staffRows} />
             <Divider />
           </>
         ) : null}
