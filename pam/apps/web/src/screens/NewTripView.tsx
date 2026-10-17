@@ -248,6 +248,8 @@ export function NewTripView({
   const [movedTo, setMovedTo] = useState<Date | null>(null);
   // Booked for a member (D-316): the moment, then the program's Home.
   const [bookedAt, setBookedAt] = useState<Date | null>(null);
+  // Saved for the member (D-595), not kept in this tab: the confirmation says "Booked", not "Example".
+  const [bookedForReal, setBookedForReal] = useState(false);
   // The member's own booking, confirmed (D-333): the booked screen.
   const [confirmed, setConfirmed] = useState<{ readonly id: string; readonly at: Date } | null>(
     bookedTrip ? { id: bookedTrip.trip.id, at: new Date(bookedTrip.trip.startsAt) } : null,
@@ -324,15 +326,12 @@ export function NewTripView({
 
   if (bookedAt && place && forMember) {
     const vars = { place: place.name, day: dayLong.format(bookedAt), time: timeFmt.format(bookedAt) };
-    // An example, and it says so (Lena's promise sweep, 10 October): a booking
-    // for a member is kept in this tab only. Nothing is saved with the program
-    // and nobody is texted, so the screen claims neither. The "booked" and
-    // "texted" words (trips.booked.title / .texted / .sms) come back when a
-    // booking for a member is saved for real and texts are live.
+    // Saved for the member (D-595): booked, on their Trips, and the bell tells them (no text). An
+    // example, and it says so (Lena's promise sweep, 10 October), when it is only kept in this tab.
     return (
       <SuccessScreen
-        title={t('trips.booked.example.title', { name: forMember.name })}
-        body={t('trips.booked.example.body', vars)}
+        title={bookedForReal ? t('trips.booked.title', { name: forMember.name }) : t('trips.booked.example.title', { name: forMember.name })}
+        body={bookedForReal ? t('trips.booked.body', vars) : t('trips.booked.example.body', vars)}
         action={<Button label={t('trips.moved.home')} variant="secondary" href="/" xstyle={styles.home} />}
         // A place with no program lead on Pam is not told either way (D-498).
         {...(hasLead ? {} : { note: t('trips.booked.noLead', { place: place.name }) })}
@@ -535,6 +534,7 @@ export function NewTripView({
               if (forMember) {
                 // The program's moment (D-316), then its Home — not the
                 // member's Trips, which is theirs.
+                setBookedForReal(trip.bookedByProgram === true);
                 setBookedAt(at(day, time));
                 return;
               }
@@ -686,7 +686,7 @@ export function NewTripView({
           )}
           {/* True only for an example place or a program booking: a trip to a real
               place is saved (D-454), and saying otherwise would be a lie. */}
-          {asksForSavedTrips(session) !== null && isSavedPlace(place.id) && !forMember ? null : (
+          {forMember && isSavedPlace(forMember.id) && isSavedPlace(place.id) && session.status === 'signed-in' && !session.session.isDemo ? null : asksForSavedTrips(session) !== null && isSavedPlace(place.id) && !forMember ? null : (
             <Text type="supporting" xstyle={styles.note}>
               {t('trips.new.example')}
             </Text>

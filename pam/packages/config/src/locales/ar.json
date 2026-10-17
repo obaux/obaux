@@ -1832,5 +1832,9 @@
   "places.reported.remove.confirm.title": "إزالة {place} من القائمة؟",
   "places.reported.remove.confirm.body": "لن يجد الأعضاء المكان في Pam بعد الآن.",
   "places.reported.done.keep": "يبقى {place} في القائمة.",
-  "places.reported.done.remove": "تمت إزالة {place} من القائمة."
+  "places.reported.done.remove": "تمت إزالة {place} من القائمة.",
+  "trips.bookedForYou": "Booked for you by {program}",
+  "person.trip.bookedBy": "Booked by {program}",
+  "notify.visit_booked_for_you": "{place} booked you a visit: {when}",
+  "notify.kind.visit_booked_for_you": "Visit booked for you"
 }

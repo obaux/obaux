@@ -1693,5 +1693,9 @@
   "places.reported.remove.confirm.title": "¿Quitar {place} de la lista?",
   "places.reported.remove.confirm.body": "Los miembros ya no lo encontrarán en Pam.",
   "places.reported.done.keep": "{place} sigue en la lista.",
-  "places.reported.done.remove": "{place} ya no está en la lista."
+  "places.reported.done.remove": "{place} ya no está en la lista.",
+  "trips.bookedForYou": "Booked for you by {program}",
+  "person.trip.bookedBy": "Booked by {program}",
+  "notify.visit_booked_for_you": "{place} booked you a visit: {when}",
+  "notify.kind.visit_booked_for_you": "Visit booked for you"
 }

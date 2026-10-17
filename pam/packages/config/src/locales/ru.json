@@ -1776,5 +1776,9 @@
   "places.reported.remove.confirm.title": "Убрать {place} из списка?",
   "places.reported.remove.confirm.body": "Участники больше не найдут его в Pam.",
   "places.reported.done.keep": "{place} остаётся в списке.",
-  "places.reported.done.remove": "Убрано из списка: {place}."
+  "places.reported.done.remove": "Убрано из списка: {place}.",
+  "trips.bookedForYou": "Booked for you by {program}",
+  "person.trip.bookedBy": "Booked by {program}",
+  "notify.visit_booked_for_you": "{place} booked you a visit: {when}",
+  "notify.kind.visit_booked_for_you": "Visit booked for you"
 }
