@@ -123,10 +123,11 @@ begin
   values (p_member_id, svc.id, p_program_service_id, p_starts_at, zone, svc.address, svc.geo, 'scheduled', org)
   returning * into visit;
 
-  -- Who, for the record: the audit log, which only the Pam team reads.
+  -- Who, for the record: the audit log, which only the Pam team reads. About the MEMBER (target_type profile, their id), so the
+  -- nightly purge that removes what names an erased account (D-443, `purge_erased_audit`) removes this too, six months after.
   insert into public.audit_log (actor_id, action, target_type, target_id, meta)
-  values (caller, 'visit.booked_for_member', 'appointment', visit.id,
-          jsonb_build_object('member', p_member_id, 'service', svc.id));
+  values (caller, 'visit.booked_for_member', 'profile', p_member_id,
+          jsonb_build_object('appointment', visit.id, 'service', svc.id));
 
   -- The bell, never a text: a key and the place and the time, nothing anybody typed.
   perform public.notify(

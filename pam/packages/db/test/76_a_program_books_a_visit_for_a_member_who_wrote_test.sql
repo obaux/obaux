@@ -236,3 +236,25 @@ select test.check('the other program''s lead is offered none of them',
 select test.as_user(:'marcus');
 select test.check('a member is offered nobody',
   (select count(*) from public.my_program_bookable_members()), 0);
+
+-- ===========================================================================
+\echo ''
+\echo '--- A member who erases their account is not kept in the audit log past six months ---'
+-- ===========================================================================
+-- The audit row of a booking is about the member (D-443: `purge_erased_audit` removes what names the account, by actor_id or target_id).
+reset role;
+select test.check('Wanda''s booking is in the audit log, about her',
+  (select count(*) from public.audit_log where action = 'visit.booked_for_member' and target_type = 'profile' and target_id = :'wanda'), 1);
+select test.check('...with the visit and the place in meta, and nobody''s name',
+  (select count(*) from public.audit_log
+    where action = 'visit.booked_for_member' and target_id = :'wanda'
+      and meta ? 'appointment' and meta ? 'service' and not (meta::text ilike '%wanda%')), 1);
+delete from auth.users where id = :'wanda';
+alter table public.audit_log disable trigger audit_log_append_only;
+update public.audit_log set created_at = now() - interval '6 months 1 day' where action = 'account.delete' and target_id = :'wanda';
+alter table public.audit_log enable trigger audit_log_append_only;
+select public.purge_erased_audit();
+select test.check('six months after her account was deleted, no audit row names Wanda',
+  (select count(*) from public.audit_log where actor_id = :'wanda' or target_id = :'wanda' or meta::text like '%' || :'wanda' || '%'), 0);
+select test.check('...and the other members'' booking rows are still there',
+  (select count(distinct target_id) from public.audit_log where action = 'visit.booked_for_member' and target_id in (:'marcus', :'wilma')), 2);
