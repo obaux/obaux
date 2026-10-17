@@ -1700,8 +1700,8 @@
   "places.reported.remove.confirm.body": "Os membros não vão mais encontrá-lo em Pam.",
   "places.reported.done.keep": "{place} continua na lista.",
   "places.reported.done.remove": "{place} saiu da lista.",
-  "caseload.visit.next": "Next visit: {when}",
-  "caseload.visit.went": "Marked as there: {date}",
-  "caseload.visit.missed": "Not marked as there: {date}",
-  "caseload.visit.missed.chip": "Not marked as there"
+  "caseload.visit.next": "Próxima visita: {when}",
+  "caseload.visit.went": "Presença registrada: {date}",
+  "caseload.visit.missed": "Presença não registrada: {date}",
+  "caseload.visit.missed.chip": "Presença não registrada"
 }

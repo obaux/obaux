@@ -1839,8 +1839,8 @@
   "places.reported.remove.confirm.body": "لن يجد الأعضاء المكان في Pam بعد الآن.",
   "places.reported.done.keep": "يبقى {place} في القائمة.",
   "places.reported.done.remove": "تمت إزالة {place} من القائمة.",
-  "caseload.visit.next": "Next visit: {when}",
-  "caseload.visit.went": "Marked as there: {date}",
-  "caseload.visit.missed": "Not marked as there: {date}",
-  "caseload.visit.missed.chip": "Not marked as there"
+  "caseload.visit.next": "الزيارة التالية: {when}",
+  "caseload.visit.went": "تم تسجيل الحضور: {date}",
+  "caseload.visit.missed": "لم يسجل الحضور: {date}",
+  "caseload.visit.missed.chip": "لم يسجل الحضور"
 }

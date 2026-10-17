@@ -1783,8 +1783,8 @@
   "places.reported.remove.confirm.body": "Участники больше не найдут его в Pam.",
   "places.reported.done.keep": "{place} остаётся в списке.",
   "places.reported.done.remove": "Убрано из списка: {place}.",
-  "caseload.visit.next": "Next visit: {when}",
-  "caseload.visit.went": "Marked as there: {date}",
-  "caseload.visit.missed": "Not marked as there: {date}",
-  "caseload.visit.missed.chip": "Not marked as there"
+  "caseload.visit.next": "Следующий визит: {when}",
+  "caseload.visit.went": "Присутствие отмечено: {date}",
+  "caseload.visit.missed": "Присутствие не отмечено: {date}",
+  "caseload.visit.missed.chip": "Присутствие не отмечено"
 }

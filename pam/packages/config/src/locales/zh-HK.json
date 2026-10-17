@@ -1700,8 +1700,8 @@
   "places.reported.remove.confirm.body": "會員在Pam中將不會再找到它。",
   "places.reported.done.keep": "{place}會繼續留在列表中。",
   "places.reported.done.remove": "{place}已從列表中移除。",
-  "caseload.visit.next": "Next visit: {when}",
-  "caseload.visit.went": "Marked as there: {date}",
-  "caseload.visit.missed": "Not marked as there: {date}",
-  "caseload.visit.missed.chip": "Not marked as there"
+  "caseload.visit.next": "下次到訪：{when}",
+  "caseload.visit.went": "標記為已到場：{date}",
+  "caseload.visit.missed": "未標記為已到場：{date}",
+  "caseload.visit.missed.chip": "未標記為已到場"
 }
