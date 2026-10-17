@@ -1594,6 +1594,10 @@ connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merge
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
 
+## Design system & Storybook · one drawer, PamSheet (17 October)
+
+Every drawer is `@pam/ui/PamSheet` (D-601, Will a93): a 48px band across the top closes it on a tap, the title starts below it, and one green link at the end of the title's row says **Close** (a drawer you read) or **Done** (a drawer where you pick); swipe and Escape still work, focus returns to the opener. Moved: New message, Location, the signature sheet, Bring a friend, Opening hours, Open in…. Ava's "What you can see" adopts it once on main. Pictures wait for Will. On `claude/pam-design-drawer-standard`.
+
 ## Design system & Storybook · counts on a row (16 October)
 
 A count at the end of a row is a plain number (`value`); the red badge is for what is new (D-586). The super admin Home's two rows follow it: Reported places changes (Piper), Programs to check stays (Ava). On `claude/pam-design-count-style`.
