@@ -98,6 +98,8 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
   const [area, setArea] = useState<AreaOption>(CITY_HALL);
   useEffect(() => setArea(loadOrigin()), []);
   const [isPickingArea, setIsPickingArea] = useState(false);
+  // While the search bar is open it takes the bell's room (Will, 17 October, a86): the bell comes back with Cancel.
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const now = useNow();
   const { isSaved, save, unsave, failed: saveFailed } = useSavedPlaces(session.status === 'signed-in', demoRole);
@@ -134,6 +136,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
 
   const field = (
     <SearchBar
+      onOpenChange={setIsSearchOpen}
       label={t('explore.search.label')}
       placeholder={t('explore.search.placeholder')}
       clearLabel={tPlain('explore.search.clear')}
@@ -167,7 +170,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
         ) : isMember && !noMessagesTab ? undefined : (
           // A member's Home has no header actions, unless the Messages tab is hidden (nobody to message):
           // the bell lives there then, so notifications stay one tap away (Will, 11 October 2026).
-          <HeaderActions role={demoRole ?? trueRole} enabled={session.status === 'signed-in'} hasHelp={!isMember} />
+          <HeaderActions role={demoRole ?? trueRole} enabled={session.status === 'signed-in'} hasHelp={!isMember} isBellHidden={isSearchOpen} />
         )
       }
       nextTrip={

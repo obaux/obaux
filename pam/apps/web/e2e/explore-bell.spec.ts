@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { settled } from './settled';
-import { launcherOf } from './searchBar';
+import { launcherOf, openSearch } from './searchBar';
 
 /**
  * A member's Explore shows the Notifications bell only once there is something in the list it opens
@@ -76,6 +76,43 @@ test.describe("a member's Explore and the bell", () => {
     await signedIn(page, 'admin', []);
     await page.goto('/');
     await settled(page);
+    await expect(bell(page)).toBeVisible();
+  });
+});
+
+test.describe('while the search bar is open the bell gives it the room (Will, 17 October, a86)', () => {
+  test('open: no bell, not in the tree, and the bar is wider; Cancel: the bell is back with its dot', async ({ page }) => {
+    await signedIn(page, 'member', [ROW]);
+    await page.goto('/');
+    await settled(page);
+    await expect(bell(page)).toBeVisible();
+    await expect(bell(page)).toHaveAccessibleName(/1 new/);
+    const rest = await launcherOf(page).boundingBox();
+
+    await openSearch(page);
+    // Not drawn and not in the accessibility tree (not just invisible).
+    await expect(bell(page)).toHaveCount(0);
+    await expect(page.locator('a[href="/notifications/"]')).toHaveCount(0);
+    const field = await page.locator('.astryx-input-group[data-size="lg"]').first().boundingBox();
+    expect(field!.width).toBeGreaterThan(rest!.width - 60);
+
+    await page.getByRole('button', { name: 'Cancel' }).click();
+    await expect(bell(page)).toBeVisible();
+    await expect(bell(page)).toHaveAccessibleName(/1 new/);
+    // The launcher is back where it was: the header did not shift.
+    const back = await launcherOf(page).boundingBox();
+    expect(Math.abs(back!.x - rest!.x)).toBeLessThan(2);
+    expect(Math.abs(back!.width - rest!.width)).toBeLessThan(2);
+    await expect(launcherOf(page)).toBeFocused();
+  });
+
+  test('Escape brings the bell back too', async ({ page }) => {
+    await signedIn(page, 'member', [ROW]);
+    await page.goto('/');
+    await settled(page);
+    const box = await openSearch(page);
+    await expect(bell(page)).toHaveCount(0);
+    await box.press('Escape');
     await expect(bell(page)).toBeVisible();
   });
 });

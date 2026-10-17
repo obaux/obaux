@@ -92,6 +92,7 @@ export function HeaderBell({
   isDemo = false,
   appearance,
   hideWhenEmpty = false,
+  isHidden = false,
 }: {
   readonly enabled: boolean;
   readonly role?: Role | null;
@@ -100,6 +101,11 @@ export function HeaderBell({
   readonly appearance?: 'filled' | 'round';
   /** Nothing is drawn while there is nothing in the list the bell opens. */
   readonly hideWhenEmpty?: boolean;
+  /**
+   * Drawn nowhere and not in the accessibility tree, while a search bar is open and wants the room (Will, 17 October, a86). The
+   * hooks above keep running, so the list and its unread count are there the moment the bell comes back.
+   */
+  readonly isHidden?: boolean;
 }) {
   const { t, tPlain } = useI18n();
   const { state } = useNotifications(enabled);
@@ -139,6 +145,8 @@ export function HeaderBell({
   useEffect(() => {
     if (hideWhenEmpty && hasAny !== null) writeHadBell(hasAny);
   }, [hideWhenEmpty, hasAny]);
+
+  if (isHidden) return null;
 
   if (state.status !== 'ready') {
     if (hideWhenEmpty && hadBell) return <HeldBell appearance={appearance} href="/notifications/" label={t('notify.title')} />;

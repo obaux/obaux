@@ -351,6 +351,8 @@ export interface SearchBarProps {
   readonly onChange: (value: string) => void;
   /** Cancel was tapped: the words are already emptied and the bar is back at rest. */
   readonly onCancel?: () => void;
+  /** The bar opened or went back to rest (it also opens by itself when it arrives holding words): a screen makes room for it. */
+  readonly onOpenChange?: (isOpen: boolean) => void;
 }
 
 /**
@@ -362,8 +364,13 @@ export interface SearchBarProps {
  *
  * Reduced motion: no slide, no drawing-in; the bar is simply in its next state.
  */
-export function SearchBar({ label, placeholder, clearLabel, cancelLabel, value, onChange, onCancel }: SearchBarProps) {
+export function SearchBar({ label, placeholder, clearLabel, cancelLabel, value, onChange, onCancel, onOpenChange }: SearchBarProps) {
   const [isOpen, setIsOpen] = useState(value !== '');
+  const openChange = useRef(onOpenChange);
+  openChange.current = onOpenChange;
+  useEffect(() => {
+    openChange.current?.(isOpen);
+  }, [isOpen]);
   const [tapped, setTapped] = useState(false);
   const rowRef = useRef<HTMLDivElement>(null);
   const launcherRef = useRef<HTMLButtonElement>(null);
@@ -414,7 +421,17 @@ export function SearchBar({ label, placeholder, clearLabel, cancelLabel, value, 
     setTapped(true);
     setIsOpen(true);
   };
+  // Cancel (or Escape) removes the focused button and the field; the focus goes to the launcher that takes their place, so a
+  // keyboard or screen reader does not land on the page's top.
+  const refocus = useRef(false);
+  useEffect(() => {
+    if (!isOpen && refocus.current) {
+      refocus.current = false;
+      launcherRef.current?.focus();
+    }
+  }, [isOpen]);
   const cancel = () => {
+    refocus.current = true;
     onChange('');
     setIsOpen(false);
     setTapped(false);
