@@ -1596,7 +1596,7 @@ only the alert texts Will signed: no "introduced to your program", no "your acco
 
 ## Design system & Storybook · one drawer, PamSheet (17 October)
 
-Every drawer is `@pam/ui/PamSheet` (D-601, Will a93): a 48px band across the top closes it on a tap, the title starts below it, and one green link at the end of the title's row says **Close** (a drawer you read) or **Done** (a drawer where you pick); swipe and Escape still work, focus returns to the opener. Moved: New message, Location, the signature sheet, Bring a friend, Opening hours, Open in…. Ava's "What you can see" adopts it once on main. Pictures wait for Will. On `claude/pam-design-drawer-standard`.
+Every drawer is `@pam/ui/PamSheet` (D-601, Will a93 and a97): a 48px band across the top closes it on a tap, the title starts below it, and one round 48px button in the top-right corner (top-left in Arabic) closes it too: a **checkmark, "Done"** where you pick or only read (Location, Opening hours, Open in…, New message), an **X, "Close"** where something is done inside (Bring a friend, whose picture is back at the top edge; Sign a policy). Swipe and Escape still work; focus returns to the opener. Ava's "What you can see" adopts it once on main. Pictures wait for Will (card a97). On `claude/pam-design-drawer-standard`.
 
 ## Design system & Storybook · counts on a row (16 October)
 

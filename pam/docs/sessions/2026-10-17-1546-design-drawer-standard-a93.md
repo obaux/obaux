@@ -19,3 +19,7 @@ New `e2e/drawers.spec.ts` (band 48px and full width and closes on a tap; title r
 Will's yes on the pictures. Ava adopts PamSheet for "What you can see" once on main.
 
 ## Needs a human
+
+## Revision, a97 (16:37)
+
+Will saw the pictures and changed the design: the round icon button in the top corner instead of the green text link, a checkmark for review/pick drawers and an X where something is done inside (D-601 rewritten), and Bring a friend back to its original (picture at the top edge). `kind` is now `review | act`; `PlaceDetail`'s new label is `labels.done` (`action.done`). Specs updated (drawers.spec: round 48px button in the corner, the checkmark, Arabic corner, focus return; trip-booked.spec: Bring a friend's picture touches the top edge, X in the corner). 17 spec files (504 tests) pass on the three projects; `audit:fit` for PamSheet, BringFriend, PlaceDetail and Policies stories: nothing new in any of seven languages at 320 (Street search's six are the accepted known ones); Storybook builds; @pam/ui tests pass.
