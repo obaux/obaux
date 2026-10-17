@@ -231,12 +231,18 @@ test.describe('a search bar is the exception: focused, it shows the dark pill ou
     await expect(page.getByRole('button', { name: 'Clear search' })).toBeVisible();
   });
 
-  test('the search bar is one field, at rest and in use: one height, the words in place, a clear button inside it, no Cancel (D-574, a86)', async ({ page }) => {
+  test('the open search field: the pill height, the words at the left, a clear button inside it, Cancel beside it; the sheet\'s box agrees (D-574, a86)', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await signedIn(page);
     await page.route('**/rest/v1/rpc/services_near*', (route) => route.fulfill(json([])));
     await page.goto('/');
     await settled(page);
+    // At rest it is a centred pill, the same height as the open field (60).
+    const pill = page.getByRole('button', { name: /^Search programs$/ });
+    expect(Math.round((await pill.boundingBox())!.height)).toBe(60);
+    await pill.click();
+    await expect(page.getByRole('button', { name: 'Cancel' })).toBeVisible();
+    await page.waitForTimeout(400);
     const group = page.locator('.astryx-input-group[data-size="lg"]').first();
     const where = () =>
       group.evaluate((g) => ({
@@ -244,15 +250,9 @@ test.describe('a search bar is the exception: focused, it shows the dark pill ou
         top: Math.round(g.getBoundingClientRect().top),
         icon: Math.round(g.querySelector('svg')!.getBoundingClientRect().x),
         text: Math.round(g.querySelector('input')!.getBoundingClientRect().x),
-        size: getComputedStyle(g.querySelector('input')!).fontSize,
       }));
     const resting = await where();
     expect(resting.height).toBe(60);
-    // A tap focuses it in place: nothing opens, nothing moves, and the only change is the outline.
-    await page.getByRole('textbox', { name: /Search programs/ }).click();
-    await page.waitForTimeout(400);
-    expect(await where()).toEqual(resting);
-    expect(await page.getByRole('button', { name: 'Cancel' }).count()).toBe(0);
     // Typing puts a clear button inside the field, 48px, and keeps the bar where it was.
     await page.keyboard.type('food');
     const clear = group.getByRole('button', { name: /^Clear/ });
@@ -260,6 +260,10 @@ test.describe('a search bar is the exception: focused, it shows the dark pill ou
     const clearBox = (await clear.boundingBox())!;
     expect(clearBox.width).toBeGreaterThanOrEqual(47);
     expect((await where()).top).toBe(resting.top);
+    // Cancel stays clear of the field, with the clear button in it.
+    const cancelBox = (await page.getByRole('button', { name: 'Cancel' }).boundingBox())!;
+    const groupBox = (await group.boundingBox())!;
+    expect(cancelBox.x).toBeGreaterThanOrEqual(groupBox.x + groupBox.width - 1);
     // The sheet's search box agrees: the same height, and its words start where the bar's do.
     await clear.click();
     await page.getByRole('button', { name: /Near/ }).first().click();

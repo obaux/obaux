@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { EducationIcon, FamilyServicesIcon, Notice, PlaceCard, PlusIcon, ScrollReveal, WorkforceIcon } from '@pam/ui';
-import { SearchField } from '@pam/ui/SearchPill';
+import { SearchBar } from '@pam/ui/SearchPill';
 import { NextTripCard } from '@pam/ui/NextTripCard';
 import { useTrips } from '@/lib/useTrips';
 import { useNextVisits, visitTagLabel } from '@/lib/useNextVisits';
@@ -92,6 +92,8 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
   const [category, setCategory] = useState<ExploreCategory>('all');
   // The one search field (D-573): inline, filtering the list under it. No pop-up, no dropdown, no full screen.
   const [query, setQuery] = useState('');
+  // The bar at rest is a centred pill; tapped it opens with Cancel beside it (Will, 17 October, a86).
+  const [searchOpen, setSearchOpen] = useState(false);
   const settled = useDebounced(query, 300);
   const [reload, setReload] = useState(0);
 
@@ -133,12 +135,15 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
   const visits = useNextVisits(isMember);
 
   const field = (
-    <SearchField
+    <SearchBar
       label={t('explore.search.label')}
       placeholder={t('explore.search.placeholder')}
       clearLabel={tPlain('explore.search.clear')}
+      cancelLabel={t('messages.search.cancel')}
       value={query}
       onChange={setQuery}
+      isOpen={searchOpen}
+      onOpenChange={setSearchOpen}
     />
   );
 
@@ -216,8 +221,9 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
         </>
       }
       query={text}
-      belowHeading={origin ? <PoweredByGoogle align="start" /> : undefined}
-      isSearchActive={query.trim() !== ''}
+      // Google's logo under the last result, centred, whenever its point is what the list is sorted from (Will, 17 October, a86).
+      belowList={origin ? <PoweredByGoogle /> : undefined}
+      isSearchActive={searchOpen || query.trim() !== ''}
       state={state}
       onRetry={() => setReload((n) => n + 1)}
       onClearSearch={() => setQuery('')}

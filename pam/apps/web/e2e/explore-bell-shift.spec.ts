@@ -49,8 +49,8 @@ const NOTE = 'pam.explore.bell';
 
 async function open(page: Page) {
   await page.goto('/');
-  // A member's Explore has its search field under the title (inline, D-573); it is what must not move when the bell arrives.
-  const search = page.getByRole('textbox', { name: /Search programs/ });
+  // A member's Explore has its search pill under the title (a86); it is what must not move when the bell arrives.
+  const search = page.getByRole('button', { name: /^Search programs$/ });
   await expect(search).toBeVisible();
   // The area chip is drawn once the session is known; measure after it, so what moves is the bell.
   await page.getByRole('button', { name: /Near City Hall/ }).first().waitFor();

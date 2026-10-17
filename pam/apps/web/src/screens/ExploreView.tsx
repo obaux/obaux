@@ -65,6 +65,8 @@ export interface ExploreViewProps {
   readonly isSearchActive?: boolean;
   /** Under the heading row, left-aligned: Google's mark when its answer shaped the list. */
   readonly belowHeading?: ReactNode;
+  /** After the last result (or the empty state): Google's logo, centred, where its suggestions are on screen. */
+  readonly belowList?: ReactNode;
   /** A message that belongs above the list — "Couldn't save that". */
   readonly notice?: ReactNode;
   /** The words the list was searched for, once they settled; '' for none. */
@@ -132,6 +134,7 @@ export function ExploreView({
   query,
   isSearchActive,
   belowHeading,
+  belowList,
   state,
   renderPlace,
   onRetry,
@@ -251,11 +254,14 @@ export function ExploreView({
       {state.status === 'ready' ? (
         <>
           <VStack gap={3}>{state.places.map((place, index) => renderPlace(place, index))}</VStack>
+          {/* Right under the last result, before the note about where the list comes from (Will, 17 October, a86). */}
+          {belowList}
           <Text type="supporting" xstyle={styles.source}>
             {t('places.source')}
           </Text>
         </>
       ) : null}
+      {state.status === 'ready' ? null : belowList}
     </Page>
   );
 }

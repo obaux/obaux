@@ -2,6 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { settled } from './settled';
 import { asMember } from './asMember';
+import ar from '@pam/config/locales/ar.json';
 
 /**
  * Explore's one search field (D-573): inline, typing filters the list right under it. Only Pam's programs ever show. A typed address that no
@@ -27,8 +28,8 @@ const FOOD = [
 ];
 const NEAREST = [row('b1000000-0000-4000-8000-000000000001', 'Example Market Street Clinic', '1500 Market St Philadelphia, PA 19102', 40)];
 
-async function open(page: Page, opts: { language?: string; areas?: unknown[]; enabled?: boolean | 'unreadable'; programs?: (q: string) => unknown[] | 'fail'; role?: 'member' | 'admin'; path?: string } = {}) {
-  const { language = null, areas = [], enabled = true, programs = (q) => (/food/i.test(q) ? FOOD : []), role = 'member', path = '/' } = opts;
+async function open(page: Page, opts: { tap?: boolean; language?: string; areas?: unknown[]; enabled?: boolean | 'unreadable'; programs?: (q: string) => unknown[] | 'fail'; role?: 'member' | 'admin'; path?: string } = {}) {
+  const { tap = true, language = null, areas = [], enabled = true, programs = (q) => (/food/i.test(q) ? FOOD : []), role = 'member', path = '/' } = opts;
   await asMember(page, role, language);
   const asked: Record<string, unknown>[] = [];
   const nearAsked: Record<string, unknown>[] = [];
@@ -63,23 +64,92 @@ async function open(page: Page, opts: { language?: string; areas?: unknown[]; en
   });
   await page.goto(path);
   await settled(page);
+  // At rest the bar is a pill; a tap opens the field (a86). Most of what follows is about the open field.
+  if (tap) await page.getByRole('button', { name: language ? (ar['explore.search.placeholder'] as string) : /^Search programs$/ }).click();
   return { asked, nearAsked, outside, box: page.getByRole('textbox', { name: /Search programs/ }) };
 }
 
 test.describe('one search field', () => {
-  test('is inline: nothing opens, no dropdown, no Cancel; the chips and the Near control stay', async ({ page }) => {
+  test('where Google\'s addresses are used, its logo is under the last result, centred (Will, a86)', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
     const { box } = await open(page);
+    await box.fill('1500 Market');
+    const logo = page.locator('[data-google-attribution]');
+    await expect(logo).toBeVisible();
+    const last = page.getByRole('heading', { name: 'Example Market Street Clinic' });
+    await expect(last).toBeVisible();
+    const l = (await logo.boundingBox())!;
+    const r = (await last.boundingBox())!;
+    expect(l.y).toBeGreaterThan(r.y);
+    expect(Math.abs(l.x + l.width / 2 - 195)).toBeLessThan(6);
+  });
+
+  test('at rest the pill has its magnifier and words centred; tapped, the same pill narrows with Cancel on its right and the words at the left (Will, a86)', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    const { box } = await open(page, { tap: false });
+    const pill = page.getByRole('button', { name: /^Search programs$/ });
+    await expect(pill).toBeVisible();
+    await expect(box).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Cancel' })).toBeHidden();
+    // Centred: the icon and the words together sit in the middle of the pill.
+    const rest = await pill.evaluate((el) => {
+      const r = el.getBoundingClientRect();
+      const icon = el.querySelector('svg')!.getBoundingClientRect();
+      const label = [...el.querySelectorAll('span')].find((x) => x.children.length === 0 && (x.textContent ?? '').trim() !== '')!.getBoundingClientRect();
+      return { height: Math.round(r.height), width: Math.round(r.width), left: Math.round(icon.left - r.left), right: Math.round(r.right - label.right) };
+    });
+    // The magnifier and the words sit together in the middle, not at the left.
+    expect(Math.abs(rest.left - rest.right)).toBeLessThan(16);
+    expect(rest.left).toBeGreaterThan(40);
+    await pill.click();
+    // Open: the field, focused, with Cancel at its right; the chips and the Near control stay; nothing drops down.
+    await expect(box).toBeFocused();
     await expect(box).toHaveAttribute('placeholder', 'Search programs');
     await expect(box).toHaveAccessibleName('Search programs by name or address');
-    await box.click();
+    const cancel = page.getByRole('button', { name: 'Cancel' });
+    await expect(cancel).toBeVisible();
+    await page.waitForTimeout(400);
+    const group = page.locator('.astryx-input-group[data-size="lg"]').first();
+    const opened = await group.evaluate((g) => {
+      const r = g.getBoundingClientRect();
+      return { height: Math.round(r.height), width: Math.round(r.width), left: Math.round(g.querySelector('svg')!.getBoundingClientRect().x - r.x) };
+    });
+    // No jump in height; narrower than the pill, and the magnifier now at the left.
+    expect(opened.height).toBe(rest.height);
+    expect(opened.width).toBeLessThan(rest.width - 60);
+    expect(opened.left).toBeLessThan(30);
+    const c = (await cancel.boundingBox())!;
+    const g = (await group.boundingBox())!;
+    expect(c.x).toBeGreaterThanOrEqual(g.x + g.width - 1);
     await expect(page.getByRole('dialog')).toHaveCount(0);
     await expect(page.getByRole('listbox')).toHaveCount(0);
-    await expect(page.getByRole('button', { name: 'Cancel' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'School and training' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Near City Hall' })).toBeVisible();
     await box.fill('food');
     await expect(page.getByRole('button', { name: 'School and training' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Near City Hall' })).toBeVisible();
+  });
+
+  test('Cancel clears the words, closes the field and brings the list back as it was; so does Escape', async ({ page }) => {
+    for (const how of ['Cancel', 'Escape'] as const) {
+      const { box } = await open(page);
+      await box.fill('food');
+      await expect(page.getByRole('heading', { name: 'Results for “food”' })).toBeVisible();
+      if (how === 'Cancel') await page.getByRole('button', { name: 'Cancel' }).click();
+      else await page.keyboard.press('Escape');
+      await expect(page.getByRole('button', { name: /^Search programs$/ })).toBeVisible();
+      await expect(box).toHaveCount(0);
+      await expect(page.getByRole('heading', { name: 'All programs' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Example Learning Hub' })).toBeVisible();
+      await page.reload();
+      await settled(page);
+    }
+  });
+
+  test('under reduced motion Cancel is simply there at once', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await open(page);
+    await expect(page.getByRole('button', { name: 'Cancel' })).toBeVisible({ timeout: 300 });
   });
 
   test('program words filter the list under it, and nothing about them goes to Google', async ({ page }) => {
@@ -123,13 +193,15 @@ test.describe('one search field', () => {
     await expect(page.getByRole('button', { name: 'Near 19102' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Example Market Street Clinic' })).toBeVisible();
     await expect(page.getByText(/^Nearest to/)).toHaveCount(0);
-    // Google's mark, left-aligned under the heading row, 18px.
+    // Google's mark, 18px, centred under the last result (Will, 17 October, a86); it was under the heading.
     const mark = page.locator('[data-google-attribution]');
     await expect(mark).toBeVisible();
     const logo = page.locator('[data-google-attribution] img[alt="Google Maps"]');
     expect(Math.round((await logo.boundingBox())!.height)).toBe(18);
-    const heading = (await page.getByRole('heading', { name: 'Results for “1500 Market”' }).boundingBox())!;
-    expect(Math.abs((await logo.boundingBox())!.x - heading.x)).toBeLessThan(3);
+    const lastResult = (await page.getByRole('heading', { name: 'Example Market Street Clinic' }).boundingBox())!;
+    const markBox = (await logo.boundingBox())!;
+    expect(markBox.y).toBeGreaterThan(lastResult.y);
+    expect(Math.abs(markBox.x + markBox.width / 2 - page.viewportSize()!.width / 2)).toBeLessThan(6);
     // Two calls, the same two as the drawer: the words and a session token, then the first suggestion's id and the same token.
     expect(asked).toEqual([
       { action: 'suggest', q: '1500 Market', token: expect.stringMatching(/^[0-9a-f]{32}$/) },
