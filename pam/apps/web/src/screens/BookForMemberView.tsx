@@ -63,8 +63,8 @@ const styles = stylex.create({
   words: { minWidth: 0 },
 });
 
-/** One person who has written to the program, from an example or a real conversation. */
-interface Person {
+/** One person a program may book for, from an example, a real conversation or the bookable list. */
+export interface Person {
   readonly id: string;
   readonly firstName: string;
   readonly lastMessageAt: string | null;
@@ -98,7 +98,7 @@ function useNextVisitHere(programId: string | null): Readonly<Record<string, str
   return next;
 }
 
-export function BookForMemberView() {
+export function BookForMemberView({ people: shown }: { readonly people?: readonly Person[] } = {}) {
   const { t, locale } = useI18n();
   // The lead's own program (D-509); the example one only in a demo or Storybook, with its example people.
   const { state: session } = useSession();
@@ -145,14 +145,15 @@ export function BookForMemberView() {
       : [];
   // Those who wrote come first, with what they said; the others follow by name, once each.
   const people: readonly Person[] =
-    examples || conversations.status !== 'ready' || programId === null
+    shown ??
+    (examples || conversations.status !== 'ready' || programId === null
       ? fromConversations
       : [
           ...fromConversations,
           ...bookable
             .filter((m) => !fromConversations.some((p) => p.id === m.id))
             .map((m) => ({ id: m.id, firstName: m.firstName, lastMessageAt: null, preview: null })),
-        ];
+        ]);
 
   const when = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
   const clock = new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' });
@@ -192,7 +193,7 @@ export function BookForMemberView() {
       <Heading level={2} xstyle={styles.heading}>
         {t('book.people')}
       </Heading>
-      {people.length === 0 && !examples && (conversations.status === 'loading' || setup.isLoading) ? null : people.length === 0 ? (
+      {people.length === 0 && !shown && !examples && (conversations.status === 'loading' || setup.isLoading) ? null : people.length === 0 ? (
         <Text type="supporting" xstyle={styles.empty}>
           {t('book.empty')}
         </Text>
