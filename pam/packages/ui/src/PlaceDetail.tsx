@@ -148,8 +148,8 @@ export interface PlaceDetailProps {
     readonly hoursOnGoogle: string;
     readonly about: string;
     readonly address: string;
-    /** The link on the week and map drawers (PamSheet): "Close" (`trips.confirm.close`). */
-    readonly close: string;
+    /** The button on the week and map drawers (PamSheet): "Done" (`action.done`). */
+    readonly done: string;
   };
 }
 
@@ -343,7 +343,7 @@ export function PlaceDetail({
   if (hoursRow) quickItems.splice(quickItems[0]?.id === 'directions' ? 1 : 0, 0, hoursRow);
 
   const weekSheet = hasWeek ? (
-    <PamSheet isOpen={isWeekOpen} onOpenChange={setWeekOpen} label={labels.hours} kind="read" actionLabel={labels.close}>
+    <PamSheet isOpen={isWeekOpen} onOpenChange={setWeekOpen} label={labels.hours} kind="review" actionLabel={labels.done}>
       {isWeekOpen ? (
         <VStack gap={3} xstyle={styles.sheet}>
           <VStack gap={0.5}>

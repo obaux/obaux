@@ -58,7 +58,7 @@ export interface BringFriendProps {
   readonly copyLabel: string;
   /** "Link copied", over the field for 3s. */
   readonly copiedLabel: string;
-  /** The link at the top right: "Close". */
+  /** The round X at the top right: "Close". */
   readonly closeLabel: string;
   /**
    * When the opener copied the link (`Date.now()` after `copyLink` said
@@ -83,9 +83,22 @@ export { COPIED_MS, copyLink };
 
 const styles = stylex.create({
   sheet: { width: '100%', paddingInline: '20px', paddingBlockStart: '0px', paddingBlockEnd: '44px' },
-  // Edge to edge, under the drawer's Close row; the sheet's own width clips nothing.
+  // Edge to edge and up to the drawer's top (Will, D-338, and again on a97: "keep the original drawer with image touching edge");
+  // the sheet's own rounded corners clip it. Above Astryx's handle strip (z-index 1), whose white fade would wash out the
+  // picture's top; the picture lets taps through to the notch beneath, so a tap on it closes and the drawer still drags from its
+  // top edge, and it draws its own pill. PamSheet draws the round X over it, top right (top left in Arabic).
   // 24px from the banner to the title, with the stack's gap (Will, D-340).
-  top: { position: 'relative', marginInline: '-20px', marginBlockEnd: '12px' },
+  top: { position: 'relative', zIndex: 2, minHeight: '64px', marginInline: '-20px', marginBlockEnd: '12px', pointerEvents: 'none' },
+  grip: {
+    position: 'absolute',
+    top: '10px',
+    insetInlineStart: 'calc(50% - 20px)',
+    width: '40px',
+    height: '5px',
+    borderRadius: '3px',
+    backgroundColor: 'oklch(1 0 0 / 75%)',
+    pointerEvents: 'none',
+  },
   // Full width, the banner's own shape (1608 × 629).
   hero: {
     display: 'block',
@@ -171,7 +184,7 @@ export function BringFriend({
   };
 
   return (
-    <PamSheet isOpen={isOpen} onOpenChange={onOpenChange} label={label} kind="read" actionLabel={closeLabel} title={null}>
+    <PamSheet isOpen={isOpen} onOpenChange={onOpenChange} label={label} kind="act" actionLabel={closeLabel} title={null}>
       {isOpen ? (
         <VStack gap={3} xstyle={styles.sheet}>
           <VStack xstyle={styles.top}>
@@ -188,6 +201,7 @@ export function BringFriend({
                 {...stylex.props(styles.hero)}
               />
             ) : null}
+            {heroSrc && !heroFailed ? <HStack aria-hidden xstyle={styles.grip} /> : null}
           </VStack>
           <Heading level={2} xstyle={styles.title}>
             {label}

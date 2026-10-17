@@ -144,7 +144,7 @@ export function AreaSearch({
       isOpen={isOpen}
       onOpenChange={(open) => (open ? undefined : onClose())}
       label={t('places.area.title')}
-      kind="pick"
+      kind="review"
       actionLabel={t('places.area.done')}
       height="tall"
       isTyping

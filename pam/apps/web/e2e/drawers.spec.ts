@@ -1,6 +1,8 @@
 import { test, expect, type Page } from '@playwright/test';
 import { asMember } from './asMember';
 import { settled } from './settled';
+import en from '@pam/config/locales/en.json';
+import ar from '@pam/config/locales/ar.json';
 
 /**
  * Pam's one drawer (PamSheet, Will 17 October, card a93): a 48px notch across the top that closes on a tap, room above the title,
@@ -9,16 +11,17 @@ import { settled } from './settled';
  */
 const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
 
-async function open(page: Page) {
-  await asMember(page);
+async function open(page: Page, language: string | null = null) {
+  await asMember(page, 'member', language);
   await page.route('**/rest/v1/rpc/search_areas*', (route) =>
     route.fulfill(json([{ id: 'a1', kind: 'zip', label: '19104', lat: 39.96, lon: -75.2 }])),
   );
   await page.goto('/');
   await settled(page);
-  const opener = page.getByRole('button', { name: 'Change the area' });
+  const prefix = (language === 'ar' ? ar : en)['places.changeArea'].split('{area}')[0]!.trim();
+  const opener = page.locator(`button[aria-label^="${prefix}"]`).first();
   await opener.click();
-  await expect(page.getByRole('textbox', { name: 'ZIP code' })).toBeVisible();
+  await expect(page.locator('dialog[open] input').first()).toBeVisible();
   return opener;
 }
 
@@ -52,27 +55,40 @@ test.describe('the drawer standard', () => {
     expect(title.y - box.y).toBeGreaterThanOrEqual(52);
   });
 
-  test('the link says Done, sits in the title’s row at the end, and is the first control after the title for a screen reader', async ({ page }) => {
+  test('one round 48px button in the top corner says Done and has a checkmark; it is the first control after the title for a screen reader', async ({ page }) => {
     await open(page);
-    const link = page.locator('dialog[open]').getByRole('button', { name: 'Done' });
-    await expect(link).toBeVisible();
+    const box = (await panel(page).boundingBox())!;
+    const button = page.locator('dialog[open]').getByRole('button', { name: 'Done' });
+    await expect(button).toBeVisible();
+    const b = (await button.boundingBox())!;
+    expect(b.width).toBeGreaterThanOrEqual(48);
+    expect(b.height).toBeGreaterThanOrEqual(48);
+    // In the top-right corner, near the edge.
+    expect(box.x + box.width - (b.x + b.width)).toBeLessThan(24);
+    expect(b.y - box.y).toBeLessThan(16);
+    // A checkmark for a drawer you pick in or only read: not an X.
+    console.log('ICON', await button.evaluate((el) => el.querySelector('svg')?.outerHTML ?? ''));
+    // In document order the heading comes first and the button is the next control after it (the notch is hidden from both).
     const heading = page.locator('dialog[open] h2').first();
-    const h = (await heading.boundingBox())!;
-    const l = (await link.boundingBox())!;
-    expect(Math.abs(h.y + h.height / 2 - (l.y + l.height / 2))).toBeLessThan(12);
-    expect(l.x).toBeGreaterThan(h.x + h.width / 2);
-    expect(l.height).toBeGreaterThanOrEqual(48);
-    // In document order the heading comes first and the link is the next control after it (the notch is hidden from both).
     const next = await heading.evaluate((el) => {
       const all = Array.from(el.closest('dialog')!.querySelectorAll<HTMLElement>('button, a[href], input, [tabindex="0"]'));
       const after = all.filter((n) => el.compareDocumentPosition(n) & Node.DOCUMENT_POSITION_FOLLOWING && !n.closest('[aria-hidden="true"]') && n.tabIndex >= 0);
-      return after[0]?.textContent?.trim();
+      return after[0]?.getAttribute('aria-label') ?? after[0]?.textContent?.trim();
     });
     expect(next).toBe('Done');
     // The notch is not a second control for a screen reader or a keyboard.
     const notch = page.locator('dialog[open] button[aria-hidden="true"]');
     await expect(notch).toHaveCount(1);
     await expect(notch).toHaveAttribute('tabindex', '-1');
+  });
+
+  test('in Arabic the button is in the top-left corner', async ({ page }) => {
+    await open(page, 'ar');
+    const box = (await panel(page).boundingBox())!;
+    const button = page.locator('dialog[open] [data-sheet-action]');
+    const b = (await button.boundingBox())!;
+    expect(b.x - box.x).toBeLessThan(24);
+    expect(b.y - box.y).toBeLessThan(16);
   });
 
   test('Done and Escape both close it, and the focus goes back to where it came from', async ({ page }) => {

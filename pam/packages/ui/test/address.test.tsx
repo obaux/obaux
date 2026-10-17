@@ -6,7 +6,7 @@ import { appleMapsHref, directionsHref } from '../src/PlaceCard.js';
 const labels = {
   hours: 'Hours',
   hoursOnGoogle: 'Check hours on Google',
-  close: 'Close',
+  done: 'Done',
   about: 'About',
   address: 'Address',
 };

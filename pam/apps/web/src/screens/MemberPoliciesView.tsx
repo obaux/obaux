@@ -557,8 +557,8 @@ function SignSheet({
       onOpenChange={(open) => (open ? undefined : onClose())}
       label={tPlain('sign.title', { title })}
       title={t('sign.heading')}
-      // "Close", not "Done": leaving here signs nothing, and Done would say it had (17 October, a93).
-      kind="read"
+      // An X, "Close": the signing happens inside the drawer, so a checkmark would say it had been confirmed (17 October, a97).
+      kind="act"
       actionLabel={t('trips.confirm.close')}
       // Drags and dismisses like any sheet from its handle, header and copy
       // (Will, D-333), but not while a stroke is in progress: "form" blocks

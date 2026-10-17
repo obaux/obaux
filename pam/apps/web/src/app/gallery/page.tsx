@@ -62,7 +62,7 @@ const styles = stylex.create({
 const DETAIL_LABELS = {
   hours: 'Opening hours',
   hoursOnGoogle: 'Check hours on Google',
-  close: 'Close',
+  done: 'Done',
   about: 'About program',
   address: 'Address',
 };

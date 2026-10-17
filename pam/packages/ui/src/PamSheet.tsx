@@ -4,36 +4,41 @@ import { useRef, type ReactNode, type RefObject } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
 import { Heading } from '@astryxdesign/core/Heading';
-import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { Button } from './Button.js';
+import { Icon } from '@astryxdesign/core/Icon';
+import { IconButton } from '@astryxdesign/core/IconButton';
 import { sheet } from './sheet.js';
 import { landFocus, landFocusStyle } from './landFocus.js';
 import { pam } from './tokens.stylex.js';
 
 /**
- * Pam's one drawer (Will, 17 October, card a93: "standardize these drawers across the entire app so they all have enough space on
- * that top notch for the person to tap and it closes. They should also have a green link on the top right … one says 'Close' and
- * another one says 'Done', depending on the purpose of the drawer … more space from the title to the top edge").
+ * Pam's one drawer (Will, 17 October, card a93; revised on card a97: "Bring the X circle button to the others … create rule that
+ * when drawer requires action inputs in main area, use checkmark icon, if only informative, use checkmark icon. But if action is
+ * performed inside drawer (like the copy link example) then use X icon. Keep the headers consistent with the extra space above …
+ * the icon button should be in top right corner").
  *
  * An Astryx `BottomSheet` with, in this order:
  *
  *   1. **The top notch is a target.** The strip Astryx draws as a grab handle is 24px and decorative; here a 48px-high band across
  *      the top of the sheet closes it on a tap (z-index above Astryx's strip, which still draws the grip and still drags).
- *      It is not a second way for a screen reader or keyboard to close: it is hidden from both, because the link below does that.
+ *      It is not a second way for a screen reader or keyboard to close: it is hidden from both, because the button below does that.
  *   2. **Room above the title.** The title starts below that band, not under the grip.
- *   3. **The title, then one green link at the end of its row: the only visible control that closes** (swipe and Escape still do).
- *      A screen reader meets the title, then the link, then the content.
+ *   3. **The title, then one round button in the top-right corner (top-left in Arabic): the only visible control that closes**
+ *      (swipe and Escape still do). A screen reader meets the title, then the button, then the content.
  *
- * Which word the link says depends on what the drawer is for (`kind`), and the caller passes the word, so it is read in the
- * person's language (`action.done` for Done; `trips.confirm.close` for Close):
+ * Which icon the button has is a rule about what the drawer is for (`kind`), and the caller passes the word, so it is read in the
+ * person's language:
  *
- *   - `read`  → "Close". A drawer you only look at, or one whose rows take you somewhere else: a week of hours, a policy,
- *     What you can see, Bring a friend, the list of map apps, who to message.
- *   - `pick`  → "Done". A drawer where you choose or set something and then leave it: the area, a signature.
+ *   - `review` → a **checkmark**, named "Done" (`action.done`). You pick something in the drawer, or you only read it: Location,
+ *     Opening hours, What you can see, New message, Open in…. Tapping it says "I have what I came for."
+ *   - `act` → an **X**, named "Close" (`trips.confirm.close`). Something is done inside the drawer itself, so a checkmark would
+ *     say it had been confirmed: Bring a friend (you copy the link there), Sign a policy (you sign there).
+ *
+ * `title={null}` is for a drawer that starts with a picture to the top edge (Bring a friend): there is no title row, and the
+ * button sits over the picture.
  */
-export type PamSheetKind = 'read' | 'pick';
+export type PamSheetKind = 'review' | 'act';
 
 export interface PamSheetProps {
   readonly isOpen: boolean;
@@ -41,9 +46,9 @@ export interface PamSheetProps {
   /** The drawer's name for a screen reader. Also its title unless `title` is given. */
   readonly label: string;
   readonly kind: PamSheetKind;
-  /** The link's word: "Close" for `read`, "Done" for `pick`. */
+  /** The button's name: "Done" for `review` (`action.done`), "Close" for `act` (`trips.confirm.close`). */
   readonly actionLabel: string;
-  /** The title: defaults to `label`; pass `null` for a drawer that draws its own (under a picture). */
+  /** The title: defaults to `label`; pass `null` for a drawer that starts with a picture to the top edge. */
   readonly title?: ReactNode | null;
   readonly height?: 'hug' | 'capped' | 'tall';
   /** Astryx's `purpose`: `form` while something is being drawn or typed that a swipe must not throw away. */
@@ -69,18 +74,20 @@ const styles = stylex.create({
     cursor: 'pointer',
     WebkitTapHighlightColor: 'transparent',
   },
-  // 48px of notch, then 8px of air, before the title row.
-  header: { width: '100%', paddingBlockStart: '56px', paddingInline: '20px', paddingBlockEnd: '8px' },
+  // 48px of notch, then 8px of air, before the title row; the title leaves room for the corner button.
+  header: { width: '100%', paddingBlockStart: '56px', paddingInlineStart: '20px', paddingInlineEnd: '72px', paddingBlockEnd: '8px' },
   title: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700, minWidth: 0 },
+  // The round button, in the top corner (the end corner: left in Arabic). The circle Bring a friend always had (D-338).
   action: {
-    flexShrink: 0,
-    minHeight: pam['--pam-touch-target-min'],
-    minWidth: pam['--pam-touch-target-min'],
-    paddingInline: '4px',
-    fontSize: '17px',
-    fontWeight: 700,
-    color: colorVars['--color-text-accent'],
-    backgroundImage: { default: 'none', ':hover': 'none', ':active': 'none' },
+    position: 'absolute',
+    insetBlockStart: '8px',
+    insetInlineEnd: '12px',
+    zIndex: 3,
+    width: pam['--pam-touch-target-min'],
+    height: pam['--pam-touch-target-min'],
+    borderRadius: '50%',
+    backgroundColor: colorVars['--color-background-body'],
+    boxShadow: '0 1px 4px oklch(0 0 0 / 18%)',
   },
 });
 
@@ -122,16 +129,19 @@ export function PamSheet({
         <VStack {...(isTyping ? {} : landFocus)} data-sheet-kind={kind} xstyle={[styles.frame, isTyping ? null : landFocusStyle.quiet]}>
           {/* The 48px notch: a touch target only. Not announced and not a tab stop; the link below is the way for those. */}
           <button type="button" aria-hidden="true" tabIndex={-1} data-sheet-notch="" onClick={close} {...stylex.props(styles.notch)} />
-          <HStack align="center" justify="between" gap={3} wrap="nowrap" xstyle={styles.header}>
-            {heading ? (
-              <Heading level={2} xstyle={styles.title}>
-                {heading}
-              </Heading>
-            ) : (
-              <span />
-            )}
-            <Button label={actionLabel} variant="ghost" onClick={close} data-sheet-action={kind} xstyle={styles.action} />
-          </HStack>
+          {heading ? (
+            <Heading level={2} xstyle={[styles.title, styles.header]}>
+              {heading}
+            </Heading>
+          ) : null}
+          <IconButton
+            label={actionLabel}
+            variant="ghost"
+            icon={<Icon icon={kind === 'review' ? 'check' : 'close'} size="md" />}
+            onClick={close}
+            data-sheet-action={kind}
+            xstyle={styles.action}
+          />
           {children}
         </VStack>
       ) : null}

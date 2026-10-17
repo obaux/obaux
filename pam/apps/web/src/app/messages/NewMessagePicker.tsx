@@ -95,8 +95,8 @@ export function NewMessagePicker({
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       label={t('messages.new.action')}
-      kind="read"
-      actionLabel={t('trips.confirm.close')}
+      kind="review"
+      actionLabel={t('action.done')}
       height="tall"
       isTyping
     >
