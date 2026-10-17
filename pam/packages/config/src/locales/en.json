@@ -1707,5 +1707,12 @@
   "trips.bookedForYou": "Booked for you",
   "person.trip.bookedBy": "Booked by {program}",
   "notify.visit_booked_for_you": "{place} booked a visit for you: {when}",
-  "notify.kind.visit_booked_for_you": "Visit booked for you"
+  "notify.kind.visit_booked_for_you": "Visit booked for you",
+  "trips.new.refused.member": "Pam cannot book a visit for {name} right now.",
+  "trips.new.refused.already": "{name} already has a visit here at about that time. Pick a different time.",
+  "trips.new.refused.limit": "You have booked as many visits as Pam allows today. Try again tomorrow.",
+  "trips.new.refused.past": "That time has already passed. Pick a later time.",
+  "trips.new.refused.far": "A visit can be booked up to about six months ahead. Pick an earlier day.",
+  "trips.new.refused.place": "You cannot book a visit at {place} right now.",
+  "trips.new.refused.service": "You cannot book that service right now. Pick another one."
 }
