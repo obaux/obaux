@@ -836,8 +836,8 @@
   "explore.empty.category.body": "Todavía no hay nada de este tipo por aquí. Prueba con todos los lugares, o con otra zona.",
   "explore.empty.showAll": "Ver todos los lugares",
   "home.caseload.title": "Sus miembros",
-  "home.caseload.search.label": "Busque a sus miembros por nombre",
-  "home.caseload.search.placeholder": "Buscar sus miembros",
+  "home.caseload.search.label": "Buscar miembros por nombre",
+  "home.caseload.search.placeholder": "Buscar miembros",
   "home.caseload.search.none": "Nadie en su lista con ese nombre",
   "home.caseload.count": "{count} personas en su lista",
   "home.interested.title": "Interesados en su programa",
@@ -1443,7 +1443,7 @@
   "transparency.program.signedUp": "Que te inscribiste, y cómo va.",
   "transparency.program.saves": "Cuándo guardas un lugar nuevo — no cuál. Solo después de inscribirte en él.",
   "transparency.program.visits": "Las visitas que planeas allí: el día y la hora, el servicio que elegiste y si te marcaron como presente.",
-  "transparency.summary.program": "Un programa ve tu nombre de pila y lo que le escribes, incluso antes de que planees una visita.",
+  "transparency.summary.program": "Un programa ve tu nombre de pila y lo que le escribes, incluso antes de que planees una visita. Ve más cuando te inscribes, firmas sus políticas o planeas una visita allí.",
   "memberPolicy.record": "El programa guarda un registro de las políticas que firmas, con la fecha.",
   "memberPolicy.readPages": "Lee cada página y luego firma.",
   "memberPolicy.record.meaning": "Firmar aquí es un registro de que leíste y estuviste de acuerdo.",
@@ -1702,5 +1702,8 @@
   "places.reported.done.remove": "{place} ya no está en la lista.",
   "place.visit.whoSees": "Quién ve esta visita",
   "place.visit.changeDate": "Cambiar fecha y hora",
-  "place.visit.checkIn": "Ya llegué"
+  "place.visit.checkIn": "Ya llegué",
+  "waitingCities.title": "Ciudades con gente en espera",
+  "waitingCities.empty.title": "Todavía nadie espera",
+  "waitingCities.empty.body": "Cuando alguien se registra desde una ciudad donde Pam todavía no está, la ciudad aparece aquí, con cuántas personas."
 }

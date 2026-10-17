@@ -881,8 +881,8 @@
   "explore.empty.category.body": "Здесь пока нет ничего такого. Попробуйте открыть все места или выбрать другой район.",
   "explore.empty.showAll": "Показать все места",
   "home.caseload.title": "Ваши участники",
-  "home.caseload.search.label": "Поиск ваших участников по имени",
-  "home.caseload.search.placeholder": "Поиск участников",
+  "home.caseload.search.label": "Поиск людей по имени",
+  "home.caseload.search.placeholder": "Поиск людей",
   "home.caseload.search.none": "В вашем списке нет никого с таким именем",
   "home.caseload.count": "{count} человека в вашем списке",
   "home.caseload.count.one": "{count} человек в вашем списке",
@@ -1511,7 +1511,7 @@
   "transparency.program.signedUp": "То, что вы записались, и как у вас там дела.",
   "transparency.program.saves": "Когда вы сохраняете новое место — но не какое именно. Только после того, как вы запишетесь в неё.",
   "transparency.program.visits": "Визиты, которые вы там планируете: день и время, выбранная вами услуга и то, отмечено ли ваше присутствие.",
-  "transparency.summary.program": "Программа видит ваше имя и то, что вы ей пишете, даже до того, как вы запланировали визит.",
+  "transparency.summary.program": "Программа видит ваше имя и то, что вы ей пишете, даже до того, как вы запланировали визит. Больше она видит после того, как вы запишетесь, подпишете её правила или запланируете там визит.",
   "memberPolicy.record": "Программа хранит запись о правилах, которые вы подписываете, с датой.",
   "memberPolicy.readPages": "Прочитайте каждую страницу, затем подпишите.",
   "memberPolicy.record.meaning": "Подпись здесь — это запись о том, что вы прочитали и согласились.",
@@ -1785,5 +1785,8 @@
   "places.reported.done.remove": "Убрано из списка: {place}.",
   "place.visit.whoSees": "Кто видит этот визит",
   "place.visit.changeDate": "Изменить дату и время",
-  "place.visit.checkIn": "Я на месте"
+  "place.visit.checkIn": "Я на месте",
+  "waitingCities.title": "Города, где люди ждут Pam",
+  "waitingCities.empty.title": "Пока никто не ждёт",
+  "waitingCities.empty.body": "Когда кто-то регистрируется из города, где Pam пока нет, город появляется здесь, с числом людей."
 }

@@ -839,8 +839,8 @@
   "explore.empty.category.body": "這附近暫時沒有這一類的地點。請試試全部地點，或另一個地區。",
   "explore.empty.showAll": "顯示全部地點",
   "home.caseload.title": "您的會員",
-  "home.caseload.search.label": "按姓名搜尋您的會員",
-  "home.caseload.search.placeholder": "搜尋您的會員",
+  "home.caseload.search.label": "搜尋會員（按姓名）",
+  "home.caseload.search.placeholder": "搜尋會員",
   "home.caseload.search.none": "名單上沒有這個名字的人",
   "home.caseload.count": "名單上有{count}人",
   "home.interested.title": "對您的計劃有興趣的人",
@@ -1443,7 +1443,7 @@
   "transparency.program.signedUp": "您已報名，以及進展如何。",
   "transparency.program.saves": "您收藏新地點的時間——但不包括是哪一個地點。只限您向它報名之後。",
   "transparency.program.visits": "您在那裏安排的到訪：日期和時間、您選擇的服務，以及您是否被標記為已到場。",
-  "transparency.summary.program": "計劃能看到您的名字和您傳送給它的訊息，即使您還沒有安排到訪。",
+  "transparency.summary.program": "計劃能看到您的名字和您傳送給它的訊息，即使您還沒有安排到訪。在您報名、簽署它的守則或在那裏安排到訪之後，它能看到更多。",
   "memberPolicy.record": "計劃會保存您所簽守則的記錄，包括日期。",
   "memberPolicy.readPages": "請閱讀每一頁，然後簽名。",
   "memberPolicy.record.meaning": "在這裏簽名，就是您已閱讀並同意的記錄。",
@@ -1702,5 +1702,8 @@
   "places.reported.done.remove": "{place}已從列表中移除。",
   "place.visit.whoSees": "誰看得到這次到訪",
   "place.visit.changeDate": "更改日期和時間",
-  "place.visit.checkIn": "我到了"
+  "place.visit.checkIn": "我到了",
+  "waitingCities.title": "有人在等候的城市",
+  "waitingCities.empty.title": "暫時沒有人在等候",
+  "waitingCities.empty.body": "當有人從Pam暫時還沒有提供服務的城市登記時，該城市會顯示在這裏，並附上人數。"
 }

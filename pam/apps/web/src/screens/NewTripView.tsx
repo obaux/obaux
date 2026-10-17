@@ -89,10 +89,15 @@ const styles = stylex.create({
   placeName: { fontSize: '17px', lineHeight: 1.3, fontWeight: 700 },
   label: { fontSize: '18px', fontWeight: 600 },
   choices: { width: '100%' },
+  // Air under the last row (Dot, b54): scrolled to the end, the last time is 72px above the Next bar: its 56px fade (the sticky footer's top, already
+  // in the page) and 16px more, so the chip's whole 48px target is clear of the fade and not flush with it.
+  endAir: { paddingBlockEnd: '16px' },
   // Day and time choices (Will, 3 October, D-235): smaller, white pills
   // with a grey outline like the round header buttons; the chosen one fills
   // green. The pill is 40px (Will, a95: the chips were too tall); the touch floor (§2.5) stays 48px, by 4px
   // of invisible hit area above and below that count as the button's own. Rows are 8px apart, so they never overlap.
+  // The hit area is placed from the PADDING edge, so a chip with a 1px border (the unselected one) needs 5px to reach 4px past
+  // its outline: with 4 it was 46px tall, 3px above the pill and only 2px below it (Iris, b54).
   choice: {
     minHeight: '40px',
     paddingInline: '16px',
@@ -104,6 +109,7 @@ const styles = stylex.create({
     '::after': { content: '""', position: 'absolute', insetBlock: '-4px', insetInline: 0 },
   },
   choiceOff: {
+    '::after': { insetBlock: '-5px' },
     backgroundColor: colorVars['--color-background-body'],
     borderWidth: '1px',
     borderStyle: 'solid',
@@ -241,6 +247,17 @@ export function NewTripView({
   const fromPlace = initial !== null && !changing;
   const placeHref = initial ? `/place/?id=${encodeURIComponent(initial.id)}` : '/trips/';
   const [step, setStep] = useState<Step>(initial ? 'when' : 'where');
+  // Tabbing to the last day or time must scroll it clear of the Next bar and its fade, not leave it under them: the page keeps this much
+  // of the bottom of the screen out of what "in view" means while this step is open (the fade 56 + the button 48 + its 16 below + 16 of air
+  // + the chip's 4px of hit area). Only this step: another screen's focus is as it was.
+  useEffect(() => {
+    if (step !== 'when') return;
+    const root = document.documentElement;
+    root.style.scrollPaddingBottom = '140px';
+    return () => {
+      root.style.scrollPaddingBottom = '';
+    };
+  }, [step]);
   const [day, setDay] = useState<Date | null>(null);
   const [time, setTime] = useState<readonly [number, number] | null>(null);
   const [note, setNote] = useState('');
@@ -648,7 +665,7 @@ export function NewTripView({
               ))}
             </HStack>
           </VStack>
-          <VStack gap={2}>
+          <VStack gap={2} xstyle={styles.endAir}>
             <Heading level={2} xstyle={styles.label}>
               {t('trips.new.time')}
             </Heading>

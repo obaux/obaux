@@ -40,6 +40,7 @@ import { PrototypeRequestProgram } from './PrototypeRequestProgram';
 import { PrototypeRequestReview } from './PrototypeRequestReview';
 import { PrototypeProgramReview } from './PrototypeProgramReview';
 import { ProgramsToCheckScreen } from '../../screens/ProgramsToCheckScreen';
+import { WaitingCitiesScreen } from '../../screens/WaitingCitiesScreen';
 import { InvitesLogScreen } from '../../screens/InvitesLogScreen';
 import TermsPage from '../../app/terms/page';
 import { AddMyProgramScreen } from '../../screens/AddMyProgramScreen';
@@ -124,6 +125,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/requests/program/': screen(() => <PrototypeRequestProgram />),
   '/requests/review/': screen(() => <PrototypeRequestReview />),
   '/programs/review/': screen(() => <ProgramsToCheckScreen />),
+  '/cities/waiting/': screen(() => <WaitingCitiesScreen />),
   '/programs/review/item/': screen(() => <PrototypeProgramReview />),
   '/invites/': screen(() => <InvitesLogScreen />),
   '/interested/': screen(() => <InterestedPage />),

@@ -836,8 +836,8 @@
   "explore.empty.category.body": "Nothing of this kind near here yet. Try all places, or another area.",
   "explore.empty.showAll": "Show all places",
   "home.caseload.title": "Your members",
-  "home.caseload.search.label": "Search your members by name",
-  "home.caseload.search.placeholder": "Search your members",
+  "home.caseload.search.label": "Search members by name",
+  "home.caseload.search.placeholder": "Search members",
   "home.caseload.search.none": "Nobody on your list by that name",
   "home.caseload.count": "{count} people on your list",
   "home.interested.title": "Interested in your program",
@@ -1443,7 +1443,7 @@
   "transparency.program.signedUp": "That you signed up, and how it is going.",
   "transparency.program.saves": "When you save a new place — not which one. Only after you sign up with it.",
   "transparency.program.visits": "The visits you plan there: the day and time, the service you picked, and whether you were marked as there.",
-  "transparency.summary.program": "A program sees your first name and what you write to them, even before you plan a visit.",
+  "transparency.summary.program": "A program sees your first name and what you write to them, even before you plan a visit. It sees more once you sign up, sign its rules or plan a visit there.",
   "memberPolicy.record": "The program keeps a record of the policies you sign, with the date.",
   "memberPolicy.readPages": "Read each page, then sign.",
   "memberPolicy.record.meaning": "Signing here is a record that you read and agreed.",
@@ -1702,5 +1702,8 @@
   "places.reported.done.remove": "{place} is off the list.",
   "place.visit.whoSees": "Who sees this visit",
   "place.visit.changeDate": "Change date and time",
-  "place.visit.checkIn": "I'm here"
+  "place.visit.checkIn": "I'm here",
+  "waitingCities.title": "Cities people are waiting for",
+  "waitingCities.empty.title": "Nobody is waiting yet",
+  "waitingCities.empty.body": "When someone signs up from a city Pam is not in yet, the city shows up here, with how many people."
 }

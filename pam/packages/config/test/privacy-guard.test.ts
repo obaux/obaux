@@ -166,3 +166,32 @@ describe('the privacy guard', () => {
     expect(users).toEqual([]);
   });
 });
+
+/**
+ * What Pam does six months after an account is deleted (`privacy.s.how-long.p3`: "we keep a short record that it existed for six
+ * months: what it did in Pam, and what Pam's staff did to it ... After six months we delete that too").
+ *
+ * "What it did" and "what staff did to it" are audit rows. Three writers name a person only inside `meta` (a conversation's other
+ * person, a program lead, the admin who deleted an account: Lena's sweep of 17 October, D-599), so a purge that looks only at
+ * `actor_id` and `target_id` leaves those rows behind past the six months the page promises.
+ */
+describe('the six months after an account is deleted (privacy.s.how-long.p3)', () => {
+  it('purges every audit row that names the erased account: as the actor, as the target, or as a value in meta', () => {
+    expect(EN['privacy.s.how-long.p3']).toMatch(/six months/);
+    expect(EN['privacy.s.how-long.p3']).toMatch(/After six months we delete that too\./);
+
+    const dir = path.join(PAM, 'packages/db/migrations');
+    const definition = /create\s+or\s+replace\s+function\s+public\.purge_erased_audit\s*\(\s*\)[\s\S]*?\bas\s+\$\$([\s\S]*?)\$\$\s*;/i;
+    const latest = readdirSync(dir)
+      .filter((f) => f.endsWith('.sql'))
+      .sort()
+      .map((file) => ({ file, sql: readFileSync(path.join(dir, file), 'utf8').replace(/--.*$/gm, '') }))
+      .filter((m) => definition.test(m.sql))
+      .at(-1);
+    expect(latest, 'purge_erased_audit is in a migration').toBeDefined();
+    const body = latest!.sql.match(definition)![1]!.replace(/\s+/g, ' ');
+    expect(body, `${latest!.file}: the actor`).toMatch(/a\.actor_id = e\.profile_id/);
+    expect(body, `${latest!.file}: the target`).toMatch(/a\.target_id = e\.profile_id/);
+    expect(body, `${latest!.file}: a top-level value of meta`).toMatch(/jsonb_each_text\(a\.meta\)[^)]*\)?[\s\S]*?m\.value = e\.profile_id::text/);
+  });
+});

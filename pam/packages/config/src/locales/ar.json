@@ -909,8 +909,8 @@
   "explore.empty.category.body": "لا شيء من هذا النوع بالقرب من هنا بعد. جرب كل الأماكن، أو منطقة أخرى.",
   "explore.empty.showAll": "عرض كل الأماكن",
   "home.caseload.title": "أعضاؤك",
-  "home.caseload.search.label": "البحث في أعضائك بالاسم",
-  "home.caseload.search.placeholder": "ابحث في أعضائك",
+  "home.caseload.search.label": "ابحث في الأعضاء بالاسم",
+  "home.caseload.search.placeholder": "ابحث في الأعضاء",
   "home.caseload.search.none": "لا أحد في قائمتك بهذا الاسم",
   "home.caseload.count": "{count} شخص في قائمتك",
   "home.caseload.count.zero": "{count} أشخاص في قائمتك",
@@ -1557,7 +1557,7 @@
   "transparency.program.signedUp": "أنك سجلت، وكيف تسير الأمور.",
   "transparency.program.saves": "وقت حفظك مكانا جديدا — دون معرفة أي مكان هو. فقط بعد أن تسجل لديه.",
   "transparency.program.visits": "الزيارات التي تخطط لها هناك: اليوم والوقت والخدمة التي اخترتها، وهل سجل حضورك.",
-  "transparency.summary.program": "يرى البرنامج اسمك الأول وما تكتبه له، حتى قبل أن تخطط لزيارة.",
+  "transparency.summary.program": "يرى البرنامج اسمك الأول وما تكتبه له، حتى قبل أن تخطط لزيارة. ويرى المزيد بعد أن تسجل لديه أو توقع على سياساته أو تخطط لزيارة هناك.",
   "memberPolicy.record": "يحتفظ البرنامج بسجل بالسياسات التي توقع عليها، مع التاريخ.",
   "memberPolicy.readPages": "اقرأ كل صفحة ثم وقّع.",
   "memberPolicy.record.meaning": "التوقيع هنا سجل بأنك قرأت ووافقت.",
@@ -1841,5 +1841,8 @@
   "places.reported.done.remove": "تمت إزالة {place} من القائمة.",
   "place.visit.whoSees": "من يرى هذه الزيارة",
   "place.visit.changeDate": "تغيير التاريخ والوقت",
-  "place.visit.checkIn": "وصلت"
+  "place.visit.checkIn": "وصلت",
+  "waitingCities.title": "مدن ينتظرها الناس",
+  "waitingCities.empty.title": "لا أحد في الانتظار بعد",
+  "waitingCities.empty.body": "عندما يسجل شخص ما من مدينة لا يتوفر فيها Pam بعد، تظهر المدينة هنا مع عدد الأشخاص."
 }
