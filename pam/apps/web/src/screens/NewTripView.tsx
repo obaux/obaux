@@ -91,12 +91,17 @@ const styles = stylex.create({
   choices: { width: '100%' },
   // Day and time choices (Will, 3 October, D-235): smaller, white pills
   // with a grey outline like the round header buttons; the chosen one fills
-  // green. Still the 48px touch floor (§2.5).
+  // green. The pill is 40px (Will, a95: the chips were too tall); the touch floor (§2.5) stays 48px, by 4px
+  // of invisible hit area above and below that count as the button's own. Rows are 8px apart, so they never overlap.
   choice: {
-    minHeight: '48px',
+    minHeight: '40px',
     paddingInline: '16px',
     fontSize: '15px',
     borderRadius: '999px',
+    // The global 48px floor on every button reads this; the pill is 40, its hit area below is the other 8.
+    '--pam-touch-target-min': '40px',
+    position: 'relative',
+    '::after': { content: '""', position: 'absolute', insetBlock: '-4px', insetInline: 0 },
   },
   choiceOff: {
     backgroundColor: colorVars['--color-background-body'],
