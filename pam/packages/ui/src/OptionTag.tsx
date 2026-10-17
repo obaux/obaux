@@ -88,7 +88,8 @@ export function TaggedWords({
   const words = lang ? <span {...langAttributes(lang)}>{children}</span> : children;
   if (!tag) return <>{words}</>;
   return (
-    <span {...stylex.props(styles.tagged)}>
+    // `data-pam-tagged` is how `globals.css` finds a list of languages, to let it grow to all of its rows (S1).
+    <span data-pam-tagged="" {...stylex.props(styles.tagged)}>
       <OptionTag tag={tag} />
       <span {...stylex.props(styles.words)}>{words}</span>
     </span>
