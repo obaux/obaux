@@ -239,8 +239,8 @@ export function SupportScreen() {
                 key={restored || 'blank'}
                 initialQuery={restored}
                 clearSignal={clearSignal}
-                label="Search Support"
-                placeholder="Ask a question, for example “why didn’t I get a code?”"
+                label="Ask a question in Support"
+                placeholder="Ask a question"
                 searchSource={SOURCE}
                 onPick={(item) => setPicked(item.auxiliaryData.query)}
                 onQuery={(v) => {

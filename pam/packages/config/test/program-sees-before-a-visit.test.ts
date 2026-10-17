@@ -28,7 +28,8 @@ const site = readFileSync(`${REPO}apps/site/src/content/WhatOthersCanSee.tsx`, '
 
 /** The two sentences the Privacy page and the site both carry (the site's JSX wraps its lines). */
 const FIRST = 'A program sees you only after you write to them, sign their rules, sign up with them or plan a visit there, and only what they need to help you.';
-const BRIDGE = 'Before a visit, they see your first name, what you write to them, the day you signed their rules and, if you signed up, how that is going.';
+const BRIDGE =
+  'Before a visit, they see your first name, what you write to them, the day you signed their rules and, if you signed up, how that is going and when you save a new place, but not which one.';
 
 describe('the Privacy page says what a program sees, before a visit and for one', () => {
   it('names every way a program comes to see a member, and what it sees before a visit', () => {
@@ -64,6 +65,16 @@ describe('the transparency screen has a card for what a program can see', () => 
     expect(program[1]?.en).toBe('What you write to it, even before you plan a visit.');
   });
 
+  it('says a program sees when a member saved a place, never which, and only after a sign-up (P10, D-199)', () => {
+    expect(program.find((l) => l.key === 'transparency.program.saves')?.en).toBe(
+      'When you save a new place — not which one. Only after you sign up with it.',
+    );
+    // The same two facts, in the Privacy page's words and on the site, and the guide's list still says it too.
+    expect(sharing).toContain('if you signed up, how that is going and when you save a new place, but not which one.');
+    expect(TRANSPARENCY_SCREEN.canSee.find((l) => l.key === 'transparency.canSee.saves')?.en).toContain('A program you joined sees this too.');
+    expect(site).toContain("cells: ['Yes', 'Yes, but only once you sign up with them', 'No']");
+  });
+
   it('says the day a member signed its rules, and never the signature', () => {
     expect(program.find((l) => l.key === 'transparency.program.signed')?.en).toBe(
       'The day you signed its rules. Never your signature.',
@@ -86,10 +97,21 @@ describe('the transparency screen has a card for what a program can see', () => 
     expect(TRANSPARENCY_GROUPS.flatMap((g) => [...g.keys])).not.toContain('transparency.canSee.signed');
   });
 
-  it('says it once more, short, in the short version', () => {
+  it('says it once more, short, in the short version, and says there is more (Sage, ledger 3c526500)', () => {
     expect(EN['transparency.summary.program']).toBe(
-      'A program sees your first name and what you write to them, even before you plan a visit.',
+      'A program sees your first name and what you write to them, even before you plan a visit. ' +
+        'It sees more once you sign up, sign its rules or plan a visit there.',
     );
+  });
+
+  it('promises nothing the Privacy page does not: each way in it names is one the page names, and the sentence adds no fact', () => {
+    // The pointer ("It sees more once you sign up, sign its rules or plan a visit there") is the three ways in of
+    // `sharing.p2`, in its words, and no fact of its own: the facts stay in the card and the page it points to.
+    const line = EN['transparency.summary.program']!;
+    const [, more = ''] = line.split('. It sees more once you ');
+    expect(more).toBe('sign up, sign its rules or plan a visit there.');
+    for (const way of ['sign their rules', 'sign up with them', 'plan a visit there']) expect(sharing, way).toContain(way);
+    expect(line).not.toMatch(/last name|phone|address|photo|\bnote\b|points|level|signature|save|saved/i);
   });
 
   it('never names more than a program sees: no last name, phone, address, note or points', () => {

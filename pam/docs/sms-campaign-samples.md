@@ -124,7 +124,7 @@ really on that screen.
 
 ## The campaign description, to paste as written
 
-The field caps at **1024 characters**. What follows is 1015, so it fits with a
+The field caps at **1024 characters**. What follows is 1017, so it fits with a
 little room — if you edit it, count before you paste. Every message type a person
 can receive is named on purpose: reviewers compare the description against the
 samples and, later, against real traffic, and a description narrower than what
@@ -132,9 +132,17 @@ actually sends is how an approved campaign gets suspended.
 
 > Pam is an app by Oba that connects people to community programs, services and the staff who support them. People get messages only after entering their own phone number on Pam's sign-in screen, which says Pam will text them and how to stop.
 >
-> Messages are account notifications and appointment reminders, at low volume. First comes a one-time sign-in code. After that a person who agreed may receive a reminder the day before an appointment they scheduled in the app, a notice when a saved place has closed or moved, and a notice that a message is waiting, and one answer to a help request; staff may receive a decision on their request, or a notice of a visit booked, changed or planned.
+> Messages are account notifications and appointment reminders, at low volume. First comes a one-time sign-in code. After that a person who agreed may receive a reminder the day before an appointment they or a program scheduled, a notice when a saved place has closed or moved, and a notice that a message is waiting, and one answer to a help request; staff may receive a decision on their request, or a notice of a visit booked, changed or planned.
 >
 > Nothing is promotional or third-party, and numbers are never sold or shared. Every message names Pam. Languages: English, Spanish, Portuguese, Chinese, Russian, Arabic. A message is one segment, except appointment reminders in Chinese, Russian and Arabic: two. STOP ends all messages permanently; HELP returns support contact.
+
+> **Widened on 17 October 2026 (a94).** Will decided that a program can book a real visit for a member who has written to
+> it, and the member is texted a reminder for that visit like any other. The registered description said only "an
+> appointment they scheduled in the app", which does not cover a visit a program booked. It now says "an appointment
+> they or a program scheduled" (1,017 characters; the cap is 1,024, and the plain "...they scheduled in the app or a
+> program booked for them" would be 1,044). **The campaign on file with the carrier still has the old sentence, so this
+> has to be filed before `texts_live` goes on**; see `docs/before-launch.md`. No new sample is needed: the reminder
+> text is the same whoever booked the visit.
 
 ### The shorter fields, if the form asks separately
 
