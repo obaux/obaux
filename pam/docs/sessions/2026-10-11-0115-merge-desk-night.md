@@ -1356,6 +1356,13 @@
   air under the last row, so it scrolls clear of the fade; tabbing to it scrolls it clear); the trip card's time
   stays whole. Iris's 24cf0db6 (the b54 re-test). Sage's ledger to 3c4c721f. All merges clean.
 - **b55 pushed (10:06, 97e5fd27).** Main CI green 10:38.
+- **Batch b56 (17 October, 10:39 to 10:44).** Lena's 91a5478c (nine fit-known entries for es, pt-BR and zh-HK) and
+  2ae1357f (her records, D-600, and a native reader's checklist in before-launch). Ava's 3b0ebc19: invite.spec.ts:178
+  waits for the screen to settle and checks the pick took; the one failure in b55's run never came back in 330 runs
+  under load, and the error line does not move the radios (measured), so no product change and no proven cause.
+  Checks: invite.spec on three projects, 24 passed. A fit run (es, zh-HK, Trips stories) on this build found 8 that
+  the new entries miss: b55's TripCard put the time in its own span, so the date line's text changed, and the
+  saved-trips place name is now two lines. Lena re-keys them.
 
 ## What was wrong, and what missed it
 
@@ -1752,9 +1759,11 @@
 | b55's flaky test: invite.spec.ts:178 at iphone-se ("Clicking the checkbox did not change its state" on the Philadelphia radio) | passed on retry; alone, `--repeat-each=15 --retries=0`: 15 passed. Not b55's code (the staff-request page). Sent to Ava to root-cause under load |
 | b55 fit audit, website stories (en, ru, ar, zh-CN, pseudo at 320×760, fit-known) | 24 stories × 5 languages: 0 new, 0 in English; the Support placeholder no longer cut |
 | b55 main CI (97e5fd27) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (10:38); Vercel web and pam-site success |
+| Batch b56 (docs, test and fit-known only): invite.spec, three projects / audit:fit es and zh-HK, --match trips, 320×760 | 24 passed / 8 unaccepted, all partial=true, 0 out (keys shifted by b55's TripCard; sent to Lena) |
 
 ## Left undone
 
+- **As of b56 (17 October, 10:44):** Iris re-checks b55. Lena: re-key the Trips fit entries for b55's TripCard.
 - **As of b55 (17 October, 10:06):** Iris re-checks When? (hit area both sides, the times at 320×568). Ava: the
   invite.spec timeout under load. Lena: fit-known entries for es, pt-BR and zh-HK (same two classes). With Will: a91,
   a93, a94, a86, a84, a88.
