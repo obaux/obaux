@@ -11,6 +11,6 @@ test('the short version’s write-to-us row has an envelope, not a phone', async
   await asMember(page);
   await page.goto('/legal/privacy/');
   await settled(page);
-  const row = page.getByText(en['privacy.s.contact.p1']).locator('xpath=ancestor::*[.//svg][1]');
+  const row = page.getByRole('listitem').filter({ hasText: en['privacy.s.contact.p1'] });
   await expect(row.locator('svg[data-icon="mail"]')).toHaveCount(1);
 });

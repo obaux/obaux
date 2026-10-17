@@ -76,6 +76,7 @@ export {
   InfoIcon,
   PdfIcon,
   PhoneIcon,
+  MailIcon,
   PlacesIcon,
   ExploreIcon,
   MessagesIcon,
