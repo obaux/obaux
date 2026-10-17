@@ -24,7 +24,7 @@ type Words = {
 const STAND_IN: Record<string, Words> = {
   en: {
     checkIn: 'Check in',
-    alt: 'Arrived',
+    alt: 'I made it',
     change: 'Change',
     back: 'Back',
     changeDate: 'Change date and time',

@@ -4,7 +4,7 @@ Pictures and a prototype only: `VisitWidget` in `packages/ui/src/VisitWidget.tsx
 Nothing uses it yet; Piper builds the screen if Will says yes. Words marked "stand-in" are not signed (Sage).
 
 - `views-390.png`, `views-320.png`, `views-320-ar.png`: the visit (rest), Check in, Change, Marked. Light and dark at 390 and 320; Arabic at 320.
-- `footers.png`: the two footers, A "Check in" | "Change" and B Sage's word (stand-in "Arrived") | "Change". Inner views are the same.
+- `footers.png`: the two footers, A "Check in" | "Change" and B Sage's word ("I made it", signed by Sage, ledger d457b5f9) | "Change". Inner views are the same.
 - `notes.png`, `notes-320-ar.png`: the small icon at the top right, open: an open eye for a program on Pam, a crossed-out eye for a place not on
   Pam (`EyeIcon`/`EyeOffIcon`, D-416: what somebody can and cannot see), opening an Astryx Popover that holds the blue note
   (`place.lead.sees` / `place.noLead`, unchanged). No "verified". The eye is 22px in a 48px target.
