@@ -110,6 +110,25 @@ describe('what the booking does: a visit on Trips and the bell, no points, no te
   });
 });
 
+describe('the audit row names the member where the six-month purge looks (D-443, D-595)', () => {
+  // `purge_erased_audit()` deletes the rows whose actor_id or target_id is an erased account. A person named only in `meta` is
+  // never found, and Privacy says an erased account's rows go six months later.
+  const insert = book?.body.match(/insert\s+into\s+public\.audit_log\s*\(([^)]*)\)\s*values\s*\(([\s\S]*?)\)\s*;/i);
+
+  it('is about the member: the target is the profile, and the lead is the actor', () => {
+    expect(insert, 'book_visit_for_member writes one audit row').toBeTruthy();
+    expect(insert![1]!.replace(/\s+/g, '')).toBe('actor_id,action,target_type,target_id,meta');
+    expect(insert![2]!).toMatch(/^\s*caller\s*,\s*'visit\.booked_for_member'\s*,\s*'profile'\s*,\s*p_member_id\s*,/);
+  });
+
+  it('does not name the member again, or anybody else, in meta: only the visit and the place', () => {
+    const meta = insert![2]!.slice(insert![2]!.indexOf('jsonb_build_object'));
+    expect(meta).toMatch(/'appointment'\s*,\s*visit\.id/);
+    expect(meta).toMatch(/'service'\s*,\s*svc\.id/);
+    expect(meta).not.toMatch(/p_member_id|member_id|caller|lead|first_name|name/i);
+  });
+});
+
 describe('the member can cancel it', () => {
   it('cancels any of the caller\'s own scheduled visits, whoever booked it', () => {
     expect(cancel, 'cancel_trip is in a migration').toBeDefined();
