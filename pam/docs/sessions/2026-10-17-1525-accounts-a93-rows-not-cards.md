@@ -39,7 +39,7 @@ Built on `main` 2de80122 (merged first; one conflict in STATUS.md, this lane's t
 - `tsc` clean; `@pam/config` tests 1353 passed.
 - `admin.spec` a93 test now checks: the unmarked line is one line, "Not marked as there: Oct 15" style, a different
   colour from "Marked as there"; no listitem on the list has a shadow or a background; each is at least 48px tall.
-- Full e2e: see the READY.
+- Full e2e (built at be7f2fb4; b007c419 only swaps the red token): 2045 passed, 19 skipped, 0 failed (23.8m).
 - Storybook built; pictures at 390 and 320 (top and scrolled), light and dark, English and Arabic, and Russian at 320 (the red line wraps to two, uncut), in
   `docs/design/review/2026-10-17-cm-home-rows/`. Measured in the story: member rows 73px, the two rows 64px, no
   shadows, transparent backgrounds.
