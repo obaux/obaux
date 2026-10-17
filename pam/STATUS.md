@@ -928,7 +928,7 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Accounts & invites · Case manager Home: visit line and two rows (17 October) — built, waiting on Lena's words and Will's yes (a93)
+## Accounts & invites · Case manager Home: visit line and two rows (17 October) — READY, ships on Will's yes (a93)
 
 `claude/pam-caseload-visit-line` (D-596). One visit line per member in Sage's words, replacing points; one read for the
 whole list; Invite someone and What you can see (a sheet) under the cards.

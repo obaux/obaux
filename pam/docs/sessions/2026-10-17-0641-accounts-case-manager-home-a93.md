@@ -54,9 +54,15 @@
   case-manager-pass, connect-examples-only, staff-home, people-strip and a11y: 168 passed on 3 projects.
 - Pictures retaken: Home en 390, en 320 and ar 320, and the sheet at the same three.
 
+## Final checks (after merging main a32c07ab and Lena's fbcffd46)
+
+- Lena's six languages for the four visit-line keys were merged by hand: her branch was off 1b32dea6, before b53's
+  keys, so I kept the merged files and took her four keys. She changed no others.
+- copy:status: all languages in step. `@pam/config`: 1351 passed. Web `tsc` is clean.
+- Full e2e after build:e2e: 2018 passed, 19 skipped, 0 failed (2037 tests, 23.7 min).
+
 ## Left undone
 
-- Lena's six languages for the three visit lines. Config is red on them until then.
 - Pictures on card a93 for Will's yes, then READY.
 
 ## Needs a human
