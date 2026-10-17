@@ -1,0 +1,70 @@
+From 8a85853103ec61f2983a910716d44d6a4620cfda Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Sat, 17 Oct 2026 15:29:51 +0000
+Subject: [PATCH 1/2] a94 (held): What others can see names a program booking a
+ visit, in Sage's signed words
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_012vS6F7CMTwFn3u5UG66JWz
+---
+ pam/apps/site/src/content/WhatOthersCanSee.tsx | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/pam/apps/site/src/content/WhatOthersCanSee.tsx b/pam/apps/site/src/content/WhatOthersCanSee.tsx
+index 76715eaf..8393e4aa 100644
+--- a/pam/apps/site/src/content/WhatOthersCanSee.tsx
++++ b/pam/apps/site/src/content/WhatOthersCanSee.tsx
+@@ -35,6 +35,10 @@ export function WhatOthersCanSee() {
+           them, the day you signed their rules and, if you signed up, how that is going and when you save a new
+           place, but not which one.
+         </P>
++        <P>
++          If you have written to a program, signed up with it or planned a visit there, it can book a visit for
++          you. It shows in your Trips with the program’s name, and you can cancel it.
++        </P>
+       </Section>
+ 
+       <Section title="Who can see what">
+@@ -52,6 +56,10 @@ export function WhatOthersCanSee() {
+               label: 'Your visits, and whether you went or missed one',
+               cells: ['Yes', 'Yes, but only visits to their own program', 'No'],
+             },
++            {
++              label: 'Which of your visits a program booked for you',
++              cells: ['Yes', 'Yes, but only visits to their own program', 'No'],
++            },
+             { label: 'Your points, your level and your badges', cells: ['Yes', 'No', 'No'] },
+             { label: 'The last day you used Pam', cells: ['Yes', 'No', 'No'] },
+             {
+-- 
+2.43.0
+
+
+From ec522ad7fb6094bc838c4f55c5641bd22d8e0eef Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Sat, 17 Oct 2026 15:37:00 +0000
+Subject: [PATCH 2/2] a94 (held): the post's fingerprint (posts:date
+ what-others-can-see=2026-10-17)
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_012vS6F7CMTwFn3u5UG66JWz
+---
+ pam/apps/site/src/content/post-updated.json | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pam/apps/site/src/content/post-updated.json b/pam/apps/site/src/content/post-updated.json
+index e6b87719..62f69f56 100644
+--- a/pam/apps/site/src/content/post-updated.json
++++ b/pam/apps/site/src/content/post-updated.json
+@@ -69,7 +69,7 @@
+   },
+   "what-others-can-see": {
+     "date": "2026-10-17",
+-    "words": "d22949a8e2372621950105750465b662192b1bb2bba2367bffebb41cdbdec657"
++    "words": "cd25eaf0241eea04cfbce998dcf23ae00b25632a1a8f1cd3cdfe8ac41ad5e042"
+   },
+   "who-is-my-guide": {
+     "date": "2026-10-11",
+-- 
+2.43.0
+
