@@ -33,5 +33,7 @@ important. We'll want that number as a reference to decide which cities to prior
 ## What a later session might change
 
 - If states are written out often, match names to letters (New Jersey to NJ) before grouping.
+- Nicknames are not matched either: "Philly" and "Philadelphia" are two rows (Sage, 17 October). A list of known
+  names and their nicknames could fold them; until the list shows it matters, the team reads the two rows together.
 - The counts include everyone who ever left a city, including people who later joined elsewhere. Will asked for
   "how many requests", and each request counts once per person (one row per person, a new city replaces the old).

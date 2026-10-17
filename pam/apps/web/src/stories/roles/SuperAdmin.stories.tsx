@@ -7,6 +7,8 @@ import zhCN from '@pam/config/locales/zh-CN.json';
 import zhHK from '@pam/config/locales/zh-HK.json';
 import ru from '@pam/config/locales/ru.json';
 import ar from '@pam/config/locales/ar.json';
+import { asRole } from '../journeys/journey';
+import { REDESIGN_ROUTES } from '../prototype/routes';
 import { screen } from './screen';
 
 /**
@@ -83,6 +85,12 @@ export const RequestReview: Story = screen('super-admin', 'A request to review',
 export const ProgramsToCheck: Story = screen('super-admin', 'Programs to check', '/programs/review/');
 /** Cities people are waiting for (D-593, card a96): counts only, biggest first. */
 export const WaitingCities: Story = screen('super-admin', 'Cities people are waiting for', '/cities/waiting/', { from: 'home' });
+/** ...and nobody waiting yet: the empty state's two lines, for the fit audit (Lena). */
+export const WaitingCitiesEmpty: Story = {
+  ...asRole('super-admin', '/cities/waiting/', { from: 'home' }, { noWaitingCities: true }),
+  name: 'Cities people are waiting for — nobody yet',
+  render: () => <>{REDESIGN_ROUTES['/cities/waiting/']!.render()}</>,
+};
 export const ProgramToCheckNew: Story = screen('super-admin', 'A new program to check (waiting four days)', '/programs/review/item/', { id: 'check-1' });
 export const ProgramToCheckChange: Story = screen('super-admin', 'A change to a live program', '/programs/review/item/', { id: 'check-2' });
 export const ProgramToCheckWithdrawn: Story = screen('super-admin', 'A request the leader deleted to start over', '/programs/review/item/', { id: 'check-3' });
