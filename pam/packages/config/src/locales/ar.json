@@ -1838,5 +1838,8 @@
   "places.reported.remove.confirm.title": "إزالة {place} من القائمة؟",
   "places.reported.remove.confirm.body": "لن يجد الأعضاء المكان في Pam بعد الآن.",
   "places.reported.done.keep": "يبقى {place} في القائمة.",
-  "places.reported.done.remove": "تمت إزالة {place} من القائمة."
+  "places.reported.done.remove": "تمت إزالة {place} من القائمة.",
+  "waitingCities.title": "مدن ينتظرها الناس",
+  "waitingCities.empty.title": "لا أحد في الانتظار بعد",
+  "waitingCities.empty.body": "عندما يسجل شخص ما من مدينة لا يتوفر فيها Pam بعد، تظهر المدينة هنا مع عدد الأشخاص."
 }

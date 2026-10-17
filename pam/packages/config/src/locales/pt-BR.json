@@ -1699,5 +1699,8 @@
   "places.reported.remove.confirm.title": "Tirar {place} da lista?",
   "places.reported.remove.confirm.body": "Os membros não vão mais encontrá-lo em Pam.",
   "places.reported.done.keep": "{place} continua na lista.",
-  "places.reported.done.remove": "{place} saiu da lista."
+  "places.reported.done.remove": "{place} saiu da lista.",
+  "waitingCities.title": "Cidades com pessoas esperando",
+  "waitingCities.empty.title": "Ninguém está esperando ainda",
+  "waitingCities.empty.body": "Quando alguém se cadastra de uma cidade onde Pam ainda não está, a cidade aparece aqui, com quantas pessoas."
 }

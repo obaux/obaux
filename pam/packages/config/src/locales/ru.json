@@ -1782,5 +1782,8 @@
   "places.reported.remove.confirm.title": "Убрать {place} из списка?",
   "places.reported.remove.confirm.body": "Участники больше не найдут его в Pam.",
   "places.reported.done.keep": "{place} остаётся в списке.",
-  "places.reported.done.remove": "Убрано из списка: {place}."
+  "places.reported.done.remove": "Убрано из списка: {place}.",
+  "waitingCities.title": "Города, где люди ждут Pam",
+  "waitingCities.empty.title": "Пока никто не ждёт",
+  "waitingCities.empty.body": "Когда кто-то регистрируется из города, где Pam пока нет, город появляется здесь, с числом людей."
 }

@@ -1699,5 +1699,8 @@
   "places.reported.remove.confirm.title": "要把{place}从列表中移除吗？",
   "places.reported.remove.confirm.body": "成员在Pam里将不再找到它。",
   "places.reported.done.keep": "{place}仍在列表中。",
-  "places.reported.done.remove": "{place}已从列表中移除。"
+  "places.reported.done.remove": "{place}已从列表中移除。",
+  "waitingCities.title": "有人在等待的城市",
+  "waitingCities.empty.title": "还没有人在等待",
+  "waitingCities.empty.body": "当有人从Pam还没有开通的城市注册时，该城市会显示在这里，并附上人数。"
 }

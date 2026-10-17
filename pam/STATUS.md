@@ -928,6 +928,12 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Accounts & invites · Cities people are waiting for (17 October) — in b53 (Sage's words, Lena's six languages)
+
+`claude/pam-waiting-city-counts` (D-593, a96 item 3). Migration `20261017055932` adds `waiting_city_counts()`
+(super admin only, counts only). A row on the super admin's Home opens `/cities/waiting/`. Test 75 and
+waiting-cities.spec cover it.
+
 ## Accounts & invites · Program lead's What to expect, row 5 (17 October) — in b52 with Lena's words
 
 `claude/pam-lead-expect-row5-a92`, stacked on `claude/lena-program-saves-held`. a92 is signed. The fifth row says

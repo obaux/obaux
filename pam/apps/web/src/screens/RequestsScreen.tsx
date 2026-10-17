@@ -1,6 +1,6 @@
 'use client';
 
-import { Loading, Notice, Page, PeopleIcon, PlacesIcon, ShieldIcon } from '@pam/ui';
+import { GlobeIcon, Loading, Notice, Page, PeopleIcon, PlacesIcon, ShieldIcon } from '@pam/ui';
 import { FloatingAction } from '@pam/ui/FloatingAction';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPageHeader } from '@pam/ui/SubPage';
@@ -14,6 +14,7 @@ import { useSession } from '@/lib/useSession';
 import { useFlaggedPlaces } from '@/lib/useFlaggedPlaces';
 import { useStaffRequests } from '@/lib/useStaffRequests';
 import { toLookAt, useProgramsToCheck } from '@/lib/programsToCheck';
+import { peopleWaiting, useWaitingCities } from '@/lib/useWaitingCities';
 import { useRoleView } from '@/lib/useViewedRole';
 
 /**
@@ -60,6 +61,9 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
   const reportedCount = reported.status === 'ready' ? reported.places.length : 0;
   const { state: programs } = useProgramsToCheck(isSuperAdmin);
   const toCheck = programs.status === 'ready' ? toLookAt(programs.programs) : 0;
+  // How many people wait for a city Pam is not in yet (D-593, card a96): where to open next.
+  const waiting = useWaitingCities(isSuperAdmin);
+  const waitingCount = waiting.status === 'ready' ? peopleWaiting(waiting.cities) : 0;
 
   const tools = (
     <>
@@ -134,6 +138,13 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
             icon: <ShieldIcon {...ICON} />,
             // A plain number (D-586): the red badge is for what is new since you looked, not for a count of what is waiting.
             ...(reportedCount > 0 ? { value: String(reportedCount) } : {}),
+          },
+          {
+            id: 'waiting-cities',
+            label: t('waitingCities.title'),
+            href: isHome ? '/cities/waiting/?from=home' : '/cities/waiting/',
+            icon: <GlobeIcon {...ICON} />,
+            ...(waitingCount > 0 ? { value: String(waitingCount) } : {}),
           },
         ]}
       />
