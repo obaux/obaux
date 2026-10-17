@@ -31,7 +31,17 @@
   status. Web `tsc` is clean.
 - Pictures in `docs/design/review/2026-10-17-cm-home-built/`: home en 390 and en 320, ar 320 and ar 390, and the
   sheet. They match Dot's drawing, with Sage's words.
-- The full e2e run was still going when this was written. The next commit has its result.
+- e2e, after build:e2e:
+  - First full run: broken. A run I had stopped took the test web server down, so everything got "connection
+    refused".
+  - The rerun of the specs that touch this Home found 8 real failures × 3 projects: admin, case-manager-pass and
+    connect-examples-only didn't stub the new `appointments` read, so the caseload waited on it. Two tests also
+    expected the promise on the page instead of in the sheet.
+  - Fixed both. New test in admin.spec: four members get "Next visit", "Not marked as there", "Marked as there"
+    and nothing; no points; exactly one whole-list read; Invite someone is a row linking to /invite/.
+  - admin, case-manager-pass and connect-examples-only: 90 passed on 3 projects. staff-home, invite,
+    people-strip, person-real-trips, a11y and languages passed in the rerun.
+- I also ran `pkill -f` once and killed my own shell again; use the port.
 
 ## Left undone
 

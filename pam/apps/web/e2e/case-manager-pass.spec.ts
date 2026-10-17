@@ -40,6 +40,7 @@ async function caseManager(page: Page, { examples = false } = {}) {
   await page.route('**/rest/v1/notifications*', (route) => route.fulfill(json([])));
   await page.route('**/rest/v1/access_controls*', (route) => route.fulfill(json([])));
   await page.route('**/rest/v1/enrollments*', (route) => route.fulfill(json([])));
+  await page.route('**/rest/v1/appointments*', (route) => route.fulfill(json([])));
   await page.route('**/rest/v1/rpc/**', (route) => route.fulfill(json([])));
   await page.route('**/rest/v1/profiles*', (route) =>
     route.fulfill(
@@ -105,7 +106,8 @@ test.describe('a case manager after joining (Iris, 15 October)', () => {
     await caseManager(page);
     await page.goto('/');
     await settled(page);
-    // A short list, the joining step's own four items, each at reading size (item 11).
+    // Since a93 the promise is one tap away, in a sheet: the joining step's own four items, each at reading size (item 11).
+    await page.getByRole('button', { name: 'What you can see' }).click();
     const items = page.getByRole('listitem').filter({ hasText: /What they want to work on|The programs they sign up for|Not what they say|When they save a new place/ });
     await expect(items).toHaveCount(4);
     for (const size of await items.evaluateAll((els) => els.map((el) => parseFloat(getComputedStyle(el).fontSize)))) {

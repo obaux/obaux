@@ -63,6 +63,8 @@ async function signedInAs(
   await page.route(NOTIFICATIONS, (route) => route.fulfill(json(notifications)));
   await page.route(CONTROLS, (route) => route.fulfill(json(controls)));
   await page.route(ENROLLMENTS, (route) => route.fulfill(json([])));
+  // Home's one read of the caseload's visits (a93): none here.
+  await page.route('**/rest/v1/appointments*', (route) => route.fulfill(json([])));
   await page.route(USER, (route) => route.fulfill(json({ id: ADMIN_ID, phone: '12673095265' })));
   await page.route(POINTS, (route) => route.fulfill(json(250)));
   await page.route(PROFILES, (route) => {
@@ -147,6 +149,43 @@ test.describe('the case manager screen', () => {
     // initial stands in — Pam's own rendering of a name the admin already has.
     await expect(page.getByRole('img', { name: 'Dante' })).toBeVisible();
     await expect(page.getByRole('img', { name: 'Tanya' })).toBeVisible();
+  });
+
+  test('each card has one visit line, no points, and Invite someone is a row under the cards (a93)', async ({ page }) => {
+    await signedInAs(page, 'admin', [
+      { id: 'm1', first_name: 'Dante', access_status: 'active', last_active_at: null },
+      { id: 'm2', first_name: 'Tanya', access_status: 'active', last_active_at: null },
+      { id: 'm3', first_name: 'Rosa', access_status: 'active', last_active_at: null },
+      { id: 'm4', first_name: 'Kofi', access_status: 'active', last_active_at: null },
+    ]);
+    const asked: string[] = [];
+    const soon = new Date(Date.now() + 2 * 86_400_000).toISOString();
+    const ago = (days: number) => new Date(Date.now() - days * 86_400_000).toISOString();
+    // Registered last, so it answers before the empty one: one read for the whole list.
+    await page.route('**/rest/v1/appointments*', (route) => {
+      asked.push(route.request().url());
+      return route.fulfill(
+        json([
+          { member_id: 'm1', starts_at: soon, status: 'scheduled' },
+          { member_id: 'm2', starts_at: ago(6), status: 'attended' },
+          { member_id: 'm2', starts_at: ago(2), status: 'missed' },
+          { member_id: 'm3', starts_at: ago(1), status: 'attended' },
+        ]),
+      );
+    });
+    await page.goto('/');
+    await expect(page.getByRole('heading', { name: 'Dante' })).toBeVisible();
+    // Each name is followed by its own line, in the list's order.
+    const main = page.locator('main');
+    await expect(main).toContainText(/Dante\s*Next visit: \w+ \d/);
+    await expect(main).toContainText(/Tanya\s*Not marked as there: \w+ \d/);
+    await expect(main).toContainText(/Rosa\s*Marked as there: \w+ \d/);
+    await expect(main).not.toContainText(/Kofi\s*(Next visit|Marked|Not marked)/);
+    await expect(page.getByText(/points/i)).toHaveCount(0);
+    expect(asked.filter((u) => u.includes('member_id=in.'))).toHaveLength(1);
+    // Invite someone is a row in the page now, not a floating button.
+    await expect(page.getByRole('link', { name: 'Invite someone' })).toHaveAttribute('href', '/invite/');
+    await expect(page.getByRole('link', { name: 'Invite someone' })).toHaveCount(1);
   });
 
   test('an empty caseload explains itself', async ({ page }) => {
@@ -296,6 +335,8 @@ test.describe('the case manager screen', () => {
 
     // §4.1: members agree to this list at onboarding. An admin should be looking
     // at the same words, so the promise is visible from both sides.
+    // One tap away since a93: the row opens a sheet with the same words.
+    await page.getByRole('button', { name: 'What you can see' }).click();
     await expect(page.getByRole('heading', { name: 'What you can see' })).toBeVisible();
     await expect(page.getByText(/Not what they say or send to other people/)).toBeVisible();
   });
