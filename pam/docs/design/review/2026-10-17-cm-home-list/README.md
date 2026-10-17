@@ -10,3 +10,13 @@ visit lines Will chose on a93 earlier, which are picture-only in these shots: th
   today's words, the four items and "They were told exactly this." Nothing is reworded; it is the same promise to members (§4.1), one tap away.
 - The floating "Invite someone" is gone from this Home (the other staff Homes keep theirs); the 12px paragraph and its heading at the foot are gone.
 - Eye icon on "What you can see" is the existing `EyeIcon` (D-416: what somebody can see). No new words.
+
+## Sage's visit-line words (06:06) and the chip's tone
+
+The line under a name now reads "Next visit: {when}", "Marked as there: {date}" or, for a visit nobody marked, a dark chip "Not marked as there" with the date under it. (Went and Missed
+are gone: an unmarked visit is not proof of a miss.)
+- The chip keeps Will's dark look (amber `warning` tone) so it is seen at a glance, but it is not the red `error` tone and carries no "missed", "no-show" or exclamation mark: it says what the
+  record says. It stays on the card's own second line, not in a badge at the corner.
+- The date is not inside the chip: at 320 "Not marked as there: Oct 15" is cut ("Not marked as there: Oc…"), so the chip is the five words and the date is the line under it. The
+  longer lines wrap to two lines when they must (Next visit at 320, Marked as there in Arabic); nothing is cut. Arabic words in the pictures are my stand-ins for Lena.
+- `proposal.patch` includes these words and the chip as picture-only code; Ava builds the real thing from the signed keys.

@@ -1,5 +1,5 @@
 diff --git a/pam/apps/web/src/screens/StaffHomes.tsx b/pam/apps/web/src/screens/StaffHomes.tsx
-index 11792cb1..0afe3a7f 100644
+index 11792cb1..6e16fddc 100644
 --- a/pam/apps/web/src/screens/StaffHomes.tsx
 +++ b/pam/apps/web/src/screens/StaffHomes.tsx
 @@ -3,10 +3,14 @@
@@ -18,6 +18,17 @@ index 11792cb1..0afe3a7f 100644
  import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
  import { MenuList } from '@pam/ui/MenuList';
  import { DashedRule } from '@pam/ui/DashedRule';
+@@ -36,8 +40,8 @@ import { PeopleHomeView, type HomePerson, type PeopleState } from './PeopleHomeV
+ type VisitRow = { member_id: string; starts_at: string; status: string | null; services: { name: string | null } | null };
+ // Picture-only stand-in words (Sage and Lena write the real ones).
+ const STAND_IN: Record<string, { next: string; went: string; missed: string }> = {
+-  en: { next: 'Next visit', went: 'Went', missed: 'Missed' },
+-  ar: { next: 'الزيارة القادمة', went: 'حضر', missed: 'لم يحضر' },
++  en: { next: 'Next visit', went: 'Marked as there', missed: 'Not marked as there' },
++  ar: { next: 'الزيارة القادمة', went: 'تم تسجيل الحضور', missed: 'لم يُسجَّل الحضور' },
+ };
+ function useCaseloadVisits(ids: readonly string[]): Record<string, VisitRow[]> {
+   const [rows, setRows] = useState<Record<string, VisitRow[]>>({});
 @@ -64,6 +68,7 @@ export function CaseloadHome() {
    const router = useRouter();
    const { state: caseload, refresh } = useCaseload(true);
@@ -26,6 +37,31 @@ index 11792cb1..0afe3a7f 100644
    const { locale } = useI18n();
    const visits = useCaseloadVisits(caseload.status === 'ready' ? caseload.members.map((m) => m.id) : []);
    const words = STAND_IN[locale] ?? STAND_IN['en']!;
+@@ -75,13 +80,13 @@ export function CaseloadHome() {
+     if (next) return [`${words.next}: ${fmt.format(new Date(next.starts_at))}`];
+     const last = mine[mine.length - 1];
+     if (!last) return [];
+-    return [`${last.status === 'attended' ? words.went : words.missed} ${fmtDay.format(new Date(last.starts_at))}`];
++    return [`${last.status === 'attended' ? words.went : words.missed}: ${fmtDay.format(new Date(last.starts_at))}`];
+   };
+   const missedChip = (id: string): { label: string; tone: 'warning' } | null => {
+     const mine = (visits[id] ?? []).slice().sort((a, b) => a.starts_at.localeCompare(b.starts_at));
+     const last = mine[mine.length - 1];
+     return last && last.status !== 'attended' && new Date(last.starts_at).getTime() < Date.now()
+-      ? { label: `${words.missed} ${fmtDay.format(new Date(last.starts_at))}`, tone: 'warning' }
++      ? { label: words.missed, tone: 'warning' }
+       : null;
+   };
+ 
+@@ -106,7 +111,7 @@ export function CaseloadHome() {
+                   href: `/person/?id=${encodeURIComponent(member.id)}`,
+                   chip: statusChip(member, t) ?? missedChip(member.id),
+                   programBadge: member.program,
+-                  meta: missedChip(member.id) ? [] : visitLine(member.id),
++                  meta: missedChip(member.id) ? [fmtDay.format(new Date((visits[member.id] ?? []).slice().sort((a, b) => a.starts_at.localeCompare(b.starts_at)).at(-1)!.starts_at))] : visitLine(member.id),
+                 }),
+               ),
+             }
 @@ -140,27 +145,42 @@ export function CaseloadHome() {
        strip={<StaffPeopleRow role="admin" />}
        // §4.1: members agreed to this list at onboarding, and the case manager
