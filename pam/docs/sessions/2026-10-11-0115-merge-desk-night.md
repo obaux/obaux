@@ -1342,7 +1342,29 @@
   placeholders and fails a cut English one); Sage signed a second sentence for the member's short "What others can
   see" (3c526500); Russian «Поиск людей» chosen because no form with «участников» fits 128px.
 
+- **b54 pushed (08:02, f4dbff9e).** Main CI green 08:34; D-599 live as `20261017083423`. Records a2bd0654.
+- **Iris's b54 re-test (08:47).** Trip names, Coming in, the note and the site date PASS. When? had two findings: the
+  chips' hit area worked above but not below (the unselected chip's 1px border left 2px below the outline, so 46px
+  tall), and at 320×568 the last row of times sat under the Next bar's fade. A trip card's "10:00 / AM" split at 320.
+- **Batch b55 (17 October, 09:35 to 10:06).** Lena's e618c540: "Search members" and the spoken "Search members by
+  name" in seven languages (ru «Поиск людей»); the 320 audit measures placeholders and fails a cut English one;
+  fit-known.json catches up (five 568 entries, 31 pseudo entries, each with its reason); the privacy guard pins the
+  purge reading meta. Lena's 99b26c35: the short "What others can see" program line gains "It sees more once you sign
+  up, sign its rules or plan a visit there" (Sage 3c526500). Wren's fa0481ce: the Support search says "Ask a
+  question", spoken "Ask a question in Support" (Sage 3c4c721f); it had read "Ask a question, for example “why" at
+  320. Piper's dcdbad8a: the chips' hit area is 4px past the outline on both sides; Dot's call for 320×568 (16px of
+  air under the last row, so it scrolls clear of the fade; tabbing to it scrolls it clear); the trip card's time
+  stays whole. Iris's 24cf0db6 (the b54 re-test). Sage's ledger to 3c4c721f. All merges clean.
+- **b55 pushed (10:06, 97e5fd27).** Main CI green 10:38.
+
 ## What was wrong, and what missed it
+
+- **A flaky test's evidence was wiped before anyone read it (b55).** The merge desk re-ran invite.spec.ts:178 fifteen
+  times in the same folder, and Playwright cleared test-results/, so the failure's error-context.md was gone when Ava
+  asked for it. Rule: copy test-results/ aside before re-running a flaky test.
+- **A spec for a hit area measured one side only (b54).** new-trip-chips.spec.ts tested 3px above the chip, not below,
+  so a 1px border that left the bottom 2px short passed. Iris found it by hand. Rule: a hit-area test measures every
+  side it claims.
 
 - **A person named only in an audit row's meta outlived the six months (D-443 to b54).** `purge_erased_audit()`
   matched actor_id and target_id only; `conversation.open` ('with', D-541), `message_program` (the lead) and
@@ -1726,9 +1748,16 @@
 | Batch b54 with D-599 (f4dbff9e): @pam/db | 1626 ok, 0 not ok; test 77: a person named only in meta is purged six months on, others' rows stay, someone erased today stays, the guard is back on |
 | b54 main CI (f4dbff9e) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (08:34); Vercel web and pam-site success |
 | `20261017075451` live (`20261017083423`) | list_migrations first (last live 20261017080113); main's file = the reviewed fa8d3c6a (same md5); purge_erased_audit: same oid as before (the append-only guard's exception still names it), owner postgres, security definer, search_path = public, extensions, reads meta (jsonb_each_text), flag kept; no execute for anon or authenticated; its nightly cron job active |
+| Batch b55, full run (97e5fd27): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1353 passed, 1 skipped / in step / 124 / 0 / 123 / 0 / 0 / 0 / 188 / 11.0 kB spare / 2041 passed, 19 skipped, 1 flaky, exit 0 / built; "no bundle names the live one"; grep 0 files / 0 / 120 scans, 0 problems |
+| b55's flaky test: invite.spec.ts:178 at iphone-se ("Clicking the checkbox did not change its state" on the Philadelphia radio) | passed on retry; alone, `--repeat-each=15 --retries=0`: 15 passed. Not b55's code (the staff-request page). Sent to Ava to root-cause under load |
+| b55 fit audit, website stories (en, ru, ar, zh-CN, pseudo at 320×760, fit-known) | 24 stories × 5 languages: 0 new, 0 in English; the Support placeholder no longer cut |
+| b55 main CI (97e5fd27) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (10:38); Vercel web and pam-site success |
 
 ## Left undone
 
+- **As of b55 (17 October, 10:06):** Iris re-checks When? (hit area both sides, the times at 320×568). Ava: the
+  invite.spec timeout under load. Lena: fit-known entries for es, pt-BR and zh-HK (same two classes). With Will: a91,
+  a93, a94, a86, a84, a88.
 - **As of b54 (17 October, 08:35):** D-599 is live; Lena pins it. With Will: a91 (the button word and "sign 1" or "sign 2"), a93 (his yes; Ava's merge and full run), a94
   (the Privacy paragraph, the opt-in, every visit or only a missed one), a86, a84, a88. Lena: the search branch
   READY, the short program line (3c526500), the Arabic no-lead note with a91. Wren: none. Iris: none.
