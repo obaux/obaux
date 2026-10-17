@@ -92,6 +92,8 @@ export interface MockOptions {
   readonly pastTrip?: boolean;
   /** The calendar link is already on (D-538): the page shows the switch and "make a new link" / "turn it off". */
   readonly calendarOn?: boolean;
+  /** The calendar link's status cannot be read (a story for the error state). */
+  readonly calendarError?: boolean;
 
   /** Also a saved trip that is on now, so its page offers "I'm here" (D-535). */
   readonly tripNow?: boolean;
@@ -438,7 +440,7 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/my_trips', () => ({ body: savedTrips })),
     on('/rpc/my_trip_services', () => ({ body: [] })),
     // The calendar link (D-538): off, then a made-up address once made. Nothing leaves the story.
-    on('/rpc/calendar_link_status', () => ({
+    on('/rpc/calendar_link_status', () => options.calendarError ? { status: 500, body: { message: 'Storybook: the status could not be read' } } : ({
       body: [{ is_on: Boolean(options.calendarOn), show_details: false, made_at: options.calendarOn ? '2026-10-10T15:00:00Z' : null }],
     })),
     on('/rpc/calendar_link_make', () => ({ body: 'storybook-example-address-not-a-real-secret' })),
