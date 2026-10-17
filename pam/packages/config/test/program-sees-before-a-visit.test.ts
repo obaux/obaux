@@ -28,7 +28,8 @@ const site = readFileSync(`${REPO}apps/site/src/content/WhatOthersCanSee.tsx`, '
 
 /** The two sentences the Privacy page and the site both carry (the site's JSX wraps its lines). */
 const FIRST = 'A program sees you only after you write to them, sign their rules, sign up with them or plan a visit there, and only what they need to help you.';
-const BRIDGE = 'Before a visit, they see your first name, what you write to them, the day you signed their rules and, if you signed up, how that is going.';
+const BRIDGE =
+  'Before a visit, they see your first name, what you write to them, the day you signed their rules and, if you signed up, how that is going and when you save a new place, but not which one.';
 
 describe('the Privacy page says what a program sees, before a visit and for one', () => {
   it('names every way a program comes to see a member, and what it sees before a visit', () => {
@@ -62,6 +63,16 @@ describe('the transparency screen has a card for what a program can see', () => 
   it('says first name and what you write first, and the condition for all of it', () => {
     expect(program[0]?.en).toBe('Your first name, once you write to it, sign its rules, sign up or plan a visit there.');
     expect(program[1]?.en).toBe('What you write to it, even before you plan a visit.');
+  });
+
+  it('says a program sees when a member saved a place, never which, and only after a sign-up (P10, D-199)', () => {
+    expect(program.find((l) => l.key === 'transparency.program.saves')?.en).toBe(
+      'When you save a new place — not which one. Only after you sign up with it.',
+    );
+    // The same two facts, in the Privacy page's words and on the site, and the guide's list still says it too.
+    expect(sharing).toContain('if you signed up, how that is going and when you save a new place, but not which one.');
+    expect(TRANSPARENCY_SCREEN.canSee.find((l) => l.key === 'transparency.canSee.saves')?.en).toContain('A program you joined sees this too.');
+    expect(site).toContain("cells: ['Yes', 'Yes, but only once you sign up with them', 'No']");
   });
 
   it('says the day a member signed its rules, and never the signature', () => {
