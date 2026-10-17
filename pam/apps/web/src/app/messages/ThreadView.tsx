@@ -71,12 +71,10 @@ import { LimitedNotice } from './LimitedNotice';
  * one place Pam drops below its 18px body floor (A21, D-392: a phone's
  * conversation apps read at 16–17px, and at 18px the bubbles wrapped every
  * few words). The
- * mic (`ChatDictationButton`) is shown on every browser, and says why when it
- * cannot start (W4, D-603). It used to hide itself when the browser had no
- * speech recognition (the same §1 rule `VoiceInput` follows: a dead button is
- * worse than no button); but a mic that is there and silent is worse still, so
- * on such a browser a tap now says "This browser can't turn speech into
- * words" and points to the keyboard.
+ * mic (`ChatDictationButton`) hides itself when the browser has no speech
+ * recognition, which is the same §1 rule `VoiceInput` follows — a dead
+ * button is worse than no button. When the browser has it but it cannot
+ * start, the conversation says why (W4, D-603).
  *
  * The send button's icon is `<Icon icon="arrowUp" size="md" />`, not
  * `ChatSendButton`'s own default (Will's screenshot, 21 September: the
@@ -617,10 +615,6 @@ export function ThreadView({
         speech.stop();
         return;
       }
-      if (!speech.isSupported) {
-        dictationFailed('unsupported');
-        return;
-      }
       attempt.current = { started: false, reported: false };
       setDictationProblem(null);
       clearStartTimer();
@@ -903,7 +897,6 @@ export function ThreadView({
           <ChatDictationButton
             dictation={dictation}
             size="md"
-            isHiddenWhenUnsupported={false}
             label={dictation.isListening ? t('messages.thread.dictateStop') : t('messages.thread.dictate')}
             xstyle={[styles.square, styles.tuck]}
           />

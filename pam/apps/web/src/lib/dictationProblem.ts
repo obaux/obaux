@@ -5,10 +5,11 @@
  * short code. Before this, Pam listened for none of them: a refused microphone,
  * no connection, or a browser with no recogniser all looked like a mic button
  * that did nothing. Each code that means "this did not work" maps to one of the
- * lines `messages.thread.dictate.problem.<kind>.*`; the codes that are not a
+ * lines `messages.thread.dictate.problem.<kind>.*` (a browser with no recogniser
+ * hides the mic instead, so it has no line); the codes that are not a
  * failure (the person stopped it, or said nothing) map to `null` and show nothing.
  */
-export type DictationProblem = 'blocked' | 'noMic' | 'offline' | 'language' | 'unsupported' | 'failed';
+export type DictationProblem = 'blocked' | 'noMic' | 'offline' | 'language' | 'failed';
 
 export function dictationProblemFor(error: string): DictationProblem | null {
   switch (error) {

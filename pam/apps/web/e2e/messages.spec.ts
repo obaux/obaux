@@ -2321,16 +2321,15 @@ test.describe('speaking a message that cannot start (W4, D-603)', () => {
     await expect(page.getByText("The microphone didn't start", { exact: true })).toBeVisible();
   });
 
-  test('a browser with no speech recognition shows the mic, and a tap says it cannot', async ({ page }) => {
+  test('a browser with no speech recognition has no mic to tap (a dead button is worse than none)', async ({ page }) => {
     await page.addInitScript(() => {
       const w = window as unknown as Record<string, unknown>;
       Object.defineProperty(w, 'SpeechRecognition', { value: undefined, configurable: true });
       Object.defineProperty(w, 'webkitSpeechRecognition', { value: undefined, configurable: true });
     });
     await openThread(page);
-    await mic(page).click();
-    await expect(page.getByText("This browser can't turn speech into words", { exact: true })).toBeVisible();
-    await expect(page.getByText('You can type your message instead.')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Add a photo' })).toBeVisible();
+    await expect(mic(page)).toHaveCount(0);
   });
 
   test('"Listening" shows as soon as it starts, and a start clears an earlier failure', async ({ page }) => {

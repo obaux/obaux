@@ -4,8 +4,8 @@
 
 ## What changed
 
-- `ThreadView.tsx`: the conversation's microphone reports every failure to start in a line above the box (Pam's warning banner, as "Pam can't send that file"), says "Listening" as soon as it starts, and is no longer hidden on a browser with no speech recognition (a tap there explains). `lib/dictationProblem.ts` maps the browser's error codes to six lines (D-603).
-- Twelve new English strings, held as English in the other six languages (recorded unrecorded with `copy:ack`).
+- `ThreadView.tsx`: the conversation's microphone reports every failure to start in a line above the box (Pam's warning banner, as "Pam can't send that file"), says "Listening" as soon as it starts, and still hides on a browser with no speech recognition (Mira put the old rule back after a first version showed it there). `lib/dictationProblem.ts` maps the browser's error codes to five lines (D-603).
+- Ten new English strings, held as English in the other six languages (recorded unrecorded with `copy:ack`).
 
 ## What was wrong, and what missed it
 
@@ -13,11 +13,11 @@
 
 ## Decisions made
 
-- D-603, including the one that reverses "hide the mic when the browser has no recogniser".
+- D-603. The mic stays hidden where the browser has no recogniser (Mira's call, 17 October, after a first version that showed it).
 
 ## Verified
 
-- `dictationProblem.test.ts`; twelve new cases in `messages.spec.ts` (narrow-320) pass on this branch and the failure cases fail on main 62ba50e4.
+- `dictationProblem.test.ts`; twelve cases in `messages.spec.ts` pass on this branch and the failure cases fail on main 62ba50e4.
 
 ## Left undone
 

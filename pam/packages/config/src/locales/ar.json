@@ -394,8 +394,6 @@
   "messages.thread.dictate.problem.offline.hint": "Check your connection and tap the microphone again. You can type your message instead.",
   "messages.thread.dictate.problem.language.title": "This browser can't listen in your language",
   "messages.thread.dictate.problem.language.hint": "You can type your message instead.",
-  "messages.thread.dictate.problem.unsupported.title": "This browser can't turn speech into words",
-  "messages.thread.dictate.problem.unsupported.hint": "You can type your message instead.",
   "messages.thread.dictate.problem.failed.title": "The microphone didn't start",
   "messages.thread.dictate.problem.failed.hint": "Tap it again, or type your message instead.",
   "messages.translated.label": "تمت الترجمة",
