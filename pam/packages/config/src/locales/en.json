@@ -45,7 +45,6 @@
   "admin.notAdmin.title": "This screen is for case managers",
   "admin.points": "{count} points",
   "admin.programLeads.title": "Program leads",
-  "admin.seeing.body": "What they want to work on, the programs they sign up for and how they are going, their visits and if they went or missed one, their points, level and badges, the last day they used Pam, the names of the people they connect with and if they are a mentor or buddy, and when they save a new place — not which one. Not what they say or send to other people, or what they share with their buddies. You see what they send you directly, and anything else only if someone reports it as not safe. They were told exactly this.",
   "admin.seeing.title": "What you can see",
   "admin.seeing.told": "They were told exactly this.",
   "admin.signedOut.body": "This screen is for case managers, and it needs you signed in.",
