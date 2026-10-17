@@ -3,6 +3,7 @@ import { screen, screenWithControls } from './screen';
 import { asRole } from '../journeys/journey';
 import { REDESIGN_ROUTES } from '../prototype/routes';
 import { withSetup } from '../journeys/journey';
+import { BookForMemberView } from '../../screens/BookForMemberView';
 
 /**
  * A program lead's app, screen by screen (D-217, D-218). Their bar is Home
@@ -108,6 +109,15 @@ export const Member: Story = screen('provider', 'A member', '/person/', { id: 'd
 export const MemberPolicies: Story = screen('provider', 'A member — policies signed', '/person/policies/', { id: 'dummy-m2' });
 export const Invite: Story = screen('provider', 'Invite someone', '/invite/');
 export const BookForMember: Story = screen('provider', 'Book a visit for a member', '/program/book/');
+/**
+ * Nobody to pick yet (D-595): nobody has written to the program, signed up with it or planned a visit there. The sentence says all
+ * three, and the list is not a blank. Drawn here so the language fit audit measures it.
+ */
+export const BookForMemberNobody: Story = {
+  ...asRole('provider', '/program/book/'),
+  name: 'Book a visit for a member — nobody to pick',
+  render: () => <BookForMemberView people={[]} />,
+};
 export const AddPerson: Story = screen('provider', 'Add a person', '/program/book/new/');
 export const AllPrograms: Story = screen('provider', 'All programs', '/programs/');
 export const AddProgram: Story = screen('provider', 'Add a program', '/programs/new/');

@@ -231,6 +231,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
             title={t('explore.nextTrip.title')}
             when={tripWhen(nextTrip.startsAt, locale)}
             href="/trips/"
+            mark={nextTrip.bookedByProgram ? t('trips.bookedForYou') : null}
             label={tPlain('explore.nextTrip.label', {
               kind: t(categoryLabelKey(nextTrip.category)),
               when: tripWhen(nextTrip.startsAt, locale),

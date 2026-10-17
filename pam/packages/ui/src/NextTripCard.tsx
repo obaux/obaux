@@ -29,6 +29,8 @@ export interface NextTripCardProps {
   readonly href: string;
   /** The whole card read out — "Your next visit: School and training, Tue …". */
   readonly label: string;
+  /** A line under the time, e.g. "Booked for you by {program}" (D-595). */
+  readonly mark?: string | null;
 }
 
 const styles = stylex.create({
@@ -61,7 +63,7 @@ const styles = stylex.create({
   },
 });
 
-export function NextTripCard({ categoryLabel, categoryIcon, art, title, when, href, label }: NextTripCardProps) {
+export function NextTripCard({ categoryLabel, categoryIcon, art, title, when, href, label, mark = null }: NextTripCardProps) {
   return (
     <ClickableCard label={label} href={href} padding={5} xstyle={styles.card}>
       <HStack gap={3} align="center" wrap="nowrap">
@@ -81,6 +83,11 @@ export function NextTripCard({ categoryLabel, categoryIcon, art, title, when, hr
             </Text>
             <Icon icon="chevronRight" size="sm" color="secondary" />
           </HStack>
+          {mark ? (
+            <Text type="supporting" xstyle={styles.when}>
+              {mark}
+            </Text>
+          ) : null}
         </VStack>
         <HStack xstyle={styles.stack} aria-hidden>
           <HStack xstyle={[styles.tile, styles.back]} />

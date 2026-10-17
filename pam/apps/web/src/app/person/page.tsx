@@ -17,6 +17,7 @@ import { ProfileSummary } from '@pam/ui/ProfileCards';
 import { TripCard } from '@pam/ui/TripCard';
 import { useRouter } from 'next/navigation';
 import { dummyTripsFor } from '@pam/config/dummy-trips';
+import { showsBookedBy } from '@/lib/bookedByLine';
 import { useMemberTrips } from '@/lib/useMemberTrips';
 import { useCaseload, type CaseloadMember } from '@/lib/useCaseload';
 import { openConversation } from '@/lib/openConversation';
@@ -312,6 +313,8 @@ function PersonScreen() {
       href={`/place/?id=${encodeURIComponent(trip.placeId)}`}
       art={<CategoryPicture category={trip.category} />}
       label={`${trip.placeName}, ${tripWhen(trip.startsAt)}`}
+      // A program booked it for them (D-595): the case manager is told which, behind one setting (lib/bookedByLine).
+      mark={'bookedByProgram' in trip && showsBookedBy(trip) ? t('person.trip.bookedBy', { program: trip.placeName }) : null}
     />
   );
   const exampleThread =

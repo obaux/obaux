@@ -88,3 +88,13 @@ test('the member\'s page counts only the attended ones next to "Programs attende
   // One attended visit of three: the label and a 1, not a 3.
   await expect(row).toHaveText('Programs attended in the past1');
 });
+
+/** D-595: the case manager is told which program booked a visit for the member (lib/bookedByLine decides on which visits). */
+test('a visit a program booked for the member says "Booked by {program}"; one they planned does not', async ({ page }) => {
+  await open(page, [
+    { id: 'b', starts_at: inDays(3), status: 'scheduled', booked_by_org: '22222222-0000-0000-0000-0000000000aa', service_id: 'a1b2c3d4-0000-4000-8000-0000000000e1', services: { name: 'Riverside Job Center', category: 'workforce' } },
+    { id: 'p', starts_at: inDays(4), status: 'scheduled', booked_by_org: null, service_id: 'a1b2c3d4-0000-4000-8000-0000000000e5', services: { name: 'Planned Place', category: 'workforce' } },
+  ]);
+  await expect(page.getByText('Booked by Riverside Job Center')).toBeVisible();
+  await expect(page.getByText(/Booked by Planned Place/)).toHaveCount(0);
+});

@@ -74,7 +74,10 @@ test.describe('agreeing to reminders', () => {
 
   test('says what is sent, what is sent today, and how to stop', async ({ page }) => {
     await page.goto('/reminders/');
-    await expect(page.getByText(/reminder before a visit/i)).toBeVisible();
+    // Sage's signed line (a94, Will 17 October): "before each visit", so it covers a visit a program booked too. The old line, "a visit you
+    // planned", must fail here: this list is what the carrier reads as the opt-in.
+    await expect(page.getByText('A reminder before each visit, with the address.', { exact: true })).toBeVisible();
+    await expect(page.getByText(/a visit you planned/i)).toHaveCount(0);
     // No promise about how often: only what really goes out today (10 October 2026, D-453).
     await expect(page.getByText(/Pam does not send any of these yet/i)).toBeVisible();
     await expect(page.getByText(/few messages a week/i)).toHaveCount(0);
@@ -86,7 +89,7 @@ test.describe('agreeing to reminders', () => {
     // Hiding the question behind a sign-in explains nothing. What Pam would
     // send is shown; the thing to do next is sign in, so that is the button.
     await page.goto('/reminders/');
-    await expect(page.getByText(/reminder before a visit/i)).toBeVisible();
+    await expect(page.getByText('A reminder before each visit, with the address.', { exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Sign in' })).toBeVisible();
   });
 
