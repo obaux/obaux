@@ -1,4 +1,5 @@
 -- A visit can say which program booked it, and the bell can say so (D-595, a94).
+-- contract: no live release inserts a notification of the kinds the old check lists differently (the list only grows by 'visit_booked_for_you'; every kind written before is still allowed).
 --
 -- Will, 17 October 05:46 (card a94): "If a program books an appointment on behalf of a member, it should show on the member's
 -- trips section or on their explore page for an upcoming visit. The only way that we can confirm if the member showed up is if
