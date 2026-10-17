@@ -928,6 +928,11 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Accounts & invites · Sign up's city note is a line, not a row (17 October) — READY (run-through P5)
+
+`claude/pam-join-city-note`. "Pam is only in these cities for now." is small print under the city field, not a disabled
+row in its list; the list holds only cities. `JoinScreen.tsx` only (not the shared Dropdown). join.spec checks it.
+
 ## Accounts & invites · Cities people are waiting for (17 October) — live in b53 (`20261017080113`)
 
 `claude/pam-waiting-city-counts` (D-593, a96 item 3). Migration `20261017055932` adds `waiting_city_counts()`
