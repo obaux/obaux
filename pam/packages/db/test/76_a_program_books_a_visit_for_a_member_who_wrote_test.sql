@@ -1,4 +1,4 @@
--- A program books a visit for a member who wrote to it, signed its rules, signed up there or planned a visit there (test 76; D-595, a94).
+-- A program books a visit for a member who wrote to it (test 76; D-595, a94).
 --
 -- Will, 17 October: a program may book a visit for a member; it shows on the member's Trips, the bell tells them, the member can
 -- cancel it, a case manager sees it was booked by the program. This file attacks each rule of `book_visit_for_member`:
@@ -23,12 +23,10 @@ set client_min_messages to notice;
 \set org1    '22222222-0000-0000-0000-000000000001'
 \set wanda   '76767676-0000-0000-0000-000000000001'
 \set wilma   '76767676-0000-0000-0000-000000000002'
-\set willa   '76767676-0000-0000-0000-000000000003'
-\set wren    '76767676-0000-0000-0000-000000000004'
 
 -- ===========================================================================
 \echo ''
-\echo '--- Fixture: Wanda signed up with Alice''s program, Wilma planned a visit there, Wren signed its rules, Willa only said she was interested; none has written to it ---'
+\echo '--- Fixture: Wanda signed up with Alice''s program, Wilma planned a visit there; neither has written to it ---'
 -- ===========================================================================
 reset role;
 -- Their own places: earlier files remove and unreview the seed's. One of Alice's organisation, one of Bob's.
@@ -36,18 +34,12 @@ insert into public.services (id, org_id, name, category, address, is_active, nee
   (:'ged', :'org1', 'Visit Booking Class', 'education', '1 Test St', true, false),
   (:'bobsvc', '22222222-0000-0000-0000-000000000002', 'Visit Booking Warehouse', 'workforce', '2 Test St', true, false)
 on conflict do nothing;
-insert into auth.users (id) values (:'wanda'), (:'wilma'), (:'willa'), (:'wren') on conflict do nothing;
+insert into auth.users (id) values (:'wanda'), (:'wilma') on conflict do nothing;
 insert into public.profiles (id, role, first_name, region_id, is_mentor, is_public, access_status)
 values (:'wanda', 'member', 'Wanda', '11111111-0000-0000-0000-000000000001', false, true, 'active'),
-       (:'wilma', 'member', 'Wilma', '11111111-0000-0000-0000-000000000001', false, true, 'active'),
-       (:'willa', 'member', 'Willa', '11111111-0000-0000-0000-000000000001', false, true, 'active'),
-       (:'wren', 'member', 'Wren', '11111111-0000-0000-0000-000000000001', false, true, 'active')
+       (:'wilma', 'member', 'Wilma', '11111111-0000-0000-0000-000000000001', false, true, 'active')
 on conflict do nothing;
-insert into public.enrollments (member_id, service_id, status) values (:'wanda', :'ged', 'enrolled'), (:'willa', :'ged', 'interested') on conflict do nothing;
-create temp table t76_policy as
-  with p as (insert into public.program_policies (service_id, title) values (:'ged', 'Visit Booking Class rules') returning id)
-  select id from p;
-insert into public.policy_signatures (policy_id, member_id, image) select id, :'wren', 'data:image/png;base64,AAAA' from t76_policy;
+insert into public.enrollments (member_id, service_id, status) values (:'wanda', :'ged', 'enrolled') on conflict do nothing;
 insert into public.appointments (member_id, service_id, starts_at, status)
 values (:'wilma', :'ged', now() + interval '20 days', 'scheduled');
 
@@ -77,19 +69,15 @@ select test.check_raises_like('a case manager cannot book',
 
 -- ===========================================================================
 \echo ''
-\echo '--- For whom: a member who has written to this program, signed its rules, signed up there or planned a visit there ---'
+\echo '--- For whom: only a member who has written to this program ---'
 -- ===========================================================================
 select test.as_user(:'alice');
-select test.check_raises_like('not for a member who has done none of those (Tanya)',
+select test.check_raises_like('not for a member with no conversation (Tanya)',
   format($f$select public.book_visit_for_member(%L, %L, (select d + interval '9 hours' from t76))$f$, :'tanya', :'ged'), '%MEMBER_NOT_LINKED%');
-select test.check_raises_like('...nor one who only said she was interested (Willa)',
-  format($f$select public.book_visit_for_member(%L, %L, (select d + interval '9 hours' from t76))$f$, :'willa', :'ged'), '%MEMBER_NOT_LINKED%');
-select test.check('...but one who signed up (Wanda) can be booked for',
-  (select count(*) from (select public.book_visit_for_member(:'wanda', :'ged', (select d + interval '60 days 9 hours' from t76))) x), 1);
-select test.check('...one who planned a visit there (Wilma)',
-  (select count(*) from (select public.book_visit_for_member(:'wilma', :'ged', (select d + interval '61 days 9 hours' from t76))) x), 1);
-select test.check('...and one who signed its rules (Wren)',
-  (select count(*) from (select public.book_visit_for_member(:'wren', :'ged', (select d + interval '62 days 9 hours' from t76))) x), 1);
+select test.check_raises_like('...not for one who only signed up (Wanda)',
+  format($f$select public.book_visit_for_member(%L, %L, (select d + interval '9 hours' from t76))$f$, :'wanda', :'ged'), '%MEMBER_NOT_LINKED%');
+select test.check_raises_like('...not for one who only planned a visit there (Wilma)',
+  format($f$select public.book_visit_for_member(%L, %L, (select d + interval '9 hours' from t76))$f$, :'wilma', :'ged'), '%MEMBER_NOT_LINKED%');
 select test.check_raises_like('...not for somebody who is not a member (a lead, Bob)',
   format($f$select public.book_visit_for_member(%L, %L, (select d + interval '9 hours' from t76))$f$, :'bob', :'ged'), '%MEMBER_NOT_LINKED%');
 select test.check_raises_like('...and the answer is the same for a person who does not exist',
@@ -139,8 +127,8 @@ select test.check('Marcus has one bell notice, with the place and the time as va
      and body_vars ? 'place' and body_vars ? 'startsAt' and (select count(*) from jsonb_object_keys(body_vars)) = 3), 1);
 select test.check('...and no text is queued for it',
   (select count(*) from public.outbound_messages where member_id = :'marcus' and created_at > now() - interval '1 minute'), 0);
-select test.check('the audit log says which lead did it: one row for each of Marcus, Wanda, Wilma and Wren',
-  (select count(*) from public.audit_log where actor_id = :'alice' and action = 'visit.booked_for_member'), 4);
+select test.check('the audit log says which lead did it',
+  (select count(*) from public.audit_log where actor_id = :'alice' and action = 'visit.booked_for_member'), 1);
 
 set role authenticated;
 select test.as_user(:'alice');
