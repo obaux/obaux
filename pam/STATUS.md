@@ -1008,6 +1008,10 @@ cleared and lands as super admin. "Use Pam as" (two-role accounts, D-374) stays;
 change. Also Iris's W2: sign-up step 2 has a Contact Pam row (help desk; no phone line, D-512).
 Open with Will: W2's back arrow (recommended: none).
 
+## Voice & UX copy · a94, a96, a93 and a91 signed (16–17 October)
+
+Ledger `docs/signed-english.md` through `33175aed`. Will signed a96 (five Privacy gaps, live in b52), a94 (a program books a visit for a member: sharing.p9, the guide rows, "Booked for you" and the reminders opt-in; live in b58, website in b59) and a90 (Maker). I signed a93's visit line ("Marked as there" / "Not marked as there"), the a91 widget words ("I made it", "Who sees this visit") and the seven Book a visit refusal lines (in b60 with Piper). Open with Will: a91, the first button ("Check in" or "I made it") and the shorter `place.lead.sees` (option 1 advised). Log: `docs/sessions/2026-10-17-1801-voice-signing-a91-a93-a94-a96-privacy-gaps.md`.
+
 ## Voice & UX copy · English signed for b22, W6, the help form and street search (13 October)
 
 Ledger: `docs/signed-english.md` on `claude/sage-signs` (732e6650). Signed and checked against the code: the b22 visit lines, the website help form, street-search labels, the W6 Join lines and `nav.back.reported`. Will's a72, a77, a80, a81 and a82 are recorded as his. Still waiting: Will on the a65 24/7 line (until launch). Session log: `docs/sessions/2026-10-13-1925-voice-signing-a29-b22-w6-help-form.md`.
