@@ -1,6 +1,5 @@
 'use client';
 
-import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
 import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
@@ -10,6 +9,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { DataHeading } from '@pam/ui/DataHeading';
 import { Badge } from '@pam/ui/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
+import { borderVars, colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { ProgramBadge } from './ProgramBadge';
 
 /**
@@ -34,19 +34,11 @@ import { ProgramBadge } from './ProgramBadge';
 export interface PersonRowProps {
   readonly firstName: string | null;
   readonly href?: string;
-  readonly chip?: {
-    readonly label: string;
-    readonly tone: 'error' | 'warning';
-    /**
-     * A short line under the chip, not inside it (Dot, a93: "Not marked as there" with the date under it, so the chip is
-     * never cut at 320 or in Arabic).
-     */
-    readonly detail?: string;
-    /** What a screen reader hears for the chip and its line together, as one phrase (Sage, a93): built with `tPlain`. */
-    readonly spoken?: string;
-  } | null;
+  readonly chip?: { readonly label: string; readonly tone: 'error' | 'warning' } | null;
   /** Extra facts, in order — points, an org name, last active, and so on. */
   readonly meta: readonly string[];
+  /** The facts line in red: a visit not marked as there (Will, card a93). The words say it; the red only draws the eye. */
+  readonly isMetaAlert?: boolean;
   /**
    * Which program this person is genuinely connected to (a real
    * `enrollments` row, `status` in `enrolled`/`active` — never shown for
@@ -65,9 +57,11 @@ export interface PersonRowProps {
    */
   readonly trailing?: ReactNode;
   /**
-   * The redesigned Home's card (D-227, Will, 2 October): the name, and right
+   * The redesigned Home's row (D-227, Will, 2 October): the name, and right
    * under it one small line — the facts joined with " · " — instead of a
-   * second row of separate words under the avatar.
+   * second row of separate words under the avatar. A row on the page with a
+   * thin line under it, not a card (Will, card a93, 17 October: "There's no
+   * need for that").
    */
   readonly isCompact?: boolean;
 }
@@ -81,6 +75,19 @@ const styles = stylex.create({
   compactName: { fontSize: '18px', lineHeight: 1.3 },
   compactMeta: { fontSize: '14px', lineHeight: 1.35 },
   compactText: { flexGrow: 1, minWidth: 0 },
+  // A list row: the page behind it, a line under it, as the rows below the list (MenuList) draw theirs.
+  row: {
+    width: '100%',
+    position: 'relative',
+    minHeight: '64px',
+    paddingBlock: spacingVars['--spacing-3'],
+    boxSizing: 'border-box',
+    borderBlockEndWidth: borderVars['--border-width'],
+    borderBlockEndStyle: 'solid',
+    borderBlockEndColor: colorVars['--color-border'],
+  },
+  // Dot's AA red is to come; until then the theme's own error red, AA in light and dark.
+  alert: { color: colorVars['--color-error'] },
   link: {
     color: 'inherit',
     textDecoration: 'none',
@@ -88,61 +95,35 @@ const styles = stylex.create({
   },
 });
 
-/** The chip, and its line under it when it has one; heard as one phrase when `spoken` is given. */
-function ChipBlock({ chip }: { readonly chip: NonNullable<PersonRowProps['chip']> }) {
-  const shown = (
-    <VStack gap={0.5} {...(chip.spoken ? { 'aria-hidden': true } : {})}>
-      <HStack>
-        <Badge variant={chip.tone} label={chip.label} />
-      </HStack>
-      {chip.detail ? (
-        <Text type="supporting" xstyle={styles.compactMeta}>
-          {chip.detail}
-        </Text>
-      ) : null}
-    </VStack>
-  );
-  return chip.spoken ? (
-    <>
-      <VisuallyHidden>{chip.spoken}</VisuallyHidden>
-      {shown}
-    </>
-  ) : (
-    shown
-  );
-}
-
-export function PersonRow({ firstName, href, chip, meta, programBadge, trailing, isCompact = false }: PersonRowProps) {
+export function PersonRow({ firstName, href, chip, meta, isMetaAlert = false, programBadge, trailing, isCompact = false }: PersonRowProps) {
   if (isCompact) {
     return (
-      <Card xstyle={styles.card}>
-        <HStack gap={3} align="center" wrap="nowrap">
-          <Avatar size="md" name={firstName ?? '?'} />
-          <VStack gap={0.5} xstyle={styles.compactText}>
-            <DataHeading level={3} xstyle={styles.compactName}>
-              {href ? (
-                <a href={href} {...stylex.props(styles.link)}>
-                  {firstName ?? '—'}
-                </a>
-              ) : (
-                (firstName ?? '—')
-              )}
-            </DataHeading>
-            {meta.length > 0 ? (
-              <Text type="supporting" xstyle={styles.compactMeta}>
-                {meta.join(' · ')}
-              </Text>
-            ) : null}
-            {chip || programBadge ? (
-              <HStack gap={2} wrap="wrap" align="center">
-                {chip ? <ChipBlock chip={chip} /> : null}
-                {programBadge ? <ProgramBadge name={programBadge.name} serviceId={programBadge.serviceId} /> : null}
-              </HStack>
-            ) : null}
-          </VStack>
-          {trailing ? <HStack xstyle={styles.trailing}>{trailing}</HStack> : null}
-        </HStack>
-      </Card>
+      <HStack gap={3} align="center" wrap="nowrap" role="listitem" xstyle={styles.row}>
+        <Avatar size="md" name={firstName ?? '?'} />
+        <VStack gap={0.5} xstyle={styles.compactText}>
+          <DataHeading level={3} xstyle={styles.compactName}>
+            {href ? (
+              <a href={href} {...stylex.props(styles.link)}>
+                {firstName ?? '—'}
+              </a>
+            ) : (
+              (firstName ?? '—')
+            )}
+          </DataHeading>
+          {meta.length > 0 ? (
+            <Text type="supporting" xstyle={[styles.compactMeta, isMetaAlert && styles.alert]}>
+              {meta.join(' · ')}
+            </Text>
+          ) : null}
+          {chip || programBadge ? (
+            <HStack gap={2} wrap="wrap" align="center">
+              {chip ? <Badge variant={chip.tone} label={chip.label} /> : null}
+              {programBadge ? <ProgramBadge name={programBadge.name} serviceId={programBadge.serviceId} /> : null}
+            </HStack>
+          ) : null}
+        </VStack>
+        {trailing ? <HStack xstyle={styles.trailing}>{trailing}</HStack> : null}
+      </HStack>
     );
   }
   return (
@@ -164,7 +145,7 @@ export function PersonRow({ firstName, href, chip, meta, programBadge, trailing,
           {trailing ? <HStack xstyle={styles.trailing}>{trailing}</HStack> : null}
         </HStack>
         <HStack gap={2} wrap="wrap" align="center">
-          {chip ? <ChipBlock chip={chip} /> : null}
+          {chip ? <Badge variant={chip.tone} label={chip.label} /> : null}
           {programBadge ? <ProgramBadge name={programBadge.name} serviceId={programBadge.serviceId} /> : null}
           {meta.map((line) => (
             <Text key={line} type="supporting" xstyle={styles.meta}>

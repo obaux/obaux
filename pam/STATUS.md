@@ -931,7 +931,8 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 ## Accounts & invites · Case manager Home: visit line and two rows (17 October) — READY, ships on Will's yes (a93)
 
 `claude/pam-caseload-visit-line` (D-596). One visit line per member in Sage's words, replacing points; one read for the
-whole list; Invite someone and What you can see (a sheet) under the cards.
+whole list; Invite someone and What you can see (a sheet) under the members. After Will's look (15:12): rows, not
+cards, and "Not marked as there: Oct 15" is one red line. Pictures: `docs/design/review/2026-10-17-cm-home-rows/`.
 
 ## Accounts & invites · Cities people are waiting for (17 October) — live in b53 (`20261017080113`)
 

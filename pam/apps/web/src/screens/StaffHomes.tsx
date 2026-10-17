@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
-import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -47,8 +46,7 @@ export function CaseloadHome() {
   const [seeOpen, setSeeOpen] = useState(false);
 
   // The one visit line under a member's name (card a93, Sage's words, ledger 6867b09b): the next visit, or the most recent
-  // marked one. "Not marked as there" is a chip, unless the card already has one for what is switched off: that one wins and
-  // the visit says itself as the line instead.
+  // marked one. "Not marked as there: Oct 15" is the same one line as "Marked as there: Oct 16", in red (Will, 17 October).
   const day = (iso: string) => new Intl.DateTimeFormat(intlLocale(locale), { month: 'short', day: 'numeric' }).format(new Date(iso));
   // The time stays on one line ("10:00 AM", not "10:00" then "AM"), as on the member's page.
   const when = (iso: string) =>
@@ -57,22 +55,8 @@ export function CaseloadHome() {
     visit.kind === 'next'
       ? t('caseload.visit.next', { when: when(visit.at) })
       : t(visit.kind === 'went' ? 'caseload.visit.went' : 'caseload.visit.missed', { date: day(visit.at) });
-  const lineAndChip = (visit: CaseloadVisit | null, chip: HomePerson['chip']): Pick<HomePerson, 'meta' | 'chip'> => {
-    if (!visit) return { meta: [], chip };
-    // The chip holds only its words, the date is the line under it (Dot), and a screen reader hears both as one phrase (Sage,
-    // ledger e520eb54).
-    if (visit.kind === 'missed' && !chip)
-      return {
-        meta: [],
-        chip: {
-          label: t('caseload.visit.missed.chip'),
-          tone: 'warning',
-          detail: day(visit.at),
-          spoken: tPlain('caseload.visit.missed', { date: day(visit.at) }),
-        },
-      };
-    return { meta: [visitWords(visit)], chip };
-  };
+  const visitLine = (visit: CaseloadVisit | null): Pick<HomePerson, 'meta' | 'isMetaAlert'> =>
+    visit ? { meta: [visitWords(visit)], isMetaAlert: visit.kind === 'missed' } : { meta: [] };
   // The example people have planned visits but no marks: they show their next one.
   const exampleNext = (personId: string): CaseloadVisit | null => {
     const now = Date.now();
@@ -101,7 +85,8 @@ export function CaseloadHome() {
                   firstName: member.firstName,
                   href: `/person/?id=${encodeURIComponent(member.id)}`,
                   programBadge: member.program,
-                  ...lineAndChip(member.visit, statusChip(member, t)),
+                  chip: statusChip(member, t),
+                  ...visitLine(member.visit),
                 }),
               ),
             }
@@ -113,7 +98,8 @@ export function CaseloadHome() {
                       id: member.id,
                       firstName: member.firstName,
                       href: `/person/?id=${member.id}`,
-                      ...lineAndChip(exampleNext(member.id), dummyChip(member.accessStatus, t)),
+                      chip: dummyChip(member.accessStatus, t),
+                      ...visitLine(exampleNext(member.id)),
                     }),
                   )
                 : [],
@@ -132,22 +118,20 @@ export function CaseloadHome() {
       state={state}
       note={isExample ? t('example.people.note') : null}
       strip={<StaffPeopleRow role="admin" />}
-      // Under the cards, two rows between lines (Will and Dot, card a93, 17 October): Invite someone, moved up from the
+      // Under the members, two rows between lines (Will and Dot, card a93, 17 October): Invite someone, moved up from the
       // floating button, and What you can see, which opens a sheet like a place's hours. The promise to members (§4.1) is the
       // same words as joining (join.privacy.admin.1–4), one tap away rather than at the foot of the page.
       footer={
         <>
-          <Card padding={1}>
-            <MenuList
-              label={t('home.caseload.title')}
-              hasDividers
-              isInset
-              items={[
-                { id: 'invite', label: t('profile.menu.invite'), href: '/invite/', icon: <PeopleIcon width={26} height={26} aria-hidden /> },
-                { id: 'see', label: t('admin.seeing.title'), onSelect: () => setSeeOpen(true), icon: <EyeIcon width={26} height={26} aria-hidden /> },
-              ]}
-            />
-          </Card>
+          {/* On the page like the members above, no card (Will, card a93, 17 October). */}
+          <MenuList
+            label={t('home.caseload.title')}
+            hasDividers
+            items={[
+              { id: 'invite', label: t('profile.menu.invite'), href: '/invite/', icon: <PeopleIcon width={26} height={26} aria-hidden /> },
+              { id: 'see', label: t('admin.seeing.title'), onSelect: () => setSeeOpen(true), icon: <EyeIcon width={26} height={26} aria-hidden /> },
+            ]}
+          />
           <BottomSheet isOpen={seeOpen} onOpenChange={setSeeOpen} label={t('admin.seeing.title')} height="hug" xstyle={sheet.panel}>
             {seeOpen ? (
               <VStack gap={3} {...landFocus} xstyle={[homeStyles.sheet, landFocusStyle.quiet]}>

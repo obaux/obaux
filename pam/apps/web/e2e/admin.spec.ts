@@ -151,7 +151,7 @@ test.describe('the case manager screen', () => {
     await expect(page.getByRole('img', { name: 'Tanya' })).toBeVisible();
   });
 
-  test('each card has one visit line, no points, and Invite someone is a row under the cards (a93)', async ({ page }) => {
+  test('each member is a row with one visit line, no points, and Invite someone is a row under them (a93)', async ({ page }) => {
     await signedInAs(page, 'admin', [
       { id: 'm1', first_name: 'Dante', access_status: 'active', last_active_at: null },
       { id: 'm2', first_name: 'Tanya', access_status: 'active', last_active_at: null },
@@ -178,9 +178,13 @@ test.describe('the case manager screen', () => {
     // Each name is followed by its own line, in the list's order.
     const main = page.locator('main');
     await expect(main).toContainText(/Dante\s*Next visit: \w+ \d/);
-    // The chip holds only its words with the date under it (Dot), and a screen reader hears one phrase (Sage).
-    await expect(main).toContainText(/Tanya[\s\S]*Not marked as there\s*\w+ \d/);
-    await expect(page.getByText(/^Not marked as there: \w+ \d+$/)).toHaveCount(1);
+    // Not marked is the same one line as Marked, in red (Will, 17 October): no chip, no date on a line of its own.
+    const missed = page.getByText(/^Not marked as there: \w+ \d+$/);
+    await expect(missed).toHaveCount(1);
+    await expect(main).toContainText(/Tanya\s*Not marked as there: \w+ \d/);
+    const red = await missed.evaluate((el) => getComputedStyle(el).color);
+    const grey = await page.getByText(/^Marked as there: \w+ \d+$/).evaluate((el) => getComputedStyle(el).color);
+    expect(red).not.toBe(grey);
     await expect(main).toContainText(/Rosa\s*Marked as there: \w+ \d/);
     await expect(main).not.toContainText(/Kofi\s*(Next visit|Marked|Not marked)/);
     await expect(page.getByText(/points/i)).toHaveCount(0);
@@ -188,6 +192,22 @@ test.describe('the case manager screen', () => {
     // Invite someone is a row in the page now, not a floating button.
     await expect(page.getByRole('link', { name: 'Invite someone' })).toHaveAttribute('href', '/invite/');
     await expect(page.getByRole('link', { name: 'Invite someone' })).toHaveCount(1);
+    // Rows on the page, not cards (Will, card a93): nothing on the list draws a shadow or a box of its own colour.
+    const boxes = await main.locator('[role="listitem"], li').evaluateAll((rows) =>
+      rows.map((row) => {
+        const style = getComputedStyle(row);
+        return { shadow: style.boxShadow, background: style.backgroundColor };
+      }),
+    );
+    expect(boxes.length).toBeGreaterThanOrEqual(6);
+    for (const box of boxes) {
+      expect(box.shadow).toBe('none');
+      expect(box.background).toBe('rgba(0, 0, 0, 0)');
+    }
+    // Each row keeps the 48px floor.
+    for (const row of await main.locator('[role="listitem"], li').all()) {
+      expect((await row.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(48);
+    }
   });
 
   test('an empty caseload explains itself', async ({ page }) => {
@@ -352,7 +372,7 @@ test.describe('the case manager screen', () => {
 
     // Scoped to the member's own card, because the page also carries the
     // promise *not* to show these things, which says the words out loud.
-    const card = page.locator('.astryx-card').filter({ hasText: 'Dante' });
+    const card = page.getByRole('listitem').filter({ hasText: 'Dante' });
     const text = (await card.innerText()).toLowerCase();
 
     // §4.1 forbids these outright. A careless `select('*')` is what this catches.

@@ -41,6 +41,8 @@ export interface HomePerson {
   /** Opens the person; omitted for a row with nowhere to go yet. */
   readonly href?: string;
   readonly meta: readonly string[];
+  /** The line under the name in red: a visit not marked as there (card a93). */
+  readonly isMetaAlert?: boolean;
   readonly chip?: PersonRowProps['chip'];
   readonly programBadge?: { readonly name: string; readonly serviceId: string } | null;
 }
@@ -70,7 +72,7 @@ export interface PeopleHomeViewProps {
   /**
    * A message button on each row (D-227, Will, 2 October), in the star's
    * place — the star moved to the person's own page. Tapping anywhere else on
-   * the card opens the person.
+   * the row opens the person.
    */
   readonly message?: {
     readonly label: (person: HomePerson) => string;
@@ -223,32 +225,36 @@ export function PeopleHomeView({
 
         {shown.length > 0 ? (
           <VStack gap={3}>
-            {shown.map((person) => (
-              <PersonRow
-                key={person.id}
-                firstName={person.firstName}
-                {...(person.href ? { href: person.href } : {})}
-                chip={person.chip ?? null}
-                programBadge={person.programBadge ?? null}
-                meta={person.meta}
-                isCompact
-                trailing={
-                  message ? (
-                    <IconButton
-                      label={message.label(person)}
-                      variant="ghost"
-                      onClick={() => message.onMessage(person)}
-                      icon={
-                        <HStack>
-                          <MessagesIcon width={24} height={24} aria-hidden />
-                        </HStack>
-                      }
-                      xstyle={styles.message}
-                    />
-                  ) : undefined
-                }
-              />
-            ))}
+            {/* Rows on the page, a line under each, no cards (Will, card a93, 17 October). */}
+            <VStack role="list">
+              {shown.map((person) => (
+                <PersonRow
+                  key={person.id}
+                  firstName={person.firstName}
+                  {...(person.href ? { href: person.href } : {})}
+                  chip={person.chip ?? null}
+                  programBadge={person.programBadge ?? null}
+                  meta={person.meta}
+                  isMetaAlert={person.isMetaAlert === true}
+                  isCompact
+                  trailing={
+                    message ? (
+                      <IconButton
+                        label={message.label(person)}
+                        variant="ghost"
+                        onClick={() => message.onMessage(person)}
+                        icon={
+                          <HStack>
+                            <MessagesIcon width={24} height={24} aria-hidden />
+                          </HStack>
+                        }
+                        xstyle={styles.message}
+                      />
+                    ) : undefined
+                  }
+                />
+              ))}
+            </VStack>
             {note ? (
               <Text type="supporting" xstyle={styles.note}>
                 {note}
