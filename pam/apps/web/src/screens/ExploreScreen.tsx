@@ -92,8 +92,6 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
   const [category, setCategory] = useState<ExploreCategory>('all');
   // The one search field (D-573): inline, filtering the list under it. No pop-up, no dropdown, no full screen.
   const [query, setQuery] = useState('');
-  // The bar at rest is a centred pill; tapped it opens with Cancel beside it (Will, 17 October, a86).
-  const [searchOpen, setSearchOpen] = useState(false);
   const settled = useDebounced(query, 300);
   const [reload, setReload] = useState(0);
 
@@ -142,8 +140,6 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
       cancelLabel={t('messages.search.cancel')}
       value={query}
       onChange={setQuery}
-      isOpen={searchOpen}
-      onOpenChange={setSearchOpen}
     />
   );
 
@@ -221,9 +217,8 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
         </>
       }
       query={text}
-      // Google's logo under the last result, centred, whenever its point is what the list is sorted from (Will, 17 October, a86).
-      belowList={origin ? <PoweredByGoogle /> : undefined}
-      isSearchActive={searchOpen || query.trim() !== ''}
+      afterResults={origin ? <PoweredByGoogle /> : undefined}
+      isSearchActive={query.trim() !== ''}
       state={state}
       onRetry={() => setReload((n) => n + 1)}
       onClearSearch={() => setQuery('')}

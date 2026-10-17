@@ -1,18 +1,18 @@
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, type Ref } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { pam } from './tokens.stylex.js';
-import { HStack } from '@astryxdesign/core/HStack';
-import { VStack } from '@astryxdesign/core/VStack';
 import { Icon } from '@astryxdesign/core/Icon';
 import { Button } from '@astryxdesign/core/Button';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { InputGroup, InputGroupText } from '@astryxdesign/core/InputGroup';
 import { TextInput } from '@astryxdesign/core/TextInput';
-import { textLinkLook } from './TextLink.js';
+import { HStack } from '@astryxdesign/core/HStack';
+import { VStack } from '@astryxdesign/core/VStack';
 import { Typeahead, TypeaheadItem } from '@astryxdesign/core/Typeahead';
+import { textLinkLook } from './TextLink.js';
 import type { SearchableItem, SearchSource } from '@astryxdesign/core/Typeahead';
 
 /**
@@ -100,15 +100,14 @@ const styles = stylex.create({
     minHeight: pam['--pam-search-height'],
     borderRadius: '999px',
     borderWidth: 0,
-    // At rest the magnifier and the words are centred (Will, 17 October, a86: "the first impression of the search bar
-    // should have items centre aligned, search changes to type on left once clicked"). This reverses D-574's words-at-the-left
-    // of 14 October: the open field (`SearchField`) has them at the left, ready to type.
+    // At rest the magnifier and the words are centred; once tapped they move to the left, where the open field has them
+    // (Will, 17 October, a86, reversing 14 October's left-at-rest, D-574). Same 16px/600 and the same 4px gap as the field, so
+    // the move is a slide and nothing changes size under the eye.
     justifyContent: 'center',
-    paddingInlineStart: 0,
     gap: '4px',
     fontSize: '16px',
     fontWeight: 600,
-    textAlign: 'start',
+    textAlign: 'center',
     color: 'light-dark(#111111, #F2F2F2)',
     backgroundColor: 'light-dark(#FFFFFF, #262626)',
     boxShadow:
@@ -117,18 +116,27 @@ const styles = stylex.create({
 });
 
 /**
- * The search bar at rest, on a member's Explore (Will, 5 October, D-265:
- * "notice how the search in the reference is … bolder text, center
- * aligned"; centred again since 17 October, a86, after 14 October's words-at-the-left, D-574): one big pill-shaped button. A tap
- * opens the field in its place, focused, with Cancel beside it (`SearchBar`).
+ * The search bar at rest, on a member's Explore (Will, 5 October, D-265: "notice how the search in the reference is … bolder
+ * text, center aligned"): one big pill-shaped button, the magnifier and the words centred. A tap opens the field in its place
+ * (`SearchBar` below does the whole move).
  */
-export function SearchLauncher({ label, onOpen }: { readonly label: string; readonly onOpen: () => void }) {
+export function SearchLauncher({
+  label,
+  onOpen,
+  buttonRef,
+}: {
+  readonly label: string;
+  readonly onOpen: () => void;
+  readonly buttonRef?: Ref<HTMLButtonElement>;
+}) {
   return (
     <Button
+      ref={buttonRef}
       label={label}
       variant="secondary"
       icon={<Icon icon="search" size="sm" />}
       onClick={onOpen}
+      data-search-launcher=""
       xstyle={styles.launcher}
     />
   );
@@ -309,74 +317,117 @@ export function SearchField({
   );
 }
 
-
-/**
- * The search bar as one thing (Will, 17 October, a86): at rest the pill, its magnifier and words centred; tapped, the same pill
- * narrows and Cancel appears at its right, the words at the left ready to type. The list under it filters as the words are
- * typed (the caller's job; D-573). Cancel clears the words, closes the field and so returns the list to how it was.
- *
- * Both states are the same height (`--pam-search-height`), so nothing below moves. The room for Cancel grows in 200ms and the
- * pill gives way to it; under reduced motion it is simply there.
- */
-export interface SearchBarProps {
-  readonly label: string;
-  readonly placeholder: string;
-  /** The clear × inside the open field. */
-  readonly clearLabel: string;
-  /** The words beside the open field. */
-  readonly cancelLabel: string;
-  readonly value: string;
-  readonly onChange: (value: string) => void;
-  readonly isOpen: boolean;
-  readonly onOpenChange: (open: boolean) => void;
-}
+const cancelIn = stylex.keyframes({
+  from: { maxWidth: '0px', opacity: 0 },
+  to: { maxWidth: '120px', opacity: 1 },
+});
 
 const barStyles = stylex.create({
   row: { width: '100%' },
-  // Basis 0, so what is typed (and the clear × that then appears) never asks for more room than Cancel leaves.
-  field: { flexGrow: 1, flexShrink: 1, flexBasis: '0%', minWidth: 0, maxWidth: '100%' },
-  // Room for Cancel, grown from nothing. It is not in the tab order or the tree while shut.
+  // The pill takes what Cancel leaves. Once Cancel is there the pill keeps 12px (a spacing token) clear of it, outline counted.
+  pill: { flexGrow: 1, minWidth: 0 },
+  pillWithCancel: { marginInlineEnd: spacingVars['--spacing-3'] },
+  // Cancel draws in over 200ms, so the pill's far edge moves in to make room instead of jumping; with reduced motion it is just there.
   cancel: {
     flexShrink: 0,
+    fontSize: '17px',
+    fontWeight: 600,
     overflow: 'hidden',
-    maxWidth: '0px',
-    opacity: 0,
-    visibility: 'hidden',
-    transitionProperty: 'max-width, opacity, visibility',
-    transitionDuration: '200ms',
-    transitionTimingFunction: 'ease-out',
-    '@media (prefers-reduced-motion: reduce)': { transitionDuration: '0ms' },
+    whiteSpace: 'nowrap',
+    animationName: { default: null, '@media (prefers-reduced-motion: no-preference)': cancelIn },
+    animationDuration: '200ms',
+    animationTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)',
   },
-  cancelOpen: { maxWidth: '120px', opacity: 1, visibility: 'visible' },
-  cancelButton: { fontSize: '17px', fontWeight: 600, whiteSpace: 'nowrap' },
 });
 
-export function SearchBar({ label, placeholder, clearLabel, cancelLabel, value, onChange, isOpen, onOpenChange }: SearchBarProps) {
+export interface SearchBarProps {
+  /** What the bar is for, read out — "Search programs by name or address". */
+  readonly label: string;
+  /** The words at rest, and in the empty field. */
+  readonly placeholder: string;
+  readonly clearLabel: string;
+  readonly cancelLabel: string;
+  readonly value: string;
+  readonly onChange: (value: string) => void;
+  /** Cancel was tapped: the words are already emptied and the bar is back at rest. */
+  readonly onCancel?: () => void;
+}
+
+/**
+ * The one search bar on Explore and the staff All programs (Will, 17 October, a86): at rest a centred pill, the magnifier and the
+ * words in the middle; a tap and the pill grows a Cancel on its right and shrinks to make room, while the magnifier and the words
+ * slide to the left, where the field has them, ready to type. Same 60px high throughout (one token), so nothing jumps. Cancel
+ * empties the words and puts the bar back at rest. It stays open while it holds words, so a screen that comes back to its query
+ * comes back open.
+ *
+ * Reduced motion: no slide, no drawing-in; the bar is simply in its next state.
+ */
+export function SearchBar({ label, placeholder, clearLabel, cancelLabel, value, onChange, onCancel }: SearchBarProps) {
+  const [isOpen, setIsOpen] = useState(value !== '');
+  const [tapped, setTapped] = useState(false);
+  const rowRef = useRef<HTMLDivElement>(null);
+  const launcherRef = useRef<HTMLButtonElement>(null);
+  // Where the magnifier was at rest, to slide it from: read at the tap, used once the field is on screen.
+  const slideFrom = useRef<number | null>(null);
+
+  // A query that arrives from outside (Back restoring it) opens the bar without a tap.
+  useEffect(() => {
+    if (value !== '' && !isOpen) setIsOpen(true);
+  }, [value, isOpen]);
+
+  useLayoutEffect(() => {
+    if (!isOpen || slideFrom.current === null) return;
+    const from = slideFrom.current;
+    slideFrom.current = null;
+    if (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const group = rowRef.current?.querySelector<HTMLElement>('.astryx-input-group');
+    const icon = group?.querySelector<SVGElement>('svg');
+    const input = group?.querySelector<HTMLElement>('input');
+    if (!group || !icon || !input || typeof icon.animate !== 'function') return;
+    const dx = from - icon.getBoundingClientRect().left;
+    if (Math.abs(dx) < 1) return;
+    // The magnifier and the words travel together, from where they were to where they are; the bar's own edges stay put.
+    group.style.overflow = 'hidden';
+    const frames = [{ transform: `translateX(${dx}px)` }, { transform: 'translateX(0)' }];
+    const timing = { duration: 200, easing: 'cubic-bezier(0.2, 0, 0, 1)' };
+    const moves = [icon.animate(frames, timing), input.animate(frames, timing)];
+    void Promise.all(moves.map((m) => m.finished.catch(() => undefined))).then(() => {
+      group.style.overflow = '';
+    });
+  }, [isOpen]);
+
+  const open = () => {
+    const icon = launcherRef.current?.querySelector('svg');
+    slideFrom.current = icon ? icon.getBoundingClientRect().left : null;
+    setTapped(true);
+    setIsOpen(true);
+  };
   const cancel = () => {
     onChange('');
-    onOpenChange(false);
+    setIsOpen(false);
+    setTapped(false);
+    onCancel?.();
   };
+
   return (
-    <HStack
-      gap={isOpen ? 2 : 0}
-      align="center"
-      wrap="nowrap"
-      xstyle={barStyles.row}
-      onKeyDown={(e: React.KeyboardEvent) => {
-        if (isOpen && e.key === 'Escape') cancel();
-      }}
-    >
-      {/* A column, so the field takes the width it is given: in a row Astryx's field would size itself to its text and overflow Cancel. */}
-      <VStack xstyle={barStyles.field}>
+    <HStack ref={rowRef} align="center" wrap="nowrap" xstyle={barStyles.row}>
+      <VStack xstyle={[barStyles.pill, isOpen && barStyles.pillWithCancel]}>
         {isOpen ? (
-          <SearchField label={label} placeholder={placeholder} value={value} onChange={onChange} hasAutoFocus clearLabel={clearLabel} />
+          <SearchField
+            label={label}
+            placeholder={placeholder}
+            clearLabel={clearLabel}
+            value={value}
+            onChange={onChange}
+            hasAutoFocus={tapped}
+          />
         ) : (
-          <SearchLauncher label={placeholder} onOpen={() => onOpenChange(true)} />
+          <SearchLauncher label={placeholder} onOpen={open} buttonRef={launcherRef} />
         )}
       </VStack>
-      <HStack xstyle={[barStyles.cancel, isOpen && barStyles.cancelOpen]} aria-hidden={!isOpen}>
-        <Button label={cancelLabel} variant="ghost" onClick={cancel} isDisabled={!isOpen} xstyle={[barStyles.cancelButton, textLinkLook.link]} />
-      </HStack>
+      {isOpen ? (
+        <Button label={cancelLabel} variant="ghost" onClick={cancel} xstyle={[barStyles.cancel, textLinkLook.link]} />
+      ) : null}
     </HStack>
   );
 }

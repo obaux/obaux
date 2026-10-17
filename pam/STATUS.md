@@ -1576,6 +1576,9 @@ only the alert texts Will signed: no "introduced to your program", no "your acco
 
 A search field shows its dark pill outline again while active; every other text box has none (D-574, Will a86 05:55, beside D-569). The resting bar and the open search field read one token, `--pam-search-height` (60px). On `claude/pam-design-search-pill`; not on `main`.
 
+## Design system & Storybook · the search bar look, a86 (17 October)
+
+`SearchBar`: centred at rest; a tap narrows it for Cancel on its right and slides the magnifier and words left; Google's mark sits under the results, centred (D-591, Will a86, reverses D-574's left-at-rest). On `claude/pam-design-search-bar-look`, stacked on the a86 inline branch; not on `main`.
 ## Design system & Storybook · counts on a row (16 October)
 
 A count at the end of a row is a plain number (`value`); the red badge is for what is new (D-586). The super admin Home's two rows follow it: Reported places changes (Piper), Programs to check stays (Ava). On `claude/pam-design-count-style`.
@@ -1591,6 +1594,10 @@ A proposal for Will, pictures only (`docs/design/review/2026-10-15-cm-home-visit
 ## Design system & Storybook · case manager prototype: Message works, Marcus has visits (15 October)
 
 `router.push` now moves the Storybook prototype (it was passed under the wrong key for Storybook 10, D-581), so "Message Marcus" opens the conversation; Marcus has visits in the pretend database. On `claude/pam-design-cm-prototype-gaps`.
+
+## Design system & Storybook · search bars keep the pill outline (14 October)
+
+A search field shows its dark pill outline again while active; every other text box has none (D-574, Will a86 05:55, beside D-569). The resting bar and the open search field read one token, `--pam-search-height` (60px). On `claude/pam-design-search-pill`; not on `main`.
 
 ## Design system & Storybook · text boxes show no ring (14 October)
 

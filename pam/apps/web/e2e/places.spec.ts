@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { settled } from './settled';
+import { openSearch } from './searchBar';
 import { asMember } from './asMember';
 
 /**
@@ -208,8 +209,7 @@ test.describe('finding a place by name (D-188)', () => {
     await expect(page.getByRole('heading', { name: 'J J Peters' })).toBeVisible();
 
     // Explore's one search field is in the page (D-573): typing filters the list right under it, and clearing brings the nearby list back.
-    await page.getByRole('button', { name: /^Search programs$/ }).click();
-    await page.getByRole('textbox', { name: /Search programs/ }).fill('petres');
+    await (await openSearch(page)).fill('petres');
     await expect.poll(() => searches.length).toBeGreaterThan(0);
     expect(searches[searches.length - 1]).toContain('petres');
     await expect(page.getByRole('heading', { name: 'Results for “petres”' })).toBeVisible();
