@@ -75,21 +75,24 @@ async function asRealMember(page: Page, booked: boolean) {
   await page.route('**/rest/v1/program_policies*', (route) => route.fulfill(json([])));
 }
 
-test('the member\'s Trips and Explore say who booked a visit for them', async ({ page }) => {
+test('the member\'s Trips and Explore cards say "Booked for you", and nothing about which program', async ({ page }) => {
+  // Will, 17 October 15:21: under the trip card "booked for you", that's it: the card's title already names the place.
   await asRealMember(page, true);
   await page.goto('/trips/');
   await settled(page);
-  await expect(page.getByText('Booked for you by Fresh Start Kitchen')).toBeVisible();
+  await expect(page.getByText('Booked for you', { exact: true })).toBeVisible();
+  await expect(page.getByText(/Booked for you by/)).toHaveCount(0);
   await page.goto('/');
   await settled(page);
-  await expect(page.getByText('Booked for you by Fresh Start Kitchen')).toBeVisible();
+  await expect(page.getByText('Booked for you', { exact: true })).toBeVisible();
+  await expect(page.getByText(/Booked for you by/)).toHaveCount(0);
 });
 
 test('a visit the member planned says nothing about a program', async ({ page }) => {
   await asRealMember(page, false);
   await page.goto('/trips/');
   await settled(page);
-  await expect(page.getByText(/Booked for you by/)).toHaveCount(0);
+  await expect(page.getByText(/Booked for you/)).toHaveCount(0);
 });
 
 test('the bell tells the member, in the app only, with the time in their words', async ({ page }) => {

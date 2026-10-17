@@ -182,7 +182,7 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
             ? t(trip.attendance === 'attended' ? 'schedule.checkedIn' : 'trips.notMarked')
             : // A program booked it for them (D-595): said on the card, as on the Explore one, until the visit is past.
               !isPast && trip.bookedByProgram
-              ? t('trips.bookedForYou', { program: trip.placeName })
+              ? t('trips.bookedForYou')
               : null
         }
         label={

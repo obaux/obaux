@@ -11,7 +11,7 @@ import { useI18n } from '@/lib/i18n';
 import { whenHappened } from '@/lib/when';
 
 /**
- * A program booked a visit for the member (D-595, a94): the words "Booked for you by {program}" on the member's Trips and on
+ * A program booked a visit for the member (D-595, a94): the words "Booked for you" (no program: the card's title already names the place, Will, 15:21) on the member's Trips and on
  * Explore's next-visit card, the bell row, and "Booked by {program}" on a case manager's view of the member's trips. They are here so the
  * language fit audit measures every one, in every language.
  */
@@ -51,7 +51,7 @@ function Cards() {
         title={t('explore.nextTrip.title')}
         when={when}
         href="/trips/"
-        mark={t('trips.bookedForYou', { program: PLACE })}
+        mark={t('trips.bookedForYou')}
         label={PLACE}
       />
       <VStack gap={2}>
