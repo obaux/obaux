@@ -78,7 +78,7 @@ const ALL: readonly SupportPost[] = [
     audience: 'residents and programs',
     title: 'Does the place know I’m coming?',
     summary: 'Programs on Pam see your visit. Most places are not told. How to call ahead, and what to do if they didn’t know you were coming.',
-    updated: '2026-10-12',
+    updated: '2026-10-16',
     keywords: ['told', 'know', 'expect', 'expecting', 'coming', 'showed up', 'turned away', 'appointment', 'call ahead', 'front desk', 'list', 'no clue'],
   },
   {
@@ -87,7 +87,7 @@ const ALL: readonly SupportPost[] = [
     audience: 'members',
     title: 'Who is my guide?',
     summary: 'Your guide is the person who invited you, or a staff member who looks after you. You may not have one yet.',
-    updated: '2026-10-10',
+    updated: '2026-10-11',
     keywords: ['guide', 'case manager', 'who', 'invited', 'staff', 'nobody', 'no guide', 'help'],
   },
   {
@@ -96,7 +96,7 @@ const ALL: readonly SupportPost[] = [
     audience: 'everyone',
     title: 'Texts from Pam: which ones, and why one didn’t come',
     summary: 'The few texts Pam sends today, the rules for them, and what to do when one does not come.',
-    updated: '2026-10-10',
+    updated: '2026-10-11',
     keywords: ['text', 'sms', 'code', 'sign in', 'reminder', 'stop', 'quiet hours', 'not now', 'did not come', 'no text'],
   },
   {
@@ -105,7 +105,7 @@ const ALL: readonly SupportPost[] = [
     audience: 'members and programs',
     title: 'Signing a program’s rules',
     summary: 'What a program’s policy is, how you read and sign it in Pam, and what the program sees.',
-    updated: '2026-10-10',
+    updated: '2026-10-16',
     keywords: ['policy', 'policies', 'rules', 'sign', 'signature', 'signing', 'bring id', 'program', 'before a visit', 'draw', 'type my name'],
     // Held until the signing screens are really in the app AND Will signs the English (signed-off.json).
     ...(isRulesSigned('en') ? {} : { status: 'draft' as const }),
@@ -125,7 +125,7 @@ const ALL: readonly SupportPost[] = [
     audience: 'everyone',
     title: 'What your guide, a program and others can see',
     summary: 'One table: what your guide, a program you joined and other members can see about you.',
-    updated: '2026-10-10',
+    updated: '2026-10-17',
     keywords: ['see', 'privacy', 'private', 'who can see', 'messages', 'points', 'visits', 'share', 'table', 'read my messages'],
   },
   {
@@ -134,7 +134,7 @@ const ALL: readonly SupportPost[] = [
     audience: 'members',
     title: 'Joining Pam: with a link, a code, or on your own',
     summary: 'The three ways to join, the steps to sign in, and what to do if a link or a code does not work.',
-    updated: '2026-10-10',
+    updated: '2026-10-11',
     keywords: ['join', 'sign up', 'sign in', 'link', 'code', 'invite', 'different phone', 'expired', 'phone number'],
   },
   {
@@ -143,7 +143,7 @@ const ALL: readonly SupportPost[] = [
     audience: 'case managers and program leads',
     title: 'Joining Pam as a case manager or program lead',
     summary: 'Staff join with an invite link. Here are the steps, and what to do if you do not have one.',
-    updated: '2026-10-10',
+    updated: '2026-10-16',
     keywords: ['staff', 'case manager', 'program lead', 'invite', 'link', 'join', 'program partner', 'already in pam'],
   },
   {
@@ -170,7 +170,7 @@ const ALL: readonly SupportPost[] = [
     audience: 'case managers, program leads and super admins',
     title: 'Sending an invite',
     summary: 'Make an invite link, send it, and what to do when it expires.',
-    updated: '2026-10-10',
+    updated: '2026-10-16',
     keywords: ['invite', 'link', 'code', 'send', 'expired', 'one number', 'invited people', 'create link'],
   },
   {
@@ -188,7 +188,7 @@ const ALL: readonly SupportPost[] = [
     audience: 'members',
     title: 'Points and badges, today',
     summary: 'How you earn points today, what the levels are, and who can see your points.',
-    updated: '2026-10-10',
+    updated: '2026-10-16',
     keywords: ['points', 'badge', 'level', 'ladder', 'earn', 'rewards', 'returned', 'rooted'],
   },
   {
@@ -198,7 +198,7 @@ const ALL: readonly SupportPost[] = [
     title: 'Keeping your program’s listing up to date',
     summary:
       'When you run a program on Pam, you can fix a phone number in a minute. Changing the name or address gets a quick check first.',
-    updated: '2026-10-10',
+    updated: '2026-10-11',
     keywords: ['listing', 'edit', 'name', 'address', 'phone', 'website', 'category', 'description', 'review', 'approve', 'checked'],
     // Held until the feature ships (D-447, branch claude/places-programs-load-own-program).
     status: 'draft',
@@ -209,7 +209,7 @@ const ALL: readonly SupportPost[] = [
     audience: 'super admins',
     title: 'Staff requests: where they are and what Approve and Deny do',
     summary: 'Where a request to be staff waits, and what Approve and Deny do.',
-    updated: '2026-10-10',
+    updated: '2026-10-16',
     keywords: ['staff requests', 'approve', 'deny', 'requests', 'super admin', 'city'],
     // Held: no screen lets anyone ask to be staff any more (staff join by invite link only, D-369),
     // so the list is empty. Publish only if a way to ask comes back.
@@ -223,7 +223,7 @@ const ALL: readonly SupportPost[] = [
     title: 'Case manager assignments',
     summary:
       'Who your case manager is, what a case manager can and can’t see, and what is always written down.',
-    updated: '2026-10-10',
+    updated: '2026-10-11',
   },
 ];
 
