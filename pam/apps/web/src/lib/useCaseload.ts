@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { visitLinesByMember, type CaseloadVisit, type VisitRow } from './caseloadVisit';
 
 /**
  * The people an admin is responsible for.
@@ -40,6 +41,12 @@ export interface CaseloadMember {
    * the most recently updated.
    */
   program: { name: string; serviceId: string } | null;
+  /**
+   * The one visit line on this member's Home card (a93): the next visit, else the last they went to, else the last missed,
+   * else null. From the same `appointments` rows the member's page shows (`appointments_select_admin`), read once for
+   * the whole list.
+   */
+  visit: CaseloadVisit | null;
 }
 
 export type CaseloadState =
@@ -139,6 +146,15 @@ export function useCaseload(enabled: boolean): { state: CaseloadState; refresh: 
           programByMember.set(row.member_id, { name: service.name, serviceId: service.id });
         }
 
+        // Every visit of everyone on the list, in one read (a93: not one per card). The same rule as the member's page
+        // (`appointments_select_admin`, `admin_covers`) decides whose come back; only the day and the status are asked for.
+        const { data: visitRows } = await supabase
+          .from('appointments')
+          .select('member_id, starts_at, status')
+          .in('member_id', rows.map((r) => r.id))
+          .neq('status', 'cancelled');
+        const visitByMember = visitLinesByMember((visitRows ?? []) as VisitRow[], Date.now());
+
         if (cancelled) return;
         setState({
           status: 'ready',
@@ -150,6 +166,7 @@ export function useCaseload(enabled: boolean): { state: CaseloadState; refresh: 
             lastActiveAt: row.last_active_at,
             points: balances[i] ?? null,
             program: programByMember.get(row.id) ?? null,
+            visit: visitByMember.get(row.id) ?? null,
           })),
         });
       } catch {
