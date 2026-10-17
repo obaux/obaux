@@ -9,7 +9,7 @@ import { Switch } from '@astryxdesign/core/Switch';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BigButton, CheckIcon, ClockIcon, TripsIcon } from '@pam/ui';
+import { BigButton, CheckIcon, CrossIcon, EditIcon, GlobeIcon, SettingsIcon, TripsIcon } from '@pam/ui';
 import { Button } from '@pam/ui/Button';
 import { CategoryArt } from '@pam/ui/CategoryArt';
 import { MenuList } from '@pam/ui/MenuList';
@@ -232,7 +232,7 @@ function CalendarScreen({ variant, isOn }: { readonly variant: 'A' | 'B'; readon
             </Text>
             <BigButton label={w.addGoogle} variant="secondary" />
           </VStack>
-          <MenuList label={w.otherApps} items={[{ id: 'other', label: w.otherApps, icon: <ClockIcon width={26} height={26} />, href: '/help/' }]} />
+          <MenuList label={w.otherApps} items={[{ id: 'other', label: w.otherApps, icon: <GlobeIcon width={26} height={26} />, href: '/help/' }]} />
           <Card padding={5}>
             <VStack gap={3}>
               <HStack gap={3} align="center" wrap="nowrap">
@@ -249,7 +249,7 @@ function CalendarScreen({ variant, isOn }: { readonly variant: 'A' | 'B'; readon
               </Text>
             </VStack>
           </Card>
-          <MenuList label={w.stop} items={[{ id: 'stop', label: w.stop, icon: <ClockIcon width={26} height={26} />, href: '/calendar/' }]} />
+          <MenuList label={w.stop} items={[{ id: 'stop', label: w.stop, icon: <SettingsIcon width={26} height={26} />, href: '/calendar/' }]} />
         </>
       )}
     </SubPage>
@@ -268,8 +268,8 @@ function StopSheet() {
             label={w.stopTitle}
             hasDividers
             items={[
-              { id: 'new', label: w.newLink, description: w.newLinkHint, icon: <ClockIcon width={26} height={26} />, onSelect: () => {} },
-              { id: 'off', label: w.off, description: w.offHint, icon: <ClockIcon width={26} height={26} />, onSelect: () => {} },
+              { id: 'new', label: w.newLink, description: w.newLinkHint, icon: <EditIcon width={26} height={26} />, onSelect: () => {} },
+              { id: 'off', label: w.off, description: w.offHint, icon: <CrossIcon width={26} height={26} />, onSelect: () => {} },
             ]}
           />
         </VStack>
