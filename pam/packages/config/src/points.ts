@@ -344,7 +344,7 @@ export const BADGES: readonly BadgeDefinition[] = [
   {
     key: 'craftsman',
     labelKey: 'badge.craftsman',
-    name: 'Craftsman',
+    name: 'Maker',
     descriptionPlain: 'You learned a trade worth paying for.',
     icon: 'tools',
     group: 'category',
