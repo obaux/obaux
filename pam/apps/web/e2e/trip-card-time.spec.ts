@@ -15,6 +15,17 @@ const tenInTheMorning = () => {
 
 test('the time on a trip card is on one line, whatever the width', async ({ page }) => {
   await asMember(page);
+  // Some phones' time formats put a plain space before AM/PM (this Chromium puts a no-break one, so the bug hid here): make it plain, as it
+  // is where Iris saw "10:00" over "AM".
+  await page.addInitScript(() => {
+    Object.defineProperty(Intl.DateTimeFormat.prototype, 'format', {
+      configurable: true,
+      get(this: Intl.DateTimeFormat) {
+        return (date?: Date | number) =>
+          this.formatToParts(date).map((p) => p.value).join('').replace(/[\u202f\u00a0]/g, ' ');
+      },
+    });
+  });
   await page.route('**/rest/v1/rpc/my_trip_services*', (r) => r.fulfill(json([])));
   await page.route('**/rest/v1/rpc/my_trip_booked_by*', (r) => r.fulfill(json([])));
   await page.route('**/rest/v1/rpc/my_trips*', (r) =>
@@ -23,20 +34,29 @@ test('the time on a trip card is on one line, whatever the width', async ({ page
   await page.route('**/rest/v1/program_policies*', (r) => r.fulfill(json([])));
   await page.goto('/trips/');
   await settled(page);
-  const lines = await page.evaluate(() => {
-    // Only the card has the time in it (the map's pin says just the day).
-    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-    let n: Node | null;
-    while ((n = walker.nextNode())) {
-      const m = /10:00\s*AM/.exec(n.textContent ?? '');
-      if (m) {
-        const range = document.createRange();
-        range.setStart(n, m.index);
-        range.setEnd(n, m.index + m[0].length);
-        return new Set([...range.getClientRects()].map((r) => Math.round(r.top))).size;
+  const linesOfTheTime = () =>
+    page.evaluate(() => {
+      // Only the card has the time in it (the map's pin says just the day).
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      let n: Node | null;
+      while ((n = walker.nextNode())) {
+        const m = /10:00\s*AM/.exec(n.textContent ?? '');
+        if (m) {
+          const range = document.createRange();
+          range.setStart(n, m.index);
+          range.setEnd(n, m.index + m[0].length);
+          return new Set([...range.getClientRects()].map((r) => Math.round(r.top))).size;
+        }
       }
-    }
-    return -1;
-  });
-  expect(lines, '"10:00 AM" is found, and sits on one line').toBe(1);
+      return -1;
+    });
+  // Whether "AM" falls off the line depends on how wide the card is, so it is checked across the narrow phones, 4px apart: without the
+  // fix some of these widths split it.
+  const split: number[] = [];
+  for (let width = 280; width <= 400; width += 4) {
+    await page.setViewportSize({ width, height: 640 });
+    const lines = await linesOfTheTime();
+    if (lines !== 1) split.push(width);
+  }
+  expect(split, 'widths at which "10:00 AM" is not on one line (or is not found)').toEqual([]);
 });
