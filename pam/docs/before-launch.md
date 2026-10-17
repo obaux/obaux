@@ -240,6 +240,18 @@ STATUS row too.
   the day Will finishes the Twilio filing and says go — together with `ALERT_TEXTS_LIVE` and
   `claude/messages-reply-start`; the order is the runbook at the top of `docs/sms-setup.md`.
 
+- [ ] **Widen the registered SMS campaign before `texts_live` goes on** (a94, 17 October 2026). Will decided that a
+  program can book real visits for members who have written to it; the member hears through the bell, and, once texts
+  are on, by the usual appointment reminders. The campaign description on file with the carrier covers reminders only for
+  "an appointment they scheduled in the app". **Will files:** in the Twilio campaign (A2P 10DLC → the Oba brand → the
+  campaign), change that sentence in the **description** to "a reminder the day before an appointment they or a program
+  scheduled" (the whole description is then 1,017 of 1,024 characters; the ready-to-paste text is in
+  `docs/sms-campaign-samples.md`, "The campaign description"). This rides the refiling already needed (the "Re-file the
+  campaign" step under the `dispatch-sms` deploy): if the refiling goes first, paste the updated block and nothing
+  more is needed. Also for Sage and Lena to decide, not Will: the Text reminders screen says Pam can text "about the
+  things you plan" (`reminders.intro`); the carrier reads that screen as the opt-in, so it may want to say visits
+  too. Nothing is sent today (`texts_live` is off), so nothing is wrong yet.
+
 - [x] **Merge and deploy 0068 and 0069** — done 8 October as 0075/0076 (D-388) (readiness fixes and blocking, on
   branch `claude/hopeful-thompson-07nj7n`, not yet on this one). 0068 is what
   lets an invite be redeemed at all (phone format) and closes several live
