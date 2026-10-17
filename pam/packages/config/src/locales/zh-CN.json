@@ -1443,7 +1443,7 @@
   "transparency.program.signedUp": "您已报名，以及进展情况。",
   "transparency.program.saves": "您何时收藏了新地点——但不包括是哪一个。仅在您向它报名之后。",
   "transparency.program.visits": "您在那里安排的预约：日期和时间、您选择的服务，以及您是否被标记为已到场。",
-  "transparency.summary.program": "项目能看到您的名字和您发给它的消息，即使您还没有安排预约。",
+  "transparency.summary.program": "项目能看到您的名字和您发给它的消息，即使您还没有安排预约。在您报名、签署它的规定或在那里安排预约之后，它能看到更多。",
   "memberPolicy.record": "项目会保存您所签规定的记录，包括日期。",
   "memberPolicy.readPages": "请阅读每一页，然后签名。",
   "memberPolicy.record.meaning": "在这里签名，就是您已阅读并同意的记录。",
