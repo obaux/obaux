@@ -33,6 +33,7 @@ import {
   redeemInvite,
   servedCities,
   submitDetails,
+  updateMyDetails,
   type InviteProblem,
   type JoinKind,
 } from '@/lib/useJoin';
@@ -149,6 +150,8 @@ export interface JoinPreview {
   readonly invite?: Invite;
   /** Open on this step (D-319): one story per screen, not one per flow. */
   readonly startAt?: JoinPhase;
+  /** Open About you with the city left empty and its line showing, so the words can be checked (Lena's fit audit). */
+  readonly isCityMissing?: boolean;
 }
 
 export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview | null } = {}) {
@@ -268,7 +271,8 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
       // The preview starts at the door, whoever the story is signed in as.
       setKind(preview.kind);
       setFirstName(preview.firstName);
-      setCity('Philadelphia');
+      setCity(preview.isCityMissing ? '' : 'Philadelphia');
+      if (preview.isCityMissing) setInvalid('city');
       // Approved, as if invited: staff finish on "I understand" and go Home
       // rather than on the waiting-for-review notice.
       setHasAccount(true);
@@ -320,6 +324,8 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
   }, [phase]);
 
   const isStaff = kind !== 'member';
+  // Staff are asked for the city they work in, not the one they live in (Iris, case manager P7).
+  const cityLabel = (invitedAs ?? kind) === 'member' ? 'join.details.city' : 'join.details.city.work';
   // A program is added from Home once the account exists (D-353), not asked
   // for here: staff finish on What to expect, step 2 of 2 (D-359).
   const total = kind === 'member' ? 3 : 2;
@@ -337,6 +343,22 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
 
     // The preview moves on as if the database had said yes (D-249).
     if (preview) {
+      setPhase('privacy');
+      return;
+    }
+
+    // Back from step 2 to fix a typo (Iris, case manager W1): the account exists, so this saves the name
+    // and city on it rather than redeeming the invite again or starting a second account.
+    if (hasAccount) {
+      if (!userId) return;
+      setBusy(true);
+      setFailed(false);
+      const saved = await updateMyDetails(userId, { firstName, lastName, city });
+      setBusy(false);
+      if (!saved) {
+        setFailed(true);
+        return;
+      }
       setPhase('privacy');
       return;
     }
@@ -453,8 +475,9 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
   const back: { readonly backLabel: string; readonly backHref?: string; readonly onBack?: () => void } =
     phase === 'details'
         ? { backLabel: t('nav.back.signInScreen'), onBack: toSignIn }
-        : phase === 'waiting'
-          ? { backLabel: t('trips.new.back'), onBack: () => setPhase('details') }
+        : phase === 'waiting' || phase === 'privacy'
+          ? // Step 2 goes back to step 1, so a mistyped name can be fixed (Iris, case manager W1, 15 October).
+            { backLabel: t('trips.new.back'), onBack: () => setPhase('details') }
           : phase === 'texts'
             ? { backLabel: t('trips.new.back'), onBack: () => setPhase('privacy') }
             : { backLabel: t('trips.new.back') };
@@ -520,8 +543,9 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
           Plan a trip (Will, 3 October, D-251) — no progress bar. Back goes one
           step back while there is one: from the phone or the code, to Sign in;
           from About you, to the phone; from the waiting list, to About you; from Text messages, to the screen before.
-          Once the account exists (What others can see, and the end) there is
-          nothing to go back to, so there is no back: the way out is the step.
+          From What others can see (step 2) back to About you, even once the account exists, so a mistyped name
+          can be fixed: Next then saves the name on the account (Iris, case manager W1, 15 October). Only the
+          last screen has no back: the way out is the step.
         */}
         <SubPageHeader
           title={
@@ -591,7 +615,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                   can still say where they live. */}
               {cities.length > 0 ? (
                 <Dropdown
-                  label={t('join.details.city')}
+                  label={t(cityLabel)}
                   width="100%"
                   value={city}
                   options={[
@@ -616,7 +640,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 <TextField
                   id={cityId}
                   purpose="city"
-                  label={t('join.details.city')}
+                  label={t(cityLabel)}
                   value={city}
                   onChange={setCity}
                   width="100%"
@@ -626,7 +650,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
 
               {invalid ? (
                 <Text type="supporting" xstyle={styles.body}>
-                  {t(`join.details.need.${invalid}`)}
+                  {t(invalid === 'city' && cityLabel !== 'join.details.city' ? 'join.details.need.city.work' : `join.details.need.${invalid}`)}
                 </Text>
               ) : null}
 
@@ -808,7 +832,20 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 )}
               </VStack>
             </>
-            {hasAccount ? null : (
+            {hasAccount ? (
+              // Help on each step of joining (A26), as on the member's step 2 (Iris, case manager W1).
+              <MenuList
+                label={t('help.contact.action')}
+                items={[
+                  {
+                    id: 'contact',
+                    label: t('help.contact.action'),
+                    href: HELP_DESK_URL,
+                    icon: <HelpIcon width={26} height={26} />,
+                  },
+                ]}
+              />
+            ) : (
               <>
                 {/*
                   Nothing was created, and saying so is the whole screen. Somebody

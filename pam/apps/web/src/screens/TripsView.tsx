@@ -176,11 +176,12 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
         }
         // After the visit, what the program marked (D-526): a mark is theirs to make; no mark says so, and costs nothing.
         mark={isPast && trip.attendance ? t(trip.attendance === 'attended' ? 'schedule.checkedIn' : 'trips.notMarked') : null}
-        label={tPlain('trips.card.label', {
-          place: trip.placeName,
-          when: when(trip.startsAt),
-          name: trip.withName ?? '',
-        })}
+        label={
+          trip.withName
+            ? tPlain('trips.card.label', { place: trip.placeName, when: when(trip.startsAt), name: trip.withName })
+            : // Nobody comes along: no "with" at the end (Iris's second member pass, P2; Sage's words).
+              tPlain('trips.card.label.alone', { place: trip.placeName, when: when(trip.startsAt) })
+        }
       />
     );
     return trip.id === justAdded ? (

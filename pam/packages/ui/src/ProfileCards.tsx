@@ -48,6 +48,11 @@ export interface ProfileSummaryProps {
   /** Beside the name — a program's verified tick on a member (D-261). */
   readonly nameAddon?: ReactNode;
   /**
+   * The page's title already says this name (someone else's page, D-534): it is shown, but not as a
+   * second heading, so a screen reader does not say it twice (Iris, 15 October).
+   */
+  readonly isNameInTitle?: boolean;
+  /**
    * Staff only (D-345): a small round camera button on the avatar's corner
    * that picks a photo. Given the file; the screen shrinks and uploads it.
    */
@@ -117,6 +122,7 @@ export function ProfileSummary({
   stats,
   corner,
   nameAddon,
+  isNameInTitle = false,
   onPhotoPick,
   photoLabel,
   isPhotoBusy = false,
@@ -171,9 +177,15 @@ export function ProfileSummary({
           </VStack>
           <VStack gap={0.5} align="center">
             <HStack gap={0} align="center" justify="center" wrap="nowrap">
-              <DataHeading level={2} xstyle={summary.name} maxLines={2}>
-                {name}
-              </DataHeading>
+              {isNameInTitle ? (
+                <Text as="p" dir="auto" xstyle={summary.name} maxLines={2}>
+                  {name}
+                </Text>
+              ) : (
+                <DataHeading level={2} xstyle={summary.name} maxLines={2}>
+                  {name}
+                </DataHeading>
+              )}
               {nameAddon}
             </HStack>
             <Text type="supporting" xstyle={summary.role}>

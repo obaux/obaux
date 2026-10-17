@@ -1,5 +1,6 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
 import { Page, Loading, Notice, PlacesIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPageHeader } from '@pam/ui/SubPage';
@@ -7,7 +8,7 @@ import { NOTICES, intlLocale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
-import { isLate, useProgramsToCheck, type ProgramToCheck } from '@/lib/programsToCheck';
+import { isLate, useProgramsToCheck, type ProgramToCheck, toLookAt } from '@/lib/programsToCheck';
 import { NotIn } from '../app/NotIn';
 import { HelpButton } from './HelpButton';
 
@@ -30,7 +31,11 @@ export function ProgramsToCheckScreen() {
   const isSuperAdmin = viewedRole === 'super_admin' && trueRole === 'super_admin';
   const { state } = useProgramsToCheck(isSuperAdmin);
 
-  const back = { backHref: '/profile/', backLabel: t('nav.back.profile') };
+  // Back the way they came: Home's row says so (Iris, super admin P2); Profile's list is the default.
+  const fromHome = useSearchParams().get('from') === 'home';
+  const back = fromHome
+    ? { backHref: '/', backLabel: t('nav.back.home') }
+    : { backHref: '/profile/', backLabel: t('nav.back.profile') };
   const header = (subtitle?: string) => (
     <SubPageHeader title={t('review.title')} {...(subtitle ? { subtitle } : {})} {...back} actions={<HelpButton />} />
   );
@@ -86,7 +91,7 @@ export function ProgramsToCheckScreen() {
 
   return (
     <Page gap={4}>
-      {header(state.status === 'ready' ? t('review.total', { total: state.programs.length }) : undefined)}
+      {header(state.status === 'ready' ? t('review.total', { total: toLookAt(state.programs) }) : undefined)}
 
       {state.status === 'loading' ? <Loading label={t('common.loading')} variant="inline" /> : null}
 

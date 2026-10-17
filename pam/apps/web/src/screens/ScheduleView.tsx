@@ -34,7 +34,7 @@ import { ConfirmDialog } from './ConfirmDialog';
  *
  * - **Day** (the default, today): each person in time order — the time and
  *   how long, their name, what the visit is — one tap from their page.
- * - **Week**: the same rows under each weekday, Monday first, with a count;
+ * - **Week**: the same rows under each of seven days starting at the day shown (today on opening), with a count;
  *   a day with nobody says so rather than disappearing.
  * - **Month**: the month as a calendar to pick a day from, and under it the
  *   days that have people coming, with how many — the summary at a glance.
@@ -206,12 +206,12 @@ const styles = stylex.create({
     transitionDuration: '160ms',
   },
   dotOn: { backgroundColor: colorVars['--color-text-primary'] },
-  // 38px tabs (Will, 7 October, D-355: "small tabs, 38px touch target") —
-  // below the 48px floor on his word; see D-355. The theme sizes a small
-  // segment from --size-element-sm, so this control alone gets a smaller one.
-  // The site-wide floor (globals.css, D-008) is lowered for this control
-  // only: 30px segments in a 38px track.
-  tabs: { '--size-element-sm': '38px', '--pam-touch-target-min': '30px', height: '38px', fontSize: '14px' },
+  // Small tabs (Will, 7 October, D-355: "small tabs"), but not below the 48px floor (A27, Iris's
+  // program lead pass W3, D-582): they were 38px in a 14px face, 30px high each. The theme sizes a
+  // small segment from --size-element-sm, so this control sets it to the floor.
+  tabs: { '--size-element-sm': '48px', '--pam-touch-target-min': '48px', height: '48px', fontSize: '16px' },
+  // Each choice at least 48 wide too: "Day" alone was 36px.
+  tab: { minWidth: '48px', minHeight: '48px' },
   // Pulled up under the range (Will, 7 October: "the gap … is too wide").
   nav: { width: '100%', marginBlockStart: '-12px' },
   navMiddle: { flexGrow: 1, minWidth: 0 },
@@ -403,7 +403,7 @@ const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDat
 const addDays = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
 const sameDay = (a: Date, b: Date) =>
   a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-/** Monday of the week `d` is in. */
+/** Monday of the week `d` is in (the month grid starts its weeks there). */
 const weekStart = (d: Date) => addDays(startOfDay(d), -((d.getDay() + 6) % 7));
 const iso = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -414,7 +414,7 @@ export function ScheduleView({
   floating,
   today = new Date(),
   note,
-  // A program lead opens on the week (Will, 5 October, D-267).
+  // A program lead opens on the week (Will, 5 October, D-267), starting at today.
   initialView = 'week',
   canCheckIn = false,
   isCollapsed = false,
@@ -532,7 +532,9 @@ export function ScheduleView({
     else setAnchor((d) => new Date(d.getFullYear(), d.getMonth() + direction, 1));
   };
 
-  const weekFrom = weekStart(anchor);
+  // The week is the seven days from the day shown, today when it opens: the days already gone are
+  // not above it (Iris's program lead pass W3). The arrows move it by seven days.
+  const weekFrom = startOfDay(anchor);
   const navLabel =
     view === 'day'
       ? sameDay(anchor, today)
@@ -778,9 +780,9 @@ export function ScheduleView({
                 size="sm"
                 xstyle={styles.tabs}
               >
-                <SegmentedControlItem value="day" label={t('schedule.tab.day')} />
-                <SegmentedControlItem value="week" label={t('schedule.tab.week')} />
-                <SegmentedControlItem value="month" label={t('schedule.tab.month')} />
+                <SegmentedControlItem value="day" label={t('schedule.tab.day')} xstyle={styles.tab} />
+                <SegmentedControlItem value="week" label={t('schedule.tab.week')} xstyle={styles.tab} />
+                <SegmentedControlItem value="month" label={t('schedule.tab.month')} xstyle={styles.tab} />
               </SegmentedControl>
             }
             isTitleHidden

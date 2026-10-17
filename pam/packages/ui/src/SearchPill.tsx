@@ -177,9 +177,10 @@ export function SearchPill<T extends SearchPillItem>({
 
   return (
     <InputGroup ref={groupRef} label={label} isLabelHidden size="lg" xstyle={styles.group}>
+      {/* The group's label names the field; its own is left empty, or it is read twice (Iris, case manager P8). */}
       <Typeahead<T>
         key={round}
-        label={label}
+        label=""
         isLabelHidden
         placeholder={placeholder}
         searchSource={searchSource}

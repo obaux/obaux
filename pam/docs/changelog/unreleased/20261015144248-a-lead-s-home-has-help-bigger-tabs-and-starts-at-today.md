@@ -1,0 +1,3 @@
+# A program lead's Home has Help, bigger tabs, and starts at today
+
+A program lead's Home now has the Help button beside the bell, and the Day, Week and Month tabs are big enough to tap. Coming in opens on the week starting today, so the days already gone are not above it. Above the people who are interested in your program there is a heading that says so, and a new lead who has no program yet no longer sees a row of strangers. Book a visit for a member lists the members who have written to your program. On Add a program, the back arrow says it goes back a step. Info tips (the small "i" and the signed mark) are easy to tap. (D-582)

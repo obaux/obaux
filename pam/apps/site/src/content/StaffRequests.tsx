@@ -26,11 +26,17 @@ export function StaffRequests() {
             'Read the name and what they asked to be. If you need to ask them something, tap “Text” their name.',
             'Choose the city this account is for. If Pam is in only one city, it is chosen for you.',
             'Tap “Approve” or “Deny”.',
+            'Pam asks you to confirm. Tap “Yes, approve” or “Yes, deny”, or tap “Not yet” to go back.',
           ]}
         />
         <P>
           Approve makes the account right away and texts the person that it was approved. Deny makes no account
           and texts the person that it was not approved.
+        </P>
+        <P>
+          When you confirm, the screen stays where it is and says what happened at the top, for example “Request
+          denied”. Approving a program, in Programs to check, works the same way: Pam asks you to confirm, then says
+          the program is approved.
         </P>
       </Section>
     </Body>

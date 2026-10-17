@@ -34,6 +34,9 @@ export const Default: Story = {};
 /** A staff account has no numbers to show, so the person has the whole card. */
 export const StaffNoStats: Story = { args: { name: 'Keisha', roleLabel: 'Case manager', stats: [] } };
 
+/** On someone else's page, whose title already says the name: the same card, but the name is not a second heading, so a screen reader says it once. */
+export const NameInTitle: Story = { args: { isNameInTitle: true } };
+
 /** A case manager viewing a member: a star in the corner. */
 export const WithCorner: Story = {
   args: {

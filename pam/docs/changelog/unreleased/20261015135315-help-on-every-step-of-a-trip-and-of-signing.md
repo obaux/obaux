@@ -1,0 +1,3 @@
+# Help on every step of a trip and of signing
+
+Plan a trip's first step ("When?") and every screen of signing a program's policies now have the Help button, the same one "Check your trip" has. A long place name on Trips wraps onto more lines instead of being cut off. The copy button on an address and "View all places to visit" on Plan a trip are big enough to tap. After a visit is marked, "Cancel this visit" goes away. Your points screen lists "I'm here" (+100) and "I went" (+60) among the ways to earn. Opening the signature sheet a second time shows an empty box with Sign greyed until you draw. (D-578)

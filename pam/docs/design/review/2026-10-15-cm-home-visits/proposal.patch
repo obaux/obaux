@@ -1,0 +1,105 @@
+diff --git a/pam/apps/web/src/screens/StaffHomes.tsx b/pam/apps/web/src/screens/StaffHomes.tsx
+index b9d82968..635d84c8 100644
+--- a/pam/apps/web/src/screens/StaffHomes.tsx
++++ b/pam/apps/web/src/screens/StaffHomes.tsx
+@@ -33,11 +33,57 @@ import { StaffPeopleRow } from './StaffPeopleRow';
+ import { PeopleHomeView, type HomePerson, type PeopleState } from './PeopleHomeView';
+ 
+ /** A case manager's home: the people on their caseload. */
++type VisitRow = { member_id: string; starts_at: string; status: string | null; services: { name: string | null } | null };
++// Picture-only stand-in words (Sage and Lena write the real ones).
++const STAND_IN: Record<string, { next: string; went: string; missed: string }> = {
++  en: { next: 'Next visit', went: 'Went', missed: 'Missed' },
++  ar: { next: 'الزيارة القادمة', went: 'حضر', missed: 'لم يحضر' },
++};
++function useCaseloadVisits(ids: readonly string[]): Record<string, VisitRow[]> {
++  const [rows, setRows] = useState<Record<string, VisitRow[]>>({});
++  const key = ids.join(',');
++  useEffect(() => {
++    if (!key) return;
++    void (async () => {
++      const { createClient } = await import('@/lib/supabase');
++      const { data } = await createClient()
++        .from('appointments')
++        .select('member_id,starts_at,status,services(name)')
++        .in('member_id', key.split(','))
++        .neq('status', 'cancelled');
++      const by: Record<string, VisitRow[]> = {};
++      for (const r of (data ?? []) as unknown as VisitRow[]) (by[r.member_id] ??= []).push(r);
++      setRows(by);
++    })();
++  }, [key]);
++  return rows;
++}
++
+ export function CaseloadHome() {
+   const { t, tPlain } = useI18n();
+   const router = useRouter();
+   const { state: caseload, refresh } = useCaseload(true);
+   const examplePeople = useExamplePeople();
++  const { locale } = useI18n();
++  const visits = useCaseloadVisits(caseload.status === 'ready' ? caseload.members.map((m) => m.id) : []);
++  const words = STAND_IN[locale] ?? STAND_IN['en']!;
++  const fmt = new Intl.DateTimeFormat(locale === 'ar' ? 'ar-u-nu-latn' : 'en-US', { weekday: 'short', hour: 'numeric', minute: '2-digit' });
++  const fmtDay = new Intl.DateTimeFormat(locale === 'ar' ? 'ar-u-nu-latn' : 'en-US', { month: 'short', day: 'numeric' });
++  const visitLine = (id: string): string[] => {
++    const mine = (visits[id] ?? []).slice().sort((a, b) => a.starts_at.localeCompare(b.starts_at));
++    const next = mine.find((v) => new Date(v.starts_at).getTime() > Date.now());
++    if (next) return [`${words.next}: ${fmt.format(new Date(next.starts_at))}`];
++    const last = mine[mine.length - 1];
++    if (!last) return [];
++    return [`${last.status === 'attended' ? words.went : words.missed} ${fmtDay.format(new Date(last.starts_at))}`];
++  };
++  const missedChip = (id: string): { label: string; tone: 'warning' } | null => {
++    const mine = (visits[id] ?? []).slice().sort((a, b) => a.starts_at.localeCompare(b.starts_at));
++    const last = mine[mine.length - 1];
++    return last && last.status !== 'attended' && new Date(last.starts_at).getTime() < Date.now()
++      ? { label: `${words.missed} ${fmtDay.format(new Date(last.starts_at))}`, tone: 'warning' }
++      : null;
++  };
+ 
+   // The real list when there is one; the example people otherwise, as on
+   // `/admin/` (Will, 16 September — and kept for investor demos, 1 October).
+@@ -58,9 +104,9 @@ export function CaseloadHome() {
+                   id: member.id,
+                   firstName: member.firstName,
+                   href: `/person/?id=${encodeURIComponent(member.id)}`,
+-                  chip: statusChip(member, t),
++                  chip: statusChip(member, t) ?? missedChip(member.id),
+                   programBadge: member.program,
+-                  meta: member.points !== null ? [t('admin.points', { count: member.points })] : [],
++                  meta: missedChip(member.id) ? [] : visitLine(member.id),
+                 }),
+               ),
+             }
+diff --git a/pam/apps/web/src/stories/journeys/fixtures.ts b/pam/apps/web/src/stories/journeys/fixtures.ts
+index 11e84937..bf49ffcd 100644
+--- a/pam/apps/web/src/stories/journeys/fixtures.ts
++++ b/pam/apps/web/src/stories/journeys/fixtures.ts
+@@ -202,6 +202,7 @@ export const NOTIFICATIONS = [
+ export const CASELOAD = [
+   { id: 'm1', first_name: 'Marcus', access_status: 'active', last_active_at: hoursAgo(0) },
+   { id: 'm2', first_name: 'Tanya', access_status: 'active', last_active_at: null },
++  { id: 'm3', first_name: 'Jordan', access_status: 'active', last_active_at: hoursAgo(30) },
+ ];
+ 
+ export const DIRECTORY_PEOPLE = [
+diff --git a/pam/apps/web/src/stories/journeys/mockSupabase.ts b/pam/apps/web/src/stories/journeys/mockSupabase.ts
+index f0d062c8..eba6be8e 100644
+--- a/pam/apps/web/src/stories/journeys/mockSupabase.ts
++++ b/pam/apps/web/src/stories/journeys/mockSupabase.ts
+@@ -701,7 +701,13 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
+     // A real member's visits, read by their case manager on the member's page (D-509): Marcus (`m1`, on the example caseload) has
+     // one coming up, one the program marked him at and one it did not, so "Trips coming up" and "Programs attended" have something to show.
+     on('/rest/v1/appointments', (url) => ({
+-      body: url.includes('member_id=eq.m1')
++      body: url.includes('member_id=in.')
++        ? [
++            { member_id: 'm1', id: 'a3', starts_at: onTheHour(2, 10), status: 'scheduled', service_id: SAVED_PLACE.id, services: { name: SAVED_PLACE.name, category: SAVED_PLACE.category } },
++            { member_id: 'm2', id: 'b1', starts_at: onTheHour(-2, 14), status: 'missed', service_id: SAVED_PLACE.id, services: { name: 'Example Learning Center', category: 'education' } },
++            { member_id: 'm3', id: 'c1', starts_at: onTheHour(-1, 9), status: 'attended', service_id: SAVED_PLACE.id, services: { name: 'Example Workforce Center', category: 'workforce' } },
++          ]
++        : url.includes('member_id=eq.m1')
+         ? [
+             { id: 'a1', starts_at: onTheHour(-9, 13), status: 'missed', service_id: SAVED_PLACE.id, services: { name: SAVED_PLACE.name, category: SAVED_PLACE.category } },
+             { id: 'a2', starts_at: onTheHour(-5, 9), status: 'attended', service_id: SAVED_PLACE.id, services: { name: SAVED_PLACE.name, category: SAVED_PLACE.category } },

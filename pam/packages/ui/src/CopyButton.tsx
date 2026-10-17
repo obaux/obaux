@@ -34,8 +34,9 @@ export interface CopyButtonProps {
   /**
    * Where it sits. `header` is the 48px circle with a thin edge, top right of a
    * page (D-417). `inCard` is for a copy action inside a card (Will, 9 October
-   * 2026): 32px, no edge — a small quiet icon at the corner of what it copies,
-   * not a button the size of the thumb. Both say the same words.
+   * 2026): a small quiet icon at the corner of what it copies, no edge. It is
+   * drawn small but is still 48px to tap (Iris's second member pass, P7),
+   * pulled into the card's corner so it grows by 8px at most. Both say the same words.
    */
   readonly placement?: 'header' | 'inCard';
   /** What lands on the clipboard. */
@@ -92,19 +93,23 @@ const styles = stylex.create({
       backgroundColor: colorVars['--color-text-primary'],
     },
   },
-  // Inside a card (Will, 9 October 2026): 32px and no ring. The glyph is 18px,
-  // and it keeps the page copy button's tick and tooltip.
+  // Inside a card (Will, 9 October 2026): no ring, the glyph 18px. The target
+  // is 48px (§2.5); the negative margin above and beside it keeps the glyph
+  // where it was, and none below it, so it never lies over the address
+  // under it (axe's target-size). It keeps the page copy button's tick and tooltip.
   inCard: {
-    width: '32px',
-    height: '32px',
-    minWidth: '32px',
-    minHeight: '32px',
+    width: '48px',
+    height: '48px',
+    minWidth: '48px',
+    minHeight: '48px',
+    marginBlockStart: '-8px',
+    marginInlineEnd: '-8px',
     padding: '0px',
     borderWidth: '0px',
     backgroundColor: 'transparent',
   },
   // The tooltip's point sits over the middle of a 32px button, not a 48px one.
-  tipInCard: { '::before': { insetInlineEnd: '11px' } },
+  tipInCard: { '::before': { insetInlineEnd: '19px' } },
   tipText: { position: 'relative', fontSize: '15px', lineHeight: 1.35, color: colorVars['--color-background-body'] },
 });
 
