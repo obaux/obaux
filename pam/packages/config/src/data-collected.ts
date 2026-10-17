@@ -62,9 +62,9 @@ export const DATA_COLLECTED: readonly CollectedData[] = [
   {
     id: 'waiting-list-text',
     what:
-      'In a city Pam is not in yet: the city, kept with the phone number (`join_waiting_city`). Until the tick ' +
-      '"Text me when Pam opens in {city}" is removed from Join (Ava, build 3), it also asks for a text that nothing ' +
-      'sends (no template, no function, not in the registered campaign); the line covers only the city and the number.',
+      'In a city Pam is not in yet: the city, kept with the phone number (`join_waiting_city`). The "Text me when ' +
+      'Pam opens in {city}" tick is gone (build 3, option A, Will signed a96 on 17 October): nothing sent that text, ' +
+      'so nobody is asked for it. The line covers the city and the number.',
     covers: {
       keys: ['privacy.s.what-we-keep.p14'],
       says: ['not in your city yet', 'the city you typed', 'your phone number', 'only the pam team can see them'],
@@ -191,7 +191,7 @@ export interface InputFile {
 
 export const INPUT_FILES: readonly InputFile[] = [
   { file: 'apps/web/src/app/signin/PhoneSignInCard.tsx', fields: 1, collects: ['phone'] },
-  { file: 'apps/web/src/app/join/JoinScreen.tsx', fields: 5, collects: ['first-name', 'last-name-and-city', 'waiting-list-text'] },
+  { file: 'apps/web/src/app/join/JoinScreen.tsx', fields: 4, collects: ['first-name', 'last-name-and-city', 'waiting-list-text'] },
   { file: 'apps/web/src/screens/AddPersonView.tsx', fields: 2, collects: ['typed-for-someone-new'] },
   { file: 'apps/web/src/screens/InviteForWho.tsx', fields: 3, collects: ['typed-for-someone-new', 'email'] },
   { file: 'apps/web/src/screens/InviteExpiredScreen.tsx', fields: 1, collects: ['email'] },

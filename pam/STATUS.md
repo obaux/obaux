@@ -928,10 +928,16 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Accounts & invites · Program lead's What to expect, row 5 (17 October) — READY for b51 with Lena's words
+## Accounts & invites · Program lead's What to expect, row 5 (17 October) — in b52 with Lena's words
 
 `claude/pam-lead-expect-row5-a92`, stacked on `claude/lena-program-saves-held`. a92 is signed. The fifth row says
 a member's new save is seen as "when", never which place, with the bell picture.
+
+## Accounts & invites · No "Text me when Pam opens" tick (16 October) — in b52 (a96 signed: option A)
+
+`claude/pam-waiting-city-no-tick` (D-587 build 3, option A). The waiting-list step saves the city and offers no text,
+and the line after says only that the city is saved. No new words. Pictures are in
+`docs/design/review/2026-10-16-waiting-city/`.
 
 ## Accounts & invites · Staff photos no account uses are removed (16 October) — in b50
 
