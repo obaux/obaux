@@ -1786,8 +1786,8 @@
   "waitingCities.title": "Города, где люди ждут Pam",
   "waitingCities.empty.title": "Пока никто не ждёт",
   "waitingCities.empty.body": "Когда кто-то регистрируется из города, где Pam пока нет, город появляется здесь, с числом людей.",
-  "caseload.visit.next": "Next visit: {when}",
-  "caseload.visit.went": "Marked as there: {date}",
-  "caseload.visit.missed": "Not marked as there: {date}",
-  "caseload.visit.missed.chip": "Not marked as there"
+  "caseload.visit.next": "Следующий визит: {when}",
+  "caseload.visit.went": "Присутствие отмечено: {date}",
+  "caseload.visit.missed": "Присутствие не отмечено: {date}",
+  "caseload.visit.missed.chip": "Присутствие не отмечено"
 }

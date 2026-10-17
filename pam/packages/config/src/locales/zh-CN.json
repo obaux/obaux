@@ -1703,8 +1703,8 @@
   "waitingCities.title": "有人在等待的城市",
   "waitingCities.empty.title": "还没有人在等待",
   "waitingCities.empty.body": "当有人从Pam还没有开通的城市注册时，该城市会显示在这里，并附上人数。",
-  "caseload.visit.next": "Next visit: {when}",
-  "caseload.visit.went": "Marked as there: {date}",
-  "caseload.visit.missed": "Not marked as there: {date}",
-  "caseload.visit.missed.chip": "Not marked as there"
+  "caseload.visit.next": "下次预约：{when}",
+  "caseload.visit.went": "标记为已到场：{date}",
+  "caseload.visit.missed": "未标记为已到场：{date}",
+  "caseload.visit.missed.chip": "未标记为已到场"
 }

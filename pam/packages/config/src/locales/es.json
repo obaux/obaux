@@ -1703,8 +1703,8 @@
   "waitingCities.title": "Ciudades con gente en espera",
   "waitingCities.empty.title": "Todavía nadie espera",
   "waitingCities.empty.body": "Cuando alguien se registra desde una ciudad donde Pam todavía no está, la ciudad aparece aquí, con cuántas personas.",
-  "caseload.visit.next": "Next visit: {when}",
-  "caseload.visit.went": "Marked as there: {date}",
-  "caseload.visit.missed": "Not marked as there: {date}",
-  "caseload.visit.missed.chip": "Not marked as there"
+  "caseload.visit.next": "Próxima visita: {when}",
+  "caseload.visit.went": "Presencia marcada: {date}",
+  "caseload.visit.missed": "Presencia sin marcar: {date}",
+  "caseload.visit.missed.chip": "Presencia sin marcar"
 }
