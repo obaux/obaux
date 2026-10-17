@@ -1828,6 +1828,7 @@ fine and the fit audit was over-counting (D-448).
 **14 October (D-571).** "Got a new phone number?" is built and held as a patch (`docs/design/review/2026-10-14-new-phone-number/`) until the app's new-number page ships.
 **16 October.** The Points and badges picture shows the six Ways to earn, and the site's own secondary-button border is gone (the design system's ring, D-493). The Staff requests confirm step and the "taken off Pam's list" sentence are in, signed by Sage (ledger fef92f08).
 **17 October (D-598).** A post's "Updated" date follows its words: `post-updated.json` and `test/post-dates.test.tsx` fingerprint each post, and `pnpm --filter @pam/site posts:date <slug>=<day>` is the fix when it fails. Eleven posts' dates moved to the day their words went live.
+**17 October (a94, held).** The "What others can see" lines for a program booking a visit are a patch (`docs/design/review/2026-10-17-a94-site/`), Sage's words (ledger e846cbd4); it ships with the booking batch, with `posts:date what-others-can-see=<that day>`.
 
 **13 October (held for Will, D-548/D-550).** About Pam shows its carousel words again and loses the line above its tabs (bd6d016a). The Home phone layout follows Figma 7:3 and the green card switches between three views; pictures to look at are in `docs/design/review/2026-10-13-website-phone/`. Not for `main` until Will says yes.
 
