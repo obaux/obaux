@@ -1,0 +1,299 @@
+From 5d3282b984564f5a68db4ce1433f1c87188772f2 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 14 Oct 2026 04:35:14 +0000
+Subject: [PATCH] Site: Got a new phone number? (D-567), a help post with a
+ call-out to the app's New number form (held)
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_012vS6F7CMTwFn3u5UG66JWz
+---
+ pam/apps/site/src/components/CalloutCard.tsx | 41 +++++++++++
+ pam/apps/site/src/components/Prose.tsx       | 15 ++++
+ pam/apps/site/src/content/CantSignIn.tsx     |  1 +
+ pam/apps/site/src/content/NewPhoneNumber.tsx | 77 ++++++++++++++++++++
+ pam/apps/site/src/content/bodies.tsx         |  2 +
+ pam/apps/site/src/content/posts.ts           |  9 +++
+ pam/apps/site/src/content/search-phrases.ts  |  6 +-
+ pam/apps/site/src/lib/links.ts               |  2 +
+ pam/apps/site/test/search.test.ts            | 14 ++++
+ 9 files changed, 164 insertions(+), 3 deletions(-)
+ create mode 100644 pam/apps/site/src/components/CalloutCard.tsx
+ create mode 100644 pam/apps/site/src/content/NewPhoneNumber.tsx
+
+diff --git a/pam/apps/site/src/components/CalloutCard.tsx b/pam/apps/site/src/components/CalloutCard.tsx
+new file mode 100644
+index 00000000..00981b01
+--- /dev/null
++++ b/pam/apps/site/src/components/CalloutCard.tsx
+@@ -0,0 +1,41 @@
++import * as stylex from '@stylexjs/stylex';
++import { Heading } from '@astryxdesign/core/Heading';
++import { Text } from '@astryxdesign/core/Text';
++import { VStack } from '@astryxdesign/core/VStack';
++import { website } from '../lib/website.stylex';
++import { type } from '../lib/website-type.stylex';
++import { SoftButton } from './SoftButton';
++
++const styles = stylex.create({
++  // The same soft grey card as "Still stuck?": radius 24, a hairline, 24px inside on a phone and 32px from 900px.
++  card: {
++    padding: { default: '24px', '@media (min-width: 900px)': '32px' },
++    boxSizing: 'border-box',
++    borderRadius: '24px',
++    borderWidth: '1px',
++    borderStyle: 'solid',
++    borderColor: website['--website-border-subtle'],
++    backgroundColor: website['--website-surface-muted'],
++    color: website['--website-text-primary'],
++    maxWidth: '760px',
++  },
++  title: { color: website['--website-text-primary'], margin: 0 },
++  line: { color: website['--website-text-primary'], margin: 0 },
++  // Full width on a phone, as wide as its words from 900px (the same rule as "Write to us").
++  button: { alignSelf: { default: 'stretch', '@media (min-width: 900px)': 'flex-start' } },
++});
++
++/** A call-out inside a post: a heading, one line, and one button to somewhere else (a form in the app). */
++export function CalloutCard({ title, line, label, href }: { readonly title: string; readonly line: string; readonly label: string; readonly href: string }) {
++  return (
++    <VStack gap={3} xstyle={styles.card}>
++      <Heading level={3} xstyle={[type.heading_title24, styles.title]}>
++        {title}
++      </Heading>
++      <Text as="p" xstyle={[type.lead_17, styles.line]}>
++        {line}
++      </Text>
++      <SoftButton label={label} href={href} xstyle={styles.button} />
++    </VStack>
++  );
++}
+diff --git a/pam/apps/site/src/components/Prose.tsx b/pam/apps/site/src/components/Prose.tsx
+index fdab043c..cbaef729 100644
+--- a/pam/apps/site/src/components/Prose.tsx
++++ b/pam/apps/site/src/components/Prose.tsx
+@@ -13,6 +13,8 @@ import { type } from '../lib/website-type.stylex';
+ const linkColor = stylex.create({ text: { color: website['--website-text-link'] } });
+ 
+ const styles = stylex.create({
++  bullets: { margin: 0, paddingInlineStart: '24px', maxWidth: '760px', display: 'flex', flexDirection: 'column', gap: '8px', listStyleType: 'disc', listStylePosition: 'outside' },
++  bullet: { paddingInlineStart: '4px', display: 'list-item' },
+   // Text keeps a readable line length; the cards (how to find it, pictures) use the full width.
+   measure: { maxWidth: '760px' },
+   lead: { maxWidth: '760px', fontWeight: 400, color: website['--website-text-primary'] },
+@@ -64,6 +66,19 @@ function menuLabel(label: string | undefined, title: string): string {
+   return label && label.length ? label : title;
+ }
+ 
++/** A short list with bullets (a few plain lines, not steps). */
++export function Bullets({ items }: { readonly items: readonly string[] }) {
++  return (
++    <ul {...stylex.props(styles.bullets)}>
++      {items.map((item) => (
++        <li key={item} {...stylex.props(styles.bullet)}>
++          <Text as="span">{item}</Text>
++        </li>
++      ))}
++    </ul>
++  );
++}
++
+ export function P({ children }: { readonly children: ReactNode }) {
+   return (
+     <Text as="p" xstyle={styles.measure}>
+diff --git a/pam/apps/site/src/content/CantSignIn.tsx b/pam/apps/site/src/content/CantSignIn.tsx
+index 2316e812..b9dc61b8 100644
+--- a/pam/apps/site/src/content/CantSignIn.tsx
++++ b/pam/apps/site/src/content/CantSignIn.tsx
+@@ -67,6 +67,7 @@ export function CantSignIn() {
+           ]}
+         />
+         <ReadMore label="More: Texts from Pam" href="/support/texts-from-pam/" />
++        <ReadMore label="More: Got a new phone number?" href="/support/new-phone-number/" />
+       </Section>
+ 
+       <Section title="The code didn’t work">
+diff --git a/pam/apps/site/src/content/NewPhoneNumber.tsx b/pam/apps/site/src/content/NewPhoneNumber.tsx
+new file mode 100644
+index 00000000..d6cbafc3
+--- /dev/null
++++ b/pam/apps/site/src/content/NewPhoneNumber.tsx
+@@ -0,0 +1,77 @@
++import { CalloutCard } from '../components/CalloutCard';
++import { HowTo } from '../components/HowTo';
++import { LegalLink } from '../components/LegalLink';
++import { Body, Bullets, Lead, P, Section } from '../components/Prose';
++import { NEW_NUMBER_URL } from '../lib/links';
++
++/**
++ * Support post: Got a new phone number? (everyone). Words by Sage, signed (A29, 14 October 2026, ledger e708a7e8);
++ * Will's request: "add that as an article inside the support website and in the article it has a callout to this form
++ * and have the post facilitate this process". It matches Ava's D-567 (the app's New number? form at
++ * /signin/new-number/). "Sign in", "New number?" and "Send" are the app's labels: keep them matching if they change.
++ * Held until a84 is signed and D-567 ships.
++ */
++export function NewPhoneNumber() {
++  return (
++    <Body>
++      <Lead>
++        Your Pam account is tied to your phone number. If your number changed, you can ask us to move your account to the
++        new one. It’s the same account, with everything in it.
++      </Lead>
++
++      <Section title="What to have ready">
++        <Bullets
++          items={[
++            'Your new phone, in your hand. Pam texts it a code first, to check it’s yours.',
++            'Your old phone number.',
++            'Your first and last name, and your city, as they are on your account.',
++            'If you can, the name of someone on Pam who knows you, like your guide. It helps us check it’s you. You can leave it out.',
++          ]}
++        />
++      </Section>
++
++      <Section title="How to ask">
++        <HowTo
++          steps={[
++            'Open Pam and go to Sign in.',
++            'Tap New number? at the bottom.',
++            'Type your new number, then the code we text to it.',
++            'Fill in the form and tap Send.',
++          ]}
++        />
++        <CalloutCard
++          title="Ready to move your account?"
++          line="Have your new phone with you. Pam texts it a code first."
++          label="Start with your new number"
++          href={NEW_NUMBER_URL}
++        />
++      </Section>
++
++      <Section title="What happens next">
++        <P>
++          A person on the Pam team checks every request by hand. We may call your new number to make sure it’s really you.
++          Nothing moves until then.
++        </P>
++        <P>Pam won’t text you when it’s done. Come back and sign in with your new number to see the answer.</P>
++        <Bullets
++          items={[
++            'If we say yes, your account moves to your new number. Sign in with your new number to open it. Your old number no longer opens your account.',
++            'If we say no, your account stays as it was, and we delete your new number from Pam at once. If you think we got it wrong, contact Pam.',
++          ]}
++        />
++      </Section>
++
++      <Section title="When this won’t work">
++        <Bullets
++          items={[
++            'If you already joined Pam with your new number, there is nothing to move it onto. Contact Pam.',
++            'The Pam team’s own admin accounts can’t be moved this way.',
++          ]}
++        />
++      </Section>
++
++      <P>How long we keep what you send is on our Privacy page.</P>
++      <LegalLink kind="privacy" label="Read the privacy policy" variant="read-more" />
++    </Body>
++  );
++}
+diff --git a/pam/apps/site/src/content/bodies.tsx b/pam/apps/site/src/content/bodies.tsx
+index d10a945f..ea9e90bd 100644
+--- a/pam/apps/site/src/content/bodies.tsx
++++ b/pam/apps/site/src/content/bodies.tsx
+@@ -14,6 +14,7 @@ import { StaffRequests } from './StaffRequests';
+ import { StartHere } from './StartHere';
+ import { TalkingToPam } from './TalkingToPam';
+ import { YourLanguage } from './YourLanguage';
++import { NewPhoneNumber } from './NewPhoneNumber';
+ import { CantSignIn } from './CantSignIn';
+ import { YourSafety } from './YourSafety';
+ import { PlaceTold } from './PlaceTold';
+@@ -30,6 +31,7 @@ import { WhoIsMyGuide } from './WhoIsMyGuide';
+  */
+ export const BODIES: Record<string, () => JSX.Element> = {
+   'cant-sign-in': CantSignIn,
++  'new-phone-number': NewPhoneNumber,
+   'your-safety': YourSafety,
+   'case-manager-assignments': CaseManagerAssignments,
+   'keeping-your-listing-up-to-date': KeepingYourListing,
+diff --git a/pam/apps/site/src/content/posts.ts b/pam/apps/site/src/content/posts.ts
+index 76baec2c..4ff35f70 100644
+--- a/pam/apps/site/src/content/posts.ts
++++ b/pam/apps/site/src/content/posts.ts
+@@ -26,6 +26,15 @@ export interface SupportPost {
+ }
+ 
+ const ALL: readonly SupportPost[] = [
++  {
++    slug: 'new-phone-number',
++    topic: 'members',
++    audience: 'everyone',
++    title: 'Got a new phone number?',
++    summary: 'If you changed your number or lost your phone, Pam can move your account to your new number. What to have ready, and what happens next.',
++    updated: '2026-10-14',
++    keywords: ['lost my phone', 'new number', 'changed my number', 'new phone', 'phone stolen', 'can’t get the code'],
++  },
+   {
+     slug: 'cant-sign-in',
+     topic: 'members',
+diff --git a/pam/apps/site/src/content/search-phrases.ts b/pam/apps/site/src/content/search-phrases.ts
+index 1339d11f..d82ec325 100644
+--- a/pam/apps/site/src/content/search-phrases.ts
++++ b/pam/apps/site/src/content/search-phrases.ts
+@@ -34,7 +34,7 @@ export const SEARCH_PHRASES: readonly SearchPhrase[] = [
+   { phrase: 'why didnt i get a code', who: 'anyone', answer: 'texts-from-pam', also: ['joining-pam'] },
+   { phrase: 'code not coming', who: 'anyone', answer: 'texts-from-pam' },
+   { phrase: 'the code doesnt work', who: 'anyone', answer: 'joining-pam', also: ['texts-from-pam'] },
+-  { phrase: 'cant sign in', who: 'anyone', answer: 'cant-sign-in', also: ['joining-pam', 'texts-from-pam'] },
++  { phrase: 'cant sign in', who: 'anyone', answer: 'cant-sign-in', also: ['joining-pam', 'new-phone-number', 'texts-from-pam'] },
+   { phrase: 'it says that code is too old', who: 'resident', answer: 'joining-pam', also: ['sending-an-invite'] },
+   { phrase: 'my link expired', who: 'anyone', answer: 'joining-pam', also: ['sending-an-invite', 'joining-as-staff'] },
+   { phrase: 'code is for a different phone', who: 'resident', answer: 'joining-pam' },
+@@ -184,8 +184,8 @@ export const SEARCH_PHRASES: readonly SearchPhrase[] = [
+   // Second batch (Sage, 11 October): other ways people say the same things
+   { phrase: 'the code is not coming', who: 'anyone', answer: 'texts-from-pam' },
+   { phrase: 'i did not get a text', who: 'anyone', answer: 'texts-from-pam' },
+-  { phrase: 'i cant sign in', who: 'anyone', answer: 'cant-sign-in', also: ['joining-pam'] },
+-  { phrase: 'i cant login', who: 'anyone', answer: 'cant-sign-in', also: ['joining-pam'] },
++  { phrase: 'i cant sign in', who: 'anyone', answer: 'cant-sign-in', also: ['joining-pam', 'new-phone-number'] },
++  { phrase: 'i cant login', who: 'anyone', answer: 'cant-sign-in', also: ['joining-pam', 'new-phone-number'] },
+   { phrase: 'become a case manager', who: 'case manager', answer: 'cant-sign-in', also: ['joining-as-staff'] },
+   { phrase: 'my link to join is too old', who: 'anyone', answer: 'joining-pam' },
+   { phrase: 'the code is for a different phone', who: 'anyone', answer: 'joining-pam' },
+diff --git a/pam/apps/site/src/lib/links.ts b/pam/apps/site/src/lib/links.ts
+index 1731703f..307f05ef 100644
+--- a/pam/apps/site/src/lib/links.ts
++++ b/pam/apps/site/src/lib/links.ts
+@@ -11,6 +11,8 @@ export const APP_URL = (
+ export const SIGN_IN_URL = `${APP_URL}/signin/`;
+ /** Sign in, then straight to Add my program (the app keeps `next` to one listed screen, used once, never for a program lead: S1). */
+ export const ADD_PROGRAM_URL = `${APP_URL}/signin/?next=/profile/add-program/`;
++/** Where someone with a new phone number asks to move their account, in the app (D-567, Ava). Held until the app page is live. */
++export const NEW_NUMBER_URL = `${APP_URL}/signin/new-number/`;
+ export const PRIVACY_URL = `${APP_URL}/privacy/`;
+ export const TERMS_URL = `${APP_URL}/terms/`;
+ 
+diff --git a/pam/apps/site/test/search.test.ts b/pam/apps/site/test/search.test.ts
+index d2371457..b76abff5 100644
+--- a/pam/apps/site/test/search.test.ts
++++ b/pam/apps/site/test/search.test.ts
+@@ -234,3 +234,17 @@ describe('most asked, under the search box', () => {
+     }
+   });
+ });
++
++// Will, 14 October: the new-number post (D-567) is found by the way people say it, and by “I can’t sign in”.
++describe('search finds “Got a new phone number?”', () => {
++  for (const q of ['new phone', 'lost my phone', 'changed my number', 'new number', 'phone stolen']) {
++    it(`“${q}” has it in the first three answers`, () => {
++      expect(find(q).posts.slice(0, 3).map((p) => p.slug)).toContain('new-phone-number');
++    });
++  }
++  for (const q of ['cant sign in', 'i cant sign in']) {
++    it(`“${q}” has it among the first five answers`, () => {
++      expect(find(q).posts.slice(0, 5).map((p) => p.slug)).toContain('new-phone-number');
++    });
++  }
++});
+-- 
+2.43.0
+

@@ -98,7 +98,9 @@ export const CalendarPreview: Story = withSetup(screen('provider', 'Home — cal
 export const Program: Story = screen('provider', 'Program', '/program/');
 export const EditService: Story = screen('provider', 'Program — edit a service', '/program/service/', { id: 'service-ged' });
 export const NewService: Story = screen('provider', 'Program — new service', '/program/service/');
-export const Policies: Story = screen('provider', 'Policies for participants', '/program/policies/');
+export const Policies: Story = screen('provider', 'Policies for members', '/program/policies/');
+/** The members who told Pam they are interested in the program (Sage's "Members interested in your program"). */
+export const Interested: Story = screen('provider', 'Members interested in your program', '/interested/');
 export const Policy: Story = screen('provider', 'A policy', '/program/policies/view/', { id: 'policy-confidentiality' });
 export const Messages: Story = screen('provider', 'Messages', '/messages/');
 export const Profile: Story = screen('provider', 'Profile', '/profile/');
@@ -138,3 +140,11 @@ export const SignUp: Story = screenWithControls<SignUpArgs>(
   },
   (args) => ({ kind: 'provider', invite: 'PAM-7Q4K', step: SIGN_UP_STEPS[args.step] }),
 );
+
+/** About you with no city: the staff line, "Tell us the city you work in." (Iris P7; for Lena's fit audit). */
+export const SignUpCityMissing: Story = screen('provider', 'Sign up — no city', '/prototype/join/', {
+  kind: 'provider',
+  invite: 'PAM-7Q4K',
+  step: 'details',
+  missing: 'city',
+});

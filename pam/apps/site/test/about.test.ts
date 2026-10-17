@@ -95,7 +95,7 @@ describe('the Points and badges post', () => {
     const { AWARDED_TODAY, POINTS_RULES } = await import('../../../packages/config/src/points');
     const post = readFileSync(join(__dirname, '..', 'src', 'content', 'PointsAndBadges.tsx'), 'utf8');
     // One row per way Pam pays; a new way in AWARDED_TODAY fails here until the post says it.
-    expect(AWARDED_TODAY).toHaveLength(4);
+    expect(AWARDED_TODAY).toHaveLength(6);
     for (const reason of AWARDED_TODAY) {
       expect(post, reason).toContain(`${POINTS_RULES[reason].points} points`);
     }

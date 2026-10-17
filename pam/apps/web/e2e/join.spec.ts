@@ -316,6 +316,66 @@ test.describe('signing up', () => {
     await expect(page.getByRole('radio', { name: 'Parole Officer or Case Manager' })).toHaveCount(0);
   });
 
+  test('a member can go back from step 2 to fix their name; it is saved on the account, not a second one (Iris W1)', async ({ page }) => {
+    const calls = await newcomer(page);
+    await page.goto('/join/');
+    await fillDetails(page);
+    await page.getByLabel('First name').fill('Marcsu');
+    await page.getByRole('button', { name: 'Next' }).click();
+    await expect(page.getByRole('heading', { name: 'What others can see' })).toBeVisible();
+
+    await page.getByRole('button', { name: 'Back a step' }).click();
+    await expect(page.getByLabel('First name')).toHaveValue('Marcsu');
+    await page.getByLabel('First name').fill('Marcus');
+    await page.getByRole('button', { name: 'Next' }).click();
+    await expect(page.getByRole('heading', { name: 'What others can see' })).toBeVisible();
+    expect(calls.start, 'a second membership was started').toHaveLength(1);
+    expect(calls.profileWrites.some((w) => w['first_name'] === 'Marcus')).toBe(true);
+  });
+
+  test('a case manager is asked the city they work in; step 2 has a way back and Contact Pam, and the invite is used once (Iris W1, P7)', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.sessionStorage.setItem('pam.invite', JSON.stringify({ code: 'PAM7Q4KX', role: 'admin' }));
+    });
+    const calls = await newcomer(page);
+    const redeemed: Record<string, unknown>[] = [];
+    await page.route('**/rest/v1/rpc/redeem_invite*', (route) => {
+      redeemed.push(route.request().postDataJSON() as Record<string, unknown>);
+      return route.fulfill(json({ id: NEWCOMER, role: 'admin' }));
+    });
+    await page.goto('/join/');
+    await page.getByLabel('First name').fill('Dnaa');
+    await page.getByLabel('Last name').fill('Lee');
+    await expect(page.getByRole('combobox', { name: 'City you work in' })).toContainText('Philadelphia');
+    await expect(page.getByRole('combobox', { name: 'City you live in' })).toHaveCount(0);
+    await page.getByRole('button', { name: 'Next' }).click();
+
+    await expect(page.getByRole('heading', { name: 'What you will see' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Contact Pam' })).toBeVisible();
+    await page.getByRole('button', { name: 'Back a step' }).click();
+    await page.getByLabel('First name').fill('Dana');
+    await page.getByRole('button', { name: 'Next' }).click();
+    await expect(page.getByRole('heading', { name: 'What you will see' })).toBeVisible();
+    expect(redeemed, 'the invite was redeemed twice').toHaveLength(1);
+    expect(calls.profileWrites.some((w) => w['first_name'] === 'Dana')).toBe(true);
+  });
+
+  test('a program lead\'s step 2 also goes back, with Contact Pam (Iris, program lead pass)', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.sessionStorage.setItem('pam.invite', JSON.stringify({ code: 'PAM7Q4KY', role: 'provider' }));
+    });
+    await newcomer(page);
+    await page.route('**/rest/v1/rpc/redeem_invite*', (route) => route.fulfill(json({ id: NEWCOMER, role: 'provider' })));
+    await page.goto('/join/');
+    await page.getByLabel('First name').fill('Pat');
+    await expect(page.getByRole('combobox', { name: 'City you work in' })).toContainText('Philadelphia');
+    await page.getByRole('button', { name: 'Next' }).click();
+    await expect(page.getByRole('heading', { name: 'What to expect' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Contact Pam' })).toBeVisible();
+    await page.getByRole('button', { name: 'Back a step' }).click();
+    await expect(page.getByLabel('First name')).toHaveValue('Pat');
+  });
+
   test('a city Pam does not serve is an offer, not an error', async ({ page }) => {
     const calls = await newcomer(page, { cityServed: false });
     await page.goto('/join/');

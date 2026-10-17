@@ -8,7 +8,6 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { List, ListItem } from '@astryxdesign/core/List';
 import { BigButton, Loading, MessagesIcon, Notice, Page } from '@pam/ui';
-import { DataHeading } from '@pam/ui/DataHeading';
 import { MenuList } from '@pam/ui/MenuList';
 import { intlLocale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
@@ -22,13 +21,12 @@ import { useSession } from '@/lib/useSession';
  * (`program_member_card`) does not return them, so this screen could not show them if it tried.
  */
 const styles = stylex.create({
-  name: { fontSize: '28px', lineHeight: 1.2 },
   section: { fontSize: '20px' },
   meta: { fontSize: '16px' },
   note: { fontSize: '15px', lineHeight: 1.5 },
 });
 
-export function ProgramMemberCardView({ id, header }: { readonly id: string | null; readonly header: (title: string) => ReactNode }) {
+export function ProgramMemberCardView({ id, header }: { readonly id: string | null; readonly header: (title: string, isName?: boolean) => ReactNode }) {
   const { t, tPlain, locale } = useI18n();
   const router = useRouter();
   const state = useProgramMemberCard(id, true);
@@ -73,10 +71,8 @@ export function ProgramMemberCardView({ id, header }: { readonly id: string | nu
 
   return (
     <Page gap={4}>
-      {header(t('person.profile'))}
-      <DataHeading level={1} xstyle={styles.name}>
-        {card.firstName}
-      </DataHeading>
+      {/* The member's name is the title, not "Profile" (Iris, case manager W3; program lead pass, 15 October). */}
+      {header(card.firstName, true)}
       {canMessage ? (
         <MenuList
           label={tPlain('person.actions.label', { name: card.firstName })}

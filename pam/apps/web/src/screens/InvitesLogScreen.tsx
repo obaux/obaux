@@ -47,6 +47,8 @@ const styles = stylex.create({
   name: { fontSize: '18px', lineHeight: 1.3 },
   line: { fontSize: '15px', lineHeight: 1.4 },
   count: { fontSize: '16px', lineHeight: 1.5 },
+  // A label's size (A27), not a caption's: the theme draws every Token at 12px.
+  state: { fontSize: '14px' },
 });
 
 const STATUS = {
@@ -142,7 +144,8 @@ export function InvitesLogScreen() {
                           {row.reissued && row.emailedTo ? ` · ${t('invites.log.emailed', { email: row.emailedTo })}` : ''}
                         </Text>
                       }
-                      endContent={<Token label={t(status.key)} color={status.color} size="sm" />}
+                      // Readable, not the smallest text on the screen (Iris, super admin P7).
+                      endContent={<Token label={t(status.key)} color={status.color} size="md" xstyle={styles.state} />}
                     />
                   );
                 })}

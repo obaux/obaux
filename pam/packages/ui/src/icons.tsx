@@ -524,6 +524,21 @@ export function SignedIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/**
+ * A page with a tick on it: a person has signed (P5, D-582). The pen (`SignIcon`) means "still to sign" everywhere else
+ * (D-270), and a tick in a circle (`SignedIcon`) is too like the check-in circle on Coming in (D-316), so "signed every
+ * policy" is neither: the document they signed, ticked.
+ */
+export function SignedDocIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z" />
+      <path d="M14 3v5h5" />
+      <path d="M9 14.5l2.2 2.2 4.3-4.2" />
+    </svg>
+  );
+}
+
 /** A plus. Add a program (D-218). */
 export function PlusIcon(props: SVGProps<SVGSVGElement>) {
   return (

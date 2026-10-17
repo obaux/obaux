@@ -126,6 +126,7 @@ STATUS row too.
      | `profile.promo.reminders.body` | Coming soon: texts about your visits and the places you saved. (A28 check, 11 October: was "We can text you if a place you saved closes or moves."; the saved-place text is held with the rest, D-481) | We can text you the day before a visit, or if a place you saved closes or moves. |
      | `reminders.today.member` (the Text reminders screen) | Pam does not send any of these yet. They are coming. (was "Today Pam sends only one of these: a note when a place you saved closes or moves. The others are coming.") | Say which of the three are sent that day: Pam sends these. |
      | `flag.done.body` (A28 check, 11 October) | Somebody at Pam looks at every one of these. | Somebody at Pam looks at every one of these. If the place comes off the list, anyone who saved it and said yes to texts is told. |
+     | Reported places, "Take it off the list" (the super admin's confirm and the line under the button; Piper's W1/W4, Sage's ledger 7cfbcb03, 15 October) | Members won't find it in Pam anymore. | Revisit then, for example: Members won't find it in Pam anymore. People who saved it and get texts from Pam are told. |
 
      `flag.done.body` lost its second sentence because the only way a person who saved a place hears that it was
      removed is the held saved-place text (D-481; no bell row is made for them, only for super admins and the

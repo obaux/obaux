@@ -56,6 +56,17 @@ test.describe('points and badges', () => {
     await expect(page).toHaveURL(/\/points\//);
   });
 
+  test('Ways to earn lists going to a visit first: I\'m here +100 and I went +60 (W2)', async ({ page }) => {
+    await signedIn(page, 400);
+    await page.goto('/points/');
+    await expect(page.getByText("I'm here", { exact: true })).toBeVisible();
+    await expect(page.getByText('+100', { exact: true })).toBeVisible();
+    await expect(page.getByText('I went', { exact: true })).toBeVisible();
+    await expect(page.getByText('+60', { exact: true })).toBeVisible();
+    const text = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
+    expect(text.indexOf("I'm here")).toBeLessThan(text.indexOf('Plan a trip'));
+  });
+
   test('shows the ladder, and where the member is standing on it', async ({ page }) => {
     await signedIn(page, 400);
     await page.goto('/points/');

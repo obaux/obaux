@@ -28,7 +28,7 @@ const meta = {
     appointments,
     actions: (
       <>
-        <HeaderActions role="provider" hasHelp={false} />
+        <HeaderActions role="provider" />
         <AddMenu />
       </>
     ),
