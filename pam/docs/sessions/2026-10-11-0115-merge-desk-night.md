@@ -1306,6 +1306,15 @@
   its line stay. Sage's ledger to d457b5f9 (Maker and a92 as Will's; a91 and a94 marked for Will to sign; "I made
   it" signed). Weekly notes for 23 October: Lena's a92 release and its site cell, the a91 words, and Wren's
   "Book a visit for a member" post once a94 ships.
+- **b51 pushed (06:20, 311a0d09).** Its two merge commits had no Screens: line; redone before the push (same tree).
+- **Batch b52 (17 October, 06:21 to 06:50).** a92: Lena's 40359733 (sharing.p2 as Will signed it, the member's
+  "A program can see" row, the website's sentence and its saved-places box) and Ava's e8fc2322 (the lead's fifth
+  What to expect row). a96: Lena's 3dd1257d (what-we-keep p1, p14 to p16, sharing.p8, in seven languages; the
+  privacy guard's five gaps now covers, held to the code by privacy-gap-lines.test.ts) and Ava's 5ef45034 (no
+  "Text me when Pam opens" tick). Nico's 476fc8be (before launch: the campaign must cover program-booked reminders
+  and match the opt-in screen). Sage's ledger to 6250025e. Conflicts: legal-updated.json (a92 and a96 each re-pinned
+  the Privacy fingerprint; legal:date privacy 2026-10-17 run over both), data-collected.ts (Lena's p14 covers kept,
+  the entry says the tick is gone) and STATUS.md (both Ava sections). Last updated stays 17 October 2026.
 
 ## What was wrong, and what missed it
 
@@ -1666,6 +1675,8 @@
 | First sweep (17 October 04:35 UTC) | cron run succeeded; function 200, folders 1, removed 0, failed 0; bucket 1 object, in use 1 |
 | Batch b51, full run (1d676149): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard | 1327 passed, 1 skipped / in step / 124 / 0 / 100 / 0 / 0 / 0 / 188 / 11.5 kB spare / 2009 passed, 19 skipped, exit 0 / built; "no bundle names the live one"; grep 0 files; site build 0; site a11y 120 scans, 0 problems |
 | b51 Maker: copy:status and fit audit (Lena, 7f653f5b) | all languages in step; `--match point` 5 stories and `--match badge` 12 stories in seven languages at 320x760 and 320x568: 0 findings |
+| b51 main CI (311a0d09) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (06:53); Vercel web and pam-site success |
+| Batch b52, full run (568ad549): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1344 passed, 1 skipped / in step / 124 / 0 / 100 / 0 / 0 / 0 / 188 / 11.1 kB spare / 2009 passed, 19 skipped, exit 0 / built; "no bundle names the live one"; grep 0 files / 0 / 120 scans, 0 problems |
 
 ## Left undone
 

@@ -30,7 +30,7 @@ export const CaseManagerAsked: Story = screen('case-manager', 'Case manager, ask
   step: 'privacy',
 });
 
-/** A program lead with an invite: "What to expect". */
+/** A program lead with an invite: "What to expect", its five rows (the fifth, a member's new saves, a92). */
 export const ProgramLeadInvited: Story = screen('provider', 'Program lead, invited — what to expect', PATH, {
   kind: 'provider',
   invite: 'PAM-7Q4K',

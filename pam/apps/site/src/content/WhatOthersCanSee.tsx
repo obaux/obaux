@@ -32,7 +32,8 @@ export function WhatOthersCanSee() {
         <P>
           A program sees you only after you write to them, sign their rules, sign up with them or plan a visit
           there, and only what they need to help you. Before a visit, they see your first name, what you write to
-          them, the day you signed their rules and, if you signed up, how that is going.
+          them, the day you signed their rules and, if you signed up, how that is going and when you save a new
+          place, but not which one.
         </P>
       </Section>
 
@@ -55,7 +56,7 @@ export function WhatOthersCanSee() {
             { label: 'The last day you used Pam', cells: ['Yes', 'No', 'No'] },
             {
               label: 'That you saved a new place (not which one)',
-              cells: ['Yes', 'Yes', 'No'],
+              cells: ['Yes', 'Yes, but only once you sign up with them', 'No'],
             },
             { label: 'Which place you saved', cells: ['No', 'No', 'No'] },
             { label: 'Who you connect with', cells: ['Yes', 'No', 'No'] },
