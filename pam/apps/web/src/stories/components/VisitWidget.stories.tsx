@@ -24,7 +24,7 @@ type Words = {
 };
 // Stand-ins for every language but English: Sage signs the English, Lena the rest (A25). "alt" is Sage's "I made it".
 const STAND_IN: Record<string, Words> = {
-  en: { checkIn: 'Check in', alt: 'I made it', change: 'Change', back: 'Back', changeDate: 'Change date and time', cancelVisit: 'Cancel visit', noteLabel: 'About this visit', closeNote: 'Close' },
+  en: { checkIn: 'Check in', alt: 'I made it', change: 'Change', back: 'Back', changeDate: 'Change date and time', cancelVisit: 'Cancel this visit', noteLabel: 'Who sees this visit', closeNote: 'Close' },
   es: { checkIn: 'Registrar llegada', alt: 'Ya llegué', change: 'Cambiar', back: 'Atrás', changeDate: 'Cambiar fecha y hora', cancelVisit: 'Cancelar visita', noteLabel: 'Sobre esta visita', closeNote: 'Cerrar' },
   'pt-BR': { checkIn: 'Fazer check-in', alt: 'Cheguei', change: 'Alterar', back: 'Voltar', changeDate: 'Alterar data e hora', cancelVisit: 'Cancelar visita', noteLabel: 'Sobre esta visita', closeNote: 'Fechar' },
   'zh-CN': { checkIn: '签到', alt: '我到了', change: '更改', back: '返回', changeDate: '更改日期和时间', cancelVisit: '取消访问', noteLabel: '关于这次访问', closeNote: '关闭' },
@@ -105,7 +105,7 @@ export const RestNotOnPam: Story = { args: { onPam: false } };
 export const CheckIn: Story = { args: { view: 'checkin' } };
 /** The Check in view with a result said inside the card. */
 export const CheckInResult: Story = { args: { view: 'checkin', result: 'notYet' } };
-/** The Change view: "Change date and time" and "Cancel visit". */
+/** The Change view: "Change date and time" and "Cancel this visit". */
 export const Change: Story = { args: { view: 'change' } };
 /** Marked: no buttons, the card says so. */
 export const Marked: Story = { args: { marked: true } };

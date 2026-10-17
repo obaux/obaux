@@ -18,6 +18,6 @@ None new: Mira's brief and Will's a91 words decided it. Marked is a one-time sta
 
 ## Left undone
 
-Piper wires the page. New words (eye note label, Close, Back, Change date and time, Cancel visit, "I made it") go through Sage and Lena. Will's footer word (A or B).
+Piper wires the page. New words (eye note label, Close, Back, Change date and time, Cancel this visit, "I made it") go through Sage and Lena. Will's footer word (A or B).
 
 ## Needs a human
