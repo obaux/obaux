@@ -198,7 +198,13 @@ test.describe('who may be staff, one request to a page (D-444)', () => {
     await page.getByRole('button', { name: 'Approve' }).click();
     await expect(page.getByText('Pick a city first.')).toBeVisible();
     expect(decided).toHaveLength(0);
-    await page.getByRole('radio', { name: 'Philadelphia' }).check();
+    // Tap the city once the page has settled, and see it taken before Approve: this check once failed at the iPhone SE
+    // size and passed on retry ("did not change its state"). The line above does not move the radios (it sits under them,
+    // measured), so the wait is for the page itself, not for that line.
+    await settled(page);
+    const philly = page.getByRole('radio', { name: 'Philadelphia' });
+    await philly.check();
+    await expect(philly).toBeChecked();
     await page.getByRole('button', { name: 'Approve' }).click();
     // Asked first, and nothing is sent until the yes (Iris, super admin W1).
     const ask = page.getByRole('dialog');
