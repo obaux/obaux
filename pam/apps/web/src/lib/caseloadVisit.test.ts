@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { visitLineOf, visitLinesByMember, type VisitRow } from './caseloadVisit';
+import { tripsFromRows } from './useMemberTrips';
 
 const NOW = Date.parse('2026-10-17T12:00:00Z');
 const at = (days: number) => new Date(NOW + days * 86_400_000).toISOString();
@@ -27,5 +28,17 @@ describe('the visit line on a member card (a93)', () => {
     expect([...lines.keys()].sort()).toEqual(['a', 'b']);
     expect(lines.get('a')?.kind).toBe('next');
     expect(lines.get('b')?.kind).toBe('missed');
+  });
+});
+
+describe('Home and the member\'s page agree on "went" (Sage, a93)', () => {
+  it('for every status a visit can have, Home says Went exactly when the member\'s page lists it as attended', () => {
+    for (const status of ['attended', 'missed', 'scheduled', 'cancelled', 'checked_in', null]) {
+      const row = { id: 'v1', starts_at: at(-2), status, service_id: 's1', services: { name: 'GED class', category: 'education' } };
+      const page = tripsFromRows([row]);
+      const home = visitLineOf([{ member_id: 'm1', starts_at: row.starts_at, status }], NOW);
+      const pageSaysWent = page.length === 1 && page[0]!.attended;
+      expect(home?.kind === 'went', `status ${String(status)}`).toBe(pageSaysWent);
+    }
   });
 });

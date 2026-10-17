@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import type { Category } from '@pam/config';
+import { wentTo } from './caseloadVisit';
 
 /**
  * A real member's planned visits, for the case manager whose caseload they are on (D-509: a real account sees real things, never
@@ -32,7 +33,7 @@ export function tripsFromRows(rows: readonly Row[]): MemberTrip[] {
   return rows.flatMap((row) => {
     const service = Array.isArray(row.services) ? row.services[0] : row.services;
     if (!row.service_id || !service?.name) return [];
-    return [{ id: row.id, placeId: row.service_id, placeName: service.name, category: (service.category ?? 'other') as Category, startsAt: row.starts_at, attended: row.status === 'attended' }];
+    return [{ id: row.id, placeId: row.service_id, placeName: service.name, category: (service.category ?? 'other') as Category, startsAt: row.starts_at, attended: wentTo(row.status) }];
   });
 }
 

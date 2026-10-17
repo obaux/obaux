@@ -5,10 +5,23 @@
  * `appointments_select_admin`): the day and time and whether they went or missed it (`transparency.canSee.appointments`).
  * A cancelled visit, and a past visit nobody has marked yet, are neither.
  */
-export type CaseloadVisit =
-  | { readonly kind: 'next'; readonly at: string }
-  | { readonly kind: 'went'; readonly at: string }
-  | { readonly kind: 'missed'; readonly at: string };
+export type CaseloadVisit = {
+  readonly kind: 'next' | 'went' | 'missed';
+  readonly at: string;
+  /**
+   * Room for the program that booked the visit (a94, Will 17 October): when programs can book visits, a missed visit a
+   * program booked says so. Piper's visit column fills it; until then it is never set.
+   */
+  readonly bookedBy?: string;
+};
+
+/**
+ * Whether the program marked the member as there. The one rule for "went" everywhere a person's visits are shown: the
+ * member's page (`useMemberTrips`, "Programs attended in the past") and Home's line both use it, so a case manager never
+ * sees a "Went" the member's page does not show (Sage, a93). `missed` is the overnight mark (`sweep_missed_visits()`).
+ */
+export const wentTo = (status: string | null): boolean => status === 'attended';
+export const missed = (status: string | null): boolean => status === 'missed';
 
 export interface VisitRow {
   readonly member_id: string;
@@ -25,10 +38,10 @@ export function visitLineOf(visits: readonly VisitRow[], now: number): CaseloadV
     .sort((a, b) => time(a) - time(b))[0];
   if (next) return { kind: 'next', at: next.starts_at };
   const past = live.filter((v) => time(v) < now).sort((a, b) => time(b) - time(a));
-  const went = past.find((v) => v.status === 'attended');
+  const went = past.find((v) => wentTo(v.status));
   if (went) return { kind: 'went', at: went.starts_at };
-  const missed = past.find((v) => v.status === 'missed');
-  if (missed) return { kind: 'missed', at: missed.starts_at };
+  const lastMissed = past.find((v) => missed(v.status));
+  if (lastMissed) return { kind: 'missed', at: lastMissed.starts_at };
   return null;
 }
 
