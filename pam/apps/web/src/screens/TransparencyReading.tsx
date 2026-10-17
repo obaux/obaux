@@ -3,7 +3,7 @@
 import * as stylex from '@stylexjs/stylex';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { EyeIcon, EyeOffIcon, MessagesIcon, PeopleIcon, PhoneIcon } from '@pam/ui';
+import { EyeIcon, EyeOffIcon, MailIcon, MessagesIcon, PeopleIcon } from '@pam/ui';
 import { FactGroup, FactRow, GuideCard, ReadCard, SummaryCard, type SummaryLine } from '@pam/ui/Reading';
 import { TRANSPARENCY_GROUPS, TRANSPARENCY_SCREEN } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
@@ -53,7 +53,7 @@ export function TransparencyReading({ detail = true }: { readonly detail?: boole
     { text: t('transparency.summary.cannot'), mark: 'no', icon: <EyeOffIcon /> },
     { text: t('transparency.summary.reported'), mark: 'yes', icon: <MessagesIcon /> },
     { text: t('transparency.summary.program'), mark: 'yes', icon: <PeopleIcon /> },
-    { text: t('privacy.s.contact.p1'), mark: 'call', icon: <PhoneIcon /> },
+    { text: t('privacy.s.contact.p1'), mark: 'call', icon: <MailIcon /> },
   ];
 
   return (
