@@ -23,14 +23,15 @@ interface RowPoint {
 }
 
 /** Every internal link row on the page, and the points on it to tap. A point on something else that acts (a trailing button) is left out. */
-async function points(page: Page): Promise<RowPoint[]> {
-  return page.evaluate(() => {
+async function points(page: Page, only?: string): Promise<RowPoint[]> {
+  return page.evaluate((only) => {
     const ACTS = 'a, button, input, select, textarea, label, summary, [role="button"], [role="switch"], [role="checkbox"], [role="radio"], [role="link"], [role="menuitem"]';
     const out: { href: string; where: string; x: number; y: number }[] = [];
     for (const row of Array.from(document.querySelectorAll<HTMLElement>('.astryx-item'))) {
       const link = Array.from(row.children).find((c): c is HTMLAnchorElement => c instanceof HTMLAnchorElement && c.hasAttribute('href'));
       const href = link?.getAttribute('href') ?? '';
       if (!link || !href.startsWith('/') || link.getAttribute('target') === '_blank') continue;
+      if (only !== undefined && href !== only) continue;
       row.scrollIntoView({ block: 'center' });
       const r = row.getBoundingClientRect();
       if (r.height === 0 || r.bottom < 0 || r.top > innerHeight) continue;
@@ -53,7 +54,7 @@ async function points(page: Page): Promise<RowPoint[]> {
       }
     }
     return out;
-  });
+  }, only);
 }
 
 async function tapEveryRow(page: Page, url: string, expectAtLeast: number) {
@@ -61,20 +62,28 @@ async function tapEveryRow(page: Page, url: string, expectAtLeast: number) {
   await settled(page);
   // Rows are read one at a time, so the page is reloaded between taps (a tap navigates away).
   const rows = new Set((await points(page)).map((p) => p.href));
+  // `points` scrolls each row it reads to the middle of the screen, so a row's points are read alone, right before they are tapped.
   expect(rows.size, `link rows found on ${url}`).toBeGreaterThanOrEqual(expectAtLeast);
   for (const href of rows) {
     for (const where of ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'icon', 'chevron']) {
       await page.goto(url);
-      await settled(page);
-      const point = (await points(page)).find((p) => p.href === href && p.where === where);
+      await page.locator('.astryx-item a[href]').first().waitFor();
+      await page.locator('html[data-row-taps]').waitFor({ state: 'attached' });
+      // Quiet before measuring: a profile that arrives late moves the rows.
+      await page.waitForLoadState('networkidle');
+      await page.evaluate(() => document.fonts.ready);
+      const point = (await points(page, href)).find((p) => p.where === where);
       if (!point) continue;
       await page.mouse.click(point.x, point.y);
-      await expect(page, `a tap on the ${where} of the row for ${href} (${url})`).toHaveURL(new RegExp(`${href.replace(/[.*+?^${}()|[\]\\?]/g, '\\$&').split('?')[0]}`));
+      await expect(page, `a tap on the ${where} of the row for ${href} (${url})`).toHaveURL(new RegExp(href.split('?')[0]!.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
     }
   }
 }
 
 test.describe('every link row opens from anywhere on it', () => {
+  // Six taps on each row, each from a fresh page.
+  test.setTimeout(240_000);
+
   test('Profile, a member', async ({ page }) => {
     await asMember(page);
     await tapEveryRow(page, '/profile/', 4);
@@ -93,5 +102,10 @@ test.describe('every link row opens from anywhere on it', () => {
   test('Help', async ({ page }) => {
     await asMember(page);
     await tapEveryRow(page, '/help/', 2);
+  });
+
+  test('a place (its rows: message, policies, …)', async ({ page }) => {
+    await asMember(page);
+    await tapEveryRow(page, '/place/?id=dummy-place-learning', 1);
   });
 });

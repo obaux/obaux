@@ -36,11 +36,14 @@ export function openRowOnTap(event: MouseEvent): void {
 export function useRowTaps(): void {
   useEffect(() => {
     const noop = () => {};
+    // Says the handler is on (a test waits for it: a tap before the page has hydrated has nothing to catch it).
+    document.documentElement.setAttribute('data-row-taps', '');
     document.addEventListener('click', openRowOnTap);
     document.addEventListener('touchstart', noop, { passive: true });
     return () => {
       document.removeEventListener('click', openRowOnTap);
       document.removeEventListener('touchstart', noop);
+      document.documentElement.removeAttribute('data-row-taps');
     };
   }, []);
 }
