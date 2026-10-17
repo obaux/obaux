@@ -106,6 +106,8 @@ export interface MockOptions {
    * (D-491) or the "already has an account" line. Unset: the decision goes through.
    */
   readonly staffReview?: 'pair' | 'city' | 'decided' | 'other' | 'addedToExisting';
+  /** Nobody waiting for a city yet (D-593): the list's empty state. */
+  readonly noWaitingCities?: boolean;
 }
 
 /** A real place of the catalogue, to plan a trip to in a story (the examples' ids are not real). */
@@ -402,6 +404,16 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/report_files_for_review', () => ({ body: [] })),
     // The programs a super admin has still to check (D-386, part 6): a decision takes one off the list.
     on('/rpc/programs_to_check', () => ({ body: programsToCheck })),
+    // How many wait for each city Pam is not in (D-593): counts only, biggest first. A long one for the fit audit.
+    on('/rpc/waiting_city_counts', () => ({
+      body: options.noWaitingCities ? [] : [
+        { place: 'Camden, NJ', people: 14 },
+        { place: 'Chester', people: 9 },
+        { place: 'Wilmington, DE', people: 6 },
+        { place: 'Upper Darby Township, Delaware County', people: 2 },
+        { place: 'Norristown', people: 1 },
+      ],
+    })),
     on('/rpc/review_program_submission', (_url, _method, body) => {
       const args = (body ?? {}) as { p_id: string };
       programsToCheck = programsToCheck.filter((row) => row.id !== args.p_id);

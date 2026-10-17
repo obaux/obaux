@@ -1315,6 +1315,18 @@
   and match the opt-in screen). Sage's ledger to 6250025e. Conflicts: legal-updated.json (a92 and a96 each re-pinned
   the Privacy fingerprint; legal:date privacy 2026-10-17 run over both), data-collected.ts (Lena's p14 covers kept,
   the entry says the tick is gone) and STATUS.md (both Ava sections). Last updated stays 17 October 2026.
+- **b52 pushed (06:53, 4e5827c3).** Main CI green at 07:27 (all four checks; Vercel web and pam-site success).
+- **Batch b53 (17 October, 06:55 to 07:25).** a96 item 3, Will's "save the city and how many requests there are": Ava's
+  ef93e6ea and Lena's 1bf1c8b6 (D-593). `waiting_city_counts()` is a security definer only a super admin can run; it
+  returns a city and a number, nothing else. Cities group trimmed and case-insensitive, and the text after a comma
+  counts as the state; full state names are not matched to their letters. A row on the super admin's Home opens
+  `/cities/waiting/`, biggest first. Privacy p14 (b52) already covers the city; `waiting-city-counts-line.test.ts`
+  holds the function to it. Sage's words, Lena's six languages. Migration `20261017055932` goes live after main's CI.
+  The same half hour: Piper's a95 (9eeb3b9e, D-594) and a91 part 3 (a438d296, D-597), Ava's a93 (0829523e, D-596)
+  and Piper's a94 fix (fd0f9578: the booking's audit row now names the member as its target, so the six-month purge
+  reaches it; Lena's finding) came in; pictures for a91, a93 and a95 went on their cards. Dot found the case
+  manager's search pill cut at 320 on main ("Search your mem"); Sage signed "Search members" and the spoken
+  "Search members by name" (WCAG 2.5.3), Lena builds it.
 
 ## What was wrong, and what missed it
 
@@ -1677,9 +1689,19 @@
 | b51 Maker: copy:status and fit audit (Lena, 7f653f5b) | all languages in step; `--match point` 5 stories and `--match badge` 12 stories in seven languages at 320x760 and 320x568: 0 findings |
 | b51 main CI (311a0d09) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (06:53); Vercel web and pam-site success |
 | Batch b52, full run (568ad549): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1344 passed, 1 skipped / in step / 124 / 0 / 100 / 0 / 0 / 0 / 188 / 11.1 kB spare / 2009 passed, 19 skipped, exit 0 / built; "no bundle names the live one"; grep 0 files / 0 / 120 scans, 0 problems |
+| b52 main CI (4e5827c3) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (07:27); Vercel web and pam-site success |
+| Batch b53, full run (1dd888f0): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1351 passed, 1 skipped / in step / 124 / 0 / 100 / 0 / 0 / 0 / 188 / 11.0 kB spare / 2014 passed, 19 skipped, 1 flaky, exit 0 / built; "no bundle names the live one"; grep 0 files / 0 / 120 scans, 0 problems |
+| b53's flaky test: place.spec.ts:143 "tapping Call tells the database once" at narrow-320 | timed out at 30s once in the full run, passed on retry; alone, `--repeat-each=15 --retries=0`: 15 passed. Not b53's code (super admin only). Sent to Piper to root-cause under load |
 
 ## Left undone
 
+- **As of b53 (17 October, 07:25):** b54 takes Piper's a95 (9eeb3b9e) and Sage's ledger (fa7c1c9b, b09c3bcd). With
+  Will: a91 (the button word, "Check in" or "I made it", and "sign 1" or "sign 2" for the note; built at a438d296),
+  a93 (his yes; Ava owes a main merge, a clean full run and Lena's four lines), a94 (the Privacy paragraph, the
+  reminders opt-in, and every booked visit or only a missed one; Piper fd0f9578 and Lena 591d222e are ready), a86,
+  a84, a88. Lena: "Search members" in seven languages and why the fit audit missed it; the Arabic no-lead note
+  ("Pam" beside the place name); a read-only sweep for audit rows that name a person only in meta. Piper: the
+  Call test's timeout under load.
 - **As of b47 (16 October, 06:40):** Wren: re-shoot the Points and badges picture and its alt text. With Will: a84,
   a86, a88, a90, a91, a92, a93, a94, a95, and the Cloud Console items below.
 - **As of b46 (16 October, 06:10):** Dot: one count style on the super admin Home (asked 06:06), then Ava's and
