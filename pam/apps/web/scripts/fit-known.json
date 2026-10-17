@@ -662,5 +662,25 @@
   {
     "key": "ar|cut|member-created-states-street-search--results-showing|العمل والمال",
     "reason": "The Places screen behind the open area sheet has a row of category filters (Work and money) whose label is partly under the sheet and its dimmed scrim, so the detector sees it partly hidden (partial=true, 0 in, 0 out). The sheet is a drawer over the page: nothing in it is cut, and the filter is fully visible once it closes. Looked at 13 October 2026 at 320px with a screenshot of the sheet open."
+  },
+  {
+    "key": "es|cut|member-created--trips-just-booked|miércoles, 14 oct · 13:00",
+    "reason": "At 320×568 the Trips drawer scrolls and fades out at its foot, and the second trip card sits half under the tab bar, so the detector sees whichever words land on that edge (the date line, the avatar letter, the chip) partly hidden (partial=true, 0 in, 0 out); which of them it reports changes from run to run and with the language. It is reached by scrolling and nothing is lost. Looked at 17 October 2026 at 320×568 with a screenshot (Spanish); the fit job runs 760, where this does not show."
+  },
+  {
+    "key": "es|cut|member-created--trips-just-booked|M",
+    "reason": "At 320×568 the Trips drawer scrolls and fades out at its foot, and the second trip card sits half under the tab bar, so the detector sees whichever words land on that edge (the date line, the avatar letter, the chip) partly hidden (partial=true, 0 in, 0 out); which of them it reports changes from run to run and with the language. It is reached by scrolling and nothing is lost. Looked at 17 October 2026 at 320×568 with a screenshot (Spanish); the fit job runs 760, where this does not show."
+  },
+  {
+    "key": "es|cut|member-created--trips-just-booked|Faltan firmas",
+    "reason": "At 320×568 the Trips drawer scrolls and fades out at its foot, and the second trip card sits half under the tab bar, so the detector sees whichever words land on that edge (the date line, the avatar letter, the chip) partly hidden (partial=true, 0 in, 0 out); which of them it reports changes from run to run and with the language. It is reached by scrolling and nothing is lost. Looked at 17 October 2026 at 320×568 with a screenshot (Spanish); the fit job runs 760, where this does not show."
+  },
+  {
+    "key": "zh-CN|cut|member-created--trips-just-booked|M",
+    "reason": "At 320×568 the Trips drawer scrolls and fades out at its foot, and the second trip card sits half under the tab bar, so the detector sees whichever words land on that edge (the date line, the avatar letter, the chip) partly hidden (partial=true, 0 in, 0 out); which of them it reports changes from run to run and with the language. It is reached by scrolling and nothing is lost. Looked at 17 October 2026 at 320×568 with a screenshot (Spanish); the fit job runs 760, where this does not show."
+  },
+  {
+    "key": "zh-CN|cut|member-created--trips-just-booked|需要签名",
+    "reason": "At 320×568 the Trips drawer scrolls and fades out at its foot, and the second trip card sits half under the tab bar, so the detector sees whichever words land on that edge (the date line, the avatar letter, the chip) partly hidden (partial=true, 0 in, 0 out); which of them it reports changes from run to run and with the language. It is reached by scrolling and nothing is lost. Looked at 17 October 2026 at 320×568 with a screenshot (Spanish); the fit job runs 760, where this does not show."
   }
 ]
