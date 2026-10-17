@@ -2,6 +2,8 @@
 
 **Date:** 2026-10-14 · **Branch:** `claude/pam-design-search-pill`
 
+> **Changed on 17 October by D-591 (Will, a86):** the resting bar is centred again, not left (below, "puts its magnifier and ... at the left"), and a tap slides the words to the left while Cancel draws in. The outline, the one height token and the 12px before Cancel stand. The Explore bar is `SearchBar`; the one-search field without Cancel (D-573) is replaced by it.
+
 **Decided by:** Will, via the merge desk (14 October, 05:55, card a86): "Also please bring back the selected dark pill outline around search bar when user selects it. And make search bar on homepage match the height of search when active, they should feel as one. not disconnected."
 
 **Search bars are the exception to D-569** (Will, 04:08: no ring on a text box). While a search field is active, its whole pill is outlined again: the same 3px ink ring (white in dark mode) that D-569 took off, on the large input group, which is only ever a search pill (`SearchPill`, `SearchField`), so every search bar matches. The field inside still draws none, and every other text box (the help form, the composer, Sign in) stays without a ring. Keyboard focus on arrival is unchanged.

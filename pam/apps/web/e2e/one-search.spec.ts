@@ -131,13 +131,15 @@ test.describe('one search field', () => {
     await expect(page.getByRole('button', { name: 'Near 19102' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Example Market Street Clinic' })).toBeVisible();
     await expect(page.getByText(/^Nearest to/)).toHaveCount(0);
-    // Google's mark, left-aligned under the heading row, 18px.
+    // Google's mark, centred under the last result (Will, 17 October, a86), 18px.
     const mark = page.locator('[data-google-attribution]');
     await expect(mark).toBeVisible();
     const logo = page.locator('[data-google-attribution] img[alt="Google Maps"]');
     expect(Math.round((await logo.boundingBox())!.height)).toBe(18);
-    const heading = (await page.getByRole('heading', { name: 'Results for “1500 Market”' }).boundingBox())!;
-    expect(Math.abs((await logo.boundingBox())!.x - heading.x)).toBeLessThan(3);
+    const logoBox = (await logo.boundingBox())!;
+    expect(Math.abs(logoBox.x + logoBox.width / 2 - page.viewportSize()!.width / 2)).toBeLessThan(3);
+    const lastResult = (await page.getByRole('heading', { name: 'Example Market Street Clinic' }).boundingBox())!;
+    expect(logoBox.y).toBeGreaterThan(lastResult.y);
     // Two calls, the same two as the drawer: the words and a session token, then the first suggestion's id and the same token.
     expect(asked).toEqual([
       { action: 'suggest', q: '1500 Market', token: expect.stringMatching(/^[0-9a-f]{32}$/) },

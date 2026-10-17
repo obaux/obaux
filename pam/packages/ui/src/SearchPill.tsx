@@ -136,6 +136,7 @@ export function SearchLauncher({
       variant="secondary"
       icon={<Icon icon="search" size="sm" />}
       onClick={onOpen}
+      data-search-launcher=""
       xstyle={styles.launcher}
     />
   );
