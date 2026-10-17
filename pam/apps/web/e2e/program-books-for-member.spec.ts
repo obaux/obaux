@@ -107,6 +107,6 @@ test('the bell tells the member, in the app only, with the time in their words',
   );
   await page.goto('/notifications/');
   await settled(page);
-  await expect(page.getByText(/Fresh Start Kitchen booked you a visit:/)).toBeVisible();
+  await expect(page.getByText(/Fresh Start Kitchen booked a visit for you:/)).toBeVisible();
   await expect(page.getByText('Visit booked for you')).toBeVisible();
 });

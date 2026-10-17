@@ -5,7 +5,7 @@
 ## What changed
 
 - Database (three migrations, each its own commit, plus test 76): `appointments.booked_by_org`; `book_visit_for_member`
-  (eligibility = wrote, signed rules, signed up or planned a visit there, per Mira's 06:11 correction; rate limit, one place per program); `my_trip_booked_by()` for the member; the `visit_booked_for_you`
+  (eligibility = wrote, signed up or planned a visit there; rate limit, one place per program); `my_trip_booked_by()` for the member; the `visit_booked_for_you`
   bell kind. A contract line was added to the first migration afterwards (a test demands one when a check is dropped).
 - App: `bookTrip` calls the real function for a real lead and member (the example path stays for demos); the lead's
   confirmation says "Booked for {name}!" and the "Example trips only for now" ending is gone for a real booking; Trips and
@@ -17,6 +17,10 @@
 - Four English-stand-in keys in all seven locales (`trips.bookedForYou`, `person.trip.bookedBy`,
   `notify.visit_booked_for_you`, `notify.kind.visit_booked_for_you`), acknowledged in the ledger: Sage to sign, Lena to translate.
 - D-595, a changelog fragment, `e2e/program-books-for-member.spec.ts` and a case in `person-real-trips.spec.ts`.
+
+- Widened to Will's option A (Mira, 06:11 and 06:45): migration 20261017065103 replaces `book_visit_for_member` with the member
+  check for wrote, signed up or planned a visit; 20261017065125 adds `my_program_bookable_members()` for the Book a visit list.
+  The English of `book.intro`, `book.people` and `book.empty` changed (they said only "wrote"); the other languages are stale for Lena.
 
 ## What was wrong, and what missed it
 

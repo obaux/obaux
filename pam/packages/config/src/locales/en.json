@@ -1070,9 +1070,9 @@
   "schedule.checkin.undo.confirm": "Undo check-in",
   "home.book": "Create new booking",
   "book.title": "Book a visit for a member",
-  "book.intro": "Members who have written to your program. Pick one, then the day and time.",
+  "book.intro": "Members who wrote to your program, signed up with it or planned a visit there. Pick one, then the day and time.",
   "book.row": "Wrote to your program",
-  "book.empty": "Nobody has written to your program yet.",
+  "book.empty": "Nobody has written to your program, signed up with it or planned a visit there yet.",
   "trips.new.for": "Booking for {name}",
   "trips.booked.title": "Booked for {name}!",
   "trips.booked.body": "{place}, {day} at {time}. It is on their Trips now.",
@@ -1086,7 +1086,7 @@
   "book.new.note": "They get one text from Pam with a link. Nothing else is sent unless they join.",
   "book.add": "Add a person",
   "book.add.body": "Someone who has not used Pam yet",
-  "book.people": "Members who wrote to your program",
+  "book.people": "Members you can book for",
   "book.booked": "Booked · {when}",
   "book.notBooked": "Not booked",
   "book.wrote": "Wrote {when}",
@@ -1696,6 +1696,6 @@
   "places.reported.done.remove": "{place} is off the list.",
   "trips.bookedForYou": "Booked for you by {program}",
   "person.trip.bookedBy": "Booked by {program}",
-  "notify.visit_booked_for_you": "{place} booked you a visit: {when}",
+  "notify.visit_booked_for_you": "{place} booked a visit for you: {when}",
   "notify.kind.visit_booked_for_you": "Visit booked for you"
 }

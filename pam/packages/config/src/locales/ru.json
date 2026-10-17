@@ -1779,6 +1779,6 @@
   "places.reported.done.remove": "Убрано из списка: {place}.",
   "trips.bookedForYou": "Booked for you by {program}",
   "person.trip.bookedBy": "Booked by {program}",
-  "notify.visit_booked_for_you": "{place} booked you a visit: {when}",
+  "notify.visit_booked_for_you": "{place} booked a visit for you: {when}",
   "notify.kind.visit_booked_for_you": "Visit booked for you"
 }

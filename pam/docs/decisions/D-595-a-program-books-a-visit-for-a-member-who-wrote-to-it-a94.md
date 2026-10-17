@@ -8,12 +8,12 @@ Will, 17 October 05:46 (card a94), chose that booking a visit for a member is re
 behalf of a member, it should show on the member's side." Until now "Book a visit for a member" (D-316) kept the booking in
 the lead's own tab and said so (Lena's promise sweep). It is saved now.
 
-**Who can be booked for.** Will's option A, as Mira restated it at 06:11: a member who has written to the program, signed its
-rules, signed up with it (requested, enrolled, active or completed; not "interested" or dropped) or planned a visit there. This
-is Sage's Privacy sentence word for word (a program sees a member "after you write to them, sign their rules, sign up with
-them or plan a visit there"). Anybody else, and anybody blocked either way, is refused (`MEMBER_NOT_LINKED`), with the same
-message for every reason. A test holds each case (`packages/db/test/76_…`). Book a visit for a member still lists the people
-who wrote; the others reach the function from the program's other lists.
+**Who can be booked for.** Will's option A as written (Mira, 06:11 and 06:45): a member who has written to the program (a
+conversation with one of its leads), signed up with it (enrolled in one of its services: requested, enrolled, active or
+completed; "interested" is not signing up) or planned a visit there (a visit not cancelled). Anybody else, and anybody blocked
+either way, is refused (`MEMBER_NOT_LINKED`) with the same message for every reason. "Book a visit for a member" lists all
+three kinds, each once, first name only (`my_program_bookable_members`; a lead reads no enrollment or visit row directly). A
+test holds each case (`packages/db/test/76_…`). Signing the program's rules alone does not count; it is not one of the three.
 
 **What the member sees.** The visit is on their Trips and, when it is their next, on Explore, marked "Booked for you by
 {program}". The bell tells them (`visit_booked_for_you`, in the app only; no text). They can move or cancel it like any visit.
@@ -45,7 +45,7 @@ in the same batch as the signed line; this change edits none of it.
 
 ## Why not
 
-- Letting a program book for anyone: it needs one of the four ways a program already sees a member, so booking for them is never the first.
+- Letting a program book for anyone: it needs one of the three ways a program already sees a member, so booking for them is never the first.
 - Storing a person as the booker: the program is who the member knows; a lead who leaves would otherwise change the record.
 
 ## Reverse it by

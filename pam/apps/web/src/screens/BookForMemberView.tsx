@@ -20,6 +20,7 @@ import { SubPage } from '@pam/ui/SubPage';
 import { readAddedTrips, TRIPS_CHANGED, withMoves } from '@/lib/addedTrips';
 import { examplesOn } from '@/lib/examples';
 import { useI18n } from '@/lib/i18n';
+import { useBookableMembers } from '@/lib/useBookableMembers';
 import { useConversations } from '@/lib/useConversations';
 import { useProgramSetup } from '@/lib/programSetup';
 import { useSession } from '@/lib/useSession';
@@ -116,7 +117,9 @@ export function BookForMemberView() {
   // Who wrote to the program (S1, Iris's program lead pass): a real lead's own conversations with members,
   // first name and last message only (D-541 part 2, D-542); the example people only in a demo or Storybook.
   const { state: conversations } = useConversations(!examples && session.status === 'signed-in');
-  const people: readonly Person[] = examples
+  // Who else may be booked for (D-595): signed up with the program or planned a visit there, who have not written.
+  const bookable = useBookableMembers(!examples && session.status === 'signed-in');
+  const fromConversations: readonly Person[] = examples
     ? dummyConversationsFor('provider').flatMap((c) => {
         const member = DUMMY_MEMBERS.find((m) => m.id === c.otherId);
         return member
@@ -140,6 +143,16 @@ export function BookForMemberView() {
             : [],
         )
       : [];
+  // Those who wrote come first, with what they said; the others follow by name, once each.
+  const people: readonly Person[] =
+    examples || conversations.status !== 'ready' || programId === null
+      ? fromConversations
+      : [
+          ...fromConversations,
+          ...bookable
+            .filter((m) => !fromConversations.some((p) => p.id === m.id))
+            .map((m) => ({ id: m.id, firstName: m.firstName, lastMessageAt: null, preview: null })),
+        ];
 
   const when = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
   const clock = new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' });
