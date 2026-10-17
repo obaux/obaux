@@ -43,10 +43,10 @@ test('a lead books for a member who wrote: the database is asked, and the screen
 // Every refusal book_visit_for_member can raise says what is true (Iris, b58): not "Try again", which can never work for a refusal.
 const REFUSED = [
   ['MEMBER_NOT_LINKED', 'Pam cannot book a visit for Jordan right now.'],
-  ['ALREADY_BOOKED', 'Jordan already has a visit here at about that time. Pick a different time.'],
-  ['RATE_LIMIT', 'You have booked as many visits as Pam allows today. Try again tomorrow.'],
+  ['ALREADY_BOOKED', 'Jordan already has a visit here around that time. Pick a different time.'],
+  ['RATE_LIMIT', 'No more visits can be booked today, for this member or for your program. Try again tomorrow.'],
   ['TRIP_IN_THE_PAST', 'That time has already passed. Pick a later time.'],
-  ['TRIP_TOO_FAR', 'A visit can be booked up to about six months ahead. Pick an earlier day.'],
+  ['TRIP_TOO_FAR', 'Visits can be booked up to about six months ahead. Pick an earlier day.'],
   ['PLACE_NOT_FOUND', 'You cannot book a visit at Fresh Start Kitchen right now.'],
   ['SERVICE_NOT_FOUND', 'You cannot book that service right now. Pick another one.'],
 ] as const;
