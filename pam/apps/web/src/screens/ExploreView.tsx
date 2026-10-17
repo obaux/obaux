@@ -63,8 +63,8 @@ export interface ExploreViewProps {
   readonly nextTrip?: ReactNode;
   /** The list is being searched or sorted by a typed address: the bar and chips stay put and nothing else hides (default: when `query` has words). */
   readonly isSearchActive?: boolean;
-  /** Under the heading row, left-aligned: Google's mark when its answer shaped the list. */
-  readonly belowHeading?: ReactNode;
+  /** Under the last result, centred: Google's mark when the list was sorted from a typed address (Will, 17 October, a86). */
+  readonly afterResults?: ReactNode;
   /** A message that belongs above the list — "Couldn't save that". */
   readonly notice?: ReactNode;
   /** The words the list was searched for, once they settled; '' for none. */
@@ -131,7 +131,7 @@ export function ExploreView({
   notice,
   query,
   isSearchActive,
-  belowHeading,
+  afterResults,
   state,
   renderPlace,
   onRetry,
@@ -206,7 +206,6 @@ export function ExploreView({
         )}
         {area}
       </HStack>
-      {belowHeading}
 
       {state.status === 'loading' ? <PlaceCardSkeletonList label={t('common.loading')} count={4} /> : null}
 
@@ -254,6 +253,7 @@ export function ExploreView({
           <Text type="supporting" xstyle={styles.source}>
             {t('places.source')}
           </Text>
+          {afterResults}
         </>
       ) : null}
     </Page>

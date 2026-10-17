@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { EducationIcon, FamilyServicesIcon, Notice, PlaceCard, PlusIcon, ScrollReveal, WorkforceIcon } from '@pam/ui';
-import { SearchField } from '@pam/ui/SearchPill';
+import { SearchBar } from '@pam/ui/SearchPill';
 import { NextTripCard } from '@pam/ui/NextTripCard';
 import { useTrips } from '@/lib/useTrips';
 import { useNextVisits, visitTagLabel } from '@/lib/useNextVisits';
@@ -133,10 +133,11 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
   const visits = useNextVisits(isMember);
 
   const field = (
-    <SearchField
+    <SearchBar
       label={t('explore.search.label')}
       placeholder={t('explore.search.placeholder')}
       clearLabel={tPlain('explore.search.clear')}
+      cancelLabel={t('messages.search.cancel')}
       value={query}
       onChange={setQuery}
     />
@@ -216,7 +217,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
         </>
       }
       query={text}
-      belowHeading={origin ? <PoweredByGoogle align="start" /> : undefined}
+      afterResults={origin ? <PoweredByGoogle /> : undefined}
       isSearchActive={query.trim() !== ''}
       state={state}
       onRetry={() => setReload((n) => n + 1)}

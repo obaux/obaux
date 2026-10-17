@@ -41,7 +41,12 @@ function search(name: string, typed: string | null, waitForKey?: string): Story 
     play: async ({ canvasElement, userEvent, globals }) => {
       if (typed === null) return;
       const bundle: Record<string, string> = BUNDLES[(globals as { locale?: string }).locale ?? 'en'] ?? en;
+      // The bar is a centred launcher until tapped (Will, 17 October); the tap opens the field, focused, with Cancel beside it.
+      const placeholder = bundle['explore.search.placeholder'] ?? '';
+      const search = await waitFor(() => [...canvasElement.querySelectorAll<HTMLElement>('button')].find((b) => b.textContent?.trim() === placeholder) ?? null);
+      await userEvent.click(search);
       const box = await waitFor(() => canvasElement.querySelector('input'));
+      if (typed === '') return;
       await userEvent.type(box, typed);
       // The words it waits for are in the language the story is shown in ("Results for “{query}”" up to the value).
       const wait = waitForKey ? (bundle[waitForKey] ?? (en as Record<string, string>)[waitForKey])!.split('{')[0]!.trim() : null;
@@ -50,8 +55,10 @@ function search(name: string, typed: string | null, waitForKey?: string): Story 
   };
 }
 
-/** At rest: the field in place of the old launcher. */
+/** At rest: the bar centred, the magnifier and the words in the middle. */
 export const Resting: Story = search('Resting', null);
+/** Tapped: the bar is narrower, Cancel on its right, the magnifier and the words at the left, the field focused. */
+export const Open: Story = search('Open', '');
 /** A program word: the list under the field is those programs. */
 export const ProgramWord: Story = search('A program word', 'work');
 /** Digits and nothing found: "Nothing matched that." */
