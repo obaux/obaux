@@ -10,11 +10,16 @@ describe('the visit line on a member card (a93)', () => {
   it('shows the next visit first, the soonest one', () => {
     expect(visitLineOf([v(5, 'scheduled'), v(1, 'scheduled'), v(-2, 'attended')], NOW)).toEqual({ kind: 'next', at: at(1) });
   });
-  it('otherwise the last visit they went to', () => {
-    expect(visitLineOf([v(-9, 'attended'), v(-3, 'attended'), v(-1, 'missed')], NOW)).toEqual({ kind: 'went', at: at(-3) });
+  it('otherwise the most recent marked past visit, whichever way it was marked (Mira, 17 October)', () => {
+    // Went Oct 10, not marked as there Oct 14: the 14th.
+    const oct10 = { member_id: 'm1', starts_at: '2026-10-10T14:00:00Z', status: 'attended' };
+    const oct14 = { member_id: 'm1', starts_at: '2026-10-14T14:00:00Z', status: 'missed' };
+    expect(visitLineOf([oct10, oct14], NOW)).toEqual({ kind: 'missed', at: oct14.starts_at });
+    // ...and the other way round.
+    expect(visitLineOf([v(-9, 'missed'), v(-3, 'attended')], NOW)).toEqual({ kind: 'went', at: at(-3) });
   });
-  it('otherwise the last one they missed', () => {
-    expect(visitLineOf([v(-9, 'missed'), v(-4, 'missed')], NOW)).toEqual({ kind: 'missed', at: at(-4) });
+  it('an unmarked past visit is skipped, not counted as the most recent', () => {
+    expect(visitLineOf([v(-9, 'attended'), v(-1, 'scheduled')], NOW)).toEqual({ kind: 'went', at: at(-9) });
   });
   it('nothing when there are no visits, or only cancelled or unmarked past ones', () => {
     expect(visitLineOf([], NOW)).toBeNull();

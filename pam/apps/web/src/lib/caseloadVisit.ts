@@ -1,7 +1,7 @@
 /**
- * The one visit line on a member's card on a case manager's Home (card a93, Dot's design, Will 17 October): the most useful
- * first. The next visit; otherwise the last visit the program marked them as there for; otherwise the last one marked missed;
- * nothing if there are no visits. Read from what the case manager already sees on the member's page (`appointments`,
+ * The one visit line on a member's card on a case manager's Home (card a93, Dot's design, Will 17 October). The next
+ * visit; otherwise the most recent past visit that is marked, whichever way ("Marked as there" or "Not marked as there",
+ * Sage's words, ledger 6867b09b); nothing if there are none. Read from what the case manager already sees on the member's page (`appointments`,
  * `appointments_select_admin`): the day and time and whether they went or missed it (`transparency.canSee.appointments`).
  * A cancelled visit, and a past visit nobody has marked yet, are neither.
  */
@@ -21,6 +21,8 @@ export type CaseloadVisit = {
  * sees a "Went" the member's page does not show (Sage, a93). `missed` is the overnight mark (`sweep_missed_visits()`).
  */
 export const wentTo = (status: string | null): boolean => status === 'attended';
+// Only the overnight sweep sets 'missed' (`sweep_missed_visits()`, D-526): nobody marked the visit. No program marks a person
+// missed, which is why Sage's words say "Not marked as there", not "Missed".
 export const missed = (status: string | null): boolean => status === 'missed';
 
 export interface VisitRow {
@@ -37,12 +39,13 @@ export function visitLineOf(visits: readonly VisitRow[], now: number): CaseloadV
     .filter((v) => time(v) >= now)
     .sort((a, b) => time(a) - time(b))[0];
   if (next) return { kind: 'next', at: next.starts_at };
-  const past = live.filter((v) => time(v) < now).sort((a, b) => time(b) - time(a));
-  const went = past.find((v) => wentTo(v.status));
-  if (went) return { kind: 'went', at: went.starts_at };
-  const lastMissed = past.find((v) => missed(v.status));
-  if (lastMissed) return { kind: 'missed', at: lastMissed.starts_at };
-  return null;
+  // Otherwise the most recent past visit that is marked, whichever way (Mira, 17 October, from the card Will chose):
+  // went Oct 10 and missed Oct 14 shows the 14th. An unmarked past visit is skipped.
+  const last = live
+    .filter((v) => time(v) < now && (wentTo(v.status) || missed(v.status)))
+    .sort((a, b) => time(b) - time(a))[0];
+  if (!last) return null;
+  return { kind: wentTo(last.status) ? 'went' : 'missed', at: last.starts_at };
 }
 
 /** Every member's line from one read of the whole list's visits. */
