@@ -1705,6 +1705,5 @@
   "waitingCities.empty.body": "Quando alguém se cadastra de uma cidade onde Pam ainda não está, a cidade aparece aqui, com quantas pessoas.",
   "caseload.visit.next": "Próxima visita: {when}",
   "caseload.visit.went": "Presença registrada: {date}",
-  "caseload.visit.missed": "Presença não registrada: {date}",
-  "caseload.visit.missed.chip": "Presença não registrada"
+  "caseload.visit.missed": "Presença não registrada: {date}"
 }

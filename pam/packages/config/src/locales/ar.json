@@ -1844,6 +1844,5 @@
   "waitingCities.empty.body": "عندما يسجل شخص ما من مدينة لا يتوفر فيها Pam بعد، تظهر المدينة هنا مع عدد الأشخاص.",
   "caseload.visit.next": "الزيارة التالية: {when}",
   "caseload.visit.went": "تم تسجيل الحضور: {date}",
-  "caseload.visit.missed": "لم يسجل الحضور: {date}",
-  "caseload.visit.missed.chip": "لم يسجل الحضور"
+  "caseload.visit.missed": "لم يسجل الحضور: {date}"
 }

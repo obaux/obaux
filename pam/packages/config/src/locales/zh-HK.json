@@ -1705,6 +1705,5 @@
   "waitingCities.empty.body": "當有人從Pam暫時還沒有提供服務的城市登記時，該城市會顯示在這裏，並附上人數。",
   "caseload.visit.next": "下次到訪：{when}",
   "caseload.visit.went": "標記為已到場：{date}",
-  "caseload.visit.missed": "未標記為已到場：{date}",
-  "caseload.visit.missed.chip": "未標記為已到場"
+  "caseload.visit.missed": "未標記為已到場：{date}"
 }
