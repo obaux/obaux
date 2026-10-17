@@ -30,6 +30,8 @@ export interface AddedTrip {
   readonly serviceName?: string;
   /** What the program marked after the visit (D-526): there, or nobody marked it. Absent while it is still planned. */
   readonly attendance?: 'attended' | 'missed';
+  /** A program lead booked this visit for the member, who had written to it (D-595): the place is that program. */
+  readonly bookedByProgram?: true;
 }
 
 const KEY = 'pam.trips.added';

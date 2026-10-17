@@ -1075,9 +1075,9 @@
   "schedule.checkin.undo.confirm": "撤销签到",
   "home.book": "新建预约",
   "book.title": "为成员预约",
-  "book.intro": "给您的项目发过消息的成员。先选一位，再选日期和时间。",
+  "book.intro": "给您的项目发过消息、报名过该项目，或在该项目预约过的成员。先选一位，再选日期和时间。",
   "book.row": "给您的项目发过消息",
-  "book.empty": "还没有人给您的项目发过消息。",
+  "book.empty": "还没有人给您的项目发过消息、报名过该项目，或在该项目预约过。",
   "trips.new.for": "正在为{name}预约",
   "trips.booked.title": "已为{name}预约！",
   "trips.booked.body": "{place}，{day} {time}。现在已在对方的“预约”中。",
@@ -1091,7 +1091,7 @@
   "book.new.note": "对方会收到Pam发来的一条带链接的短信。除非对方加入，否则不会再发送其他任何内容。",
   "book.add": "添加一个人",
   "book.add.body": "还没用过Pam的人",
-  "book.people": "给您的项目发过消息的成员",
+  "book.people": "您可以为其预约的成员",
   "book.booked": "已预约 · {when}",
   "book.notBooked": "未预约",
   "book.wrote": "发来消息：{when}",
@@ -1702,5 +1702,9 @@
   "places.reported.done.remove": "{place}已从列表中移除。",
   "waitingCities.title": "有人在等待的城市",
   "waitingCities.empty.title": "还没有人在等待",
-  "waitingCities.empty.body": "当有人从Pam还没有开通的城市注册时，该城市会显示在这里，并附上人数。"
+  "waitingCities.empty.body": "当有人从Pam还没有开通的城市注册时，该城市会显示在这里，并附上人数。",
+  "trips.bookedForYou": "已为您预约",
+  "person.trip.bookedBy": "由{program}预约",
+  "notify.visit_booked_for_you": "{place}已为您预约：{when}",
+  "notify.kind.visit_booked_for_you": "已为您预约"
 }

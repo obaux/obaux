@@ -1170,9 +1170,9 @@
   "schedule.checkin.undo.confirm": "التراجع عن تسجيل الحضور",
   "home.book": "إنشاء حجز جديد",
   "book.title": "حجز زيارة لعضو",
-  "book.intro": "الأعضاء الذين راسلوا برنامجك. اختر عضوا، ثم اليوم والوقت.",
+  "book.intro": "الأعضاء الذين راسلوا برنامجك أو سجلوا فيه أو خططوا لزيارة هناك. اختر عضوا، ثم اليوم والوقت.",
   "book.row": "راسل برنامجك",
-  "book.empty": "لم يراسل أحد برنامجك بعد.",
+  "book.empty": "لم يراسل أحد برنامجك أو يسجل فيه أو يخطط لزيارة هناك بعد.",
   "trips.new.for": "الحجز لأجل {name}",
   "trips.booked.title": "تم الحجز لأجل {name}!",
   "trips.booked.body": "الموعد في {place}، {day} الساعة {time}. أصبح الآن ضمن زياراته.",
@@ -1186,7 +1186,7 @@
   "book.new.note": "تصله رسالة نصية واحدة من Pam مع رابط. ولا يتم إرسال أي شيء آخر ما لم ينضم.",
   "book.add": "إضافة شخص",
   "book.add.body": "شخص لم يستخدم Pam بعد",
-  "book.people": "الأعضاء الذين راسلوا برنامجك",
+  "book.people": "الأعضاء الذين يمكنك الحجز لهم",
   "book.booked": "تم الحجز · {when}",
   "book.notBooked": "لم يتم الحجز",
   "book.wrote": "تاريخ الرسالة: {when}",
@@ -1841,5 +1841,9 @@
   "places.reported.done.remove": "تمت إزالة {place} من القائمة.",
   "waitingCities.title": "مدن ينتظرها الناس",
   "waitingCities.empty.title": "لا أحد في الانتظار بعد",
-  "waitingCities.empty.body": "عندما يسجل شخص ما من مدينة لا يتوفر فيها Pam بعد، تظهر المدينة هنا مع عدد الأشخاص."
+  "waitingCities.empty.body": "عندما يسجل شخص ما من مدينة لا يتوفر فيها Pam بعد، تظهر المدينة هنا مع عدد الأشخاص.",
+  "trips.bookedForYou": "تم الحجز لك",
+  "person.trip.bookedBy": "تم الحجز بواسطة {program}",
+  "notify.visit_booked_for_you": "قام {place} بحجز زيارة لك: {when}",
+  "notify.kind.visit_booked_for_you": "زيارة محجوزة لك"
 }

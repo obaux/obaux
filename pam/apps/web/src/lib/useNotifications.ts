@@ -28,7 +28,8 @@ export interface NotificationRow {
     | 'service_removed'
     | 'message_reported'
     | 'staff_request_pending'
-    | 'message_received';
+    | 'message_received'
+    | 'visit_booked_for_you';
   bodyKey: string;
   bodyVars: Record<string, string>;
   subjectType: string | null;
