@@ -1693,5 +1693,8 @@
   "places.reported.remove.confirm.title": "Tirar {place} da lista?",
   "places.reported.remove.confirm.body": "Os membros não vão mais encontrá-lo em Pam.",
   "places.reported.done.keep": "{place} continua na lista.",
-  "places.reported.done.remove": "{place} saiu da lista."
+  "places.reported.done.remove": "{place} saiu da lista.",
+  "caseload.visit.next": "Next visit: {when}",
+  "caseload.visit.went": "Marked as there: {date}",
+  "caseload.visit.missed": "Not marked as there: {date}"
 }

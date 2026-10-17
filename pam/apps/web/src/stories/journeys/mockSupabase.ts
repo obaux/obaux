@@ -759,6 +759,19 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rest/v1/enrollments', () => ({ body: [] })),
     // A real member's visits, read by their case manager on the member's page (D-509): Marcus (`m1`, on the example caseload) has
     // one coming up, one the program marked him at and one it did not, so "Trips coming up" and "Programs attended" have something to show.
+    // Home's one read for the whole caseload (a93): only the day and the status.
+    (url) =>
+      has('/rest/v1/appointments')(url) && url.includes('member_id=in.')
+        ? {
+            body: [
+              { member_id: 'm1', starts_at: onTheHour(-5, 9), status: 'attended' },
+              { member_id: 'm1', starts_at: onTheHour(2, 10), status: 'scheduled' },
+              { member_id: 'm2', starts_at: onTheHour(-6, 9), status: 'attended' },
+              { member_id: 'm2', starts_at: onTheHour(-2, 13), status: 'missed' },
+              { member_id: 'm3', starts_at: onTheHour(-1, 15), status: 'attended' },
+            ],
+          }
+        : null,
     on('/rest/v1/appointments', (url) => ({
       body: url.includes('member_id=eq.m1')
         ? [

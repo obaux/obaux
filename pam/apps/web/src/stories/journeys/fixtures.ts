@@ -202,6 +202,8 @@ export const NOTIFICATIONS = [
 export const CASELOAD = [
   { id: 'm1', first_name: 'Marcus', access_status: 'active', last_active_at: hoursAgo(0) },
   { id: 'm2', first_name: 'Tanya', access_status: 'active', last_active_at: null },
+  // A third, so Home's visit line shows each of its kinds (a93): Marcus has one coming, Tanya's last was not marked, Jordan's was.
+  { id: 'm3', first_name: 'Jordan', access_status: 'active', last_active_at: hoursAgo(30) },
 ];
 
 export const DIRECTORY_PEOPLE = [

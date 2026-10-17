@@ -1776,5 +1776,8 @@
   "places.reported.remove.confirm.title": "Убрать {place} из списка?",
   "places.reported.remove.confirm.body": "Участники больше не найдут его в Pam.",
   "places.reported.done.keep": "{place} остаётся в списке.",
-  "places.reported.done.remove": "Убрано из списка: {place}."
+  "places.reported.done.remove": "Убрано из списка: {place}.",
+  "caseload.visit.next": "Next visit: {when}",
+  "caseload.visit.went": "Marked as there: {date}",
+  "caseload.visit.missed": "Not marked as there: {date}"
 }

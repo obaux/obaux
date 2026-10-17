@@ -3,10 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
+import { BottomSheet } from '@astryxdesign/core/BottomSheet';
+import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { Notice, Page, PeopleIcon, TripsIcon } from '@pam/ui';
+import { EyeIcon, Notice, Page, PeopleIcon, TripsIcon } from '@pam/ui';
+import { sheet } from '@pam/ui/sheet';
+import { landFocus, landFocusStyle } from '@pam/ui/landFocus';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { MenuList } from '@pam/ui/MenuList';
 import { DashedRule } from '@pam/ui/DashedRule';
@@ -28,16 +32,43 @@ import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { useCaseload } from '@/lib/useCaseload';
 import { dummyChip, statusChip } from '@/lib/caseloadLabels';
+import type { CaseloadVisit } from '@/lib/caseloadVisit';
+import { intlLocale } from '@pam/config';
 import { HeaderActions } from './HeaderActions';
 import { StaffPeopleRow } from './StaffPeopleRow';
 import { PeopleHomeView, type HomePerson, type PeopleState } from './PeopleHomeView';
 
 /** A case manager's home: the people on their caseload. */
 export function CaseloadHome() {
-  const { t, tPlain } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   const router = useRouter();
   const { state: caseload, refresh } = useCaseload(true);
   const examplePeople = useExamplePeople();
+  const [seeOpen, setSeeOpen] = useState(false);
+
+  // The one visit line under a member's name (card a93, Sage's words, ledger 6867b09b): the next visit, or the most recent
+  // marked one. "Not marked as there" is a chip, unless the card already has one for what is switched off: that one wins and
+  // the visit says itself as the line instead.
+  const day = (iso: string) => new Intl.DateTimeFormat(intlLocale(locale), { month: 'short', day: 'numeric' }).format(new Date(iso));
+  const when = (iso: string) =>
+    `${new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'short' }).format(new Date(iso))} ${new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' }).format(new Date(iso))}`;
+  const visitWords = (visit: CaseloadVisit): string =>
+    visit.kind === 'next'
+      ? t('caseload.visit.next', { when: when(visit.at) })
+      : t(visit.kind === 'went' ? 'caseload.visit.went' : 'caseload.visit.missed', { date: day(visit.at) });
+  const lineAndChip = (visit: CaseloadVisit | null, chip: HomePerson['chip']): Pick<HomePerson, 'meta' | 'chip'> => {
+    if (!visit) return { meta: [], chip };
+    if (visit.kind === 'missed' && !chip) return { meta: [], chip: { label: visitWords(visit), tone: 'warning' } };
+    return { meta: [visitWords(visit)], chip };
+  };
+  // The example people have planned visits but no marks: they show their next one.
+  const exampleNext = (personId: string): CaseloadVisit | null => {
+    const now = Date.now();
+    const next = DUMMY_APPOINTMENTS.filter((a) => a.personId === personId && Date.parse(a.startsAt) >= now).sort((a, b) =>
+      a.startsAt.localeCompare(b.startsAt),
+    )[0];
+    return next ? { kind: 'next', at: next.startsAt } : null;
+  };
 
   // The real list when there is one; the example people otherwise, as on
   // `/admin/` (Will, 16 September — and kept for investor demos, 1 October).
@@ -51,16 +82,14 @@ export function CaseloadHome() {
               status: 'ready',
               // Each opens the member's page (D-227), which shows a real
               // member only what this list already does — see `/person/`.
-              // The line under the name is the points; when they last used
-              // Pam is on their page now (Will, 2 October).
+              // The line under the name is their visits (card a93); points are on their page (Will, 17 October).
               people: caseload.members.map(
                 (member): HomePerson => ({
                   id: member.id,
                   firstName: member.firstName,
                   href: `/person/?id=${encodeURIComponent(member.id)}`,
-                  chip: statusChip(member, t),
                   programBadge: member.program,
-                  meta: member.points !== null ? [t('admin.points', { count: member.points })] : [],
+                  ...lineAndChip(member.visit, statusChip(member, t)),
                 }),
               ),
             }
@@ -72,8 +101,7 @@ export function CaseloadHome() {
                       id: member.id,
                       firstName: member.firstName,
                       href: `/person/?id=${member.id}`,
-                      chip: dummyChip(member.accessStatus, t),
-                      meta: member.points !== undefined ? [t('admin.points', { count: member.points })] : [],
+                      ...lineAndChip(exampleNext(member.id), dummyChip(member.accessStatus, t)),
                     }),
                   )
                 : [],
@@ -92,29 +120,42 @@ export function CaseloadHome() {
       state={state}
       note={isExample ? t('example.people.note') : null}
       strip={<StaffPeopleRow role="admin" />}
-      // §4.1: members agreed to this list at onboarding, and the case manager
-      // reads the same words, so the promise is visible from both sides.
+      // Under the cards, two rows between lines (Will and Dot, card a93, 17 October): Invite someone, moved up from the
+      // floating button, and What you can see, which opens a sheet like a place's hours. The promise to members (§4.1) is the
+      // same words as joining (join.privacy.admin.1–4), one tap away rather than at the foot of the page.
       footer={
-        <VStack gap={2}>
-          <Heading level={2} xstyle={homeStyles.section}>
-            {t('admin.seeing.title')}
-          </Heading>
-          {/*
-            The promise to members as a short list at reading size, not one 12px paragraph (Iris, case manager P5;
-            the merge desk's item 11). The items are the joining step's own (join.privacy.admin.1–4, Sage's ledger
-            4269f020, matching the member's list), so Home and joining can never say two different things.
-          */}
-          <VStack gap={2} role="list">
-            {[1, 2, 3, 4].map((n) => (
-              <Text key={n} role="listitem" xstyle={homeStyles.intro}>
-                {t(`join.privacy.admin.${n}`)}
-              </Text>
-            ))}
-          </VStack>
-          <Text type="supporting" xstyle={homeStyles.intro}>
-            {t('admin.seeing.told')}
-          </Text>
-        </VStack>
+        <>
+          <Card padding={1}>
+            <MenuList
+              label={t('home.caseload.title')}
+              hasDividers
+              isInset
+              items={[
+                { id: 'invite', label: t('profile.menu.invite'), href: '/invite/', icon: <PeopleIcon width={26} height={26} aria-hidden /> },
+                { id: 'see', label: t('admin.seeing.title'), onSelect: () => setSeeOpen(true), icon: <EyeIcon width={26} height={26} aria-hidden /> },
+              ]}
+            />
+          </Card>
+          <BottomSheet isOpen={seeOpen} onOpenChange={setSeeOpen} label={t('admin.seeing.title')} height="hug" xstyle={sheet.panel}>
+            {seeOpen ? (
+              <VStack gap={3} {...landFocus} xstyle={[homeStyles.sheet, landFocusStyle.quiet]}>
+                <Heading level={2} xstyle={homeStyles.section}>
+                  {t('admin.seeing.title')}
+                </Heading>
+                <VStack gap={2} role="list">
+                  {[1, 2, 3, 4].map((n) => (
+                    <Text key={n} role="listitem" xstyle={homeStyles.intro}>
+                      {t(`join.privacy.admin.${n}`)}
+                    </Text>
+                  ))}
+                </VStack>
+                <Text type="supporting" xstyle={homeStyles.intro}>
+                  {t('admin.seeing.told')}
+                </Text>
+              </VStack>
+            ) : null}
+          </BottomSheet>
+        </>
       }
       actions={<HeaderActions role="admin" />}
       // Message, the shortcut on each card (D-227): the example conversation
@@ -133,7 +174,6 @@ export function CaseloadHome() {
           });
         },
       }}
-      floating={<InviteFloating />}
       onRetry={refresh}
       onPick={(person) => person.href && router.push(person.href)}
       empty={
@@ -325,6 +365,7 @@ const homeStyles = stylex.create({
   // Room above the rows (Will: "plenty of breathing room around them").
   actions: { paddingBlock: '24px 16px' },
   intro: { fontSize: '16px', lineHeight: 1.5 },
+  sheet: { paddingInline: '24px', paddingBlock: '20px 24px' },
   explainer: { paddingBlockEnd: '16px' },
   note: { fontSize: '15px', lineHeight: 1.5 },
 });
