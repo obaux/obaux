@@ -97,10 +97,21 @@ describe('the transparency screen has a card for what a program can see', () => 
     expect(TRANSPARENCY_GROUPS.flatMap((g) => [...g.keys])).not.toContain('transparency.canSee.signed');
   });
 
-  it('says it once more, short, in the short version', () => {
+  it('says it once more, short, in the short version, and says there is more (Sage, ledger 3c526500)', () => {
     expect(EN['transparency.summary.program']).toBe(
-      'A program sees your first name and what you write to them, even before you plan a visit.',
+      'A program sees your first name and what you write to them, even before you plan a visit. ' +
+        'It sees more once you sign up, sign its rules or plan a visit there.',
     );
+  });
+
+  it('promises nothing the Privacy page does not: each way in it names is one the page names, and the sentence adds no fact', () => {
+    // The pointer ("It sees more once you sign up, sign its rules or plan a visit there") is the three ways in of
+    // `sharing.p2`, in its words, and no fact of its own: the facts stay in the card and the page it points to.
+    const line = EN['transparency.summary.program']!;
+    const [, more = ''] = line.split('. It sees more once you ');
+    expect(more).toBe('sign up, sign its rules or plan a visit there.');
+    for (const way of ['sign their rules', 'sign up with them', 'plan a visit there']) expect(sharing, way).toContain(way);
+    expect(line).not.toMatch(/last name|phone|address|photo|\bnote\b|points|level|signature|save|saved/i);
   });
 
   it('never names more than a program sees: no last name, phone, address, note or points', () => {

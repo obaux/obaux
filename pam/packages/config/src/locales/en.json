@@ -1443,7 +1443,7 @@
   "transparency.program.signedUp": "That you signed up, and how it is going.",
   "transparency.program.saves": "When you save a new place — not which one. Only after you sign up with it.",
   "transparency.program.visits": "The visits you plan there: the day and time, the service you picked, and whether you were marked as there.",
-  "transparency.summary.program": "A program sees your first name and what you write to them, even before you plan a visit.",
+  "transparency.summary.program": "A program sees your first name and what you write to them, even before you plan a visit. It sees more once you sign up, sign its rules or plan a visit there.",
   "memberPolicy.record": "The program keeps a record of the policies you sign, with the date.",
   "memberPolicy.readPages": "Read each page, then sign.",
   "memberPolicy.record.meaning": "Signing here is a record that you read and agreed.",

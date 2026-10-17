@@ -1443,7 +1443,7 @@
   "transparency.program.signedUp": "Que te inscribiste, y cómo va.",
   "transparency.program.saves": "Cuándo guardas un lugar nuevo — no cuál. Solo después de inscribirte en él.",
   "transparency.program.visits": "Las visitas que planeas allí: el día y la hora, el servicio que elegiste y si te marcaron como presente.",
-  "transparency.summary.program": "Un programa ve tu nombre de pila y lo que le escribes, incluso antes de que planees una visita.",
+  "transparency.summary.program": "Un programa ve tu nombre de pila y lo que le escribes, incluso antes de que planees una visita. Ve más cuando te inscribes, firmas sus políticas o planeas una visita allí.",
   "memberPolicy.record": "El programa guarda un registro de las políticas que firmas, con la fecha.",
   "memberPolicy.readPages": "Lee cada página y luego firma.",
   "memberPolicy.record.meaning": "Firmar aquí es un registro de que leíste y estuviste de acuerdo.",
