@@ -17,7 +17,9 @@ import { OptionTag, TaggedWords, langAttributes } from './OptionTag.js';
  *
  * A row is a link (`href`) or, for the one that is an action rather than a
  * place — signing out — a button (`onSelect`). Either way the whole row is the
- * target, through `ListItem`'s own invisible-anchor/button pattern.
+ * target: a button row through `ListItem`'s own click handler; a link row because
+ * Astryx draws its link only around the label, so the app shell (`tapRows.ts`,
+ * `useRowTaps`) clicks that link for a tap anywhere else on the row.
  */
 export interface MenuItem {
   readonly id: string;
