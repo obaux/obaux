@@ -1,0 +1,107 @@
+diff --git a/pam/apps/web/src/screens/StaffHomes.tsx b/pam/apps/web/src/screens/StaffHomes.tsx
+index 11792cb1..0afe3a7f 100644
+--- a/pam/apps/web/src/screens/StaffHomes.tsx
++++ b/pam/apps/web/src/screens/StaffHomes.tsx
+@@ -3,10 +3,14 @@
+ import { useEffect, useState } from 'react';
+ import { useRouter } from 'next/navigation';
+ import * as stylex from '@stylexjs/stylex';
++import { BottomSheet } from '@astryxdesign/core/BottomSheet';
++import { Card } from '@astryxdesign/core/Card';
+ import { Heading } from '@astryxdesign/core/Heading';
+ import { Text } from '@astryxdesign/core/Text';
+ import { VStack } from '@astryxdesign/core/VStack';
+-import { Notice, Page, PeopleIcon, TripsIcon } from '@pam/ui';
++import { EyeIcon, Notice, Page, PeopleIcon, TripsIcon } from '@pam/ui';
++import { sheet } from '@pam/ui/sheet';
++import { landFocus, landFocusStyle } from '@pam/ui/landFocus';
+ import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
+ import { MenuList } from '@pam/ui/MenuList';
+ import { DashedRule } from '@pam/ui/DashedRule';
+@@ -64,6 +68,7 @@ export function CaseloadHome() {
+   const router = useRouter();
+   const { state: caseload, refresh } = useCaseload(true);
+   const examplePeople = useExamplePeople();
++  const [seeOpen, setSeeOpen] = useState(false);
+   const { locale } = useI18n();
+   const visits = useCaseloadVisits(caseload.status === 'ready' ? caseload.members.map((m) => m.id) : []);
+   const words = STAND_IN[locale] ?? STAND_IN['en']!;
+@@ -140,27 +145,42 @@ export function CaseloadHome() {
+       strip={<StaffPeopleRow role="admin" />}
+       // §4.1: members agreed to this list at onboarding, and the case manager
+       // reads the same words, so the promise is visible from both sides.
++      // Under the cards, a short list of rows between lines (Will, card a93, 17 October): Invite someone, moved up from the bar's
++      // corner, and What you can see, which opens a sheet with the fine print as the hours sheet does. The promise to members is the
++      // same words, one tap away rather than at the foot of the page (§4.1).
+       footer={
+-        <VStack gap={2}>
+-          <Heading level={2} xstyle={homeStyles.section}>
+-            {t('admin.seeing.title')}
+-          </Heading>
+-          {/*
+-            The promise to members as a short list at reading size, not one 12px paragraph (Iris, case manager P5;
+-            the merge desk's item 11). The items are the joining step's own (join.privacy.admin.1–4, Sage's ledger
+-            4269f020, matching the member's list), so Home and joining can never say two different things.
+-          */}
+-          <VStack gap={2} role="list">
+-            {[1, 2, 3, 4].map((n) => (
+-              <Text key={n} role="listitem" xstyle={homeStyles.intro}>
+-                {t(`join.privacy.admin.${n}`)}
+-              </Text>
+-            ))}
+-          </VStack>
+-          <Text type="supporting" xstyle={homeStyles.intro}>
+-            {t('admin.seeing.told')}
+-          </Text>
+-        </VStack>
++        <>
++          <Card padding={1}>
++            <MenuList
++              label={t('home.caseload.title')}
++              hasDividers
++              isInset
++              items={[
++                { id: 'invite', label: t('profile.menu.invite'), href: '/invite/', icon: <PeopleIcon width={26} height={26} aria-hidden /> },
++                { id: 'see', label: t('admin.seeing.title'), onSelect: () => setSeeOpen(true), icon: <EyeIcon width={26} height={26} aria-hidden /> },
++              ]}
++            />
++          </Card>
++          <BottomSheet isOpen={seeOpen} onOpenChange={setSeeOpen} label={t('admin.seeing.title')} height="hug" xstyle={sheet.panel}>
++            {seeOpen ? (
++              <VStack gap={3} {...landFocus} xstyle={[homeStyles.sheet, landFocusStyle.quiet]}>
++                <Heading level={2} xstyle={homeStyles.section}>
++                  {t('admin.seeing.title')}
++                </Heading>
++                <VStack gap={2} role="list">
++                  {[1, 2, 3, 4].map((n) => (
++                    <Text key={n} role="listitem" xstyle={homeStyles.intro}>
++                      {t(`join.privacy.admin.${n}`)}
++                    </Text>
++                  ))}
++                </VStack>
++                <Text type="supporting" xstyle={homeStyles.intro}>
++                  {t('admin.seeing.told')}
++                </Text>
++              </VStack>
++            ) : null}
++          </BottomSheet>
++        </>
+       }
+       actions={<HeaderActions role="admin" />}
+       // Message, the shortcut on each card (D-227): the example conversation
+@@ -179,7 +199,6 @@ export function CaseloadHome() {
+           });
+         },
+       }}
+-      floating={<InviteFloating />}
+       onRetry={refresh}
+       onPick={(person) => person.href && router.push(person.href)}
+       empty={
+@@ -371,6 +390,7 @@ const homeStyles = stylex.create({
+   // Room above the rows (Will: "plenty of breathing room around them").
+   actions: { paddingBlock: '24px 16px' },
+   intro: { fontSize: '16px', lineHeight: 1.5 },
++  sheet: { paddingInline: '24px', paddingBlock: '20px 24px' },
+   explainer: { paddingBlockEnd: '16px' },
+   note: { fontSize: '15px', lineHeight: 1.5 },
+ });
