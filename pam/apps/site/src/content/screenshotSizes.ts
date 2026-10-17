@@ -54,7 +54,7 @@ export const SHOT_SIZES: Record<string, { w: number; h: number }> = {
   },
   "points-and-badges/points.png": {
     "w": 390,
-    "h": 655
+    "h": 770
   },
   "messages-in-pam/options.png": {
     "w": 390,
@@ -89,6 +89,18 @@ export const SHOT_SIZES: Record<string, { w: number; h: number }> = {
     "h": 844
   },
   "../home/conversation.png": {
+    "w": 390,
+    "h": 844
+  },
+  "signing-a-programs-rules/place-policies.png": {
+    "w": 390,
+    "h": 844
+  },
+  "signing-a-programs-rules/place-policy.png": {
+    "w": 390,
+    "h": 844
+  },
+  "signing-a-programs-rules/sign.png": {
     "w": 390,
     "h": 844
   }

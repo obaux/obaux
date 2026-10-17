@@ -7,6 +7,9 @@ import zhCN from '@pam/config/locales/zh-CN.json';
 import zhHK from '@pam/config/locales/zh-HK.json';
 import ru from '@pam/config/locales/ru.json';
 import ar from '@pam/config/locales/ar.json';
+import { asRole } from '../../journeys/journey';
+import type { MockOptions } from '../../journeys/mockSupabase';
+import { REDESIGN_ROUTES } from '../../prototype/routes';
 import { screen } from '../screen';
 
 /**
@@ -83,3 +86,23 @@ export const ProgramDiscarded: Story = {
   name: 'Program — discarded, said after (long name)',
   play: confirm('review.discard', 'review.discard.yes'),
 };
+
+/**
+ * What Approve can meet instead (D-491; Lena's weekly review of the staff-request words): the database refuses, or the
+ * person already had an account and is now a program lead too. The same long-named request; the answer comes from
+ * the mock (`staffReview`).
+ */
+const refused = (staffReview: NonNullable<MockOptions['staffReview']>, name: string): Story => {
+  const route = REDESIGN_ROUTES['/requests/review/']!;
+  return {
+    ...asRole('super-admin', '/requests/review/', { id: 'r-3' }, { staffReview }),
+    name,
+    render: () => <>{route.render()}</>,
+    play: confirm('requests.approve', 'requests.confirm.approve.yes'),
+  };
+};
+export const RequestAddedToExistingAccount = refused('addedToExisting', 'Request — approved, already had an account (long name)');
+export const RequestRefusedPair = refused('pair', 'Request — refused, a different kind of account (long name)');
+export const RequestRefusedCity = refused('city', 'Request — refused, their account is in another city (long name)');
+export const RequestRefusedDecided = refused('decided', 'Request — refused, already decided');
+export const RequestFailed = refused('other', 'Request — the decision failed');

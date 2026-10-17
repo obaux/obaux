@@ -46,6 +46,22 @@ Five things the page does not say (the entries with a `gap`), none of them new, 
 
 Each is for Will to decide: the page is his signed text.
 
+## Where the five stand (16 October, afternoon)
+
+Drafted against the migrations and the code the same afternoon and signed for Will by Sage (A29, ledger `2430f52f`):
+`what-we-keep.p1` (edited), new `p16` (a waiting city), `p17` (a report about a place), `p18` (a staff photo), and
+`sharing.p8` widened. Checking them corrected three of the entries above:
+
+- **Reports are read by every case manager as well as super admins** (`service_flags_select_admin = is_admin()`,
+  0033; D-585 shows a case manager the reason and the note).
+- **The tick promises a text nothing sends** (`waiting_cities` is read by nothing). The line ships with the tick removed.
+- **"Only the Pam team can see" last name and city is true only after a migration** takes both columns out of the
+  select grant for anon and authenticated (0075); today regional case managers, accepted buddies and public mentors
+  can read them through the API, though no screen shows them.
+
+Nothing deletes a report, a waiting-list row (until the account goes) or a staff photo; the photo line's last two
+sentences wait for two builds. The entries stay `gap` until Will signs; then they move to `covers` with the keys above.
+
 ## What a later session might reverse
 
 - The count per file is blunt; a finer check would read each field's `purpose` or label. Not worth it until the

@@ -1252,6 +1252,39 @@
   first four, checked against the code; Sage signs; then one card to Will. From b48, a branch that adds a field
   adds its entry in `data-collected.ts`, or the config tests fail. The held a84 and a86 branches add fields, so
   they need entries when they are released. Weekly notes: nothing new for Lena or Wren.
+- **The guard's five gaps, checked (14:49 to 14:55).** Lena checked each against the code and the migrations, and
+  Sage signed the English (2430f52f). Four findings changed the question for Will. The "Text me when Pam opens" tick
+  promises a text nothing sends (`waiting_cities` is read by nothing). Every case manager can read place reports.
+  Last name and city are in the column grant for anon and authenticated, and the row policies let some connected
+  people read them. Staff photos are never deleted. Card a96 (14:53) asks Will to sign five lines; the advice is
+  A, A, yes, yes, yes. Ava is building the column revoke, the photo deletes, and (held) the tick's removal. a84 (h)
+  is withdrawn: p7 is back to the email only.
+- **Batch b49 (16 October, 14:51 to 15:00).** Sage's ledger up to 2430f52f (33 rows: the Points rows, "They wrote",
+  Wren's two post lines, the five gap lines signed for Will, and earlier rows that had not reached `main`). Wren's
+  weekly batch (ed17f91f): the Points picture shows all six ways to earn, with alt text to match; the site's own
+  button border is gone (one secondary button, the D-493 edge, 48px measured); Staff requests (a draft post) asks
+  you to confirm; Is the place told says a place may be taken off the list. Lena's staff-request words (ed85e716):
+  "member", not "participant", in five languages, and no article before Pam in pt-BR. Ava's stories (d792732f) for
+  the four refusals on Approve and "now a program lead too", so the fit audit can see those lines. Ava's privacy build 1
+  (4d34f550, D-588): one migration, `20261016145411`, takes `last_name` and `home_city` out of the select grant for
+  anon and authenticated. Every reader was checked: the app selects neither; the functions that do are security
+  definer; About you writes them with the update grant, which stays. DB test 74 covers a case manager, a buddy, a
+  mentor's reader, the person and anon. It goes live once CI's Migrations and RLS pass on main. Weekly notes for 23
+  October: Wren's three carried items (the 10 October checks, the rules post pictures, the policies post after a31)
+  and the a96 translations once Will signs.
+- **b48 green (15:10). Ava's migration live (15:12). b49 green (15:37).** `20261016145411` applied live as
+  `20261016151253` once main's Migrations and RLS passed (list_migrations first). Checked live with
+  `has_column_privilege`: `last_name` and `home_city` select false for anon and authenticated, update true for
+  authenticated, `first_name` unchanged. Card a96 updated: item 1 is live, with pictures of the tick (Ava's held
+  76ad2bbb). Ava, Lena and Wren told at 15:37. Piper, Nico and Dot told the guard's rule at 15:11.
+- **Batch b50 (16 October, 15:12 to 15:50).** Sage's ledger to 80730eb5. Wren's 1cff9bba: the 10 October check
+  found nothing wrong; three posts now say the staff invite email and "Email me a new link" (true while
+  `invite_emails_live` is on: checked live, 'on'); the rules post has two pictures. Ava's staff photo cleanup
+  (1ff9579d, D-590): the old file goes when a photo changes, and a new Edge Function, `sweep-staff-photos`, keeps
+  only the file each profile points at, each night at 04:35 UTC (`20261016150353`). It removes nothing if any read
+  fails, skips files under an hour old, and logs counts only. Dry run on live (counts only): one photo, in use, none
+  to remove. Conflict: STATUS.md, Ava's two sections; both kept. Weekly notes for 23 October: Wren's carried list is
+  down to the policies post (after a31).
 ## What was wrong, and what missed it
 
 - **The weekly notes were not kept between 10 and 16 October.** `docs/team.md` says the merge desk adds to
@@ -1589,6 +1622,13 @@
 | Batch b47, full run (76fb8057): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard | 1311 passed, 1 skipped / in step / 124 / 0 / 100 / 0 / 0 / 0 / 186 / 11.5 kB spare / 2003 passed, 19 skipped, exit 0 / built; "no bundle names the live one"; grep 0 files |
 | b47 main CI (912f3871) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (07:36); Vercel web and pam-site success |
 | Batch b48 (79d5e156, Lena's privacy guard): install / config / config tsc / site test / site tsc / web tsc | 0 / 1319 passed, 1 skipped (8 new) / 0 / 100 / 0 / 0 |
+| Batch b49 (b77afec2): config / copy / site test / site tsc / site build / site a11y / web tsc | 1319 passed, 1 skipped / in step / 100 / 0 / 0 / 120 scans, 0 problems (with `CHROMIUM_PATH=/opt/pw-browsers/chromium`; the script reads `CHROMIUM_PATH`, not `PLAYWRIGHT_CHROMIUM_PATH`) / 0 |
+| Batch b49, after Ava's stories (7b64aba0): web tsc / storybook + guard | 0 / built; "no bundle names the live one"; grep 0 files |
+| b48 main CI (313c77ef) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (15:10); Vercel web and pam-site success |
+| D-588 live (`20261016151253`), has_column_privilege | last_name, home_city: SELECT false for anon and authenticated; UPDATE true for authenticated; first_name SELECT true |
+| b49 main CI (f0dd0eec) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (15:37); Vercel web and pam-site success |
+| Sweep dry run on live (counts only, before deploy) | profiles with a photo 1, outside the bucket 0; objects 1, in use 1, would remove 0 |
+| Batch b50, full run (ffe44005): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1327 passed, 1 skipped / in step / 124 / 0 / 100 / 0 / 0 / 0 / 188 / 11.5 kB spare / 2009 passed, 19 skipped, exit 0 / built; "no bundle names the live one"; grep 0 files / 0 / 120 scans, 0 problems |
 | Control Room v24 harness (390 and 1280) | reply about a card: section lands at 76px under the tabs, card folded, button "Replied" (aria "Replied. Reply again"); pressing it restores the card's prefix; a general message leaves scrollY unchanged; a data push mid-glide doesn't stop it; 0 page errors |
 
 ## Left undone

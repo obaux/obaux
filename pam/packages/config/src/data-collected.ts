@@ -52,19 +52,25 @@ export const DATA_COLLECTED: readonly CollectedData[] = [
     id: 'last-name-and-city',
     what:
       'A last name (optional) and a city (required), typed or picked on About you by everyone, member or staff. ' +
-      'Both are written to the profile (`updateMyDetails`, `redeem_invite`: `last_name`, `home_city`).',
+      'Both are written to the profile (`updateMyDetails`, `redeem_invite`: `last_name`, `home_city`). Only the ' +
+      'Pam team reads them: nobody signed in can select either column, their own included (20261016145411, test 74).',
     covers: null,
     gap:
-      'what-we-keep.p1 names only the first name, the phone number and the language. The a84-h short form of p7 ' +
-      '(held for Will) names a last name and a city for staff only. Members are not covered. For Will.',
+      'Signed by Sage for Will (ledger 2430f52f, 16 October): what-we-keep.p1 widened to name both and to say only ' +
+      'the Pam team sees them. That is true once 20261016145411 (D-588) is live: it takes last_name and home_city ' +
+      'out of the select grant for anon and authenticated (option A on card a96). With B, both go on the guide\'s ' +
+      'list instead. a84 (h) is withdrawn; p7 is the email alone. For Will.',
   },
   {
     id: 'waiting-list-text',
     what:
       'In a city Pam is not in yet: the city (`join_waiting_city`). The "Text me when Pam opens in {city}" tick is gone ' +
-      '(D-587 build 3, held for Will): nothing sent that text, so nobody is asked for it.',
+      '(D-587 build 3, option A, Will signed a96 on 17 October): nothing sent that text, so nobody is asked for it.',
     covers: null,
-    gap: 'No Privacy line names the waiting list yet; Lena is drafting it with Sage. For Will.',
+    gap:
+      'Nothing sends this text (waiting_cities is read by nothing; no template, no function; the campaign ' +
+      'description has none). Signed by Sage for Will (ledger 2430f52f): what-we-keep.p16, which ships with the ' +
+      'tick removed from Join. For Will.',
   },
   {
     id: 'typed-for-someone-new',
@@ -136,23 +142,32 @@ export const DATA_COLLECTED: readonly CollectedData[] = [
   },
   {
     id: 'place-report',
-    what: 'A reason and an optional note about a place that is closed or wrong (`/flag/`); super admins read it (D-585).',
+    what: 'A reason and an optional note about a place that is closed or wrong (`/flag/`); every case manager and super admin reads it (D-585).',
     covers: null,
     gap:
-      'No Privacy line says a report about a place is kept, with the person\'s account, or who reads it. The screen ' +
-      'says nobody at the place is told who reported it. For Will.',
+      'Signed by Sage for Will (ledger 2430f52f): what-we-keep.p17 (what is kept, that case managers and the Pam ' +
+      'team read it, that the place is not told, that the report stays unsigned if the account is deleted). Nothing ' +
+      'deletes a report; a purge would be a build first. For Will.',
   },
   {
     id: 'staff-photo',
-    what: 'A staff member\'s own profile photo, picked on Profile (D-345); members see it.',
+    what:
+      'A staff member\'s own profile photo, picked on Profile (D-345); members see it. Only the current one is kept: ' +
+      'the old file is removed when a new photo is saved, and each night `sweep-staff-photos` removes every file no ' +
+      'account points at, so a deleted account\'s photo is gone by the next morning (D-587 build 2).',
     covers: null,
-    gap: 'No Privacy line mentions a staff photo (p7 is about the invite email). For Will.',
+    gap:
+      'Signed by Sage for Will (ledger 2430f52f): what-we-keep.p18. Its last two sentences (the old file is deleted ' +
+      'when the photo changes; the photo goes with the account) wait for two builds: staffPhoto.ts removes the ' +
+      'previous file, and the account-delete routine removes staff-photos/<id>/. Nothing deletes a photo today. For Will.',
   },
   {
     id: 'program-details',
     what: 'A program\'s name, kind, address, phone, website, description and services, typed by its lead (join, Program tab).',
     covers: null,
-    gap: 'a84 `sharing.p8` ("an approved program\'s name, type, address, phone, website and description are shown on Pam"). Held for Will.',
+    gap:
+      'a84 j `sharing.p8`, widened by Sage (ledger 2430f52f) to say the services a program lists are shown too, ' +
+      'with their details and hours. Held for Will.',
   },
 ];
 

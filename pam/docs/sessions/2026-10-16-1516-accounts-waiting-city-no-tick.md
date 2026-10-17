@@ -1,6 +1,6 @@
 # 2026-10-16 — accounts waiting city no tick
 
-**Branch:** `claude/pam-waiting-city-no-tick` · **Lane:** Accounts & invites · **HELD for Will**
+**Branch:** `claude/pam-waiting-city-no-tick` · **Lane:** Accounts & invites · Will signed a96 (option A) on 17 October
 
 ## What changed
 
