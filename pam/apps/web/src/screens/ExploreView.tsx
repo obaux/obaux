@@ -246,6 +246,8 @@ export function ExploreView({
           />
         )
       ) : null}
+      {/* Google's mark follows the empty state too: the address was asked of Google even when nothing was near it. */}
+      {state.status === 'empty' ? afterResults : null}
 
       {state.status === 'ready' ? (
         <>

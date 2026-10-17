@@ -181,6 +181,30 @@ test.describe('one search field', () => {
     await box.fill('1500 Market');
     await expect(page.getByRole('heading', { name: 'Nothing matched that.' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Near 19102' })).toBeVisible();
+    // Google's mark follows the empty state, centred, since the address was asked of Google.
+    const mark = page.locator('[data-google-attribution]');
+    await expect(mark).toBeVisible();
+    const markBox = (await mark.boundingBox())!;
+    const empty = (await page.getByRole('heading', { name: 'Nothing matched that.' }).boundingBox())!;
+    expect(markBox.y).toBeGreaterThan(empty.y);
+    expect(Math.abs(markBox.x + markBox.width / 2 - page.viewportSize()!.width / 2)).toBeLessThan(3);
+  });
+
+  test('Escape closes and clears the bar; and while it is closed Cancel is not there to Tab to', async ({ page }) => {
+    const { box } = await open(page);
+    await box.fill('food');
+    await page.keyboard.press('Escape');
+    await expect(launcherOf(page)).toBeVisible();
+    await expect(page.getByRole('textbox', { name: /Search programs/ })).toHaveCount(0);
+    // Closed: no Cancel in the page at all, so Tab cannot land on one.
+    await expect(page.getByRole('button', { name: 'Cancel' })).toHaveCount(0);
+    for (let i = 0; i < 8; i += 1) {
+      await page.keyboard.press('Tab');
+      await expect(page.getByRole('button', { name: 'Cancel' })).toHaveCount(0);
+    }
+    // And the words are gone: the full list is back.
+    await openSearch(page);
+    await expect(page.locator('.astryx-input-group[data-size="lg"] input').first()).toHaveValue('');
   });
 
   test('Place Details is frugal: three bursts of typing cost one choose, and a longer text for the same place costs none', async ({ page }) => {

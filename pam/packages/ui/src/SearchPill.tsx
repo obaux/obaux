@@ -396,6 +396,18 @@ export function SearchBar({ label, placeholder, clearLabel, cancelLabel, value, 
     });
   }, [isOpen]);
 
+  // Escape closes and clears, the same as Cancel, from wherever the focus is in the bar.
+  const cancelRef = useRef<() => void>(() => undefined);
+  useEffect(() => {
+    const row = rowRef.current;
+    if (!row || !isOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') cancelRef.current();
+    };
+    row.addEventListener('keydown', onKey);
+    return () => row.removeEventListener('keydown', onKey);
+  }, [isOpen]);
+
   const open = () => {
     const icon = launcherRef.current?.querySelector('svg');
     slideFrom.current = icon ? icon.getBoundingClientRect().left : null;
@@ -408,6 +420,7 @@ export function SearchBar({ label, placeholder, clearLabel, cancelLabel, value, 
     setTapped(false);
     onCancel?.();
   };
+  cancelRef.current = cancel;
 
   return (
     <HStack ref={rowRef} align="center" wrap="nowrap" xstyle={barStyles.row}>
