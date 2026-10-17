@@ -40,6 +40,7 @@ import {
   type MessageFile,
   type OutgoingAttachment,
 } from '@/lib/messageFile';
+import { DICTATION_START_MS, dictationProblemFor, type DictationProblem } from '@/lib/dictationProblem';
 import { MESSAGE_PHOTO_ACCEPT, photoType, shrinkPhoto } from '@/lib/messagePhoto';
 import { FileSummary, GoogleLinkCard, MessageFileCard } from './MessageFileCard';
 import { PhotoViewer } from './PhotoViewer';
@@ -70,9 +71,12 @@ import { LimitedNotice } from './LimitedNotice';
  * one place Pam drops below its 18px body floor (A21, D-392: a phone's
  * conversation apps read at 16–17px, and at 18px the bubbles wrapped every
  * few words). The
- * mic (`ChatDictationButton`) hides itself when the browser has no speech
- * recognition, which is the same §1 rule `VoiceInput` follows — a dead
- * button is worse than no button.
+ * mic (`ChatDictationButton`) is shown on every browser, and says why when it
+ * cannot start (W4, D-603). It used to hide itself when the browser had no
+ * speech recognition (the same §1 rule `VoiceInput` follows: a dead button is
+ * worse than no button); but a mic that is there and silent is worse still, so
+ * on such a browser a tap now says "This browser can't turn speech into
+ * words" and points to the keyboard.
  *
  * The send button's icon is `<Icon icon="arrowUp" size="md" />`, not
  * `ChatSendButton`'s own default (Will's screenshot, 21 September: the
@@ -567,7 +571,69 @@ export function ThreadView({
   const { t, tPlain, locale } = useI18n();
   const inputRef = useRef<ChatComposerInputHandle>(null);
   const [draft, setDraft] = useState('');
-  const dictation = useChatDictation({ inputRef, lang: speechLanguage });
+  // Speaking a message says why it did not start (W4, D-603). Astryx's mic
+  // reports nothing on its own: a refused microphone, no connection or a
+  // browser with no recogniser all looked like a button that did nothing. So
+  // the errors the browser sends, a start that never answers, and the tap on a
+  // browser with no recogniser each put one line above the box, and a start
+  // clears it. `tries` counts them so a second failure shakes the line again.
+  const [dictationProblem, setDictationProblem] = useState<DictationProblem | null>(null);
+  const [dictationTries, setDictationTries] = useState(0);
+  const attempt = useRef({ started: false, reported: false });
+  const startTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clearStartTimer = () => {
+    if (startTimer.current) clearTimeout(startTimer.current);
+    startTimer.current = null;
+  };
+  const dictationFailed = (kind: DictationProblem) => {
+    clearStartTimer();
+    attempt.current.reported = true;
+    setDictationProblem(kind);
+    setDictationTries((n) => n + 1);
+  };
+  const speech = useChatDictation({
+    inputRef,
+    lang: speechLanguage,
+    onStart: () => {
+      clearStartTimer();
+      attempt.current.started = true;
+      setDictationProblem(null);
+    },
+    onError: (event) => {
+      const kind = dictationProblemFor(event.error);
+      if (kind) dictationFailed(kind);
+    },
+    onEnd: () => {
+      clearStartTimer();
+      // Ended without ever starting and without saying why.
+      if (!attempt.current.started && !attempt.current.reported) dictationFailed('failed');
+    },
+  });
+  useEffect(() => clearStartTimer, []);
+  const dictation = {
+    ...speech,
+    toggle: () => {
+      if (speech.isListening) {
+        speech.stop();
+        return;
+      }
+      if (!speech.isSupported) {
+        dictationFailed('unsupported');
+        return;
+      }
+      attempt.current = { started: false, reported: false };
+      setDictationProblem(null);
+      clearStartTimer();
+      startTimer.current = setTimeout(() => {
+        if (!attempt.current.started && !attempt.current.reported) dictationFailed('failed');
+      }, DICTATION_START_MS);
+      try {
+        speech.start();
+      } catch {
+        dictationFailed('failed');
+      }
+    },
+  };
 
   // While the mic is on, the words follow you (Will, 8 October, D-397). The
   // box grows to 8 lines, then scrolls inside itself; a typed word keeps
@@ -720,6 +786,28 @@ export function ThreadView({
               {t('messages.thread.attach.drop')}
             </Text>
           </ChatComposerDrawer>
+        ) : dictationProblem ? (
+          // Why speaking did not start (W4, D-603): the same banner, and the
+          // same shake, as a file Pam cannot take, below.
+          <ChatComposerDrawer>
+            <VStack key={dictationTries} data-dictation-problem={dictationProblem} xstyle={styles.refusal}>
+              <Banner
+                status="warning"
+                title={t(`messages.thread.dictate.problem.${dictationProblem}.title`)}
+                description={t(`messages.thread.dictate.problem.${dictationProblem}.hint`)}
+                endContent={
+                  <IconButton
+                    label={t('messages.thread.attach.close')}
+                    icon={<Icon icon="close" size="md" />}
+                    variant="ghost"
+                    size="md"
+                    onClick={() => setDictationProblem(null)}
+                    xstyle={styles.square}
+                  />
+                }
+              />
+            </VStack>
+          </ChatComposerDrawer>
         ) : picked?.kind === 'photo' ? (
           <ChatComposerDrawer>
             <HStack gap={2} align="center">
@@ -780,6 +868,11 @@ export function ThreadView({
               />
             </VStack>
           </ChatComposerDrawer>
+        ) : dictation.isListening ? (
+          // Listening, said in words as well as by the bars on the mic (W4).
+          <ChatComposerDrawer>
+            <Banner status="info" title={t('voice.listening')} />
+          </ChatComposerDrawer>
         ) : undefined
       }
       input={
@@ -810,6 +903,7 @@ export function ThreadView({
           <ChatDictationButton
             dictation={dictation}
             size="md"
+            isHiddenWhenUnsupported={false}
             label={dictation.isListening ? t('messages.thread.dictateStop') : t('messages.thread.dictate')}
             xstyle={[styles.square, styles.tuck]}
           />
