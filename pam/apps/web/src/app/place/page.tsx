@@ -395,6 +395,13 @@ function PlaceScreen() {
   const tellsNoLead = isMemberView && !hasLead;
   // A place with a lead on Pam sees the visit (D-526): said before the member plans one.
   const tellsLeadSees = isMemberView && hasLead;
+  // What the program sees of a visit, or that it is not on Pam (D-498): a banner below the services while a member picks one, so they
+  // are told before they book (a91, Will 17 October); once booked it stays where it was until the visit card takes it (a91 part 3).
+  const programNote = tellsNoLead ? (
+    <Banner status="info" title={t('place.noLead', { place: place!.name })} />
+  ) : tellsLeadSees ? (
+    <Banner status="info" title={t('place.lead.sees', { place: place!.name })} />
+  ) : null;
   // A member can message a place only if somebody on Pam runs it (Will, 12 October: programs gathered from
   // the internet have no one to answer). Until that is known the entry points wait, not flash in and out (D-544).
   const hidesMessage = isMemberView && leadKnown !== true;
@@ -523,7 +530,7 @@ function PlaceScreen() {
         addressFirst={visitWhen !== null}
         hoursHref={googleHref}
         notice={
-          visitWhen || policiesOnTop || tellsNoLead || tellsLeadSees ? (
+          visitWhen || policiesOnTop || (visit && programNote) ? (
             <VStack gap={3}>
               {visitWhen ? (
                 // The visit, confirmed (D-273), as a small hero (D-281): only
@@ -551,8 +558,7 @@ function PlaceScreen() {
               {visit && hasLead && isSavedPlace(visit.id) && isMemberView && !visit.attendance && inMarkWindow(visit.startsAt) ? (
                 <ImHereCard visitId={visit.id} placeName={place!.name} onMarked={() => setJustMarked(true)} />
               ) : null}
-              {tellsNoLead ? <Banner status="info" title={t('place.noLead', { place: place!.name })} /> : null}
-              {tellsLeadSees ? <Banner status="info" title={t('place.lead.sees', { place: place!.name })} /> : null}
+              {visit ? programNote : null}
               {policiesOnTop ? (
                 <PolicyStatusCard
                   isDone={allSigned}
@@ -579,6 +585,7 @@ function PlaceScreen() {
             {visit ? null : (
               <ServiceCards services={services} selectedId={service?.id ?? null} onSelect={setPickedService} />
             )}
+            {visit ? null : programNote}
           </>
         }
         quickActionsLabel={t('place.quick.label')}

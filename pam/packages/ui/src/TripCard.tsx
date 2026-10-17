@@ -53,13 +53,18 @@ const styles = stylex.create({
     overflow: 'hidden',
   },
   body: { minWidth: 0, flexGrow: 1 },
-  // Wraps, never cut (Iris's second member pass, P3): a long program name
-  // takes a second line rather than ending in "…".
+  // Wraps, to two lines at most, then "…" (Will, 17 October, a95; it wrapped without limit after Iris's second member pass, P3,
+  // and was one line before that). The whole name is the card's accessible name, so nothing is lost to a screen reader.
   name: {
     fontSize: '17px',
     lineHeight: 1.3,
     fontWeight: 700,
     overflowWrap: 'anywhere',
+    display: '-webkit-box',
+    WebkitBoxOrient: 'vertical',
+    WebkitLineClamp: 2,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
     unicodeBidi: 'plaintext', // its own direction, not the screen's (D-422)
   },
   when: { fontSize: '16px', lineHeight: 1.35 },
