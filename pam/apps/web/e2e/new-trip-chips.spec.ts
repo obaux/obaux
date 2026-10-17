@@ -17,7 +17,7 @@ test('the date chips are 40px pills with a 48px hit area, and six of them', asyn
   const box = (await chips.first().boundingBox())!;
   expect(box.height).toBeGreaterThanOrEqual(39.5);
   expect(box.height).toBeLessThanOrEqual(40.5);
-  // 3px above the pill is inside the hit area; 5px is not.
+  // 3px above the pill is inside the hit area; 6px is not.
   const hit = (dy: number) =>
     chips.first().evaluate((el, y) => {
       const r = el.getBoundingClientRect();
