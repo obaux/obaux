@@ -17,8 +17,8 @@ const KEY = 'privacy.s.what-we-keep.p13';
 describe('Privacy on counting how many phones open Your points and Profile (a76)', () => {
   const section = PRIVACY.sections.find((s) => s.id === 'what-we-keep');
 
-  it('is the last paragraph of “What we keep”', () => {
-    expect(section?.bodyKeys.at(-1)).toBe(KEY);
+  it('is the thirteenth paragraph of “What we keep” (later lines, p14 onwards, come after it)', () => {
+    expect(section?.bodyKeys[12]).toBe(KEY);
   });
 
   it('says what is counted, what is in the number, and what shows in a report, in the words Will signed', () => {

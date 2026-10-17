@@ -60,7 +60,25 @@ Drafted against the migrations and the code the same afternoon and signed for Wi
   can read them through the API, though no screen shows them.
 
 Nothing deletes a report, a waiting-list row (until the account goes) or a staff photo; the photo line's last two
-sentences wait for two builds. The entries stay `gap` until Will signs; then they move to `covers` with the keys above.
+sentences waited for two builds.
+
+## The five are on the page (17 October)
+
+Will signed card a96 at 05:53 on 17 October: option A for last name and city (D-588 had already taken both columns out
+of the select grant, test 74), and yes to the other four, exactly as Sage signed them. They are in the bundles in seven
+languages as `what-we-keep.p1` (edited) and, because a84's `p14` and `p15` are not signed yet and a section numbers its
+paragraphs 1..N with no gaps, **`p14` a waiting city, `p15` a report about a place, `p16` a staff photo**, and
+**`sharing.p8`** the program's details and the services it lists. The five entries above moved from `gap` to `covers`.
+a84's lines, when Will signs them, take the next numbers (`p17`, `p18`), and the Google Calendar lines `sharing.p9`
+(`third-party-hosts.test.ts` already points there).
+
+`test/privacy-gap-lines.test.ts` holds each line to what it describes: the English word for word; the D-588 revoke is the
+last word on both columns and no screen selects them; nothing in the SMS templates or the edge functions touches a
+waiting city, and only its owner or a super admin has a policy on it; the reporter's id is set null with the account and
+no program lead can read a flag; the photo bucket is public and staff-only, the app removes the old file, and the nightly
+sweep is scheduled; and the services a program lists are readable by a visitor once it is live. Each was mutated once to
+see it fail. The tick "Text me when Pam opens in {city}" is removed by Ava's build 3 in the same batch; this file does not
+pin that, because the branch ships before or with it.
 
 ## What a later session might reverse
 
