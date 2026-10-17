@@ -196,7 +196,7 @@ export function BringFriend({
           <HStack gap={2} align="end" wrap="nowrap" xstyle={styles.row}>
             {/* The link takes all the room Copy leaves it (D-334). */}
             <VStack xstyle={styles.field}>
-              <TextField label={linkLabel} isLabelHidden value={link} isReadOnly width="100%" />
+              <TextField label={linkLabel} isLabelHidden value={link} isReadOnly width="100%" dir="ltr" />
             </VStack>
             <Button label={copyLabel} variant="secondary" onClick={() => void copy()} xstyle={styles.copy} />
             {/*
