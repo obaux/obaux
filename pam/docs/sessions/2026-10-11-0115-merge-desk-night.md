@@ -1367,6 +1367,24 @@
 - **Iris's b55 re-test (10:48): PASS on all six.** Russian «людей» beside «участники» is on Lena's native-reader list.
 - **Batch b57 (17 October, 11:15 to 11:20).** Lena's 8effdeb6: the eight Trips fit keys re-keyed after b55's TripCard
   (the card under the drawer's fade; they show only in a run without English). Iris's d2198a66 (the b55 re-test).
+- **b57 pushed (11:20, 2de80122).** Main CI green 11:44.
+- **Will's afternoon notes (17 October, 15:01 to 15:21).** a86: hide the bell while search is open. Dot built it
+  (7b991ad3, Cancel and Escape also put focus back on the launcher); pictures 5 and 6 on a86. a93 (15:12): no white
+  cards or shadows, and the unmarked visit as one red line. Ava rebuilt it (cef097f1, Dot's --color-text-red) and Lena
+  took the chip key out (806ce909); new pictures on a93. A standard drawer for the whole app (15:12): Dot's PamSheet
+  (D-601, fbab33a9: a 48px band that closes on a tap, more room above the title, one green Close or Done), every
+  drawer moved onto it; new card a97, where Location's Done replaces Will's a81 Cancel. a94 (15:21): "signed on all.
+  But under trip card say 'booked for you' that's it." Card a96 marked answered (live since b52/b53).
+- **Batch b58 (17 October, 15:47 to 16:30): a94, a program books a visit for a member.** Piper's a01972c8 (the
+  booking for real; the member's card says only "Booked for you", on Trips and Explore's next visit; the guide sees
+  "Booked by {program}" on every booked visit; the audit row targets the member). Lena's 2c725ac1 (sharing.p9 in Will's
+  words, who-can-see.p1, transparency.canSee.bookedBy, transparency.program.visits, reminders.intro and .what.1,
+  join.privacy.admin.2 in Sage's words, ADMIN_CAN_SEE `which_visits_a_program_booked_for_them`, legal:date privacy
+  2026-10-17, admin.seeing.body retired; seven languages) and her consent.spec fix 8041e77f. Sage's ledger e846cbd4.
+  Wren's two site patches (What others can see: the booking paragraph and the guide row; Who is my guide's picture
+  re-shot, which also replaced a stale "call us"). Lena's afternoon records d3e20ed8. Members are told on the Privacy
+  page in the same batch, as Will ruled for D-413. Five migrations live: 20261017062631 as `20261017162826`, 062632 as
+  `162851`, 062633 as `162859`, 065103 as `162920`, 065125 as `162927`.
 
 ## What was wrong, and what missed it
 
@@ -1568,6 +1586,17 @@
   for to match a first Privacy draft, then Lena showed the booking itself allows three conditions and Sage's second
   draft said so; it went back to Will's option A as written. Lesson: wait for the Privacy draft to settle before
   changing a builder's brief to match it.
+- **A words branch shipped to the batch without its e2e (b58, 16:05).** Lena's a94 words changed reminders.what.1,
+  and her READY said "Not run: the Playwright e2e". consent.spec still looked for "reminder before a visit" and failed
+  on all three projects in b58's full run (2057 passed, 6 failed). Fixed in 8041e77f, with an exact match and a check
+  that the old line is gone. Lesson (b43's again): a branch that changes a line on screen greps apps/web/e2e for the old
+  words before READY, and a READY that says "e2e not run" is not READY.
+- **Two main merges in one stack (a94, 15:25 to 15:30).** Piper and Lena each merged main into the a94 stack before the
+  merge desk's note naming one of them landed. Both kept both blocks in the locale files, so it was harmless, and
+  Piper made his locale files identical to Lena's. Lesson: when two teammates share a stack, the dispatch says who
+  merges main, before either starts.
+- **A worktree path reused (Lena, 17 October).** `git worktree add -b … /tmp/wt/x` failed because x was an old worktree,
+  and the chained commands ran there anyway. Nothing was pushed. Lesson: check the path before chaining.
 
 ## Decisions
 
@@ -1766,9 +1795,21 @@
 | Batch b56 (docs, test and fit-known only): invite.spec, three projects / audit:fit es and zh-HK, --match trips, 320×760 | 24 passed / 8 unaccepted, all partial=true, 0 out (keys shifted by b55's TripCard; sent to Lena) |
 | b56 main CI (2421ff80) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (11:12); Vercel web and pam-site success |
 | Batch b57 (fit-known and research only): audit:fit es and zh-HK, --match trips, 320×760 | 8 found, 8 accepted, 0 not |
+| b57 main CI (2de80122) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (11:44); Vercel web and pam-site success |
+| a86 bell (Dot 7b991ad3): the new explore-bell specs on the old source (1f1521cb), then on 7b991ad3 | 6 failed, 9 passed / explore-bell, explore-bell-shift, one-search, focus-text-boxes: 102 passed on three projects; @pam/ui 124; web tsc 0 |
+| a94 "Booked for you" spec (Piper): program-books-for-member.spec from a01972c8 on fd0f9578 | 3 failed (the "Booked for you" test on narrow-320, dark-320, iphone-se), 12 passed |
+| Batch b58, full run (d1583ae1: Piper a01972c8, Lena 2c725ac1, Sage e846cbd4): config / db / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1375 passed, 1 skipped / 1676 ok, 0 not ok / in step / 124 / 0 / 123 / 0 / 0 / 0 / 188 / 10.8 kB spare / 2057 passed, 19 skipped, 6 failed (consent.spec:75 and :85, three projects: the old reminders line) / built; "no bundle names the live one"; grep 0 files / 0 / 120 scans, 0 problems |
+| Batch b58 with Wren's two patches and Lena's records (43089440): posts:date what-others-can-see=2026-10-17 / site test / site tsc / config / site build / site a11y | no change / 123 passed / 0 / 1375 passed / 0 / 120 scans, 0 problems |
+| Batch b58 with Lena's consent.spec fix (7e396f27): consent, program-books-for-member, person-real-trips on three projects | 114 passed |
+| a94's five migrations live (`20261017162826`, `162851`, `162859`, `162920`, `162927`) | list_migrations first (last live 20261017083423, no drift); the five files' md5 = Piper's a01972c8; appointments.booked_by_org and its index exist; notifications_kind_known = the old five kinds + visit_booked_for_you; book_visit_for_member (one overload, the widened body and comment), my_trip_booked_by, my_program_bookable_members: security definer, search_path = public, extensions, no execute for anon or public, execute for authenticated; booked rows: 0; get_advisors: only the by-design SECURITY DEFINER classes |
 
 ## Left undone
 
+- **As of b58 (17 October, 16:30):** b59 takes Dot's mail icon (9c8d5753) and Wren's re-shot guide picture after it;
+  Wren matches Texts from Pam's "A reminder before a visit you planned" to the signed "before each visit" (Sage signs
+  any sentence), and the held post on a program booking a visit is now due. Proofs owed by the merge desk: a93's
+  admin.spec on 5d32da07, the drawers spec and the mail-icon spec on main. With Will: a86 (yes and the p7 line), a91
+  (the button word and "sign 1" or "sign 2"), a93 (yes), a97 (yes; Location's Done), a84, a88.
 - **As of b57 (17 October, 11:20):** nothing open in the lanes but what waits on Will: a91, a93, a94, a86, a84, a88.
 - **As of b56 (17 October, 10:44):** Iris re-checks b55. Lena: re-key the Trips fit entries for b55's TripCard.
 - **As of b55 (17 October, 10:06):** Iris re-checks When? (hit area both sides, the times at 320×568). Ava: the
