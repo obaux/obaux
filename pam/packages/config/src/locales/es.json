@@ -1694,8 +1694,8 @@
   "places.reported.remove.confirm.body": "Los miembros ya no lo encontrarán en Pam.",
   "places.reported.done.keep": "{place} sigue en la lista.",
   "places.reported.done.remove": "{place} ya no está en la lista.",
-  "trips.bookedForYou": "Booked for you by {program}",
-  "person.trip.bookedBy": "Booked by {program}",
-  "notify.visit_booked_for_you": "{place} booked a visit for you: {when}",
-  "notify.kind.visit_booked_for_you": "Visit booked for you"
+  "trips.bookedForYou": "Reservado para ti por {program}",
+  "person.trip.bookedBy": "Reservado por {program}",
+  "notify.visit_booked_for_you": "{place} te reservó una visita: {when}",
+  "notify.kind.visit_booked_for_you": "Visita reservada para ti"
 }

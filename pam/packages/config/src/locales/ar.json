@@ -1833,8 +1833,8 @@
   "places.reported.remove.confirm.body": "لن يجد الأعضاء المكان في Pam بعد الآن.",
   "places.reported.done.keep": "يبقى {place} في القائمة.",
   "places.reported.done.remove": "تمت إزالة {place} من القائمة.",
-  "trips.bookedForYou": "Booked for you by {program}",
-  "person.trip.bookedBy": "Booked by {program}",
-  "notify.visit_booked_for_you": "{place} booked a visit for you: {when}",
-  "notify.kind.visit_booked_for_you": "Visit booked for you"
+  "trips.bookedForYou": "تم الحجز لك بواسطة {program}",
+  "person.trip.bookedBy": "تم الحجز بواسطة {program}",
+  "notify.visit_booked_for_you": "قام {place} بحجز زيارة لك: {when}",
+  "notify.kind.visit_booked_for_you": "زيارة محجوزة لك"
 }

@@ -1694,8 +1694,8 @@
   "places.reported.remove.confirm.body": "成员在Pam里将不再找到它。",
   "places.reported.done.keep": "{place}仍在列表中。",
   "places.reported.done.remove": "{place}已从列表中移除。",
-  "trips.bookedForYou": "Booked for you by {program}",
-  "person.trip.bookedBy": "Booked by {program}",
-  "notify.visit_booked_for_you": "{place} booked a visit for you: {when}",
-  "notify.kind.visit_booked_for_you": "Visit booked for you"
+  "trips.bookedForYou": "由{program}为您预约",
+  "person.trip.bookedBy": "由{program}预约",
+  "notify.visit_booked_for_you": "{place}已为您预约：{when}",
+  "notify.kind.visit_booked_for_you": "已为您预约"
 }
