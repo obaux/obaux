@@ -1285,6 +1285,37 @@
   fails, skips files under an hour old, and logs counts only. Dry run on live (counts only): one photo, in use, none
   to remove. Conflict: STATUS.md, Ava's two sections; both kept. Weekly notes for 23 October: Wren's carried list is
   down to the policies post (after a31).
+- **b50 green (16:22). The sweep live (16:24 to 16:55); its first night (17 October 04:35).** `sweep-staff-photos`
+  deployed as v1 with verify_jwt off; a POST without the dispatch secret is refused (401), a GET is 405. The cron
+  migration `20261016150353` applied live as `20261016155130` once main's Migrations and RLS passed (list_migrations
+  first); the job is active at 35 4 * * *, calls the sweep and sends the secret from the vault. First run: cron
+  succeeded, the function answered 200 with folders 1, removed 0, failed 0; the one photo in use was kept.
+- **Will's answers, 17 October 05:32 to 05:46, sent on the same turn.** a86: the search bar shrinks with Cancel beside
+  it, its content centred at rest and on the left once tapped, the Google logo centred under the results (Piper and
+  Dot). a90: "Craftsman" becomes "Maker". a91: the blue note moves below the services (Piper, its own branch); the
+  note gets shorter (Sage's two options, for Will to sign); the visit card becomes a widget with two buttons and the
+  note behind an icon once booked (Dot draws, Piper builds). Sage flagged "Check in" as a supervision word and signed
+  "I made it" as the alternative; Will chooses on a91. a92: signed; Lena releases her held branch and Ava adds the
+  lead's fifth row, in one batch. a93: the visit line on the case manager's Home, and two rows under the cards
+  ("Invite someone", "What you can see" in a sheet); Ava builds it, Piper being full. a94: programs book real
+  visits; Sage's draft found it widens what a guide sees (who booked), so the line and one question (every booked
+  visit, or only a missed one) went back on the card, and eligibility narrowed to members who wrote to the program,
+  to match the sentence.
+- **Batch b51 (17 October, 05:50).** Lena's 7f653f5b: the workforce badge "Craftsman" is "Maker" in seven languages
+  (es Oficio and pt-BR Ofício, the trade rather than a gendered person-noun; zh 匠人, ru Мастер, ar صانع); the key and
+  its line stay. Sage's ledger to d457b5f9 (Maker and a92 as Will's; a91 and a94 marked for Will to sign; "I made
+  it" signed). Weekly notes for 23 October: Lena's a92 release and its site cell, the a91 words, and Wren's
+  "Book a visit for a member" post once a94 ships.
+- **b51 pushed (06:20, 311a0d09).** Its two merge commits had no Screens: line; redone before the push (same tree).
+- **Batch b52 (17 October, 06:21 to 06:50).** a92: Lena's 40359733 (sharing.p2 as Will signed it, the member's
+  "A program can see" row, the website's sentence and its saved-places box) and Ava's e8fc2322 (the lead's fifth
+  What to expect row). a96: Lena's 3dd1257d (what-we-keep p1, p14 to p16, sharing.p8, in seven languages; the
+  privacy guard's five gaps now covers, held to the code by privacy-gap-lines.test.ts) and Ava's 5ef45034 (no
+  "Text me when Pam opens" tick). Nico's 476fc8be (before launch: the campaign must cover program-booked reminders
+  and match the opt-in screen). Sage's ledger to 6250025e. Conflicts: legal-updated.json (a92 and a96 each re-pinned
+  the Privacy fingerprint; legal:date privacy 2026-10-17 run over both), data-collected.ts (Lena's p14 covers kept,
+  the entry says the tick is gone) and STATUS.md (both Ava sections). Last updated stays 17 October 2026.
+
 ## What was wrong, and what missed it
 
 - **The weekly notes were not kept between 10 and 16 October.** `docs/team.md` says the merge desk adds to
@@ -1457,6 +1488,14 @@
   words without re-running the spec that reads them. Fixed in 1d5df9ee (visible text only). Lesson: after a words-only
   change, re-run the specs that read those words. And Lena's: an audit's "0" says nothing about a state no story draws,
   so a READY names the keys no story reaches.
+- **The same search bar built twice (a86, 17 October 05:36 to 06:11).** The merge desk told Piper to "work
+  SearchPill with Dot" and told Dot that Dot owns it. Both built a SearchBar in parallel; the branches clashed in nine
+  files. Piper and Dot settled on Dot's (fcb8c125) before the merge desk's ruling landed. Lesson: a dispatch names one
+  owner per file, and the other teammate is told to keep out of it.
+- **A narrowing sent before the drafts settled (a94, 05:50 to 05:58).** The merge desk narrowed who a program can book
+  for to match a first Privacy draft, then Lena showed the booking itself allows three conditions and Sage's second
+  draft said so; it went back to Will's option A as written. Lesson: wait for the Privacy draft to settle before
+  changing a builder's brief to match it.
 
 ## Decisions
 
@@ -1630,6 +1669,14 @@
 | Sweep dry run on live (counts only, before deploy) | profiles with a photo 1, outside the bucket 0; objects 1, in use 1, would remove 0 |
 | Batch b50, full run (ffe44005): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1327 passed, 1 skipped / in step / 124 / 0 / 100 / 0 / 0 / 0 / 188 / 11.5 kB spare / 2009 passed, 19 skipped, exit 0 / built; "no bundle names the live one"; grep 0 files / 0 / 120 scans, 0 problems |
 | Control Room v24 harness (390 and 1280) | reply about a card: section lands at 76px under the tabs, card folded, button "Replied" (aria "Replied. Reply again"); pressing it restores the card's prefix; a general message leaves scrollY unchanged; a data push mid-glide doesn't stop it; 0 page errors |
+| b50 main CI (807db3c1) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (16:22); Vercel web and pam-site success |
+| sweep-staff-photos deploy | v1 ACTIVE, verify_jwt false; POST without the dispatch secret 401; GET 405 |
+| D-590 cron live (`20261016155130`) | job sweep-staff-photos active, 35 4 * * *; calls the function with the vault secret |
+| First sweep (17 October 04:35 UTC) | cron run succeeded; function 200, folders 1, removed 0, failed 0; bucket 1 object, in use 1 |
+| Batch b51, full run (1d676149): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard | 1327 passed, 1 skipped / in step / 124 / 0 / 100 / 0 / 0 / 0 / 188 / 11.5 kB spare / 2009 passed, 19 skipped, exit 0 / built; "no bundle names the live one"; grep 0 files; site build 0; site a11y 120 scans, 0 problems |
+| b51 Maker: copy:status and fit audit (Lena, 7f653f5b) | all languages in step; `--match point` 5 stories and `--match badge` 12 stories in seven languages at 320x760 and 320x568: 0 findings |
+| b51 main CI (311a0d09) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (06:53); Vercel web and pam-site success |
+| Batch b52, full run (568ad549): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1344 passed, 1 skipped / in step / 124 / 0 / 100 / 0 / 0 / 0 / 188 / 11.1 kB spare / 2009 passed, 19 skipped, exit 0 / built; "no bundle names the live one"; grep 0 files / 0 / 120 scans, 0 problems |
 
 ## Left undone
 
