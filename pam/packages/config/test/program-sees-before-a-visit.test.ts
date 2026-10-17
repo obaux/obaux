@@ -81,11 +81,14 @@ describe('the transparency screen has a card for what a program can see', () => 
     );
   });
 
-  it('gives the four things on a visit in the words of the Privacy page', () => {
+  it('gives the four things on a visit, for the ones a member plans and the ones a program books (a94)', () => {
+    // The card says "the service", not "the service you picked": a visit a program books has a service the program picked (Sage,
+    // ledger 06:05). `sharing.p2` says it of a visit the member plans, and `sharing.p9` says a program can book one.
     expect(program.find((l) => l.key === 'transparency.program.visits')?.en).toBe(
-      'The visits you plan there: the day and time, the service you picked, and whether you were marked as there.',
+      'The visits you plan there, and the ones it books for you: the day and time, the service, and whether you were marked as there.',
     );
     expect(sharing).toContain('the day and time, the service you picked, and whether you were marked as there');
+    expect(EN['privacy.s.sharing.p9']).toMatch(/it can book a visit for you/);
   });
 
   it('keeps a program-only fact out of the list headed "Your guide can see:"', () => {

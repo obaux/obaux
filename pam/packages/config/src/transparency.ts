@@ -57,6 +57,18 @@ export const ADMIN_CAN_SEE = [
    */
   'visits_planned_at_their_own_program',
   /**
+   * D-595 (a94; Will, 17 October, card a94, 15:21: "signed on all"): a program can book a visit for a member who wrote to it, signed up
+   * with it or planned a visit there (`book_visit_for_member`), and a case manager (the member's guide) sees, beside every such visit,
+   * that a program booked it and WHICH program: "Booked by {program}" (`person.trip.bookedBy`; `BOOKED_BY_SHOWN_ON` is 'every', Will's
+   * answer to the open question). It is an organisation, never a person: `appointments.booked_by_org` is read through
+   * `appointments_select_admin`, and which lead did it is in `audit_log`, which only the Pam team reads. A program lead reads no
+   * appointment row at all (test 65), so this fact is the guide's alone. Said to the member before it ships, in four places that
+   * `program-booking-line.test.ts` holds together: the Privacy page (`privacy.s.who-can-see.p1`), the guide's list
+   * (`transparency.canSee.bookedBy`), the staff's own list (`join.privacy.admin.2`) and this entry. The member sees "Booked for you" on
+   * the card and can cancel the visit (`cancel_trip` cancels any of their own scheduled visits, whoever booked it).
+   */
+  'which_visits_a_program_booked_for_them',
+  /**
    * D-541 (Will, 11 October, 20:22 and 20:24: "members must be able to message a program before booking" and
    * "communicate what programs can see, even before the person books"): a member can write to a program from its
    * page at any time, with no sign-up and no visit.
@@ -290,6 +302,8 @@ export const TRANSPARENCY_SCREEN: {
       key: 'transparency.canSee.appointments',
       en: 'Your visits, and if you went or missed one. A program sees the visits you plan there too.',
     },
+    // D-595 (a94, Will 17 October): the guide sees which of the visits a program booked. Said once here; the Privacy page says it in `who-can-see.p1`.
+    { key: 'transparency.canSee.bookedBy', en: 'Which of your visits a program booked for you.' },
     // D-413 — badges named, not left to "level": a case manager already reads them.
     { key: 'transparency.canSee.points', en: 'Your points, your level and your badges' },
     // The case manager sees this. A program does NOT yet: D-242 (Will, 3 October) said it should, but the
@@ -355,7 +369,7 @@ export const TRANSPARENCY_SCREEN: {
     },
     {
       key: 'transparency.program.visits',
-      en: 'The visits you plan there: the day and time, the service you picked, and whether you were marked as there.',
+      en: 'The visits you plan there, and the ones it books for you: the day and time, the service, and whether you were marked as there.',
     },
   ],
 
@@ -417,7 +431,12 @@ export const TRANSPARENCY_GROUPS: readonly {
 }[] = [
   {
     titleKey: 'transparency.group.plans',
-    keys: ['transparency.canSee.goals', 'transparency.canSee.enrollments', 'transparency.canSee.appointments'],
+    keys: [
+      'transparency.canSee.goals',
+      'transparency.canSee.enrollments',
+      'transparency.canSee.appointments',
+      'transparency.canSee.bookedBy',
+    ],
   },
   {
     titleKey: 'transparency.group.progress',
