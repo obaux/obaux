@@ -874,5 +874,13 @@
   {
     "key": "es|cut|member-created-states-saved-trips--trips-with-a-past-visit|Riverside Job Center",
     "reason": "The Trips drawer scrolls and fades out at its foot; the second saved trip's name (\"Riverside Job Center\", two lines then \"…\" since b54) sits under that fade, so the detector sees it partly hidden (partial=true, 1 in, 0 out). In English the same name is cut the same way, which is why a run that includes English never reports it; it shows only in a run without English as the baseline (for example --locales es,zh-HK). Reached by scrolling; nothing is lost. Looked at 17 October 2026 at 320×760 with a screenshot (Spanish) and with Mira's run of --locales es,zh-HK --match trips on b55."
+  },
+  {
+    "key": "es|cut|member-created--trips-just-booked|13:00",
+    "reason": "At 320×568 the Trips drawer scrolls and fades out at its foot, and the second trip card sits half under the tab bar, so the detector sees whichever of its words land on that edge partly hidden (partial=true, 0 in, 0 out); since b55 the time is its own no-wrap text node (\"13:00\", \"12:00\"), so it is the time that is reported in Spanish. It is reached by scrolling and nothing is lost. Same class as the Trips entries above; found by the a94 audit on c780d42b (the new story Program booked a visit › On Trips is the second card there)."
+  },
+  {
+    "key": "es|cut|member-created-states-program-booked-a-visit--on-trips|12:00",
+    "reason": "At 320×568 the Trips drawer scrolls and fades out at its foot, and the second trip card sits half under the tab bar, so the detector sees whichever of its words land on that edge partly hidden (partial=true, 0 in, 0 out); since b55 the time is its own no-wrap text node (\"13:00\", \"12:00\"), so it is the time that is reported in Spanish. It is reached by scrolling and nothing is lost. Same class as the Trips entries above; found by the a94 audit on c780d42b (the new story Program booked a visit › On Trips is the second card there)."
   }
 ]

@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { EN } from './_bundles.js';
+import { ADMIN_CANNOT_SEE, ADMIN_CAN_SEE, TRANSPARENCY_GROUPS, TRANSPARENCY_I18N_KEYS, TRANSPARENCY_SCREEN } from '../src/transparency.js';
 
 /**
  * A program books a visit for a member (D-595; Will's option A, card a94, 17 October 2026).
@@ -137,11 +138,82 @@ describe('the member can cancel it', () => {
   });
 });
 
-describe('the Privacy paragraph, once it is on the page', () => {
-  it('names the same three ways in, and the Trips and cancel promises', () => {
-    const line = Object.entries(EN).find(([key, text]) => key.startsWith('privacy.s.') && /can book a visit for you/.test(text));
-    if (!line) return;
-    expect(line[1]).toMatch(/written to a program, signed up with it or planned a visit there/);
-    expect(line[1]).toMatch(/shows in your Trips with the program's name, and you can cancel it/);
+describe('the Privacy paragraph Will signed (card a94, 17 October 15:21)', () => {
+  it('says exactly what he signed, as the last paragraph of "sharing"', () => {
+    expect(EN['privacy.s.sharing.p9']).toBe(
+      "If you have written to a program, signed up with it or planned a visit there, it can book a visit for you. It shows in your Trips with the program's name, and you can cancel it.",
+    );
+    // Numbering has no gaps: the held Google calendar line (D-539) is the one after it, `sharing.p10`.
+    expect(EN['privacy.s.sharing.p10']).toBeUndefined();
+    expect(EN['privacy.s.sharing.p8']).toBeDefined();
+  });
+
+  it('names the same three ways in as the function and the lead\'s list (`book.intro`, `book.empty`)', () => {
+    expect(EN['privacy.s.sharing.p9']).toMatch(/written to a program, signed up with it or planned a visit there/);
+    expect(EN['book.intro']).toMatch(/wrote to your program, signed up with it or planned a visit there/);
+    expect(EN['book.empty']).toMatch(/written to your program, signed up with it or planned a visit there/);
+  });
+});
+
+describe('the member is told what the guide sees of a booked visit, in four places that agree (a94, `ADMIN_CAN_SEE`)', () => {
+  const GUIDE_FIELD = 'which_visits_a_program_booked_for_them';
+
+  it('has the field in the contract, and not among the things a guide cannot see', () => {
+    expect(ADMIN_CAN_SEE as readonly string[]).toContain(GUIDE_FIELD);
+    expect(ADMIN_CANNOT_SEE as readonly string[]).not.toContain(GUIDE_FIELD);
+  });
+
+  it('says it on the guide\'s list once, in the contract\'s own words, in one of its groups', () => {
+    const line = TRANSPARENCY_SCREEN.canSee.find((l) => l.key === 'transparency.canSee.bookedBy');
+    expect(line?.en).toBe('Which of your visits a program booked for you.');
+    expect(EN['transparency.canSee.bookedBy']).toBe(line!.en);
+    expect(TRANSPARENCY_I18N_KEYS).toContain('transparency.canSee.bookedBy');
+    expect(TRANSPARENCY_GROUPS.filter((g) => g.keys.includes('transparency.canSee.bookedBy'))).toHaveLength(1);
+    // `canSee.appointments` is pinned elsewhere and is not edited for this.
+    expect(EN['transparency.canSee.appointments']).toBe('Your visits, and if you went or missed one. A program sees the visits you plan there too.');
+  });
+
+  it('says it on the Privacy page where the guide is named, and on the staff\'s own list', () => {
+    expect(EN['privacy.s.who-can-see.p1']).toMatch(/your visits and which ones a program booked for you, your points/);
+    expect(EN['join.privacy.admin.2']).toBe(
+      'The programs they sign up for and how they are going, their visits, which ones a program booked and if they went or missed one, and the names of the people they connect with, and if they are a mentor or buddy.',
+    );
+  });
+
+  it('shows the guide "Booked by {program}" beside every booked visit, which is what Will signed (not only a missed one)', () => {
+    expect(EN['person.trip.bookedBy']).toBe('Booked by {program}');
+    const line = readFileSync(path.join(PAM, 'apps/web/src/lib/bookedByLine.ts'), 'utf8');
+    expect(line).toMatch(/BOOKED_BY_SHOWN_ON:\s*'every'\s*\|\s*'missed'\s*=\s*'every'/);
+    // Both screens that show the guide a member's visits go through the one rule.
+    for (const file of ['apps/web/src/app/person/page.tsx', 'apps/web/src/screens/PastTripsView.tsx']) {
+      expect(readFileSync(path.join(PAM, file), 'utf8'), file).toMatch(/showsBookedBy\(trip\)/);
+    }
+  });
+
+  it('is an organisation the guide learns, never the lead: the migration adds no column that names a person', () => {
+    const adds = MIGRATIONS.filter((m) => /alter\s+table\s+public\.appointments[\s\S]*?add\s+column/i.test(m.sql) && /booked_by/i.test(m.sql));
+    expect(adds.map((m) => m.file)).toHaveLength(1);
+    const columns = [...adds[0]!.sql.matchAll(/add\s+column\s+(?:if\s+not\s+exists\s+)?(\w+)\s+([^,;]+)/gi)].map((m) => [m[1], m[2]!.trim()]);
+    expect(columns).toEqual([['booked_by_org', expect.stringMatching(/^uuid references public\.orgs/)]]);
+  });
+});
+
+describe('what the member sees on the card (Will, card a94: under the trip card say "booked for you", that is it)', () => {
+  it('is "Booked for you", with no program name in it: the card\'s own title is the place', () => {
+    expect(EN['trips.bookedForYou']).toBe('Booked for you');
+    const card = readFileSync(path.join(PAM, 'packages/ui/src/TripCard.tsx'), 'utf8');
+    expect(card).toMatch(/\{placeName\}/);
+  });
+});
+
+describe('the Text reminders screen, which the carrier reads as the opt-in (Sage 06:15 and 06:20; Will signed)', () => {
+  it('lists what it can send and covers a booked visit: "before each visit", not "a visit you planned"', () => {
+    expect(EN['reminders.intro']).toBe(
+      'Pam can text you the reminders and notes listed below. It is your choice, and you can change it whenever you want.',
+    );
+    expect(EN['reminders.what.1']).toBe('A reminder before each visit, with the address.');
+    // No text goes to a member when a program books for them: the bell tells them (D-595), so no row for it.
+    expect(EN['reminders.what.4']).toBeUndefined();
+    expect(book!.body).not.toMatch(/outbound_messages|sms|twilio/i);
   });
 });
