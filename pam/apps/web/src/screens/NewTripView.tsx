@@ -118,7 +118,7 @@ const styles = stylex.create({
   note: { fontSize: '15px', lineHeight: 1.5 },
 });
 
-/** The next `count` weekdays, from tomorrow. */
+/** The next `count` weekdays, from tomorrow (six: the rest were too many chips, and pushed the time out of view, a95). */
 function nextWeekdays(count: number): Date[] {
   const out: Date[] = [];
   const d = new Date();
@@ -287,12 +287,12 @@ export function NewTripView({
     return () => clearTimeout(timer);
   }, [movedTo]);
 
-  // A walk-in (D-333): the days it meets, at its set time; otherwise any
-  // weekday in the next two weeks, at one of four times.
+  // A walk-in (D-333): the days it meets, at its set time; otherwise the next six
+  // weekdays, at one of four times.
   const booking = place ? bookingFor(place.id) : null;
   const walkIn = booking?.kind === 'dropin' ? booking.schedule : null;
   const days = useMemo(
-    () => (walkIn ? nextDropIns(walkIn, WALK_IN_DAYS) : nextWeekdays(10)),
+    () => (walkIn ? nextDropIns(walkIn, WALK_IN_DAYS) : nextWeekdays(6)),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- the schedule is a lookup by place.
     [place?.id],
   );
@@ -475,9 +475,9 @@ export function NewTripView({
         : step === 'check'
           ? { onBack: () => setStep('when') }
           : {})}
-      // Plan a trip (D-235): search where Help was on the first step. When
-      // has Help too (Iris's second member pass, W4; A26: help on each step
-      // of a multi-step task), as Check and Done do.
+      // Plan a trip (D-235): search where Help was on the first step; no
+      // Help on When either (Will, a95, 17 October: he took it off again, against A26 and Iris's second member pass W4,
+      // so the six dates and the times are in view). Check and Done keep Help.
       // The step's one button at the foot of the screen (D-326), like a
       // place's Plan a trip: Next on When, Add this trip on Check.
       footer={
@@ -560,7 +560,7 @@ export function NewTripView({
             href="/"
             xstyle={styles.round}
           />
-        ) : (
+        ) : step === 'when' ? undefined : (
           <HelpButton />
         )
       }

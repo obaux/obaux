@@ -206,7 +206,7 @@ export function ProgramHome() {
   if (appointments.length === 0) {
     return (
       <Page gap={4}>
-        <LargeTitleHeader title={t('home.setup.title')} actions={<HeaderActions role="provider" />} />
+        <LargeTitleHeader title={t('home.setup.title')} actions={<HeaderActions role="provider" hasHelp={false} />} />
         {/* No program yet, so nobody can be interested in it: no strip, not even the examples (W4). */}
         {hasNoProgram ? null : <StaffPeopleRow role="provider" />}
         <SetupCardList cards={hasNoProgram ? cards : [...cards, CALENDAR_CARD(t)]} />
@@ -221,7 +221,7 @@ export function ProgramHome() {
       // The bell and + (D-221); Search is in the + past ten visits (D-358).
       actions={(openSearch) => (
         <>
-          <HeaderActions role="provider" />
+          <HeaderActions role="provider" hasHelp={false} />
           <AddMenu onSearch={openSearch} />
         </>
       )}
