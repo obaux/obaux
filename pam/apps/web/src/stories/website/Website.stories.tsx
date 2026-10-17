@@ -31,7 +31,7 @@ export const Support: Story = { render: () => <WebsiteWalker start="/support/" /
 export const SupportSearch: Story = {
   render: () => <WebsiteWalker start="/support/" />,
   play: async ({ canvasElement }) => {
-    const box = await within(canvasElement).findByRole('combobox', { name: 'Search Support' });
+    const box = await within(canvasElement).findByRole('combobox', { name: 'Ask a question in Support' });
     await userEvent.type(box, 'reason');
     await expect(await within(canvasElement).findByText(/1 result for/)).toBeInTheDocument();
   },
@@ -44,7 +44,7 @@ export const SupportSearch: Story = {
 export const SupportSearchOwnWords: Story = {
   render: () => <WebsiteWalker start="/support/" />,
   play: async ({ canvasElement }) => {
-    const box = await within(canvasElement).findByRole('combobox', { name: 'Search Support' });
+    const box = await within(canvasElement).findByRole('combobox', { name: 'Ask a question in Support' });
     await userEvent.type(box, 'why did my text not come');
     await expect(await within(canvasElement).findByText(/results? for/)).toBeInTheDocument();
   },
@@ -54,7 +54,7 @@ export const SupportSearchOwnWords: Story = {
 export const SupportSearchSuggestions: Story = {
   render: () => <WebsiteWalker start="/support/" />,
   play: async ({ canvasElement }) => {
-    const box = await within(canvasElement).findByRole('combobox', { name: 'Search Support' });
+    const box = await within(canvasElement).findByRole('combobox', { name: 'Ask a question in Support' });
     await userEvent.type(box, 'why didn');
     await expect(await within(document.body).findByRole('option', { name: /Why didn’t I get a code\?/ })).toBeInTheDocument();
   },
@@ -64,7 +64,7 @@ export const SupportSearchSuggestions: Story = {
 export const SupportSearchTypo: Story = {
   render: () => <WebsiteWalker start="/support/" />,
   play: async ({ canvasElement }) => {
-    const box = await within(canvasElement).findByRole('combobox', { name: 'Search Support' });
+    const box = await within(canvasElement).findByRole('combobox', { name: 'Ask a question in Support' });
     await userEvent.type(box, 'invte');
     await expect(await within(canvasElement).findByText('Sending an invite')).toBeInTheDocument();
   },
@@ -74,7 +74,7 @@ export const SupportSearchTypo: Story = {
 export const SupportSearchDidYouMean: Story = {
   render: () => <WebsiteWalker start="/support/" />,
   play: async ({ canvasElement }) => {
-    const box = await within(canvasElement).findByRole('combobox', { name: 'Search Support' });
+    const box = await within(canvasElement).findByRole('combobox', { name: 'Ask a question in Support' });
     await userEvent.type(box, 'probation');
     await expect(await within(canvasElement).findByText('Did you mean:')).toBeInTheDocument();
   },
@@ -87,7 +87,7 @@ export const SupportSearchDidYouMean: Story = {
 export const SupportSearchNothingFound: Story = {
   render: () => <WebsiteWalker start="/support/" />,
   play: async ({ canvasElement }) => {
-    const box = await within(canvasElement).findByRole('combobox', { name: 'Search Support' });
+    const box = await within(canvasElement).findByRole('combobox', { name: 'Ask a question in Support' });
     await userEvent.type(box, 'zzzz');
     await expect(await within(canvasElement).findByText(/We do not have an article for that yet/)).toBeInTheDocument();
     await expect(await within(canvasElement).findByText('Still stuck?')).toBeInTheDocument();

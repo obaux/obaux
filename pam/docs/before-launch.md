@@ -240,6 +240,24 @@ STATUS row too.
   the day Will finishes the Twilio filing and says go — together with `ALERT_TEXTS_LIVE` and
   `claude/messages-reply-start`; the order is the runbook at the top of `docs/sms-setup.md`.
 
+- [ ] **Widen the registered SMS campaign before `texts_live` goes on** (a94, 17 October 2026). Will decided that a
+  program can book real visits for members who have written to it; the member hears through the bell, and, once texts
+  are on, by the usual appointment reminders. The campaign description on file with the carrier covers reminders only for
+  "an appointment they scheduled in the app". **Will files:** in the Twilio campaign (A2P 10DLC → the Oba brand → the
+  campaign), change that sentence in the **description** to "a reminder the day before an appointment they or a program
+  scheduled" (the whole description is then 1,017 of 1,024 characters; the ready-to-paste text is in
+  `docs/sms-campaign-samples.md`, "The campaign description"). This rides the refiling already needed (the "Re-file the
+  campaign" step under the `dispatch-sms` deploy): if the refiling goes first, paste the updated block and nothing
+  more is needed. Also for Sage and Lena to decide, not Will: the Text reminders screen says Pam can text "about the
+  things you plan" (`reminders.intro`); the carrier reads that screen as the opt-in, so it may want to say visits
+  too. Nothing is sent today (`texts_live` is off), so nothing is wrong yet.
+  **Update, 17 October (Sage signed new opt-in words, ledger 6b4e546f; they ship with card a94):** the Text reminders
+  screen will say `reminders.intro` "Pam can text you the reminders and notes listed below. It is your choice, and you
+  can change it whenever you want." and list `reminders.what.1` "A reminder before each visit, with the address."
+  **The opt-in description Will files with the carrier must match `reminders.intro` and its list once those ship**
+  (paste the answer under "How do end-users consent…" in `docs/sms-campaign-samples.md` only after it says the same).
+  No booking text goes to members (the bell only), so there is no `reminders.what.4`.
+
 - [x] **Merge and deploy 0068 and 0069** — done 8 October as 0075/0076 (D-388) (readiness fixes and blocking, on
   branch `claude/hopeful-thompson-07nj7n`, not yet on this one). 0068 is what
   lets an invite be redeemed at all (phone format) and closes several live
@@ -508,6 +526,11 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   translations are Claude's, and this is a promise: a native reader of Spanish,
   Brazilian Portuguese, Simplified and Traditional Chinese, Russian and Arabic should
   confirm it says exactly that and no more.
+
+- [ ] **A native reader for three new things of 17 October (Lena; Mira asked 10:25).** Six translations each, written by Claude, none read by a native speaker.
+  (1) **The case manager's search pill** (`home.caseload.search.placeholder` and `.label`, D-600): the words must fit 128px, so they are short: es "Buscar miembros" / "Buscar miembros por nombre"; pt-BR "Buscar membros" / "Buscar membros pelo nome"; zh-CN 搜索成员 / 搜索成员（按姓名）; zh-HK 搜尋會員 / 搜尋會員（按姓名）; ru «Поиск людей» / «Поиск людей по имени»; ar "ابحث في الأعضاء" / "ابحث في الأعضاء بالاسم". The label has to begin with the pill's words (voice control says them, WCAG 2.5.3). Check: does each read naturally, spoken aloud as the label; is Russian «людей» (people) acceptable where the rest of the app says «участники» for members (the pill has no room for «участников»); do 成员 and 會員 match the word the app uses for members.
+  (2) **The short version's second sentence** (`transparency.summary.program`): "It sees more once you sign up, sign its rules or plan a visit there." Check that each language's word for "rules"/"policies" is the one its Privacy page uses (`sharing.p2`), and that the sentence says a program sees more, not that it must.
+  (3) **The case manager's visit line** (`caseload.visit.*`, Ava's a93, ships with her branch): "Marked as there" and "Not marked as there" say what the *program* marked, not whether the member went. es "Presencia marcada / sin marcar", pt-BR "Presença registrada / não registrada", zh 标记为已到场 / 未标记为已到场 (zh-HK 標記為已到場 / 未標記為已到場), ru «Присутствие отмечено / не отмечено», ar "تم تسجيل الحضور / لم يسجل الحضور". Check that none of them reads as "the member was absent".
 
 - [ ] **Hear the language tags with a screen reader (10 October, D-455).** Every list
   of languages now starts each name with an English tag (EN, ES, PT-BR, ZH-CN, ZH-HK,
