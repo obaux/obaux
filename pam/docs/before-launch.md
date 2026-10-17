@@ -251,6 +251,12 @@ STATUS row too.
   more is needed. Also for Sage and Lena to decide, not Will: the Text reminders screen says Pam can text "about the
   things you plan" (`reminders.intro`); the carrier reads that screen as the opt-in, so it may want to say visits
   too. Nothing is sent today (`texts_live` is off), so nothing is wrong yet.
+  **Update, 17 October (Sage signed new opt-in words, ledger 6b4e546f; they ship with card a94):** the Text reminders
+  screen will say `reminders.intro` "Pam can text you the reminders and notes listed below. It is your choice, and you
+  can change it whenever you want." and list `reminders.what.1` "A reminder before each visit, with the address."
+  **The opt-in description Will files with the carrier must match `reminders.intro` and its list once those ship**
+  (paste the answer under "How do end-users consent…" in `docs/sms-campaign-samples.md` only after it says the same).
+  No booking text goes to members (the bell only), so there is no `reminders.what.4`.
 
 - [x] **Merge and deploy 0068 and 0069** — done 8 October as 0075/0076 (D-388) (readiness fixes and blocking, on
   branch `claude/hopeful-thompson-07nj7n`, not yet on this one). 0068 is what
