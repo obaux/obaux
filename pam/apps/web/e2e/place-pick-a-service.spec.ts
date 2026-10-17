@@ -57,3 +57,12 @@ test('a place with no services never says it', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'Plan a trip' })).toBeVisible();
   await expect(page.getByText(LINE)).toHaveCount(0);
 });
+
+test('the note about what the program sees is below the services, so a member reads it after choosing one (a91)', async ({ page }) => {
+  await signedInMember(page);
+  await page.goto('/place/?id=dummy-place-learning');
+  await settled(page);
+  const services = (await page.getByText('GED classes', { exact: true }).boundingBox())!;
+  const note = (await page.getByText(/This is only to help you plan\. Pam does not tell/).boundingBox())!;
+  expect(note.y).toBeGreaterThan(services.y);
+});
