@@ -81,6 +81,8 @@ export const Requests: Story = screen('super-admin', 'Staff requests', '/request
 export const RequestReview: Story = screen('super-admin', 'A request to review', '/requests/review/', { id: 'r-2' });
 // The programs leaders have sent for Pam to check (D-386, part 6).
 export const ProgramsToCheck: Story = screen('super-admin', 'Programs to check', '/programs/review/');
+/** Cities people are waiting for (D-593, card a96): counts only, biggest first. */
+export const WaitingCities: Story = screen('super-admin', 'Cities people are waiting for', '/cities/waiting/', { from: 'home' });
 export const ProgramToCheckNew: Story = screen('super-admin', 'A new program to check (waiting four days)', '/programs/review/item/', { id: 'check-1' });
 export const ProgramToCheckChange: Story = screen('super-admin', 'A change to a live program', '/programs/review/item/', { id: 'check-2' });
 export const ProgramToCheckWithdrawn: Story = screen('super-admin', 'A request the leader deleted to start over', '/programs/review/item/', { id: 'check-3' });

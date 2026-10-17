@@ -1693,5 +1693,8 @@
   "places.reported.remove.confirm.title": "要把{place}從列表中移除嗎？",
   "places.reported.remove.confirm.body": "會員在Pam中將不會再找到它。",
   "places.reported.done.keep": "{place}會繼續留在列表中。",
-  "places.reported.done.remove": "{place}已從列表中移除。"
+  "places.reported.done.remove": "{place}已從列表中移除。",
+  "waitingCities.title": "Cities people are waiting for",
+  "waitingCities.empty.title": "Nobody is waiting yet",
+  "waitingCities.empty.body": "When someone signs up from a city Pam is not in yet, the city shows up here, with how many people asked."
 }

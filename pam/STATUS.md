@@ -928,6 +928,12 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Accounts & invites · Cities people are waiting for (17 October) — built, waiting on Sage's words and Lena's translations
+
+`claude/pam-waiting-city-counts` (D-593, a96 item 3). Migration `20261017055932` adds `waiting_city_counts()`
+(super admin only, counts only). A row on the super admin's Home opens `/cities/waiting/`. Test 75 and
+waiting-cities.spec cover it.
+
 ## Accounts & invites · Staff photos no account uses are removed (16 October) — in b50
 
 `claude/pam-staff-photo-cleanup` (D-590; Lena's privacy guard, D-587).
