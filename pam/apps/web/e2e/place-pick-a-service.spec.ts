@@ -63,6 +63,6 @@ test('the note about what the program sees is below the services, so a member re
   await page.goto('/place/?id=dummy-place-learning');
   await settled(page);
   const services = (await page.getByText('GED classes', { exact: true }).boundingBox())!;
-  const note = (await page.getByText(/This is only to help you plan\. Pam does not tell/).boundingBox())!;
+  const note = (await page.getByText(/will see your visit|only to help you plan/).boundingBox())!;
   expect(note.y).toBeGreaterThan(services.y);
 });
