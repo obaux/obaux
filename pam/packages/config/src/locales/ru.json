@@ -1786,7 +1786,7 @@
   "waitingCities.title": "Города, где люди ждут Pam",
   "waitingCities.empty.title": "Пока никто не ждёт",
   "waitingCities.empty.body": "Когда кто-то регистрируется из города, где Pam пока нет, город появляется здесь, с числом людей.",
-  "trips.bookedForYou": "Запись для вас от {program}",
+  "trips.bookedForYou": "Запись для вас",
   "person.trip.bookedBy": "Запись от {program}",
   "notify.visit_booked_for_you": "{place}: вас записали на визит. Когда: {when}",
   "notify.kind.visit_booked_for_you": "Для вас записан визит"

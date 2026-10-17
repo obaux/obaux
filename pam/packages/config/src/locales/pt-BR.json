@@ -1703,7 +1703,7 @@
   "waitingCities.title": "Cidades com pessoas esperando",
   "waitingCities.empty.title": "Ninguém está esperando ainda",
   "waitingCities.empty.body": "Quando alguém se cadastra de uma cidade onde Pam ainda não está, a cidade aparece aqui, com quantas pessoas.",
-  "trips.bookedForYou": "Reservado para você por {program}",
+  "trips.bookedForYou": "Reservada para você",
   "person.trip.bookedBy": "Reservado por {program}",
   "notify.visit_booked_for_you": "{place} reservou uma visita para você: {when}",
   "notify.kind.visit_booked_for_you": "Visita reservada para você"

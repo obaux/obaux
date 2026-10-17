@@ -1703,7 +1703,7 @@
   "waitingCities.title": "有人在等待的城市",
   "waitingCities.empty.title": "还没有人在等待",
   "waitingCities.empty.body": "当有人从Pam还没有开通的城市注册时，该城市会显示在这里，并附上人数。",
-  "trips.bookedForYou": "由{program}为您预约",
+  "trips.bookedForYou": "已为您预约",
   "person.trip.bookedBy": "由{program}预约",
   "notify.visit_booked_for_you": "{place}已为您预约：{when}",
   "notify.kind.visit_booked_for_you": "已为您预约"

@@ -1842,7 +1842,7 @@
   "waitingCities.title": "مدن ينتظرها الناس",
   "waitingCities.empty.title": "لا أحد في الانتظار بعد",
   "waitingCities.empty.body": "عندما يسجل شخص ما من مدينة لا يتوفر فيها Pam بعد، تظهر المدينة هنا مع عدد الأشخاص.",
-  "trips.bookedForYou": "تم الحجز لك بواسطة {program}",
+  "trips.bookedForYou": "تم الحجز لك",
   "person.trip.bookedBy": "تم الحجز بواسطة {program}",
   "notify.visit_booked_for_you": "قام {place} بحجز زيارة لك: {when}",
   "notify.kind.visit_booked_for_you": "زيارة محجوزة لك"
