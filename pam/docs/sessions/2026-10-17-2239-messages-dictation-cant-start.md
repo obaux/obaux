@@ -21,7 +21,7 @@
 
 ## Left undone
 
-- Sage signs the English; Lena translates. No line for `no-speech`; no "starting…" state.
+- Lena translates the six languages (Sage signed the English, a2703793, with two edits made here). No line for `no-speech`; no "starting…" state.
 
 ## Needs a human
 

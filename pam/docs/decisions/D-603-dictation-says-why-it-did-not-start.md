@@ -16,6 +16,6 @@
 
 **Not done on purpose:** no line for `no-speech` (it ended after listening, not a failure to start); no "starting…" state between the tap and the browser's start; no retry.
 
-**Words:** ten new English strings, `messages.thread.dictate.problem.<kind>.title` and `.hint` (five kinds), held as English in the other six languages and recorded unrecorded (`copy:ack`). They await Sage (signing the English) and Lena (translating).
+**Words:** ten new English strings, `messages.thread.dictate.problem.<kind>.title` and `.hint` (five kinds). Sage signed them on 17 October 2026 (her ledger a2703793, `claude/sage-signs`) with two edits, both made here: `blocked.hint` gained "You can type your message instead." so every banner ends with a way through that needs no settings, and `failed.hint` says "Tap the microphone again" instead of "Tap it again", since "it" only works if you read the title. The other six languages hold the English until Lena translates.
 
 **Proof:** `lib/dictationProblem.test.ts` (the mapping); `e2e/messages.spec.ts` › "speaking a message that cannot start": a stub recogniser that is refused (`not-allowed`, `service-not-allowed`), has no microphone, no connection, a language it cannot hear, an unexpected code, ends without starting, throws, never answers (ten seconds, with the page clock), plus a browser with no recogniser (no mic); "Listening" and its clearing an earlier failure; the line closes and is an alert. On main (62ba50e4) the failure cases fail on the line not showing.
