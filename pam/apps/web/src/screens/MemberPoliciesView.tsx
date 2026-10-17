@@ -3,8 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { HelpButton } from './HelpButton';
 import * as stylex from '@stylexjs/stylex';
-import { BottomSheet } from '@astryxdesign/core/BottomSheet';
-import { sheet } from '@pam/ui/sheet';
+import { PamSheet } from '@pam/ui/PamSheet';
 import { Card } from '@astryxdesign/core/Card';
 import { Button } from '@pam/ui/Button';
 import { Heading } from '@astryxdesign/core/Heading';
@@ -134,20 +133,9 @@ const styles = stylex.create({
     color: colorVars['--color-text-accent'],
     backgroundImage: { default: 'none', ':hover': 'none', ':active': 'none' },
   },
-  // Clear of the grab handle, as the New message sheet is.
-  sheet: { width: '100%', paddingInline: '20px', paddingBlockStart: spacingVars['--spacing-6'], paddingBottom: '24px', overscrollBehavior: 'contain' },
-  sheetTitle: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700 },
+  // Under PamSheet's notch, title and link (17 October, a93).
+  sheet: { width: '100%', paddingInline: '20px', paddingBlockStart: spacingVars['--spacing-2'], paddingBottom: '24px', overscrollBehavior: 'contain' },
   sheetHint: { fontSize: '17px', lineHeight: 1.45 },
-  sheetRow: { width: '100%' },
-  close: {
-    width: '48px',
-    height: '48px',
-    flexShrink: 0,
-    borderRadius: '50%',
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: colorVars['--color-border'],
-  },
 });
 
 /** The place's name: from the link, or the example set. */
@@ -564,33 +552,22 @@ function SignSheet({
   }, [isOpen]);
 
   return (
-    <BottomSheet
+    <PamSheet
       isOpen={isOpen}
       onOpenChange={(open) => (open ? undefined : onClose())}
       label={tPlain('sign.title', { title })}
-      xstyle={sheet.panel}
+      title={t('sign.heading')}
+      // "Close", not "Done": leaving here signs nothing, and Done would say it had (17 October, a93).
+      kind="read"
+      actionLabel={t('trips.confirm.close')}
       // Drags and dismisses like any sheet from its handle, header and copy
       // (Will, D-333), but not while a stroke is in progress: "form" blocks
       // the swipe until the finger lifts. The pad stops its own touches
       // reaching the sheet as well; the scrim locks the page behind.
       purpose={isDrawing ? 'form' : 'info'}
-      height="hug"
     >
       {isOpen ? (
         <VStack gap={3} xstyle={styles.sheet}>
-          <HStack gap={3} align="start" justify="between" wrap="nowrap" xstyle={styles.sheetRow}>
-            <Heading level={2} xstyle={styles.sheetTitle}>
-              {t('sign.heading')}
-            </Heading>
-            {/* A way out besides the swipe (D-333). */}
-            <IconButton
-              label={t('sign.cancel')}
-              variant="ghost"
-              icon={<Icon icon="close" size="md" />}
-              onClick={onClose}
-              xstyle={styles.close}
-            />
-          </HStack>
           <Text type="supporting" xstyle={styles.sheetHint}>
             {t(isTyping ? 'sign.typeHint' : 'sign.draw')}
           </Text>
@@ -645,7 +622,7 @@ function SignSheet({
           </Text>
         </VStack>
       ) : null}
-    </BottomSheet>
+    </PamSheet>
   );
 }
 

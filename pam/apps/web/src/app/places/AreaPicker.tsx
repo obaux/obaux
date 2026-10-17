@@ -2,14 +2,10 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
-import { BottomSheet } from '@astryxdesign/core/BottomSheet';
-import { sheet } from '@pam/ui/sheet';
-import { Button } from '@pam/ui/Button';
-import { Heading } from '@astryxdesign/core/Heading';
-import { HStack } from '@astryxdesign/core/HStack';
+import { PamSheet } from '@pam/ui/PamSheet';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { AreaChip, PlacesIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { SearchField } from '@pam/ui/SearchPill';
@@ -42,19 +38,8 @@ import { PoweredByGoogle } from '@/screens/PoweredByGoogle';
  */
 
 const styles = stylex.create({
-  // Clear of the grab handle, as the New message sheet is.
-  body: { width: '100%', paddingInline: '16px', paddingBlockStart: spacingVars['--spacing-6'], paddingBlockEnd: '24px' },
-  top: { width: '100%' },
-  title: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700 },
-  // "Cancel" — a word at the top right, in the accent, as on every phone.
-  done: {
-    minHeight: '48px',
-    paddingInline: '4px',
-    fontSize: '17px',
-    fontWeight: 700,
-    color: colorVars['--color-text-accent'],
-    backgroundImage: { default: 'none', ':hover': 'none', ':active': 'none' },
-  },
+  // The notch, the title and the link are PamSheet's (17 October, a93).
+  body: { width: '100%', paddingInline: '16px', paddingBlockStart: spacingVars['--spacing-2'], paddingBlockEnd: '24px' },
   hint: { fontSize: '15px', lineHeight: 1.5 },
     privacy: { fontSize: '14px', lineHeight: 1.5 },
   privacyCentered: { textAlign: 'center', width: '100%' },
@@ -155,23 +140,17 @@ export function AreaSearch({
   const shown = [current, ...options.filter((o) => o.id !== current.id)];
 
   return (
-    <BottomSheet
+    <PamSheet
       isOpen={isOpen}
       onOpenChange={(open) => (open ? undefined : onClose())}
       label={t('places.area.title')}
+      kind="pick"
+      actionLabel={t('places.area.done')}
       height="tall"
-      xstyle={sheet.panel}
+      isTyping
     >
       {isOpen ? (
         <VStack ref={body} gap={3} xstyle={styles.body}>
-          <HStack gap={3} align="center" justify="between" wrap="nowrap" xstyle={styles.top}>
-            <Heading level={2} xstyle={styles.title}>
-              {t('places.area.title')}
-            </Heading>
-            {/* A way out that changes nothing; a pick closes it by itself. */}
-            <Button label={t('messages.search.cancel')} variant="ghost" onClick={onClose} xstyle={styles.done} />
-          </HStack>
-
           <SearchField
             label={t(street.enabled ? 'places.areaLabel.street' : 'places.areaLabel')}
             describedBy={hintId}
@@ -253,6 +232,6 @@ export function AreaSearch({
           </Text>
         </VStack>
       ) : null}
-    </BottomSheet>
+    </PamSheet>
   );
 }

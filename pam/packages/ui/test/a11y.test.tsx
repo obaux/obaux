@@ -45,6 +45,7 @@ const placeLabels = { save: 'Save', saved: 'Saved' };
 const detailLabels = {
   hours: 'Opening hours',
   hoursOnGoogle: 'Check hours on Google',
+  close: 'Close',
   about: 'About program',
   address: 'Address',
 };

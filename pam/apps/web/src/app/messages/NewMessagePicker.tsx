@@ -2,11 +2,9 @@
 
 import { useMemo, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
-import { BottomSheet } from '@astryxdesign/core/BottomSheet';
-import { sheet } from '@pam/ui/sheet';
+import { PamSheet } from '@pam/ui/PamSheet';
 import { List, ListItem } from '@astryxdesign/core/List';
 import { Avatar } from '@astryxdesign/core/Avatar';
-import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
@@ -42,12 +40,8 @@ export interface PickablePerson {
 }
 
 const styles = stylex.create({
-  // Clear of the sheet's grab handle: the first thing in the sheet used to sit
-  // under it (Will's screenshot, 21 September).
-  body: { width: '100%', paddingBlockStart: spacingVars['--spacing-6'], paddingBlockEnd: spacingVars['--spacing-2'] },
-  // "New message", left-aligned and drawer-sized: the Trips drawer's title
-  // size, smaller than a screen's large title (Will, 3 October).
-  title: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700, paddingInline: spacingVars['--spacing-4'] },
+  // The notch, the title and the link are PamSheet's (17 October, a93).
+  body: { width: '100%', paddingBlockStart: spacingVars['--spacing-2'], paddingBlockEnd: spacingVars['--spacing-2'] },
   // The pill sits in from the sheet's edges, as it does on Home.
   search: { width: '100%', paddingInline: spacingVars['--spacing-4'] },
   // Rows in from the edge so each avatar lines up under the pill's search
@@ -97,11 +91,16 @@ export function NewMessagePicker({
   };
 
   return (
-    <BottomSheet isOpen={isOpen} onOpenChange={onOpenChange} label={t('messages.new.action')} height="tall" xstyle={sheet.panel}>
+    <PamSheet
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      label={t('messages.new.action')}
+      kind="read"
+      actionLabel={t('trips.confirm.close')}
+      height="tall"
+      isTyping
+    >
       <VStack gap={3} xstyle={styles.body}>
-        <Heading level={2} xstyle={styles.title}>
-          {t('messages.new.action')}
-        </Heading>
         <VStack xstyle={styles.search}>
           <SearchField
             label={t('messages.new.search')}
@@ -137,6 +136,6 @@ export function NewMessagePicker({
           </VStack>
         )}
       </VStack>
-    </BottomSheet>
+    </PamSheet>
   );
 }

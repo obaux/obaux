@@ -8,8 +8,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Badge, type BadgeVariant } from './Badge.js';
-import { BottomSheet } from '@astryxdesign/core/BottomSheet';
-import { sheet } from './sheet.js';
+import { PamSheet } from './PamSheet.js';
 import { Button } from './Button.js';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { ClockIcon, PlacesIcon } from './icons.js';
@@ -21,7 +20,6 @@ import { AppleMapsAppIcon, GoogleMapsAppIcon } from './MapAppIcons.js';
 import { MenuList, type MenuItem } from './MenuList.js';
 import { devicePlatform, mapsLaunchFor, openAppOrStore, type DevicePlatform } from './mapsLaunch.js';
 import { AutoHeight, TextSwap } from './Swap.js';
-import { landFocus, landFocusStyle } from './landFocus.js';
 
 /**
  * One place, on its own screen: the place profile.
@@ -150,6 +148,8 @@ export interface PlaceDetailProps {
     readonly hoursOnGoogle: string;
     readonly about: string;
     readonly address: string;
+    /** The link on the week and map drawers (PamSheet): "Close" (`trips.confirm.close`). */
+    readonly close: string;
   };
 }
 
@@ -209,11 +209,8 @@ const styles = stylex.create({
   // The "Open in…" drawer: a 48px app symbol, then the app's name, the whole row a link.
   appIcon: { width: '48px', height: '48px', fontSize: '48px', flexShrink: 0 },
   // The week drawer (D-309).
-  // Clear of the sheet's handle above the title.
-  sheet: { paddingInline: '24px', paddingBlock: '20px 24px' },
-  // "Open in": a quiet label above the apps, not a heading to read first
-  // (Will, 10 October 2026: "much smaller").
-  sheetTitle: { fontSize: '15px', lineHeight: 1.3, fontWeight: 600, color: colorVars['--color-text-secondary'] },
+  // The title row, the notch and the link are PamSheet's; this is the body under them.
+  sheet: { paddingInline: '20px', paddingBlock: '8px 24px' },
   dayLine: { minHeight: '44px', paddingInline: '12px', borderRadius: '12px' },
   todayLine: { backgroundColor: colorVars['--color-background-muted'] },
   todayTag: { fontSize: '13px', fontWeight: 600, color: colorVars['--color-text-accent'] },
@@ -346,13 +343,9 @@ export function PlaceDetail({
   if (hoursRow) quickItems.splice(quickItems[0]?.id === 'directions' ? 1 : 0, 0, hoursRow);
 
   const weekSheet = hasWeek ? (
-    <BottomSheet isOpen={isWeekOpen} onOpenChange={setWeekOpen} label={labels.hours} height="hug" xstyle={sheet.panel}>
+    <PamSheet isOpen={isWeekOpen} onOpenChange={setWeekOpen} label={labels.hours} kind="read" actionLabel={labels.close}>
       {isWeekOpen ? (
-        <VStack gap={3} {...landFocus} xstyle={[styles.sheet, landFocusStyle.quiet]}>
-          {/* The sheet draws its own Close; a second one would be two. */}
-          <Heading level={2} xstyle={styles.sheetTitle}>
-            {labels.hours}
-          </Heading>
+        <VStack gap={3} xstyle={styles.sheet}>
           <VStack gap={0.5}>
             {weekLines!.map((line, index) => {
               const isToday = index === todayIndex;
@@ -395,7 +388,7 @@ export function PlaceDetail({
           ) : null}
         </VStack>
       ) : null}
-    </BottomSheet>
+    </PamSheet>
   ) : null;
 
   // "Open in…" (Will, 9 October 2026): the two maps apps as app symbols in
@@ -412,18 +405,15 @@ export function PlaceDetail({
     : [];
   const mapsSheet =
     addressActions && mapApps.length > 0 ? (
-      <BottomSheet
+      <PamSheet
         isOpen={isMapsOpen}
         onOpenChange={setMapsOpen}
         label={addressActions.labels.openInTitle}
-        height="hug"
-        xstyle={sheet.panel}
+        kind="read"
+        actionLabel={labels.close}
       >
         {isMapsOpen ? (
-          <VStack gap={2} {...landFocus} xstyle={[styles.sheet, landFocusStyle.quiet]}>
-            <Heading level={2} xstyle={styles.sheetTitle}>
-              {addressActions.labels.openInTitle}
-            </Heading>
+          <VStack gap={2} xstyle={styles.sheet}>
             <MenuList
               label={addressActions.labels.openInTitle}
               items={mapApps.map((app) => {
@@ -450,7 +440,7 @@ export function PlaceDetail({
             />
           </VStack>
         ) : null}
-      </BottomSheet>
+      </PamSheet>
     ) : null;
 
   return (

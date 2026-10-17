@@ -127,6 +127,7 @@ const workforce = DUMMY_PLACES_BY_ID['dummy-place-workforce']!;
 const LABELS: DetailArgs['labels'] = {
   hours: 'place.hours',
   hoursOnGoogle: 'place.hoursOnGoogle',
+  close: 'trips.confirm.close',
   about: 'place.about',
   address: 'place.address',
 };

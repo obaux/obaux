@@ -2,10 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
-import { BottomSheet } from '@astryxdesign/core/BottomSheet';
+import { PamSheet } from './PamSheet.js';
 import { Button } from './Button.js';
 import { Icon } from '@astryxdesign/core/Icon';
-import { IconButton } from '@astryxdesign/core/IconButton';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
@@ -13,11 +12,9 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { pam } from './tokens.stylex.js';
 import { TextField } from './TextField.js';
-import { sheet } from './sheet.js';
 import { canShareSheet, shareText } from './share.js';
 import { COPIED_MS, copyLink } from './clipboard.js';
 import { BigButton } from './BigButton.js';
-import { landFocus, landFocusStyle } from './landFocus.js';
 
 /**
  * The banner across the top is Will's picture (D-337, 7 October: "instead of
@@ -61,7 +58,7 @@ export interface BringFriendProps {
   readonly copyLabel: string;
   /** "Link copied", over the field for 3s. */
   readonly copiedLabel: string;
-  /** The × at the top right: "Close". */
+  /** The link at the top right: "Close". */
   readonly closeLabel: string;
   /**
    * When the opener copied the link (`Date.now()` after `copyLink` said
@@ -86,23 +83,9 @@ export { COPIED_MS, copyLink };
 
 const styles = stylex.create({
   sheet: { width: '100%', paddingInline: '20px', paddingBlockStart: '0px', paddingBlockEnd: '44px' },
-  // Edge to edge and up to the drawer's top (Will, D-338); the sheet's own
-  // rounded corners clip it.
-  // Above Astryx's handle strip (z-index 1), whose white fade would wash out
-  // the picture's top; the picture lets taps through to the handle beneath,
-  // so the drawer still drags from its top edge, and draws its own pill.
+  // Edge to edge, under the drawer's Close row; the sheet's own width clips nothing.
   // 24px from the banner to the title, with the stack's gap (Will, D-340).
-  top: { position: 'relative', zIndex: 2, minHeight: '64px', marginInline: '-20px', marginBlockEnd: '12px' },
-  grip: {
-    position: 'absolute',
-    top: '10px',
-    insetInlineStart: 'calc(50% - 20px)',
-    width: '40px',
-    height: '5px',
-    borderRadius: '3px',
-    backgroundColor: 'oklch(1 0 0 / 75%)',
-    pointerEvents: 'none',
-  },
+  top: { position: 'relative', marginInline: '-20px', marginBlockEnd: '12px' },
   // Full width, the banner's own shape (1608 × 629).
   hero: {
     display: 'block',
@@ -112,18 +95,6 @@ const styles = stylex.create({
     objectFit: 'cover',
     backgroundColor: colorVars['--color-background-muted'],
     pointerEvents: 'none',
-  },
-  // The × tucked into the top right corner, a white circle so it reads on
-  // the picture (D-338).
-  close: {
-    position: 'absolute',
-    top: '12px',
-    insetInlineEnd: '12px',
-    width: pam['--pam-touch-target-min'],
-    height: pam['--pam-touch-target-min'],
-    borderRadius: '50%',
-    backgroundColor: colorVars['--color-background-body'],
-    boxShadow: '0 1px 4px oklch(0 0 0 / 18%)',
   },
   title: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700, textAlign: 'center' },
   // 24px from the sentence to the link, with the stack's gap (D-340).
@@ -200,15 +171,9 @@ export function BringFriend({
   };
 
   return (
-    <BottomSheet
-      isOpen={isOpen}
-      onOpenChange={onOpenChange}
-      label={label}
-      height="hug"
-      xstyle={sheet.panel}
-    >
+    <PamSheet isOpen={isOpen} onOpenChange={onOpenChange} label={label} kind="read" actionLabel={closeLabel} title={null}>
       {isOpen ? (
-        <VStack gap={3} {...landFocus} xstyle={[styles.sheet, landFocusStyle.quiet]}>
+        <VStack gap={3} xstyle={styles.sheet}>
           <VStack xstyle={styles.top}>
             {heroSrc && !heroFailed ? (
               // Decoration: the title under it says what the drawer is.
@@ -223,14 +188,6 @@ export function BringFriend({
                 {...stylex.props(styles.hero)}
               />
             ) : null}
-            {heroSrc && !heroFailed ? <HStack aria-hidden xstyle={styles.grip} /> : null}
-            <IconButton
-              label={closeLabel}
-              icon={<Icon icon="close" size="md" />}
-              variant="ghost"
-              onClick={() => onOpenChange(false)}
-              xstyle={styles.close}
-            />
           </VStack>
           <Heading level={2} xstyle={styles.title}>
             {label}
@@ -265,6 +222,6 @@ export function BringFriend({
           {canShare && shareLabel ? <BigButton label={shareLabel} onPress={() => void share()} /> : null}
         </VStack>
       ) : null}
-    </BottomSheet>
+    </PamSheet>
   );
 }

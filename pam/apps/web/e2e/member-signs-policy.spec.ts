@@ -101,7 +101,7 @@ test('the sheet opens empty every time: Sign is greyed until something is drawn 
   await page.getByLabel('Your full name').fill('Marcus Reed');
   const sign = page.getByRole('dialog').getByRole('button', { name: 'Sign', exact: true });
   await expect(sign).toBeEnabled();
-  await page.getByRole('dialog').getByRole('button', { name: 'Cancel' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Close' }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
   await page.getByRole('button', { name: 'Sign', exact: true }).click();
   await expect(page.getByRole('dialog').getByRole('button', { name: 'Sign', exact: true })).toBeDisabled();

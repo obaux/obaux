@@ -360,6 +360,7 @@ export function ProgramView({
           labels={{
             hours: t('place.hours'),
             hoursOnGoogle: t('place.hoursOnGoogle'),
+            close: t('trips.confirm.close'),
             about: t('place.about'),
             address: t('place.address'),
           }}
