@@ -204,7 +204,7 @@ test.describe('a search box focused on arrival is focused, so the keyboard is up
     await page.waitForTimeout(600);
     expect((await focused(page)).ring).toBe(false);
     // A tap into a text box draws none either, and nor does Tab onto one.
-    await page.getByRole('button', { name: 'Cancel' }).focus();
+    await page.getByRole('button', { name: 'Done' }).focus();
     await page.keyboard.press('Tab');
     await expect(box).toBeFocused();
     expect((await focused(page)).ring).toBe(false);

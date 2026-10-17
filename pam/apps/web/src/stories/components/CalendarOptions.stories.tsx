@@ -14,7 +14,6 @@ import { Button } from '@pam/ui/Button';
 import { CategoryArt } from '@pam/ui/CategoryArt';
 import { MenuList } from '@pam/ui/MenuList';
 import { PamSheet } from '@pam/ui/PamSheet';
-import { Page } from '@pam/ui/Page';
 import { SubPage } from '@pam/ui/SubPage';
 import { TripCard } from '@pam/ui/TripCard';
 import { useI18n } from '@/lib/i18n';
@@ -279,7 +278,6 @@ function StopSheet() {
   );
 }
 
-void Page;
 
 /** A: a button on each visit, under its card in Trips. */
 export const A_Visit: Story = { render: () => <TripsWithButton /> };

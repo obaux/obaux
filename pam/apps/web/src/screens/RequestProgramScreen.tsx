@@ -116,6 +116,7 @@ export function RequestProgramScreen({ userId }: { readonly userId: string | nul
         labels={{
           hours: t('place.hours'),
           hoursOnGoogle: t('place.hoursOnGoogle'),
+          done: t('action.done'),
           about: t('place.about'),
           address: t('place.address'),
         }}

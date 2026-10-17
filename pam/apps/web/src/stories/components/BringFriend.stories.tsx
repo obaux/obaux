@@ -8,7 +8,7 @@ import { FRIEND_BANNER, FRIEND_BANNER_SRCSET } from '@/lib/friendBanner';
  * Bring a friend, as a drawer (D-336): opened from its row on "Your trip is
  * booked". Will's banner across the top (D-337), one sentence, then the link and
  * Copy. Opening it copies the link and says "Link copied" over the field for
- * 3s (D-337); an × at the top right closes it. Only after a visit is booked, so the
+ * 3s (D-337); a green Close link at the top right (and the band across the top) closes it (PamSheet, 17 October). Only after a visit is booked, so the
  * link points to a real slot (D-333).
  */
 const meta = {
