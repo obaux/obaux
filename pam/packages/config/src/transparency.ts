@@ -328,8 +328,9 @@ export const TRANSPARENCY_SCREEN: {
   /**
    * What a PROGRAM reads of a member, in the order the member meets it (D-541). It is its own card because the list
    * above is headed "Your guide can see": a fact only a program reads (a message to it, a signature on its rules) cannot
-   * stand under that heading without telling the member their guide reads it. Lines the guide also reads — visits,
-   * a saved place — keep their "A program … sees this too" on the guide's list above.
+   * stand under that heading without telling the member their guide reads it. Lines the guide also reads — visits —
+   * keep their "A program … sees this too" on the guide's list above; a saved place is on both lists, because what a program reads of it
+   * (when, only after a sign-up) is narrower than what the guide reads, so the card says it in its own words (P10).
    *
    * The first line is the condition for all the others: a program sees nothing of a member who has done none of the four
    * things. "Before any visit" is the first, second and third lines; the fifth is what a planned visit adds.
@@ -345,6 +346,13 @@ export const TRANSPARENCY_SCREEN: {
       en: 'The day you signed its rules. Never your signature.',
     },
     { key: 'transparency.program.signedUp', en: 'That you signed up, and how it is going.' },
+    // D-199 / P10 (Iris, program lead pass, 15 October): `people_activity()` hands a program the time a member saved a place, never which
+    // place, and only for a member enrolled with it (`can_message()`: not one who only wrote, signed its rules or planned a visit).
+    // The guide's list above says "A program you joined sees this too"; this card now says it from the program's side.
+    {
+      key: 'transparency.program.saves',
+      en: 'When you save a new place — not which one. Only after you sign up with it.',
+    },
     {
       key: 'transparency.program.visits',
       en: 'The visits you plan there: the day and time, the service you picked, and whether you were marked as there.',
