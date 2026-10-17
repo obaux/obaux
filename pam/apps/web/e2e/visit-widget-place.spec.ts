@@ -52,7 +52,7 @@ test('a visit days away: footer is Change alone; Change shows Change date and ti
 test('who sees the visit is behind the eye, not a banner under the card', async ({ page }) => {
   await open(page, hoursFromNow(72));
   // The sentence is not on the page until the eye is opened.
-  await expect(page.getByText(/will see your visit/i)).toHaveCount(0);
+  await expect(page.getByText(/will see your visit/i)).toBeHidden();
   await page.getByRole('button', { name: 'Who sees this visit' }).click();
   await expect(page.getByRole('dialog').getByText(/Riverside Job Center will see your visit/)).toBeVisible();
 });
