@@ -56,7 +56,7 @@ test('a real lead sees the members who wrote to her program, and picking one ope
   await expect(page.getByText('Can I come on Thursday?')).toBeVisible();
   // Staff are not people to book for.
   await expect(page.getByText('Tanya')).toHaveCount(0);
-  await expect(page.getByText('Nobody has written to your program yet.')).toHaveCount(0);
+  await expect(page.getByText('Nobody has written to your program, signed up with it or planned a visit there yet.')).toHaveCount(0);
   await jordan.click();
   await expect(page).toHaveURL(new RegExp(`for=${JORDAN}`));
 });
@@ -80,7 +80,7 @@ test('a real lead nobody has written to is told so', async ({ page }) => {
   await leadWith(page, false);
   await page.goto('/program/book/');
   await settled(page);
-  await expect(page.getByText(/Nobody has written to your program yet/)).toBeVisible();
+  await expect(page.getByText(/Nobody has written to your program, signed up with it or planned a visit there yet/)).toBeVisible();
 });
 
 test('a real lead whose program is not on Pam has no rows and no link to the example place (a55)', async ({ page }) => {
@@ -99,4 +99,18 @@ test('a real lead\'s row books into her own program, never the example one', asy
   await page.getByRole('link', { name: /Jordan/ }).click();
   await expect(page).toHaveURL(new RegExp(`place=${PROGRAM}`));
   await expect(page).not.toHaveURL(/dummy-place/);
+});
+
+test('a member who signed up or planned a visit there is listed too, once, even when they also wrote (D-595)', async ({ page }) => {
+  await leadWith(page, true);
+  const WANDA = '7c1f8c1e-1c7e-4a5c-9d6e-0f3a2b4c5d70';
+  await page.route('**/rest/v1/rpc/my_program_bookable_members*', (route) =>
+    route.fulfill(json([{ member_id: JORDAN, first_name: 'Jordan' }, { member_id: WANDA, first_name: 'Wanda' }])),
+  );
+  await page.goto('/program/book/');
+  await settled(page);
+  await expect(page.getByRole('link', { name: /Wanda/ })).toBeVisible();
+  await expect(page.getByRole('link', { name: /Jordan/ })).toHaveCount(1);
+  await page.getByRole('link', { name: /Wanda/ }).click();
+  await expect(page).toHaveURL(new RegExp(`for=${WANDA}`));
 });

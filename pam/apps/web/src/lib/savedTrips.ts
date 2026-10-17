@@ -48,7 +48,11 @@ export interface TripServiceRow {
 }
 
 /** A saved trip, in the shape every trips screen already reads. Cancelled ones are not sent; attended and missed ones say so (D-526). */
-export function tripsFromRows(rows: readonly TripRow[], services: readonly TripServiceRow[] = []): AddedTrip[] {
+export function tripsFromRows(
+  rows: readonly TripRow[],
+  services: readonly TripServiceRow[] = [],
+  bookedByProgram: ReadonlySet<string> = new Set(),
+): AddedTrip[] {
   const serviceOf = new Map(services.map((s) => [s.appointment_id, s]));
   return rows
     .filter((row) => ['scheduled', 'attended', 'missed'].includes(row.status) && row.service_id !== null)
@@ -62,6 +66,7 @@ export function tripsFromRows(rows: readonly TripRow[], services: readonly TripS
       startsAt: row.starts_at,
       note: row.note ?? '',
       ...(row.status === 'attended' || row.status === 'missed' ? { attendance: row.status } : {}),
+      ...(bookedByProgram.has(row.id) ? { bookedByProgram: true as const } : {}),
       ...(serviceOf.has(row.id)
         ? { serviceId: serviceOf.get(row.id)!.program_service_id, serviceName: serviceOf.get(row.id)!.service_name }
         : {}),
@@ -78,7 +83,10 @@ export async function loadSavedTrips(): Promise<void> {
     // Which service each is for (D-470): a failed read leaves the trips without it, not hidden.
     const named = await supabase.rpc('my_trip_services');
     const services = named.error ? [] : ((named.data ?? []) as TripServiceRow[]);
-    setSavedTrips(tripsFromRows((data ?? []) as TripRow[], services));
+    // Which a program booked for the member (D-595): a failed read shows them as the member's own, not hidden.
+    const byProgram = await supabase.rpc('my_trip_booked_by');
+    const booked = new Set(byProgram.error ? [] : ((byProgram.data ?? []) as { appointment_id: string }[]).map((r) => r.appointment_id));
+    setSavedTrips(tripsFromRows((data ?? []) as TripRow[], services, booked));
   } catch {
     // Keep what is shown; the screens do not need to know the read failed.
     setSavedTrips(readSaved(), 'error');
@@ -106,6 +114,24 @@ export type NewTrip = Omit<AddedTrip, 'id'>;
  * booked then).
  */
 export async function bookTrip(session: SessionState, trip: NewTrip): Promise<AddedTrip | null> {
+  // A program lead booking for a member who wrote to it (D-595): saved for real, on the member's Trips.
+  if (trip.forMemberId && isSavedPlace(trip.forMemberId) && isSavedPlace(trip.placeId) && session.status === 'signed-in' && !session.session.isDemo) {
+    try {
+      const { createClient } = await import('./supabase');
+      const { data, error } = await createClient().rpc('book_visit_for_member', {
+        p_member_id: trip.forMemberId,
+        p_service_id: trip.placeId,
+        p_starts_at: trip.startsAt,
+        p_program_service_id: trip.serviceId !== undefined && isSavedPlace(trip.serviceId) ? trip.serviceId : null,
+        p_timezone: localTimeZone(),
+      });
+      if (error || !data) return null;
+      const row = data as { id: string; starts_at: string };
+      return { ...trip, id: row.id, startsAt: row.starts_at, bookedByProgram: true };
+    } catch {
+      return null;
+    }
+  }
   const userId = asksForSavedTrips(session);
   if (userId !== null && isSavedPlace(trip.placeId) && !trip.forMemberId) {
     try {

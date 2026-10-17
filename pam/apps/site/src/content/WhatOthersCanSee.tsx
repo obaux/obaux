@@ -35,6 +35,10 @@ export function WhatOthersCanSee() {
           them, the day you signed their rules and, if you signed up, how that is going and when you save a new
           place, but not which one.
         </P>
+        <P>
+          If you have written to a program, signed up with it or planned a visit there, it can book a visit for
+          you. It shows in your Trips with the program’s name, and you can cancel it.
+        </P>
       </Section>
 
       <Section title="Who can see what">
@@ -50,6 +54,10 @@ export function WhatOthersCanSee() {
             },
             {
               label: 'Your visits, and whether you went or missed one',
+              cells: ['Yes', 'Yes, but only visits to their own program', 'No'],
+            },
+            {
+              label: 'Which of your visits a program booked for you',
               cells: ['Yes', 'Yes, but only visits to their own program', 'No'],
             },
             { label: 'Your points, your level and your badges', cells: ['Yes', 'No', 'No'] },
