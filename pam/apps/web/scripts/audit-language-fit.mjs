@@ -42,7 +42,8 @@
  *
  * English is the baseline: a defect that is already there in English is the
  * design's, not the translation's, and is listed apart. Only defects that are
- * NEW in a language are what the run fails on.
+ * NEW in a language are what the run fails on. The one exception is a placeholder,
+ * which is words, not layout: it fails in English too.
  */
 import http from 'node:http';
 import fs from 'node:fs';
@@ -406,14 +407,20 @@ async function run() {
 const { results, failures } = await run();
 
 // ── English is the baseline; only what is new in a language counts ──
+// Except a placeholder: it is words, not layout, so one wider than its field is wrong in English too and is never "the
+// design's own" (17 October: English "Search your members" was cut in the case manager Home's pill, so a rule that only
+// failed what is new in a language let the pill through in all seven).
+const isWords = (f) => f.kind === 'placeholder';
 const baseline = new Set();
-for (const r of results) if (r.locale === 'en') for (const f of r.found) baseline.add(`${r.id}|${f.key}`);
+for (const r of results) if (r.locale === 'en') for (const f of r.found) if (!isWords(f)) baseline.add(`${r.id}|${f.key}`);
 const fresh = [];
 for (const r of results) {
-  if (r.locale === 'en') continue;
-  for (const f of r.found) if (!baseline.has(`${r.id}|${f.key}`)) fresh.push({ id: r.id, title: r.title, name: r.name, locale: r.locale, ...f });
+  for (const f of r.found) {
+    const isNew = isWords(f) || (r.locale !== 'en' && !baseline.has(`${r.id}|${f.key}`));
+    if (isNew) fresh.push({ id: r.id, title: r.title, name: r.name, locale: r.locale, ...f });
+  }
 }
-const existing = results.filter((r) => r.locale === 'en').flatMap((r) => r.found.map((f) => ({ id: r.id, title: r.title, ...f })));
+const existing = results.filter((r) => r.locale === 'en').flatMap((r) => r.found.filter((f) => !isWords(f)).map((f) => ({ id: r.id, title: r.title, ...f })));
 
 if (OUT) fs.writeFileSync(OUT, JSON.stringify({ fresh, existing, failures }, null, 2));
 
