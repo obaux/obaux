@@ -10,7 +10,7 @@ Three things, all on `:active`, in `apps/web/src/app/globals.css` (a `pam` layer
 
 | What | Press | In | Release |
 | --- | --- | --- | --- |
-| **A row** (`.astryx-item`) | background shade: 7% black (10% white in dark) | 60ms | 200ms, `cubic-bezier(0.2, 0.8, 0.2, 1)` |
+| **A row** (`.astryx-item`) or **a segment** of a switch (Day / Week / Month, Conversations / Reported) | background shade: 7% black (10% white in dark); no scale | 60ms | 200ms, `cubic-bezier(0.2, 0.8, 0.2, 1)` |
 | **A card or tile** (`.astryx-clickable-card`) | `scale(0.97)` and the same shade | 90ms | 220ms, same curve |
 | **A button** (`.astryx-button`, not disabled) | `scale(0.97)` | 90ms | 220ms, same curve |
 | **Reduced motion** | the shade stays; no scale and no transition | | |
@@ -20,6 +20,10 @@ Three things, all on `:active`, in `apps/web/src/app/globals.css` (a `pam` layer
 ## Why it was flat
 
 Before: a row had no press style at all (Astryx draws `:active` on its link, which is only the words); a card, tile or button had Astryx's 10% overlay and nothing else. And iOS Safari applies `:active` only on a page with a touchstart listener, which Pam had none of until the row-taps fix (b60, `useRowTaps`), so on an iPhone nothing reacted at all.
+
+## What Iris found showed nothing, and now does (P1)
+
+Checked by holding each: a trip card and a program card (both `ClickableCard`: scale and shade), a conversation row (an `Item`: shade), a place's service choices (buttons: scale), the Day / Week / Month switch (its segment: shade). Iris's "some change" list (list rows, tab bar, header icon buttons, chips, big and secondary buttons) gets the same layer through `.astryx-item` and `.astryx-button`.
 
 ## What to reverse
 

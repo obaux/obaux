@@ -629,7 +629,7 @@
  * feels like someone is tapping or pressing in. Right now those items are feeling very flat"). Three things, all on `:active`, which iOS
  * Safari applies because the app keeps one touchstart listener (packages/ui/src/tapRows.ts):
  *
- *   - a ROW darkens while held: a quick 7% shade (10% white in the dark), in at 60ms, released over 200ms;
+ *   - a ROW or a SEGMENT of a switch darkens while held: a quick 7% shade (10% white in the dark), in at 60ms, released over 200ms;
  *   - a CARD or TILE and a BUTTON press in: scale(0.97) with the same shade on a card, in at 90ms, a soft release over 220ms;
  *   - reduced motion keeps the shade and drops the scale: no transform, no transition.
  *
@@ -654,6 +654,15 @@
     transition-duration: 60ms;
   }
 
+  /* A segment of a switch (Day | Week | Month, Conversations | Reported): shade while held, no scale. */
+  .astryx-segmented-control-item {
+    transition: background-image var(--pam-press-out) var(--pam-press-ease);
+  }
+  .astryx-segmented-control-item:active {
+    background-image: linear-gradient(var(--pam-press-shade), var(--pam-press-shade));
+    transition-duration: 60ms;
+  }
+
   /* A card or tile that opens something, and a button: press in. */
   .astryx-clickable-card,
   .astryx-button {
@@ -673,6 +682,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .astryx-item,
+    .astryx-segmented-control-item,
     .astryx-clickable-card,
     .astryx-button {
       transition: none;
