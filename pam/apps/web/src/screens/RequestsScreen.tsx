@@ -15,8 +15,8 @@ import { useFlaggedPlaces } from '@/lib/useFlaggedPlaces';
 import { useStaffRequests } from '@/lib/useStaffRequests';
 import { toLookAt, useProgramsToCheck } from '@/lib/programsToCheck';
 import { peopleWaiting, useWaitingCities } from '@/lib/useWaitingCities';
+import { usePamInbox, usePamStatus } from '@/lib/pam';
 import { pamWaitingCount } from '@/lib/pamInbox';
-import { usePamInbox } from '@/lib/usePamInbox';
 import { useRoleView } from '@/lib/useViewedRole';
 
 /**
@@ -67,7 +67,8 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
   const waiting = useWaitingCities(isSuperAdmin);
   const waitingCount = waiting.status === 'ready' ? peopleWaiting(waiting.cities) : 0;
   // What people wrote to Pam (card a100): first, because someone is waiting on an answer. Only while the switch is on.
-  const pamInbox = usePamInbox(isSuperAdmin);
+  const pamLive = usePamStatus(isSuperAdmin).status === 'ready';
+  const pamInbox = usePamInbox(isSuperAdmin && pamLive);
   const pamWaiting = pamInbox.status === 'ready' ? pamWaitingCount(pamInbox.rows) : 0;
 
   const tools = (
@@ -129,7 +130,7 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
         label={t('review.title')}
         items={[
           // Only once the inbox has loaded: with the switch off, or before Pam's functions exist, there is no row at all.
-          ...(pamInbox.status === 'ready'
+          ...(pamLive && pamInbox.status === 'ready'
             ? [
                 {
                   id: 'messages-to-pam',

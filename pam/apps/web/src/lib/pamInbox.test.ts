@@ -1,39 +1,40 @@
 import { describe, expect, it } from 'vitest';
-import { groupPamInbox, pamWaitingCount, replyDuration, waitedFor, type PamInboxRow } from './pamInbox';
+import type { PamInboxRow } from './pam';
+import { inboxGroups, pamWaitingCount, replyDuration, waitedFor, writtenIn } from './pamInbox';
 
 const row = (id: string, over: Partial<PamInboxRow>): PamInboxRow => ({
   conversationId: id,
+  askerId: `a-${id}`,
   firstName: id,
   role: 'member',
-  region: 'Philadelphia',
+  regionName: 'Philadelphia',
   programName: null,
-  lastMessageAt: '2026-10-18T10:00:00Z',
-  lastFromTeam: false,
-  waitingSince: null,
   status: 'open',
-  lastLine: '…',
+  lastMessageAt: '2026-10-18T10:00:00Z',
+  lastFrom: 'asker',
+  waitingSince: null,
+  preview: '…',
   ...over,
 });
 
-describe('groupPamInbox (card a100)', () => {
+describe('the inbox lists only conversations somebody wrote in (card a100)', () => {
   const rows = [
     row('aaliyah', { waitingSince: '2026-10-18T07:00:00Z', lastMessageAt: '2026-10-18T07:00:00Z' }),
     row('marcus', { waitingSince: '2026-10-16T09:00:00Z', lastMessageAt: '2026-10-18T09:30:00Z' }),
-    row('dana', { lastFromTeam: true, lastMessageAt: '2026-10-13T12:00:00Z' }),
-    row('lou', { lastFromTeam: true, lastMessageAt: '2026-10-17T12:00:00Z' }),
-    row('old', { status: 'closed', lastMessageAt: '2026-10-01T12:00:00Z' }),
-    row('reopened', { status: 'closed', waitingSince: '2026-10-18T08:00:00Z', lastMessageAt: '2026-10-18T08:00:00Z' }),
+    row('dana', { lastFrom: 'team', lastMessageAt: '2026-10-13T12:00:00Z' }),
+    // Pam's welcome and nothing else: every account has one, and it is not a conversation to answer.
+    row('welcomed', { firstName: null, lastFrom: null, lastMessageAt: null, preview: null }),
+    row('old', { status: 'closed', lastFrom: 'team', lastMessageAt: '2026-10-01T12:00:00Z' }),
   ];
-  const groups = groupPamInbox(rows);
 
-  it('puts the longest wait first, even when that person wrote again since', () => {
+  it('leaves out a conversation that holds only the welcome', () => {
+    expect(writtenIn(rows).map((r) => r.conversationId)).not.toContain('welcomed');
+  });
+  it('groups the rest: longest wait first, then answered, then closed', () => {
+    const groups = inboxGroups(rows);
     expect(groups.waiting.map((r) => r.conversationId)).toEqual(['marcus', 'aaliyah']);
-  });
-  it('lists answered conversations newest first', () => {
-    expect(groups.answered.map((r) => r.conversationId)).toEqual(['lou', 'dana']);
-  });
-  it('keeps a closed conversation closed, whatever its last message', () => {
-    expect(groups.closed.map((r) => r.conversationId)).toEqual(['reopened', 'old']);
+    expect(groups.answered.map((r) => r.conversationId)).toEqual(['dana']);
+    expect(groups.closed.map((r) => r.conversationId)).toEqual(['old']);
   });
   it('counts only open conversations that wait, for Home (D-586)', () => {
     expect(pamWaitingCount(rows)).toBe(2);

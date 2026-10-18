@@ -1,54 +1,21 @@
 /**
- * The Pam team's inbox (card a100, D-605): who wrote to Pam, grouped the way the super admin works through them.
- *
- * Pure: the rows come from `pam_inbox()` (Nico's, Pam team only) and this file only sorts and words them, so the order
- * and the "Waiting 3 hours" line are tested without a browser. A row carries only what that function returns: a first
- * name, a role, a region, a lead's program, and the last message's first line. No last name, phone, email or city.
+ * The Pam team's inbox (card a100, D-605), the parts Nico's `lib/pam.ts` leaves to the screen: which conversations it
+ * lists, and the "Waiting 3 hours" and reply-time words. Pure, so they are tested without a browser.
  */
+import { groupInbox, type PamInboxRow } from './pam';
 
-export type PamAskerRole = 'member' | 'admin' | 'provider';
+/**
+ * Every account gets a Pam conversation with Pam's welcome (D-605), so `pam_inbox()` returns one for nearly everybody.
+ * The inbox lists only the ones somebody has written in (a person or the team): a welcome on its own is not a
+ * conversation to answer.
+ */
+export const writtenIn = (rows: readonly PamInboxRow[]): readonly PamInboxRow[] => rows.filter((row) => row.preview !== null);
 
-export interface PamInboxRow {
-  readonly conversationId: string;
-  readonly firstName: string;
-  readonly role: PamAskerRole;
-  readonly region: string | null;
-  /** For a program lead: the program they lead. */
-  readonly programName: string | null;
-  readonly lastMessageAt: string;
-  /** Pam wrote the last message (a person on the team; the automatic out-of-hours reply never counts). */
-  readonly lastFromTeam: boolean;
-  /** When the person's oldest message since Pam last replied was sent; null when nothing waits. */
-  readonly waitingSince: string | null;
-  readonly status: 'open' | 'closed';
-  readonly lastLine: string;
-}
-
-export interface PamInboxGroups {
-  /** Longest waiting first: for this audience, silence is what loses people (Iris). */
-  readonly waiting: readonly PamInboxRow[];
-  /** Open, and Pam wrote last: newest first. */
-  readonly answered: readonly PamInboxRow[];
-  /** Folded under one row at the foot: newest first. */
-  readonly closed: readonly PamInboxRow[];
-}
-
-const newestFirst = (a: PamInboxRow, b: PamInboxRow) => b.lastMessageAt.localeCompare(a.lastMessageAt);
-
-/** A closed conversation is closed whatever its last message; an open one waits until someone on the team writes. */
-export function groupPamInbox(rows: readonly PamInboxRow[]): PamInboxGroups {
-  const open = rows.filter((row) => row.status === 'open');
-  return {
-    waiting: open
-      .filter((row) => row.waitingSince !== null)
-      .sort((a, b) => (a.waitingSince ?? '').localeCompare(b.waitingSince ?? '') || newestFirst(a, b)),
-    answered: open.filter((row) => row.waitingSince === null).sort(newestFirst),
-    closed: rows.filter((row) => row.status === 'closed').sort(newestFirst),
-  };
-}
+/** The inbox's three groups, from the conversations somebody has written in (`groupInbox` sorts them, Nico's). */
+export const inboxGroups = (rows: readonly PamInboxRow[]) => groupInbox(writtenIn(rows));
 
 /** The Home row's number (a plain count, D-586): conversations waiting for a reply. */
-export const pamWaitingCount = (rows: readonly PamInboxRow[]): number => groupPamInbox(rows).waiting.length;
+export const pamWaitingCount = (rows: readonly PamInboxRow[]): number => inboxGroups(rows).waiting.length;
 
 /**
  * How long someone has waited, as the one unit a person would say: minutes under an hour, hours under a day, then

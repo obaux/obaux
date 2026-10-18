@@ -15,8 +15,9 @@ import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { whenHappened } from '@/lib/when';
-import { groupPamInbox, replyDuration, waitedFor, type PamInboxRow } from '@/lib/pamInbox';
-import { usePamInbox } from '@/lib/usePamInbox';
+import { usePamInbox, usePamStatus, type PamInboxRow } from '@/lib/pam';
+import { inboxGroups, replyDuration, waitedFor } from '@/lib/pamInbox';
+import { usePamReplyTimes } from '@/lib/usePamReplyTimes';
 import { NotIn } from '../app/NotIn';
 import { HelpButton } from './HelpButton';
 
@@ -48,7 +49,11 @@ export function PamInboxScreen() {
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { viewedRole } = useRoleView(trueRole);
   const isSuperAdmin = viewedRole === 'super_admin' && trueRole === 'super_admin';
-  const state = usePamInbox(isSuperAdmin);
+  // Nico's hooks (`lib/pam.ts`): the switch first, and nothing else is asked while it is off.
+  const pam = usePamStatus(isSuperAdmin);
+  const live = pam.status === 'ready';
+  const state = usePamInbox(isSuperAdmin && live);
+  const replyTimes = usePamReplyTimes(isSuperAdmin && live);
 
   const params = useSearchParams();
   const showClosed = params.get('show') === 'closed';
@@ -77,7 +82,7 @@ export function PamInboxScreen() {
       </Page>
     );
   }
-  if (!isSuperAdmin || state.status === 'off') {
+  if (!isSuperAdmin || pam.status === 'off') {
     return (
       <Page gap={4}>
         {header}
@@ -90,7 +95,7 @@ export function PamInboxScreen() {
       </Page>
     );
   }
-  if (state.status === 'loading') {
+  if (pam.status === 'loading' || state.status === 'loading') {
     return (
       <Page gap={3}>
         {header}
@@ -108,7 +113,7 @@ export function PamInboxScreen() {
     );
   }
 
-  const groups = groupPamInbox(state.rows);
+  const groups = inboxGroups(state.rows);
   const fromParam = fromHome ? '&from=home' : '';
 
   const context = (row: PamInboxRow): string =>
@@ -116,13 +121,14 @@ export function PamInboxScreen() {
       ? row.programName
         ? t('pam.inbox.role.lead', { program: row.programName })
         : t('pam.inbox.role.leadNoProgram')
-      : [t(row.role === 'admin' ? 'pam.inbox.role.caseManager' : 'pam.inbox.role.member'), row.region].filter(Boolean).join(' · ');
+      : [t(row.role === 'admin' ? 'pam.inbox.role.caseManager' : 'pam.inbox.role.member'), row.regionName].filter(Boolean).join(' · ');
 
   const rows = (list: readonly PamInboxRow[], label: string) => (
     <List aria-label={label}>
       {list.map((row) => {
         const waited = row.waitingSince ? waitedFor(row.waitingSince) : null;
-        const line = row.lastFromTeam ? t('pam.inbox.you', { line: row.lastLine }) : row.lastLine;
+        const preview = row.preview ?? '';
+        const line = row.lastFrom === 'team' ? t('pam.inbox.you', { line: preview }) : preview;
         return (
           <ListItem
             key={row.conversationId}
@@ -130,7 +136,7 @@ export function PamInboxScreen() {
             startContent={<Avatar size="lg" name={row.firstName || '?'} tooltip={false} alt="" />}
             label={
               <Text dir="auto" xstyle={waited ? styles.nameWaiting : styles.name}>
-                {row.firstName}
+                {row.firstName ?? '—'}
               </Text>
             }
             description={
@@ -145,9 +151,11 @@ export function PamInboxScreen() {
               </VStack>
             }
             endContent={
-              <Text type="supporting" xstyle={styles.when}>
-                {whenHappened(row.lastMessageAt, locale, t)}
-              </Text>
+              row.lastMessageAt ? (
+                <Text type="supporting" xstyle={styles.when}>
+                  {whenHappened(row.lastMessageAt, locale, t)}
+                </Text>
+              ) : undefined
             }
             xstyle={styles.item}
           />
@@ -169,7 +177,8 @@ export function PamInboxScreen() {
     );
   }
 
-  const reply = state.replyMedianSeconds !== null ? replyDuration(state.replyMedianSeconds) : null;
+  // The median, so one long wait does not move the line (Mira): "usually".
+  const reply = replyTimes ? replyDuration(replyTimes.medianSeconds) : null;
   const nothingOpen = groups.waiting.length === 0 && groups.answered.length === 0;
 
   return (

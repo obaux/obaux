@@ -12,27 +12,31 @@ const ME = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
 const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
 const ago = (minutes: number) => new Date(Date.now() - minutes * 60_000).toISOString();
 
-const row = (id: string, first_name: string, role: string, extra: Record<string, unknown>) => ({
+// The columns `pam_inbox()` returns (Nico, D-606).
+const row = (id: string, first_name: string | null, role: string, extra: Record<string, unknown>) => ({
   conversation_id: id,
+  asker_id: `a-${id}`,
   first_name,
   role,
-  region: 'Philadelphia',
+  region_name: 'Philadelphia',
   program_name: null,
-  last_from_team: false,
-  waiting_since: null,
   status: 'open',
-  last_line: '…',
   last_message_at: ago(60),
+  last_from: 'asker',
+  waiting_since: null,
+  preview: '…',
   ...extra,
 });
 
 const INBOX = [
   // Aaliyah wrote last, but Marcus has waited longest: he comes first.
-  row('c2', 'Aaliyah', 'member', { waiting_since: ago(3 * 60), last_message_at: ago(3 * 60), last_line: 'How do I change my city?' }),
-  row('c1', 'Marcus', 'member', { waiting_since: ago(2 * 24 * 60 + 5), last_message_at: ago(10), last_line: "I can't get my code." }),
-  row('c3', 'Lou', 'provider', { region: null, program_name: 'Fresh Start Kitchen', waiting_since: ago(20), last_message_at: ago(20), last_line: 'Our hours are wrong.' }),
-  row('c4', 'Dana', 'admin', { last_from_team: true, last_message_at: ago(5 * 24 * 60), last_line: 'We have fixed your city.' }),
-  row('c5', 'Renee', 'member', { status: 'closed', last_from_team: true, last_message_at: ago(9 * 24 * 60), last_line: 'Glad it works now.' }),
+  row('c2', 'Aaliyah', 'member', { waiting_since: ago(3 * 60), last_message_at: ago(3 * 60), preview: 'How do I change my city?' }),
+  row('c1', 'Marcus', 'member', { waiting_since: ago(2 * 24 * 60 + 5), last_message_at: ago(10), preview: "I can't get my code." }),
+  row('c3', 'Lou', 'provider', { region_name: null, program_name: 'Fresh Start Kitchen', waiting_since: ago(20), last_message_at: ago(20), preview: 'Our hours are wrong.' }),
+  row('c4', 'Dana', 'admin', { last_from: 'team', last_message_at: ago(5 * 24 * 60), preview: 'We have fixed your city.' }),
+  row('c5', 'Renee', 'member', { status: 'closed', last_from: 'team', last_message_at: ago(9 * 24 * 60), preview: 'Glad it works now.' }),
+  // Pam's welcome and nothing else, as every account has: not in the inbox.
+  row('c6', 'Kofi', 'member', { last_from: null, last_message_at: null, preview: null }),
 ];
 
 interface Setup {
@@ -75,7 +79,7 @@ async function signedIn(page: Page, { role = 'super_admin', live = true, inbox =
     return route.fulfill(json(inbox));
   });
   await page.route('**/rest/v1/rpc/pam_reply_times*', (route) =>
-    route.fulfill(json([{ median_seconds: median, mean_seconds: median, conversations: median === null ? 0 : 12 }])),
+    route.fulfill(json([{ median_seconds: median, mean_seconds: median, answered: median === null ? 0 : 12 }])),
   );
   return asked;
 }
@@ -134,6 +138,8 @@ test.describe('Messages to Pam (card a100)', () => {
 
     // Closed is one row with its count, not the conversations themselves.
     await expect(page.getByText('Renee')).toHaveCount(0);
+    // A conversation with only Pam's welcome in it is nobody's question.
+    await expect(page.getByText('Kofi')).toHaveCount(0);
     const closedRow = page.getByRole('link', { name: /Closed conversations/ });
     await expect(page.getByRole('listitem').filter({ has: closedRow })).toContainText('1');
     await expect(page.getByText('Last 30 days: you usually reply within 3 hours.')).toBeVisible();
@@ -146,7 +152,7 @@ test.describe('Messages to Pam (card a100)', () => {
 
   test('says only a first name, the role and the region or program: nothing else about the person', async ({ page }) => {
     await signedIn(page, {
-      inbox: [row('c9', 'Marcus', 'member', { waiting_since: ago(30), last_line: 'Hello', last_name: 'Reeves', phone: '+12155550100', city: 'Camden' })],
+      inbox: [row('c9', 'Marcus', 'member', { waiting_since: ago(30), preview: 'Hello', last_name: 'Reeves', phone: '+12155550100', city: 'Camden' })],
     });
     await page.goto('/pam/messages/');
     const list = page.getByRole('list', { name: 'Waiting for Pam' });
