@@ -12,8 +12,8 @@ import { useI18n } from '@/lib/i18n';
  */
 // The day is the weekday long and the month short, from Intl in each language (Will, 18 October): en "Thursday, Oct 22", es "jueves, 22 oct"; Arabic has no short month, so it stays whole.
 const WORDS = {
-  en: { add: 'Add to calendar', added: 'Added to calendar', eyebrow: 'Your next visit', day: 'Thursday, Oct 22', time: '10:00 AM', countdown: 'In 2 days', change: 'Change appointment' },
-  ar: { add: 'أضف إلى التقويم', added: 'أُضيف إلى التقويم', eyebrow: 'زيارتك القادمة', day: 'الخميس، 22 أكتوبر', time: '10:00 ص', countdown: 'بعد يومين', change: 'غيّر الموعد' },
+  en: { add: 'Add to calendar', added: 'Added to calendar', addedName: 'Added to calendar. Opens Calendar settings.', eyebrow: 'Your next visit', day: 'Thursday, Oct 22', time: '10:00 AM', countdown: 'In 2 days', change: 'Change appointment' },
+  ar: { add: 'أضف إلى التقويم', added: 'أُضيف إلى التقويم', addedName: 'أُضيف إلى التقويم. يفتح إعدادات التقويم.', eyebrow: 'زيارتك القادمة', day: 'الخميس، 22 أكتوبر', time: '10:00 ص', countdown: 'بعد يومين', change: 'غيّر الموعد' },
 };
 export const useCalendarWords = () => (useI18n().locale === 'ar' ? WORDS.ar : WORDS.en);
 
@@ -35,7 +35,7 @@ const styles = stylex.create({
 export function CalendarAction({ added = false }: { readonly added?: boolean }) {
   const w = useCalendarWords();
   return added ? (
-    <Button label={w.added} variant="ghost" href="/calendar/" icon={<CalendarCheckIcon width={22} height={22} aria-hidden />} xstyle={styles.added} />
+    <Button label={w.added} aria-label={w.addedName} variant="ghost" href="/calendar/" icon={<CalendarCheckIcon width={22} height={22} aria-hidden />} xstyle={styles.added} />
   ) : (
     <Button label={w.add} variant="secondary" icon={<CalendarAddIcon width={22} height={22} aria-hidden />} xstyle={styles.add} />
   );

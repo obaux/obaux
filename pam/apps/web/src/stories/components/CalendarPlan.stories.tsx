@@ -40,7 +40,9 @@ const WORDS = {
     syncing: 'Goes to Apple Calendar',
     syncingName: 'Goes to Apple Calendar through your calendar link. Opens Calendar.',
     sync: 'Sync all future trip details?',
-    syncTrips: 'Sync all future trips', // stand-in; Sage signs it
+    // Sage's words (ledger 4aef64a9).
+    syncTrips: 'Add all your future visits',
+    syncHint: 'Set up a calendar link once. Your visits go in by themselves, and change if one moves or is cancelled.',
     sheetTitle: 'Add to calendar',
     done: 'Done',
     apple: 'Apple Calendar',
@@ -80,7 +82,8 @@ const WORDS = {
     syncing: 'تتم المزامنة مع تقويم Apple', // stand-in until Lena translates Sage's words
     syncingName: 'تتم المزامنة مع تقويم Apple عبر رابط التقويم. يفتح التقويم.', // stand-in
     sync: 'مزامنة تفاصيل كل رحلاتك القادمة؟',
-    syncTrips: 'مزامنة كل رحلاتك القادمة', // stand-in
+    syncTrips: 'أضف كل زياراتك القادمة', // stand-in until Lena's translation
+    syncHint: 'أعدّ رابط التقويم مرة واحدة. تُضاف زياراتك تلقائيًا، وتتغير إذا تغيّرت زيارة أو أُلغيت.', // stand-in
     sheetTitle: 'أضف إلى التقويم',
     done: 'تم',
     apple: 'تقويم Apple',
@@ -149,8 +152,8 @@ function AddSheet() {
               { id: 'apple', label: w.apple, icon: <TripsIcon width={26} height={26} />, onSelect: () => {} },
               { id: 'google', label: w.google, icon: <TripsIcon width={26} height={26} />, onSelect: () => {} },
               { id: 'outlook', label: w.outlook, icon: <TripsIcon width={26} height={26} />, onSelect: () => {} },
-              // Sync moves in here from under the card (Will, 18 October). Stand-in words until Sage's.
-              { id: 'sync', label: w.syncTrips, icon: <SyncIcon width={26} height={26} aria-hidden />, href: '/calendar/' },
+              // Sync moves in here from under the card (Will, 18 October): an action row like its neighbours, with its hint.
+              { id: 'sync', label: w.syncTrips, description: w.syncHint, icon: <SyncIcon width={26} height={26} aria-hidden />, href: '/calendar/' },
             ]}
           />
         </VStack>
