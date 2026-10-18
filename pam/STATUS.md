@@ -1686,6 +1686,10 @@ connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merge
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
 
+## Design system & Storybook · When Pam fails, D-616 (18 October)
+
+One small alert fixed at the bottom (`useMalfunction().show`, Lena's `notice.malfunction`), no timer, never over the failed control; a switch moves only after its save, no answer in 15 s is a failure, a late save is read back. Done for Text alerts; the other instant-save controls are named in Patterns and left to their owners. Logging is a stand-in until Nico's `reportAppError` lands. Branch `claude/pam-design-malfunction` (D-617); waits on Mira (b76).
+
 ## Design system & Storybook · Text alerts: Iris's B3, B6 and the lead state (18 October)
 
 The error sits under the row that failed; the row's name works the switch; the screen follows the database's yes. Branch `claude/pam-design-alerts-b3-b6` off b74; waits on Mira (b75).

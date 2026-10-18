@@ -247,7 +247,8 @@ function AlertsList() {
                   isLabelHidden
                   value={live && isOn(kind)}
                   isLoading={pending.has(kind)}
-                  changeAction={(on, event) => change(kind, on, event.target)}
+                  // `onChange`, not `changeAction`: Astryx's changeAction moves the switch at once and puts it back on a failure; ours moves after the save (D-616).
+                  onChange={(on, event) => void change(kind, on, event.target)}
                   isDisabled={!userId || !loaded || !live || stopped}
                 />
               }
