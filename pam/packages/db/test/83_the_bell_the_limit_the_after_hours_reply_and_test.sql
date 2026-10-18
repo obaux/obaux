@@ -101,6 +101,12 @@ insert into public.messages (conversation_id, sender_id, body, system_key) value
 select test.check('a system message (no sender) queues nothing',
   (select count(*) from public.outbound_messages where member_id = :'kai'), 0);
 
+-- A person who did not ask for message texts gets none from Pam either.
+insert into public.notification_preferences (member_id, sms_enabled, alert_message) values (:'lu', true, false) on conflict (member_id) do update set sms_enabled = true, alert_message = false;
+insert into public.messages (conversation_id, sender_id, body) values ((select v from t83 where k = 'lu'), :'root', 'Hello Lu');
+select test.check('Pam writes to Lu, who did not ask for message texts: none is queued',
+  (select count(*) from public.outbound_messages where member_id = :'lu'), 0);
+
 \echo ''
 \echo '--- Reporting a Pam message is refused ---'
 set role authenticated;
@@ -120,6 +126,8 @@ update public.pam_threads set status = 'closed', last_auto_reply_at = null where
 insert into public.messages (conversation_id, sender_id, body) values ((select v from t83 where k = 'kai'), :'kai', 'Is anyone there tonight?');
 select test.check('a message when Pam is not here gets one automatic reply, from nobody',
   (select count(*) from public.messages where conversation_id = (select v from t83 where k = 'kai') and sender_id is null and system_key = 'pam.away'), 1);
+select test.check('...and the reply queues no text for Kai, who asked for them (it has no sender)',
+  (select count(*) from public.outbound_messages where member_id = :'kai' and template_key = 'message_waiting'), 0);
 select test.check('...carrying when Pam is next here',
   (select count(*) from public.messages where conversation_id = (select v from t83 where k = 'kai') and system_key = 'pam.away'
      and (system_vars ->> 'opensAt')::timestamptz = public.pam_next_open(now())), 1);

@@ -690,23 +690,87 @@ test.describe('a conversation', () => {
     await expect(page.getByRole('textbox')).toHaveCount(0);
   });
 
-  test('a send that fails for any other reason still says the connection dropped', async ({ page }) => {
+  // A message that did not go stays in the conversation, outlined, with "Not sent" and a Try again, in every conversation
+  // (D-605; Will, 18 October: messaging "works better than any other part of the app"). A tap on Try again sends it once.
+  const failingSend = async (page: import('@playwright/test').Page, mode: 'never-lands' | 'lands-but-no-answer') => {
+    const stored: { id: string; conversation_id: string; sender_id: string; body: string; created_at: string }[] = [];
+    let posts = 0;
+    await page.route(MESSAGES, (route) => {
+      const request = route.request();
+      if (request.method() === 'POST') {
+        posts += 1;
+        const body = request.postDataJSON() as { body: string };
+        const row = { id: `mine-${posts}`, conversation_id: CONVO, sender_id: ME, body: body.body, created_at: new Date().toISOString() };
+        // The first try fails; in the second mode it had in fact been stored, and only the answer was lost.
+        if (posts === 1) {
+          if (mode === 'lands-but-no-answer') stored.push(row);
+          return route.fulfill({ status: 500, contentType: 'application/json', body: '{}' });
+        }
+        stored.push(row);
+        return route.fulfill(json(row));
+      }
+      const theirs = { id: MSG_THEIRS, conversation_id: CONVO, sender_id: OTHER, body: 'Is the class still on Tuesday?', created_at: new Date(Date.now() - 60_000).toISOString() };
+      // Filtered the way the database does: the retry's look for its own earlier message asks for the sender.
+      if (request.url().includes(`sender_id=eq.${ME}`)) return route.fulfill(json(stored));
+      return route.fulfill(json([theirs, ...stored]));
+    });
+    return { posts: () => posts };
+  };
+
+  test('a send that fails stays in the conversation as "Not sent", with its words, and a 48px Try again', async ({ page }) => {
     await signedInAs(page, 'member');
     await withOneConversation(page);
-    await page.route(MESSAGES, (route) => {
-      if (route.request().method() === 'POST') return route.fulfill({ status: 500, contentType: 'application/json', body: '{}' });
-      return route.fulfill(
-        json([{ id: MSG_THEIRS, conversation_id: CONVO, sender_id: OTHER, body: 'Is the class still on Tuesday?', created_at: new Date().toISOString() }]),
-      );
-    });
+    await failingSend(page, 'never-lands');
     await page.goto(`/messages/thread/?id=${CONVO}`);
     await settled(page);
 
     await page.getByRole('textbox').fill('See you Thursday.');
     await page.getByRole('button', { name: /send/i }).click();
 
-    await expect(page.getByText('Your connection dropped')).toBeVisible();
-    await expect(page.getByText('Some things are turned off')).toHaveCount(0);
+    await expect(page.getByText('Not sent', { exact: true })).toBeVisible();
+    await expect(page.getByText('See you Thursday.')).toBeVisible();
+    const tryAgain = page.getByRole('button', { name: 'Not sent. Try again.' });
+    await expect(tryAgain).toBeVisible();
+    expect((await tryAgain.boundingBox())!.height).toBeGreaterThanOrEqual(47.5);
+    // The old banner at the foot is gone, and so is the old notice's wording.
+    await expect(page.getByText('Your connection dropped')).toHaveCount(0);
+    await expect(page.getByText('That did not send')).toHaveCount(0);
+  });
+
+  test('Try again sends it once: the message appears once, "Not sent" goes, a quiet "Sent" follows', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await withOneConversation(page);
+    const server = await failingSend(page, 'never-lands');
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await page.getByRole('textbox').fill('See you Thursday.');
+    await page.getByRole('button', { name: /send/i }).click();
+    await expect(page.getByText('Not sent', { exact: true })).toBeVisible();
+
+    await page.getByRole('button', { name: 'Not sent. Try again.' }).click();
+    await expect(page.getByText('Not sent', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('See you Thursday.')).toHaveCount(1);
+    await expect(page.getByText('Sent', { exact: true })).toBeVisible();
+    expect(server.posts()).toBe(2);
+  });
+
+  test('Try again after a send that had in fact gone through does not send a second copy', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await withOneConversation(page);
+    const server = await failingSend(page, 'lands-but-no-answer');
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await page.getByRole('textbox').fill('See you Thursday.');
+    await page.getByRole('button', { name: /send/i }).click();
+    await expect(page.getByText('Not sent', { exact: true })).toBeVisible();
+
+    await page.getByRole('button', { name: 'Not sent. Try again.' }).click();
+    await expect(page.getByText('Not sent', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('See you Thursday.')).toHaveCount(1);
+    // The first try was the message: nothing was posted again.
+    expect(server.posts()).toBe(1);
   });
 
   test('reporting picks a reason and ends in a thank-you, never a dead end', async ({ page }) => {

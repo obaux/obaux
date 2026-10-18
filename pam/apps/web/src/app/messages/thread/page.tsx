@@ -1,11 +1,11 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Text } from '@astryxdesign/core/Text';
 import { Loading, Notice, Page } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
-import { NOTICES, speechLanguageFor } from '@pam/config';
+import { DEFAULT_PAM_HOURS, NOTICES, speechLanguageFor } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../../NotIn';
 import { useSession } from '@/lib/useSession';
@@ -21,6 +21,8 @@ import { DemoThreadLazy } from '../DemoThreadLazy';
 import { ThreadVisit } from '../ThreadVisit';
 import { threadLineFor } from '@/lib/threadLine';
 import { messageProgram } from '@/lib/openConversation';
+import { openPamConversation, PAM_MARK, usePamStatus } from '@/lib/pam';
+import { pamSystemText } from '@/lib/pamMessages';
 
 /**
  * One conversation — read what has been said, and send the next thing.
@@ -59,13 +61,17 @@ function isDummyId(id: string | null): boolean {
 const NO_MESSAGES: readonly never[] = [];
 
 function ThreadScreen() {
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   const { state: session } = useSession();
   const params = useSearchParams();
   const conversationId = params.get('id');
   // A place's Message button (D-541): no conversation yet, only the place. This screen opens, or reuses, the
   // member's conversation with one lead of its program and swaps this address for the conversation's.
   const programId = conversationId ? null : params.get('program');
+  // Contact Pam and Help's Write to Pam (D-605): no conversation id yet, only "my Pam conversation". This screen opens it (made
+  // with Pam's welcome the first time) and swaps this address for the conversation's. Off, or for the Pam team, there is none.
+  const wantsPam = !conversationId && !programId && params.get('pam') === '1';
+  const [pamFailed, setPamFailed] = useState(false);
   const router = useRouter();
   const [programFailed, setProgramFailed] = useState(false);
   // Opened from a program's page (D-313): Back returns there, so a member
@@ -112,17 +118,50 @@ function ThreadScreen() {
     };
   }, [programId, signedIn, trueRole, router, params]);
 
-  const { state, send, sending, sendFailed, limited } = useThread(signedIn && realCanMessage && !exampleId ? conversationId : null);
+  useEffect(() => {
+    if (!wantsPam || !signedIn) return;
+    let cancelled = false;
+    void openPamConversation().then((id) => {
+      if (cancelled) return;
+      if (!id) {
+        setPamFailed(true);
+        return;
+      }
+      router.replace(`/messages/thread/?id=${encodeURIComponent(id)}`);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [wantsPam, signedIn, router]);
+
+  const { state, send, retry, sending, limited } = useThread(signedIn && realCanMessage && !exampleId ? conversationId : null);
 
   // Somebody blocked in this conversation (0076, D-463): the composer says so.
-  const { state: blockState } = useBlockState(signedIn && realCanMessage && !exampleId ? conversationId : null);
+  const { state: blockState } = useBlockState(signedIn && realCanMessage && !exampleId && !(state.status === 'ready' && state.isPam) ? conversationId : null);
   const blocked = blockState?.iBlocked ? 'mine' : blockState?.blockedMe ? 'theirs' : null;
 
   const speechLanguage = speechLanguageFor(locale);
 
   // Other people's words in the reader's language, labelled (D-423). Nothing
   // happens while MESSAGE_TRANSLATION is off.
-  const translations = useMessageTranslations(state.status === 'ready' ? state.messages : NO_MESSAGES);
+  const isPam = state.status === 'ready' && state.isPam;
+  const translations = useMessageTranslations(state.status === 'ready' && !state.isPam ? state.messages : NO_MESSAGES);
+
+  // Pam's side of its own conversation: when Pam is here (for the out-of-hours reply's words), and the system messages drawn in the
+  // reader's language (D-605). The Pam team reads them as Pam's own.
+  const pamStatus = usePamStatus(isPam && state.status === 'ready' && !state.teamView);
+  const hours = pamStatus.status === 'ready'
+    ? { tz: pamStatus.pam.hoursTz, days: pamStatus.pam.hoursDays, open: pamStatus.pam.hoursOpen, close: pamStatus.pam.hoursClose }
+    : DEFAULT_PAM_HOURS;
+  const firstName = session.status === 'signed-in' ? (session.session.firstName ?? null) : null;
+  const shown = useMemo(() => {
+    if (state.status !== 'ready') return NO_MESSAGES;
+    return state.messages.map((m) => {
+      if (m.systemKey === null) return m;
+      const text = pamSystemText(m.systemKey, { t, tPlain, locale, firstName: state.teamView ? null : firstName, hours });
+      return { ...m, body: text };
+    });
+  }, [state, t, tPlain, locale, firstName, hours]);
 
   if (session.status === 'loading') {
     return (
@@ -193,6 +232,28 @@ function ThreadScreen() {
     );
   }
 
+  if (wantsPam) {
+    if (pamFailed || trueRole === 'super_admin') {
+      return (
+        <Page gap={4}>
+          <SubPageHeader title={t('messages.title')} backHref={backHref} backLabel={backLabel} />
+          <Notice
+            notice="service_not_available"
+            title={t('messages.thread.notFound.title')}
+            body={t('messages.thread.notFound.body')}
+            contactLabel={t('help.contact.action')}
+          />
+        </Page>
+      );
+    }
+    return (
+      <Page gap={4}>
+        <SubPageHeader title={t('messages.title')} backHref={backHref} backLabel={backLabel} />
+        <Loading label={t('common.loading')} variant="inline" />
+      </Page>
+    );
+  }
+
   if (demo && conversationId) {
     // `DemoThreadLazy` draws its own `ThreadHeader` inside the pinned block
     // (it knows the pair) and the same `ThreadView` as a real thread.
@@ -224,7 +285,14 @@ function ThreadScreen() {
     );
   }
 
-  const title = state.status === 'ready' ? (state.otherName ?? t('messages.thread.someone')) : t('messages.title');
+  // Pam's conversation (D-605): "Pam" and its mark for the person; the person's own name for the Pam team reading it.
+  const pamAsker = state.status === 'ready' && state.isPam && !state.teamView;
+  const title =
+    state.status === 'ready'
+      ? pamAsker
+        ? t('pam.name')
+        : (state.otherName ?? t('messages.thread.someone'))
+      : t('messages.title');
   // What the name alone cannot say (D-187, D-395): the line under it — "Case
   // manager", or "Program lead at …" with the program's whole name; staff
   // looking at a member see nothing.
@@ -235,7 +303,7 @@ function ThreadScreen() {
 
   if (state.status === 'ready') {
     // Only an example's photo is ever looked up by name (a real person sharing one must not get a stranger's face).
-    const examplePhoto = examplesOn ? staffPhotoFor(state.otherName, state.otherProgramName ?? null) : null;
+    const examplePhoto = pamAsker ? PAM_MARK : examplesOn ? staffPhotoFor(state.otherName, state.otherProgramName ?? null) : null;
     return (
       <ThreadFrame>
         <ThreadTop>
@@ -243,11 +311,12 @@ function ThreadScreen() {
             name={title}
             backHref={backHref}
             backLabel={backLabel}
-            menuHref={`/messages/thread/options/?id=${encodeURIComponent(conversationId ?? '')}`}
+            // Pam's conversation has no ⋯ for the person: no report, no block (D-605). The Pam team's has its own (Close, Reopen).
+            {...(pamAsker ? {} : { menuHref: `/messages/thread/options/?id=${encodeURIComponent(conversationId ?? '')}` })}
           />
         </ThreadTop>
         <ThreadViewLazy
-          messages={state.messages}
+          messages={shown}
           translations={translations}
           otherName={state.otherName}
           otherPhotoUrl={examplePhoto}
@@ -271,8 +340,10 @@ function ThreadScreen() {
           }
           onSend={send}
           sending={sending}
-          sendFailed={sendFailed}
-          limited={limited || accountLimited}
+          onRetry={(id) => void retry(id)}
+          // A limited account can write to Pam (Will, 18 October), so nothing limits this conversation.
+          limited={state.isPam ? false : limited || accountLimited}
+          pam={pamAsker}
           blocked={blocked}
           speechLanguage={speechLanguage}
         />
