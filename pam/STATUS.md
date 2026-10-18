@@ -1642,6 +1642,10 @@ connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merge
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
 
+## Design system & Storybook · Flag screen without its card (18 October)
+
+`/flag/` loses the card around its form, by the D-615 pattern (no card around a single list). Branch `claude/pam-design-flag-no-card`; Piper told; Will sees the pictures before it ships.
+
 ## Design system & Storybook · Explore bell and staff search (18 October)
 
 A member's Explore draws the bell only while something is unread; the staff Home's member search is a plain field (D-610). Branch `claude/pam-design-explore-bell`; waits on Mira. a86 (`claude/pam-design-search-bar-look`) takes it by merge next.
