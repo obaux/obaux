@@ -78,9 +78,9 @@ Why each clause is there, and what makes it true:
 - **No network address is read or kept at all** (Nico's last change: signed-out reports share one cap of 30 a minute, and the signed-in counter is
   keyed on the account). That removes the salted-md5 question I raised at 21:40 and a sentence Privacy would otherwise have needed. The pin
   holds it (`error-log-line.test.ts`).
-- **The signed-in rate-limit counter holds an account id for "five minutes at most", with one caveat:** a report deletes counters older than five
-  minutes, and the nightly sweep deletes those older than an hour, so after a quiet night a counter can sit until the next report or 04:20. It is
-  no new fact: the request log (p11) already holds which account called and when, for a week.
+- **The signed-in rate-limit counter holds an account id for five minutes at most, and now that is true:** Nico gave the counters their own `pg_cron` job
+  every five minutes (`f71a4665`) on top of the clear at each report, after I pointed out that a quiet night could leave one until 04:20. It is no
+  new fact either way: the request log (p11) already holds which account called and when, for a week. The pin holds the function and the schedule.
 - **The shared caps (30 a minute signed out, 200 overall) can be used up** by a script, which would hide real reports for that minute. A robustness
   question for Nico, not a Privacy one.
 
