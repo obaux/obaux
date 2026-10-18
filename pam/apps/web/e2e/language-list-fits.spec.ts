@@ -229,6 +229,42 @@ test.describe('320×320', () => {
     expect(await unreachable(page, 'listbox', 'option'), 'languages that cannot be scrolled to').toEqual([]);
   });
 
+  // The list in the sheet has no cap of its own (it had Astryx's 300px, then 288px): the sheet scrolls, and a list that scrolls inside it as well
+  // is two boxes for one list, which had to be scrolled together to reach Arabic (Mira, 18 October: one box is the sheet's).
+  test(`${SIGN_UP} on a screen too short for the whole list scrolls in one box, the sheet's, and every language is reached by it`, async ({ page }) => {
+    await newcomer(page);
+    await page.goto('/join/');
+    await settled(page);
+    await page.getByRole('combobox', { name: en['onboarding.language.title'] }).click();
+    const m = await measure(page, 'listbox', 'option');
+    expect(m.list, 'a list was found').not.toBeNull();
+    const result = await page.evaluate(() => {
+      const rows = [...document.querySelectorAll<HTMLElement>('[role="option"]')].filter((row) => row.getBoundingClientRect().height > 0);
+      const list = rows[0]!.closest<HTMLElement>('[role="listbox"]')!;
+      // Every box round the list that scrolls: the list itself, the sheet's content, anything else.
+      const boxes: HTMLElement[] = [];
+      for (let el: HTMLElement | null = list; el && el !== document.documentElement; el = el.parentElement) {
+        if (/(auto|scroll)/.test(getComputedStyle(el).overflowY) && el.scrollHeight > el.clientHeight + 1) boxes.push(el);
+      }
+      const names = boxes.map((box) => box.getAttribute('role') ?? box.tagName.toLowerCase());
+      const lost: string[] = [];
+      for (const row of rows) {
+        for (const box of boxes) {
+          const edge = box.getBoundingClientRect();
+          const b = row.getBoundingClientRect();
+          if (b.bottom > edge.bottom) box.scrollTop += b.bottom - edge.bottom;
+          else if (b.top < edge.top) box.scrollTop -= edge.top - b.top;
+        }
+        const b = row.getBoundingClientRect();
+        if (b.top < -0.5 || b.bottom > window.innerHeight + 0.5) lost.push((row.textContent ?? '').trim());
+      }
+      return { names, lost, listScrolls: boxes.includes(list) };
+    });
+    expect(result.names, 'the boxes that scroll round the list').toHaveLength(1);
+    expect(result.listScrolls, 'the list itself does not scroll').toBe(false);
+    expect(result.lost, 'languages the sheet cannot be scrolled to').toEqual([]);
+  });
+
   // The globe's menu opens under the globe, so on this screen it has 248px of room and the cap alone (288px) ran it 40px past the bottom:
   // Arabic was reached only by scrolling the page and the menu together (Iris, 18 October). The popover keeps to the room it has.
   test("Sign in: the globe's menu on a screen too short for the whole list stays on the screen, and every language can be scrolled to", async ({ page }) => {

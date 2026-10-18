@@ -387,15 +387,22 @@
    * screen. These lists are found by their rows (`TaggedWords` marks the ones that start with the English tag), so the
    * City list and every other menu keep the cap. The new cap is nine rows of the touch target (seven languages and room for
    * two more), and the viewport still limits it, less a gap above and below.
-   * Three selectors because the cap is in three places: the globe's menu, the popover round it (which decides where the
-   * menu opens), and a dropdown's list, which on Sign up is the list inside the bottom sheet (`LanguageField`): the sheet
-   * has the room, and the list inside it still has Astryx's 300px.
+   * Two selectors because the cap is in two places: the globe's menu and the popover round it (which decides where the
+   * menu opens). The list in Sign up's sheet (`LanguageField`) has Astryx's 300px, which is lifted below.
    */
   .astryx-dropdown-menu:has([data-pam-tagged]),
-  [popover]:has(.astryx-dropdown-menu [data-pam-tagged]),
-  [role='listbox']:has([data-pam-tagged]) {
+  [popover]:has(.astryx-dropdown-menu [data-pam-tagged]) {
     max-block-size: min(calc(9 * var(--pam-touch-target-min)), calc(100vh - 2 * var(--spacing-4)));
     max-block-size: min(calc(9 * var(--pam-touch-target-min)), calc(100dvh - 2 * var(--spacing-4)));
+  }
+
+  /*
+   * The list inside Sign up's sheet has no cap of its own: the sheet round it scrolls when the window is short, and a list with a
+   * cap as well scrolled inside it, two boxes for one list that had to be scrolled together (320×320: the sheet's content area and
+   * the list). The sheet is the one box. A window with room for the seven rows is as it was.
+   */
+  [role='listbox']:has([data-pam-tagged]) {
+    max-block-size: none;
   }
 
   /*
