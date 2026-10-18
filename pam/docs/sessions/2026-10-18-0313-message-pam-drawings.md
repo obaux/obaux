@@ -4,7 +4,7 @@
 
 ## What changed
 
-Drawings for card "Message Pam" from Nico's plan (claude/messages-plan-message-pam @ bfeead66): `stories/roles/states/MessagePam.stories.tsx` (Design/Message Pam (plan)), M1 Messages with Pam as the one row (and with others), M2 the Pam thread (pinned lines, a reply from Pam), M3 Contact Pam (Help's first row, and the empty thread it opens), M4 the super admin's Home with a Pam inbox row and its plain count, M5 the inbox (Waiting | Closed), M6 the super admin's thread (and starting one), M7 the New message sheet with members and programs. Pictures in `docs/design/review/2026-10-18-message-pam/` at 390 and 320, light, dark and Arabic. Nothing is built: the words are placeholders for Sage, the Arabic are stand-ins, and no app code changed.
+Drawings for card "Message Pam" from Nico's plan (claude/messages-plan-message-pam @ bfeead66): `stories/roles/states/MessagePam.stories.tsx` (Design/Message Pam (plan)), M1 Messages with Pam as the one row (and with others), M2 the Pam thread (pinned lines, a reply from Pam), M3 Contact Pam (Help's first row, and the empty thread it opens), M4 the super admin's Home with a Pam inbox row and its plain count, M5 the inbox (Waiting | Closed), M6 the super admin's thread (and starting one), M7 the New message sheet with members and programs. Pictures in `docs/design/review/2026-10-18-message-pam-ab/` at 390 and 320, light, dark and Arabic. Nothing is built: the words are placeholders for Sage, the Arabic are stand-ins, and no app code changed.
 
 ## What was wrong, and what missed it
 
@@ -25,3 +25,7 @@ Where Ava's inbox sits: drawn as a Home row that opens a list (M4, M5), and the 
 ## Needs a human
 
 Will picks on the card (Nico's nine questions).
+
+## Round 2 (18 October, 03:50): two versions, for Will to choose
+
+Mira asked for both: **A** (Iris's smallest v1: "Write to Pam" under Help's answers, the person writes first, no Pam row in Messages until they do, the super admin answers and does not start a conversation with a member) and **B** (Nico's plan: Pam in everyone's Messages, the super admin starts a conversation with a member or a program). Both carry Sage's draft card (ledger d9174a60, unsigned) at the top of the thread and Ava's inbox (claude/pam-message-pam-admin-plan @ c50f0f8f): a Home row first with a plain count, `/pam/messages/` with Waiting for Pam (longest first, with the wait), Answered, Closed folded, the stat line, saved replies and Close in the thread's menu. Stories: `MessagePam.stories.tsx` X1-X6 (both), A1-A3, B1-B6. The first-round pictures (single plan) were replaced by `2026-10-18-message-pam-ab/`. The card's 911/988 paragraph is second and bold; measured at 320 x 568 with the keyboard closed it ends at y=343 of 568 (composer top 422), in English and Arabic (296), so it reads without scrolling when a thread opens at its card. The build must open an empty thread at the card, not at the bottom (ThreadView scrolls to the latest message).
