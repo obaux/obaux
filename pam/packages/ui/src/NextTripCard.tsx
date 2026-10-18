@@ -29,7 +29,7 @@ export interface NextTripCardProps {
   readonly href: string;
   /** The whole card read out — "Your next visit: School and training, Tue …". */
   readonly label: string;
-  /** A line under the time, e.g. "Booked for you by {program}" (D-595). */
+  /** A line under the time, e.g. "Booked for you" when a program booked it (D-595; Will, 15:21: no program name on the card). */
   readonly mark?: string | null;
 }
 

@@ -640,3 +640,73 @@
 :root { overflow-wrap: break-word; }
 :root:not([lang='en']) { hyphens: auto; }
 :root:lang(zh-CN), :root:lang(zh-HK) { line-break: strict; }
+
+/*
+ * The press layer (Will, 17 October 2026, card a99: "a more sophisticated interaction layer across the app for tapable items, where it
+ * feels like someone is tapping or pressing in. Right now those items are feeling very flat"). Three things, all on `:active`, which iOS
+ * Safari applies because the app keeps one touchstart listener (packages/ui/src/tapRows.ts):
+ *
+ *   - a ROW or a SEGMENT of a switch darkens while held: a quick 7% shade (10% white in the dark), in at 60ms, released over 200ms;
+ *   - a CARD or TILE and a BUTTON press in: scale(0.97) with the same shade on a card, in at 90ms, a soft release over 220ms;
+ *   - reduced motion keeps the shade and drops the scale: no transform, no transition.
+ *
+ * `Press` (packages/ui/src/motion.tsx) already scales a primary button's wrapper to 0.97; it is marked `data-pam-press`, and what is
+ * inside it is left to it so a primary button does not press to 0.94.
+ */
+@layer pam {
+  :root {
+    --pam-press-shade: light-dark(oklch(0 0 0 / 7%), oklch(1 0 0 / 10%));
+    --pam-press-scale: 0.97;
+    --pam-press-in: 90ms;
+    --pam-press-out: 220ms;
+    --pam-press-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* A row: darken while held. */
+  .astryx-item {
+    transition: background-color var(--pam-press-out) var(--pam-press-ease);
+  }
+  .astryx-item:active {
+    background-color: var(--pam-press-shade);
+    transition-duration: 60ms;
+  }
+
+  /* A segment of a switch (Day | Week | Month, Conversations | Reported): shade while held, no scale. */
+  .astryx-segmented-control-item {
+    transition: background-image var(--pam-press-out) var(--pam-press-ease);
+  }
+  .astryx-segmented-control-item:active {
+    background-image: linear-gradient(var(--pam-press-shade), var(--pam-press-shade));
+    transition-duration: 60ms;
+  }
+
+  /* A card or tile that opens something, and a button: press in. */
+  .astryx-clickable-card,
+  .astryx-button {
+    transition-property: transform, background-color, border-color, opacity, background-image;
+    transition-duration: var(--pam-press-out), 125ms, 125ms, 125ms, 125ms;
+    transition-timing-function: var(--pam-press-ease);
+  }
+  .astryx-clickable-card:active {
+    transform: scale(var(--pam-press-scale));
+    background-image: linear-gradient(var(--pam-press-shade), var(--pam-press-shade));
+    transition-duration: var(--pam-press-in), 125ms, 125ms, 125ms, 125ms;
+  }
+  .astryx-button:active:not(:disabled, [aria-disabled='true']):not([data-pam-press] *) {
+    transform: scale(var(--pam-press-scale));
+    transition-duration: var(--pam-press-in), 125ms, 125ms, 125ms, 125ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .astryx-item,
+    .astryx-segmented-control-item,
+    .astryx-clickable-card,
+    .astryx-button {
+      transition: none;
+    }
+    .astryx-clickable-card:active,
+    .astryx-button:active:not(:disabled, [aria-disabled='true']):not([data-pam-press] *) {
+      transform: none;
+    }
+  }
+}

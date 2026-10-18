@@ -108,12 +108,32 @@ function localTimeZone(): string {
 
 export type NewTrip = Omit<AddedTrip, 'id'>;
 
+/** Why the database refused a program's booking for a member (D-595): each one is true, and none is fixed by trying again as it was. */
+export type BookRefusal = 'member' | 'already' | 'limit' | 'past' | 'far' | 'place' | 'service';
+export interface BookRefused {
+  readonly refused: BookRefusal;
+}
+const REFUSALS: readonly (readonly [string, BookRefusal])[] = [
+  ['MEMBER_NOT_LINKED', 'member'],
+  ['ALREADY_BOOKED', 'already'],
+  ['RATE_LIMIT', 'limit'],
+  ['TRIP_IN_THE_PAST', 'past'],
+  ['TRIP_TOO_FAR', 'far'],
+  ['PLACE_NOT_FOUND', 'place'],
+  ['SERVICE_NOT_FOUND', 'service'],
+];
+/** Which refusal the database's error is, or null for any other (a network failure, a signed-out caller: the generic message). */
+export function bookRefusalOf(error: { readonly message?: string } | null | undefined): BookRefusal | null {
+  const said = error?.message ?? '';
+  return REFUSALS.find(([code]) => said.includes(code))?.[1] ?? null;
+}
+
 /**
  * Plan a trip: saved when it can be, kept in this tab when not. Resolves the
  * trip with its id, or null when it could not be saved (nothing is shown as
- * booked then).
+ * booked then). A program booking for a member that the database refuses resolves `{ refused }`, saying which refusal (D-595).
  */
-export async function bookTrip(session: SessionState, trip: NewTrip): Promise<AddedTrip | null> {
+export async function bookTrip(session: SessionState, trip: NewTrip): Promise<AddedTrip | BookRefused | null> {
   // A program lead booking for a member who wrote to it (D-595): saved for real, on the member's Trips.
   if (trip.forMemberId && isSavedPlace(trip.forMemberId) && isSavedPlace(trip.placeId) && session.status === 'signed-in' && !session.session.isDemo) {
     try {
@@ -125,7 +145,11 @@ export async function bookTrip(session: SessionState, trip: NewTrip): Promise<Ad
         p_program_service_id: trip.serviceId !== undefined && isSavedPlace(trip.serviceId) ? trip.serviceId : null,
         p_timezone: localTimeZone(),
       });
-      if (error || !data) return null;
+      if (error) {
+        const refused = bookRefusalOf(error);
+        return refused ? { refused } : null;
+      }
+      if (!data) return null;
       const row = data as { id: string; starts_at: string };
       return { ...trip, id: row.id, startsAt: row.starts_at, bookedByProgram: true };
     } catch {

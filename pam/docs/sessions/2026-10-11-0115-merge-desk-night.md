@@ -1418,6 +1418,34 @@
   touchstart listener for iOS `:active`; Storybook's preview the same; MenuList's comment corrected; e2e
   row-taps.spec.ts and unit tap-rows.test.tsx). Iris's calendar research 6259d308 (docs only).
 
+- **b60 pushed (21:13, 62ba50e4).** Main CI green 21:45; Vercel web and pam-site success. Dot and Iris told; Iris's
+  interaction run-through began on main.
+- **Iris's interaction run-through (22:33, ea2583f9, in b61).** 149 screens and 1,138 controls across four roles, each
+  tapped at its middle and edges: no dead taps, nothing that can't be left. One finding stops someone (S1: the
+  language list before sign-in hides Arabic) and went to Lena; W1, P3 and P4 to Piper; W2 and P2 to Dot after the
+  press layer; W3 is what a97 fixes; W4 to Nico; P5 to Ava; P1 is Dot's press layer.
+- **Card a98 (22:16).** Dot's options A and B for the Calendar screen, with the two Privacy lines for Will to sign
+  and Lena's note on what showing the link again costs.
+- **Card a99 (23:02).** Dot's press-in layer (b4e48c1a, D-602) with two clips (converted to MP4 for Will's iPhone);
+  Control Room v26 (version 45) plays a clip from the page's own picture store.
+- **Nico's dictation lines (W4).** fa69f253, then 8f7102c7: the merge desk put back the rule that the microphone is
+  hidden on a browser with no speech recognition (the brief had listed that case by mistake); Sage signed the ten lines
+  (ledger a2703793); Lena translates after S1.
+- **Batch b61 (17 October, 22:40 to 23:16).** Piper's e1edb3f1 (Book a visit's list only from
+  my_program_bookable_members; a failed list read says something went wrong; each of the seven refusals shows Sage's
+  line; the two stale comments) with Lena's 8d100f0a on top (the seven lines in six languages and their pin). Iris's
+  b58 re-test (cafb4b20) and run-through (ea2583f9), and Sage's ledger, docs only.
+- **Card a98, plan C (23:50).** Will wrote to Dot directly: every calendar event carries the place and address, one
+  visit is added from a calendar button in the booked card, and "Sync all future trip details?" leads to a Calendar
+  screen that names the linked calendar. Dot drew it (e282408e); the card asks Will to confirm it ("yes C") before
+  anything is built, since it reached the desk second-hand.
+- **Control Room v27 (23:25, version 46).** On a phone the picture button sits top right, above Send, and the words
+  get the left of the box (Will, 23:19).
+- **Batch b62 (17 October, 23:19 to 23:56).** Dot's b4e48c1a, the press-in layer (D-602, Will's yes on a99 at
+  23:17): a row darkens, a card, tile or button presses in to 97%, a switch's segment shades without moving, and
+  reduced motion keeps only the shade. Ava's 92c978bf (Iris's P5): sign-up's "Pam is only in these cities for now."
+  is a line under the city field, not a row in its list. No new words, no migrations.
+
 ## What was wrong, and what missed it
 
 - **A flaky test's evidence was wiped before anyone read it (b55).** The merge desk re-ran invite.spec.ts:178 fifteen
@@ -1645,6 +1673,10 @@
   row … did not open it". Lesson: read a proof's failure messages, not its count; a proof must fail on the assertion
   it claims, not on setup that only the new code satisfies.
 
+- **A cleanup that the safety check stopped (b61 proof, 22:50).** A proof command ended in `rm -rf test-results/*`
+  after a `cd`, a relative glob the check cannot resolve; the whole command was refused and nothing ran. Re-run without
+  it (Playwright clears its own results). Lesson: no relative `rm` after a `cd`; there was nothing to clean.
+
 ## Decisions
 
 - Will's answer on a card goes to the teammate waiting on it the same turn. If that teammate needs Will's own
@@ -1857,9 +1889,24 @@
 | Row taps proof on main cffe1c68 (row-taps.spec.ts from 6e9b59de, --retries=0) | run 1: 15 failed, all on the `data-row-taps` wait (hollow); run 2 without that wait: 15 failed (5 tests × 3 projects), each a top-left tap that didn't open its row |
 | Batch b60, full run (24257e53: Dot 6e9b59de): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1375 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 188 / 10.4 kB spare / 2081 passed, 19 skipped, 0 failed / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
 | Calendar links live (19:24, a count) | 1 |
+| b60 main CI (62ba50e4) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (21:45); Vercel web and pam-site success |
+| b61 proof: book-for-member-real and program-books-for-member from b61, on main's build (b60 code), --retries=0 | 27 failed (9 tests × 3 projects), each on its assertion (the blocked member listed, a failed read shown as nobody, each refusal without its line); 33 passed (unchanged) |
+| Batch b61, full run (a72f2b3d: Piper e1edb3f1, Lena 8d100f0a, Iris cafb4b20 and ea2583f9, Sage's ledger): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1386 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 188 / 10.3 kB spare / 2108 passed, 19 skipped, 0 failed / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
+| b61 main CI (bf23451b) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (23:52); Vercel web and pam-site success |
+| b62 proof: press-layer.spec from b4e48c1a, on main bf23451b's build, --retries=0 | 12 failed (4 tests × 3 projects), each on its assertion (a card at scale 1, not 0.97; a row with no shade) |
+| b62 proof: join.spec from 92c978bf, on main bf23451b's build, --retries=0 | 3 failed (the new test × 3 projects, on toBeVisible: no note under the city field), 72 passed |
+| Batch b62, full run (ae016693: Dot b4e48c1a, Ava 92c978bf): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1386 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 188 / 10.3 kB spare / 2123 passed, 19 skipped, 0 failed / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
 
 ## Left undone
 
+- **As of b62 (17 October, 23:56):** b63 takes Lena's S1 (95d3fb42: the language lists show all seven; its spec
+  fails 24 of 24 on b62's build, on its check). Lena then: Nico's dictation lines in six languages on 8f7102c7, one
+  READY with Nico. Piper: W1, P3, P4, on one branch. Dot: W2 and P2 (f9b12280, e2e re-running), and plan C's small
+  fixes. Sage and Lena: plan C's two Privacy lines. Iris: re-test b61's Book a visit list and refusals. With Will:
+  a86, a91, a93, a97 (fixes W3), a98 (now plan C, from Will's note to Dot: "yes C" asked on the card), a84, a88.
+- **As of b61 (17 October, 23:16):** Lena: S1 (the language list), then Nico's dictation lines in six languages on
+  8f7102c7, one READY with Nico. Piper: W1, P3, P4. Dot: W2, then P2; the press layer b4e48c1a waits on Will (a99).
+  Ava: P5. With Will: a86, a91, a93, a97 (fixes W3), a98, a99, a84, a88.
 - **As of b60 (17 October, 21:12):** b61 takes Piper's Book a visit list and refusals (READY owed) with Lena's six
   languages (8d100f0a) on top. Dot: calendar options A and B for card a98, then the press-in layer for card a99. Iris:
   the interaction run-through once b60 is live. With Will: a86, a91, a93, a97 ("Approved" passed on by Dot with no
