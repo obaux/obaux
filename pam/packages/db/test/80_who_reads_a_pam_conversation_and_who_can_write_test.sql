@@ -46,6 +46,9 @@ insert into auth.users (id, phone) values (:'rosa', '12675550801');
 insert into public.profiles (id, role, first_name, region_id, phone, access_status) values
   (:'rosa', 'member', 'Rosa', :'region_north', '+12675550801', 'active');
 
+-- The clock is real, so Pam is open all week here: an out-of-hours reply would add a message the counts below do not expect (test 83 tests it).
+update public.app_settings set value = '{"tz":"America/New_York","days":[1,2,3,4,5,6,7],"open":"00:00","close":"23:59"}' where key = 'pam_hours';
+
 -- Marcus's one Pam conversation, with two messages: one from him, one from the team.
 insert into public.conversations (id, kind) values (:'pam_c', 'support');
 insert into public.conversation_members (conversation_id, profile_id) values (:'pam_c', :'marcus');
@@ -180,3 +183,4 @@ begin
   end;
 end;
 $$;
+update public.app_settings set value = '{"tz":"America/New_York","days":[1,2,3,4,5],"open":"09:00","close":"17:00"}' where key = 'pam_hours';

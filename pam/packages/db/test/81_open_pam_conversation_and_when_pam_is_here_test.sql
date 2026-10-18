@@ -67,6 +67,8 @@ update public.app_settings set value = '{"tz":"America/New_York","days":[1,2,3,4
 
 \echo ''
 \echo '--- Open a Pam conversation: nothing while the switch is off ---'
+-- The clock is real, so Pam is open all week here: an out-of-hours reply would add a message the counts below do not expect (test 83 tests it).
+update public.app_settings set value = '{"tz":"America/New_York","days":[1,2,3,4,5,6,7],"open":"00:00","close":"23:59"}' where key = 'pam_hours';
 set role authenticated;
 select test.as_user(:'rosa');
 select test.check_text('switch off: no conversation and no id',
@@ -101,7 +103,7 @@ select test.check('...and only the welcome',
   (select count(*) from public.messages where conversation_id = (select v from t81 where k = 'first')), 1);
 select test.check_text('pam_status says it is on, with the hours',
   (select live::text || ' ' || hours_tz || ' ' || hours_open::text || ' ' || hours_close::text from public.pam_status()),
-  'true America/New_York 09:00:00 17:00:00');
+  'true America/New_York 00:00:00 23:59:00');
 select test.check('conversation_partners gives the Pam side as one row with no profile, name or role',
   (select count(*) from public.conversation_partners()
      where conversation_id = (select v from t81 where k = 'first') and profile_id is null and first_name is null and role is null), 1);
@@ -123,3 +125,4 @@ select test.check('...and reads both people''s Pam conversations',
   (select count(*) from public.pam_threads where asker_id in (:'rosa', :'alice')), 2);
 reset role;
 update public.app_settings set value = 'off' where key = 'pam_messaging_live';
+update public.app_settings set value = '{"tz":"America/New_York","days":[1,2,3,4,5],"open":"09:00","close":"17:00"}' where key = 'pam_hours';

@@ -73,6 +73,8 @@ insert into public.services (id, org_id, name, category, address, source, source
   (:'svc_n', :'org_n', 'Pam Msg No Lead', 'workforce', '2 Pam St', 'manual', null, false, true),
   (:'svc_g', null, 'Pam Msg Gathered', 'workforce', '3 Pam St', 'city_import', 'pam-msg-3', false, true);
 update public.app_settings set value = 'on' where key = 'pam_messaging_live';
+-- The clock is real, so Pam is open all week here: an out-of-hours reply would add a message the counts below do not expect (test 83 tests it).
+update public.app_settings set value = '{"tz":"America/New_York","days":[1,2,3,4,5,6,7],"open":"00:00","close":"23:59"}' where key = 'pam_hours';
 
 \echo ''
 \echo '--- Only the Pam team calls any of these ---'
@@ -212,3 +214,4 @@ select test.check_text('wider, the old one counts too: three answered',
 rollback;
 reset role;
 update public.app_settings set value = 'off' where key = 'pam_messaging_live';
+update public.app_settings set value = '{"tz":"America/New_York","days":[1,2,3,4,5],"open":"09:00","close":"17:00"}' where key = 'pam_hours';
