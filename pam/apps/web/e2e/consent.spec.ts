@@ -76,21 +76,52 @@ test.describe('agreeing to reminders', () => {
     await page.goto('/reminders/');
     // Sage's signed line (a94, Will 17 October): "before each visit", so it covers a visit a program booked too. The old line, "a visit you
     // planned", must fail here: this list is what the carrier reads as the opt-in.
-    await expect(page.getByText('A reminder before each visit, with the address.', { exact: true })).toBeVisible();
+    // The kinds are Text alerts' own names (Sage 11175802), read from the bundle: one vocabulary, no full stops.
+    await expect(page.getByText(en['alerts.visit'], { exact: true })).toBeVisible();
+    await expect(page.getByText(en['alerts.closed'], { exact: true })).toBeVisible();
     await expect(page.getByText(/a visit you planned/i)).toHaveCount(0);
-    // No promise about how often: only what really goes out today (10 October 2026, D-453).
-    await expect(page.getByText(/Pam does not send any of these yet/i)).toBeVisible();
+    await expect(page.getByText('A reminder before each visit, with the address.', { exact: true })).toHaveCount(0);
+    // No sentence about what is not sent yet: a "Coming soon" badge under each row whose text is not (D-608). Texts are held, so both.
+    await expect(page.getByText(/Pam does not send any of these yet/i)).toHaveCount(0);
+    await expect(page.getByText('Coming soon', { exact: true })).toHaveCount(2);
+    await expect(page.getByText('Kinds of texts', { exact: true })).toBeVisible();
+    await expect(page.getByText(/Pam can text you the reminders/)).toHaveCount(0);
     await expect(page.getByText(/few messages a week/i)).toHaveCount(0);
     await expect(page.getByText(/Reply STOP/)).toBeVisible();
     await expect(page.getByText(/rates may apply/i)).toBeVisible();
+  });
+
+  test('the one line about sender, frequency, STOP, HELP and rates is on screen without scrolling at 320 x 568 (D-608)', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 568 });
+    await page.goto('/reminders/');
+    await settled(page);
+    const how = page.getByText(en['reminders.how'], { exact: true });
+    await expect(how).toBeVisible();
+    const box = (await how.boundingBox())!;
+    expect(box.y + box.height).toBeLessThanOrEqual(568);
+    // The rows come before it, each with its badge under the name.
+    await expect(page.getByText('Kinds of texts', { exact: true })).toBeVisible();
   });
 
   test('signed out, it still explains the choice and points at sign-in', async ({ page }) => {
     // Hiding the question behind a sign-in explains nothing. What Pam would
     // send is shown; the thing to do next is sign in, so that is the button.
     await page.goto('/reminders/');
-    await expect(page.getByText('A reminder before each visit, with the address.', { exact: true })).toBeVisible();
+    await expect(page.getByText(en['alerts.visit'], { exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Sign in' })).toBeVisible();
+  });
+
+  test('sent here from a Text alerts switch, Back goes to Text alerts and says so; from Profile it is Back to Profile (Iris B2)', async ({ page }) => {
+    await page.goto('/reminders/?next=alerts&kind=message');
+    await settled(page);
+    const fromAlerts = page.getByRole('link', { name: 'Back to Text alerts' });
+    await expect(fromAlerts).toHaveAttribute('href', '/alerts/');
+    await expect(page.getByRole('link', { name: 'Back to Profile' })).toHaveCount(0);
+
+    await page.goto('/reminders/');
+    await settled(page);
+    await expect(page.getByRole('link', { name: 'Back to Profile' })).toHaveAttribute('href', '/profile/');
+    await expect(page.getByRole('link', { name: 'Back to Text alerts' })).toHaveCount(0);
   });
 
   test('signed in, saying no is one tap and is a real answer', async ({ page }) => {

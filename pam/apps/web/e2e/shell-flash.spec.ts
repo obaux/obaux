@@ -30,7 +30,7 @@ async function signedInAs(page: Page, role: string, options: { holdProfile?: boo
       window.localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(session));
     }
   }, ME);
-  await page.route('**/auth/v1/user*', (route) => route.fulfill(json({ id: ME, phone: '12673095265' })));
+  await page.route('**/auth/v1/user*', (route) => route.fulfill(json({ id: ME, phone: '12155550191' })));
   await page.route('**/rest/v1/**', (route) => route.fulfill(json([])));
   await page.route('**/rest/v1/rpc/member_points*', (route) => route.fulfill(json(250)));
   await page.route('**/rest/v1/profiles*', (route) => {
