@@ -8,6 +8,22 @@ Replace the developer-style controls panel with a simple, user-facing **mood dra
 
 Each mood is a breathing pattern that already exists. The drawer only changes how patterns are presented and chosen.
 
+## Design system boundary
+
+Will's team has its own design system (typography, colour, components, spacing). It owns how things **look**. This brief owns what things **do** and **say**.
+
+The design system owns:
+- The dock button, including how the mood name is shown on it.
+- The timer and its labels: the counter in the middle (`#phase` cue and `#count` number).
+- All typography, colour, radius, elevation and spacing tokens.
+- The drawer's cards, buttons and links as components.
+
+You build structure and behaviour only:
+- Use semantic markup and stable class names or `data-` attributes so the design system can be applied without rewriting the logic (suggested: `data-mood`, `data-selected`, `.mood-card`, `.mood-drawer`, `.mood-begin`, `.dock-mood`).
+- Do not choose fonts, font sizes, colours, radii or shadows. Where a style is unavoidable to make the page usable, put it in one clearly marked `/* placeholder: replace with design system tokens */` block using neutral defaults and CSS custom properties (for example `--ds-surface`, `--ds-text`, `--ds-accent`), so the design system can override them in one place.
+- Do not restyle `#phase` or `#count`. Leave them exactly as they are. The design system will take them over.
+- Layout rules that exist for function stay: minimum 44px touch targets, safe-area padding, bottom placement, no horizontal scroll.
+
 ## Do not change
 
 - The art: the sky, the two half-ellipses, the stars, the fade and blur behaviour, the counter in the middle.
@@ -31,12 +47,12 @@ Default mood: **Calm**.
 
 ## Entry point
 
-- The bottom dock keeps one button. Its label is the **current mood name** followed by a small chevron (for example `Calm ⌄`). Tapping it opens the drawer.
+- The bottom dock keeps one button. It shows the **current mood name** (Calm, Balanced, Sleepy or Focused). Tapping it opens the drawer. The design system decides how the mood name is presented on the button; render the name as plain text inside `.dock-mood` and expose the current mood as `data-mood` on the button.
 - Minimum height 44px. Keep the existing dock position and safe-area padding.
 
 ## Drawer behaviour
 
-- **Phone (width 640px or less):** bottom sheet, full width, rounded top corners (14px), max height 62% of the screen, content scrolls inside if needed. A small drag handle at the top.
+- **Phone (width 640px or less):** bottom sheet, full width, rounded top corners, max height 62% of the screen, content scrolls inside if needed. A drag handle at the top.
 - **Larger screens:** a 360px wide floating card, centered at the bottom.
 - Close it by: tapping outside it, swiping the sheet down, pressing `Escape`, or choosing **Begin**.
 - While the drawer is open, **pause the breath clock**. If it closes without Begin, resume exactly where it was.
@@ -78,19 +94,21 @@ Button: `Got it`
 
 Remember that the person has seen it with `localStorage` under a single key. Wrap every read and write in `try/catch`. If storage is unavailable, show it once per page load instead. Never block the app on storage.
 
-## Visual style
+## Styling: handled by the design system
 
-Match the page. Use the same dark glass as the existing panel and the existing palette.
+Do not invent a visual style. Build the structure with neutral placeholder styling and leave the real look to the design system (see "Design system boundary").
 
-- Sheet: `rgba(20,18,20,.82)` with `backdrop-filter: blur(8px)`. White text. System font (`system-ui`).
-- Heading 18px, weight 600. Card mood name 18px, weight 600. Card second line 14px, white at about 70% opacity.
-- Cards: full width, minimum height 72px, 12px radius, 8px gap between them, 16px inner padding. A faint white 6% fill and a 1px white 12% border.
-- Selected card: 2px border in orange `#ff8a3a` (the page's rim colour) and a white 10% fill. Do not rely on colour alone. Also show a check mark at the right edge of the selected card.
-- Begin button: full width, minimum height 52px, orange `#ff8a3a` background with dark text `#060b24`, 12px radius.
-- Footer text 13px, white at 70%. The `Good to know` link is underlined.
-- Sheet open and close: 250ms slide and fade.
+What the structure must provide so the design system can style it:
+- Each card is one tappable element containing two separate text nodes: the mood name and the "from → to" line, in that order.
+- The selected card carries `data-selected="true"` and `aria-checked="true"`, and shows a **non-colour** selected indicator in the markup (an element for a check mark, not only a colour change). The design system styles it.
+- The Begin button, the footer line and the `Good to know` link are separate elements, each with its own class.
+- The sheet has a handle element, a heading, a card list, a button and a footer, in that order.
+
+Behaviour that stays in this build:
+- Sheet open and close is a slide and fade. Keep the transition duration in one custom property (default 250ms) so the design system can change it.
 - Respect `prefers-reduced-motion`: turn the slide off, keep a quick fade.
 - Respect `env(safe-area-inset-bottom)` for bottom padding. Keep at least 16px of side gutter.
+- A neutral dark placeholder surface and light text are fine, so the drawer is readable until the design system is applied. Keep them in the marked placeholder block.
 
 ## Accessibility
 
@@ -99,15 +117,15 @@ Match the page. Use the same dark glass as the existing panel and the existing p
 - Move focus into the drawer when it opens. Trap focus inside while open. Return focus to the dock button when it closes.
 - Every tappable control is at least 44px tall.
 - Visible keyboard focus ring on every control (2px white outline with offset).
-- Text contrast of at least 4.5:1 on the glass background.
+- Text contrast is the design system's job, but do not ship placeholder colours that fail 4.5:1.
 
 ## Acceptance checks
 
 Test at 390x780 and 360x740 phone viewports and at one wide desktop viewport.
 
-1. Page opens on Calm and the breath is running as before. The dock button reads `Calm ⌄`.
+1. Page opens on Calm and the breath is running as before. The dock button shows `Calm`.
 2. Tap the dock button: drawer opens, breath pauses, four cards and Begin are visible. On a 390x780 phone, all four cards, the button and the footer fit without scrolling. If they do not fit at 360x740, the content scrolls inside the sheet.
-3. Tap Sleepy: it shows as selected (border, check mark) and the button reads `Begin Sleepy`.
+3. Tap Sleepy: it is marked selected (`data-selected`, `aria-checked`, check mark element present) and the button reads `Begin Sleepy`.
 4. Tap Begin the first time: `Good to know` appears. Tap `Got it`: the drawer closes and Sleepy starts from the start of its inhale. The counter reads `Breathe in 4`.
 5. Reopen, pick another mood, Begin: no `Good to know` this time.
 6. Tap the `Good to know` link: the panel opens again.
@@ -125,12 +143,12 @@ Test at 390x780 and 360x740 phone viewports and at one wide desktop viewport.
 
 ## Decisions made on Will's behalf (confirm or change)
 
-- The dock button shows the current mood name instead of the word "Controls".
+- The dock button shows the current mood name. The design system decides how it looks.
 - The breath pauses while the drawer is open.
 - Selecting a mood does not start it. Only the Begin button does.
-- The selected state and Begin button use the page's orange.
 - `Good to know` appears once, before the first Begin.
 - The developer panel moves behind `?dev`.
+- Everything visual (typography, colour, the dock button, the timer and its labels) is left to the design system. This build ships neutral placeholders in one marked block.
 
 ## Review before launch
 
