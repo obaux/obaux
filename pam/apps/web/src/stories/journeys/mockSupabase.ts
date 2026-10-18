@@ -90,8 +90,13 @@ export interface MockOptions {
   readonly savedTrip?: boolean;
   /** Also a saved trip whose day has passed, so Trips shows its Past visits section. */
   readonly pastTrip?: boolean;
-  /** The calendar link is already on (D-538): the page shows the switch and "make a new link" / "turn it off". */
+  /** The calendar link is already on (D-538): the page shows which calendar and "Get a new link" / "Disconnect". Same as `calendarLink: 'apple'`. */
   readonly calendarOn?: boolean;
+  /**
+   * The calendar link, linked (a98 plan C, D-604): the calendar the member said they use, or `'legacy'` for a link made before the place's
+   * name was shown (Pam has no address to show for it). Without it, and without `calendarOn`, nothing is linked: "Which calendar do you use?".
+   */
+  readonly calendarLink?: 'apple' | 'google' | 'outlook' | 'other' | 'legacy';
   /** The calendar link's status cannot be read (a story for the error state). */
   readonly calendarError?: boolean;
 
@@ -238,6 +243,8 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
   // What this story's member has signed, and the drawing kept on their account.
   const signed: Record<string, { at: string; image: string | null }> = {};
   let savedSignature: string | null = null;
+  // The calendar link (a98 plan C): what is linked now. Choosing a calendar links it, "Get a new link" keeps the calendar, "Disconnect" clears it.
+  let calendarNow: 'apple' | 'google' | 'outlook' | 'other' | 'legacy' | null = options.calendarLink ?? (options.calendarOn ? 'apple' : null);
   // A program sent from Add a program in this story is on file from then on.
   let ownProgram: 'review' | 'live' | undefined = options.ownProgram;
   // What is waiting for Pam on it (D-462): a first send, or a live program's change.
@@ -439,13 +446,33 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/log_call', () => ({ body: true })),
     on('/rpc/my_trips', () => ({ body: savedTrips })),
     on('/rpc/my_trip_services', () => ({ body: [] })),
-    // The calendar link (D-538): off, then a made-up address once made. Nothing leaves the story.
-    on('/rpc/calendar_link_status', () => options.calendarError ? { status: 500, body: { message: 'Storybook: the status could not be read' } } : ({
-      body: [{ is_on: Boolean(options.calendarOn), show_details: false, made_at: options.calendarOn ? '2026-10-10T15:00:00Z' : null }],
-    })),
-    on('/rpc/calendar_link_make', () => ({ body: 'storybook-example-address-not-a-real-secret' })),
-    on('/rpc/calendar_link_set_details', () => ({ body: true })),
-    on('/rpc/calendar_link_off', () => ({ body: null })),
+    // The calendar link (D-538, a98 plan C): nothing linked, then a made-up address once one is made. Nothing leaves the story.
+    on('/rpc/calendar_link_state', () =>
+      options.calendarError
+        ? { status: 500, body: { message: 'Storybook: the status could not be read' } }
+        : {
+            body: [
+              calendarNow
+                ? {
+                    is_on: true,
+                    is_legacy: calendarNow === 'legacy',
+                    calendar: calendarNow === 'legacy' ? null : calendarNow,
+                    linked_on: '2026-10-10',
+                    token: calendarNow === 'legacy' ? null : 'storybook-example-address-not-a-real-secret',
+                  }
+                : { is_on: false, is_legacy: false, calendar: null, linked_on: null, token: null },
+            ],
+          },
+    ),
+    on('/rpc/calendar_link_issue', (_url, _method, body) => {
+      const chosen = (body as { p_calendar?: string | null } | null)?.p_calendar;
+      calendarNow = chosen === 'apple' || chosen === 'google' || chosen === 'outlook' || chosen === 'other' ? chosen : calendarNow && calendarNow !== 'legacy' ? calendarNow : 'other';
+      return { body: null };
+    }),
+    on('/rpc/calendar_link_off', () => {
+      calendarNow = null;
+      return { body: null };
+    }),
 
     // A program lead's own visits (D-526): none in a story.
     on('/rpc/my_program_visits', () => ({ body: [] })),

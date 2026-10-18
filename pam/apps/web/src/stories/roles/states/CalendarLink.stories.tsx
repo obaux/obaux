@@ -7,13 +7,15 @@ import ru from '@pam/config/locales/ru.json';
 import zhCN from '@pam/config/locales/zh-CN.json';
 import zhHK from '@pam/config/locales/zh-HK.json';
 import { asRole } from '../../journeys/journey';
+import type { MockOptions } from '../../journeys/mockSupabase';
 import { REDESIGN_ROUTES } from '../../prototype/routes';
 
 /**
- * The calendar link page in the states the fit audit could not see (D-538). The plain story loads with the link off, but the
- * long strings are in what a tap shows: the address once it is made (with the Apple, Google and "others" lines), the "Make a
- * new link?" question, and the "Turn it off?" question. Each of these plays the tap, in the language the story is shown in
- * (the labels are read from that language's own bundle), so `audit:fit` measures them in all seven.
+ * Profile › Calendar in every state the fit audit could not see (D-538; a98 plan C, D-604). The plain story is nothing linked ("Which
+ * calendar do you use?"); the long strings are in what the other states draw: which calendar and since when, the buttons for each
+ * calendar app, "Manage" (get a new link, disconnect), the older link made before the place was shown, and the two "are you sure" boxes.
+ * The two questions play the tap, in the language the story is shown in (the line tapped is read from that language's own bundle), so
+ * `audit:fit` measures them in all seven.
  */
 const meta = { title: 'Member/Created/States/Calendar link' } satisfies Meta;
 
@@ -25,25 +27,52 @@ const BUNDLES: Record<string, Record<string, string>> = { en, es, 'pt-BR': ptBR,
 const route = REDESIGN_ROUTES['/calendar/'];
 if (!route) throw new Error('No prototype route for /calendar/ — add it to src/stories/prototype/routes.tsx');
 
-/** The label of a button in the language this story is being shown in. */
-const label = (locale: string | undefined, key: string) => BUNDLES[locale ?? 'en']?.[key] ?? en[key as keyof typeof en];
+/** A line of the page in the language this story is being shown in. */
+const words = (locale: string | undefined, key: string) => BUNDLES[locale ?? 'en']?.[key] ?? en[key as keyof typeof en];
 
-function calendar(name: string, calendarOn: boolean, key: string): Story {
-  return {
-    ...asRole('member', '/calendar/', {}, { calendarOn }),
+function calendar(name: string, options: MockOptions, tap?: string): Story {
+  const story: Story = {
+    ...asRole('member', '/calendar/', {}, options),
     name,
     render: () => <>{route!.render()}</>,
-    play: async ({ canvas, userEvent, globals }) => {
-      const locale = (globals as { locale?: string }).locale;
-      const button = await canvas.findByRole('button', { name: label(locale, key) });
-      await userEvent.click(button);
-    },
   };
+  // The row's own small line, which carries no name in it, so it is found whatever the language puts around a calendar's name.
+  if (tap) {
+    story.play = async ({ canvas, userEvent, globals }) => {
+      const locale = (globals as { locale?: string }).locale;
+      await userEvent.click(await canvas.findByText(words(locale, tap)));
+    };
+  }
+  return story;
 }
 
-/** Off, then "Make my calendar link": the address, "shown once", and the lines for each calendar app. */
-export const LinkMade: Story = calendar('Link made', false, 'calendar.make');
-/** On: "Make a new link" asked. */
-export const NewLinkAsked: Story = calendar('New link?', true, 'calendar.new');
-/** On: "Turn it off" asked. */
-export const TurnOffAsked: Story = calendar('Turn off?', true, 'calendar.off');
+/** Nothing linked: "Which calendar do you use?" and the four kinds. */
+export const WhichCalendar: Story = calendar('Which calendar?', {});
+/** Linked to Apple Calendar: "Set up on …", its button, Copy, "Keep this link to yourself", Manage. */
+export const LinkedApple: Story = calendar('Linked: Apple', { calendarLink: 'apple' });
+/** Linked to Google Calendar: the add-by-address button and the note that the phone app cannot add it. */
+export const LinkedGoogle: Story = calendar('Linked: Google', { calendarLink: 'google' });
+/** Linked to Outlook (or another calendar): Copy is the main button, with the note on how to add it. */
+export const LinkedOther: Story = calendar('Linked: another calendar', { calendarLink: 'other' });
+/** A link made before the place's name was shown: it still works, and says so; the four kinds below get a new one. */
+export const OlderLink: Story = calendar('Older link', { calendarLink: 'legacy' });
+/** Linked: "Get a new link?" asked (Manage's first line). */
+export const NewLinkAsked: Story = calendar('Get a new link?', { calendarLink: 'apple' }, 'calendar.newLink.hint');
+/** Linked: "Disconnect Apple Calendar?" asked (Manage's second line). */
+export const DisconnectAsked: Story = calendar('Disconnect?', { calendarLink: 'apple' }, 'calendar.disconnect.hint');
+/** The older link: "Turn it off?" asked. */
+export const OlderLinkOffAsked: Story = calendar('Older link: turn off?', { calendarLink: 'legacy' }, 'calendar.disconnect.hint');
+
+const booked = REDESIGN_ROUTES['/trips/new/'];
+if (!booked) throw new Error('No prototype route for /trips/new/ — add it to src/stories/prototype/routes.tsx');
+
+/** A booked visit, and "Add to calendar" tapped: the sheet with the hint and the three calendars (one visit, nothing stored). */
+export const AddOneVisit: Story = {
+  ...asRole('member', '/trips/new/', { booked: 'dummy-trip-1' }),
+  name: 'Add one visit to a calendar',
+  render: () => <>{booked!.render()}</>,
+  play: async ({ canvas, userEvent, globals }) => {
+    const locale = (globals as { locale?: string }).locale;
+    await userEvent.click(await canvas.findByRole('button', { name: words(locale, 'trips.addToCalendar') }));
+  },
+};

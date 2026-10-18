@@ -85,7 +85,7 @@ export const LINK_CALENDAR_NAME = 'Visits';
 
 /**
  * The calendar's name in the member's saved language (read when the feed is fetched; nothing new is stored). Sage signed "Visits"
- * (ledger 9190aac3); the six translations say it the way each language's own lines say a visit (`calendar.warn`, `trips.title`).
+ * (ledger 9190aac3); the six translations say it the way each language's own lines say a visit (`calendar.privacy`, `trips.title`).
  */
 export const LINK_CALENDAR_NAMES: Readonly<Record<string, string>> = {
   en: 'Visits',
