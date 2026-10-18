@@ -41,6 +41,7 @@ const styles = stylex.create({
   line: { fontSize: '17px', lineHeight: 1.35, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', unicodeBidi: 'plaintext' },
   when: { fontSize: '14px', whiteSpace: 'nowrap' },
   stat: { fontSize: '15px', lineHeight: 1.4, color: colorVars['--color-text-secondary'] },
+  sent: { fontSize: '17px', lineHeight: 1.4, fontWeight: 600 },
 });
 
 export function PamInboxScreen() {
@@ -57,6 +58,8 @@ export function PamInboxScreen() {
 
   const params = useSearchParams();
   const showClosed = params.get('show') === 'closed';
+  // After Pam writes to a program: how many leads it went to (S3).
+  const sentTo = Number(params.get('sent') ?? NaN);
   const fromHome = params.get('from') === 'home';
   const back = showClosed
     ? { backHref: fromHome ? '/pam/messages/?from=home' : '/pam/messages/', backLabel: t('pam.inbox.title') }
@@ -184,6 +187,11 @@ export function PamInboxScreen() {
   return (
     <Page gap={4}>
       {header}
+      {Number.isFinite(sentTo) && sentTo > 0 ? (
+        <Text role="status" xstyle={styles.sent}>
+          {t('pam.inbox.sent', { count: sentTo })}
+        </Text>
+      ) : null}
       {nothingOpen ? <Text type="supporting">{t('pam.inbox.empty')}</Text> : null}
       {groups.waiting.length > 0 ? (
         <VStack gap={1}>

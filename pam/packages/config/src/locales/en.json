@@ -1767,5 +1767,21 @@
   "pam.inbox.replyTime.hours.one": "Last 30 days: half of Pam’s first replies came within {count} hour.",
   "pam.inbox.replyTime.days": "Last 30 days: half of Pam’s first replies came within {count} days.",
   "pam.inbox.replyTime.days.one": "Last 30 days: half of Pam’s first replies came within {count} day.",
-  "pam.inbox.replyTime.none": "Last 30 days: no replies yet."
+  "pam.inbox.replyTime.none": "Last 30 days: no replies yet.",
+  "pam.saved.title": "Saved replies",
+  "pam.saved.guide": "Your guide is the best person for this. You can write to them in Messages.",
+  "pam.saved.program": "The program can answer this best. You can message them from their page.",
+  "pam.saved.aboutMember": "We can only help a member with them. Please ask them to write to Pam, or talk it through in your conversation with them.",
+  "pam.thread.close": "Close conversation",
+  "pam.thread.reopen": "Reopen conversation",
+  "pam.thread.closed": "Closed.",
+  "pam.thread.reopened": "Reopened.",
+  "pam.thread.statusFailed": "That didn't go through. Try again.",
+  "pam.start.action": "Message {name} as Pam",
+  "pam.start.note": "{name} sees this as from Pam.",
+  "pam.start.programNote": "This goes to each of the program's leads. They see it as from Pam.",
+  "pam.program.action": "Message this program",
+  "pam.program.noLead": "Nobody runs this program in Pam right now, so it can't get messages.",
+  "pam.inbox.sent": "Sent to {count} leads.",
+  "pam.inbox.sent.one": "Sent to {count} lead."
 }
