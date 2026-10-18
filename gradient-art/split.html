@@ -112,30 +112,6 @@ vec3 starField(vec2 q) {
   return acc;
 }
 
-// an occasional streak across the upper sky: two independent tracks, each firing on its own schedule
-vec3 shootingStars(vec2 q, float W) {
-  vec3 acc = vec3(0.0);
-  for (int i = 0; i < 2; i++) {
-    float fi = float(i);
-    float period = mix(7.3, 11.9, fi);
-    float tt = uTime + fi * 3.1;
-    float n = floor(tt / period);
-    float ph = tt - n * period;
-    if (hash(vec2(n, fi + 2.0)) > 0.35 && ph < 0.9) {  // about two in three slots fire; each streak lasts 0.9 s
-      float u = ph / 0.9;
-      vec2 start = vec2((hash(vec2(n, fi + 7.1)) - 0.5) * 1.8 * W, mix(0.05, 0.42, hash(vec2(n, fi + 9.9))));
-      vec2 dir = normalize(vec2(hash(vec2(n, fi + 4.2)) > 0.5 ? -1.0 : 1.0, -0.45));
-      vec2 head = start + dir * u * 0.55;
-      vec2 v = q - head;
-      float along = clamp(dot(v, -dir), 0.0, 0.16);
-      float d = length(v + dir * along);
-      float life = sin(3.14159 * u);
-      acc += vec3(1.0, 0.97, 0.9) * life * (exp(-d * d / 0.0000030) * pow(1.0 - along / 0.16, 2.0) * 1.2 + 0.8 * exp(-dot(v, v) / 0.0004));
-    }
-  }
-  return acc;
-}
-
 void main() {
   vec2 q = (gl_FragCoord.xy - 0.5 * uRes) / uRes.y;   // y: -0.5 .. 0.5, x: wider on a landscape screen
   float W = 0.5 * uRes.x / uRes.y;                      // half the screen width, same units
@@ -165,7 +141,7 @@ void main() {
   // night sky: only where the sky has gone dark, so the orange glow below stays clean
   float luma = dot(sky, vec3(0.299, 0.587, 0.114));
   float dark = 1.0 - smoothstep(0.07, 0.20, luma);
-  sky += (starField(q) + shootingStars(q, W)) * dark * uStars;
+  sky += starField(q) * dark * uStars;
 
   vec3 col = mix(sky, c, body);
 
