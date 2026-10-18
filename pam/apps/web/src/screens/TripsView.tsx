@@ -129,6 +129,8 @@ const PIN_ART = { width: 20, height: 20, 'aria-hidden': true } as const;
 
 export function TripsView({ trips, headerActions, justAdded = null }: TripsViewProps) {
   const { t, tPlain, locale } = useI18n();
+  // Where the sheet's top edge is, so the map can take the pins it covers out of a screen reader's reach (Iris, P3).
+  const [sheetTop, setSheetTop] = useState<number | null>(null);
   // Coming up stays on the map and in the count; a visit whose time has gone
   // moves down to Past visits, most recent first, with no policies to sign.
   const nowAt = new Date().toISOString();
@@ -206,6 +208,7 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
     // What a tapped next-trip card grows into (D-269): Trips has no `Page`.
     <VStack data-pam-morph-target="" xstyle={styles.screen}>
       <TripsMap
+        sheetTop={sheetTop}
         pins={shown.map((trip) => ({
           id: trip.id,
           name: trip.placeName,
@@ -229,6 +232,7 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
       */}
       {justAdded ? <Confetti /> : null}
       <MapDrawer
+        onTopChange={setSheetTop}
         initialStop={justAdded ? 'full' : 'half'}
         bottomOffset={TAB_BAR}
         topOffset={84}
