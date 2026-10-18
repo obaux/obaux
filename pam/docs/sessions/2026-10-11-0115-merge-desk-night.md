@@ -1473,6 +1473,27 @@
   so, in Sage's signed words (01:54, "Goes to {calendar}": Pam offers the visits and cannot see the calendar take
   them, so not "Syncing"). Dot drew it (e10e64cf, on its own row) and Piper builds it. Plan C's sheet is the
   a97 drawer (Dot's calendar branch carries it), so plan C ships with a97, which waits on Will's yes.
+- **Will's change to the calendar button (18 October, 02:33 to 03:11).** Will did not want the synced row ("Goes
+  to {calendar}" on its own row): the corner button stays where it was tapped and, once added, says "Added to
+  calendar" (Will's words) with no calendar name and no white background, and opens Calendar settings. "Sync all
+  future trip details?" leaves the foot of the card and becomes the drawer's last row, "Add all your future visits"
+  (Sage 4aef64a9), its hint cut by Will to "Set up a calendar link once." (03:11). The button goes on the place
+  page's green card too, and the card's month is short ("Thursday, Oct 22"). "Added" shows with a calendar link,
+  or for a visit added on this phone, a note kept in the browser that holds only that it was added; Lena checked
+  that no signed line changes. Dot drew it (12648c0a, on card a98); Piper built it (dd970847, full run under way).
+  "Your trip is booked" is not a new page: it has closed every booking since D-334.
+- **Message Pam (Will, 02:39).** Anyone in the app can message Pam, into the super admin's inbox, and the super admin
+  can message members and programs. Plans, no code: Nico's (00daebd0: a one-member 'support' conversation per
+  person, policies scoped to it through is_pam_team(), six expand migrations, nine questions), Ava's inbox (b71ff657,
+  five questions), Iris's research (90eb554a: the smallest safe first version has the person write first), Sage's
+  draft words (d9174a60) and Dot's drawings (5ff6849c). It is the first place the Pam team reads message bodies, a
+  widening of ADMIN_CAN_SEE, and Pam writing first reverses D-171 and D-262 for members, so Will signs it and
+  members are told first (D-413). The live project has no conversations yet (read-only count, 02:48). One card for
+  Will, with Lena's lines; nothing is built before Will picks.
+- **Batch b65 (18 October, 02:37 to 03:14).** W4 (D-603): when speaking a message cannot start, the conversation
+  says why and what to try, in seven languages (Nico e3b04c4f, Lena dbe32f83: Sage's ten lines, a test that fails
+  when a kind has no words, five stories). Iris's re-test of b64 (5c4d74d9, docs): press part 2 and the Sunday
+  schedule pass; Trips' map pins show no press (polish, for Dot).
 
 ## What was wrong, and what missed it
 
@@ -1726,6 +1747,9 @@
   Change appointment, judged from a small screenshot. Dot checked main's real build and the pixels: it points left, as
   it should, so Dot made no change and wrote no test that would pass on main. Lesson: look at the pixels before
   filing a visual bug.
+- **A CI watcher that stopped before CI did (b64, 02:38).** The watcher ran with the 30-minute background limit and
+  was stopped while Accessibility was still running; nothing said so until its notice. Restarted with an hour, and
+  b65 waited for the green. Lesson: give a CI watcher the full hour.
 
 ## Decisions
 
@@ -1956,9 +1980,19 @@
 | b64 proof, first form: press-layer.spec from f88e5bed on b63's build, --retries=0 | 15 failed, 9 of them hollow (timed out waiting for `a[data-pam-stretch]`, which only the new code sets); sent back |
 | b64 proof: press-layer.spec from 6581d593 on b63's build, --retries=0 | 15 failed, each on its assertion (12 at scale 1, not 0.97: Explore's card, a service choice, a case manager's member card, a lead's setup card, × 3; 3 a tab with no shade); 12 passed (b62's cases) |
 | Batch b64, full run (73026a81: Piper 4785216f, Dot 6581d593, Iris 9a349d9d): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1391 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 188 / 10.2 kB spare / 2162 passed, 19 skipped, 0 failed / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
+| b64 main CI (c67be570, pushed 02:07:27) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (02:45); Vercel web and pam-site success (02:13) |
+| Iris's re-test of b64 (5c4d74d9) | Press part 2 PASS (Explore's, the case manager's and the lead's cards, service choices: 97% and a shade, light and dark, 390 and 320; the tab bar shades; reduced motion shade only); the example schedule PASS (six pinned days, 18 October to 1 November) |
+| W4 proof: messages.spec's "speaking a message that cannot start" from dbe32f83 on main's build (c67be570), --retries=0 | 33 failed (11 tests × 3), each on toBeVisible of the line's words; 3 passed ("a browser with no speech recognition has no mic to tap", already true on main) |
+| Batch b65, full run (dd85a115: W4 a2f5f480, Iris 5c4d74d9): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1403 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 192 / 10.0 kB spare / 2198 passed, 19 skipped, 0 failed / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
 
 ## Left undone
 
+- **As of b65 (18 October, 03:14):** b66 takes Piper's two b63 follow-ups (2cec036c, its stories test proven by the
+  desk) and Lena's S1 (Sign up's language list as Astryx's bottom sheet) when its READY comes in. Piper: plan C's
+  READY after its full run, with Will's 03:11 hint. Dot: the drawer with the short hint, then Message Pam's version
+  A and Sage's words. Lena: S1, plan C's lines and words, then Message Pam's lines with Sage. Iris: re-test b65's
+  W4. With Will: "yes a97" (plan C ships with it), an iPhone try of one visit, the Message Pam card when it is
+  ready; a86, a91, a93, a84, a88.
 - **As of b64 (18 October, 02:07):** b65 takes Lena's S1 once proven on b64's build. Piper: plan C's booked-card
   action and its synced state (Sage's words signed, Dot's e10e64cf), full checks and a real picture; then Iris's two
   b63 follow-ups and the "Change the time" link. Lena: S1 as a bottom sheet (Astryx's own presentation, no
