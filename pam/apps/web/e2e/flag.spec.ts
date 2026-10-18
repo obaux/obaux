@@ -162,3 +162,11 @@ test.describe('reporting a place', () => {
     expect(results.violations).toEqual([]);
   });
 });
+
+test('no card around the one form: the page is its frame (D-615, Will, 18 October)', async ({ page }) => {
+  await signedIn(page);
+  await page.goto(`/flag/?place=${PLACE}`);
+  await settled(page);
+  await expect(page.getByRole('radio').first()).toBeVisible();
+  await expect(page.locator('.astryx-card')).toHaveCount(0);
+});

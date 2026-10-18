@@ -1651,6 +1651,10 @@ only the alert texts Will signed: no "introduced to your program", no "your acco
 
 `SettingsList` is the pattern for a list of switches: no card, thin lines, badge under the name (D-615; Foundations › Patterns). Text alerts uses it, without the STOP line or the Privacy link. Branch `claude/pam-design-settings-list`; waits on Sage's `alerts.kinds` words and Will's look at the pictures.
 
+## Design system & Storybook · Flag screen without its card (18 October)
+
+`/flag/` loses the card around its form, by the D-615 pattern (no card around a single list). Branch `claude/pam-design-flag-no-card`; Piper told; Will sees the pictures before it ships.
+
 ## Design system & Storybook · Coming soon and Example badges (18 October)
 
 `StatusBadge` replaces the "coming soon" and "example" sentences on Profile and the example lists (D-612, D-608). Branch `claude/pam-design-d608-badges` (main + Sage's b50e386a); waits on Mira. Text alerts and six languages are others'.
