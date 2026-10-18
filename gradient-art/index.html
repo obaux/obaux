@@ -92,6 +92,7 @@ uniform vec3 uBase;       // lower body base wash
 uniform vec3 uHighlight;  // glassy edge shine, liquid specular, guide ring
 uniform float uGlass;     // 0 = flat, 1 = full refraction / shine
 uniform float uStyle;     // 0 sphere · 1 bloom · 2 horizon · 3 ripple · 4 lotus
+uniform float uSquare;    // 0 = circle, 1 = squircle (box breathing)
 
 const vec2  C    = vec2(0.5, 0.5);   // sphere centre
 const float RMIN = 0.19;             // radius when fully exhaled
@@ -133,16 +134,27 @@ vec3 blob(vec3 acc, inout float wsum, vec2 p, vec2 c, float r, vec3 col) {
   return acc + col * w;
 }
 
+// distance-like measure: a circle at uSquare = 0, a squircle with app-icon corners at 1
+float sqLen(vec2 v) {
+  float n = mix(2.0, 5.0, uSquare);
+  vec2 a = abs(v) + 1e-5;
+  return pow(pow(a.x, n) + pow(a.y, n), 1.0 / n);
+}
+
 // ===== style 0: sphere — a perfect circle that grows and shrinks =====
 vec3 styleSphere(vec2 p) {
   float t = uTime * uMotion;
 
   // ---- outline: a perfect circle whose radius follows the breath ----
   vec2 v = p - C;
-  float len = max(length(v), 1e-4);
-  vec2 nrm = v / len;                                   // outward normal
-  float r = mix(RMIN, RMAX, uBreath);
-  float sdf = len - r;
+  float n = mix(2.0, 5.0, uSquare);
+  vec2 av = abs(v) + 1e-5;
+  float len = pow(pow(av.x, n) + pow(av.y, n), 1.0 / n);
+  vec2 gv = vec2(sign(v.x) * pow(av.x, n - 1.0), sign(v.y) * pow(av.y, n - 1.0)) / pow(len, n - 1.0);
+  float gm = length(gv);
+  vec2 nrm = gv / gm;                                   // outward normal
+  float r = mix(RMIN, RMAX, uBreath) * mix(1.0, 0.93, uSquare);   // squircle trimmed to match the circle's visual size
+  float sdf = (len - r) / gm;                           // approx. distance to the edge
 
   // ---- interior: the same picture, scaled with the sphere ----------
   vec2 vi = v * (R0 / r);
@@ -205,7 +217,7 @@ vec3 styleSphere(vec2 p) {
   bg = max(bg, uBg);
 
   // faint guide ring just outside the largest size: the target for a full inhale
-  float ringPx = abs(len - (RMAX + 0.02)) * uRes.y;
+  float ringPx = abs(len - (RMAX * mix(1.0, 0.93, uSquare) + 0.02)) / gm * uRes.y;
   bg = mix(bg, uHighlight, 0.22 * (1.0 - smoothstep(0.5, 1.6, ringPx)));
 
   vec3 col = mix(bg, bodyCol, mask);
@@ -232,9 +244,10 @@ vec3 backdrop(vec2 p) {
 vec3 styleBloom(vec2 p) {
   float t = uTime * uMotion;
   vec2 v = p - C;
-  float len = length(v);
+  float sq = mix(1.0, 0.93, uSquare);
+  float len = sqLen(v) / sq;
   vec2 w = vec2(fbm(p * 2.0 + vec2(0.0, t * 0.12)), fbm(p * 2.0 + vec2(5.2, -t * 0.10))) - 0.44;
-  float dn = length(v + w * 0.10 * uMotion) / 0.30;      // 0 at the centre, 1 at the nominal edge
+  float dn = sqLen(v + w * 0.10 * uMotion) / (0.30 * sq);      // 0 at the centre, 1 at the nominal edge
   float d = dn / mix(0.42, 1.0, uBreath);                 // exhale: colours gather in; inhale: they spread out
 
   vec3 c = mix(uYellow, uPink, sstep(0.0, 0.50, d));
@@ -279,7 +292,7 @@ vec3 styleHorizon(vec2 p) {
 vec3 styleRipple(vec2 p) {
   float t = uTime * uMotion;
   vec2 v = p - vec2(0.5, 0.56);                          // raised a little so the cue sits clear below
-  float len = length(v), ang = atan(v.y, v.x);
+  float len = sqLen(v), ang = atan(v.y, v.x);
   float sc = mix(0.55, 1.0, uBreath);
   vec3 col = mix(uBg, backdrop(p), 0.55);
   float core = mix(0.05, 0.09, uBreath);
@@ -374,7 +387,7 @@ const PATTERNS = {
   calm:      { label: 'Calm · in 4, out 6',      phases: [['in', 4], ['out', 6]] },
   coherent:  { label: 'Coherent · 5.5 / 5.5',    phases: [['in', 5.5], ['out', 5.5]] },
   relax:     { label: 'Relax · 4-7-8',           phases: [['in', 4], ['full', 7], ['out', 8]] },
-  box:       { label: 'Box · 4-4-4-4',           phases: [['in', 4], ['full', 4], ['out', 4], ['empty', 4]] },
+  box:       { label: 'Box · 4-4-4-4',           phases: [['in', 4], ['full', 4], ['out', 4], ['empty', 4]], shape: 'squircle' },
 };
 const CUES = { in: 'Breathe in', out: 'Breathe out', full: 'Hold', empty: 'Hold' };
 const STYLES = {
@@ -423,7 +436,7 @@ const hex2rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
 const state = {
   speed: 1, motion: 0.45, glass: 0.7,              // look of the colour flow inside the sphere
   playing: true, time: 0, clock: 0, pattern: 'calm', style: 'bloom', // clock = seconds of breathing, independent of flow speed
-  px: .5, py: .5, tx: .5, ty: .5, press: 0, tpress: 0,
+  px: .5, py: .5, tx: .5, ty: .5, press: 0, tpress: 0, sq: 0,   // sq eases 0 (circle) to 1 (squircle)
 };
 const params = new URLSearchParams(location.search);
 if (params.has('t'))       state.clock = +params.get('t');      // jump to a moment in the breath cycle
@@ -431,6 +444,9 @@ if (params.has('motion'))  state.motion = +params.get('motion');
 if (params.has('glass'))   state.glass = +params.get('glass');
 if (params.has('style') && STYLES[params.get('style')]) state.style = params.get('style');
 if (params.has('pattern') && PATTERNS[params.get('pattern')]) state.pattern = params.get('pattern');
+
+const squareTarget = () => PATTERNS[state.pattern].shape === 'squircle' ? 1 : 0;
+state.sq = squareTarget();
 
 function resize() {
   const s = Math.min(innerWidth, innerHeight), dpr = Math.min(devicePixelRatio || 1, 2);
@@ -454,6 +470,7 @@ function draw(b) {
   gl.uniform1f(U('uMotion'), state.motion);
   gl.uniform1f(U('uGlass'), state.glass);
   gl.uniform1f(U('uBreath'), b.v);
+  gl.uniform1f(U('uSquare'), state.sq);
   gl.uniform1f(U('uStyle'), Object.keys(STYLES).indexOf(state.style));
   gl.uniform2f(U('uPointer'), state.px, state.py);
   gl.uniform1f(U('uPress'), state.press);
@@ -466,6 +483,7 @@ let last = performance.now();
   if (state.playing) { state.time += dt * state.speed; state.clock += dt; }
   const k = 1 - Math.exp(-dt * 7);
   state.px += (state.tx - state.px) * k; state.py += (state.ty - state.py) * k; state.press += (state.tpress - state.press) * k;
+  state.sq += (squareTarget() - state.sq) * (1 - Math.exp(-dt * 4));
   last = now;
   const b = breathAt(PATTERNS[state.pattern], state.clock);
   updateGuide(b); draw(b); requestAnimationFrame(frame);
@@ -547,7 +565,7 @@ window.art = {
   state, PALETTE, PATTERNS,
   setColors(map) { for (const k in map) if (k in PALETTE) { PALETTE[k] = map[k]; if (inputs[k]) inputs[k].value = map[k]; } setInk(); },
   setPattern(name) { if (PATTERNS[name]) { state.pattern = name; state.clock = 0; patternSel.value = name; } },
-  addPattern(name, label, phases) { PATTERNS[name] = { label, phases }; patternSel.add(new Option(label, name)); },
+  addPattern(name, label, phases, shape) { PATTERNS[name] = { label, phases, shape }; patternSel.add(new Option(label, name)); },
   setStyle,
   setSpeed(v)  { state.speed = v; },
   setMotion(v) { state.motion = v; },
