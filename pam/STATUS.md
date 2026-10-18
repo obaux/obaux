@@ -1701,6 +1701,10 @@ connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merge
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
 
+## Design system & Storybook · BigButton's name, the 48px language check (18 October)
+
+BigButton's accessible name carries no bidi isolates (D-435). The seven-language list at 48px rows is 344px in Lena's 432px cap, no scrolling, all seven languages measured at 320px (`language-list-fits` passes). Branch `claude/pam-design-bigbutton-plain`; waits on Mira.
+
 ## Design system & Storybook · When Pam fails, D-616 (18 October)
 
 One small alert fixed at the bottom (`useMalfunction().show`, Lena's `notice.malfunction`), no timer, never over the failed control; a switch moves only after its save, no answer in 15 s is a failure, a late save is read back. Done for Text alerts; the other instant-save controls are named in Patterns and left to their owners. Logging is Nico's `reportAppError` (merged). Branch `claude/pam-design-malfunction` (D-617); waits on Mira (b76).
