@@ -7,8 +7,9 @@ Owners are by `docs/lanes.md`. Owners convert their own files in the next batch;
 
 `grep` finds 78 lines with `something_went_wrong` in 40 files under `apps/web/src` (stories and tests apart). About a
 third of them are the second half of a pair (the `notice=` prop and the `NOTICES[...]` title lookup for the same
-card), so the screens below are the real count: **22 failed actions, 21 pages that cannot load** (43 sites), plus the
-shared join result and the component gallery.
+card), so the screens below are the real count: **23 rows of failed actions and 18 rows of pages that cannot load** (a row
+is a screen; two rows name two files), plus the join result codes and the component gallery. `ReportedSection` and
+`BookForMemberView` were classified from their conditions without opening the screen: the owners should confirm.
 
 ## Failed action (the small alert, at the bottom)
 
@@ -51,7 +52,7 @@ shared join result and the component gallery.
 | The tab shell (session) | `app/TabGate.tsx` (line 65) | Ava |
 | Message thread (`/messages/thread/`) | `app/messages/thread/page.tsx` (lines 184, 372) | Nico |
 | Notifications | `app/notifications/page.tsx` (line 194) | Nico |
-| Text reminders (calendar link page, state) | `screens/CalendarLinkView.tsx` (line 70, the `state.status === 'error'` half) | Piper |
+| Calendar link (state) | `screens/CalendarLinkView.tsx` (line 70, the `state.status === 'error'` half) | Piper |
 | A place (`/place/`) | `app/place/page.tsx` (line 341) | Piper |
 | Interested members | `app/interested/page.tsx` (line 83) | Piper |
 | Explore | `screens/ExploreView.tsx` (line 206) | Piper |
