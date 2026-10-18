@@ -103,6 +103,18 @@ export function createReporter(deps: ReporterDeps): (report: AppErrorReport) => 
   };
 }
 
+/**
+ * The code for a caught failure: `offline` when the phone has no network, `timeout` for an abort, else the error's own status or
+ * SQLSTATE if it has one of the closed shapes (anything else becomes `unknown` when it is reported). Never its message.
+ */
+export function codeFromError(caught: unknown, online: boolean = typeof navigator === 'undefined' || navigator.onLine !== false): string {
+  if (!online) return 'offline';
+  const error = caught as { name?: unknown; code?: unknown; status?: unknown } | null | undefined;
+  if (error?.name === 'AbortError') return 'timeout';
+  const code = typeof error?.code === 'string' || typeof error?.code === 'number' ? error.code : error?.status;
+  return appErrorCode(typeof code === 'string' || typeof code === 'number' ? code : null);
+}
+
 function platform(): string {
   const cap = (globalThis as { Capacitor?: { getPlatform?: () => string } }).Capacitor;
   const p = cap?.getPlatform?.();

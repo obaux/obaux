@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { APP_ERROR_QUEUE_MAX, createReporter } from './reportAppError';
+import { APP_ERROR_QUEUE_MAX, codeFromError, createReporter } from './reportAppError';
 
 /** D-616: a failed action is reported with an action key and a code, never a message; it never throws; it waits offline. */
 function setup(opts: { online?: boolean; reach?: boolean; throws?: boolean } = {}) {
@@ -83,5 +83,17 @@ describe('reportAppError', () => {
     state.later[0]!();
     await settle();
     expect(state.sent.map((w) => w['p_code'])).toEqual(['timeout']);
+  });
+});
+
+describe('codeFromError', () => {
+  it('says offline without a network, timeout for an abort, and otherwise only a status or SQLSTATE', () => {
+    expect(codeFromError(new Error('x'), false)).toBe('offline');
+    expect(codeFromError({ name: 'AbortError' }, true)).toBe('timeout');
+    expect(codeFromError({ code: '42501', message: 'permission denied for (phone)=(+12155550100)' }, true)).toBe('42501');
+    expect(codeFromError({ status: 503 }, true)).toBe('503');
+    expect(codeFromError({ code: 'PGRST202' }, true)).toBe('unknown');
+    expect(codeFromError(new Error('duplicate (phone)=(+12155550100)'), true)).toBe('unknown');
+    expect(codeFromError(undefined, true)).toBe('unknown');
   });
 });
