@@ -426,6 +426,7 @@
   "notice.service_not_available.body": "Puede volver. Contacta a Pam y te ayudamos a encontrar otro lugar.",
   "notice.service_not_available.title": "Este lugar no está en Pam ahora",
   "notice.something_went_wrong.body": "Esto no es culpa tuya. Intenta otra vez. Si sigue pasando, contacta a Pam.",
+  "notice.malfunction": "No salió. No es culpa tuya, así que inténtalo otra vez.",
   "notice.something_went_wrong.title": "Algo salió mal",
   "notify.demo.newInterest": "{count} personas están interesadas en {program}",
   "notify.demo.pointsEarned": "Ganaste {points} puntos por {reason}",
