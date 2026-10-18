@@ -99,6 +99,12 @@ describe('the error log keeps what Privacy says it keeps (D-616)', () => {
     expect(sql).toMatch(/delete from public\.notifications where kind = 'app_error' and created_at < now\(\) - make_interval\(days => public\.app_errors_keep_days\(\)\)/);
   });
 
+  it('keeps no network address, not even a hash of one: the line does not mention it and an address is personal data', () => {
+    const fn = functionText('report_app_error');
+    expect(fn).not.toMatch(/x-forwarded-for|request\.headers|inet_client_addr|client_addr/i);
+    expect(sql).not.toMatch(/inet\b/i);
+  });
+
   it('adds no outside company: no http call in the migration', () => {
     expect(sql).not.toMatch(/net\.http|http_post|http_get|pg_net|https?:\/\//i);
   });
