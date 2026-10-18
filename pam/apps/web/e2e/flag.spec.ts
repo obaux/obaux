@@ -170,3 +170,27 @@ test('no card around the one form: the page is its frame (D-615, Will, 18 Octobe
   await expect(page.getByRole('radio').first()).toBeVisible();
   await expect(page.locator('.astryx-card')).toHaveCount(0);
 });
+
+test('a radio sits level with the first line of its label, whether the label wraps or not (Mira, 18 October)', async ({ page }) => {
+  await signedIn(page);
+  await page.goto(`/flag/?place=${PLACE}`);
+  await settled(page);
+  const radios = page.getByRole('radio');
+  const count = await radios.count();
+  expect(count).toBe(4);
+  let wrapped = 0;
+  for (let i = 0; i < count; i++) {
+    const m = await radios.nth(i).evaluate((input) => {
+      const row = input.closest('.astryx-item') as HTMLElement;
+      const circle = (input.parentElement as HTMLElement).getBoundingClientRect();
+      const label = row.querySelector('span[id]') as HTMLElement;
+      const box = label.getBoundingClientRect();
+      const line = parseFloat(getComputedStyle(label).lineHeight);
+      return { circleY: circle.y + circle.height / 2, firstLineY: box.y + line / 2, lines: Math.round(box.height / line) };
+    });
+    if (m.lines > 1) wrapped++;
+    expect(Math.abs(m.circleY - m.firstLineY)).toBeLessThanOrEqual(0.5);
+  }
+  // At 390 and 320 the long fourth reason wraps, so the case is really exercised.
+  expect(wrapped).toBeGreaterThan(0);
+});

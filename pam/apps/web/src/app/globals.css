@@ -784,4 +784,17 @@
       transform: none;
     }
   }
+
+  /*
+   * A radio sits level with the FIRST line of its label (Mira, 18 October, on Flag's two-line reason): Astryx centres
+   * the circle on the whole row, so a label that wraps drops it between its lines. Top-aligned, and the text column
+   * takes the 2px that a 20px line is short of the 24px circle, so a one-line row is the height it was and the circle
+   * is level with the first line in every row.
+   */
+  .astryx-radio-list .astryx-item {
+    align-items: flex-start;
+  }
+  .astryx-radio-list .astryx-item > :nth-child(2) {
+    padding-block-start: 2px;
+  }
 }
