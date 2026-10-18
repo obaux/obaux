@@ -5,19 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Orb Hero</title>
 <style>
-  :root { --bg: #121317; }
-  html, body { margin: 0; min-height: 100%; background: var(--bg); color: #fff; }
-  body { padding-top: env(safe-area-inset-top, 0px); }
-  /* The hero is a 4:3 banner at the top of the page. */
-  #hero { display: block; width: 100%; max-width: 560px; margin: 0 auto; aspect-ratio: 4 / 3; touch-action: pan-y; }
+  :root { --bg: #121317; --fg: #fff; --muted: rgba(255,255,255,.6); --line: rgba(255,255,255,.18); --btn: rgba(255,255,255,.12); --btn-active: rgba(255,255,255,.22); }
+  html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--fg); }
+  body { padding-top: env(safe-area-inset-top, 0px); font: 14px/1.4 -apple-system, system-ui, sans-serif; }
+  /* The hero is a 4:3 banner at the top of the page. The engine lays out to the canvas's size. */
+  #hero { display: block; width: 100%; max-width: 560px; margin: 0 auto; aspect-ratio: 4 / 3; touch-action: pan-y;
+          /* pinned, so the animation stays in view while you scroll the Tune sliders */
+          position: sticky; top: env(safe-area-inset-top, 0px); z-index: 1; background: var(--bg); }
   .controls { display: flex; gap: 10px; justify-content: center; padding: 20px 16px; }
-  .controls button {
-    font: 600 14px/1 -apple-system, system-ui, sans-serif; color: #fff;
-    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18);
-    padding: 12px 20px; border-radius: 999px;
-  }
-  .controls button:active { background: rgba(255,255,255,.22); }
-  #nogl { display: none; font: 15px system-ui; padding: 24px; }
+  button { font: 600 14px/1 -apple-system, system-ui, sans-serif; color: var(--fg); background: var(--btn); border: 1px solid var(--line); padding: 12px 20px; border-radius: 999px; }
+  button:active { background: var(--btn-active); }
+  button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+  #nogl { display: none; padding: 24px; }
+
+  /* Tune panel (demo only, not part of the engine) */
+  #tune { display: none; max-width: 560px; margin: 0 auto; padding: 0 16px 32px; box-sizing: border-box; }
+  #tune.open { display: block; }
+  #tune h2 { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 20px 0 6px; font-weight: 600; }
+  .row { display: grid; grid-template-columns: 1fr 90px 46px; gap: 10px; align-items: center; padding: 4px 0; }
+  .row label { color: var(--fg); }
+  .row output { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+  .row input[type=range] { width: 100%; min-width: 0; }
+  #tune .actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+  #tune textarea { width: 100%; box-sizing: border-box; margin-top: 12px; min-height: 140px; background: rgba(255,255,255,.06); color: var(--fg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; font: 12px/1.4 ui-monospace, Menlo, monospace; }
+  #tune p { color: var(--muted); margin: 8px 0 0; }
 </style>
 </head>
 <body>
@@ -26,36 +37,56 @@
 <div class="controls">
   <button id="replay" type="button">Replay</button>
   <button id="exit" type="button">Exit</button>
+  <button id="tunebtn" type="button" aria-expanded="false" aria-controls="tune">Tune</button>
 </div>
+<section id="tune" aria-label="Tune the animation"></section>
 
 <script>
-/* ------------------------------------------------------------------ *
- *  OrbHero — WebGL2 circle-lattice entrance, no dependencies.
- *  Sized by its canvas: give the canvas a 4:3 box and it lays out to fit.
+/* =====================================================================
+ *  OrbHero — a WebGL2 circle-lattice entrance. One file, no dependencies.
  *
- *  new OrbHero(canvas, {
- *    icons:   [...]   // slot 0 = centre circle, then outward. Each icon FILLS ITS
- *                     // CIRCLE (cover-fit). Entry = URL / data-URI string,
- *                     // <img>/<canvas>/ImageBitmap, or { path } (a 24×24 SVG
- *                     // path, drawn white on a coloured disc — placeholder art).
- *                     // Defaults to OrbHero.BUILTIN_ICONS.
- *    fill:    ['#2a2d36']  // disc colour behind { path } placeholders, cycled by slot
- *    rows:    [4, 5, 4]    // circles per row, top to bottom; the hero is the centre of the
- *                          // middle row (so it must be odd). Rows are centred: a hex lattice.
- *    empty:   [[0,0],[1,0],[1,4]]  // [row, column] of circles left empty (no icon)
- *    emptyFill: '#2a2d36'  // colour of an empty circle
- *    center:  [0.5, 0.5]   // hero centre, as a fraction of the canvas
- *    pitch:   0.195        // distance between neighbours, in canvas widths
- *    heroSize: 0.34        // peak hero radius, in canvas widths
- *    restSize: 0.09        // circle radius once the lattice is out (hero rests 12% larger)
- *    iconRes: 512          // px per icon layer (the hero peaks near 540 device px)
- *    interactive: true     // touch / hover nudges nearby circles; they spring back
- *  })
- *  hero.play()   // entrance
- *  hero.exit()   // shrink everything away
- *  hero.seek(t)  // freeze at t seconds (debug / screenshots)
- * ------------------------------------------------------------------ */
+ *  WHAT IT DOES
+ *    A hero circle grows, then shrinks as the rest of the lattice springs
+ *    out from behind it. After landing, circles float a little and react to
+ *    touch. Every circle is a picture (your icon art fills the whole disc)
+ *    or an empty disc.
+ *
+ *  HOW IT WORKS (read this before changing things)
+ *    1. LAYOUT  `_layout()` turns `layout.rows` into one record per circle:
+ *       a home position in canvas-width units, distance `d` from the hero,
+ *       an icon slot, and random-but-seeded float phases. Runs on resize.
+ *    2. TIME    Every frame is a pure function of `t` (seconds since play()).
+ *       The entrance springs are precomputed into lookup tables
+ *       (`_buildTables`), so `seek(t)` can draw any instant. Only the touch
+ *       response is live state (it integrates frame to frame).
+ *    3. FRAME   `_frame()` works out each circle's centre, radius and icon
+ *       slot, writes them into one Float32Array, and uploads it.
+ *    4. DRAW    One instanced draw call: a quad per circle. The fragment
+ *       shader samples that circle's layer of a texture array and applies
+ *       an antialiased circular mask. No fill, border or shadow is drawn.
+ *
+ *  UNITS
+ *    Sizes and distances are in CANVAS WIDTHS (0.1 = 10% of the canvas
+ *    width), so the layout scales with the canvas. Times are seconds.
+ *
+ *  CUSTOMISING
+ *    Pass a partial config; it is merged over OrbHero.DEFAULTS (objects
+ *    merge, arrays and values replace):
+ *        new OrbHero(canvas, { spring: { size: { zeta: 0.5 } } });
+ *    Change it later with hero.configure({...}) (replays the entrance).
+ *    Everything tunable, with units and effect, is in DEFAULTS below.
+ *
+ *  API
+ *    hero.play()            run the entrance
+ *    hero.exit()            run the exit
+ *    hero.configure(patch)  merge config, rebuild, replay. Returns a Promise
+ *    hero.seek(t[, exitT])  freeze at an instant (debugging / screenshots)
+ *    hero.destroy()         stop and release the observer
+ *    hero.ready             Promise: icons uploaded, loop running
+ *    hero.config            the live, merged config (read-only by convention)
+ * ===================================================================== */
 class OrbHero {
+  // Placeholder art: white line icons on a disc. Replace via `icons`.
   static BUILTIN_ICONS = [
     { path: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10' },                       // home
     { path: 'M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z' }, // heart
@@ -70,34 +101,134 @@ class OrbHero {
     { path: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z' },                                                     // zap
   ];
 
-  // Timeline, seconds (read off the reference recording).
-  static T = {
-    heroGrow: 0.65,                                // hero growth ends; the spring-back to rest starts
-    latticeStart: 0.65, latticeStagger: 0.22,
-    settle: 0.7,                                   // a circle is "landed" this long after it starts
-    idleFade: 1.2,                                 // float / breathing ease in over this long after landing
-    exitDur: 0.6, exitStagger: 0.35,
+  /* ------------------------------------------------------------------
+   *  DEFAULTS: every tunable value. Override any subset.
+   * ------------------------------------------------------------------ */
+  static DEFAULTS = {
+    // The pictures. Slot 0 is the hero; the rest are dealt to the other (non-empty) circles
+    // nearest-first, repeating if there are fewer icons than circles. Each entry is:
+    //   - a URL or data: URI string,
+    //   - an <img>, <canvas> or ImageBitmap (same-origin / CORS-clean),
+    //   - or { path: 'SVG path d, 24x24 box' }: placeholder, white line art on a disc.
+    // Image icons FILL THE WHOLE CIRCLE (cover-fit, centred, clipped by the circle),
+    // so supply square art, with its own background if it needs one.
+    // null = OrbHero.BUILTIN_ICONS.
+    icons: null,
+
+    colors: {
+      placeholder: ['#2a2d36'],  // disc colour behind { path } icons, cycled by slot index
+      empty: '#2a2d36',          // colour of a circle left empty
+    },
+
+    layout: {
+      rows: [4, 5, 4],           // circles per row, top to bottom. Rows are centred, so this is a
+                                 // hex lattice. The hero is the middle circle of the middle row,
+                                 // so the middle row needs an odd count and rows.length must be odd.
+      empty: [[0, 0], [1, 0], [1, 4]],  // [row, column] of circles with no icon (zero-based)
+      pitch: 0.195,              // distance between neighbours in a row. The widest row must fit:
+                                 // (widest - 1) / 2 * pitch + size.circle <= 0.5  (here 2 * 0.195 + 0.09 = 0.48)
+      rowSpacing: 0.87,          // row gap as a share of pitch. 0.87 is a true hex lattice
+      center: [0.5, 0.5],        // where the hero sits, as a fraction of the canvas [x, y]
+    },
+
+    size: {                      // radii, in canvas widths
+      start: 0.15,               // hero radius at t = 0
+      heroPeak: 0.34,            // hero radius when fully grown
+      circle: 0.09,              // radius of every other circle at rest
+      heroRestScale: 1.12,       // hero's resting radius = circle * this
+    },
+
+    timing: {                    // seconds
+      heroGrow: 0.65,            // hero growth takes this long; the spring-back starts after it
+      latticeStart: null,        // when the other circles start moving. null = heroGrow (they
+                                 // start the moment the hero lets go); lower = overlap
+      stagger: 0.22,             // extra delay per unit of distance from the hero (0 = all at once)
+      landing: 0.7,              // a circle counts as "landed" this long after it starts; its
+                                 // idle float fades in from then
+      heroLanding: 0.9,          // same for the hero, counted from the end of heroGrow
+    },
+
+    // Damped springs. They are driven by a short ramp so they leave rest smoothly.
+    //   zeta  : damping. 1 = no overshoot; lower overshoots more. Overshoot is
+    //           exp(-pi*zeta/sqrt(1-zeta^2)):  0.8 -> 1.5%,  0.66 -> 6%,  0.62 -> 8%,  0.5 -> 16%
+    //   omega : stiffness in rad/s. Higher = faster. Time to settle is about 4 / (zeta*omega).
+    spring: {
+      ramp: 0.2,                       // seconds to ease the target in; 0 = a hard kick at the start
+      position: { zeta: 0.80, omega: 10.0 },  // where circles travel (barely overshoots)
+      size:     { zeta: 0.62, omega: 10.0 },  // how big they get (the soft pop)
+      hero:     { zeta: 0.66, omega: 9.5 },   // the hero's shrink; dips a little under its rest size
+    },
+
+    // Float after landing: each circle drifts on two slow sines and breathes a hair.
+    idle: {
+      driftX: 0.0065,            // horizontal amplitude, canvas widths (about 2.6px on a 402px canvas)
+      driftY: 0.0075,            // vertical amplitude
+      breathe: 0.012,            // size pulse, as a fraction (0.012 = +/-1.2%)
+      fade: 1.2,                 // seconds for the float to fade in after landing (never switch it
+                                 // on at full strength: that reads as a jump)
+      freq: { x: [0.11, 0.19], y: [0.13, 0.23], breathe: [0.12, 0.20] },  // Hz ranges, picked per circle
+      seed: 7,                   // changes every circle's phases; same seed = same motion
+      heroFreq: [0.15, 0.18, 0.14],   // the hero's x, y, breathe frequencies (Hz)
+      heroPhase: [1.3, 4.1, 2.2],     // and phases (radians)
+    },
+
+    // Touch / hover: circles near the pointer are pushed away and spring back.
+    touch: {
+      enabled: true,
+      enableAfter: null,         // seconds from play() before it can react. null = once the
+                                 // last circle has landed
+      radius: 0.22,              // reach of the push, canvas widths
+      stiffness: 36,             // spring pulling a circle home (higher = snappier return)
+      damping: 3.6,              // friction (lower = wobbles longer; zeta = damping / (2*sqrt(stiffness)))
+      hover: 1.8,                // push strength while hovering / dragging (about 0.05 canvas widths of travel)
+      press: 3.2,                // push strength while pressed
+      tap: 0.3,                  // extra kick on the moment of press
+      heroMass: 0.6,             // below 1 = the hero reacts less than the others
+    },
+
+    exit: {
+      dur: 0.6,                  // seconds each circle takes to shrink away
+      stagger: 0.35,             // spread of start times: outermost first, hero last
+    },
+
+    render: {
+      iconRes: 512,              // pixels per icon layer. The hero peaks near 540 device px on a
+                                 // 402px canvas; lower this to save memory (about iconRes^2 * 5.3 bytes per icon)
+      maxDpr: 2,                 // cap on devicePixelRatio, to bound fill cost on 3x phones
+    },
+
+    // Callbacks. Not called when seek() has the animation frozen.
+    onSettled: null,             // () => void   once per play(), when the last circle has landed
+    onExited: null,              // () => void   once per exit(), when everything is gone
   };
 
-  // Damped springs, driven by a short ramp so they leave rest smoothly. zeta < 1 overshoots:
-  // overshoot = exp(-pi*zeta / sqrt(1 - zeta^2)), so 0.8 -> 1.5%, 0.66 -> 6%, 0.62 -> 8%.
-  static SPRING = {
-    ramp: 0.2,
-    pos:  { zeta: 0.80, omega: 10.0 },              // where a circle is: barely overshoots
-    size: { zeta: 0.62, omega: 10.0 },              // how big it is: a soft pop past full size
-    hero: { zeta: 0.66, omega: 9.5 },              // the hero's shrink: dips just under its rest size
-  };
-  // Touch response: a spring on each circle's offset, pushed by the pointer.
-  static TOUCH = { radius: 0.22, k: 36, damping: 3.6, hover: 1.8, press: 3.2, tap: 0.3, heroMass: 0.6 };
+  /* ---------- config helpers ---------- */
+  // Plain objects merge; arrays, functions, images and primitives replace.
+  static _merge(base, patch) {
+    const plain = v => v && typeof v === 'object' && Object.getPrototypeOf(v) === Object.prototype;
+    const out = { ...base };
+    for (const k in patch) out[k] = plain(base?.[k]) && plain(patch[k]) ? OrbHero._merge(base[k], patch[k]) : patch[k];
+    return out;
+  }
 
-  // Unit step response of a spring, sampled at 480Hz, so any frame can be drawn from t alone.
+  // Throws before anything is applied, so a bad config never replaces a good one.
+  static _validate(cfg) {
+    const rows = cfg.layout.rows, mid = (rows.length - 1) / 2;
+    if (!Number.isInteger(mid) || !Number.isInteger((rows[mid] - 1) / 2)) {
+      throw new Error('layout.rows needs an odd number of rows and an odd count in the middle row: the hero sits at the centre of the middle row. Got ' + JSON.stringify(rows));
+    }
+  }
+
+  // Unit step response of a spring (driven through a ramp), sampled at 480Hz. Because the
+  // entrance only ever needs "how far along is this spring after tau seconds", one table per
+  // spring lets any frame be drawn from t alone.
   static _table({ zeta, omega }, ramp) {
     const dt = 1 / 480, n = 3 * 480, out = new Float32Array(n + 1);
     const smoother = x => x * x * x * (x * (x * 6 - 15) + 10);
     let x = 0, v = 0;
     for (let i = 0; i <= n; i++) {
       out[i] = x;
-      const u = smoother(Math.min(1, (i * dt) / ramp));
+      const u = ramp > 0 ? smoother(Math.min(1, (i * dt) / ramp)) : 1;
       v += (omega * omega * (u - x) - 2 * zeta * omega * v) * dt;
       x += v * dt;
     }
@@ -109,30 +240,40 @@ class OrbHero {
     return i >= tab.length - 1 ? tab[tab.length - 1] : tab[i] + (tab[i + 1] - tab[i]) * (f - i);
   }
 
-  constructor(canvas, opts = {}) {
+  static ease = {
+    outCubic: x => 1 - Math.pow(1 - x, 3),
+    smooth: x => x * x * (3 - 2 * x),
+    inCubic: x => x * x * x,
+  };
+
+  constructor(canvas, config = {}) {
     this.canvas = canvas;
-    this.opts = Object.assign({
-      icons: OrbHero.BUILTIN_ICONS, center: [0.5, 0.5], fill: ['#2a2d36'],
-      rows: [4, 5, 4], empty: [[0, 0], [1, 0], [1, 4]], emptyFill: '#2a2d36',
-      pitch: 0.195, heroSize: 0.34, restSize: 0.09, startSize: 0.15, iconRes: 512, maxDpr: 2, interactive: true,
-    }, opts);
+    this.config = OrbHero._merge(OrbHero.DEFAULTS, config);
+    OrbHero._validate(this.config);
     const gl = this.gl = canvas.getContext('webgl2', { alpha: true, premultipliedAlpha: true, antialias: false });
     if (!gl) throw new Error('WebGL2 unavailable');
 
     this.mode = 'in'; this.t0 = performance.now(); this.exitT0 = 0; this.frozen = null;
     this.reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    const SP = OrbHero.SPRING;
-    this.tabs = { pos: OrbHero._table(SP.pos, SP.ramp), size: OrbHero._table(SP.size, SP.ramp), hero: OrbHero._table(SP.hero, SP.ramp) };
     this.pointer = { x: 0, y: 0, active: false, down: false, tap: false };
     this.heroSt = { ox: 0, oy: 0, vx: 0, vy: 0 };
-    this.heroIdle = { f1: 0.15, f2: 0.18, f3: 0.14, p1: 1.3, p2: 4.1, p3: 2.2 };
+
+    this._buildTables();
     this._bindPointer();
     this._initGL();
     this._ro = new ResizeObserver(() => this.resize());
     this._ro.observe(canvas);
     this.resize();
-    this.ready = this._buildIcons(this.opts.icons).then(() => { this.play(); this._loop(); });
+    this.ready = this._buildIcons().then(() => { if (this._dead) return; this.play(); this._loop(); });
+  }
+
+  _buildTables() {
+    const sp = this.config.spring;
+    this.tabs = {
+      pos: OrbHero._table(sp.position, sp.ramp),
+      size: OrbHero._table(sp.size, sp.ramp),
+      hero: OrbHero._table(sp.hero, sp.ramp),
+    };
   }
 
   /* ---------------------------- GL setup --------------------------- */
@@ -143,15 +284,15 @@ class OrbHero {
       uniform vec2 uRes;
       out vec2 vUv; flat out vec4 vA; flat out vec4 vB;
       void main(){
-        float ext = 1.06;
-        vec2 px = aA.xy + aQuad * aA.z * ext;
+        float ext = 1.06;                                    // quad is a little bigger than the circle, for the edge feather
+        vec2 px = aA.xy + aQuad * aA.z * ext;                // aA = (centre x px, centre y px, radius px, unused)
         vec2 ndc = px / uRes * 2.0 - 1.0; ndc.y = -ndc.y;
         gl_Position = vec4(ndc, 0.0, 1.0);
         vUv = vec2(aQuad.x, -aQuad.y) * ext; vA = aA; vB = aB;   // y-up, matches screen after the flip above
       }`;
     // The icon is the circle: one layer of a texture array, mapped across the whole disc.
     // Coverage stays solid out to r = 1 and only feathers outside it, so the artwork's own
-    // edge is never thinned (that thinning read as a faint ring).
+    // edge is never thinned (that thinning read as a faint ring).  aB = (icon layer, -, -, opacity)
     const fs = `#version 300 es
       precision highp float;
       in vec2 vUv; flat in vec4 vA; flat in vec4 vB;
@@ -184,6 +325,7 @@ class OrbHero {
     const aQuad = gl.getAttribLocation(prog, 'aQuad');
     gl.enableVertexAttribArray(aQuad); gl.vertexAttribPointer(aQuad, 2, gl.FLOAT, false, 0, 0);
 
+    // Per-circle data: 8 floats each. aA = (x, y, radius, 0), aB = (slot, 0, 0, opacity).
     this.inst = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, this.inst);
     for (const [name, off] of [['aA', 0], ['aB', 16]]) {
       const l = gl.getAttribLocation(prog, name);
@@ -195,14 +337,19 @@ class OrbHero {
   }
 
   /* ----------------------------- icons ----------------------------- */
-  // One texture-array layer per icon. Layers can't bleed into each other the way
-  // neighbouring cells of a shared atlas do, and each layer mipmaps on its own.
-  async _buildIcons(icons) {
-    const gl = this.gl, n = icons.length, R = this.opts.iconRes;
+  // One texture-array layer per icon, plus a last layer for the empty disc. Layers can't bleed
+  // into each other the way neighbouring cells of a shared atlas do, and each mipmaps on its own.
+  async _buildIcons() {
+    const gl = this.gl, C = this.config, R = C.render.iconRes;
+    const icons = C.icons ?? OrbHero.BUILTIN_ICONS, n = icons.length;
     this.slots = n;
     const cv = document.createElement('canvas'); cv.width = cv.height = R;
     const ctx = cv.getContext('2d');
+    const disc = color => {
+      ctx.fillStyle = color; ctx.beginPath(); ctx.arc(R / 2, R / 2, R / 2, 0, Math.PI * 2); ctx.fill();
+    };
 
+    if (this.tex) gl.deleteTexture(this.tex);
     const tex = this.tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D_ARRAY, tex);
     gl.texStorage3D(gl.TEXTURE_2D_ARRAY, Math.floor(Math.log2(R)) + 1, gl.RGBA8, R, R, n + 1);   // +1: the empty circle
@@ -213,8 +360,7 @@ class OrbHero {
       const src = icons[i];
       if (src && src.path) {
         // Placeholder: a full disc with a white glyph at half size.
-        ctx.fillStyle = this.opts.fill[i % this.opts.fill.length];
-        ctx.beginPath(); ctx.arc(R / 2, R / 2, R / 2, 0, Math.PI * 2); ctx.fill();
+        disc(C.colors.placeholder[i % C.colors.placeholder.length]);
         const s = (R * 0.5) / 24;
         ctx.save(); ctx.translate(R * 0.25, R * 0.25); ctx.scale(s, s);
         ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.7; ctx.lineCap = ctx.lineJoin = 'round';
@@ -228,10 +374,8 @@ class OrbHero {
       }
       gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, i, R, R, 1, gl.RGBA, gl.UNSIGNED_BYTE, cv);
     }
-    // Last layer: a plain disc, for circles left empty.
     ctx.clearRect(0, 0, R, R);
-    ctx.fillStyle = this.opts.emptyFill;
-    ctx.beginPath(); ctx.arc(R / 2, R / 2, R / 2, 0, Math.PI * 2); ctx.fill();
+    disc(C.colors.empty);
     gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, n, R, R, 1, gl.RGBA, gl.UNSIGNED_BYTE, cv);
 
     gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
@@ -249,24 +393,25 @@ class OrbHero {
   }
 
   /* ----------------------------- layout ---------------------------- */
-  // Explicit rows, each centred, so the lattice is exactly symmetric. Row spacing is the
-  // hex one (pitch * 0.87); the hero is the centre circle of the middle row.
+  // Explicit rows, each centred, so the lattice is exactly symmetric. Positions are home
+  // positions relative to the hero, in canvas widths; the hero is not in `orbs`.
   _layout() {
     if (!this.slots) return;
-    const { pitch, restSize, rows, empty } = this.opts;
-    const dy = pitch * 0.87, mid = (rows.length - 1) / 2;
-    let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const L = this.config.layout, I = this.config.idle, size = this.config.size, tm = this.config.timing;
+    const dy = L.pitch * L.rowSpacing, mid = (L.rows.length - 1) / 2;
+    let seed = I.seed; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const pick = ([a, b]) => a + rnd() * (b - a);
 
     const orbs = [];
-    rows.forEach((n, j) => {
+    L.rows.forEach((n, j) => {
       for (let i = 0; i < n; i++) {
         if (j === mid && i === (n - 1) / 2) continue;   // the hero
-        const x = (i - (n - 1) / 2) * pitch, y = (j - mid) * dy;
-        orbs.push({ x, y, d: Math.hypot(x, y), r: restSize,
-                    f1: 0.11 + rnd() * 0.08, f2: 0.13 + rnd() * 0.10, f3: 0.12 + rnd() * 0.08,
+        const x = (i - (n - 1) / 2) * L.pitch, y = (j - mid) * dy;
+        orbs.push({ x, y, d: Math.hypot(x, y), r: size.circle,
+                    f1: pick(I.freq.x), f2: pick(I.freq.y), f3: pick(I.freq.breathe),
                     p1: rnd() * 6.283, p2: rnd() * 6.283, p3: rnd() * 6.283,
                     st: { ox: 0, oy: 0, vx: 0, vy: 0 },
-                    empty: empty.some(([a, b]) => a === j && b === i) });
+                    empty: L.empty.some(([a, b]) => a === j && b === i) });
       }
     });
     orbs.sort((a, b) => a.d - b.d);
@@ -276,10 +421,12 @@ class OrbHero {
     }
     this.orbs = orbs; this.maxD = orbs.length ? orbs[orbs.length - 1].d : 1;
     this.data = new Float32Array((orbs.length + 1) * 8);
+    // When the last circle has landed.
+    this.settleAt = (tm.latticeStart ?? tm.heroGrow) + this.maxD * tm.stagger + tm.landing;
   }
 
   resize() {
-    const dpr = Math.min(devicePixelRatio || 1, this.opts.maxDpr);
+    const dpr = Math.min(devicePixelRatio || 1, this.config.render.maxDpr);
     const W = Math.max(1, Math.round(this.canvas.clientWidth * dpr));
     const H = Math.max(1, Math.round(this.canvas.clientHeight * dpr));
     if (W === this.W && H === this.H) return;
@@ -289,42 +436,67 @@ class OrbHero {
     this._layout();
   }
 
-  /* ---------------------------- animation -------------------------- */
-  play() { this.mode = 'in'; this.t0 = performance.now(); this.frozen = null; }
-  exit() { if (this.mode !== 'out') { this.mode = 'out'; this.exitT0 = performance.now(); } }
+  /* ---------------------------- public API ------------------------- */
+  play() { this.mode = 'in'; this.t0 = performance.now(); this.frozen = null; this._settled = false; this._exited = false; }
+  exit() { if (this.mode !== 'out') { this.mode = 'out'; this.exitT0 = performance.now(); this._exited = false; } }
   seek(t, exitT) { this.frozen = { t, exitT: exitT ?? null }; }
 
-  static ease = {
-    outCubic: x => 1 - Math.pow(1 - x, 3),
-    // Starts and ends at rest, with a longer glide than lift-off: no pop at either end.
-    soft: x => { const g = x * x * (3 - 2 * x); return 1 - (1 - g) * (1 - g); },
-    smooth: x => x * x * (3 - 2 * x),
-    inCubic: x => x * x * x,
-    inOutCubic: x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2,
-  };
+  // Merge a partial config, rebuild what depends on it, and replay the entrance.
+  configure(patch = {}) {
+    const needIcons = 'icons' in patch || 'colors' in patch || patch.render?.iconRes !== undefined;
+    const needSize = patch.render?.maxDpr !== undefined;
+    const next = OrbHero._merge(this.config, patch);
+    OrbHero._validate(next);
+    this.config = next;
+    this._buildTables();
+    if (needSize) this.W = this.H = 0;
+    if (needSize) this.resize();
+    if (needIcons) {
+      this.ready = this._buildIcons().then(() => { if (!this._dead) this.play(); });
+    } else {
+      this._layout(); this.play(); this.ready = Promise.resolve();
+    }
+    return this.ready;
+  }
 
+  // Stops the loop and releases listeners and GL objects. The canvas's context is left alone, so
+  // the same canvas can host a new OrbHero straight away (React strict mode mounts twice).
+  destroy() {
+    this._dead = true;
+    cancelAnimationFrame(this._raf); this._ro.disconnect(); this._unbindPointer();
+    const gl = this.gl;
+    if (this.tex) gl.deleteTexture(this.tex);
+    gl.deleteBuffer(this.inst); gl.deleteVertexArray(this.vao); gl.deleteProgram(this.prog);
+  }
+
+  /* ----------------------------- touch ----------------------------- */
   _bindPointer() {
     const c = this.canvas, P = this.pointer;
     const at = e => {
       const r = c.getBoundingClientRect();
       P.x = (e.clientX - r.left) / r.width; P.y = (e.clientY - r.top) / r.width;   // canvas-width units
     };
-    c.addEventListener('pointerdown', e => { at(e); P.active = P.down = P.tap = true; });
-    c.addEventListener('pointermove', e => { at(e); P.active = true; });
-    const end = () => { P.active = P.down = false; };
-    c.addEventListener('pointerup', end); c.addEventListener('pointercancel', end); c.addEventListener('pointerleave', end);
+    const on = {
+      pointerdown: e => { at(e); P.active = P.down = P.tap = true; },
+      pointermove: e => { at(e); P.active = true; },
+      pointerup: () => { P.active = P.down = false; },
+      pointercancel: () => { P.active = P.down = false; },
+      pointerleave: () => { P.active = P.down = false; },
+    };
+    for (const k in on) c.addEventListener(k, on[k]);
+    this._unbindPointer = () => { for (const k in on) c.removeEventListener(k, on[k]); };
   }
 
   // One body on a spring around its home position, pushed away from the pointer.
   _physics(st, bx, by, dt, mass, tap) {
-    const K = OrbHero.TOUCH, P = this.pointer;
+    const K = this.config.touch, P = this.pointer;
     const steps = Math.max(1, Math.ceil(dt * 120)), h = dt / steps;
     if (tap && P.active) {
       const dx = bx + st.ox - P.x, dy = by + st.oy - P.y, d = Math.hypot(dx, dy) || 1e-6;
       if (d < K.radius * 1.4) { const k = K.tap * (1 - d / (K.radius * 1.4)) / mass; st.vx += dx / d * k; st.vy += dy / d * k; }
     }
     for (let i = 0; i < steps; i++) {
-      let ax = -K.k * st.ox - K.damping * st.vx, ay = -K.k * st.oy - K.damping * st.vy;
+      let ax = -K.stiffness * st.ox - K.damping * st.vx, ay = -K.stiffness * st.oy - K.damping * st.vy;
       if (P.active) {
         const dx = bx + st.ox - P.x, dy = by + st.oy - P.y, d = Math.hypot(dx, dy) || 1e-6;
         if (d < K.radius) {
@@ -336,33 +508,42 @@ class OrbHero {
     }
   }
 
+  /* ----------------------------- frame ----------------------------- */
   _frame(now) {
-    const gl = this.gl, T = OrbHero.T, E = OrbHero.ease, S = OrbHero._sample, o = this.opts, tabs = this.tabs;
+    const gl = this.gl, C = this.config, E = OrbHero.ease, S = OrbHero._sample, tabs = this.tabs;
+    const tm = C.timing, sz = C.size, I = C.idle, X = C.exit;
     const clamp01 = x => Math.min(1, Math.max(0, x));
+    const latticeStart = tm.latticeStart ?? tm.heroGrow;
 
     let t = (now - this.t0) / 1000;
     let exitT = this.mode === 'out' ? (now - this.exitT0) / 1000 : -1;
     if (this.frozen) { t = this.frozen.t; exitT = this.frozen.exitT ?? -1; }
     if (this.reduceMotion && !this.frozen) t = 10;   // jump to the finished layout
     const still = this.reduceMotion;                  // no float, no touch response
-    const live = !this.frozen && !still && o.interactive && t > 1.4;
+    const live = !this.frozen && !still && C.touch.enabled && t > (C.touch.enableAfter ?? this.settleAt);
     const clock = still ? 0 : now / 1000;
     const dt = Math.min(0.033, Math.max(0, (now - (this.lastNow ?? now)) / 1000)); this.lastNow = now;
-    let tap = this.pointer.tap; this.pointer.tap = false;
+    const tap = this.pointer.tap; this.pointer.tap = false;
+
+    // Callbacks (never while frozen by seek()).
+    if (!this.frozen) {
+      if (this.mode === 'in' && !this._settled && t >= this.settleAt) { this._settled = true; C.onSettled?.(); }
+      if (this.mode === 'out' && !this._exited && exitT >= X.stagger + X.dur) { this._exited = true; C.onExited?.(); }
+    }
 
     const W = this.W;
-    const ccx = o.center[0] * W, ccy = o.center[1] * this.H;
+    const ccx = C.layout.center[0] * W, ccy = C.layout.center[1] * this.H;
     const out = d => {                               // exit multiplier: outer first, hero last
       if (exitT < 0) return 1;
-      const delay = (this.maxD - d) / this.maxD * T.exitStagger;
-      return 1 - E.inCubic(clamp01((exitT - delay) / T.exitDur));
+      const delay = (this.maxD - d) / this.maxD * X.stagger;
+      return 1 - E.inCubic(clamp01((exitT - delay) / X.dur));
     };
-    // Float: two slow sines per axis-pair plus a hair of breathing, faded in after landing.
+    // Float: a slow sine per axis plus a hair of breathing, faded in after landing.
     const idle = (b, landed) => {
-      const k = still ? 0 : E.smooth(clamp01((t - landed) / T.idleFade));
-      return [Math.sin(clock * b.f1 * 6.283 + b.p1) * 0.0065 * k,
-              Math.sin(clock * b.f2 * 6.283 + b.p2) * 0.0075 * k,
-              1 + Math.sin(clock * b.f3 * 6.283 + b.p3) * 0.012 * k];
+      const k = still ? 0 : E.smooth(clamp01((t - landed) / I.fade));
+      return [Math.sin(clock * b.f1 * 6.283 + b.p1) * I.driftX * k,
+              Math.sin(clock * b.f2 * 6.283 + b.p2) * I.driftY * k,
+              1 + Math.sin(clock * b.f3 * 6.283 + b.p3) * I.breathe * k];
     };
     // Pointer coordinates are in canvas widths; so are bodies' homes and offsets.
     const cxw = ccx / W, cyw = ccy / W;
@@ -374,25 +555,26 @@ class OrbHero {
     };
 
     for (const orb of this.orbs) {
-      const start = T.latticeStart + orb.d * T.latticeStagger;
+      const start = latticeStart + orb.d * tm.stagger;
       const tau = t - start;
       if (tau <= 0) continue;
       const ep = S(tabs.pos, tau), es = S(tabs.size, tau);
-      let hx = orb.x * ep, hy = orb.y * ep;           // home, in canvas widths from the hero centre
-      const [ix, iy, br] = idle(orb, start + T.settle);
+      const hx = orb.x * ep, hy = orb.y * ep;         // home, in canvas widths from the hero centre
+      const [ix, iy, br] = idle(orb, start + tm.landing);
       if (live) this._physics(orb.st, cxw + hx, cyw + hy, dt, 1, tap);
       const ox = live ? orb.st.ox : 0, oy = live ? orb.st.oy : 0;
       push(ccx + (hx + ix + ox) * W, ccy + (hy + iy + oy) * W, orb.r * es * br * out(orb.d), orb.slot);
     }
 
     // Hero last so it sits above everything during the hand-off.
-    const rest = o.restSize * 1.12;
-    let hr = t < T.heroGrow
-      ? o.startSize + (o.heroSize - o.startSize) * E.outCubic(t / T.heroGrow)
-      : rest + (o.heroSize - rest) * (1 - S(tabs.hero, t - T.heroGrow));
-    hr *= exitT < 0 ? 1 : Math.max(0, 1 - E.inCubic(clamp01((exitT - T.exitStagger) / T.exitDur)));
-    const [hix, hiy, hbr] = idle(this.heroIdle, T.heroGrow + 0.9);
-    if (live) this._physics(this.heroSt, cxw, cyw, dt, OrbHero.TOUCH.heroMass, tap);
+    const rest = sz.circle * sz.heroRestScale;
+    let hr = t < tm.heroGrow
+      ? sz.start + (sz.heroPeak - sz.start) * E.outCubic(t / tm.heroGrow)
+      : rest + (sz.heroPeak - rest) * (1 - S(tabs.hero, t - tm.heroGrow));
+    hr *= exitT < 0 ? 1 : Math.max(0, 1 - E.inCubic(clamp01((exitT - X.stagger) / X.dur)));
+    const hf = I.heroFreq, hp = I.heroPhase;
+    const [hix, hiy, hbr] = idle({ f1: hf[0], f2: hf[1], f3: hf[2], p1: hp[0], p2: hp[1], p3: hp[2] }, tm.heroGrow + tm.heroLanding);
+    if (live) this._physics(this.heroSt, cxw, cyw, dt, C.touch.heroMass, tap);
     push(ccx + (hix + (live ? this.heroSt.ox : 0)) * W, ccy + (hiy + (live ? this.heroSt.oy : 0)) * W, hr * hbr, 0);
 
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -408,18 +590,86 @@ class OrbHero {
     const tick = now => { this._frame(now); this._raf = requestAnimationFrame(tick); };
     this._raf = requestAnimationFrame(tick);
   }
-
-  destroy() { cancelAnimationFrame(this._raf); this._ro.disconnect(); }
 }
 
-/* ------------------------------ demo -------------------------------- */
+/* =====================================================================
+ *  DEMO PAGE (not part of the engine): the banner, Replay / Exit, and a
+ *  Tune panel that edits the config live and copies the changes as JSON.
+ * ===================================================================== */
 try {
   const hero = new OrbHero(document.getElementById('hero'));
   window.hero = hero;
   document.getElementById('replay').onclick = () => hero.play();
   document.getElementById('exit').onclick = () => hero.exit();
   const q = new URLSearchParams(location.search);
+  // ?config={"spring":{"size":{"zeta":0.5}}}  applies a config, so a tuned setup can be shared as a link
+  if (q.has('config')) hero.configure(JSON.parse(q.get('config')));
   if (q.has('t')) hero.ready.then(() => hero.seek(parseFloat(q.get('t')), q.has('x') ? parseFloat(q.get('x')) : null));
+
+  // [group, label, config path, min, max, step]
+  const KNOBS = [
+    ['Entrance', 'Hero grow (s)', 'timing.heroGrow', 0.2, 1.5, 0.05],
+    ['Entrance', 'Stagger (s / unit)', 'timing.stagger', 0, 0.6, 0.01],
+    ['Entrance', 'Hero peak size', 'size.heroPeak', 0.2, 0.45, 0.01],
+    ['Entrance', 'Circle size', 'size.circle', 0.06, 0.1, 0.005],
+    ['Entrance', 'Pitch', 'layout.pitch', 0.15, 0.22, 0.005],
+    ['Spring: position', 'Damping (zeta)', 'spring.position.zeta', 0.4, 1.2, 0.01],
+    ['Spring: position', 'Stiffness (omega)', 'spring.position.omega', 3, 20, 0.5],
+    ['Spring: size', 'Damping (zeta)', 'spring.size.zeta', 0.4, 1.2, 0.01],
+    ['Spring: size', 'Stiffness (omega)', 'spring.size.omega', 3, 20, 0.5],
+    ['Spring: hero', 'Damping (zeta)', 'spring.hero.zeta', 0.4, 1.2, 0.01],
+    ['Spring: hero', 'Stiffness (omega)', 'spring.hero.omega', 3, 20, 0.5],
+    ['Float', 'Drift X', 'idle.driftX', 0, 0.02, 0.0005],
+    ['Float', 'Drift Y', 'idle.driftY', 0, 0.02, 0.0005],
+    ['Float', 'Breathe', 'idle.breathe', 0, 0.05, 0.001],
+    ['Touch', 'Reach', 'touch.radius', 0.1, 0.4, 0.01],
+    ['Touch', 'Hover push', 'touch.hover', 0, 6, 0.1],
+    ['Touch', 'Press push', 'touch.press', 0, 8, 0.1],
+    ['Touch', 'Return stiffness', 'touch.stiffness', 10, 80, 1],
+    ['Touch', 'Friction', 'touch.damping', 1, 10, 0.1],
+  ];
+  const get = (o, path) => path.split('.').reduce((a, k) => a?.[k], o);
+  const nest = (path, v) => path.split('.').reduceRight((acc, k) => ({ [k]: acc }), v);
+  const panel = document.getElementById('tune');
+  let lastGroup = '';
+  for (const [group, label, path, min, max, step] of KNOBS) {
+    if (group !== lastGroup) { const h = document.createElement('h2'); h.textContent = group; panel.append(h); lastGroup = group; }
+    const row = document.createElement('div'); row.className = 'row';
+    const id = 'k_' + path.replace(/\./g, '_');
+    const lab = Object.assign(document.createElement('label'), { htmlFor: id, textContent: label });
+    const inp = Object.assign(document.createElement('input'), { type: 'range', id, min, max, step, value: get(hero.config, path) });
+    const out = document.createElement('output'); out.htmlFor = id; out.textContent = inp.value;
+    inp.oninput = () => { out.textContent = inp.value; };
+    inp.onchange = () => hero.configure(nest(path, parseFloat(inp.value)));   // on release: replay with the new value
+    row.append(lab, inp, out); panel.append(row);
+  }
+  // Changed values only, as the JSON you would pass to the constructor.
+  const diff = (cur, def) => {
+    const out = {};
+    for (const k in cur) {
+      if (typeof cur[k] === 'function' || k === 'icons') continue;
+      if (cur[k] && typeof cur[k] === 'object' && !Array.isArray(cur[k])) { const d = diff(cur[k], def?.[k] ?? {}); if (Object.keys(d).length) out[k] = d; }
+      else if (JSON.stringify(cur[k]) !== JSON.stringify(def?.[k])) out[k] = cur[k];
+    }
+    return out;
+  };
+  const actions = document.createElement('div'); actions.className = 'actions';
+  const copy = Object.assign(document.createElement('button'), { type: 'button', textContent: 'Copy config' });
+  const reset = Object.assign(document.createElement('button'), { type: 'button', textContent: 'Reset' });
+  const box = Object.assign(document.createElement('textarea'), { readOnly: true, hidden: true, id: 'cfgout', ariaLabel: 'Config JSON' });
+  const note = document.createElement('p'); note.textContent = 'Changes replay when you let go of a slider. "Copy config" gives only what differs from the defaults.';
+  copy.onclick = async () => {
+    const json = JSON.stringify(diff(hero.config, OrbHero.DEFAULTS), null, 2);
+    box.value = json === '{}' ? '// no changes from the defaults' : json; box.hidden = false;
+    try { await navigator.clipboard.writeText(box.value); copy.textContent = 'Copied'; } catch { box.select(); copy.textContent = 'Select and copy below'; }
+    setTimeout(() => { copy.textContent = 'Copy config'; }, 1800);
+  };
+  reset.onclick = () => {
+    location.reload();
+  };
+  actions.append(copy, reset); panel.append(actions, note, box);
+  const tb = document.getElementById('tunebtn');
+  tb.onclick = () => { const open = panel.classList.toggle('open'); tb.setAttribute('aria-expanded', open); };
 } catch (err) {
   console.error(err);
   document.getElementById('hero').style.display = 'none';
