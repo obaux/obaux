@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Orb Hero</title>
+<style>
+  :root { --bg: #121317; }
+  html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; }
+  #hero { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  .controls {
+    position: fixed; left: 0; right: 0; bottom: max(20px, env(safe-area-inset-bottom));
+    display: flex; gap: 10px; justify-content: center;
+  }
+  .controls button {
+    font: 600 14px/1 -apple-system, system-ui, sans-serif; color: #fff;
+    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    padding: 12px 20px; border-radius: 999px;
+  }
+  .controls button:active { background: rgba(255,255,255,.22); }
+  #nogl { display: none; color: #fff; font: 15px system-ui; padding: 24px; }
+</style>
+</head>
+<body>
+<canvas id="hero"></canvas>
+<p id="nogl">WebGL2 isn't available on this device.</p>
+<div class="controls">
+  <button id="replay">Replay</button>
+  <button id="exit">Exit</button>
+</div>
+
+<script>
+/* ------------------------------------------------------------------ *
+ *  OrbHero — WebGL2 orb-lattice entrance, no dependencies.
+ *
+ *  new OrbHero(canvas, {
+ *    icons:   [...]   // slot 0 = centre orb, then outward. Each entry is
+ *                     //   a URL / data-URI string, an <img>/<canvas>/ImageBitmap,
+ *                     //   or { path: 'svg path d, 24x24 box' } (stroked white).
+ *                     //   Defaults to OrbHero.BUILTIN_ICONS.
+ *    center:  [0.5, 0.5]   // hero centre as fraction of the canvas
+ *    pitch:   0.30         // lattice spacing, in canvas widths
+ *    heroSize: 0.37        // peak hero radius, in canvas widths
+ *    restSize: 0.145       // hero radius once the lattice is out
+ *  })
+ *  hero.play()   // entrance
+ *  hero.exit()   // shrink everything away
+ *  hero.seek(t)  // freeze at t seconds (debug / screenshots)
+ * ------------------------------------------------------------------ */
+class OrbHero {
+  static BUILTIN_ICONS = [
+    { path: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10' },                       // home
+    { path: 'M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z' }, // heart
+    { path: 'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3' },                               // search
+    { path: 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z' }, // star
+    { path: 'M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0' },             // bell
+    { path: 'M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z' },        // user
+    { path: 'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z' },   // pin
+    { path: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' },                       // chat
+    { path: 'M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z' }, // camera
+    { path: 'M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z' }, // music
+    { path: 'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z' }, // calendar
+    { path: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z' },                                                     // zap
+    { path: 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z' }, // book
+  ];
+
+  // Timeline, seconds (read off the reference recording).
+  static T = {
+    heroGrow: 1.15, heroShrinkEnd: 1.9,
+    latticeStart: 1.2, latticeDur: 0.8, latticeStagger: 0.45,
+    exitDur: 0.6, exitStagger: 0.35,
+  };
+
+  constructor(canvas, opts = {}) {
+    this.canvas = canvas;
+    this.opts = Object.assign({
+      icons: OrbHero.BUILTIN_ICONS, center: [0.5, 0.5],
+      pitch: 0.30, heroSize: 0.37, restSize: 0.145, startSize: 0.16, maxDpr: 2,
+    }, opts);
+    const gl = this.gl = canvas.getContext('webgl2', { alpha: true, premultipliedAlpha: true, antialias: false });
+    if (!gl) throw new Error('WebGL2 unavailable');
+
+    this.tilt = [0, 0]; this.tiltTarget = [0, 0];
+    this.mode = 'in'; this.t0 = performance.now(); this.exitT0 = 0; this.frozen = null;
+    this.reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    this._initGL();
+    this._bindInput();
+    this._resize = () => this.resize();
+    addEventListener('resize', this._resize);
+    this.resize();
+    this.ready = this._buildAtlas(this.opts.icons).then(() => { this.play(); this._loop(); });
+  }
+
+  /* ---------------------------- GL setup --------------------------- */
+  _initGL() {
+    const gl = this.gl;
+    const vs = `#version 300 es
+      in vec2 aQuad; in vec4 aA; in vec4 aB;
+      uniform vec2 uRes;
+      out vec2 vUv; flat out vec4 vA; flat out vec4 vB;
+      void main(){
+        float ext = 1.06;
+        vec2 px = aA.xy + aQuad * aA.z * ext;
+        vec2 ndc = px / uRes * 2.0 - 1.0; ndc.y = -ndc.y;
+        gl_Position = vec4(ndc, 0.0, 1.0);
+        vUv = vec2(aQuad.x, -aQuad.y) * ext; vA = aA; vB = aB;   // y-up, matches screen after the flip above
+      }`;
+    const fs = `#version 300 es
+      precision highp float;
+      in vec2 vUv; flat in vec4 vA; flat in vec4 vB;
+      uniform sampler2D uAtlas; uniform vec2 uGrid; uniform float uTime; uniform vec2 uTilt;
+      out vec4 o;
+
+      float hash(vec2 p){ p = fract(p*vec2(123.34,456.21)); p += dot(p,p+45.32); return fract(p.x*p.y); }
+      float noise(vec2 p){
+        vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f);
+        return mix(mix(hash(i),hash(i+vec2(1,0)),f.x), mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x), f.y);
+      }
+      float fbm(vec2 p){ float a=.5,s=0.; for(int i=0;i<3;i++){ s+=a*noise(p); p=p*2.03+17.1; a*=.5; } return s; }
+      vec3 pal(float t, vec3 d){
+        vec3 c = .52 + .36*cos(6.28318*(t+d));
+        return mix(vec3(dot(c, vec3(.3,.59,.11))), c, .72);   // pull saturation back
+      }
+
+      // Placeholder art for the centre orb (peach sky, teal monoliths, orange/blue bowl).
+      vec3 heroScene(vec2 p, float t){
+        float n = fbm(p*2.0 + t*.08);
+        vec3 c = mix(vec3(.36,.62,.88), vec3(1.,.72,.66), smoothstep(-.15,.85,p.y + (n-.5)*.6));
+        float m = 0.;
+        for(int i=0;i<4;i++){
+          float fi = float(i);
+          float h = .10 + .40*hash(vec2(fi,5.));
+          m = max(m, step(abs(p.x-(-.27+fi*.18)), .065) * step(p.y,h) * step(-.25,p.y));
+        }
+        c = mix(c, vec3(.10,.28,.27)*(.8+.4*n), m);
+        vec2 q = vec2(p.x*.95, (p.y+.78)*1.45);
+        float d = length(q) + (n-.5)*.18;
+        vec3 g = mix(vec3(.80,.68,.38), vec3(1.,.36,.14), smoothstep(.80,.50,d));
+        g = mix(g, vec3(1.,.26,.62), smoothstep(.46,.34,d));
+        g = mix(g, vec3(.32,.36,.92), smoothstep(.34,.26,d));
+        return mix(c, g, smoothstep(-.22,-.30,p.y));
+      }
+
+      // Generic iridescent swirl; seed picks the palette.
+      vec3 scene(vec2 p, float seed, float t){
+        vec2 q = p*1.8 + seed*31.7;
+        float w  = fbm(q + t*.12);
+        float w2 = fbm(q*1.6 + w*2.2 - t*.10);
+        vec3 d = vec3(0.,.33,.67) + seed*vec3(.3,.7,.2);
+        vec3 c = pal(w2*1.2 + seed*3., d);
+        c = mix(c, pal(w*2. + p.y*.5 + seed*5., d.zxy), .45);
+        c = mix(c, vec3(1.,.95,.85), smoothstep(.02,.0,abs(w2-.5)-.03)*.35);
+        return c*(.45 + .6*w2);
+      }
+
+      void main(){
+        vec2 uv = vUv; float r = length(uv);
+        float aa = 1.5 / vA.z;
+        float a = (1. - smoothstep(1.-aa, 1., r)) * vB.w;
+        if (a <= 0.) discard;
+        float rr = min(r, 1.), z = sqrt(1. - rr*rr);
+
+        // Fisheye lookup: magnified centre, 1:1 at the rim.
+        vec2 p = uv / (1. + z*.85);
+        float ca = cos(vA.w), sa = sin(vA.w);
+        p = mat2(ca,-sa,sa,ca) * p + uTilt*vec2(.10,-.10);
+        float t = uTime;
+        vec3 col = vB.z > .5 ? heroScene(p*1.1, t) : scene(p, vB.y, t);
+
+        // Thin-film rim + glow.
+        float f = 1. - z;
+        vec3 film = pal(f*1.4 + vB.y, vec3(0.,.33,.67));
+        col = mix(col, col*.55 + film*.75, smoothstep(.55,1.,f)*.7);
+        col += film * .25 * pow(f, 6.);
+
+        // Specular.
+        vec3 n = vec3(uv, z);
+        vec3 L = normalize(vec3(-.45 + uTilt.x*.4, .6 - uTilt.y*.4, .65));
+        float nl = max(dot(n,L), 0.);
+        col += pow(nl,48.)*.6 + pow(nl,6.)*.08;
+
+        // Icon, slightly lens-shifted and parallaxed by tilt.
+        vec2 iu = (uv*(1. + .2*rr*rr) + uTilt*vec2(.05,-.05)) / 1.15 + .5;
+        if (all(greaterThanEqual(iu, vec2(0.))) && all(lessThanEqual(iu, vec2(1.)))) {
+          vec2 cell = vec2(mod(vB.x, uGrid.x), floor(vB.x / uGrid.x));
+          vec4 ic = texture(uAtlas, (cell + vec2(iu.x, 1.-iu.y)) / uGrid);
+          col = col*(1. - ic.a) + ic.rgb;
+        }
+        col = clamp(col, 0., 1.);
+        o = vec4(col*a, a);
+      }`;
+    const sh = (type, src) => {
+      const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+      return s;
+    };
+    const prog = this.prog = gl.createProgram();
+    gl.attachShader(prog, sh(gl.VERTEX_SHADER, vs));
+    gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, fs));
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+    gl.useProgram(prog);
+    this.u = {};
+    for (const n of ['uRes', 'uAtlas', 'uGrid', 'uTime', 'uTilt']) this.u[n] = gl.getUniformLocation(prog, n);
+
+    this.vao = gl.createVertexArray(); gl.bindVertexArray(this.vao);
+    const quad = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+    const aQuad = gl.getAttribLocation(prog, 'aQuad');
+    gl.enableVertexAttribArray(aQuad); gl.vertexAttribPointer(aQuad, 2, gl.FLOAT, false, 0, 0);
+
+    this.inst = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, this.inst);
+    for (const [name, off] of [['aA', 0], ['aB', 16]]) {
+      const l = gl.getAttribLocation(prog, name);
+      gl.enableVertexAttribArray(l); gl.vertexAttribPointer(l, 4, gl.FLOAT, false, 32, off);
+      gl.vertexAttribDivisor(l, 1);
+    }
+    gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    gl.clearColor(0, 0, 0, 0);
+  }
+
+  /* --------------------------- icon atlas -------------------------- */
+  async _buildAtlas(icons) {
+    const gl = this.gl, n = icons.length, CELL = 192;
+    const cols = Math.ceil(Math.sqrt(n)), rows = Math.ceil(n / cols);
+    this.slots = n; this.grid = [cols, rows];
+    const cv = document.createElement('canvas'); cv.width = cols * CELL; cv.height = rows * CELL;
+    const ctx = cv.getContext('2d');
+    const pad = CELL * 0.18;
+
+    for (let i = 0; i < n; i++) {
+      const ox = (i % cols) * CELL, oy = Math.floor(i / cols) * CELL;
+      const src = icons[i];
+      ctx.save();
+      ctx.shadowColor = 'rgba(20,10,40,.45)'; ctx.shadowBlur = CELL * 0.06; ctx.shadowOffsetY = CELL * 0.015;
+      if (src && src.path) {
+        const s = (CELL - pad * 2) / 24;
+        ctx.translate(ox + pad, oy + pad); ctx.scale(s, s);
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.7; ctx.lineCap = ctx.lineJoin = 'round';
+        ctx.stroke(new Path2D(src.path));
+      } else {
+        const img = typeof src === 'string' ? await OrbHero._loadImage(src) : src;
+        const w = img.width || img.naturalWidth, h = img.height || img.naturalHeight;
+        const k = Math.min((CELL - pad * 2) / w, (CELL - pad * 2) / h);
+        ctx.drawImage(img, ox + (CELL - w * k) / 2, oy + (CELL - h * k) / 2, w * k, h * k);
+      }
+      ctx.restore();
+    }
+    const tex = this.tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, cv);
+    gl.generateMipmap(gl.TEXTURE_2D);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    this._layout();
+  }
+  static _loadImage(url) {
+    return new Promise((res, rej) => {
+      const i = new Image(); i.crossOrigin = 'anonymous';
+      i.onload = () => res(i); i.onerror = () => rej(new Error('icon failed: ' + url)); i.src = url;
+    });
+  }
+
+  /* ----------------------------- layout ---------------------------- */
+  // Hex lattice in canvas-width units, centred on the hero. Size falls off with distance (lens bulge).
+  _layout() {
+    if (!this.slots) return;
+    const { pitch, restSize, center } = this.opts;
+    const aspect = this.H / this.W;
+    const dx = pitch, dy = pitch * 0.87;
+    const cx = center[0] - 0.5, cy = (center[1] - 0.5) * aspect;
+    let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const sm = (a, b, x) => { x = Math.min(1, Math.max(0, (x - a) / (b - a))); return x * x * (3 - 2 * x); };
+
+    const orbs = [];
+    const rowsN = Math.ceil(aspect / dy) + 2, colsN = Math.ceil(1 / dx) + 2;
+    for (let j = -rowsN; j <= rowsN; j++) for (let i = -colsN; i <= colsN; i++) {
+      if (!i && !j) continue;
+      const jit = 0.015;
+      const x = i * dx + (j & 1 ? dx / 2 : 0) + (rnd() - 0.5) * jit * 2;
+      const y = j * dy + (rnd() - 0.5) * jit * 2;
+      const d = Math.hypot(x, y);
+      const r = restSize * (1 - 0.55 * sm(0.1, 1.1, d)) * (0.92 + rnd() * 0.16);
+      if (Math.abs(x + cx) > 0.5 + r || Math.abs(y + cy) > aspect / 2 + r) continue;
+      orbs.push({ x, y, d, r, seed: rnd(), rot: rnd() * 6.283, phase: rnd() * 6.283 });
+    }
+    orbs.sort((a, b) => a.d - b.d);
+    orbs.forEach((o, k) => { o.slot = this.slots > 1 ? 1 + (k % (this.slots - 1)) : 0; });
+    this.orbs = orbs; this.maxD = orbs.length ? orbs[orbs.length - 1].d : 1;
+    this.data = new Float32Array((orbs.length + 1) * 8);
+  }
+
+  resize() {
+    const dpr = Math.min(devicePixelRatio || 1, this.opts.maxDpr);
+    this.W = Math.max(1, Math.round(this.canvas.clientWidth * dpr));
+    this.H = Math.max(1, Math.round(this.canvas.clientHeight * dpr));
+    this.canvas.width = this.W; this.canvas.height = this.H;
+    this.gl.viewport(0, 0, this.W, this.H);
+    this._layout();
+  }
+
+  /* ---------------------------- animation -------------------------- */
+  play() { this.mode = 'in'; this.t0 = performance.now(); this.frozen = null; }
+  exit() { if (this.mode !== 'out') { this.mode = 'out'; this.exitT0 = performance.now(); } }
+  seek(t, exitT) { this.frozen = { t, exitT: exitT ?? null }; }
+
+  static ease = {
+    outCubic: x => 1 - Math.pow(1 - x, 3),
+    inCubic: x => x * x * x,
+    inOutCubic: x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2,
+    outBack: x => { const c1 = 1.2, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); },
+  };
+
+  _frame(now) {
+    const gl = this.gl, T = OrbHero.T, E = OrbHero.ease, o = this.opts;
+    const clamp01 = x => Math.min(1, Math.max(0, x));
+    const lerp = (a, b, k) => a + (b - a) * k;
+
+    let t = (now - this.t0) / 1000;
+    let exitT = this.mode === 'out' ? (now - this.exitT0) / 1000 : -1;
+    if (this.frozen) { t = this.frozen.t; exitT = this.frozen.exitT ?? -1; }
+    if (this.reduceMotion && !this.frozen) { t = 10; }   // jump to the finished layout
+    const clock = now / 1000;
+
+    // Tilt eases toward target.
+    this.tilt[0] += (this.tiltTarget[0] - this.tilt[0]) * 0.08;
+    this.tilt[1] += (this.tiltTarget[1] - this.tilt[1]) * 0.08;
+
+    const W = this.W, aspect = this.H / this.W;
+    const ccx = o.center[0] * W, ccy = o.center[1] * this.H;
+    const out = (d) => {                               // exit multiplier, outer first, hero last
+      if (exitT < 0) return 1;
+      const delay = (this.maxD - d) / this.maxD * T.exitStagger;
+      return 1 - E.inCubic(clamp01((exitT - delay) / T.exitDur));
+    };
+
+    let n = 0; const D = this.data;
+    const push = (x, y, r, rot, slot, seed, hero, alpha) => {
+      if (r * W < 0.6) return;
+      D.set([x, y, r * W, rot, slot, seed, hero, alpha], n * 8); n++;
+    };
+
+    for (const orb of this.orbs) {
+      const k = clamp01((t - (T.latticeStart + orb.d * T.latticeStagger)) / T.latticeDur);
+      if (k <= 0) continue;
+      const e = E.outCubic(k), s = E.outBack(k) * out(orb.d);
+      const bob = t > 2.4 ? Math.sin(clock * 0.9 + orb.phase) * 0.006 : 0;
+      push(ccx + orb.x * e * W, ccy + (orb.y * e + bob) * W, orb.r * s,
+           orb.rot + clock * 0.03, orb.slot, orb.seed, 0, 1);
+    }
+
+    // Hero last so it sits above everything during the hand-off.
+    let hr;
+    if (t < T.heroGrow) hr = lerp(o.startSize, o.heroSize, E.outCubic(t / T.heroGrow));
+    else hr = lerp(o.heroSize, o.restSize, E.inOutCubic(clamp01((t - T.heroGrow) / (T.heroShrinkEnd - T.heroGrow))));
+    hr *= exitT < 0 ? 1 : Math.max(0, 1 - E.inCubic(clamp01((exitT - T.exitStagger * 1.0) / T.exitDur)));
+    push(ccx, ccy, hr, 0, 0, 0, 1, 1);
+
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.useProgram(this.prog); gl.bindVertexArray(this.vao);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.inst);
+    gl.bufferData(gl.ARRAY_BUFFER, D.subarray(0, n * 8), gl.DYNAMIC_DRAW);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, this.tex);
+    gl.uniform1i(this.u.uAtlas, 0);
+    gl.uniform2f(this.u.uRes, this.W, this.H);
+    gl.uniform2f(this.u.uGrid, this.grid[0], this.grid[1]);
+    gl.uniform1f(this.u.uTime, this.reduceMotion ? 0 : clock);
+    gl.uniform2f(this.u.uTilt, this.tilt[0], this.tilt[1]);
+    gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, n);
+  }
+  _loop() {
+    const tick = now => { this._frame(now); this._raf = requestAnimationFrame(tick); };
+    this._raf = requestAnimationFrame(tick);
+  }
+
+  /* ------------------------------ input ---------------------------- */
+  _bindInput() {
+    const set = (x, y) => { this.tiltTarget = [x, y]; };
+    this.canvas.addEventListener('pointermove', e => {
+      const r = this.canvas.getBoundingClientRect();
+      set(((e.clientX - r.left) / r.width - .5) * 2, ((e.clientY - r.top) / r.height - .5) * 2);
+    });
+    this.canvas.addEventListener('pointerleave', () => set(0, 0));
+    // Device tilt (works without a prompt on Android; iOS needs requestPermission — see README note).
+    addEventListener('deviceorientation', e => {
+      if (e.gamma == null) return;
+      set(Math.max(-1, Math.min(1, e.gamma / 30)), Math.max(-1, Math.min(1, (e.beta - 45) / 30)));
+    });
+  }
+
+  destroy() { cancelAnimationFrame(this._raf); removeEventListener('resize', this._resize); }
+}
+
+/* ------------------------------ demo -------------------------------- */
+try {
+  const hero = new OrbHero(document.getElementById('hero'));
+  window.hero = hero;
+  document.getElementById('replay').onclick = () => hero.play();
+  document.getElementById('exit').onclick = () => hero.exit();
+  const q = new URLSearchParams(location.search);
+  if (q.has('t')) hero.ready.then(() => hero.seek(parseFloat(q.get('t')), q.has('x') ? parseFloat(q.get('x')) : null));
+} catch (err) {
+  console.error(err);
+  document.getElementById('hero').style.display = 'none';
+  document.getElementById('nogl').style.display = 'block';
+}
+</script>
+</body>
+</html>
