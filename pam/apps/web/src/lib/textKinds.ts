@@ -1,4 +1,5 @@
 import { ALERT_TEXTS_LIVE } from './alertTextsLive';
+import { VISIT_REMINDERS_LIVE_IN_APP } from './visitRemindersLive';
 
 /** Which kinds of texts the consent screens list for a kind of person, and whether each is sent today (D-608). See `TextKindsList`. */
 export type TextKindsFor = 'member' | 'admin' | 'provider';
@@ -15,7 +16,7 @@ export function textKindsFor(who: TextKindsFor, textsLive: boolean): readonly Ki
   const rows: Kind[] =
     who === 'member'
       ? [
-          { key: 'alerts.visit', live: false },
+          { key: 'alerts.visit', live: textsLive && VISIT_REMINDERS_LIVE_IN_APP },
           { key: 'alerts.closed', live: textsLive },
         ]
       : who === 'provider'

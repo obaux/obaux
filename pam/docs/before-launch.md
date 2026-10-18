@@ -114,7 +114,7 @@ STATUS row too.
   reminder, ten lines in the app say what Pam does today. The day it does (check the *live* function and
   database, as for the site's `VISIT_REMINDERS_LIVE`, D-458), do these together, then say so to the merge desk:
   1. Flip `VISIT_REMINDERS_LIVE` in `apps/site/src/content/flags.ts` **and** `VISIT_REMINDERS_LIVE_IN_APP` in
-     `packages/config/test/promises-of-texts.test.ts`. The test fails if only one is flipped.
+     `apps/web/src/lib/visitRemindersLive.ts` (it also takes the "Coming soon" badge off the trip-reminder row on the agree screens and Text alerts). The test fails if only one is flipped.
   2. Put these back in `en.json` (English first; Will reads it, because it is a promise), then the other six.
      The six as they were before D-474 are in git: `git show 717ed79:pam/packages/config/src/locales/<locale>.json`
      (that is `main` just before this change). Take the key's value from there, or write it again and

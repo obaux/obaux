@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { textKindsFor } from './textKinds';
 
 describe('the kinds of texts on the consent screens (D-608)', () => {
-  it('a member: the visit reminder is not sent yet; the saved-place note goes with texts_live', () => {
+  it('a member: the trip reminder follows the visit-reminder flag as well as texts_live; the saved-place note goes with texts_live', () => {
     expect(textKindsFor('member', false)).toEqual([
       { key: 'alerts.visit', live: false },
       { key: 'alerts.closed', live: false },

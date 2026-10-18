@@ -10,9 +10,12 @@ import { BUNDLES } from './_bundles.js';
  * (`docs/before-launch.md` › *Visit reminders go live*).
  *
  * The site holds the switch (`apps/site/src/content/flags.ts`, `VISIT_REMINDERS_LIVE`); this
- * constant is the app's copy of it, and a test fails if the two disagree, so neither is flipped alone.
+ * constant is the app's copy of it (`apps/web/src/lib/visitRemindersLive.ts`, which also drives the "Coming soon" badge on the visit-reminder
+ * row), and a test fails if the two disagree, so neither is flipped alone.
  */
-const VISIT_REMINDERS_LIVE_IN_APP = false;
+const APP_FLAG = fileURLToPath(new URL('../../../apps/web/src/lib/visitRemindersLive.ts', import.meta.url));
+const appFlag = /export const VISIT_REMINDERS_LIVE_IN_APP = (true|false);/.exec(readFileSync(APP_FLAG, 'utf8'));
+const VISIT_REMINDERS_LIVE_IN_APP = appFlag?.[1] === 'true';
 
 const SITE_FLAGS = fileURLToPath(new URL('../../../apps/site/src/content/flags.ts', import.meta.url));
 
