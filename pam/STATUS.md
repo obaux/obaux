@@ -1199,6 +1199,21 @@ under the header, which comes and goes; looked at in Russian and Arabic at 320px
 
 ---
 
+## Places & programs · a94 and a95 live; the Book a visit list and its refusals; the run-through's three items (17-18 October)
+
+Piper's lane, from `claude/places-programs-*`. **Live:** a program books a visit for a member who wrote to it, signed up with it or planned a visit
+there (a94, D-595, b58; five migrations live as `20261017162826` to `20261017162927`); the member's card says "Booked for you", the guide sees
+"Booked by {program}" on every booked visit (Will, 15:21). Book a visit's list is the database's own `my_program_bookable_members` (no blocked member), and
+each of the seven refusals says what is true (b61, `e1edb3f1`). a95 and a91 part 1 are live (b54, b55): shorter trip names, six weekdays, 40px When? chips with a
+48px hit area, the last times scroll clear of Next, a trip's time stays whole, the note below the services; and the Call test no longer taps before sign-in is known
+(`984b5c65`). **Ready, not yet on main:** the run-through's W1, P3 and P4 (`claude/places-programs-run-through` @ `97ca390e`, b64): a visit row opens the member from
+anywhere but the check-in circle, the pins the Trips sheet covers are out of a screen reader's reach, and a Storybook story's names match the pretend database; proofs
+in `docs/sessions/2026-10-18-0020-piper-run-through-w1-p3-p4-visit-rows-covered-pins-story-names.md`. **Held for Will:** a91's visit widget
+(`claude/places-programs-a91-widget` @ `741cc0f7`, D-597: his footer word and his signature on the shorter note), and a98 plan C (the calendar link shown again), which waits
+for his "yes C" and Mira's go. **Known:** the example schedule has nobody booked for the whole coming week when today is a Sunday (`dummy-appointments.ts`); the fix is the next branch.
+
+---
+
 ## Places & programs · the services a program offers, on screens (10 October) — merged 10 October
 
 D-313 and D-462, from `claude/places-programs-services-list` (Piper, 0dba5bb), merged to `main` by
