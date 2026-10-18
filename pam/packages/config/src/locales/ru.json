@@ -333,7 +333,7 @@
   "messages.thread.send": "Отправить",
   "messages.thread.sending": "Отправляем…",
   "messages.thread.sent": "Отправлено",
-  "messages.thread.rateLimited": "That's a lot at once. Wait a moment, then send it again.",
+  "messages.thread.rateLimited": "Слишком много сразу. Подождите немного и отправьте ещё раз.",
   "messages.thread.notSent": "Не отправлено",
   "messages.thread.tryAgain": "Попробовать снова",
   "messages.thread.notSent.label": "Не отправлено. Попробовать снова.",
