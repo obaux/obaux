@@ -743,6 +743,67 @@ test.describe('a conversation', () => {
     await expect(page.getByText('Is the class still on Tuesday?')).toHaveCount(1);
   });
 
+  test('a hidden tab makes no requests, and a bad connection backs off and says nothing (Iris S1)', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await withOneConversation(page);
+    await page.clock.install();
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+    let asked = 0;
+    let failing = false;
+    await page.route(MESSAGES, (route) => {
+      if (route.request().method() !== 'GET') return route.continue();
+      asked += 1;
+      if (failing) return route.fulfill({ status: 500, contentType: 'application/json', body: '{}' });
+      return route.fulfill(json([]));
+    });
+
+    // Hidden: nothing is asked, however long it stays hidden.
+    await page.evaluate(() => {
+      Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'hidden' });
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    await page.clock.runFor(120_000);
+    expect(asked).toBe(0);
+
+    // Back in front: one look at once, and it goes on from there.
+    failing = true;
+    await page.evaluate(() => {
+      Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'visible' });
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    await expect.poll(() => asked).toBeGreaterThanOrEqual(1);
+    const atReturn = asked;
+    // A failing connection: waits of 16, 32 and 60 seconds, never every 8. In 120 seconds that is a handful, not fifteen.
+    await page.clock.runFor(120_000);
+    expect(asked - atReturn).toBeGreaterThanOrEqual(2);
+    expect(asked - atReturn).toBeLessThanOrEqual(5);
+    // Nothing is said about it: the conversation is as it was, with no banner.
+    await expect(page.getByText('Is the class still on Tuesday?')).toBeVisible();
+    await expect(page.getByText('Something went wrong')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /Try again/ })).toHaveCount(0);
+  });
+
+  test('the Messages tab\'s unread mark comes on by itself, without a reload (Iris S1)', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await withOneConversation(page);
+    const read = new Date(Date.now() - 60_000).toISOString();
+    await page.route(MEMBERS, (route) => route.fulfill(json([{ conversation_id: CONVO, last_read_at: read }])));
+    const old = { id: MSG_THEIRS, conversation_id: CONVO, sender_id: OTHER, body: 'Is the class still on Tuesday?', created_at: new Date(Date.now() - 3_600_000).toISOString() };
+    await page.route(MESSAGES, (route) => route.fulfill(json([old])));
+    await page.clock.install();
+    await page.goto('/messages/');
+    await settled(page);
+    const tab = page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: /Messages/ });
+    await expect(tab).toBeVisible();
+    await expect(tab).not.toHaveAccessibleName(/New messages/);
+
+    const fresh = { id: 'fresh-1', conversation_id: CONVO, sender_id: OTHER, body: 'Running late.', created_at: new Date().toISOString() };
+    await page.route(MESSAGES, (route) => route.fulfill(json([fresh, old])));
+    await page.clock.runFor(21_000);
+    await expect(tab).toHaveAccessibleName(/New messages/);
+  });
+
   test('a send that fails stays in the conversation as "Not sent", with its words, and a 48px Try again', async ({ page }) => {
     await signedInAs(page, 'member');
     await withOneConversation(page);

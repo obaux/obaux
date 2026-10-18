@@ -71,11 +71,16 @@ export function useNotifications(
   const [state, setState] = useState<NotificationsState>({ status: 'loading' });
   const [nonce, setNonce] = useState(0);
   const refresh = useCallback(() => setNonce((n) => n + 1), []);
-  const tick = useLiveTick(enabled && live, 30_000);
+  const { tick, settle } = useLiveTick(enabled && live, 30_000);
 
   useEffect(() => {
     if (!enabled) return;
     let cancelled = false;
+    let failed = false;
+    const fail = () => {
+      failed = true;
+      setState((prev) => (prev.status === 'ready' ? prev : { status: 'error' }));
+    };
 
     const load = async () => {
       try {
@@ -90,7 +95,7 @@ export function useNotifications(
 
         if (cancelled) return;
         if (error) {
-          setState((prev) => (prev.status === 'ready' ? prev : { status: 'error' }));
+          fail();
           return;
         }
 
@@ -119,16 +124,18 @@ export function useNotifications(
           })),
         });
       } catch {
-        if (!cancelled) setState((prev) => (prev.status === 'ready' ? prev : { status: 'error' }));
+        if (!cancelled) fail();
       }
     };
 
     setState((prev) => (prev.status === 'ready' ? prev : { status: 'loading' }));
-    void load();
+    void load().then(() => {
+      if (!cancelled) settle(!failed);
+    });
     return () => {
       cancelled = true;
     };
-  }, [enabled, nonce, tick]);
+  }, [enabled, nonce, tick, settle]);
 
   const markAllSeen = useCallback(async () => {
     try {

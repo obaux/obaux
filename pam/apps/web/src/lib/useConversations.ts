@@ -112,11 +112,17 @@ export function useConversations(enabled: boolean): {
   const [nonce, setNonce] = useState(0);
   const refresh = useCallback(() => setNonce((n) => n + 1), []);
   // Looks again every 20 seconds while the app is in front, and when it comes back (Iris S1): a reply that came in shows without a visit.
-  const tick = useLiveTick(enabled, 20_000);
+  const { tick, settle } = useLiveTick(enabled, 20_000);
 
   useEffect(() => {
     if (!enabled) return;
     let cancelled = false;
+    let failed = false;
+    // A failed look says nothing on screen when there is already a list (the next one catches up); the ticker backs off.
+    const fail = () => {
+      failed = true;
+      setState((prev) => (prev.status === 'ready' ? prev : { status: 'error', offline: !navigator.onLine }));
+    };
 
     const load = async () => {
       try {
@@ -137,7 +143,7 @@ export function useConversations(enabled: boolean): {
 
         if (cancelled) return;
         if (error) {
-          setState((prev) => (prev.status === 'ready' ? prev : { status: 'error', offline: !navigator.onLine }));
+          fail();
           return;
         }
 
@@ -157,7 +163,7 @@ export function useConversations(enabled: boolean): {
 
         if (cancelled) return;
         if (partnersError || latestError) {
-          setState((prev) => (prev.status === 'ready' ? prev : { status: 'error', offline: !navigator.onLine }));
+          fail();
           return;
         }
 
@@ -217,17 +223,19 @@ export function useConversations(enabled: boolean): {
 
         setState({ status: 'ready', conversations });
       } catch {
-        if (!cancelled) setState((prev) => (prev.status === 'ready' ? prev : { status: 'error', offline: !navigator.onLine }));
+        if (!cancelled) fail();
       }
     };
 
     // Quietly when there is already a list on screen: no flash back to loading.
     setState((prev) => (prev.status === 'ready' ? prev : { status: 'loading' }));
-    void load();
+    void load().then(() => {
+      if (!cancelled) settle(!failed);
+    });
     return () => {
       cancelled = true;
     };
-  }, [enabled, nonce, tick]);
+  }, [enabled, nonce, tick, settle]);
 
   return { state, refresh };
 }
