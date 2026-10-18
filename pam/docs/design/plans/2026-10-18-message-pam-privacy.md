@@ -1,6 +1,6 @@
 # Message Pam: the Privacy, transparency and Terms lines (draft for Will's card)
 
-**Status:** draft English for Will to sign, with Sage; nothing built, **no translations until he signs**. Written by Lena (Languages & legal), 18 October 2026, against Nico's plan `2026-10-18-message-pam.md` (his branch `claude/messages-plan-message-pam`), Ava's `2026-10-18-message-pam-admin.md` and Sage's words (ledger `d9174a60`).
+**Status:** draft English for Will to sign, **checked and agreed by Sage (ledger `d849470f`)**; nothing built, **no translations until he signs**. Written by Lena (Languages & legal), 18 October 2026, against Nico's plan `2026-10-18-message-pam.md` (his branch `claude/messages-plan-message-pam`), Ava's `2026-10-18-message-pam-admin.md` and Sage's words (ledger `d9174a60`).
 **Why it needs Will:** the Pam team reading the text of a message is new. Today nobody at Pam reads a message body except one reported to them (`ADMIN_CANNOT_SEE.message_bodies`), and the Privacy page says so. This is a **widening**, and D-413 and D-414 say a changed promise is told to members **before it takes effect** and ships with its words.
 
 ## What the page has to say, and where (the four things Mira named)
@@ -15,9 +15,10 @@
 ## The lines
 
 **L1, Privacy `what-we-keep.p17` (new).**
-> If you write to Pam in the app, we keep what you write and what the Pam team writes back. Only the Pam team reads this conversation. Your guide and your programs don't see it. We keep it while you use Pam, and if you ask us to delete your account, we delete the whole conversation with it.
+> If you write to Pam in the app, or Pam writes to you, we keep what you both write. Only the Pam team reads this conversation. Your guide and your programs don't see it. We keep it while you use Pam, and if you ask us to delete your account, we delete the whole conversation with it.
 
 - "Only the Pam team reads this conversation. Your guide and your programs don't see it." is Sage's card sentence **word for word** (hers is pinned above the composer; the transparency line uses it too). One claim, three places; a test holds them together.
+- **Sage's edit (ledger `d849470f`):** the first sentence now covers a conversation Pam starts (L2 A or C), which my first version did not. The card's sentence is untouched. Sage agrees L2 A/B/C, L3, L4 and L5 as drafted, and keeps "You'll" in her in-app notice and "You will" on the Privacy page: the same claim.
 - "Pam team" is the page's own word for the people who read what the page names (`what-we-keep.p1`, `p7`, `p14`, `p15`).
 
 **L2, Privacy `contact.p3` (new): Pam writes first.** Will picks the scope (question 3 in Nico's plan); the line states the same scope as Sage's notice.
@@ -40,7 +41,7 @@ It must **not** go in the guide's list ("Your guide can see:"): your guide canno
 
 1. **A pin for the one claim:** "Only the Pam team reads this conversation. Your guide and your programs don't see it." is in L1, L4 and the pinned line, word for word, in English (`message-pam-line.test.ts`); the other six languages are held by the usual in-step check.
 2. **L1 is true of the policies:** the migration that adds the team's read policy names `is_pam_team()` and `kind = 'support'` on every new policy on `messages`, `conversations` and `conversation_members`; **no** new policy mentions the case-manager role or a program; `messages_select_conversation_member` keeps its "deliberately NO admin policy" comment. Nico's DB tests (a super admin reads a support conversation and no direct one; a case manager, a program lead and another member read none) are the live check.
-3. **L1's erasure sentence is true:** deleting the asker deletes `pam_threads` and its conversation and messages (Nico's after-delete trigger), tested at the database.
+3. **L1's erasure sentence is true, for a conversation Pam starts too:** deleting the asker deletes `pam_threads` and its conversation and messages (Nico's after-delete trigger), tested at the database.
 4. **The privacy guard (D-587):** no new field to count (the Pam conversation uses the existing composer in `ThreadView.tsx`), so the existing `messages` entry gains L1 as a covering line, with its sentence as a "must still say". The inbox shows a person's first name, role and region, which the team already sees (`directory_people`): no new entry.
 5. **The transparency contract:** the plan puts `messages_written_to_pam` in `ADMIN_CAN_SEE`, which is the **guide's** list (RLS for the `admin` role is held to it). **I recommend a separate `PAM_TEAM_CAN_READ` list** (its own comment, its own pin tying it to L1 and L4), so the guide's list never widens and the two cannot be confused. Nico decides; I follow whichever.
 
