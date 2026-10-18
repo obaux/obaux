@@ -111,27 +111,32 @@ function problems(m: Measured): string[] {
   return found;
 }
 
-/** The rows that cannot be got to: each is scrolled into view inside the list, then must be inside the list and the screen. */
-async function unreachable(page: Page, listRole: 'menu' | 'listbox', rowRole: 'menuitemradio' | 'option'): Promise<string[]> {
+/**
+ * The rows that cannot be got to: each is scrolled into view, then must be inside the list and the screen. By default whatever scrolls
+ * (the list, the sheet round it, the page) may be scrolled; with `listOnly` just the list is, because a menu whose last row is got to
+ * only by scrolling the page and the menu together has not put it in reach.
+ */
+async function unreachable(page: Page, listRole: 'menu' | 'listbox', rowRole: 'menuitemradio' | 'option', listOnly = false): Promise<string[]> {
   return page.evaluate(
-    ({ listRole, rowRole }) => {
+    ({ listRole, rowRole, listOnly }) => {
       const rows = [...document.querySelectorAll<HTMLElement>(`[role="${rowRole}"]`)].filter((row) => row.getBoundingClientRect().height > 0);
       const list = rows[0]?.closest<HTMLElement>(`[role="${listRole}"]`);
       if (!list) return ['no list'];
       const lost: string[] = [];
       for (const row of rows) {
-        // The list alone is scrolled, not the page: a row that is reached only by scrolling the page and the list together is not reached.
-        const before = row.getBoundingClientRect();
-        const box = list.getBoundingClientRect();
-        if (before.bottom > box.bottom) list.scrollTop += before.bottom - box.bottom;
-        else if (before.top < box.top) list.scrollTop -= box.top - before.top;
+        if (listOnly) {
+          const before = row.getBoundingClientRect();
+          const box = list.getBoundingClientRect();
+          if (before.bottom > box.bottom) list.scrollTop += before.bottom - box.bottom;
+          else if (before.top < box.top) list.scrollTop -= box.top - before.top;
+        } else row.scrollIntoView({ block: 'nearest' });
         const b = row.getBoundingClientRect();
         const l = list.getBoundingClientRect();
         if (b.top < l.top - 0.5 || b.bottom > l.bottom + 0.5 || b.top < -0.5 || b.bottom > window.innerHeight + 0.5) lost.push((row.textContent ?? '').trim());
       }
       return lost;
     },
-    { listRole, rowRole },
+    { listRole, rowRole, listOnly },
   );
 }
 
@@ -236,7 +241,7 @@ test.describe('320×320', () => {
     expect(holder, 'the menu sits in a popover').not.toBeNull();
     expect(holder!.top, 'it starts on the screen').toBeGreaterThanOrEqual(-0.5);
     expect(holder!.bottom, 'it ends on the screen').toBeLessThanOrEqual(m.screen.height + 0.5);
-    expect(await unreachable(page, 'menu', 'menuitemradio'), 'languages that cannot be scrolled to').toEqual([]);
+    expect(await unreachable(page, 'menu', 'menuitemradio', true), 'languages that cannot be scrolled to by scrolling the menu alone').toEqual([]);
   });
 });
 
