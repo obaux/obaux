@@ -168,3 +168,11 @@ test.describe('Add to Apple Calendar', () => {
     });
   });
 });
+
+test('Another calendar: Disconnect uses the plain turn-off words, not "Disconnect Another calendar"', async ({ page }) => {
+  await signedIn(page, { is_on: true, is_legacy: false, calendar: 'other', linked_on: '2026-10-12', token: TOKEN });
+  await page.goto('/calendar/');
+  await settled(page);
+  await expect(page.getByRole('button', { name: /^Turn it off/ }).first()).toBeVisible();
+  await expect(page.getByText(/Disconnect Another calendar/)).toHaveCount(0);
+});

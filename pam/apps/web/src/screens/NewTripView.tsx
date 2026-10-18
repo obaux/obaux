@@ -331,6 +331,8 @@ export function NewTripView({
   }, [place?.id]);
   const dayFmt = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'short', month: 'short', day: 'numeric' });
   const dayLong = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long', month: 'long', day: 'numeric' });
+  // The green card says "Thursday, Oct 22" (Will, 18 October); the sentences around it keep the whole month.
+  const dayCard = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long', month: 'short', day: 'numeric' });
   const timeFmt = new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' });
   const at = (d: Date, [h, m]: readonly [number, number]) => {
     const x = new Date(d);
@@ -394,7 +396,7 @@ export function NewTripView({
             action={action}
             actionOwnRow={actionOwnRow}
             eyebrow={place.name}
-            day={dayLong.format(confirmed.at)}
+            day={dayCard.format(confirmed.at)}
             time={timeFmt.format(confirmed.at)}
             service={chosenService?.name ?? null}
             countdown={countdown(confirmed.at, t)}

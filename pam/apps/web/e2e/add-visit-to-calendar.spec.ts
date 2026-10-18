@@ -113,3 +113,22 @@ for (const locale of ['en', 'ar']) {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   });
 }
+
+/** The green card abbreviates the month (Will, 18 October): "Monday, Oct 19". Arabic months have no short form and must still read. */
+test('the booked card says the month short in English', async ({ page }) => {
+  await booked(page);
+  await expect(page.getByText(/^(Mon|Tues|Wednes|Thurs|Fri)day, (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{1,2}$/)).toBeVisible();
+  await expect(page.getByText(/^\w+day, (January|February|March|April|June|July|August|September|October|November|December) \d/)).toHaveCount(0);
+});
+
+test('the booked card still reads in Arabic, where months have no short form', async ({ page }) => {
+  await page.addInitScript(() => window.localStorage.setItem('pam.locale', 'ar'));
+  await page.goto('/trips/new/?place=dummy-place-learning&name=Example%20Learning%20Center&category=education');
+  await settled(page);
+  await page.getByRole('button', { name: /^(الاثنين|الثلاثاء|الأربعاء|الخميس|الجمعة)/ }).first().click();
+  await page.getByRole('button', { name: /AM|PM|[٠-٩0-9]+[:٫][٠-٩0-9]+/ }).first().click();
+  await page.getByRole('button', { name: /^التالي/ }).click();
+  await page.getByRole('button', { name: /^إضافة هذه الزيارة/ }).click();
+  const day = page.getByText(/^(الاثنين|الثلاثاء|الأربعاء|الخميس|الجمعة)[،,] .*[٠-٩0-9]/);
+  await expect(day.first()).toBeVisible();
+});
