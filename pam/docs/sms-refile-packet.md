@@ -41,10 +41,10 @@ If "Someone wants to connect" goes in this filing, see §9 for the clause.
 
 ## 3. How end users consent / message flow (paste)
 
-**Draft, true only once the join step says what `/reminders/` says (§0).** 1,005 of 1,024 characters. Recount after any edit.
+**Draft, true only once the join step says what `/reminders/` says (§0).** 1,019 of 1,024 characters. Recount after any edit. The screen's title is "Text alerts" since Sage's `1a6bfd90` (one name for texts).
 
 ```
-People opt in in the Pam app, on a screen for that one choice. Nothing is pre-selected; there is no checkbox. A person enters their own mobile number on the sign-in screen to get a one-time code; asking for the code is the request to be texted it. After signing in they see a "Text reminders" screen. Its "Kinds of texts" list names what Pam sends, for example "A reminder before your trip" or "Someone messages you" (staff see their own), marks any not yet live "Coming soon", and says Pam sends one text each time something on the list happens, that STOP stops them, HELP gets help, and text and data rates may apply. Consent is pressing the button "Agree to receive texts". "Not now" records a decline, and Pam works either way. A Text alerts switch never records consent; with none on file it opens this screen. Numbers are never bought or rented. A staff member may type an invited person's number so only that number can use the invite link; Pam never texts it, and the person agrees for themselves.
+People opt in in the Pam app, on a screen for that one choice. Nothing is pre-selected; there is no checkbox. A person enters their own mobile number on the sign-in screen to get a one-time code; asking for the code is the request to be texted it. After signing in they see a "Text alerts" screen. Its "Kinds of texts" list names what Pam sends, for example "A reminder before your trip" or "Someone messages you" (staff see their own), marks any not yet live "Coming soon", and says Pam sends one text each time something on the list happens, that STOP stops them, HELP gets help, and text and data rates may apply. Consent is pressing the button "Agree to receive texts". "Not now" records a decline, and Pam works either way. The switches in Profile › Text alerts never record consent; with none on file they open this screen. Numbers are never bought or rented. A staff member may type an invited person's number so only that number can use the invite link; Pam never texts it, and the person agrees for themselves.
 ```
 
 Each claim and what makes it true:
@@ -54,7 +54,7 @@ Each claim and what makes it true:
 | Button reads "Agree to receive texts"; "Not now" beside it; no checkbox | `reminders.agree`, `reminders.skip`; both screens, Sage `1c09f1de` (one set of words). `/reminders/` built (`f648db12`); **join step not built yet** (it still has `reminders.optIn`, "Yes, text me reminders"). |
 | "Kinds of texts" lists them by name, "Coming soon" on any not live | `TextKindsList` (`reminders.what` = "Kinds of texts"; rows are Text alerts' own names, Sage `11175802`, `9f550846`; the badge is `common.comingSoon`, set by data: `textKindsFor`). Member rows: `alerts.closed` "A saved place closes or moves", `alerts.visit` "A reminder before your trip" (Coming soon: the visit reminders are not built). The two names quoted in the paragraph are those two and `alerts.message` "Someone messages you". |
 | STOP / HELP / rates line | `reminders.how`, on main: "Pam sends one text each time something on this list happens. Reply STOP to stop, or HELP for help. Text and data rates may apply." |
-| A Text alerts switch never records consent | Dot's D-615 routing and its specs (`claude/pam-design-settings-list`). `AlertsView` used to record consent on any switch; that is why the routing exists. |
+| The switches in Profile › Text alerts never record consent (the settings screen and the agree screen now share the title "Text alerts"; the button, "Agree to receive texts", is what tells them apart) | Dot's D-615 routing and its specs (`claude/pam-design-settings-list`). `AlertsView` used to record consent on any switch; that is why the routing exists. |
 | Staff see it with their own kinds of text | `textKindsFor`: case manager `alerts.message`, `alerts.trip` ("Someone plans a trip"); program lead `alerts.booked` ("Someone books a visit"), `alerts.changed` ("Someone changes a booking"), `alerts.message`. All "Coming soon" until `texts_live` and `ALERT_TEXTS_LIVE` are on. |
 | No Privacy link on the screens | Sage `2a600d73`, Mira 17:58. The Privacy URL is a field on the form (§7). |
 | "Numbers are never bought or rented. A staff member may type an invited person's number…" | **The earlier paragraph said staff never enter numbers. They do:** inviting someone needs their name and mobile number (`invite.who.phone`, "Only this number can use the link"; `create_invite`, 0070/0077). Pam never texts that number: `invite_member` and `invite_provider` have a template and nothing queues them, the person has to type their own number at sign-in, and the only consent is the agree button. |
@@ -187,7 +187,7 @@ Placeholders; Wren fills the file names. All at 390 wide, light mode, English, s
 | # | Screen | Route | Attach to | File |
 |---|---|---|---|---|
 | S1 | Sign-in, the number field and "Pam texts you a code…" | `/signin/` | opt-in flow (supporting) | *placeholder* |
-| S2 | **Text reminders, as a member** (rows with "Coming soon", the STOP/HELP/rates line, "Agree to receive texts", "Not now") | `/reminders/` | **the form's opt-in screenshot** | *placeholder* |
+| S2 | **The agree screen titled "Text alerts", as a member** (rows with "Coming soon", the STOP/HELP/rates line, "Agree to receive texts", "Not now") | `/reminders/` | **the form's opt-in screenshot** | *placeholder* |
 | S3 | the same, as a case manager | `/reminders/` | supporting | *placeholder* |
 | S4 | the same, as a program lead | `/reminders/` | supporting | *placeholder* |
 | S5 | the join step a new member meets first (same words as S2) | `/join/` (texts step) | supporting | *placeholder* |

@@ -660,7 +660,7 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
        a reminder, the check-in, and one Chinese and one Russian or Arabic reminder:
        the point is that every script and the two-segment reminder appear.
      - **Opt-in description:** paste the answer under "How do end-users consent…" and
-       attach the **Text reminders** screenshot, not the sign-in one.
+       attach the **agree screen** screenshot (titled "Text alerts" since 18 October), not the sign-in one.
      - **Embedded links: Yes.** Rejected before when it said No.
      - **Embedded phone numbers: No** (A28: no text carries Pam's number any more).
      - **Help message:** the carrier's HELP auto-reply is set in the Twilio console
