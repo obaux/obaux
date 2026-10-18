@@ -3,22 +3,33 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Arch Glow</title>
+<title>Breath Guide</title>
 <style>
+  html { color-scheme: dark; }
   html, body { margin: 0; height: 100%; background: #000; overflow: hidden; font: 12px/1.3 system-ui, sans-serif; }
   #stage { position: fixed; inset: 0; display: grid; place-items: center; }
-  canvas { display: block; }
+  canvas { display: block; touch-action: none; }
+
+  /* breath cue, centred in the sphere; ink colour follows the Background swatch */
+  #guide {
+    position: fixed; inset: 0; display: grid; place-content: center; justify-items: center; gap: .15em;
+    pointer-events: none; color: var(--ink, #110c0e); text-align: center;
+  }
+  #phase { font-size: clamp(12px, 2.3vmin, 20px); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; opacity: .78; }
+  #count { font-size: clamp(30px, 8vmin, 68px); font-weight: 300; line-height: 1; font-variant-numeric: tabular-nums; opacity: .85; }
+
   #panel {
     position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); width: 300px; max-height: 70%; overflow: auto;
     padding: 12px; border-radius: 10px; background: rgba(20,18,20,.82); color: #eee;
-    backdrop-filter: blur(8px); transition: opacity .2s;
+    backdrop-filter: blur(8px); transition: opacity .2s, transform .25s; touch-action: pan-y; z-index: 6;
   }
   #panel.hidden { opacity: 0; pointer-events: none; transform: translate(-50%, 16px); }
-  #panel { transition: opacity .2s, transform .25s; }
   #panel h2 { margin: 0 0 8px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #aaa; }
+  #panel .close { float: right; margin: -4px 0 0; padding: 4px 10px; }
   .row { display: flex; align-items: center; justify-content: space-between; margin: 5px 0; }
-  .row input[type=color] { width: 36px; height: 22px; padding: 0; border: 0; background: none; cursor: pointer; }
+  .row input[type=color] { width: 44px; height: 28px; padding: 0; border: 0; background: none; cursor: pointer; }
   .row input[type=range] { width: 110px; }
+  select { background: #333; color: #eee; border: 0; border-radius: 6px; padding: 6px 8px; font: inherit; max-width: 170px; }
   button { background: #333; color: #eee; border: 0; border-radius: 6px; padding: 5px 9px; cursor: pointer; margin: 6px 6px 0 0; }
   button:hover { background: #444; }
   #toggle {
@@ -26,32 +37,29 @@
     background: rgba(20,18,20,.72); backdrop-filter: blur(8px); touch-action: manipulation;
   }
   #toggle.open { opacity: 0; pointer-events: none; }
-  canvas { touch-action: none; }
-  #panel { touch-action: pan-y; z-index: 6; }
-  #panel .close { float: right; margin: -4px 0 0; padding: 4px 10px; }
-  .row input[type=color] { width: 44px; height: 28px; }
+  #hint { position: fixed; left: 12px; bottom: 10px; color: #ffffff66; }
   @media (max-width: 640px) {
     #panel { left: 0; right: 0; bottom: 0; transform: none; width: auto; max-height: 62%; border-radius: 14px 14px 0 0; padding: 14px 16px 22px; }
     #panel.hidden { transform: translateY(100%); }
     #toggle { bottom: 20px; }
-    #panel { transition: opacity .2s, transform .25s; }
     .row input[type=range] { width: 55%; }
     #hint { display: none; }
   }
-  #hint { position: fixed; left: 12px; bottom: 10px; color: #ffffff66; }
 </style>
 </head>
 <body>
 <div id="stage"><canvas id="c"></canvas></div>
-<button id="toggle" type="button">Colors</button>
+<div id="guide" aria-live="off"><div id="phase">Breathe in</div><div id="count">4</div></div>
+<button id="toggle" type="button">Controls</button>
 <div id="panel"></div>
-<div id="hint">press C to toggle controls · space to pause · drag to push the glow</div>
+<div id="hint">press C for controls · space to pause</div>
 
 <script id="fs" type="x-shader/x-fragment">
 precision highp float;
 uniform vec2  uRes;
 uniform float uTime;      // seconds (already scaled by speed on the JS side)
-uniform float uMotion;    // 0 = static circle, 1 = full liquid motion
+uniform float uMotion;    // 0 = still colour, 1 = full liquid flow inside the sphere
+uniform float uBreath;    // 0 = fully exhaled (small), 1 = fully inhaled (large)
 uniform vec2  uPointer;   // 0..1, smoothed touch / mouse position
 uniform float uPress;     // 0..1, eased while pressing
 
@@ -59,7 +67,7 @@ uniform float uPress;     // 0..1, eased while pressing
 uniform vec3 uBg;         // dark backdrop
 uniform vec3 uGlowRed;    // side glow
 uniform vec3 uGlowOrange; // bottom glow
-uniform vec3 uEdgeGlow;   // magenta rim beside the drop
+uniform vec3 uEdgeGlow;   // magenta halo around the sphere
 uniform vec3 uTop;        // green rim
 uniform vec3 uYellow;     // pale yellow bands + core
 uniform vec3 uPink;       // salmon ring
@@ -69,11 +77,13 @@ uniform vec3 uBlobB;      // lower body: yellow-green
 uniform vec3 uBlobC;      // lower body: green-teal
 uniform vec3 uBlobD;      // lower body: blue-grey
 uniform vec3 uBase;       // lower body base wash
-uniform vec3 uHighlight;  // glassy edge shine + liquid specular
+uniform vec3 uHighlight;  // glassy edge shine, liquid specular, guide ring
 uniform float uGlass;     // 0 = flat, 1 = full refraction / shine
 
-const vec2  C = vec2(0.5, 0.5);   // droplet centre
-const float R = 0.27;             // droplet radius
+const vec2  C    = vec2(0.5, 0.5);   // sphere centre
+const float RMIN = 0.19;             // radius when fully exhaled
+const float RMAX = 0.30;             // radius when fully inhaled
+const float R0   = 0.27;             // reference radius the interior picture is drawn at
 
 float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
 
@@ -114,28 +124,23 @@ void main() {
   vec2 p = gl_FragCoord.xy / uRes;     // 0..1, y up (canvas is square)
   float t = uTime * uMotion;
 
-  // ---- outline: a droplet whose surface wobbles --------------------
+  // ---- outline: a perfect circle whose radius follows the breath ----
   vec2 v = p - C;
   float len = max(length(v), 1e-4);
   vec2 nrm = v / len;                                   // outward normal
-  float ang = atan(v.y, v.x);
-  float wob = (0.028 * sin(3.0 * ang + t * 0.9)
-             + 0.016 * sin(5.0 * ang - t * 1.3)
-             + 0.007 * sin(8.0 * ang + t * 1.9)) * uMotion;
-  vec2 pdir = normalize(uPointer - C + 1e-5);
-  float bump = uPress * 0.06 * pow(max(dot(nrm, pdir), 0.0), 4.0);   // finger pulls the surface
-  float r = R * (1.0 + wob) + bump;
+  float r = mix(RMIN, RMAX, uBreath);
   float sdf = len - r;
 
-  // ---- interior: swirl, then warp through noise so colour flows ----
+  // ---- interior: the same picture, scaled with the sphere ----------
+  vec2 vi = v * (R0 / r);
   float k = 1.0 - clamp(len / r, 0.0, 1.0);
-  vec2 q = C + rot(v, k * 1.6 * sin(t * 0.35) * uMotion);
+  vec2 q = C + rot(vi, k * 1.6 * sin(t * 0.35) * uMotion);
   vec2 wq = q * 2.2;
   vec2 wv = vec2(fbm(wq + vec2(0.0, t * 0.15)), fbm(wq + vec2(5.2, -t * 0.12))) - 0.44;
-  q += wv * 0.22;
+  q += wv * 0.13;
 
   float pr = length(p - uPointer);
-  float d = length(q - (C + vec2(0.0, 0.05))) / r;
+  float d = length(q - (C + vec2(0.0, 0.05))) / R0;
   d += uMotion * 0.02 * sin(d * 9.0 - t * 1.1);
   d += 0.05 * uPress * sin(pr * 20.0 - t * 3.0) * exp(-pr * 3.5);
 
@@ -145,7 +150,7 @@ void main() {
   vec3 edgeC = mix(uTan, uTop, smoothstep(0.40, 0.72, q.y));
   vec3 pat = vec3(bands(d * (1.0 - ca), edgeC).r, bands(d, edgeC).g, bands(d * (1.0 + ca), edgeC).b);
 
-  // lower body: soft drifting colour blobs, carried by the same flow
+  // lower body: soft colour blobs
   float ws = 0.12;
   vec3 acc = uBase * ws;
   acc = blob(acc, ws, q, vec2(0.40 + 0.04 * sin(t * 0.7),        0.40 + 0.04 * cos(t * 0.5)), 0.17, uBlobA);
@@ -156,16 +161,16 @@ void main() {
 
   vec3 bodyCol = mix(body, pat, sstep(0.34, 0.64, q.y));
 
-  // liquid surface: height field from noise -> normal -> glossy specular
+  // glossy surface: height field from noise -> normal -> soft specular
   vec2 hq = q * 3.0 + t * 0.1;
   float h0 = fbm(hq), hx = fbm(hq + vec2(0.03, 0.0)), hy = fbm(hq + vec2(0.0, 0.03));
   vec3 n3 = normalize(vec3(-(hx - h0) / 0.03 * 0.3, -(hy - h0) / 0.03 * 0.3, 1.0));
   vec3 H = normalize(vec3(-0.4, 0.6, 0.7) + vec3(0.0, 0.0, 1.0));
   float spec = pow(max(dot(n3, H), 0.0), 28.0);
-  bodyCol += uHighlight * spec * 0.28 * uGlass;
+  bodyCol += uHighlight * spec * 0.14 * uGlass;
 
-  // edge: crisp up top, melting away toward the bottom
-  float soft = max(mix(0.003, 0.055, smoothstep(0.62, 0.24, p.y)), 1.5 / uRes.y);
+  // clean antialiased edge, about 1.5 px
+  float soft = max(0.003, 1.5 / uRes.y);
   float mask = 1.0 - smoothstep(-soft, soft, sdf);
 
   // ---- backdrop ----------------------------------------------------
@@ -173,17 +178,22 @@ void main() {
   vec2 pw = p - nrm * 0.035 * uGlass * exp(-max(sdf, 0.0) * 12.0);
   float rip = sin(sdf * 62.0 + sin(p.y * 7.0 + t * 0.4) * 1.6 - t * 1.6) * exp(-max(sdf, 0.0) * 7.0) * smoothstep(0.0, 0.012, sdf);
   float dx = abs(pw.x - C.x);
-  float up = smoothstep(0.66, 0.12, pw.y + 0.10 * dx);        // glow strength, grows downward
+  float up = min(smoothstep(0.66, 0.12, pw.y + 0.10 * dx) * (0.85 + 0.30 * uBreath), 1.0);   // glow swells with the inhale
   vec3 glow = mix(uGlowRed, uGlowOrange, smoothstep(0.34, 0.04, pw.y));
   vec3 bg = mix(uBg, glow, up);
   bg *= 1.0 - 0.3 * smoothstep(0.40, 0.75, length(p - vec2(0.5, 0.25)));
 
-  // rim glow hugging the drop
+  // halo around the sphere, brighter when full
   float rimY = smoothstep(0.26, 0.40, p.y) * smoothstep(0.66, 0.52, p.y);
   float rim = exp(-max(sdf, 0.0) * 14.0) * rimY;
   bg = mix(bg, uEdgeGlow, rim * 0.85);
+  bg = mix(bg, uEdgeGlow, 0.22 * uBreath * exp(-max(sdf, 0.0) * 9.0));
   bg += uGlowRed * 0.04 * uGlass * rip * (0.4 + up);
   bg = max(bg, uBg);
+
+  // faint guide ring just outside the largest size: the target for a full inhale
+  float ringPx = abs(len - (RMAX + 0.02)) * uRes.y;
+  bg = mix(bg, uHighlight, 0.22 * (1.0 - smoothstep(0.5, 1.6, ringPx)));
 
   vec3 col = mix(bg, bodyCol, mask);
 
@@ -223,10 +233,38 @@ const PALETTE = {
   uHighlight:  '#ffffff',
 };
 const LABELS = {
-  uBg: 'Background', uGlowRed: 'Glow · red', uGlowOrange: 'Glow · orange', uEdgeGlow: 'Rim glow',
-  uTop: 'Cap green', uYellow: 'Bands yellow', uPink: 'Ring pink', uTan: 'Edge tan',
-  uBlobA: 'Body · pink', uBlobB: 'Body · yellow', uBlobC: 'Body · green', uBlobD: 'Body · blue', uBase: 'Body base', uHighlight: 'Edge shine',
+  uBg: 'Background', uGlowRed: 'Glow · red', uGlowOrange: 'Glow · orange', uEdgeGlow: 'Halo',
+  uTop: 'Rim green', uYellow: 'Bands yellow', uPink: 'Ring pink', uTan: 'Edge tan',
+  uBlobA: 'Body · pink', uBlobB: 'Body · yellow', uBlobC: 'Body · green', uBlobD: 'Body · blue', uBase: 'Body base', uHighlight: 'Shine + ring',
 };
+
+// ===================================================================
+//  Breathing patterns — seconds per phase, in order.
+//  kind: in (grow) · out (shrink) · full (hold inhaled) · empty (hold exhaled)
+// ===================================================================
+const PATTERNS = {
+  calm:      { label: 'Calm · in 4, out 6',      phases: [['in', 4], ['out', 6]] },
+  coherent:  { label: 'Coherent · 5.5 / 5.5',    phases: [['in', 5.5], ['out', 5.5]] },
+  relax:     { label: 'Relax · 4-7-8',           phases: [['in', 4], ['full', 7], ['out', 8]] },
+  box:       { label: 'Box · 4-4-4-4',           phases: [['in', 4], ['full', 4], ['out', 4], ['empty', 4]] },
+};
+const CUES = { in: 'Breathe in', out: 'Breathe out', full: 'Hold', empty: 'Hold' };
+const ease = u => 0.5 - 0.5 * Math.cos(Math.PI * u);      // slow start, slow finish, like a real breath
+
+// returns { v: 0..1 sphere size, kind, left: whole seconds remaining, cycle }
+function breathAt(pattern, clock) {
+  const total = pattern.phases.reduce((s, p) => s + p[1], 0);
+  let tt = clock % total;
+  for (const [kind, dur] of pattern.phases) {
+    if (tt < dur) {
+      const u = tt / dur;
+      const v = kind === 'in' ? ease(u) : kind === 'out' ? 1 - ease(u) : kind === 'full' ? 1 : 0;
+      return { v, kind, left: Math.max(1, Math.ceil(dur - tt - 1e-6)), cycle: Math.floor(clock / total) + 1 };
+    }
+    tt -= dur;
+  }
+  return { v: 0, kind: 'empty', left: 1, cycle: 1 };
+}
 
 // ---------------------------------------------------------------- GL
 const canvas = document.getElementById('c');
@@ -247,11 +285,16 @@ gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false,
 const U = n => gl.getUniformLocation(prog, n);
 
 const hex2rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
-const state = { speed: 1, motion: 1, playing: true, time: 0, px: .5, py: .5, tx: .5, ty: .5, press: 0, tpress: 0, glass: 0.7 };
+const state = {
+  speed: 1, motion: 0.45, glass: 0.7,              // look of the colour flow inside the sphere
+  playing: true, time: 0, clock: 0, pattern: 'calm', // clock = seconds of breathing, independent of flow speed
+  px: .5, py: .5, tx: .5, ty: .5, press: 0, tpress: 0,
+};
 const params = new URLSearchParams(location.search);
-if (params.has('t'))      { state.time = +params.get('t'); }
-if (params.has('glass'))  { state.glass = +params.get('glass'); }
-if (params.has('motion')) { state.motion = +params.get('motion'); }
+if (params.has('t'))       state.clock = +params.get('t');      // jump to a moment in the breath cycle
+if (params.has('motion'))  state.motion = +params.get('motion');
+if (params.has('glass'))   state.glass = +params.get('glass');
+if (params.has('pattern') && PATTERNS[params.get('pattern')]) state.pattern = params.get('pattern');
 
 function resize() {
   const s = Math.min(innerWidth, innerHeight), dpr = Math.min(devicePixelRatio || 1, 2);
@@ -261,11 +304,20 @@ function resize() {
 }
 addEventListener('resize', resize); resize();
 
-function draw() {
+const phaseEl = document.getElementById('phase'), countEl = document.getElementById('count');
+let shown = '';
+function updateGuide(b) {
+  const key = b.kind + b.left;
+  if (key === shown) return;
+  shown = key; phaseEl.textContent = CUES[b.kind]; countEl.textContent = b.left;
+}
+
+function draw(b) {
   gl.uniform2f(U('uRes'), canvas.width, canvas.height);
   gl.uniform1f(U('uTime'), state.time);
   gl.uniform1f(U('uMotion'), state.motion);
   gl.uniform1f(U('uGlass'), state.glass);
+  gl.uniform1f(U('uBreath'), b.v);
   gl.uniform2f(U('uPointer'), state.px, state.py);
   gl.uniform1f(U('uPress'), state.press);
   for (const k in PALETTE) gl.uniform3fv(U(k), hex2rgb(PALETTE[k]));
@@ -274,10 +326,12 @@ function draw() {
 let last = performance.now();
 (function frame(now) {
   const dt = Math.min((now - last) / 1000, 0.05);
-  if (state.playing) state.time += dt * state.speed;
+  if (state.playing) { state.time += dt * state.speed; state.clock += dt; }
   const k = 1 - Math.exp(-dt * 7);
   state.px += (state.tx - state.px) * k; state.py += (state.ty - state.py) * k; state.press += (state.tpress - state.press) * k;
-  last = now; draw(); requestAnimationFrame(frame);
+  last = now;
+  const b = breathAt(PATTERNS[state.pattern], state.clock);
+  updateGuide(b); draw(b); requestAnimationFrame(frame);
 })(last);
 
 // ---------------------------------------------------------- pointer
@@ -295,49 +349,62 @@ canvas.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') re
 
 // ------------------------------------------------------------- panel
 const panel = document.getElementById('panel');
-panel.innerHTML = '<button class="close" id="close" type="button">Done</button><h2>Colours</h2>';
+const setInk = () => document.documentElement.style.setProperty('--ink', PALETTE.uBg);
+setInk();
+panel.innerHTML = `<button class="close" id="close" type="button">Done</button><h2>Breathing</h2>
+  <div class="row"><span>Pattern</span><select id="pattern">${
+    Object.entries(PATTERNS).map(([k, p]) => `<option value="${k}">${p.label}</option>`).join('')}</select></div>
+  <button id="restart" type="button">Restart</button><button id="pause" type="button">Pause</button>
+  <h2 style="margin-top:14px">Colours</h2>`;
 const inputs = {};
 for (const k in PALETTE) {
   const row = document.createElement('label'); row.className = 'row';
   row.innerHTML = `<span>${LABELS[k]}</span><input type="color" value="${PALETTE[k]}">`;
   const inp = row.querySelector('input'); inputs[k] = inp;
-  inp.addEventListener('input', () => { PALETTE[k] = inp.value; });
+  inp.addEventListener('input', () => { PALETTE[k] = inp.value; setInk(); });
   panel.appendChild(row);
 }
-panel.insertAdjacentHTML('beforeend', `<h2 style="margin-top:12px">Motion</h2>
+panel.insertAdjacentHTML('beforeend', `<h2 style="margin-top:12px">Colour flow</h2>
   <div class="row"><span>Amount</span><input id="motion" type="range" min="0" max="2" step=".05" value="${state.motion}"></div>
   <div class="row"><span>Glass</span><input id="glass" type="range" min="0" max="1.5" step=".05" value="${state.glass}"></div>
   <div class="row"><span>Speed</span><input id="speed" type="range" min="0" max="3" step=".05" value="${state.speed}"></div>
-  <button id="pause">Pause</button><button id="png">Save PNG</button>`);
+  <button id="png" type="button">Save PNG</button>`);
+const patternSel = panel.querySelector('#pattern');
+patternSel.value = state.pattern;
+patternSel.onchange = () => { state.pattern = patternSel.value; state.clock = 0; };
+panel.querySelector('#restart').onclick = () => { state.clock = 0; };
 panel.querySelector('#motion').oninput = e => state.motion = +e.target.value;
 panel.querySelector('#glass').oninput  = e => state.glass  = +e.target.value;
 panel.querySelector('#speed').oninput  = e => state.speed  = +e.target.value;
 const pauseBtn = panel.querySelector('#pause');
-const togglePlay = () => { state.playing = !state.playing; pauseBtn.textContent = state.playing ? 'Pause' : 'Play'; };
+const togglePlay = () => { state.playing = !state.playing; pauseBtn.textContent = state.playing ? 'Pause' : 'Resume'; };
 pauseBtn.onclick = togglePlay;
 panel.querySelector('#png').onclick = () => {
-  draw(); const a = document.createElement('a'); a.download = 'arch-glow.png'; a.href = canvas.toDataURL('image/png'); a.click();
+  draw(breathAt(PATTERNS[state.pattern], state.clock)); const a = document.createElement('a'); a.download = 'breath.png'; a.href = canvas.toDataURL('image/png'); a.click();
 };
 const toggleBtn = document.getElementById('toggle');
 const setPanel = open => { panel.classList.toggle('hidden', !open); toggleBtn.classList.toggle('open', open); };
 toggleBtn.onclick = () => setPanel(true);
 panel.querySelector('#close').onclick = () => setPanel(false);
-setPanel(innerWidth > 640);   // closed by default on phones
+setPanel(false);   // the breath is the page; controls stay out of the way until asked for
 addEventListener('keydown', e => {
   if (e.key === 'c' || e.key === 'C') setPanel(panel.classList.contains('hidden'));
   if (e.key === ' ') { e.preventDefault(); togglePlay(); }
 });
-if (params.has('clean')) { setPanel(false); toggleBtn.remove(); document.getElementById('hint').remove(); }
+if (params.has('clean')) { toggleBtn.remove(); document.getElementById('hint').remove(); }
 
 // ------------------------------------------------------- public API
 window.art = {
-  state, PALETTE,
-  setColors(map) { for (const k in map) if (k in PALETTE) { PALETTE[k] = map[k]; if (inputs[k]) inputs[k].value = map[k]; } },
+  state, PALETTE, PATTERNS,
+  setColors(map) { for (const k in map) if (k in PALETTE) { PALETTE[k] = map[k]; if (inputs[k]) inputs[k].value = map[k]; } setInk(); },
+  setPattern(name) { if (PATTERNS[name]) { state.pattern = name; state.clock = 0; patternSel.value = name; } },
+  addPattern(name, label, phases) { PATTERNS[name] = { label, phases }; patternSel.add(new Option(label, name)); },
   setSpeed(v)  { state.speed = v; },
   setMotion(v) { state.motion = v; },
   setGlass(v)  { state.glass = v; },
   play()  { state.playing = true; },
   pause() { state.playing = false; },
+  restart() { state.clock = 0; },
 };
 </script>
 </body>
