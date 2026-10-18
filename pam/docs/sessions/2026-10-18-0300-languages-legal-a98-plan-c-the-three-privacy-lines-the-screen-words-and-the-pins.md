@@ -35,10 +35,16 @@
 - Will cut "Goes to {calendar}" (02:33): the corner button says **"Added to calendar"** once a visit is added, with a sync row in the drawer. Nothing I wrote for "Goes to" shipped (the keys were never on my branch). **Translated** from Sage's ledgers 4aef64a9, b875573a and c2ca2e94, with Piper's key names (`dd970847`, `45d1911c`, merged): `calendar.addOne.added` and `.added.label`, `.syncAll` ("Add all your future visits") and `.syncAll.hint` (cut by Will to "Set up a calendar link once."), and `.changed`. `trips.syncAll` is retired (six translations). The merge conflicted only at the tail of the six bundles and the ledger, where we both added keys; resolved key by key, not by hand.
 - **"Added" is remembered on the phone only** (Mira's question, answered: no new Privacy line). The pin in `calendar-link-line.test.ts` now says exactly what is true: `visitAddedToCalendar.ts` is the only file that names that storage, with one write whose key is `pam.calendarAdded:` plus the visit id and whose value is the visit's start time (`toISOString()`), no calendar, place or address, no request; `AddVisitToCalendar.tsx` has no storage and no request. Mutation-tested: a value that carries a calendar fails it, and a `fetch` in the screen fails it. The privacy-guard entry for the calendar link says the note exists and is never sent.
 
+## Follow-up 2, 18 October ~04:15 UTC: Sage changed the moved-visit line
+
+- Sage's ledger 2e05e77a: `calendar.addOne.changed` is now "Your calendar has the old time." (it was "This visit changed after you added it. Add it again."), and the new `calendar.addOne.changed.label` is the whole sentence for a screen reader, "This visit changed after you added it. Your calendar has the old time."; the visible line is `aria-hidden` beside it. Piper's `22896318`, merged. Both keys are translated in six languages: the visible line says only what is wrong (es "Tu calendario tiene la hora anterior.", pt-BR "Seu calendário está com o horário antigo.", zh-CN 您的日历里还是旧的时间。, zh-HK 您的日曆上仍是舊的時間。, ru «В вашем календаре старое время.», ar «في تقويمك الوقت القديم.»), and the label is the old first sentence, kept as it was, plus that line. The line no longer tells the person to add the visit again; the button beside it still does.
+- The merge conflicted only in the six bundles and the ledger, on the same two keys; resolved by taking my bundles, applying the two keys, then `copy:ack`. `copy:status`: all in step. `@pam/config`: 60 files, 1,408 tests pass.
+- **The pin is unchanged.** Piper's `AddVisitToCalendar.tsx` now measures whether the header can hold the corner button; it has no storage and no request, so `calendar-link-line.test.ts` still holds.
+- The moved-visit line's placement inside the card waits for Dot's drawing; I re-run the fit check when Piper sends that SHA.
+
 ## Left undone
 
 - **Native readers** (`docs/before-launch.md`, new entry).
-- **The booked card's "Goes to {calendar}" words** (Sage's ledger a7f6b7f8): Piper adds the keys, I translate; the "your calendar" for Another calendar needs its own key.
 - **If the build goes live on a day other than 18 October:** `legal:date privacy <day>`, then change the day in the seven p6 lines (the pin tells which), then `copy:ack`.
 - `docs/signed-english.md` rows 55, 56 and 105 (Sage's file) still describe the old lines.
 
