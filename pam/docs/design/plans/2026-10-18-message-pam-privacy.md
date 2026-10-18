@@ -1,6 +1,6 @@
 # Message Pam: the Privacy, transparency and Terms lines (draft for Will's card)
 
-**Status:** draft English for Will to sign, **L1 checked and agreed by Sage (ledger `d849470f`)**; nothing built, **no translations until he signs**. Written by Lena (Languages & legal), 18 October 2026, against Nico's plan `2026-10-18-message-pam.md` (his branch `claude/messages-plan-message-pam`), Ava's `2026-10-18-message-pam-admin.md` and Sage's words (ledgers `d9174a60`, `d849470f`, `7b280684`). **Letters are the card's (a100)** from the second version on: **A** = the member always writes first (Pam still starts conversations with staff and programs, as the super admin can today); **B** = Pam can start a conversation with anyone (Sage's old "A"); **C** = B plus the Profile switch, on by default (Sage's `7b280684`). My earlier "B" (Iris's narrower wording) is not on the card and is gone.
+**Status:** draft English for Will to sign, **L1 checked and agreed by Sage (ledger `d849470f`)**; nothing built, **no translations until he signs**. Written by Lena (Languages & legal), 18 October 2026, against Nico's plan `2026-10-18-message-pam.md` (his branch `claude/messages-plan-message-pam`), Ava's `2026-10-18-message-pam-admin.md` and Sage's words (ledgers `d9174a60`, `d849470f`, `179bd706`, `7b280684`). **Letters are the card's (a100)** from the second version on: **A** = the member always writes first (Pam still starts conversations with staff and programs, as the super admin can today); **B** = Pam can start a conversation with anyone (Sage's old "A"); **C** = B plus the Profile switch, on by default (Sage's `7b280684`). My earlier "B" (Iris's narrower wording) is not on the card and is gone.
 **Why it needs Will:** the Pam team reading the text of a message is new. Today nobody at Pam reads a message body except one reported to them (`ADMIN_CANNOT_SEE.message_bodies`), and the Privacy page says so. This is a **widening**, and D-413 and D-414 say a changed promise is told to members **before it takes effect** and ships with its words.
 
 ## What the page has to say, and where (the four things Mira named)
@@ -41,6 +41,8 @@
 
 **L4, the transparency screen, a third card beside "A program can see:" (new keys `transparency.pam.heading`, `transparency.pam.messages`).** Worded together with L1: L1 says "If you write to Pam in the app, or Pam writes to you, we keep what you both write."; L4 says the same two directions in a list line.
 > **The Pam team can read:** What you and Pam write to each other. Only the Pam team reads this conversation. Your guide and your programs don't see it.
+
+Sage proposed the same sentence independently (ledger `179bd706`), so L4 is signed English.
 
 It must **not** go in the guide's list ("Your guide can see:"): your guide cannot read it, and a line there would say the opposite. The screen's footer already says "If this changes, we will tell you first."; L5 is how. L4 is the same under A, B and C (under A Pam still writes back).
 
