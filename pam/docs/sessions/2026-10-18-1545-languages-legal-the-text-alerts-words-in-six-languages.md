@@ -4,9 +4,9 @@ Lena, on `claude/lena-text-alerts-words`, off main `1551ed31`. Asked by Sage at 
 
 ## What changed
 
-- **Three keys, six languages:** `alerts.kinds` "Kinds of texts" (new), `alerts.comingSoon` "Coming soon" (was a sentence; now a badge), `alerts.how` "One text each time, only for what is on. Reply STOP to stop, or HELP for help. Text and data rates may apply." STOP and HELP stay in Latin letters in every language. Every translated line is shorter than the one it replaces (English 154 to 109 characters), so there is nothing new for the 320 audit, and the Text alerts screen has no story.
+- **Six keys, six languages:** `alerts.kinds` "Kinds of texts" (new), `alerts.comingSoon` "Coming soon" (was a sentence; now a badge), `alerts.privacy` "Privacy" and its accessible name `alerts.privacy.label` "Privacy: Text messages" (new; the link goes to `/privacy/#texts`), and the two carrier lines, signed by Sage at `c286f954`: `alerts.how` "Pam sends one text each time something you turned on happens. Reply STOP to stop, or HELP for help. Text and data rates may apply." and `reminders.how` "Pam sends one text each time something on this list happens. ..." (the /reminders/ screen and the join step). STOP and HELP stay in Latin letters in every language. The lines are no longer than the ones they replace, so there is nothing new for the 320 audit, and the Text alerts screen has no story.
 - **`docs/sms-campaign-samples.md`:** the consent paragraph Will pastes into the registration said the screen shows "STOP stops them permanently, HELP reaches a person". It now says "replying STOP stops them, replying HELP gets help" (989 of 1,024 characters). A reviewer compares that paragraph with the screenshot.
-- **`docs/before-launch.md` A28.2:** `alerts.how` done; `reminders.how` (the screen the registration shows, and the join flow) still says "reach a person".
+- **`docs/before-launch.md` A28.2:** done for `alerts.how` and `reminders.how`; the HELP reply is an address, and neither screen says "reach a person" any more.
 
 ## Checked against the carrier minimum
 
@@ -14,7 +14,7 @@ Frequency, STOP, HELP and rates are on the line; the row labels are the list of 
 
 ## Found
 
-- **Sage's proposed `privacy.s.texts.p4` ("A text alert says only that something happened...") is not true of two of the seven rows** it sits under: Before your trip (the time and the address) and a saved place that closes or moves (the reason). Sent to her with a true version; card a102 carries one line. My line and its pin are on `claude/lena-text-promises` @ 9f114de5.
+- **Sage's proposed `privacy.s.texts.p4` ("A text alert says only that something happened...") is not true of two of the seven rows** it sits under: Before your trip (the time and the address) and a saved place that closes or moves (the reason). Sent to her with a true version; card a102 carries one line. My line and its pin are on `claude/lena-text-promises`; Sage then withdrew hers.
 - Nico's `alerts.spec.ts` lines 70, 90 and 176 quote the old Coming soon sentence and fail when `alerts.comingSoon` becomes "Coming soon". Not edited here (his file); he gets the three lines.
 
 ## Left undone
