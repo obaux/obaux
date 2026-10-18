@@ -11,13 +11,18 @@ STATUS row too.
 
 ## Open
 
+- [ ] **A native reader for the calendar plan C words (a98, 18 October 2026; Lena; Sage's ledger ef40b2fb, 9190aac3, and the three Privacy lines Will signed at 01:46).** Six translations each, written by Claude, none read by a native speaker.
+  (1) **The three Privacy lines** (usted, você, 您, вы): `privacy.s.what-we-keep.p12` (Pam keeps a secret code it can make the link from again, which calendar you said you use and the day), the new `privacy.s.sharing.p10` (one visit added to a calendar: a file your phone opens, or a Google link; "For one visit, Pam does not see which calendar you choose"; "It is a copy") and `privacy.s.sharing.p6` (who can see where you are going; "If you disconnect it"; the last sentence names the day older links were made before: **18 October in every language**, which moves with `legal:date` and is pinned to it). Promises: check that "secret code it can make the link from again" reads as a code and not as a password, and that "a copy" says the copy does not follow the visit.
+  (2) **The screen** (tú, você, 您, вы): the 25 keys of the Calendar page and the add-a-visit sheet: "Which calendar do you use?", "Set up on {date}", "Get a new link", "Disconnect {calendar}" (desconectar / desconectar / 断开 / 斷開 / отключить / إلغاء الربط), "Manage", and the three rows of the sheet. **Product names:** pt-BR says "Google Agenda" (the name in Brazil's stores), es and ru say "Google Calendar" / "Google Календарь", zh "Google 日历 / 日曆", ar «تقويم Google»; is each the name a person finds in their own phone? **"Another calendar" inline** ("Disconnect Otro calendario") reads oddly in every language until Piper changes it (asked).
+  (3) **The name of the calendar in the member's calendar list** (`LINK_CALENDAR_NAMES` in the feed function, "Visits"): Visitas / Visitas / 预约 / 到訪 / Визиты / الزيارات. It sits beside "Work" and "Home" in the member's own calendar app: is it the plain word there?
 - [ ] **Google Calendar sync: waiting until Will wants it on** (a71, 12 October 2026: "wait until we switch sync on. Not now."). It is built and held on the branch `claude/places-programs-google-sync` (head 5f1e70ae; D-539): not merged, not deployed, no migration applied. When Will asks for it, its two Privacy lines come back on a card with the Google Cloud checklist (the full checklist is in that branch's `docs/before-launch.md`). The calendar link (D-538) is separate and does not need it.
 
 - [ ] **Calendar link: someone taps it on a real phone** (Piper, 11 October 2026, D-538). (1) On an Android phone, make a link on
   Profile > Calendar and tap "Open Google Calendar on the web": it should reach Google Calendar's "add by URL" page in the
   phone's browser; if Google sends the phone to its app or a sign-in that loses the page, the line above the button
   ("ask for the desktop site") is the only way, so say so on the page more plainly. (2) Paste the link into Apple Calendar,
-  Google Calendar (on a computer) and Outlook, and check a visit shows, moves and goes, with the place's name off and on.
+  Google Calendar (on a computer) and Outlook, and check a visit shows with the place's name and address (there is no switch for them any
+  more, a98 plan C), moves and goes.
   (3) Deploy `calendar-feed` with JWT verification off and fetch a made-up address: a bare 404. (4) A native reader for
   `calendar.others` in the six languages (it names buttons in Google Calendar and Outlook).
 
@@ -505,8 +510,8 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   "Desde URL"; pt-BR Google Agenda "Outras agendas" › "Do URL"; ru "Другие календари" › "По URL"; ar «تقاويم أخرى» › «من عنوان URL»;
   zh-CN “其他日历” › “通过网址”; zh-HK 「其他日曆」›「透過網址」; Outlook "Subscribe from web" is "Suscribirse desde la web", "Assinar da Web",
   “从 Web 订阅”, 「從 Web 訂閱」, «Подписаться из Интернета», «الاشتراك من الويب»). And **"Pam visit"** stays English inside the quotes in
-  `calendar.details.hint`, because the event's text is English whatever the member's language (D-538, "Not done"): if the event text
-  is ever translated, change both together.
+  `calendar.legacy.body` and in Privacy `sharing.p6`, because an older link's event text is English whatever the member's language
+  (D-538, "Not done"; `calendar.details.hint` is retired, a98 plan C): if the event text is ever translated, change them together.
   **`calendar.google.phone`** names a switch in the phone's browser, "Desktop site"; each translation uses Chrome's name for it in that
   language, from memory (es "Sitio para computadoras"; pt-BR "Site para computador"; zh-CN “桌面版网站”; zh-HK 「電腦版網站」; ru «Версия для
   компьютера»; ar «موقع سطح المكتب», where the Arabic says "choose" rather than "turn on" to avoid a vowel mark). Safari on an iPhone
