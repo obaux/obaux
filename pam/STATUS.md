@@ -1605,6 +1605,10 @@ connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merge
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
 
+## Design system & Storybook · press layer part 2 (18 October)
+
+Stretched-link cards, service choices and tabs press (D-602 addendum). Branch `claude/pam-design-press-layer-2`; waits on Mira.
+
 ## Design system & Storybook · counts on a row (16 October)
 
 A count at the end of a row is a plain number (`value`); the red badge is for what is new (D-586). The super admin Home's two rows follow it: Reported places changes (Piper), Programs to check stays (Ava). On `claude/pam-design-count-style`.
