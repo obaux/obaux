@@ -12,8 +12,8 @@ run on main when it lands.
 
 **Who builds what.** Dot builds the alert and the switch rule, Nico the log, and Ava the Problems list.
 
-The plan tests that rule as written and doesn't reopen it. It ends with the questions I'd like
-answered before the build, so I test the intended behaviour, not my guess at it.
+The plan tests that rule as written and doesn't reopen it. The desk answered my five questions at 21:24.
+Those answers are folded in below and listed at the end.
 
 ## Rules for the run
 
@@ -24,7 +24,8 @@ answered before the build, so I test the intended behaviour, not my guess at it.
   nothing is sent, and nothing reaches the live project.
 - **Failures are made in the page, three ways:**
   - **Offline:** Playwright's `setOffline(true)` (airplane mode). Requests fail at once.
-  - **Slow:** the answer is held for 5 s, 15 s, then 45 s, then given as a success or a 500.
+  - **Slow:** a save or switch counts as failed after **15 s** with no answer. A send keeps its 30 s
+    (P2). The answer is held for 5 s, 14 s, 16 s and 45 s, then given as a success or a 500.
   - **Refused:** a 500, a 400 with a database error code, and a 401 for an expired session.
 - **Sizes:** 320×568 for every case, and 390×844 for the overlay cases. For the keyboard, I shrink
   the visual viewport to 568 − 290px, the height an iPhone SE keyboard leaves, and fire the resize. A
@@ -58,20 +59,21 @@ are added.
 | | Calendar link (`CalendarLinkView`) | the switch |
 | | Directory `/directory/` (the super admin's switches) | the switch |
 | Agreeing | the agree screen `/reminders/`: Agree and Not now; Join (`JoinScreen`) | the write |
-| Messages | a message thread: a text and a photo; Message Pam | the send. Its own "Not sent" stays (see the overlap check) |
+| Messages | a message thread: a text and a photo; Message Pam | the send. **No overlay**: "Not sent" with Try again on the message is that screen's alert. Still logged |
 | | a new message (`NewMessagePicker`); the thread's options (`ThreadOptionsViews`); its files (`ThreadFilesView`, `MessageFileCard`) | the send or save |
 | Places | a place (`/place/`): save, I'm here (`ImHereCard`); Saved (`SavedView`); "Something is wrong here" `/flag/`; reported places | the save or report |
 | Trips | a new trip (`NewTripView`); booking for a member (`BookForMemberView`); Schedule (`ScheduleView`) | the save |
 | Programs | adding a program (`AddProgramView`); a program (`ProgramView`); editing a service (`ServiceEditView`); a program review; a request review | the save or decision |
 | Profile and the rest | Profile (`ProfileScreen`), Use as (`UseAsView`), What you sent (`WhatYouSentView`), notifications, a support reply, invites (new, add, expired), Explore's saves | the save |
-| Sign in | sending the code; checking the code | the send. These may stay inline; see question 4 |
+| Sign in | sending the code (didn't send, or the server errored) | the bottom alert. A wrong code, or a field to correct, **stays inline** (D-509) |
 
 For **each** row, offline and with a 15-second wait that then fails:
 
-- **A1. The alert shows.** It shows once, overlaid at the bottom. Its words are D-616's (the title and
-  line Sage signs). The time from the failure to the alert is under 1 s offline. With a slow
-  connection it shows when the app gives up; I record that time for each place, and whether it's the
-  same everywhere.
+- **A1. The alert shows.** It shows once, overlaid at the bottom, with Sage's line (834facaa,
+  `notice.malfunction`): "That didn't go through. It's not your fault, so try again." It's in all
+  seven languages once Lena's words land. The time from the failure to the alert is under 1 s
+  offline. With a slow connection it shows at 15 s, the same everywhere: no alert at 14 s, the alert
+  by 16 s. For a message send, there's no overlay; "Not sent" shows at 30 s.
 - **A2. Nothing looks saved.** A switch doesn't move, and after a 15 s wait it's still in its old
   place. A field keeps its words. A message stays "Not sent", in place, and isn't duplicated.
 - **A3. While it waits, it shows.** During the slow save the control says it's working (busy, or the
@@ -80,9 +82,13 @@ For **each** row, offline and with a 15-second wait that then fails:
   replaced. There's no stale alert on the next screen.
 - **A5. Success is silent.** A save that succeeds after a 5 s wait moves the switch and shows no
   alert.
-- **A6. Slow, then success.** A save held for 45 s that then succeeds isn't left showing "failed"
-  while the database has it. I record what's on screen at 20, 30 and 46 s, and whether a reload
-  agrees.
+- **A6. Slow, then success.** The switch has been called failed at 15 s, but the database then saves
+  it at 45 s. The switch doesn't then say off while the database says on. I record what's on screen at
+  16, 30 and 46 s, and whether a reload agrees. If they disagree, that's a finding: the person was
+  told it didn't go through when it did.
+- **A7. Mistakes stay inline.** A wrong sign-in code, and a field to correct (D-509), show their own
+  line by the field and no bottom alert. Nothing is logged for them, since they aren't Pam's
+  failures.
 
 ## B. Where the alert sits
 
@@ -121,24 +127,39 @@ At 320 and 390, in English, Arabic, Russian and Spanish, light and dark:
   one) is reachable by keyboard and has a name.
 - **C4. Arabic.** The live text is in Arabic, with no English left in it.
 
-## D. The log (`app_errors`)
+## D. The log (`app_errors`): Lena's nine rules
 
-I read Nico's migration and its grants, and capture each insert from the app in the stub.
+The desk's answer: a row keeps **nothing about the account**, no id and no hash, and no free text. I
+test Lena's Privacy read (161e3ab1, `docs/legal/2026-10-18-error-log-privacy-read.md`, section 3)
+rule by rule. In the app I capture each call to the writer in the stub. On the database I read the
+migration and, where it doesn't need PostGIS, run its functions in a throwaway Postgres.
 
-- **D1. Nothing personal in the row.** No name, phone, email, address, message text, photo URL,
-  place a person saved, or free text they typed. No query string with an id in it (the screen is
-  logged as its route, `/messages/thread/`, not `?id=…`). I'll check the device and user-agent fields
-  too.
-- **D2. Who it was:** see question 2.
-- **D3. Who can read it.** Only super admins (by RLS), and no one through `anon`. A member can insert
-  their own failure, but can't read or change anyone's, including their own after the fact.
-- **D4. What it holds:** the action (a fixed key such as `alerts.switch` or `messages.send`), the
-  kind (offline, timeout, refused, with the code), the route, the app's version, and the time. That's
-  enough to act on without anything about the person.
-- **D5. Offline.** A failure that happened offline is still logged once back online (queued), or
-  isn't logged by design. Either is fine, but it should be stated. It's never logged twice.
-- **D6. Flooding.** 100 failures in a minute from one account don't make 100 rows the team must
-  read, or there's a cap.
+- **D1. The detail is never the error's own message.** I make each save fail with an error whose
+  message, `details` and `hint` hold a 555 phone number, a made-up email address, a first name and a
+  place name. None of them is in the call or the stored row. On the server, the writer refuses a
+  detail that isn't from the closed list (HTTP status, SQLSTATE, offline, timeout, unknown) or that
+  has a run of 7 or more digits, an `@`, or an `=`.
+- **D2. The route is a pattern.** A failure on `/messages/thread/?id=…&from=pam`, `/place/?id=…` and
+  `/reminders/?next=alerts&kind=closed` is stored as the route with no id and no query.
+- **D3. The action key is from a closed list.** The writer refuses a key that isn't on it, including
+  one with spaces or user text.
+- **D4. Size limits.** The database refuses a field over its maximum. The writer is rate-limited for
+  each account: a loop of 100 failures in a minute stops at the limit, and the app shows nothing
+  more for it.
+- **D5. Who writes and who reads.** A member, a case manager and a program lead each get nothing from
+  `select` on the table or the list function. A super admin gets rows. `anon` gets nothing and can't
+  write. The writer is `security definer` with `set search_path = public, extensions`.
+- **D6. 30 days is enforced.** A scheduled delete exists and its text says 30 days.
+- **D7. The bell carries no detail.** The bell and its notification row hold no more than the note
+  does, and nothing from the person who met the error.
+- **D8. No new host.** In the browser the only request a failure makes is to Pam's own database. My
+  route log shows no other host asked.
+- **D9. Off means off.** With `app_errors_live` off, a failure makes no call to the writer. The alert
+  still shows to the person; the desk to confirm.
+- **D10. No account in the row:** no `profile_id`, no hash of one, and no device id. The request
+  itself is authenticated, and that log is the platform's, kept a week, as Lena's read says.
+- **D11. Offline.** A failure while offline is logged once when back online, or not at all by design.
+  It's never logged twice. A failure to write the log is silent to the person (E5).
 
 ## E. The bell and the Problems list (super admins)
 
@@ -162,17 +183,17 @@ I read Nico's migration and its grants, and capture each insert from the app in 
   (W4) stays. I check that the D-616 alert sits alongside them or replaces them as Dot intends.
 - A switch the person can't use (Coming soon, after a STOP) never shows the alert on a tap.
 
-## Questions before the build
+## The desk's answers (21:24), as tested above
 
-1. **Messages:** does a failed send get the overlay as well as its own "Not sent", or only "Not sent"?
-2. **The log's "who":** does a row keep the account's id (personal data in a strict reading), a
-   one-way hash, or nothing? D1 says "nothing personal", so I'd expect no id.
-3. **Words:** is the alert the existing "Something went wrong. This is not your fault…" or a new
-   short line from Sage? The plan checks whichever is signed.
-4. **Sign-in:** do the sign-in errors ("Check the number and try again") stay inline, as they are
-   about what was typed?
-5. **"Slow":** after how long does a save count as failed? P2's send uses 30 s. Is it the same for
-   switches and saves?
+1. **A failed send** keeps "Not sent" with its retry on the message and gets no overlay; it's still
+   logged. (If Will says otherwise, this changes.)
+2. **The log** keeps nothing about the account (no id, no hash) and no free text. Codes, action keys
+   and routes come from closed lists or patterns. See section D.
+3. **The words** are Sage's new line at 834facaa: "That didn't go through. It's not your fault, so try
+   again." Lena is translating it.
+4. **A mistake the person can fix** stays inline (D-509). Pam's own failures get the bottom alert,
+   on sign-in too.
+5. **A save or switch** counts as failed after 15 s. A send keeps its 30 s.
 
 ## Needs Will's phone
 
