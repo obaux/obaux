@@ -27,6 +27,15 @@ export interface SupportPost {
 
 const ALL: readonly SupportPost[] = [
   {
+    slug: 'program-books-a-visit',
+    topic: 'members',
+    audience: 'everyone',
+    title: 'When a program books a visit for you',
+    summary: 'A program you wrote to, signed up with or planned a visit at can book a visit for you. Here is where it shows and how to cancel it.',
+    updated: '2026-10-17',
+    keywords: ['book a visit', 'booked for you', 'program booked', 'booked by', 'cancel', 'trips', 'visit i did not make', 'someone booked', 'who can book', 'appointment'],
+  },
+  {
     slug: 'cant-sign-in',
     topic: 'members',
     audience: 'everyone',
@@ -78,7 +87,7 @@ const ALL: readonly SupportPost[] = [
     audience: 'residents and programs',
     title: 'Does the place know I’m coming?',
     summary: 'Programs on Pam see your visit. Most places are not told. How to call ahead, and what to do if they didn’t know you were coming.',
-    updated: '2026-10-16',
+    updated: '2026-10-17',
     keywords: ['told', 'know', 'expect', 'expecting', 'coming', 'showed up', 'turned away', 'appointment', 'call ahead', 'front desk', 'list', 'no clue'],
   },
   {
@@ -96,7 +105,7 @@ const ALL: readonly SupportPost[] = [
     audience: 'everyone',
     title: 'Texts from Pam: which ones, and why one didn’t come',
     summary: 'The few texts Pam sends today, the rules for them, and what to do when one does not come.',
-    updated: '2026-10-11',
+    updated: '2026-10-17',
     keywords: ['text', 'sms', 'code', 'sign in', 'reminder', 'stop', 'quiet hours', 'not now', 'did not come', 'no text'],
   },
   {
@@ -116,7 +125,7 @@ const ALL: readonly SupportPost[] = [
     audience: 'members',
     title: 'Planning a visit',
     summary: 'Plan a visit to a place, change it, cancel it, and where past visits go.',
-    updated: '2026-10-10',
+    updated: '2026-10-17',
     keywords: ['visit', 'trip', 'plan', 'plan a trip', 'new trip', 'appointment', 'change', 'cancel', 'past visits', 'service', 'book', 'schedule'],
   },
   {

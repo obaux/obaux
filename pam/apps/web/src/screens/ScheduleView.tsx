@@ -260,7 +260,6 @@ const styles = stylex.create({
   note: { fontSize: '15px', lineHeight: 1.5 },
   // The name is the link now (a button cannot sit inside one), the rest of
   // the row plain; it reads the same (D-316).
-  nameLink: { color: 'inherit', textDecorationLine: 'none' },
   checkWrap: { position: 'relative', flexShrink: 0 },
   check: {
     width: '48px',
@@ -479,20 +478,16 @@ export function ScheduleView({
     return (
       <ListItem
         key={a.id}
-        // With a check-in circle, the name carries the link (a button cannot
-        // sit inside one); otherwise the whole row does.
-        {...(canCheckIn || !a.href ? {} : { href: a.href })}
+        // The whole row opens the member (Iris, W1), the check-in circle apart. With a check-in circle the row used to carry no link, only the
+        // 24px name did, so the time, the visit line and the space between did nothing. Astryx draws a row's link around its words only
+        // (the circle is a sibling, not inside it) and the app's row-tap handler (`useRowTaps`) clicks that link for a tap anywhere on the
+        // row that is not itself something that acts, as the check-in button is.
+        {...(a.href ? { href: a.href } : {})}
         label={
           // A light-green signature for someone who has signed every policy
           // (D-316, D-261); which ones is on their page.
           <HStack gap={2} align="center" wrap="nowrap">
-            {canCheckIn && a.href ? (
-              <a href={a.href} {...stylex.props(styles.label, styles.nameLink)}>
-                {a.firstName}
-              </a>
-            ) : (
-              <Text xstyle={styles.label}>{a.firstName}</Text>
-            )}
+            <Text xstyle={styles.label}>{a.firstName}</Text>
             {isVerified(a.personId, policies) ? (
               <HStack role="img" aria-label={t('verified.short')}>
                 <SignedMark />

@@ -37,7 +37,7 @@ export function TextsFromPam() {
             ...(VISIT_REMINDERS_LIVE
               ? [
                   {
-                    label: 'A reminder before a visit you planned',
+                    label: 'A reminder before each visit',
                     cells: ['The day before, with the address.', 'Members who said yes to texts.'],
                   },
                 ]
@@ -60,7 +60,7 @@ export function TextsFromPam() {
         <P>
           {VISIT_REMINDERS_LIVE
             ? 'Pam does not text you when someone messages you, and it does not text you when someone wants to connect.'
-            : 'Pam does not send a reminder before a visit you planned. It does not text you when someone messages you, and it does not text you when someone wants to connect.'}{' '}
+            : 'Pam does not send a reminder before each visit. It does not text you when someone messages you, and it does not text you when someone wants to connect.'}{' '}
           The Text reminders screen lists what Pam would send, and says which of those it sends today. The Text
           alerts screen says “Coming soon” beside the ones it does not send yet.
         </P>

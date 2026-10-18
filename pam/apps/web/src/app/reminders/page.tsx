@@ -15,7 +15,7 @@ import { useSession } from '@/lib/useSession';
 import { setReminderConsent } from '@/lib/useReminderConsent';
 
 /**
- * Do you want Pam to text you about the things you plan?
+ * Do you want Pam to text you about your visits, the ones you plan and the ones a program books for you (D-595)?
  *
  * Its own screen, for two reasons that point the same way.
  *

@@ -175,6 +175,16 @@ export function PhoneIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/** An envelope. Write to us: an email line (the phone is for lines that dial). */
+export function MailIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} data-icon="mail" {...props}>
+      <rect x="3" y="5.5" width="18" height="13" rx="2" />
+      <path d="M3.5 7.5l8.5 6 8.5-6" />
+    </svg>
+  );
+}
+
 /**
  * A bell. Things that have happened and need somebody.
  *
