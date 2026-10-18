@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Role } from '@pam/config';
 import { requestLinkPreviews, wantsPreview } from './linkPreview';
+import { useLiveTick } from './useLiveTick';
 import { loadPhotos, removeUnsentPhoto, shrinkPhoto, uploadMessagePhoto } from './messagePhoto';
 import {
   displayFileName,
@@ -118,6 +119,9 @@ const MESSAGE_COLUMNS =
 // conversation has had since 0005 still read it.
 const MESSAGE_COLUMNS_BEFORE_0080 = 'id, sender_id, body, attachment_url, attachment_kind, created_at';
 
+/** How long a message may go unanswered before it is "Not sent" (Iris P2). */
+const SEND_DEADLINE_MS = 30_000;
+
 const photoPathOf = (row: MessageRow) => (row.attachment_kind === 'photo' ? row.attachment_url : null);
 
 const fileOf = (row: MessageRow): MessageFile | null =>
@@ -161,7 +165,8 @@ const toMessage = (
   file: fileOf(row),
   createdAt: row.created_at,
   // Read by the Pam team, everything that is not the person's is Pam's (including the system's); otherwise mine is what I wrote.
-  mine: askerId !== null ? row.sender_id !== askerId : row.sender_id !== null && row.sender_id === me,
+  // A message written by no person (Pam's welcome, the out-of-hours reply) is Pam's, never "mine" for the team reading it either.
+  mine: askerId !== null ? row.sender_id !== null && row.sender_id !== askerId : row.sender_id !== null && row.sender_id === me,
 });
 
 export function useThread(conversationId: string | null): {
@@ -181,11 +186,15 @@ export function useThread(conversationId: string | null): {
    * (terms.s.limits.p3, D-427) instead of leaving a message marked as not sent.
    */
   limited: boolean;
+  /** The last send was refused for sending too many too fast; its words and attachment are given back. `n` counts them. */
+  tooFast: { readonly n: number; readonly body: string; readonly attachment: OutgoingAttachment | null } | null;
   refresh: () => void;
 } {
   const [loaded, setLoaded] = useState<ThreadState>({ status: 'loading' });
   const [outbox, setOutbox] = useState<readonly OutboxItem[]>([]);
   const [limited, setLimited] = useState(false);
+  /** The last send was refused for sending too many too fast (Pam's limit): its words and picture, given back to the box. */
+  const [tooFast, setTooFast] = useState<{ readonly n: number; readonly body: string; readonly attachment: OutgoingAttachment | null } | null>(null);
   const [nonce, setNonce] = useState(0);
   const refresh = useCallback(() => setNonce((n) => n + 1), []);
   const seq = useRef(0);
@@ -320,6 +329,72 @@ export function useThread(conversationId: string | null): {
     };
   }, [conversationId, nonce]);
 
+  // What came in while it is open (Iris S1): ask for anything newer than the last message, every few seconds while the app is in front,
+  // and at once when it comes back or the network does. By conversation and time only, never by words. Merged by id, so a message
+  // that was just sent here, or that this very ask already brought, is never shown twice; nothing flashes back to loading.
+  const { tick, settle } = useLiveTick(loaded.status === 'ready', 8_000);
+  const loadedNow = useRef(loaded);
+  loadedNow.current = loaded;
+  useEffect(() => {
+    const here = loadedNow.current;
+    if (tick === 0 || !conversationId || here.status !== 'ready') return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const { createClient } = await import('./supabase');
+        const supabase = createClient();
+        const last = here.messages[here.messages.length - 1]?.createdAt;
+        const ask = (columns: string) => {
+          let query = supabase.from('messages').select(columns).eq('conversation_id', conversationId);
+          if (last) query = query.gte('created_at', last);
+          return query.order('created_at', { ascending: true }).limit(200);
+        };
+        let { data, error } = await ask(MESSAGE_COLUMNS_WITH_SYSTEM);
+        if (error) ({ data, error } = await ask(MESSAGE_COLUMNS));
+        if (error) {
+          settle(false);
+          return;
+        }
+        if (cancelled) return;
+        const rows = (data ?? []) as unknown as MessageRow[];
+        const now = loadedNow.current;
+        if (now.status !== 'ready') {
+          settle(true);
+          return;
+        }
+        const known = new Set(now.messages.map((m) => m.id));
+        const fresh = rows.filter((row) => !known.has(row.id));
+        if (fresh.length === 0) {
+          settle(true);
+          return;
+        }
+        const links = await loadPhotos(fresh.map(photoPathOf).filter((p): p is string => p !== null));
+        if (cancelled) return;
+        const added = fresh.map((row) => toMessage(row, now.meId, links, undefined, now.askerId));
+        setLoaded((prev) =>
+          prev.status === 'ready'
+            ? { ...prev, messages: [...prev.messages, ...added.filter((m) => !prev.messages.some((x) => x.id === m.id))] }
+            : prev,
+        );
+        settle(true);
+        // Read as it arrives, as when the conversation was opened (the Pam team's reading is not a member's).
+        if (!now.teamView && added.some((m) => !m.mine)) {
+          void supabase
+            .from('conversation_members')
+            .update({ last_read_at: new Date().toISOString() })
+            .eq('conversation_id', conversationId)
+            .eq('profile_id', now.meId);
+        }
+      } catch {
+        // Nothing on screen for a missed ask: the next one catches up, after a longer wait.
+        settle(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [tick, conversationId, settle]);
+
   /** One try at storing a message. True once it is in; false (and kept, or dropped when the account is limited) if not. */
   const attempt = useCallback(
     async (item: OutboxItem): Promise<boolean> => {
@@ -347,6 +422,10 @@ export function useThread(conversationId: string | null): {
         }
         const { createClient } = await import('./supabase');
         const supabase = createClient();
+        // No answer is not "Sending…" for ever (Iris P2): after 30 seconds it is given up on and shows "Not sent" with Try again. The
+        // request may still have reached the database, which is what Try again's look before sending is for.
+        const giveUp = new AbortController();
+        const deadline = setTimeout(() => giveUp.abort(), SEND_DEADLINE_MS);
         const { data, error } = await supabase
           .from('messages')
           .insert({
@@ -357,7 +436,9 @@ export function useThread(conversationId: string | null): {
             ...(named ? { attachment_name: named.name, attachment_bytes: named.bytes } : {}),
           })
           .select(MESSAGE_COLUMNS)
+          .abortSignal(giveUp.signal)
           .single();
+        clearTimeout(deadline);
         if (error || !data) throw error ?? new Error('insert failed');
         stored = null;
 
@@ -369,9 +450,16 @@ export function useThread(conversationId: string | null): {
         setLoaded((prev) => (prev.status === 'ready' ? { ...prev, messages: [...prev.messages, message] } : prev));
         setOutbox((prev) => prev.filter((o) => o.id !== item.id));
         return true;
-      } catch {
+      } catch (caught) {
         if (stored?.kind === 'photo') void removeUnsentPhoto(stored.path);
         if (stored?.kind === 'file') void removeUnsentFile(stored.path);
+        // Sending too many, too fast (Pam's limit): not a message that failed, so no "Not sent" and no Try again that would be
+        // refused again. It goes back to the box, and the screen says to wait a little.
+        if (String((caught as { message?: unknown } | null)?.message ?? '').includes('PAM_RATE_LIMITED')) {
+          setOutbox((prev) => prev.filter((o) => o.id !== item.id));
+          setTooFast((prev) => ({ n: (prev?.n ?? 0) + 1, body: item.body, attachment: item.attachment }));
+          return false;
+        }
         // A refusal and a dropped connection look alike from here; only one
         // of them is the account's doing, and it deserves its own words.
         // (Not in a Pam conversation: a limited account can write to Pam, so a failed send there is only ever not sent.)
@@ -480,5 +568,5 @@ export function useThread(conversationId: string | null): {
   }, [loaded, outbox]);
 
   const sending = outbox.some((o) => o.status === 'sending');
-  return { state, send, retry, sending, limited, refresh };
+  return { state, send, retry, sending, limited, tooFast, refresh };
 }

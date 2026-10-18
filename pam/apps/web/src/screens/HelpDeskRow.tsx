@@ -18,6 +18,10 @@ const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
  */
 export function useHelpDeskItem(id = 'desk'): MenuItem {
   const { t } = useI18n();
+  const toPam = useWriteToPamItem();
+  // Signed in with messaging Pam on (D-605, Iris W2): "Contact Pam" opens the person's conversation with Pam, in the app, instead of
+  // the website. Off, signed out, or the Pam team: it is what it was.
+  if (toPam) return { id, label: t('help.desk.label'), href: toPam.href, icon: <MessagesIcon {...ICON} /> };
   return {
     id,
     label: t('help.desk.label'),

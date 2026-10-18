@@ -27,6 +27,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
+import { Link } from '@astryxdesign/core/Link';
 import { ProgressBar } from '@astryxdesign/core/ProgressBar';
 import { Thumbnail } from '@astryxdesign/core/Thumbnail';
 import { DocumentIcon, Notice, PhotoIcon } from '@pam/ui';
@@ -150,6 +151,13 @@ export interface ThreadViewMessage {
   readonly status?: 'sent' | 'sending' | 'failed';
   /** How much of its photo has gone (0 to 1) while it is uploading, or absent. */
   readonly progress?: number | null;
+  /**
+   * Who wrote it, when that is not the other person of the conversation: the team's view of a Pam conversation says "Pam" (with its mark)
+   * for the welcome and the out-of-hours reply. Used for the avatar and the hidden "{name}, {time}" label.
+   */
+  readonly author?: { readonly name: string; readonly photoUrl?: string | null };
+  /** Which sentence this is, for a message written by no person (`pam.away`), or absent. */
+  readonly systemKey?: string | null;
 }
 
 export interface ThreadViewProps {
@@ -178,6 +186,11 @@ export interface ThreadViewProps {
    */
   readonly limited?: boolean;
   /**
+   * The last send was refused for sending too many too fast (Pam's limit): the words (and photo) go back in the box, and a calm line
+   * says to wait a little. There is no "Not sent" and no Try again for it, which would only be refused again.
+   */
+  readonly tooFast?: { readonly n: number; readonly body: string; readonly attachment: OutgoingAttachment | null } | null;
+  /**
    * Somebody blocked in this conversation (0076, D-463): `mine` when the reader did,
    * `theirs` when the other person did. Reading and reporting stay; the composer
    * gives way to a notice that says which.
@@ -203,7 +216,11 @@ export interface ThreadViewProps {
    * Called with `setDraft`, which replaces what is in the box and puts the cursor at its end: a saved reply fills the box and is
    * never sent by itself.
    */
-  readonly teamTools?: (composer: { readonly setDraft: (text: string) => void }) => ReactNode;
+  readonly teamTools?: (composer: {
+    readonly setDraft: (text: string) => void;
+    /** Puts words into the box at the cursor (a space first if the letter before it is not one), keeps what was typed, focuses the box, leaves the cursor after them. */
+    readonly insertDraft: (text: string) => void;
+  }) => ReactNode;
 }
 
 /**
@@ -312,6 +329,8 @@ const styles = stylex.create({
   // "Sending…", "Not sent" and "Sent" under a bubble, quiet; the Try again beside "Not sent" is a full 48px target.
   statusLine: { alignItems: 'center', minHeight: '24px' },
   progress: { width: '160px', maxWidth: '100%' },
+  // The number in the out-of-hours reply is a call (Iris P1): vertical padding on an inline link lengthens what a thumb can hit, not the line.
+  callLink: { paddingBlock: '14px', paddingInline: '6px', fontWeight: 600 },
   statusText: { fontSize: '13px', lineHeight: 1.4 },
   retry: { minHeight: '48px', minWidth: '48px' },
   // A photo in a bubble (D-394): a 240px square, cropped to fill, that opens
@@ -603,6 +622,7 @@ export function ThreadView({
   sending,
   onRetry,
   limited = false,
+  tooFast = null,
   blocked = null,
   speechLanguage,
   pam = false,
@@ -683,6 +703,47 @@ export function ThreadView({
   // Only then: someone editing the middle of a long message by hand is
   // never pulled away from where they are.
   const inputBox = useRef<HTMLDivElement>(null);
+  // Where the cursor was in the box when it last had one: tapping a button outside the box takes the focus (and the selection) away,
+  // so the place is kept from every change of selection inside it.
+  const savedRange = useRef<Range | null>(null);
+  useEffect(() => {
+    const keep = () => {
+      const editable = inputBox.current?.querySelector<HTMLElement>('[contenteditable]');
+      const selection = window.getSelection();
+      if (!editable || !selection || selection.rangeCount === 0) return;
+      const range = selection.getRangeAt(0);
+      if (editable.contains(range.startContainer) && editable.contains(range.endContainer)) savedRange.current = range.cloneRange();
+    };
+    document.addEventListener('selectionchange', keep);
+    return () => document.removeEventListener('selectionchange', keep);
+  }, []);
+  const insertDraft = (text: string) => {
+    const editable = inputBox.current?.querySelector<HTMLElement>('[contenteditable]');
+    if (!editable) {
+      setDraft((now) => (now === '' || /\s$/.test(now) ? now + text : `${now} ${text}`));
+      return;
+    }
+    editable.focus();
+    const selection = window.getSelection();
+    const place = savedRange.current && editable.contains(savedRange.current.startContainer) ? savedRange.current.cloneRange() : null;
+    const range = place ?? (() => {
+      const end = document.createRange();
+      end.selectNodeContents(editable);
+      end.collapse(false);
+      return end;
+    })();
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+    // A space first, unless the box is empty or the letter before the cursor already is one.
+    const before = document.createRange();
+    before.setStart(editable, 0);
+    before.setEnd(range.startContainer, range.startOffset);
+    const behind = before.toString();
+    const lead = behind === '' || /\s$/.test(behind) ? '' : ' ';
+    if (!document.execCommand('insertText', false, lead + text)) {
+      setDraft((now) => (now === '' || /\s$/.test(now) ? now + text : `${now} ${text}`));
+    }
+  };
   // Fills the box with words that were not typed (a saved reply), focuses it and leaves the cursor at the end.
   const fillDraft = (text: string) => {
     setDraft(text);
@@ -712,6 +773,17 @@ export function ThreadView({
   }, [dictation.isListening]);
 
   const name = otherName ?? t('messages.thread.someone');
+  // 988 in Pam's out-of-hours reply is a call: one tap opens the dialler, as it does on Your safety (Iris P1). Its name says what it is.
+  const callable = (body: string): ReactNode =>
+    body.split(/(988)/).map((part, index) =>
+      part === '988' ? (
+        <Link key={index} href="tel:988" label={tPlain('help.safety.crisis.heading')} xstyle={styles.callLink}>
+          988
+        </Link>
+      ) : (
+        part
+      ),
+    );
 
   // Under my message: "Sending…" while it goes; "Not sent" and a 48px "Try again" if it did not (D-605); a quiet "Sent" under the last
   // message only. The same words and the same ways for a text and a photo, in every conversation.
@@ -788,6 +860,23 @@ export function ThreadView({
     });
   };
 
+  // Sent too many, too fast (Pam's limit): what was written goes back in the box, and a calm line says to wait a little.
+  const [rateLine, setRateLine] = useState(false);
+  const seenTooFast = useRef(0);
+  useEffect(() => {
+    if (!tooFast || tooFast.n === seenTooFast.current) return;
+    seenTooFast.current = tooFast.n;
+    setDraft((now) => (now.trim() === '' ? tooFast.body : now));
+    if (tooFast.attachment?.kind === 'photo') {
+      const photo = tooFast.attachment.file;
+      setPicked((prev) => prev ?? { kind: 'photo', file: photo, preview: URL.createObjectURL(photo) });
+    } else if (tooFast.attachment?.kind === 'file') {
+      const file = tooFast.attachment.file;
+      setPicked((prev) => prev ?? { kind: 'file', file });
+    }
+    setRateLine(true);
+  }, [tooFast]);
+
   // Any way a file arrives — a picker, a drop, a paste — comes through here:
   // a JPEG, a PNG or an iPhone photo is a photo, shrunk to a JPEG right away
   // so the person sees what will be sent (and learns now if it cannot be
@@ -835,6 +924,7 @@ export function ThreadView({
     setDraft('');
     clearPicked();
     setAttachProblem(null);
+    setRateLine(false);
     await onSend(value, attachment);
   };
 
@@ -1082,7 +1172,32 @@ export function ThreadView({
   return (
     <>
     <ChatLayout
-      composer={teamTools ? <VStack>{teamTools({ setDraft: fillDraft })}{composer}</VStack> : composer}
+      composer={
+        teamTools || rateLine ? (
+          <VStack>
+            {teamTools ? teamTools({ setDraft: fillDraft, insertDraft }) : null}
+            {rateLine ? (
+              <Banner
+                status="info"
+                title={t('messages.thread.rateLimited')}
+                endContent={
+                  <IconButton
+                    label={t('messages.thread.attach.close')}
+                    icon={<Icon icon="close" size="md" />}
+                    variant="ghost"
+                    size="md"
+                    onClick={() => setRateLine(false)}
+                    xstyle={styles.square}
+                  />
+                }
+              />
+            ) : null}
+            {composer}
+          </VStack>
+        ) : (
+          composer
+        )
+      }
       density="compact"
       scrollButton={<ScrollToBottom />}
       xstyle={styles.layout}
@@ -1115,7 +1230,9 @@ export function ThreadView({
               translation && message.body ? (
                 <TranslatedBody original={message.body} translation={translation} {...(extra ? { captionStyle: extra } : {})} />
               ) : (
-                <Text dir="auto" xstyle={[styles.body, extra]}>{message.body ?? ''}</Text>
+                <Text dir="auto" xstyle={[styles.body, extra]}>
+                  {message.systemKey === 'pam.away' && message.body ? callable(message.body) : (message.body ?? '')}
+                </Text>
               );
             // A divider opens each day (D-389).
             const isNewDay = i === 0 || dayKey(message.createdAt) !== dayKey(messages[i - 1]!.createdAt);
@@ -1135,12 +1252,16 @@ export function ThreadView({
                   // screen reader hears "You, 2:14 PM" before the words.
                   name={
                     <VisuallyHidden>
-                      {tPlain('messages.thread.from', { name: message.mine ? tPlain('messages.thread.you') : name, time })}
+                      {tPlain('messages.thread.from', { name: message.mine ? tPlain('messages.thread.you') : (message.author?.name ?? name), time })}
                     </VisuallyHidden>
                   }
                   avatar={
                     message.mine ? undefined : (
-                      <Avatar size="md" name={name} {...(otherPhotoUrl ? { src: otherPhotoUrl } : {})} />
+                      <Avatar
+                        size="md"
+                        name={message.author?.name ?? name}
+                        {...(message.author ? (message.author.photoUrl ? { src: message.author.photoUrl } : {}) : otherPhotoUrl ? { src: otherPhotoUrl } : {})}
+                      />
                     )
                   }
                 >

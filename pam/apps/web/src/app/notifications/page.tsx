@@ -140,7 +140,7 @@ export default function NotificationsPage() {
   const signedIn = session.status === 'signed-in';
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { viewedRole } = useRoleView(trueRole);
-  const { state, markAllSeen } = useNotifications(signedIn);
+  const { state, markAllSeen } = useNotifications(signedIn, false);
   const unread = unreadCount(state);
   const isDemo = useDemoView(session);
 

@@ -322,6 +322,7 @@
   "messages.thread.send": "发送",
   "messages.thread.sending": "正在发送…",
   "messages.thread.sent": "已发送",
+  "messages.thread.rateLimited": "That is a lot of messages in a short time. Wait a little, then send it again.",
   "messages.thread.notSent": "未发送",
   "messages.thread.tryAgain": "再试一次",
   "messages.thread.notSent.label": "未发送。再试一次。",
