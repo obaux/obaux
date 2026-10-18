@@ -4,7 +4,10 @@ import { staffPhotoFor } from '@pam/config/dummy-connections';
 import { isFreshAccount } from '@/lib/programSetup';
 import { dummyConversationsFor } from '@pam/config/dummy-conversations';
 import { DUMMY_ANYONE } from '@pam/config/dummy-people';
+import { DEFAULT_PAM_HOURS } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
+import { PAM_MARK } from '@/lib/pam';
+import { pamSystemText } from '@/lib/pamMessages';
 import { usePreloadThreadView } from '@/app/messages/ThreadViewLazy';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
@@ -47,7 +50,7 @@ export function MessagesScreen() {
 function MessagesScreenInner() {
   // A conversation opens ready, its composer and fades already loaded (D-400).
   usePreloadThreadView();
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   const { state: session } = useSession();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   // A limited account reads but cannot start a message (0031): no New message,
@@ -119,10 +122,13 @@ function MessagesScreenInner() {
     state.status === 'ready'
       ? state.conversations.map((c) => ({
           id: c.id,
-          name: c.otherName ?? t('messages.thread.someone'),
-          context: contextFor(role, c.otherRole ? { role: c.otherRole, programName: c.otherProgramName } : null, t),
+          // Pam's conversation (D-605): "Pam", its mark, and no context line; its preview is the welcome itself, cut to a line by the row.
+          name: c.isPam ? t('pam.name') : (c.otherName ?? t('messages.thread.someone')),
+          context: c.isPam ? null : contextFor(role, c.otherRole ? { role: c.otherRole, programName: c.otherProgramName } : null, t),
           // A photo with no words reads "Photo" (D-394).
-          preview: preview(c.lastMessageBody ??
+          preview: preview((c.lastMessageSystemKey
+            ? (pamSystemText(c.lastMessageSystemKey, { t, tPlain, locale, firstName: session.status === 'signed-in' ? (session.session.firstName ?? null) : null, hours: DEFAULT_PAM_HOURS })?.split('\n')[0] ?? null)
+            : null) ?? c.lastMessageBody ??
             (c.lastMessageAttachment === 'photo'
               ? t('messages.preview.photo')
               : c.lastMessageAttachment === 'file'
@@ -133,7 +139,7 @@ function MessagesScreenInner() {
           href: `/messages/thread/?id=${encodeURIComponent(c.id)}`,
           // An example person's stock photo is for examples only: a real person who happens to share a name
           // and program with one must not be shown a stranger's face, nor have their device sent to a photo host.
-          photoUrl: examplesOn ? staffPhotoFor(c.otherName, c.otherProgramName) : null,
+          photoUrl: c.isPam ? PAM_MARK : examplesOn ? staffPhotoFor(c.otherName, c.otherProgramName) : null,
         }))
       : [];
 

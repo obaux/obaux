@@ -1,7 +1,6 @@
 'use client';
 
 import * as stylex from '@stylexjs/stylex';
-import { Text } from '@astryxdesign/core/Text';
 import { Loading, Notice } from '@pam/ui';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
@@ -23,7 +22,6 @@ import { ReportsList } from './ReportsList';
  * it is a preview.
  */
 const styles = stylex.create({
-  note: { fontSize: '15px', lineHeight: 1.5 },
 });
 
 export function ReportedSection({
@@ -63,10 +61,6 @@ export function ReportedSection({
       ) : null}
 
       {examples && (previewing || emptyReal) ? <DummyReportsLazy /> : null}
-
-      <Text type="supporting" xstyle={styles.note}>
-        {t('reports.intro')}
-      </Text>
     </>
   );
 }

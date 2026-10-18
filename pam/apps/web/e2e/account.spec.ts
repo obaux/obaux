@@ -134,6 +134,15 @@ test.describe('the way out', () => {
     await expect(page).toHaveURL(/\/join\//);
   });
 
+  test('an unfinished account can sign out, with no line under the button (D-608)', async ({ page }) => {
+    await signedIn(page, null);
+    await page.goto('/account/');
+    await expect(page.getByText('Your account is not finished yet. It takes a minute.')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Sign out' })).toBeVisible();
+    // Nobody needs it to decide (Sage's audit).
+    await expect(page.getByText('You can sign back in with your phone number any time.')).toHaveCount(0);
+  });
+
   test('a paused account is told so once, plainly, with the way out', async ({ page }) => {
     await signedIn(page, { role: 'member', access_status: 'suspended' });
     await page.goto('/');

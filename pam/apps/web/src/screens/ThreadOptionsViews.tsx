@@ -98,18 +98,16 @@ function ThreadOptions() {
       >
         {phase === 'done' ? (
           <>
-            <Notice
-              notice="service_not_available"
-              title={t(`messages.${kind}.done.title`)}
-              body={t(`messages.${kind}.done.body`)}
-            />
             <BigButton label={t('messages.options.back')} href={threadHref} />
           </>
         ) : (
           <>
-            <Text type="supporting" xstyle={styles.body}>
-              {t(`messages.${kind}.body`)}
-            </Text>
+            {/* The title says it for Unblock; Block keeps the one sentence a hard-to-undo act needs (D-608). */}
+            {unblocking ? null : (
+              <Text type="supporting" xstyle={styles.body}>
+                {t('messages.block.body')}
+              </Text>
+            )}
             {phase === 'failed' ? (
               <Notice
                 notice="something_went_wrong"

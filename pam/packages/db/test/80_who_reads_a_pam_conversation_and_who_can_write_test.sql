@@ -102,6 +102,14 @@ select test.check('another member reads nothing of it',
 select test.as_user(:'marcus');
 select test.check('Marcus reads his own two messages',
   (select count(*) from public.messages where conversation_id = :'pam_c'), 2);
+-- Controls for the zeros above and below: the direct conversation the Pam team and the limited account are kept out of really has
+-- messages and two members, and its own member can read it and write in it.
+select test.check('control: Marcus reads his direct conversation with Alice (it has messages, and two members)',
+  (select (count(*) > 0)::int from public.messages where conversation_id = :'direct_c')
+  + (select count(*) from public.conversation_members where conversation_id = :'direct_c'), 3);
+insert into public.messages (conversation_id, sender_id, body) values (:'direct_c', :'marcus', 'control: an active member writes here');
+select test.check('control: ...and an active member can write in it',
+  (select count(*) from public.messages where conversation_id = :'direct_c' and body = 'control: an active member writes here'), 1);
 select test.check('...and the photo, but not the thread row (that is the team''s)',
   (select count(*) from storage.objects where bucket_id = 'message-photos' and name = :'pam_c' || '/shot.jpg')
   + (select count(*) from public.pam_threads), 1);

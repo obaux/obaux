@@ -50,6 +50,10 @@ export interface ConversationRow {
   /** What the last message carried (D-394, D-399); with no words, the row says "Photo" or "Document". */
   readonly lastMessageAttachment: 'photo' | 'file' | null;
   readonly lastMessageMine: boolean;
+  /** Pam's side of a conversation (D-605): the other participant has no profile; the row says "Pam". */
+  readonly isPam: boolean;
+  /** The last message was written by no person (Pam's welcome or out-of-hours reply): which sentence to draw. */
+  readonly lastMessageSystemKey: string | null;
   /** A message from the other person arrived since this was last opened. */
   readonly unread: boolean;
 }
@@ -67,15 +71,17 @@ interface MemberRow {
 
 interface PartnerRow {
   conversation_id: string;
-  profile_id: string;
+  /** Null for Pam's side of a conversation: it has no profile behind it (20261018072339). */
+  profile_id: string | null;
   first_name: string | null;
-  role: Role;
+  role: Role | null;
   program_name: string | null;
 }
 
 interface LatestMessageRow {
   conversation_id: string;
-  sender_id: string;
+  sender_id: string | null;
+  system_key?: string | null;
   body: string | null;
   attachment_kind: string | null;
   created_at: string;
@@ -86,6 +92,16 @@ const RECENCY_SCAN_LIMIT = 500;
 
 const attachmentOf = (kind: string | null | undefined): 'photo' | 'file' | null =>
   kind === 'photo' || kind === 'file' ? kind : null;
+
+/** The latest messages, with the key a system message carries; before that column is live, without it (D-605). */
+async function readLatest(ids: readonly string[]) {
+  const { createClient } = await import('./supabase');
+  const supabase = createClient();
+  const read = (columns: string) =>
+    supabase.from('messages').select(columns).in('conversation_id', ids as string[]).order('created_at', { ascending: false }).limit(RECENCY_SCAN_LIMIT);
+  const withKey = await read('conversation_id, sender_id, system_key, body, attachment_kind, created_at');
+  return withKey.error ? read('conversation_id, sender_id, body, attachment_kind, created_at') : withKey;
+}
 
 export function useConversations(enabled: boolean): {
   state: ConversationsState;
@@ -133,12 +149,7 @@ export function useConversations(enabled: boolean): {
         const [{ data: partners, error: partnersError }, { data: latest, error: latestError }] =
           await Promise.all([
             supabase.rpc('conversation_partners'),
-            supabase
-              .from('messages')
-              .select('conversation_id, sender_id, body, attachment_kind, created_at')
-              .in('conversation_id', ids)
-              .order('created_at', { ascending: false })
-              .limit(RECENCY_SCAN_LIMIT),
+            readLatest(ids),
           ]);
 
         if (cancelled) return;
@@ -149,7 +160,7 @@ export function useConversations(enabled: boolean): {
 
         const otherByConversation = new Map<
           string,
-          { id: string; name: string | null; role: Role | null; programName: string | null }
+          { id: string | null; name: string | null; role: Role | null; programName: string | null }
         >();
         for (const row of (partners ?? []) as PartnerRow[]) {
           otherByConversation.set(row.conversation_id, {
@@ -163,7 +174,7 @@ export function useConversations(enabled: boolean): {
         // `latest` is sorted newest-first across every conversation, so the
         // first row seen for a given id is that conversation's latest message.
         const latestByConversation = new Map<string, LatestMessageRow>();
-        for (const row of (latest ?? []) as LatestMessageRow[]) {
+        for (const row of (latest ?? []) as unknown as LatestMessageRow[]) {
           if (!latestByConversation.has(row.conversation_id)) {
             latestByConversation.set(row.conversation_id, row);
           }
@@ -182,13 +193,15 @@ export function useConversations(enabled: boolean): {
             return {
               id: row.conversation_id,
               otherProfileId: other?.id ?? null,
+              isPam: other !== null && other.id === null,
+              lastMessageSystemKey: latestMsg?.system_key ?? null,
               otherName: other?.name ?? null,
               otherRole: other?.role ?? null,
               otherProgramName: other?.programName ?? null,
               lastMessageAt: latestMsg?.created_at ?? null,
               lastMessageBody: latestMsg?.body ?? null,
               lastMessageAttachment: attachmentOf(latestMsg?.attachment_kind),
-              lastMessageMine: latestMsg ? latestMsg.sender_id === me : false,
+              lastMessageMine: latestMsg ? latestMsg.sender_id !== null && latestMsg.sender_id === me : false,
               unread,
             };
           })

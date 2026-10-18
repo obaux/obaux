@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { markHasConversation } from './useMessagingReach';
 
 /**
  * Message Pam: the hooks and calls the screens use (D-605, D-606). The database is `20261018071550` to `20261018073016`;
@@ -13,6 +14,9 @@ import { useEffect, useState } from 'react';
  * the hours, and how long people wait. Each of those refuses anyone else in the database (`ONLY_A_SUPER_ADMIN`); a screen
  * gates on the role as well, so the call is not made at all.
  */
+
+/** Pam's mark: the app's own icon, a white P on Pam's green, never a face (Dot, 18 October 2026). Beside Pam's messages and in its row. */
+export const PAM_MARK = '/icon-192.png';
 
 export interface PamStatus {
   /** Whether messaging Pam is switched on. Off or unreadable: show nothing. */
@@ -83,6 +87,36 @@ export async function openPamConversation(): Promise<string | null> {
   } catch {
     return null;
   }
+}
+
+/**
+ * Opens the signed-in person's Pam conversation once for this person per page load (D-605): made with Pam's welcome the first time, so
+ * it is in their Messages from the first load after the switch is on, with the welcome unread. `ready` is true once that has been asked
+ * (whatever the answer), so the unread count that follows includes it. Off, or for the Pam team (`skip`), nothing is asked or made.
+ */
+const asked = new Map<string, Promise<string | null>>();
+export function usePamBootstrap(userId: string | null, skip: boolean): { readonly ready: boolean } {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    if (!userId || skip) {
+      setReady(!userId ? false : true);
+      return;
+    }
+    let cancelled = false;
+    let pending = asked.get(userId);
+    if (!pending) {
+      pending = openPamConversation();
+      asked.set(userId, pending);
+    }
+    void pending.then((id) => {
+      if (id) markHasConversation();
+      if (!cancelled) setReady(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, skip]);
+  return { ready };
 }
 
 // ---------------------------------------------------------------------------

@@ -690,23 +690,87 @@ test.describe('a conversation', () => {
     await expect(page.getByRole('textbox')).toHaveCount(0);
   });
 
-  test('a send that fails for any other reason still says the connection dropped', async ({ page }) => {
+  // A message that did not go stays in the conversation, outlined, with "Not sent" and a Try again, in every conversation
+  // (D-605; Will, 18 October: messaging "works better than any other part of the app"). A tap on Try again sends it once.
+  const failingSend = async (page: import('@playwright/test').Page, mode: 'never-lands' | 'lands-but-no-answer') => {
+    const stored: { id: string; conversation_id: string; sender_id: string; body: string; created_at: string }[] = [];
+    let posts = 0;
+    await page.route(MESSAGES, (route) => {
+      const request = route.request();
+      if (request.method() === 'POST') {
+        posts += 1;
+        const body = request.postDataJSON() as { body: string };
+        const row = { id: `mine-${posts}`, conversation_id: CONVO, sender_id: ME, body: body.body, created_at: new Date().toISOString() };
+        // The first try fails; in the second mode it had in fact been stored, and only the answer was lost.
+        if (posts === 1) {
+          if (mode === 'lands-but-no-answer') stored.push(row);
+          return route.fulfill({ status: 500, contentType: 'application/json', body: '{}' });
+        }
+        stored.push(row);
+        return route.fulfill(json(row));
+      }
+      const theirs = { id: MSG_THEIRS, conversation_id: CONVO, sender_id: OTHER, body: 'Is the class still on Tuesday?', created_at: new Date(Date.now() - 60_000).toISOString() };
+      // Filtered the way the database does: the retry's look for its own earlier message asks for the sender.
+      if (request.url().includes(`sender_id=eq.${ME}`)) return route.fulfill(json(stored));
+      return route.fulfill(json([theirs, ...stored]));
+    });
+    return { posts: () => posts };
+  };
+
+  test('a send that fails stays in the conversation as "Not sent", with its words, and a 48px Try again', async ({ page }) => {
     await signedInAs(page, 'member');
     await withOneConversation(page);
-    await page.route(MESSAGES, (route) => {
-      if (route.request().method() === 'POST') return route.fulfill({ status: 500, contentType: 'application/json', body: '{}' });
-      return route.fulfill(
-        json([{ id: MSG_THEIRS, conversation_id: CONVO, sender_id: OTHER, body: 'Is the class still on Tuesday?', created_at: new Date().toISOString() }]),
-      );
-    });
+    await failingSend(page, 'never-lands');
     await page.goto(`/messages/thread/?id=${CONVO}`);
     await settled(page);
 
     await page.getByRole('textbox').fill('See you Thursday.');
     await page.getByRole('button', { name: /send/i }).click();
 
-    await expect(page.getByText('Your connection dropped')).toBeVisible();
-    await expect(page.getByText('Some things are turned off')).toHaveCount(0);
+    await expect(page.getByText('Not sent', { exact: true })).toBeVisible();
+    await expect(page.getByText('See you Thursday.')).toBeVisible();
+    const tryAgain = page.getByRole('button', { name: 'Not sent. Try again.' });
+    await expect(tryAgain).toBeVisible();
+    expect((await tryAgain.boundingBox())!.height).toBeGreaterThanOrEqual(47.5);
+    // The old banner at the foot is gone, and so is the old notice's wording.
+    await expect(page.getByText('Your connection dropped')).toHaveCount(0);
+    await expect(page.getByText('That did not send')).toHaveCount(0);
+  });
+
+  test('Try again sends it once: the message appears once, "Not sent" goes, a quiet "Sent" follows', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await withOneConversation(page);
+    const server = await failingSend(page, 'never-lands');
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await page.getByRole('textbox').fill('See you Thursday.');
+    await page.getByRole('button', { name: /send/i }).click();
+    await expect(page.getByText('Not sent', { exact: true })).toBeVisible();
+
+    await page.getByRole('button', { name: 'Not sent. Try again.' }).click();
+    await expect(page.getByText('Not sent', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('See you Thursday.')).toHaveCount(1);
+    await expect(page.getByText('Sent', { exact: true })).toBeVisible();
+    expect(server.posts()).toBe(2);
+  });
+
+  test('Try again after a send that had in fact gone through does not send a second copy', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await withOneConversation(page);
+    const server = await failingSend(page, 'lands-but-no-answer');
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await page.getByRole('textbox').fill('See you Thursday.');
+    await page.getByRole('button', { name: /send/i }).click();
+    await expect(page.getByText('Not sent', { exact: true })).toBeVisible();
+
+    await page.getByRole('button', { name: 'Not sent. Try again.' }).click();
+    await expect(page.getByText('Not sent', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('See you Thursday.')).toHaveCount(1);
+    // The first try was the message: nothing was posted again.
+    expect(server.posts()).toBe(1);
   });
 
   test('reporting picks a reason and ends in a thank-you, never a dead end', async ({ page }) => {
@@ -753,8 +817,7 @@ test.describe('a conversation', () => {
     // Asked first: nothing is called by tapping the row.
     await page.getByRole('button', { name: 'Block this person' }).click();
     await expect(page.getByRole('heading', { name: 'Block this person?' })).toBeVisible();
-    await expect(page.getByText(/They will see that messages are blocked/)).toBeVisible();
-    await expect(page.getByText(/unblock them any time from this menu/)).toBeVisible();
+    await expect(page.getByText(/^Neither of you can send messages here\. You can unblock them later\.$/)).toBeVisible();
     expect(calls).toEqual([]);
     // "Not now" goes back to the menu and still calls nothing.
     await page.getByRole('button', { name: 'Not now' }).click();
@@ -764,6 +827,8 @@ test.describe('a conversation', () => {
     await page.getByRole('button', { name: 'Block this person' }).click();
     await page.getByRole('button', { name: 'Block', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Blocked' }).first()).toBeVisible();
+    // The title says it (D-608): no second paragraph about what blocking does.
+    await expect(page.getByText(/Neither of you can send messages here now/)).toHaveCount(0);
     expect(calls).toEqual(['block']);
     await expect(page.getByRole('link', { name: 'Back to the conversation' }).first()).toBeVisible();
 
@@ -771,8 +836,11 @@ test.describe('a conversation', () => {
     await page.goto(`/messages/thread/options/?id=${CONVO}`);
     await settled(page);
     await page.getByRole('button', { name: 'Unblock this person' }).click();
+    await expect(page.getByRole('heading', { name: 'Unblock this person?' })).toBeVisible();
+    await expect(page.getByText(/You will both be able to send messages here again/)).toHaveCount(0);
     await page.getByRole('button', { name: 'Unblock', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Unblocked' }).first()).toBeVisible();
+    await expect(page.getByText(/You can send messages here again/)).toHaveCount(0);
     expect(calls).toEqual(['block', 'unblock']);
   });
 
@@ -1115,6 +1183,53 @@ test.describe('photos and documents, picked or pasted (D-408)', () => {
     expect(inserted).toMatchObject({ conversation_id: CONVO, attachment_kind: 'photo' });
   });
 
+  test('a photo shows its progress while it goes, and when it did not go it stays "Not sent" with the picture and Try again sends it once (D-609)', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    let uploads = 0;
+    let release: () => void = () => {};
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    await page.route('**/storage/v1/object/message-photos/**', async (route) => {
+      uploads += 1;
+      if (uploads === 1) {
+        await gate;
+        return route.fulfill({ status: 500, contentType: 'application/json', body: '{}' });
+      }
+      return route.fulfill(json({ Key: 'message-photos/x.jpg' }));
+    });
+    let inserts = 0;
+    await page.route(MESSAGES, (route) => {
+      if (route.request().method() === 'POST') {
+        inserts += 1;
+        const row = route.request().postDataJSON() as Record<string, unknown>;
+        return route.fulfill(json({ id: 'new-photo', sender_id: ME, body: null, attachment_url: row.attachment_url, attachment_kind: 'photo', created_at: new Date().toISOString() }));
+      }
+      return route.fulfill(json([]));
+    });
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await paste(page, { name: 'image.png', type: 'image/png', base64: PNG });
+    await page.getByRole('button', { name: /send/i }).click();
+    // On its way: "Sending…" and a bar, the picture already in the conversation.
+    await expect(page.getByRole('progressbar', { name: 'Sending…' })).toBeVisible();
+    await expect(page.getByText('Sending…', { exact: true }).first()).toBeVisible();
+    release();
+
+    await expect(page.getByText('Not sent', { exact: true })).toBeVisible();
+    await expect(page.getByRole('progressbar')).toHaveCount(0);
+    await expect(page.getByRole('img', { name: 'A photo you sent' })).toBeVisible();
+    expect(inserts).toBe(0);
+
+    await page.getByRole('button', { name: 'Not sent. Try again.' }).click();
+    await expect(page.getByText('Not sent', { exact: true })).toHaveCount(0);
+    await expect(page.getByRole('img', { name: 'A photo you sent' })).toHaveCount(1);
+    await expect.poll(() => inserts).toBe(1);
+    await expect(page.getByText('Sent', { exact: true })).toBeVisible();
+    expect(inserts).toBe(1);
+    expect(uploads).toBe(2);
+  });
+
   test('a pasted PDF or Word file is a document, the same as from the button; pasted words are still words', async ({ page }) => {
     await signedInAs(page, 'admin');
     await withOneConversation(page);
@@ -1300,6 +1415,8 @@ test.describe('the conversation, drawn closer (D-400, D-401)', () => {
     await settled(page);
     const line = page.getByText(/^Program lead at Example Food Pantry of North Philadelphia and the Neighborhoods Around It$/);
     await expect(line).toBeVisible();
+    // Will signed this line (D-541, a102 waits on his answer): a member writing to a program is told what the program sees.
+    await expect(page.getByText('This program sees your first name and what you write.')).toBeVisible();
     const box = (await line.boundingBox())!;
     // Inside the screen, and nothing clipped: it grows to a second line rather than being cut.
     expect(box.x).toBeGreaterThanOrEqual(0);
@@ -2139,7 +2256,7 @@ test.describe("the bell's rows land on real screens in the new layout", () => {
 test.describe('a real account sees only its real things (Will, 11 October 2026)', () => {
   const EXAMPLES = /Teresa|Sandra|Renee|Example people|People who offered help/;
 
-  test('a member with no one to message has no Messages tab, no examples, a short empty state, and the bell is on Home', async ({ page }) => {
+  test('a member with no one to message has no Messages tab, no examples, a short empty state, and no bell on Home until something is new', async ({ page }) => {
     await signedInAs(page, 'member');
     await page.route(MEMBERS, (route) => route.fulfill(json([])));
     await page.route(PEOPLE, (route) => route.fulfill(json([])));
@@ -2156,10 +2273,13 @@ test.describe('a real account sees only its real things (Will, 11 October 2026)'
     await expect(bar.getByRole('link', { name: 'Profile' })).toBeVisible();
     await expect(bar.getByRole('link', { name: /Messages/ })).toHaveCount(0);
 
-    // Notifications are still reachable: the bell is in Home's header.
+    // Home's header draws the bell only while something is unread (Will, 18 October); with nothing new it has none,
+    // and the list stays one tap away from Profile.
     await page.goto('/');
     await settled(page);
-    await expect(page.getByRole('link', { name: /Notifications/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Notifications/ })).toHaveCount(0);
+    await page.goto('/profile/');
+    await settled(page);
     await expect(page.getByRole('link', { name: /Notifications/ })).toHaveAttribute('href', '/notifications/');
   });
 
