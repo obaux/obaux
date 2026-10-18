@@ -2426,3 +2426,7 @@ Crossfade 650ms, line out 160ms then in 320ms, no scale (D-556). Story: Website 
 ## Design system & Storybook · help dialog and dark link text (13 October)
 
 Spec for the help call-out and dialog, and a new `--website-text-link` token (dark: very light lime #EEF1C2) for Wren (D-562).
+
+## Places & programs · a98 plan C, the calendar link shown again (18 October)
+
+Built and proved on `claude/places-programs-calendar-plan-c`, **held: nothing ships until Will signs the three Privacy lines** (p12, the one-visit line, p6). D-604 supersedes D-538. A link's address is a random lookup id plus an HMAC under a Vault key made in the database; Pam stores the lookup id, the version, the calendar the member chose and the day, never the address; a new link or Disconnect stops the old address for good. Every event in the feed is UID, DTSTART, DTEND, SUMMARY (the place), LOCATION (the address) and TRANSP; the calendar's name ("Visits") follows the member's saved language; legacy links answer as before. The booked screen adds one visit from the phone (Apple/Outlook `.ics` built in the browser, Google's add-event link), nothing sent or stored. Needs: the migration applied after `list_migrations`, the `calendar-feed` function redeployed (`ics.ts`, `handler.ts`), Dot's redrawn booked-card button, Lena's translations of 29 stand-in keys and of `LINK_CALENDAR_NAMES` (`ics.ts`).
