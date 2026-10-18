@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
+import en from '@pam/config/locales/en.json';
 import { InviteForWho } from '../../screens/InviteForWho';
 
 /**
@@ -25,9 +26,9 @@ export const CaseManager: Story = { args: { role: 'admin' } };
 /** Staff only: the email is not optional, so Create link says what is missing. */
 export const StaffNeedsEmail: Story = {
   play: async ({ canvas, userEvent }) => {
-    await userEvent.type(canvas.getByLabelText('Their first name'), 'Bo');
-    await userEvent.type(canvas.getByLabelText('Their mobile number'), '2155550112');
-    await userEvent.click(canvas.getByRole('button', { name: 'Create link' }));
+    await userEvent.type(canvas.getByLabelText(en['invite.who.name']), 'Bo');
+    await userEvent.type(canvas.getByLabelText(en['invite.who.phone']), '2155550112');
+    await userEvent.click(canvas.getByRole('button', { name: en['invite.who.make'] }));
   },
 };
 export const Member: Story = { args: { role: 'member' } };

@@ -2,6 +2,12 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { DashedRule } from '@pam/ui/DashedRule';
+import { useStoryText } from '../support/useStoryText';
+
+function Explanation() {
+  const tr = useStoryText();
+  return <Text type="supporting">{tr('home.calendar.preview.intro')}</Text>;
+}
 
 /**
  * The dashed rule (D-356): round-ended 2px dashes, black at 5%. Put it under
@@ -23,7 +29,7 @@ export const Default: Story = {};
 export const UnderAnExplanation: Story = {
   render: () => (
     <VStack gap={5}>
-      <Text type="supporting">When members plan a trip to your program, they show up here, by day.</Text>
+      <Explanation />
       <DashedRule />
     </VStack>
   ),

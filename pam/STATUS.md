@@ -1653,6 +1653,10 @@ only the alert texts Will signed: no "introduced to your program", no "your acco
 
 `StatusBadge` replaces the "coming soon" and "example" sentences on Profile and the example lists (D-612, D-608). Branch `claude/pam-design-d608-badges` (main + Sage's b50e386a); waits on Mira. Text alerts and six languages are others'.
 
+## Design system & Storybook · stories read the bundles (18 October)
+
+Seven component stories draw the app's own words from the bundle, so they follow the Language toolbar and cannot drift after a wording change. Branch `claude/pam-design-stories-bundles`; about 100 stories still carry a literal that is right today.
+
 ## Design system & Storybook · Explore bell and staff search (18 October)
 
 A member's Explore draws the bell only while something is unread; the staff Home's member search is a plain field (D-610). Branch `claude/pam-design-explore-bell`; waits on Mira. a86 (`claude/pam-design-search-bar-look`) takes it by merge next.
