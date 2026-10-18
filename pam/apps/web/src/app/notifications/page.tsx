@@ -92,6 +92,12 @@ function describe(
   if (bodyKey === 'notify.staff_request_pending' && typeof bodyVars['role'] === 'string') {
     return t(bodyKey, { ...bodyVars, role: t(`role.${bodyVars['role']}`) });
   }
+  // The database writes the action's key (D-616); the bell says its name, or the key when it has none yet.
+  if (bodyKey === 'notify.app_error' && typeof bodyVars['action'] === 'string') {
+    const nameKey = `appError.action.${bodyVars['action']}`;
+    const name = t(nameKey);
+    return t(bodyKey, { ...bodyVars, action: name === nameKey ? bodyVars['action'] : name });
+  }
   return t(bodyKey, bodyVars);
 }
 

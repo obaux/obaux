@@ -928,6 +928,13 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Accounts & invites · Problems, what broke this week (18 October) — READY on `claude/pam-problems-list` (D-616, b76)
+
+A super admin's `/problems/` reads `app_errors_grouped` (7 days, newest first): the action's name, key, route, code, count, last
+and first seen; no person, no free text. Opened from the bell's `app_error` row (which now says the action's name, not its key)
+and a row beside Waiting cities. Proven by `e2e/problems.spec.ts`. Part (b), the team-side saves on Dot's rule, waits for Dot's
+hook on main.
+
 ## Accounts & invites · Message Pam, the Pam team's side (18 October) — S1 to S4 with Iris's passes 1 and 2 and Dot's review, one READY on main, behind Nico's switch (card a100, D-613)
 
 Built on `claude/pam-message-pam-admin` @ 1b67f588, stacked on Nico's `claude/messages-pam-s0-s1a`.
