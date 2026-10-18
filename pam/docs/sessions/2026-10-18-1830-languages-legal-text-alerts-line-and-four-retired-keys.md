@@ -14,7 +14,7 @@ Lena, on `claude/lena-text-alerts-kinds`, on Dot's `claude/pam-design-settings-l
 
 ## Checked
 
-The 320 audit of the Text alerts stories and Arabic at 390: see the READY.
+The 320 audit of the six Text alerts stories (member, case manager, program lead, stopped, and the two "agree first" ones), in seven languages at 320×760 and 320×568, and English and Arabic at 390×760: **0 findings new in a language at all three sizes**. A separate check opened the four list stories (member, case manager, program lead, stopped) in each of the seven languages and found the `alerts.kinds` line in the page text every time (28 of 28), so the clean audit is of the real line.
 
 ## Left undone
 
