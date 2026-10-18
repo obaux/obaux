@@ -325,8 +325,10 @@ function PamComposer({ photo, placeholder, draft = null }: { readonly photo: boo
       if (draft) {
         const field = c.querySelector<HTMLElement>('[contenteditable], [role="textbox"]');
         if (field && field.textContent !== draft) field.textContent = draft;
+        // The app's own placeholder overlay, found by what it is (a leaf, aria-hidden), not by its words: in
+        // other languages it holds the app's translation, not the story's English (Lena's 320 audit).
         for (const el of c.querySelectorAll<HTMLElement>('div')) {
-          if (el.children.length === 0 && el.textContent === text) el.style.display = 'none';
+          if (el.children.length === 0 && el.getAttribute('aria-hidden') === 'true') el.style.display = 'none';
         }
       }
     };

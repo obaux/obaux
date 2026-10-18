@@ -20,6 +20,7 @@ import { useI18n } from '@/lib/i18n';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { ListItem } from '@astryxdesign/core/List';
 import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
+import { StatusBadge } from '@pam/ui/StatusBadge';
 
 /**
  * Messages, on the tab-screen frame (D-213, from the references Will gave on
@@ -111,7 +112,6 @@ const styles = stylex.create({
   field: { flexGrow: 1, minWidth: 0 },
   cancel: { flexShrink: 0, fontSize: '17px', fontWeight: 600 },
   state: { paddingBlock: '48px' },
-  note: { fontSize: '15px', lineHeight: 1.5 },
   list: { width: '100%' },
   // The row Will picked (1 October): name, one quiet line, a subtle time.
   name: { fontSize: '18px', lineHeight: 1.3 },
@@ -303,9 +303,7 @@ export function MessagesView({
             ))}
           </List>
           {note ? (
-            <Text type="supporting" xstyle={styles.note}>
-              {note}
-            </Text>
+            <StatusBadge label={note} />
           ) : null}
         </VStack>
       ) : null}

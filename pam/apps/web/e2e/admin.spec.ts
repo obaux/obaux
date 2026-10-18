@@ -154,14 +154,14 @@ test.describe('the case manager screen', () => {
     await page.goto('/');
     // A real account sees its real, empty list, never example people (Will, 11 October).
     await expect(page.getByRole('heading', { name: 'Jordan' })).toHaveCount(0);
-    await expect(page.getByText('Example people, so you can see how this looks.')).toHaveCount(0);
+    await expect(page.getByText('Example', { exact: true })).toHaveCount(0);
   });
 
   test('a demo account sees the example roster, labelled', async ({ page }) => {
     await signedInAs(page, 'admin', [], [], [], true);
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Jordan' })).toBeVisible();
-    await expect(page.getByText('Example people, so you can see how this looks.').first()).toBeVisible();
+    await expect(page.getByText('Example', { exact: true }).first()).toBeVisible();
   });
 
   test('an invite is a link to send, with the code kept for a phone call (D-254)', async ({ page }) => {
@@ -442,7 +442,7 @@ test.describe('what has happened that a case manager has to act on', () => {
     await page.goto('/notifications/');
 
     await expect(page.getByText('Example Food Pantry was reported: It is closed')).toBeVisible();
-    await expect(page.getByText('Examples, so you can see what this looks like.')).toBeVisible();
+    await expect(page.getByText('Example', { exact: true })).toBeVisible();
   });
 
   test('a real account never sees the example set', async ({ page }) => {
@@ -450,7 +450,7 @@ test.describe('what has happened that a case manager has to act on', () => {
     await page.goto('/notifications/');
     await expect(page.getByRole('heading', { name: 'Notifications' }).first()).toBeVisible();
     await expect(page.getByText('Example Food Pantry was reported: It is closed')).toHaveCount(0);
-    await expect(page.getByText('Examples, so you can see what this looks like.')).toHaveCount(0);
+    await expect(page.getByText('Example', { exact: true })).toHaveCount(0);
   });
 
   test('has no WCAG A/AA violations', async ({ page }) => {

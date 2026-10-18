@@ -42,6 +42,7 @@ import { useRoleView } from '@/lib/useViewedRole';
 import { DUMMY_SELF_ID, dummyConversationIdBetween, dummyConversationsFor } from '@pam/config/dummy-conversations';
 import { ProgramBadge } from '../ProgramBadge';
 import { ProgramMemberCardView } from '../../screens/ProgramMemberCardView';
+import { StatusBadge } from '@pam/ui/StatusBadge';
 
 /**
  * One person, for a case manager or a program to look at.
@@ -80,7 +81,6 @@ const styles = stylex.create({
   section: { fontSize: '20px' },
   name: { fontSize: '18px' },
   meta: { fontSize: '16px' },
-  note: { fontSize: '15px', lineHeight: 1.5 },
   // Stretched-link pattern (same as `PersonRow`): the heading is a real
   // anchor, widened over the whole card with `::after`, so the card is one
   // tap target rather than a link buried inside otherwise-dead space.
@@ -518,9 +518,7 @@ function PersonScreen() {
 
       {/* Said only of the made-up people; a real member's page shows real things and no note (D-509). */}
       {person.isExample ? (
-        <Text type="supporting" xstyle={styles.note}>
-          {t('example.people.note')}
-        </Text>
+        <StatusBadge label={t('common.example')} />
       ) : null}
     </Page>
   );

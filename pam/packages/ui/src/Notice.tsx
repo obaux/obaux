@@ -61,7 +61,8 @@ export interface NoticeProps {
   notice: NoticeKey;
   /** Localised title and body, resolved by the caller through i18n. */
   title: string;
-  body: string;
+  /** Left out when the title says it all (D-608: screens do not explain). */
+  body?: string;
   /**
    * Localised label for the support action, "Contact Pam" (`help.contact.action`).
    * Omit it to leave the action out. It opens Help (A28), never a dialler.
@@ -205,7 +206,7 @@ export function Notice({
             {title}
           </Heading>
         </HStack>
-        <Text xstyle={quiet ? styles.quietBody : styles.body}>{message}</Text>
+        {message ? <Text xstyle={quiet ? styles.quietBody : styles.body}>{message}</Text> : null}
         {hasActions ? (
           <HStack gap={2} wrap="wrap">
             {actions}

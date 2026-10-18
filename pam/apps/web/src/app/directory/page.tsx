@@ -20,6 +20,7 @@ import { useSession } from '@/lib/useSession';
 import { useDirectory, setDemoView } from '@/lib/useDirectory';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useDemoView } from '@/lib/useDemoView';
+import { StatusBadge } from '@pam/ui/StatusBadge';
 
 /**
  * Everyone on Pam, for the person running it.
@@ -47,7 +48,6 @@ import { useDemoView } from '@/lib/useDemoView';
 const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
 
 const styles = stylex.create({
-  note: { fontSize: '15px', lineHeight: 1.5 },
 });
 
 /** "All", then one option per role, in the order somebody thinks of them. */
@@ -307,9 +307,7 @@ export default function DirectoryPage() {
               </ScrollReveal>
             );
           })}
-          <Text type="supporting" xstyle={styles.note}>
-            {t('example.people.note')}
-          </Text>
+          <StatusBadge label={t('common.example')} />
         </VStack>
       ) : null}
     </Page>
