@@ -15,9 +15,11 @@
 --   * Nobody else is ever told: a case manager hears nothing about a Pam conversation.
 -- Every other conversation behaves exactly as before.
 --
--- No text either. `queue_message_text_alert` (20261010134429, D-478) queues the opt-in "message waiting" text for every other
--- member of a conversation; a Pam conversation is left out of it (the plan said bell only; D-606 records the choice). If Will
--- wants Pam replies to text a person who asked for message texts, that is one line here and a decision.
+-- Texts: a Pam conversation is left exactly as every other conversation is. `queue_message_text_alert` (20261010134429, D-478)
+-- queues the opt-in "message waiting" text for every other member of a conversation, so a person who asked for message texts
+-- gets one when Pam writes, as from anyone (the merge desk, 18 October: "Will said messaging Pam should feel like messaging
+-- anyone else"). The welcome and the out-of-hours reply have no sender, so `m.profile_id <> new.sender_id` is never true and
+-- they queue nothing. All of it is behind `texts_live`, which is off.
 
 create or replace function public.pam_team_ids()
 returns uuid[]
@@ -93,32 +95,3 @@ end;
 $$;
 
 revoke all on function public.notify_on_message() from public, anon, authenticated;
-
--- ---------------------------------------------------------------------------
--- No "message waiting" text for a Pam conversation.
-
-create or replace function public.queue_message_text_alert()
-returns trigger
-language plpgsql
-security definer
-set search_path = public, extensions
-as $$
-declare
-  recipient uuid;
-  base      text := coalesce((select value from public.app_settings where key = 'app_url'), '');
-begin
-  if public.is_support_conversation(new.conversation_id) then
-    return new;
-  end if;
-
-  for recipient in
-    select m.profile_id from public.conversation_members m
-    where m.conversation_id = new.conversation_id and m.profile_id <> new.sender_id
-  loop
-    perform public.queue_text_alert(recipient, 'message_waiting', base || '/messages/');
-  end loop;
-  return new;
-end;
-$$;
-
-revoke all on function public.queue_message_text_alert() from public, anon, authenticated;

@@ -87,6 +87,8 @@ select test.check_raises_like('...nor start one with a program',
   format($$ select public.pam_start_program_conversation(%L, 'hi') $$, :'svc_a'), '%ONLY_A_SUPER_ADMIN%');
 select test.check_raises_like('...nor close a thread',
   $$ select public.pam_set_thread_status(gen_random_uuid(), 'closed') $$, '%ONLY_A_SUPER_ADMIN%');
+select test.check_raises_like('...nor ask whether a program has a lead',
+  format($$ select public.pam_program_has_lead(%L) $$, :'svc_a'), '%ONLY_A_SUPER_ADMIN%');
 select test.check_raises_like('...nor change the hours',
   $$ select public.pam_set_hours('America/New_York', array[1], '09:00', '17:00') $$, '%ONLY_A_SUPER_ADMIN%');
 select test.check_raises_like('...nor read the reply times', $$ select * from public.pam_reply_times(30) $$, '%ONLY_A_SUPER_ADMIN%');
@@ -161,6 +163,10 @@ select test.check('...in the lead''s own Pam conversation',
   (select count(*) from public.pam_inbox() where asker_id = :'lead_a' and preview = 'Hello from Pam'), 1);
 select test.check('...and nobody else''s',
   (select count(*) from public.pam_inbox() where asker_id in (:'lead_b', :'lead_c')), 0);
+select test.check('pam_program_has_lead says yes for a program with an active lead, no for one without, and no for a place with no organisation',
+  (select case when public.pam_program_has_lead(:'svc_a') then 1 else 0 end)
+  + (select case when public.pam_program_has_lead(:'svc_n') then 10 else 0 end)
+  + (select case when public.pam_program_has_lead(:'svc_g') then 100 else 0 end), 1);
 select test.check_raises_like('a program with no lead on Pam raises PAM_NO_ACTIVE_LEAD',
   format($$ select public.pam_start_program_conversation(%L, 'hi') $$, :'svc_n'), '%PAM_NO_ACTIVE_LEAD%');
 select test.check_raises_like('...and so does a place Pam gathered from the internet (no organisation)',

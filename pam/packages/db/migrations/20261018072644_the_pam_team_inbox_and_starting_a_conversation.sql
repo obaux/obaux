@@ -18,6 +18,7 @@
 --   pam_set_hours(tz, days, open, close)  Writes `app_settings.pam_hours`, after checking it.
 --   pam_start_conversation(person, text)  The Pam team writes first, to any member, case manager or program lead, in that
 --                                         person's one Pam conversation (made with the welcome if it is not there). Audited.
+--   pam_program_has_lead(svc)             Whether the program has an active lead to write to (the screen asks before it offers the button).
 --   pam_start_program_conversation(svc, text)  The same text to each ACTIVE lead of the program, each in their own Pam
 --                                         conversation; returns how many. No active lead: raises PAM_NO_ACTIVE_LEAD.
 -- D-171 and D-262 (a super admin messages nobody / only staff, never a member) are narrowed for the Pam conversation only:
@@ -266,6 +267,28 @@ begin
 end;
 $$;
 
+-- Whether a program has an active lead on Pam to write to, so the screen can say so before the Pam team writes a message that
+-- cannot go (the same rule as `pam_start_program_conversation`).
+create or replace function public.pam_program_has_lead(p_service uuid)
+returns boolean
+language plpgsql
+stable
+security definer
+set search_path = public, extensions
+as $$
+begin
+  if not public.is_pam_team() then
+    raise exception 'ONLY_A_SUPER_ADMIN';
+  end if;
+  return exists (
+    select 1
+    from public.services s
+    join public.profiles p on p.org_id = s.org_id
+    where s.id = p_service and s.org_id is not null and p.role = 'provider' and p.access_status = 'active'
+  );
+end;
+$$;
+
 do $grants$
 declare
   f text;
@@ -273,7 +296,7 @@ begin
   foreach f in array array[
     'pam_inbox()', 'pam_set_thread_status(uuid, text)', 'pam_reply_times(integer)',
     'pam_set_hours(text, integer[], time, time)', 'pam_start_conversation(uuid, text)',
-    'pam_start_program_conversation(uuid, text)'
+    'pam_start_program_conversation(uuid, text)', 'pam_program_has_lead(uuid)'
   ] loop
     execute format('revoke all on function public.%s from public, anon', f);
     execute format('grant execute on function public.%s to authenticated', f);

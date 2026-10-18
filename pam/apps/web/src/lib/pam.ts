@@ -228,6 +228,9 @@ async function call<T>(fn: string, args?: Record<string, unknown>): Promise<PamR
 export const setPamThreadStatus = (conversationId: string, status: 'open' | 'closed') =>
   call<null>('pam_set_thread_status', { p_conversation: conversationId, p_status: status });
 
+/** Whether a program has an active lead on Pam to write to, so the screen can say so before offering to write (the Pam team only). */
+export const pamProgramHasLead = (serviceId: string) => call<boolean>('pam_program_has_lead', { p_service: serviceId });
+
 /** Pam writes first to one person (a member, a case manager or a program lead). Returns the conversation id. */
 export const startPamConversation = (profileId: string, body: string) =>
   call<string>('pam_start_conversation', { p_profile: profileId, p_body: body });

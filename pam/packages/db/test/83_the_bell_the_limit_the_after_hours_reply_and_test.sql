@@ -85,19 +85,20 @@ select test.check('...a second reply while that is unread adds no second row',
   (select count(*) from public.notifications where subject_id = (select v from t83 where k = 'kai') and recipient_id = :'kai'), 1);
 
 \echo ''
-\echo '--- No text for a Pam conversation, though an ordinary one still texts ---'
+\echo '--- Texts: a Pam conversation is like any other (behind texts_live, which is off) ---'
 insert into public.notification_preferences (member_id) values (:'kai') on conflict (member_id) do nothing;
 update public.notification_preferences set sms_enabled = true, alert_message = true, sms_stopped_at = null where member_id = :'kai';
 delete from public.outbound_messages where member_id = :'kai';
-insert into public.conversations (id, kind) values ('ffffffff-0000-0000-0000-000000008301', 'direct');
-insert into public.conversation_members (conversation_id, profile_id) values
-  ('ffffffff-0000-0000-0000-000000008301', :'kai'), ('ffffffff-0000-0000-0000-000000008301', :'alice');
-insert into public.messages (conversation_id, sender_id, body) values ('ffffffff-0000-0000-0000-000000008301', :'alice', 'See you Thursday');
-select test.check('control: a message from a program lead queues the "message waiting" text for Kai, who asked for it',
+insert into public.messages (conversation_id, sender_id, body) values ((select v from t83 where k = 'kai'), :'root', 'And a text?');
+select test.check('Pam writes to Kai, who asked for message texts: the "message waiting" text is queued, as from anyone',
   (select count(*) from public.outbound_messages where member_id = :'kai' and template_key = 'message_waiting'), 1);
 delete from public.outbound_messages where member_id = :'kai';
-insert into public.messages (conversation_id, sender_id, body) values ((select v from t83 where k = 'kai'), :'root', 'And a text?');
-select test.check('...but Pam writing in the Pam conversation queues none',
+insert into public.messages (conversation_id, sender_id, body) values ((select v from t83 where k = 'kai'), :'kai', 'My own message queues nothing for me');
+select test.check('Kai writing to Pam queues nothing for anyone (Pam has no phone)',
+  (select count(*) from public.outbound_messages where template_key = 'message_waiting' and member_id in (:'kai', :'root')), 0);
+delete from public.outbound_messages where member_id = :'kai';
+insert into public.messages (conversation_id, sender_id, body, system_key) values ((select v from t83 where k = 'kai'), null, '', 'pam.welcome');
+select test.check('a system message (no sender) queues nothing',
   (select count(*) from public.outbound_messages where member_id = :'kai'), 0);
 
 \echo ''

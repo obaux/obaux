@@ -447,6 +447,7 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     })),
     on('/rpc/pam_set_thread_status', () => ({ body: null })),
     on('/rpc/pam_start_conversation', () => ({ body: 'c0000000-0000-4000-8000-0000000000b9' })),
+    on('/rpc/pam_program_has_lead', () => ({ body: true })),
     on('/rpc/pam_start_program_conversation', () => ({ body: 2 })),
     on('/rpc/pam_set_hours', () => ({ body: null })),
     on('/rpc/pam_reply_times', () => ({ body: [{ median_seconds: 5400, mean_seconds: 7200, answered: 12 }] })),
