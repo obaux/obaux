@@ -123,6 +123,27 @@ test.describe('Text alerts say little (D-608, Will 18 October: "we don\'t need a
     expect(Math.min(...badges)).toBeGreaterThan(liveY);
   });
 
+  test('an (i) beside a name does not make its line taller: every row has the same name-to-badge gap and switch place', async ({ page }) => {
+    // A case manager's second row, "Someone plans a trip", carries the glossary's (i), a 48px target.
+    await signedInAs(page, 'admin', null, 'off');
+    await page.goto('/alerts/');
+    await settled(page);
+    const measure = async (name: string) => {
+      const toggle = page.getByRole('switch', { name });
+      // The nearest ancestor holding both this switch and a badge is this row (a row has one of each).
+      const row = toggle.locator('xpath=ancestor::*[.//*[contains(@class,"astryx-badge")]][1]');
+      const label = row.getByText(name, { exact: true }).first();
+      const badge = row.locator('.astryx-badge').first();
+      const [l, b, w, r] = await Promise.all([label.boundingBox(), badge.boundingBox(), toggle.boundingBox(), row.boundingBox()]);
+      return { gap: b!.y - l!.y, switchFromTop: w!.y + w!.height / 2 - r!.y };
+    };
+    const plain = await measure('Someone messages you');
+    const withInfo = await measure('Someone plans a trip');
+    expect(Math.abs(withInfo.gap - plain.gap)).toBeLessThanOrEqual(1);
+    // The rows are the same height, so the switch is level with the name in both.
+    expect(Math.abs(withInfo.switchFromTop - plain.switchFromTop)).toBeLessThanOrEqual(1);
+  });
+
   test('the badge sits under the name, not beside it', async ({ page }) => {
     await signedInAs(page, 'member', null, 'off');
     await page.goto('/alerts/');
