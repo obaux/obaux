@@ -73,6 +73,7 @@ uniform float uBreath;    // 0 = fully exhaled (halves pulled back), 1 = fully i
 uniform float uSoft;      // 0 = crisp, 1 = very blurred bloom
 uniform float uReachMin;  // how far each half reaches toward the centre on a full exhale (fraction of half the screen width)
 uniform float uReachMax;  // ... and on a full inhale
+uniform float uFadeMin;   // strength of the halves on a full exhale (1 = no dimming)
 
 uniform vec3 uBg;         // sky: top
 uniform vec3 uGlowRed;    // sky: upper glow
@@ -105,12 +106,13 @@ void main() {
   float ry = max(0.42, reach * 1.2);                   // always taller than wide
   float xe = W - abs(q.x);                             // distance in from the nearest screen edge
   float en = length(vec2(xe / reach, q.y / ry));       // 1.0 on the curved edge
-  float body = 1.0 - smoothstep(1.0 - uSoft, 1.05, en);   // wide feather: no outline anywhere
+  float fade = mix(uFadeMin, 1.0, b);                   // halves dim as you breathe out, return as you breathe in
+  float body = (1.0 - smoothstep(1.0 - uSoft, 1.05, en)) * fade;   // wide feather: no outline anywhere
 
   vec3 c = mix(uCore, uTop, sstep(0.18, 1.12, en));    // white along the screen edge, orange toward the curve
 
   // soft orange halo past the curved edges
-  sky = mix(sky, uTop * 0.55, 0.18 * (0.5 + 0.5 * b) * exp(-max(en - 1.0, 0.0) * 3.0) * smoothstep(0.85, 1.1, en));
+  sky = mix(sky, uTop * 0.55, 0.18 * (0.5 + 0.5 * b) * fade * exp(-max(en - 1.0, 0.0) * 3.0) * smoothstep(0.85, 1.1, en));
 
   vec3 col = mix(sky, c, body);
 
@@ -182,7 +184,7 @@ const U = n => gl.getUniformLocation(prog, n);
 
 const hex2rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
 const state = {
-  motion: 0.45, soft: 0.35, reachMin: 0.52, reachMax: 0.88,   // look (reach = fraction of half the screen width)
+  motion: 0.45, soft: 0.65, reachMin: 0.52, reachMax: 0.88, fadeMin: 0.5,   // look (reach = fraction of half the screen width)
   playing: true, time: 0, clock: 0, pattern: 'calm',       // clock = seconds of breathing
 };
 const params = new URLSearchParams(location.search);
@@ -214,6 +216,7 @@ function draw(b) {
   gl.uniform1f(U('uSoft'), state.soft);
   gl.uniform1f(U('uReachMin'), state.reachMin);
   gl.uniform1f(U('uReachMax'), state.reachMax);
+  gl.uniform1f(U('uFadeMin'), state.fadeMin);
   for (const k in PALETTE) gl.uniform3fv(U(k), hex2rgb(PALETTE[k]));
   gl.drawArrays(gl.TRIANGLES, 0, 3);
 }
@@ -246,9 +249,10 @@ const slider = (id, label, min, max, step, value) =>
 panel.insertAdjacentHTML('beforeend', `<h2 style="margin-top:12px">Shape</h2>
   ${slider('reachMax', 'Reach · inhale', 0.6, 0.97, 0.01, state.reachMax)}
   ${slider('reachMin', 'Reach · exhale', 0.2, 0.8, 0.01, state.reachMin)}
-  ${slider('soft', 'Softness', 0.1, 0.9, 0.05, state.soft)}
+  ${slider('soft', 'Blur', 0.1, 1, 0.05, state.soft)}
+  ${slider('fadeMin', 'Exhale dimming', 0.2, 1, 0.05, state.fadeMin)}
   ${slider('motion', 'Sway', 0, 2, 0.05, state.motion)}`);
-for (const k of ['reachMin', 'reachMax', 'soft', 'motion']) panel.querySelector('#' + k).oninput = e => { state[k] = +e.target.value; };
+for (const k of ['reachMin', 'reachMax', 'soft', 'fadeMin', 'motion']) panel.querySelector('#' + k).oninput = e => { state[k] = +e.target.value; };
 const patternSel = panel.querySelector('#pattern');
 patternSel.value = state.pattern;
 patternSel.onchange = () => { state.pattern = patternSel.value; state.clock = 0; };
