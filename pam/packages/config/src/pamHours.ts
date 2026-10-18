@@ -47,16 +47,26 @@ type Translate = (key: string, vars?: Record<string, string>) => string;
 const dayName = (day: number, locale: string) =>
   new Intl.DateTimeFormat(locale, { weekday: 'long', timeZone: 'UTC' }).format(new Date(Date.UTC(2024, 0, day)));
 
-/** A time of day in the reader's own format, without minutes when there are none: "9 AM", "5:30 PM", "09:00". */
+/**
+ * A time of day in the reader's own format, without minutes when there are none: "9 AM", "5:30 PM", "9时". Some languages give
+ * a bare number for a whole hour ("9", "09" in Spanish, Portuguese, Russian), which does not read as a time; there the minutes
+ * are written too ("9:00", "17:00") (Lena).
+ */
 function timeOfDay(hhmm: string, locale: string): string {
   const [h = '0', m = '0'] = hhmm.split(':');
   const hours = Number(h);
   const minutes = Number(m);
-  return new Intl.DateTimeFormat(locale, {
-    hour: 'numeric',
-    ...(minutes !== 0 ? { minute: '2-digit' as const } : {}),
-    timeZone: 'UTC',
-  }).format(new Date(Date.UTC(2024, 0, 1, hours, minutes)));
+  const moment = new Date(Date.UTC(2024, 0, 1, hours, minutes));
+  const make = (withMinutes: boolean) =>
+    new Intl.DateTimeFormat(locale, {
+      hour: 'numeric',
+      ...(withMinutes ? { minute: '2-digit' as const } : {}),
+      timeZone: 'UTC',
+    });
+  const alone = make(minutes !== 0);
+  const onlyANumber = alone.formatToParts(moment).every((part) => part.type === 'hour' || part.type === 'minute' || part.type === 'literal');
+  const hasWord = alone.formatToParts(moment).some((part) => part.type === 'dayPeriod') || /[^\d\s:.]/.test(alone.format(moment));
+  return (onlyANumber && !hasWord ? make(true) : alone).format(moment);
 }
 
 /** The zone as a person says it: "Eastern" for New York (Sage), otherwise the city. */
@@ -69,6 +79,7 @@ function zoneName(tz: string, t: Translate): string {
 /** "Monday to Friday", "Every day", "Saturday", or "Monday, Wednesday and Friday". */
 export function pamDaysLine(days: readonly number[], locale: string, t: Translate): string {
   const sorted = [...new Set(days)].sort((a, b) => a - b);
+  if (sorted.length === 0) return '';
   if (sorted.length === 7) return t('pam.hours.days.every');
   if (sorted.length === 1) return dayName(sorted[0]!, locale);
   const run = sorted.every((d, i) => i === 0 || d === sorted[i - 1]! + 1);
