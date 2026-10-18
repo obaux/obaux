@@ -38,6 +38,7 @@ const soon = (days: number, hour: number) => {
   d.setHours(hour, 0, 0, 0);
   return d.toISOString();
 };
+/** The names are the pretend database's own people for these ids (dummy-m1 Jordan, dummy-m2 Keisha, dummy-m3 Miguel), so a row opens the person it names (Iris, P4). */
 const bookedFor = (n: number, name: string, days: number, hour: number) => ({
   id: `added-story-${n}`,
   placeId: 'dummy-place-learning',
@@ -91,7 +92,7 @@ export const WhatYouSent: Story = withSetup(screen('provider', 'What you sent', 
 });
 export const HomeFolded: Story = withSetup(screen('provider', 'Home — first bookings, photo still to add', '/'), {
   done: ['program'],
-  booked: [bookedFor(1, 'Marcus', 1, 10), bookedFor(2, 'Tanya', 2, 13), bookedFor(3, 'Luis', 3, 11)],
+  booked: [bookedFor(1, 'Jordan', 1, 10), bookedFor(2, 'Keisha', 2, 13), bookedFor(3, 'Miguel', 3, 11)],
 });
 export const NotificationsNone: Story = withSetup(screen('provider', 'Notifications — none yet', '/notifications/'), {});
 export const MessagesNone: Story = withSetup(screen('provider', 'Messages — none yet', '/messages/'), {});
