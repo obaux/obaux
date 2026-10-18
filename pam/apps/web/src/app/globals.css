@@ -380,6 +380,24 @@
     stroke-width: 2.5;
   }
 
+  /*
+   * A list of languages shows all of them (S1, Iris's interaction run-through, 17 October 2026). Astryx stops a menu and a
+   * dropdown's list at 300px, which is six rows of 48px and a bit: on the way in Russian was cut in half and Arabic was
+   * under the edge, with nothing to say there was more, and the person who needs Arabic may read nothing else on the
+   * screen. These lists are found by their rows (`TaggedWords` marks the ones that start with the English tag), so the
+   * City list and every other menu keep the cap. The new cap is nine rows of the touch target (seven languages and room for
+   * two more), and the viewport still limits it, less a gap above and below.
+   * Three selectors because the cap is in three places: the globe's menu, the popover round it (which decides where the
+   * menu opens), and a dropdown's list, which on Sign up is the list inside the bottom sheet (`LanguageField`): the sheet
+   * has the room, and the list inside it still has Astryx's 300px.
+   */
+  .astryx-dropdown-menu:has([data-pam-tagged]),
+  [popover]:has(.astryx-dropdown-menu [data-pam-tagged]),
+  [role='listbox']:has([data-pam-tagged]) {
+    max-block-size: min(calc(9 * var(--pam-touch-target-min)), calc(100vh - 2 * var(--spacing-4)));
+    max-block-size: min(calc(9 * var(--pam-touch-target-min)), calc(100dvh - 2 * var(--spacing-4)));
+  }
+
   /* The closed box's chevron (D-372): larger and bolder, tucked 20px in
      from the right edge (Dropdown sets the padding) rather than 15px. */
   .astryx-selector:has(> [data-pam-dropdown]) .astryx-icon,

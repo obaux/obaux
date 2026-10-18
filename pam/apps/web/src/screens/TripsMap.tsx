@@ -167,8 +167,16 @@ function PreviewTripsMap({ pins: all, sheetTop }: { readonly pins: readonly Trip
     else placed.push({ at, members: [pin] });
   }
 
+  // With the sheet all the way up the whole drawn map is under it, the "Map preview" note too: a finger lands on the sheet, so Tab and a screen
+  // reader leave the map alone, and no focus ring is drawn across the Trips title from a control the sheet hides (Iris, P3 polish).
+  const isMapCovered = sheetTop !== null && sheetTop <= NOTE_BOTTOM;
   return (
-    <VStack xstyle={[styles.map, styles.preview]} role="region" aria-label={t('trips.map.label')}>
+    <VStack
+      xstyle={[styles.map, styles.preview]}
+      role="region"
+      aria-label={t('trips.map.label')}
+      {...(isMapCovered ? { 'aria-hidden': true, inert: true } : {})}
+    >
       {/* Said only when there is something drawn: with no trips this is just a quiet ground. */}
       {pins.length > 0 ? (
         <Text type="supporting" xstyle={styles.previewLabel}>
