@@ -162,3 +162,30 @@ test.describe('reporting a place', () => {
     expect(results.violations).toEqual([]);
   });
 });
+
+test('a radio sits level with the first line of its label, whether the label wraps or not (Mira, 18 October)', async ({ page }) => {
+  await signedIn(page);
+  await page.goto(`/flag/?place=${PLACE}`);
+  await settled(page);
+  const radios = page.getByRole('radio');
+  const count = await radios.count();
+  expect(count).toBe(4);
+  let wrapped = 0;
+  for (let i = 0; i < count; i++) {
+    const m = await radios.nth(i).evaluate((input) => {
+      const row = input.closest('.astryx-item') as HTMLElement;
+      const circle = (input.parentElement as HTMLElement).getBoundingClientRect();
+      const label = row.querySelector('span[id]') as HTMLElement;
+      const box = label.getBoundingClientRect();
+      const line = parseFloat(getComputedStyle(label).lineHeight);
+      // The first line's own box (an inline span is shorter than its line), whose middle is the middle of that line.
+      const lines = Math.round((box.height - 17) / line) + 1;
+      const firstLine = box.height - (lines - 1) * line;
+      return { circleY: circle.y + circle.height / 2, firstLineY: box.y + firstLine / 2, lines };
+    });
+    if (m.lines > 1) wrapped++;
+    expect(Math.abs(m.circleY - m.firstLineY)).toBeLessThanOrEqual(1);
+  }
+  // The long fourth reason wraps at every width the specs run at, so the case is really exercised.
+  expect(wrapped).toBeGreaterThan(0);
+});
