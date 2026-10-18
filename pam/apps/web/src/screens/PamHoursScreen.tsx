@@ -3,7 +3,6 @@
 import { useEffect, useState, type ComponentProps } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
-import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { TimeInput } from '@astryxdesign/core/TimeInput';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -27,7 +26,7 @@ import { HelpButton } from './HelpButton';
  */
 const styles = stylex.create({
   label: { fontSize: '15px', fontWeight: 700, color: colorVars['--color-text-secondary'] },
-  time: { flexGrow: 1, minWidth: 0 },
+  time: { width: '100%' },
   preview: { fontSize: '17px', lineHeight: 1.45, whiteSpace: 'pre-line' },
   status: { fontSize: '17px', lineHeight: 1.4 },
 });
@@ -122,7 +121,8 @@ export function PamHoursScreen() {
 
       <VStack gap={2}>
         <Text xstyle={styles.label}>{t('pam.hours.times', { zone: t('pam.hours.zone.eastern') })}</Text>
-        <HStack gap={2} wrap="nowrap">
+        {/* One above the other: side by side, two time fields push the page wider than a phone. */}
+        <VStack gap={2}>
           <TimeInput
             label={t('pam.hours.open')}
             value={hours.open as Time}
@@ -137,7 +137,7 @@ export function PamHoursScreen() {
             width="100%"
             xstyle={styles.time}
           />
-        </HStack>
+        </VStack>
       </VStack>
 
       <VStack gap={2}>
