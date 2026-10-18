@@ -32,6 +32,9 @@ const ALLOWED = new Set([
   'service_id',
   'profile_id',
   'conversation_id',
+  // Who wrote a message and when: an id and a time, never words. A failed send looks for its own earlier try by these (D-605).
+  'sender_id',
+  'created_at',
   'member_id',
   'subject_id',
   'user_id',

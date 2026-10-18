@@ -127,7 +127,6 @@ export function DemoThread({
         }
         onSend={send}
         sending={false}
-        sendFailed={false}
         speechLanguage={speechLanguage}
       />
     </>

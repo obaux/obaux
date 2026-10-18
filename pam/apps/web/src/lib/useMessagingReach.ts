@@ -68,3 +68,8 @@ export function useMessagingReach(enabled: boolean, recheck: string): boolean | 
 
   return reach;
 }
+
+/** Somebody now has a conversation (Pam's, made with its welcome): the Messages tab is shown (D-605). */
+export function markHasConversation(): void {
+  if (answer !== true) publish(true);
+}
