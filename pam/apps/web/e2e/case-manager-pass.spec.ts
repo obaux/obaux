@@ -112,7 +112,24 @@ test.describe('a case manager after joining (Iris, 15 October)', () => {
       expect(size).toBeGreaterThanOrEqual(16);
     }
     await expect(page.getByText('They were told exactly this.')).toBeVisible();
-    await expect(page.getByRole('combobox', { name: 'Search members by name', exact: true })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'Search members by name', exact: true })).toBeVisible();
+  });
+
+  test("Home's member search filters the list in place: no dropdown of names over the page (Will, 18 October)", async ({ page }) => {
+    await caseManager(page);
+    await page.goto('/');
+    await settled(page);
+    const box = page.getByRole('textbox', { name: 'Search members by name', exact: true });
+    await expect(page.getByRole('combobox')).toHaveCount(0);
+    await box.fill('Mar');
+    await expect(page.getByRole('heading', { level: 1, name: /Mar/ })).toBeVisible();
+    // The names the old dropdown listed are the list itself now: nothing floats over it.
+    await expect(page.getByRole('listbox')).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /Marcus/ }).first()).toBeVisible();
+    await box.fill('Zed');
+    await expect(page.getByRole('heading', { level: 2, name: /Nothing matches/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Marcus/ })).toHaveCount(0);
+    await expect(page.getByRole('listbox')).toHaveCount(0);
   });
 
   test('P9: an empty invite names every missing field at once', async ({ page }) => {

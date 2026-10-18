@@ -87,7 +87,6 @@ export function CaseloadHome() {
       search={{
         label: t('home.caseload.search.label'),
         placeholder: t('home.caseload.search.placeholder'),
-        none: t('home.caseload.search.none'),
       }}
       state={state}
       note={isExample ? t('example.people.note') : null}
@@ -135,7 +134,6 @@ export function CaseloadHome() {
       }}
       floating={<InviteFloating />}
       onRetry={refresh}
-      onPick={(person) => person.href && router.push(person.href)}
       empty={
         <Notice
           notice="no_caseload_members"

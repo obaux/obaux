@@ -12,15 +12,18 @@ export function HeaderActions({
   role = 'member',
   enabled = true,
   hasHelp = true,
+  bellOnlyWhenNew = false,
 }: {
   readonly role?: Role | null;
   readonly enabled?: boolean;
   /** Off on Messages, where New message takes Help's place (D-220). */
   readonly hasHelp?: boolean;
+  /** A member's Explore: the bell is there only while something is unread, and the search bar has the row otherwise. */
+  readonly bellOnlyWhenNew?: boolean;
 }) {
   return (
     <>
-      <HeaderBell enabled={enabled} role={role} appearance="round" />
+      <HeaderBell enabled={enabled} role={role} appearance="round" hideWhenNothingNew={bellOnlyWhenNew} />
       {hasHelp ? <HelpButton /> : null}
     </>
   );
