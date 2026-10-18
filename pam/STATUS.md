@@ -1653,9 +1653,9 @@ only the alert texts Will signed: no "introduced to your program", no "your acco
 
 `SettingsList` is the pattern for a list of switches: no card, thin lines, badge under the name (D-615; Foundations › Patterns). Text alerts uses it, without the STOP line or the Privacy link. Branch `claude/pam-design-settings-list`; waits on Sage's `alerts.kinds` words and Will's look at the pictures.
 
-## Design system & Storybook · Flag screen without its card (18 October)
+## Design system & Storybook · Flag screen keeps its card (18 October)
 
-`/flag/` loses the card around its form, by the D-615 pattern (no card around a single list). Branch `claude/pam-design-flag-no-card`; Piper told; Will sees the pictures before it ships.
+`/flag/` keeps its card. Dot took it off by the D-615 pattern (e4e3230f); Will answered at 19:22, "Keep the original layouts" (his 17:51 notes were for Text alerts), and the change came out of b74 before it shipped. Dot's session log and pictures stay as the record.
 
 ## Design system & Storybook · Coming soon and Example badges (18 October)
 

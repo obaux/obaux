@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { VStack } from '@astryxdesign/core/VStack';
+import { Card } from '@astryxdesign/core/Card';
 import { Text } from '@astryxdesign/core/Text';
 import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
 import { TextArea } from '@astryxdesign/core/TextArea';
@@ -133,38 +134,39 @@ function FlagForm() {
         />
       ) : null}
 
-      {/* No card around the one form (D-615, Will, 18 October: "no card around a single list"): the page is the frame. */}
-      <VStack gap={3} xstyle={styles.card}>
-        {/*
-          One choice, always one selected, in the order things go wrong. The
-          keys are the database's four and the labels are the member's words
-          for them — "It is closed", not "closed".
-        */}
-        <RadioList
-          label={t('flag.title')}
-          isLabelHidden
-          value={reason}
-          onChange={(next) => setReason(next as ServiceFlagReason)}
-          xstyle={styles.reasons}
-        >
-          {SERVICE_FLAG_REASON_KEYS.map((key) => (
-            <RadioListItem key={key} value={key} label={t(`flag.reason.${key}`)} />
-          ))}
-        </RadioList>
+      <Card padding={4} xstyle={styles.card}>
+        <VStack gap={3}>
+          {/*
+            One choice, always one selected, in the order things go wrong. The
+            keys are the database's four and the labels are the member's words
+            for them — "It is closed", not "closed".
+          */}
+          <RadioList
+            label={t('flag.title')}
+            isLabelHidden
+            value={reason}
+            onChange={(next) => setReason(next as ServiceFlagReason)}
+            xstyle={styles.reasons}
+          >
+            {SERVICE_FLAG_REASON_KEYS.map((key) => (
+              <RadioListItem key={key} value={key} label={t(`flag.reason.${key}`)} />
+            ))}
+          </RadioList>
 
-        {/*
-          Two rows, not three. The note is the fifth case and optional; a box
-          the size of a paragraph asks for a paragraph, and the person filling
-          this in is often standing outside a locked door.
-        */}
-        <TextArea label={t('flag.note')} value={note} onChange={(next) => setNote(next)} rows={2} width="100%" />
+          {/*
+            Two rows, not three. The note is the fifth case and optional; a box
+            the size of a paragraph asks for a paragraph, and the person filling
+            this in is often standing outside a locked door.
+          */}
+          <TextArea label={t('flag.note')} value={note} onChange={(next) => setNote(next)} rows={2} width="100%" />
 
-        <BigButton
-          label={status === 'sending' ? t('flag.sending') : t('flag.action')}
-          onPress={() => void send()}
-          isDisabled={status === 'sending'}
-        />
-      </VStack>
+          <BigButton
+            label={status === 'sending' ? t('flag.sending') : t('flag.action')}
+            onPress={() => void send()}
+            isDisabled={status === 'sending'}
+          />
+        </VStack>
+      </Card>
     </Page>
   );
 }
