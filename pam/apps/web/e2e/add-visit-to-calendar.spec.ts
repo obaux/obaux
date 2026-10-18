@@ -135,8 +135,8 @@ test('the drawer ends with "Add all your future visits" and its hint, opening th
   const sheet = page.getByRole('dialog');
   const rows = await sheet.locator('a, button').evaluateAll((els) => els.map((el) => (el.textContent ?? '').trim()).filter(Boolean));
   const names = rows.filter((text) => /Apple Calendar|Google Calendar|Outlook|Add all your future visits/.test(text));
-  expect(names.map((text) => text.replace(/Set up.*$/, '').trim())).toEqual(['Apple Calendar', 'Google Calendar', 'Outlook', SYNC]);
-  await expect(sheet.getByText('Set up a calendar link once. Your visits go in by themselves, and change if one moves or is cancelled.')).toBeVisible();
+  expect(names.map((text) => text.replace(/Set up a calendar link once\.$/, '').trim())).toEqual(['Apple Calendar', 'Google Calendar', 'Outlook', SYNC]);
+  await expect(sheet.getByText('Set up a calendar link once.')).toBeVisible();
   const row = sheet.getByRole('link', { name: new RegExp(SYNC) });
   expect((await row.boundingBox())!.height).toBeGreaterThanOrEqual(47.5);
   await row.click();

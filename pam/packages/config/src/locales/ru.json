@@ -1825,6 +1825,6 @@
   "calendar.addOne.added": "Added to calendar",
   "calendar.addOne.added.label": "Added to calendar. Opens Calendar settings.",
   "calendar.addOne.syncAll": "Add all your future visits",
-  "calendar.addOne.syncAll.hint": "Set up a calendar link once. Your visits go in by themselves, and change if one moves or is cancelled.",
+  "calendar.addOne.syncAll.hint": "Set up a calendar link once.",
   "calendar.addOne.changed": "This visit changed after you added it. Add it again."
 }
