@@ -81,6 +81,9 @@ export function ProblemsScreen() {
     );
   }
 
+  // A key that has no name yet comes back from tPlain as the key itself.
+  const hasName = (action: string) => tPlain(`appError.action.${action}`) !== `appError.action.${action}`;
+
   return (
     <Page gap={4}>
       {header}
@@ -106,14 +109,19 @@ export function ProblemsScreen() {
             <ListItem
               key={`${p.area} ${p.action} ${p.code}`}
               label={
-                <Text dir="ltr" xstyle={styles.action}>
-                  {p.action}
-                </Text>
+                // The same plain name the bell used (Sage, 21:54: appError.action.<key>), or the key itself until it has one.
+                hasName(p.action) ? (
+                  <Text xstyle={styles.action}>{t(`appError.action.${p.action}`)}</Text>
+                ) : (
+                  <Text dir="ltr" xstyle={styles.action}>
+                    {p.action}
+                  </Text>
+                )
               }
               description={
                 <VStack gap={0}>
                   <Text dir="ltr" xstyle={styles.detail}>
-                    {`${p.area} · ${p.code}`}
+                    {hasName(p.action) ? `${p.action} · ${p.area} · ${p.code}` : `${p.area} · ${p.code}`}
                   </Text>
                   <Text xstyle={styles.detail}>{t('problems.last', { when: whenHappened(p.lastSeen, locale, t) })}</Text>
                   <Text xstyle={styles.detail}>{t('problems.first', { when: whenHappened(p.firstSeen, locale, t) })}</Text>
