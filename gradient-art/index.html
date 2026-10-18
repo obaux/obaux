@@ -19,15 +19,8 @@
   #count { font-size: clamp(30px, 8vmin, 68px); font-weight: 300; line-height: 1; font-variant-numeric: tabular-nums; opacity: .85; }
 
   #guide[data-ink=light] { color: #fff; text-shadow: 0 1px 14px rgba(0,0,0,.45); }
-  #guide[data-pos=below] { place-content: end center; padding-bottom: clamp(70px, 14vmin, 130px); }
+  #guide[data-pos=below] { inset: calc(50% + min(100vw, 100vh) * 0.25) 0 0 0; place-content: start center; }   /* sits just under the artwork, wherever the screen is tall */
   #guide[data-pos=below] #count { font-size: clamp(28px, 6vmin, 52px); }
-  #styles {
-    position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 5; display: flex; gap: 4px; padding: 4px;
-    max-width: calc(100% - 24px); box-sizing: border-box; overflow-x: auto; border-radius: 999px;
-    background: rgba(20,18,20,.6); backdrop-filter: blur(8px);
-  }
-  #styles button { margin: 0; padding: 6px 12px; border-radius: 999px; background: transparent; font-size: 12px; touch-action: manipulation; }
-  #styles button.active { background: rgba(255,255,255,.18); }
   #panel {
     position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); width: 300px; max-height: 70%; overflow: auto;
     padding: 12px; border-radius: 10px; background: rgba(20,18,20,.82); color: #eee;
@@ -42,27 +35,46 @@
   select { background: #333; color: #eee; border: 0; border-radius: 6px; padding: 6px 8px; font: inherit; max-width: 170px; }
   button { background: #333; color: #eee; border: 0; border-radius: 6px; padding: 5px 9px; cursor: pointer; margin: 6px 6px 0 0; }
   button:hover { background: #444; }
-  #toggle {
-    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 5; margin: 0; padding: 8px 14px; font-size: 13px;
-    background: rgba(20,18,20,.72); backdrop-filter: blur(8px); touch-action: manipulation;
-  }
-  #toggle.open { opacity: 0; pointer-events: none; }
   #hint { position: fixed; left: 12px; bottom: 10px; color: #ffffff66; }
   @media (max-width: 640px) {
     #panel { left: 0; right: 0; bottom: 0; transform: none; width: auto; max-height: 62%; border-radius: 14px 14px 0 0; padding: 14px 16px 22px; }
     #panel.hidden { transform: translateY(100%); }
-    #toggle { bottom: 20px; }
     .row input[type=range] { width: 55%; }
     #hint { display: none; }
-    #styles button { padding: 6px 9px; }
+  }
+  /* bottom dock: style switcher + controls button, clear of the viewer's top bar */
+  #dock {
+    position: fixed; left: 0; right: 0; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 5;
+    display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 0 16px;
+    pointer-events: none; transition: opacity .2s;
+  }
+  #dock > * { pointer-events: auto; }
+  #dock.open { opacity: 0; }
+  #dock.open > * { pointer-events: none; }
+  #styles { display: flex; gap: 4px; padding: 4px; max-width: 100%; box-sizing: border-box; overflow-x: auto; border-radius: 999px; background: rgba(20,18,20,.6); backdrop-filter: blur(8px); scrollbar-width: none; }
+  #styles::-webkit-scrollbar { display: none; }
+  #styles button { margin: 0; min-height: 44px; padding: 0 16px; border-radius: 999px; background: transparent; font-size: 14px; flex: 0 0 auto; touch-action: manipulation; }
+  #styles button.active { background: rgba(255,255,255,.2); }
+  #toggle { margin: 0; min-height: 44px; padding: 0 24px; border-radius: 999px; font-size: 14px; background: rgba(20,18,20,.72); backdrop-filter: blur(8px); touch-action: manipulation; }
+  @media (max-width: 440px) {
+    #dock { padding: 0 12px; }
+    #styles button { padding: 0 10px; font-size: 13px; }
+  }
+  @media (pointer: coarse), (max-width: 640px) {
+    #panel { padding-bottom: calc(22px + env(safe-area-inset-bottom, 0px)); }
+    #panel button { min-height: 44px; padding: 0 18px; font-size: 14px; }
+    #panel select { min-height: 44px; font-size: 15px; max-width: 62%; }
+    #panel .row { min-height: 48px; margin: 2px 0; font-size: 14px; }
+    #panel .row input[type=color] { width: 56px; height: 40px; }
+    #panel .row input[type=range] { height: 44px; width: 55%; accent-color: #fff; }
+    #panel h2 { font-size: 12px; margin-bottom: 4px; }
   }
 </style>
 </head>
 <body>
 <div id="stage"><canvas id="c"></canvas></div>
 <div id="guide" aria-live="off"><div id="phase">Breathe in</div><div id="count">4</div></div>
-<div id="styles"></div>
-<button id="toggle" type="button">Controls</button>
+<div id="dock"><div id="styles"></div><button id="toggle" type="button">Controls</button></div>
 <div id="panel"></div>
 <div id="hint">press C for controls · 1–5 switch style · space to pause</div>
 
@@ -548,8 +560,8 @@ for (const [k, st] of Object.entries(STYLES)) {
   b.onclick = () => setStyle(k); stylesEl.appendChild(b);
 }
 setStyle(state.style);
-const toggleBtn = document.getElementById('toggle');
-const setPanel = open => { panel.classList.toggle('hidden', !open); toggleBtn.classList.toggle('open', open); };
+const toggleBtn = document.getElementById('toggle'), dockEl = document.getElementById('dock');
+const setPanel = open => { panel.classList.toggle('hidden', !open); dockEl.classList.toggle('open', open); };
 toggleBtn.onclick = () => setPanel(true);
 panel.querySelector('#close').onclick = () => setPanel(false);
 setPanel(false);   // the breath is the page; controls stay out of the way until asked for
@@ -558,7 +570,7 @@ addEventListener('keydown', e => {
   if (e.key === ' ') { e.preventDefault(); togglePlay(); }
   const n = '12345'.indexOf(e.key); if (n >= 0 && n < Object.keys(STYLES).length) setStyle(Object.keys(STYLES)[n]);
 });
-if (params.has('clean')) { toggleBtn.remove(); stylesEl.remove(); document.getElementById('hint').remove(); }
+if (params.has('clean')) { dockEl.remove(); document.getElementById('hint').remove(); }
 
 // ------------------------------------------------------- public API
 window.art = {
