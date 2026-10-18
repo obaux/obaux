@@ -42,6 +42,10 @@ import { PrototypeProgramReview } from './PrototypeProgramReview';
 import { ProgramsToCheckScreen } from '../../screens/ProgramsToCheckScreen';
 import { WaitingCitiesScreen } from '../../screens/WaitingCitiesScreen';
 import { ProblemsScreen } from '../../screens/ProblemsScreen';
+import { PamInboxScreen } from '../../screens/PamInboxScreen';
+import { PamStartScreen } from '../../screens/PamStartScreen';
+import { PamHoursScreen } from '../../screens/PamHoursScreen';
+import { PamThreadOptionsView } from '../../screens/PamThreadOptionsScreen';
 import { InvitesLogScreen } from '../../screens/InvitesLogScreen';
 import TermsPage from '../../app/terms/page';
 import { AddMyProgramScreen } from '../../screens/AddMyProgramScreen';
@@ -128,6 +132,10 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/programs/review/': screen(() => <ProgramsToCheckScreen />),
   '/cities/waiting/': screen(() => <WaitingCitiesScreen />),
   '/problems/': screen(() => <ProblemsScreen />),
+  '/pam/messages/': screen(() => <PamInboxScreen />),
+  '/pam/start/': screen(() => <PamStartScreen />),
+  '/pam/hours/': screen(() => <PamHoursScreen />),
+  '/pam/thread/options/': screen(() => <PamThreadOptionsView />),
   '/programs/review/item/': screen(() => <PrototypeProgramReview />),
   '/invites/': screen(() => <InvitesLogScreen />),
   '/interested/': screen(() => <InterestedPage />),

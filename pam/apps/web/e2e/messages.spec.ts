@@ -62,7 +62,7 @@ async function signedInAs(
   await seedSession(page);
   await page.route(NOTIFICATIONS, (route) => route.fulfill(json([])));
   await page.route(CONTROLS, (route) => route.fulfill(json([])));
-  await page.route(USER, (route) => route.fulfill(json({ id: ME, phone: '12673095265' })));
+  await page.route(USER, (route) => route.fulfill(json({ id: ME, phone: '12155550191' })));
   await page.route(POINTS, (route) => route.fulfill(json(250)));
   await page.route(PROFILES, (route) =>
     route.fulfill(

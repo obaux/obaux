@@ -1,6 +1,6 @@
 'use client';
 
-import { GlobeIcon, Loading, Notice, Page, PeopleIcon, PlacesIcon, ShieldIcon } from '@pam/ui';
+import { GlobeIcon, Loading, MessagesIcon, Notice, Page, PeopleIcon, PlacesIcon, ShieldIcon } from '@pam/ui';
 import { FloatingAction } from '@pam/ui/FloatingAction';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPageHeader } from '@pam/ui/SubPage';
@@ -15,6 +15,8 @@ import { useFlaggedPlaces } from '@/lib/useFlaggedPlaces';
 import { useStaffRequests } from '@/lib/useStaffRequests';
 import { toLookAt, useProgramsToCheck } from '@/lib/programsToCheck';
 import { peopleWaiting, useWaitingCities } from '@/lib/useWaitingCities';
+import { usePamInbox, usePamStatus } from '@/lib/pam';
+import { pamWaitingCount } from '@/lib/pamInbox';
 import { useRoleView } from '@/lib/useViewedRole';
 
 /**
@@ -64,6 +66,10 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
   // How many people wait for a city Pam is not in yet (D-593, card a96): where to open next.
   const waiting = useWaitingCities(isSuperAdmin);
   const waitingCount = waiting.status === 'ready' ? peopleWaiting(waiting.cities) : 0;
+  // What people wrote to Pam (card a100): first, because someone is waiting on an answer. Only while the switch is on.
+  const pamLive = usePamStatus(isSuperAdmin).status === 'ready';
+  const pamInbox = usePamInbox(isSuperAdmin && pamLive);
+  const pamWaiting = pamInbox.status === 'ready' ? pamWaitingCount(pamInbox.rows) : 0;
 
   const tools = (
     <>
@@ -123,6 +129,19 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
       <MenuList
         label={t('review.title')}
         items={[
+          // Only once the inbox has loaded: with the switch off, or before Pam's functions exist, there is no row at all.
+          ...(pamLive && pamInbox.status === 'ready'
+            ? [
+                {
+                  id: 'messages-to-pam',
+                  label: t('pam.inbox.title'),
+                  href: isHome ? '/pam/messages/?from=home' : '/pam/messages/',
+                  icon: <MessagesIcon {...ICON} />,
+                  // A plain number (D-586): how many conversations wait for a reply.
+                  ...(pamWaiting > 0 ? { value: String(pamWaiting) } : {}),
+                },
+              ]
+            : []),
           {
             id: 'programs-to-check',
             label: t('review.title'),

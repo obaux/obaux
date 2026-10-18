@@ -33,7 +33,8 @@ async function signedIn(page: Page, role: 'member' | 'admin' | 'provider') {
 }
 
 const OFFERS = [
-  ['member', 'Get text reminders'],
+  // One name for texts (Sage, 1a6bfd90, B4): the member's offer is "Get text alerts" too.
+  ['member', 'Get text alerts'],
   ['admin', 'Get text alerts'],
   ['provider', 'Get text alerts'],
 ] as const;

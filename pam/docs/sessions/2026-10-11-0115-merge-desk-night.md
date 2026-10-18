@@ -1665,6 +1665,36 @@
   without one; the rest ran on the final tree with a two-hour limit. At 19:19 Sage signed a truer limit line ("That's
   a lot at once. Try again later.": the limit is per hour and per day); it goes in b75 with Lena's six languages and
   Nico's pin, since neither line shows while the switch is off.
+- **Batch b75 (18 October, 20:45 to 21:56).** One name for texts, the two agree screens, Message Pam's team side, and
+  Iris's fixes. Iris's b74 re-test (ada1aca0) found Profile said "Text reminders", which opened "Text alerts", whose
+  switch opened "Text reminders" (B4). Sage signed one name (38a23293, de0f701f, 1a6bfd90, 2da9f7ef): the settings
+  screen and Profile's row are "Text alerts"; the agree screen is "Get text alerts", the Profile card's words, so its
+  Back never says "Back to Text alerts" on Text alerts. Lena's six languages: 2bc91ea4, 022f8eb7. The agree screens as
+  Will asked at 19:22: /reminders/ keeps its card, and inside it the kinds of texts are Nico's TextKindsList rows, the
+  same short names as Text alerts, each Coming soon while texts are held (f648db12). The sign-up step keeps its own
+  layout, which never had a card; the same rows replace its introduction and three bell lines (Ava's 9b6d87b5). Lena
+  retired the keys neither draws now (cc6e9c9f, a32b53ee). Will had pictures from this build before it shipped (21:11;
+  Nico's at 20:18). Nico's d272c53b: the saved-place text carries its link. Lena found the gap while writing the
+  refile packet; without the link every such text would have failed (migration 20261018185235, live with this batch as
+  20261018210554). Nico's eb4fbf3d: the trip row is live only with its own app flag, so its badge and the promise
+  lines move together. Nico's c2f9d615: Back from a Text alerts switch says and goes "Back to Text alerts" (B2). Dot's
+  b631a543 (B3, B6): a failed switch shows its error under its row, the name works the switch, and the yes follows the
+  database. Dot's c6179f45: a radio's circle sits level with a wrapped label's first line. Dot's 7f9d6a77: the Message
+  Pam drawings read the bundles (R6). Lena's e8c22aa8 (B5, Spanish) and 8e85d5c8 (R4, R5: Arabic duals without the
+  digit, each language's own comma); her refile packet's consent paragraph now quotes the built screens (26168781,
+  6a4eb410, c543dcae). Message Pam, still behind its switch (off): Sage's truer limit line with Lena's six languages
+  (dc22398b) and Nico's seven-language pin (59504caa); Nico's R1 (Pam's own messages read as Pam on the team's side)
+  and R3 (525d5103). Ava's team side came in one piece (e5b6c391, a476758d, 928fee6f): saved replies, Close and
+  Reopen, Pam writes first, Pam's hours, and Iris's pass 1 and pass 2 items, with Sage's and Lena's words; its author
+  line uses Nico's, one source. Tests, stories and fixtures use made-up 555 numbers instead of Pam's old support line
+  (593c87a9, Iris b74; whether that number is Will's own is with him). Two merge fixes: join.spec still pinned the old
+  title and row, because Ava's branch was older than Sage's names (c31ebaad); and message-pam.spec's limit line came
+  back as the old one (92327adf, the lesson below). At 21:14, looking at b631a543's failed-switch card, Will asked for
+  the small alert at the bottom of the screen as the pattern for malfunctions, a switch that does not move until its
+  save succeeds, and a log of what breaks so the team is told (D-616). b75 ships the card as it is, since no switch on
+  Text alerts can be tapped while texts are off. D-616 is b76: Dot's alert and switch rule, Nico's app_errors (off
+  until Will signs Lena's Privacy line), Ava's Problems list, Sage's notice.malfunction and notify.app_error, Lena's
+  six languages and pins, Iris's test plan.
 
 ## What was wrong, and what missed it
 
@@ -2005,6 +2035,14 @@
   not turned round, only text and layout), which is written beside the arrow in the code. Dot read it and stopped
   before building. Before asking a lane to change how something looks, search the code and decisions for Will's word
   on it.
+- **A put-back on one branch undid another branch's line at merge (b75, 20:50 to 21:00).** Sage changed
+  message-pam.spec's limit line (38a23293), then put it back (de0f701f), leaving the pin to Nico. Nico's branch was
+  built on a base that already held her new line (through Lena's dc22398b), so on his side the line had not changed;
+  on hers, the put-back had. Git took the put-back without a conflict, and the old line was back in the batch. tsc and
+  the copy check were clean; only the full run would have shown it, as a failure on a line nobody had touched. I found
+  it by comparing each merged file with its owner's tip, and fixed it in 92327adf; no other file one branch owns
+  differs from that branch's tip. Lesson: after assembling a batch, compare every file one branch owns with that
+  branch's tip, and read any file two branches changed by hand. A put-back is a change like any other.
 
 ## Decisions
 
@@ -2281,9 +2319,21 @@
 | Batch b74, run 1 (1265929d) | Failed at build and web tsc: SetupCard.stories.tsx(10,56), `string | null | undefined` not assignable to `string | undefined` (the merge, above); the e2e's server never started. Fixed in 5a1acac0: the story passes a second line only when it has one; web tsc clean |
 | Batch b74, run 2 (2ea7c387: b73 + Dot 38d9ed64, e4e3230f, b8f59d58; Lena b90f9303, 4e530fca, eb6a6015, 04b45a8e, bdb0c5d2, 292baea7; Nico 21b053e9, bdb959a4, 3300423e; Sage 11175802, 9f550846; merge fix 5a1acac0): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full | Stopped at the session's 30-minute background limit during the e2e, with nothing failed: config 1451 passed (1 skipped, 1 todo), copy in step; ui 130; ui build; site test 124; site tsc; build:e2e; tsc; web unit 206; budget 8.4 kB to spare; e2e: all 820 on narrow-320 and all 820 on dark-320, and 499 of 819 on iphone-se-viewport, with no failure |
 | Batch b74, the rest (95f0451c: 2ea7c387, then b0f2f51c with app/flag/page.tsx, flag.spec.ts and the changelog entry back as on main bc96890b, Dot's session log and pictures kept as the record, then Dot 764de5e7 and f813d2d5, the Patterns page and D-615 narrowed, and 1e915872, a spec comment): config / copy / build:e2e / tsc / web unit / budget / e2e on iphone-se-viewport in full / flag and alerts e2e on narrow-320 and dark-320 / storybook + guard / site build / site a11y | All green: config 1451 passed (1 skipped, 1 todo), copy in step; build:e2e; tsc; web unit 206; budget 8.4 kB to spare; e2e iphone-se-viewport in full 812 passed, 7 skipped, 0 failed (11.2 m); flag and alerts on narrow-320 and dark-320 46 passed, 12 skipped; storybook built, no bundle names the live project; site build; site a11y 125 scans, 0 problems. Untouched by these three commits and green in run 2: ui, ui build, site test, site tsc |
+| b74 main CI (e1a2cbec, pushed 19:57:47) | Types/unit/build (20:08), Migrations and RLS, Publish Storybook, Accessibility (20:42): all four green; Vercel web and pam-site success (20:02) |
+| 20261018185235 (Nico d272c53b, at 59504caa; its db tree is main e1a2cbec's plus the migration and test 84; local Postgres 16) | Suite 1836 ok, "All database checks passed". Mutation (queue_saved_place_closed's vars back to `{reason_key}` only): FAILED on "...and the link the sentence ends with, from app_url: without it render() throws \"missing variable link\"" (test 84) |
+| Batch b75 db tree (92327adf: Nico's 20261018185235 and test 84, db tests 22 and 23 on made-up 555 numbers; local Postgres 16) | Suite 1836 ok, "All database checks passed" |
+| 20261018185235 live (21:05, as 20261018210554) | Read back: one queue_saved_place_closed(uuid, text) returning integer, its body the file's (md5 9f6577bc), security definer, search_path public, extensions, no execute for anon or authenticated; saved_place_closed rows waiting: 0 before and after; texts_live off |
+| Batch b75, full run (92327adf: e1a2cbec + Sage 38a23293, de0f701f, 1a6bfd90, 2da9f7ef, 455cf870; Lena 2bc91ea4, dc22398b, cc6e9c9f, 022f8eb7, a32b53ee, e8c22aa8, 26168781, 6a4eb410, c543dcae, 959a0df1, 37b2f8ce, 32f90fe2, 05d04a72, 8e85d5c8; Nico d272c53b, 525d5103, 59504caa, 13989ef3, f648db12, c2f9d615, eb4fbf3d; Ava 9b6d87b5, e5b6c391, a476758d, 928fee6f; Dot b631a543, c6179f45, 7f9d6a77; Iris 7afc9719, ada1aca0; merge fixes c31ebaad, 593c87a9, 92327adf): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | All green: config 1456 passed (1 skipped, 1 todo), copy in step; ui 130; ui build; site 124; site tsc; build:e2e; tsc; web unit 214; budget 7.7 kB to spare; e2e 2561 passed, 22 skipped, 0 failed, no retries (33.8 m); storybook built, no bundle names the live project; site build; site a11y 125 scans, 0 problems. Language fit on the Storybook build (en, ar, 760): the Explore clamps did not come back; two findings not yet in fit-known.json, the Spanish search placeholder 2 px over its pill on the case manager's Home story in both runs, in no file b75 touched (sent to Lena) |
 
 ## Left undone
 
+- **As of b75 (18 October, 21:56):** One name for texts: "Text alerts", and "Get text alerts" on both agree screens,
+  each in its original layout. The saved-place text has its link (live). Message Pam is whole on both sides and stays
+  behind its switch (off); Iris re-tests on main. Next: Wren's site renames and agree-screen pictures for the refile;
+  Will refiles with Lena's packet; then the switch batch (Nico W3 ca9a3c14, Lena 1b0f47d4, the flip-day runbook) and
+  release 0.53.0 on Will's go. With Will: A30 to confirm in the session; whether Pam's old support number is his own;
+  the connect text in the refile; a102, a86, the website's photo line; a97/a98, a91, a93, a84, a88. b76: D-616 (Will,
+  21:14), and his card for it: sign the Privacy line for the error log, 30 days or a week, and whether to keep role.
 - **As of b74 (18 October, 19:57):** Text alerts is a plain list (D-615); every other screen keeps its layout (Will,
   19:22). Message Pam has Iris's first-pass fixes on the person's side except W3 (the limited notice, b75), behind the
   switch (off), with P3 live. b75: Nico's saved-place link (d272c53b, migration 20261018185235, before any switch-on)
