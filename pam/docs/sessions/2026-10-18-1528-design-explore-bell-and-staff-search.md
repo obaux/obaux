@@ -20,6 +20,7 @@ D-610.
 ## Verified
 
 - On main's real build (a worktree, `build:e2e`): (a) and (b) fail on `toHaveCount(0)` of the bell link; the new shift case and the staff-search cases fail too. Here: 24/24 bell specs, 18/18 case-manager-pass, 194 web unit tests, `tsc` clean.
+- Full e2e: 2261 passed, 3 failed, all `messages.spec.ts` "a member with no one to message" (it expected a bell on Home with an empty list, the old rule); the spec now expects none on Home and the bell on Profile, and passes (3/3).
 - Pictures: `docs/design/review/2026-10-18-explore-bell/` (390 light and 320 dark; none, read, unread; staff typing).
 
 ## Left undone
