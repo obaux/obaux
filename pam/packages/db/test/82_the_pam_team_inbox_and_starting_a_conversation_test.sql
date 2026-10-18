@@ -44,6 +44,7 @@ grant execute on function test.check_text(text, text, text) to authenticated, an
 \set dana   '33333333-0000-0000-0000-00000000000a'
 \set root   '33333333-0000-0000-0000-000000000020'
 \set ivy    'cccccccc-0000-0000-0000-000000008201'
+\set wes    'cccccccc-0000-0000-0000-000000008205'
 \set lead_a 'cccccccc-0000-0000-0000-000000008202'
 \set lead_b 'cccccccc-0000-0000-0000-000000008203'
 \set lead_c 'cccccccc-0000-0000-0000-000000008204'
@@ -58,7 +59,7 @@ grant execute on function test.check_text(text, text, text) to authenticated, an
 reset role;
 select set_config('request.jwt.claim.sub', '', false);
 insert into auth.users (id, phone) values
-  (:'ivy', '12675550821'), (:'lead_a', '12675550822'), (:'lead_b', '12675550823'), (:'lead_c', '12675550824');
+  (:'ivy', '12675550821'), (:'lead_a', '12675550822'), (:'lead_b', '12675550823'), (:'lead_c', '12675550824'), (:'wes', '12675550825');
 insert into public.orgs (id, name, type, region_id) values
   (:'org_a', 'Pam Msg Org A', 'program', :'region_north'),
   (:'org_c', 'Pam Msg Org C', 'program', :'region_north'),
@@ -67,7 +68,8 @@ insert into public.profiles (id, role, first_name, region_id, phone, access_stat
   (:'ivy', 'member', 'Ivy', :'region_north', '+12675550821', 'active', null),
   (:'lead_a', 'provider', 'Lia', :'region_north', '+12675550822', 'active', :'org_a'),
   (:'lead_b', 'provider', 'Lob', :'region_north', '+12675550823', 'limited', :'org_a'),
-  (:'lead_c', 'provider', 'Lic', :'region_north', '+12675550824', 'active', :'org_c');
+  (:'lead_c', 'provider', 'Lic', :'region_north', '+12675550824', 'active', :'org_c'),
+  (:'wes', 'member', 'Wes', :'region_north', '+12675550825', 'active', null);
 insert into public.services (id, org_id, name, category, address, source, source_ref, needs_review, is_active) values
   (:'svc_a', :'org_a', 'Pam Msg Program A', 'workforce', '1 Pam St', 'manual', null, false, true),
   (:'svc_n', :'org_n', 'Pam Msg No Lead', 'workforce', '2 Pam St', 'manual', null, false, true),
@@ -139,9 +141,18 @@ select test.check('Ivy answers: she is waiting, and the preview is the first lin
 insert into public.messages (conversation_id, sender_id, body) values ((select v from t82 where k = 'ivy'), :'root', 'Great');
 select test.check('the team answers: nobody is waiting',
   (select count(*) from public.pam_inbox() where asker_id = :'ivy' and last_from = 'team' and waiting_since is null), 1);
-select test.check('a conversation with only the welcome (Rosa''s, from test 81) has no last message and nobody waiting',
-  (select count(*) from public.pam_inbox() where asker_id = 'cccccccc-0000-0000-0000-000000008101'
-     and last_from is null and last_message_at is null and waiting_since is null and preview is null), 1);
+-- Wes opens his Pam conversation the way the app does and writes nothing: it holds only Pam's welcome.
+select test.as_user(:'wes');
+insert into t82 select 'wes', public.open_pam_conversation();
+select test.as_user(:'root');
+select test.check('control: Wes has a Pam conversation (one thread, his)',
+  (select count(*) from public.pam_threads where asker_id = :'wes' and conversation_id = (select v from t82 where k = 'wes')), 1);
+select test.check('control: and it holds exactly one message, Pam''s welcome, which no person wrote',
+  (select count(*) from public.messages where conversation_id = (select v from t82 where k = 'wes')), 1);
+select test.check('control: ...with the key pam.welcome and no sender',
+  (select count(*) from public.messages where conversation_id = (select v from t82 where k = 'wes') and system_key = 'pam.welcome' and sender_id is null), 1);
+select test.check('a conversation with only Pam''s welcome (Wes''s) is not in the inbox: nobody has written',
+  (select count(*) from public.pam_inbox() where asker_id = :'wes'), 0);
 select public.pam_set_thread_status((select v from t82 where k = 'ivy'), 'closed');
 select test.check_text('close: the inbox says closed',
   (select status from public.pam_inbox() where asker_id = :'ivy'), 'closed');
@@ -161,6 +172,13 @@ select test.check('the same text goes to the program''s one active lead (the lim
   public.pam_start_program_conversation(:'svc_a', 'Hello from Pam')::bigint, 1);
 select test.check('...in the lead''s own Pam conversation',
   (select count(*) from public.pam_inbox() where asker_id = :'lead_a' and preview = 'Hello from Pam'), 1);
+reset role;
+select test.check('control: Program A''s organisation has two providers on Pam, one of them limited, and another organisation has its own lead',
+  (select count(*) from public.profiles where role = 'provider' and org_id = :'org_a')
+  + (select count(*) from public.profiles where id = :'lead_b' and access_status = 'limited')
+  + (select count(*) from public.profiles where id = :'lead_c' and org_id = :'org_c' and access_status = 'active'), 4);
+set role authenticated;
+select test.as_user(:'root');
 select test.check('...and nobody else''s',
   (select count(*) from public.pam_inbox() where asker_id in (:'lead_b', :'lead_c')), 0);
 select test.check('pam_program_has_lead says yes for a program with an active lead, no for one without, and no for a place with no organisation',

@@ -43,17 +43,19 @@ import { useExamplesOn } from '@/lib/useExamplesOn';
  * `useDemoView` themselves — everywhere else still reads `role` alone, the
  * same as before this existed.
  *
- * `hideWhenEmpty` (Will, 12 October: "only show Notifications bell for members
- * Explore page, when notifications exist") draws nothing while the list the
- * bell opens has nothing in it. "Exist" means the list is non-empty, read or
- * not; a list whose every row was read still has its bell, without a dot. It
- * starts hidden and stays hidden until the list arrives non-empty, so the slot
- * never flashes in and out. Where examples are on, it follows what
- * `/notifications/` shows: the example set for the role, none for a fresh
- * account.
+ * `hideWhenNothingNew` (Will, 12 October: "only show Notifications bell for members
+ * Explore page, when notifications exist"; again 18 October: "I still see the
+ * notification bell even though there are no active notifications") draws
+ * nothing unless something in the list is unread. "Active" is stricter than the
+ * 12 October reading, which kept the bell for a list of read rows: a member
+ * whose every row was read has no bell on Explore, and reaches the list from
+ * Profile (or Messages), which keep it. It starts hidden and stays hidden until
+ * the list arrives with something unread, so the slot never flashes in and
+ * out. Where examples are on, it follows what the bell itself would count: the
+ * example set for the role, none for a fresh account.
  */
 /**
- * `hideWhenEmpty` and the page not moving (Iris's W3): where the answer to "any notifications?" is
+ * `hideWhenNothingNew` and the page not moving (Iris's W3): where the answer to "any notifications?" is
  * a second away, the bell arriving widens the header's corner and, on a narrow phone, the role chip
  * drops under the logo and everything below moves down a thumb's width. So the phone keeps one
  * note about itself, "the bell was there last time", and holds the bell's place (unseen, unreachable)
@@ -91,25 +93,24 @@ export function HeaderBell({
   role,
   isDemo = false,
   appearance,
-  hideWhenEmpty = false,
+  hideWhenNothingNew = false,
 }: {
   readonly enabled: boolean;
   readonly role?: Role | null;
   readonly isDemo?: boolean;
   /** `round` for the redesigned headers (D-210). */
   readonly appearance?: 'filled' | 'round';
-  /** Nothing is drawn while there is nothing in the list the bell opens. */
-  readonly hideWhenEmpty?: boolean;
+  /** Nothing is drawn unless something the bell opens is unread. */
+  readonly hideWhenNothingNew?: boolean;
 }) {
   const { t, tPlain } = useI18n();
   const { state } = useNotifications(enabled);
   const [dummyUnread, setDummyUnread] = useState<number | null>(null);
-  const [dummyTotal, setDummyTotal] = useState<number | null>(null);
   // Read after the first render, so what the server drew and what the phone draws first are the same.
   const [hadBell, setHadBell] = useState(false);
   useEffect(() => {
-    if (hideWhenEmpty) setHadBell(readHadBell());
-  }, [hideWhenEmpty]);
+    if (hideWhenNothingNew) setHadBell(readHadBell());
+  }, [hideWhenNothingNew]);
 
   // Example alerts are for Storybook and demo accounts only; a real account's bell counts its real ones.
   const examples = useExamplesOn();
@@ -124,7 +125,6 @@ export function HeaderBell({
       const { DUMMY_NOTIFICATIONS } = await import('@pam/config/dummy-notifications');
       if (cancelled) return;
       setDummyUnread(DUMMY_NOTIFICATIONS[role as Role].filter((item) => item.isNew).length);
-      setDummyTotal(DUMMY_NOTIFICATIONS[role as Role].length);
     })();
     return () => {
       cancelled = true;
@@ -132,25 +132,25 @@ export function HeaderBell({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [needsDummy, role]);
 
-  // Whether there is anything to open, once that is known. With examples, the example set is waited for.
-  const known = state.status === 'ready' && !(needsDummy && dummyTotal === null && !isFreshAccount());
-  const hasAny = known ? (needsDummy ? (dummyTotal ?? 0) > 0 : state.status === 'ready' && state.items.length > 0) : null;
+  // Whether anything is unread, once that is known. With examples, the example set is waited for.
+  const known = state.status === 'ready' && !(needsDummy && dummyUnread === null && !isFreshAccount());
+  const hasNew = known ? (needsDummy ? (dummyUnread ?? 0) > 0 : unreadCount(state) > 0) : null;
 
   useEffect(() => {
-    if (hideWhenEmpty && hasAny !== null) writeHadBell(hasAny);
-  }, [hideWhenEmpty, hasAny]);
+    if (hideWhenNothingNew && hasNew !== null) writeHadBell(hasNew);
+  }, [hideWhenNothingNew, hasNew]);
 
   if (state.status !== 'ready') {
-    if (hideWhenEmpty && hadBell) return <HeldBell appearance={appearance} href="/notifications/" label={t('notify.title')} />;
+    if (hideWhenNothingNew && hadBell) return <HeldBell appearance={appearance} href="/notifications/" label={t('notify.title')} />;
     return null;
   }
 
-  if (hideWhenEmpty) {
+  if (hideWhenNothingNew) {
     // The example set stands in only where `/notifications/` shows it; a fresh account has none (D-361).
-    if (hasAny === null) {
+    if (hasNew === null) {
       return hadBell ? <HeldBell appearance={appearance} href="/notifications/" label={t('notify.title')} /> : null;
     }
-    if (!hasAny) return null;
+    if (!hasNew) return null;
   }
 
   const unread = needsDummy && dummyUnread !== null ? dummyUnread : unreadCount(state);

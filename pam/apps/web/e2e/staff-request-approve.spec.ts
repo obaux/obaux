@@ -57,7 +57,7 @@ test('approving someone who is already a member says they are now a program lead
   await page.getByRole('button', { name: 'Approve' }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Yes, approve' }).click();
   await expect(page.getByText('Pia is now a program lead too')).toBeVisible();
-  await expect(page.getByText(/They keep that, and can switch/)).toBeVisible();
+  await expect(page.getByText(/^We texted them that they are in\.$/)).toBeVisible();
   await expect(page.getByRole('button', { name: 'Approve' })).toHaveCount(0);
   await expect(page.getByRole('link', { name: /Contact Pam/ })).toHaveCount(0);
 });

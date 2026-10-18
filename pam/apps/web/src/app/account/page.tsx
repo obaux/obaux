@@ -54,7 +54,6 @@ import { ProfileLoading, ProfileScreen } from '../../screens/ProfileScreen';
  */
 
 const styles = stylex.create({
-  note: { fontSize: '15px', lineHeight: 1.5 },
   intro: { fontSize: '18px', lineHeight: 1.5 },
 });
 
@@ -136,17 +135,13 @@ export default function AccountPage() {
 
       <HelpBar label={t('nav.help')} variant="block" />
 
-      <VStack gap={2}>
-        <BigButton
-          label={busy ? t('account.signingOut') : t('signin.signout')}
-          variant="primary"
-          onPress={() => void leave()}
-          isDisabled={busy}
-        />
-        <Text type="supporting" xstyle={styles.note}>
-          {t('account.signout.body')}
-        </Text>
-      </VStack>
+      {/* No line under the button (D-608): nobody needs it to decide. */}
+      <BigButton
+        label={busy ? t('account.signingOut') : t('signin.signout')}
+        variant="primary"
+        onPress={() => void leave()}
+        isDisabled={busy}
+      />
     </Page>
   );
 }

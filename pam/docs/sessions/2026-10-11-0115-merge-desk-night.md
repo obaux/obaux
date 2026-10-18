@@ -1441,6 +1441,14 @@
   anything is built, since it reached the desk second-hand.
 - **Control Room v27 (23:25, version 46).** On a phone the picture button sits top right, above Send, and the words
   get the left of the box (Will, 23:19).
+- **Control Room v28 (18 October, 16:07, version 47).** Will (16:00): when one of us stops at a permission prompt, the
+  Control Room should say so. The panel that lists stuck sessions only appeared while someone was stuck, its Turn on
+  sat in a small line, and a declined connector left nothing on the page. Now a watch line is always there (Watching,
+  with when it last checked; Turn on; Turn it on when Claude Code Remote is off for the page; a note when the page is
+  opened outside Claude). The panel, "Waiting for your OK", sits above the intro and says what each stuck session is
+  doing now. It counts board sessions, sessions tagged pam and sessions the desk started; the tab title shows the
+  count, and the map and roster mark the person. It checks every 30 seconds. Tried in a harness in eight states at
+  390, 320 dark and desktop; not yet seen with a real prompt.
 - **Batch b62 (17 October, 23:19 to 23:56).** Dot's b4e48c1a, the press-in layer (D-602, Will's yes on a99 at
   23:17): a row darkens, a card, tile or button presses in to 97%, a switch's segment shades without moving, and
   reduced motion keeps only the shade. Ava's 92c978bf (Iris's P5): sign-up's "Pam is only in these cities for now."
@@ -1577,6 +1585,33 @@
   with the switch. Will at 14:55: the bell on a member's Explore with nothing new, and the search dropdown over the
   page (Dot; a86 already removes the dropdown); at 15:19: screens explain too much (D-608, Sage's rule; Text alerts
   first, Nico builds). None of those is in b70. Nico's slice 2 (c535f8a8) came READY at 15:29 and goes in b71.
+- **Batch b71 (18 October, 15:55 to 16:40).** Message Pam's person's side, on main behind its switch (off). Nico's
+  slice 2 (c535f8a8, D-609): Pam's row first in Messages, the Pam conversation with its welcome and after-hours reply,
+  the fixed address /messages/pam/ (with the switch off it lands on Messages), Help's "Write to Pam", and in every
+  conversation a message that did not go is kept, marked Not sent, with Try again. Its migration (20261018080342: the
+  Pam team's inbox lists only conversations somebody wrote in) went live at 16:15 as 20261018161516, after Nico's test
+  fix (3a046434): test 82 had passed with that rule removed. The merge drops two `sendFailed={false}` lines from Dot's
+  drawing stories, because slice 2 removed that prop; Dot's drawing stays as it was, and Nico's built stories sit
+  beside it (MessagePamBuilt.stories.tsx). Will at 15:49 asked for the next release: Message Pam switched on, in the
+  order on thread 2729f940, with a86, a97/a98, a93, a91 and a84 held unless he says yes. Card a102 (the lines that
+  leave the screens for Privacy, D-608) went up at 16:10. Will at 16:00: a permission prompt should show in the
+  Control Room (v28, below).
+- **Batch b72 (18 October, 16:23 to 17:30).** Will's two asks from this afternoon, and the first of the fewer words.
+  Dot's d0359060 (D-610, Will 14:55): a member's Explore shows the bell only while something is new, so Search
+  programs takes the full width; staff Home's Search members is a plain field that filters the list, with no dropdown
+  (Explore's own dropdown goes with a86, on Will's yes). D-608 (Will 15:19): Sage's shorter English (b50e386a) and
+  Lena's six languages (630f9868), 34 values; Nico's Text alerts (D-611: names, "Kinds of texts", a Coming soon badge,
+  no intro) with Lena's words (dd03b8f5, a37039b1); Nico's cuts on Connections, block and unblock, and Reported
+  messages (29e5f13d, with the program conversation's note put back: it is line 5 on card a102); Ava's cuts on Join,
+  Invite and Account (529b21f0). With them: Message Pam slice 3 (photos show their progress and keep a photo that did
+  not go, in every conversation) and teamTools/setDraft for Ava's saved replies, both behind the switch (off); Lena's
+  report-reach pin (2175d0de). Merge desk: the bundles and ledger met Nico's English copies of the same Text alerts
+  keys; merged key by key, Lena's translations taken on the 20 keys both changed, and every row of the merged ledger
+  equals main's or one of Lena's tips. Held for b73: Lena and Nico's slice 5 (209722d3, with Nico's hours fix),
+  Piper's D-608 cuts (7cbe17e6, once the messages.empty cut comes out and book.new.note goes). The full run failed 12
+  cases: four specs in Piper's, Ava's and Nico's files still pinned sentences Sage's shorter English had changed;
+  fixed in the batch (0fe32067), each check pinning the signed sentence whole, and the owners told. The Control Room's
+  "Right now" and team rows were five days old; rewritten at 16:47.
 
 ## What was wrong, and what missed it
 
@@ -1861,6 +1896,30 @@
   went with it, the spec lost its empty-list case, and the new Explore never had either, so the bell came back with
   nothing behind it. Lesson: retiring a screen moves its per-screen rules with its content or lists them as dropped,
   and a spec rewritten for the new screen keeps every case the old one held.
+- **Two READYs, each green, red together (b71, 16:00).** Nico's slice 2 removed ThreadView's sendFailed prop; Dot's
+  drawing stories, on main since b70, still passed it. Each branch built on its own base, and only the merge failed
+  (build and web tsc). Slice 2 was proven on b69, not on b70, the base it landed on. Lesson: prove a READY on the base
+  it lands on; when two lanes touch one component's props, the second READY merges main before it says READY.
+- **A test that passes with its rule removed (test 82, 15:56).** The check "a conversation with only Pam's welcome is
+  not in the inbox" passed with the `where exists` line taken out of 20261018080342, because Wes's conversation was
+  never opened, so there was nothing to keep out. Nico's fix opens it and puts a control beside each zero (3a046434);
+  with the line removed the check now fails, and nothing else does. Lesson: a check that expects nothing needs a
+  control that shows something was there to miss; and a migration does not go live until its mutation has failed.
+- **A line moved onto Will's card while two lanes were cutting it (b72, 16:19).** Card a102 went up at 16:10 with
+  messages.program.note on it (line 5, a line Will signed before). Nico had the D-608 audit from 15:58 and cut it at
+  16:18; his READY and my hold crossed. Piper's READY cut a line in Nico's file that the switch-on batch owns. Both
+  were caught at the merge desk and nothing shipped wrong. Lesson: when a line moves onto a card for Will, tell every
+  lane whose audit rows include it, in the same minute, with the words "leave it on screen".
+- **The page Will reads went stale while the cards stayed current (16:47).** The Control Room's cards and chat replies
+  were up to the minute, but its "Right now" panel still showed 13 October and each teammate's "Doing now" was from 11
+  to 13 October. Lesson: write "Right now" and the team rows with each batch, the same as STATUS.
+- **Words changed, and no screen was run (b72, 17:24).** Sage's shorter English (b50e386a) and Lena's six languages on
+  it (630f9868) were proven by the config tests, which check the bundles, not the screens. Four specs in three other
+  lanes pinned the old sentences, and only the batch's full run found them, as 12 failures. One more check, which
+  expected an old sentence to be gone (consent.spec, texts stopped), now passes without testing anything. Lesson: a
+  READY that changes words runs the full e2e; before assembling, the merge desk searches every spec and test for each
+  changed value's old sentences (every run of four words from the old value): the ones that would fail and the ones
+  expecting it gone.
 
 ## Decisions
 
@@ -2116,9 +2175,37 @@
 | Message files sweep live (D-607; list_migrations before) | Function sweep-message-files deployed 15:50 (version 1, JWT off; files read back the same as 2a7a51d5). Schedule 20261018074530 applied as 20261018155025: cron 'sweep-message-files' at 50 4 * * *, active, calling the function with the vault secret. Before: message-photos, message-files and link-previews 0 objects; 0 messages with an attachment; 0 link pictures. Run by hand at 15:50: 200 {folders 0, removed 0, failed 0}. Without the secret: 401 |
 | Batch b70, full run (1d7afe45: Nico 6842b4b8, Lena fe3374f3, Dot a01bbf8c, Ava 07e164b1): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1406 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 198 / 10.1 kB spare / 2255 passed, 19 skipped, 0 failed, 0 flaky / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
 | b70 with the sweep (c48f8810, + Nico 2a7a51d5): config / site test / site tsc / DB suite | 1419 passed, 1 skipped / 124 / 0 / all passed, 1816 ok (the schedule migration skips itself where there is no scheduler) |
+| b70 main CI (16962fc4, pushed 15:53:36) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (Accessibility 16:30); Vercel web and pam-site success |
+| Test 82 fix (Nico 3a046434, merged as b70fb74f; local Postgres 16) | Suite: all passed, 1826 ok. Mutation (the `where exists` line in 20261018080342 replaced by `;`): FAILED, on one check only: "a conversation with only Pam's welcome (Wes's) is not in the inbox: nobody has written" |
+| pam_inbox live (list_migrations before: 080342 not there) | Applied 16:15 as 20261018161516. Read back: body md5 3a54da7e3fbedbf4bf29c25478b8f853, the same as the file; security definer; search_path public, extensions; execute for authenticated and service_role only (no anon); no arguments |
+| b71 new specs on main's build (16962fc4, build:e2e; b71's message-pam.spec and messages.spec, narrow-320, retries 0) | 19 failed, 91 passed. Failed: 16 of the 17 message-pam cases (Pam's row, the thread, the after-hours reply, a limited account, Not sent and Try again, Help's Write to Pam, /messages/pam/ three ways, the seven languages) and the three new failed-send cases in messages.spec (no "Not sent"). The one that passes is the switch-off control ("nothing of Pam is shown"), as it should. The seven language cases first failed on a missing key, so they ran again with b71's bundles against main's build and failed on their first screen check (no Pam heading). DB suite on b70fb74f's own tree: all passed, 1826 ok |
+| Batch b71, full run (767309c2: b70 + Nico c535f8a8, merge fix): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1443 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 200 / 8.7 kB spare / 2312 passed, 19 skipped, 0 failed, 0 flaky / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
+| b71 main CI (184fc004, pushed 16:40:47) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (Accessibility 17:18); Vercel web and pam-site success |
+| b72 new specs on b71's build (767309c2 out/, the same app as main 184fc004; b72's ten changed specs and bundles, narrow-320, retries 0) | 15 failed, 168 passed, 6 skipped; every failure on its assertion (toHaveCount 10, toBeVisible 3, toBe 1, toBeGreaterThan 1): Ava's account, invite and join; Nico's two alerts cases, blocking, the photo progress case and Connections; Dot's explore-bell (2), explore-bell-shift (2), case-manager-pass (2) and messages' "no one to message". One new case passes on b71: message-pam's "a photo to Pam ... Not sent until Try again", because keeping and retrying a photo came with slice 2; it is a guard, and slice 3's progress is proven by the messages case |
+| b72 ledger (merge desk, key by key) | Against main: 30 rows added, 48 removed, 222 changed across six languages; every row equals main's or Lena's at a37039b1 or 630f9868 (0 otherwise); copy:status in step |
+| Batch b72, full run (bfb1a0d9: b71 + Nico 29e5f13d, Lena a37039b1, 2175d0de and 630f9868, Dot d0359060, Ava 529b21f0): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1447 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 200 / 9.3 kB spare / 2324 passed, 19 skipped, 12 failed, 0 flaky (four specs on three projects pinned the old words; fixed in 0fe32067, next row) / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
+| b72 spec fix (0fe32067, merge desk): add-my-program, program-book-example, staff-request-approve, messages, on the three projects | 306 passed. Each check now pins the signed sentence whole (anchored), so the old sentence cannot pass it |
 
 ## Left undone
 
+- **As of b72 (18 October, 17:30):** Will's bell and Search members fixes and the first D-608 cuts are on main;
+  Message Pam (person's side, photos) is on main behind the switch (off). b73: Lena and Nico's slice 5 (209722d3 plus
+  Nico's hours fix), Piper's D-608 cuts and book.new.note, Lena's retire commit (programs.new.done.body,
+  home.caseload.search.none, points.intro, programs.review.text.body). Then Message Pam's last fixes: Nico's live
+  refresh (S1, a timer that fetches what is new while the screen is open) and W1, W2, W4, P1 to P3 and the
+  profile_roles migration; Ava's team side in one READY (S2 to S4 with Dot's three, W5, W6, P4 to P7, T1 to T6, Lena's
+  959a0df1); Iris re-tests on main; then the switch batch and release 0.53.0 on Will's go. Dot: a86 brought up to
+  main. Wren: the Text reminders picture from main. With Will: a102, a86 (the Explore dropdown goes with it), the
+  website's photo line; a97/a98, a91, a93, a84, a88.
+- **As of b71 (18 October, 16:40):** Message Pam: the database side, the files sweep and the person's side are on
+  main, all behind the switch (off); pam_inbox's rule is live (20261018161516). b72 is assembled and runs next: Dot's
+  Explore bell and Search members (d0359060, D-610), Nico's Text alerts, slice 3 and D-608 rows (to 29e5f13d), Sage
+  and Lena's shorter words (b50e386a, 630f9868), Lena's Text alerts words and report pin, Ava's D-608 cuts (529b21f0).
+  After it: Lena and Nico's slice 5 (209722d3) and Piper's D-608 cuts in b73; Ava's screens S1 to S4 on Nico's hooks;
+  then Iris goes through it as each role; then the switch batch (Lena 1b0f47d4 and 6e3ea458, Wren 5fccabca and
+  bbff3a77, legal:date, copy:ack, posts:date, the messages.empty cuts) and release 0.53.0, on Will's go. D-608: Sage's
+  audit (8e302eea) routed to each lane; card a102 waits on Will. With Will: a86 (yes and its Privacy line), a102, the
+  website's photo line; a97/a98, a91, a93, a84, a88.
 - **As of b70 (18 October, 15:53):** Message Pam: the database side and the files sweep are live and on main; the
   switch is off. Slice 2, the person's side (Nico c535f8a8), is READY for b71 with its migration 20261018080342
   (pam_inbox skips conversations nobody wrote in). Card a101 is signed; Lena's lines (1b0f47d4) ship in the batch that

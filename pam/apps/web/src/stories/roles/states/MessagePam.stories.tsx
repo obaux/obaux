@@ -454,7 +454,6 @@ function PersonThread({ messages, status = null, draft = null }: { readonly mess
         intro={<ThreadIntro name={w.pam} photoUrl={PAM_MARK} context={null} />}
         onSend={async () => true}
         sending={false}
-        sendFailed={false}
         speechLanguage={locale === 'ar' ? 'ar' : 'en-US'}
       />
       <PamComposer photo draft={draft} />
@@ -622,7 +621,6 @@ function AdminThread({ kind }: { readonly kind: 'answering' | 'new-member' | 'ne
         }
         onSend={async () => true}
         sending={false}
-        sendFailed={false}
         speechLanguage={locale === 'ar' ? 'ar' : 'en-US'}
       />
       <PamComposer photo placeholder={kind === 'answering' ? w.replyAs : w.writeAs} />
