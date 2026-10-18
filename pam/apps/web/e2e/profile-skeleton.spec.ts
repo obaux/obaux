@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { settled } from './settled';
+import { arrived } from './arrived';
 
 /**
  * Profile's hero card while it loads (Will, 11 October: "skeleton loaders for the image, stats and labels in profile
@@ -70,9 +71,12 @@ test.describe("Profile's hero card while it loads", () => {
     await expect(card).toBeVisible();
     // While the points are on their way, a pulse stands where the number will be.
     await expect(card.locator('.astryx-skeleton').first()).toBeVisible();
+    // Both reads are of a card that has finished rising (8px as it arrives): the claim is that nothing MOVES when the numbers land.
+    await arrived(card);
     const before = (await card.boundingBox())!;
     await expect(card.getByText('400', { exact: true })).toBeVisible({ timeout: 5000 });
     await expect(card.locator('.astryx-skeleton')).toHaveCount(0);
+    await arrived(card);
     const after = (await card.boundingBox())!;
 
     expect(Math.abs(after.height - before.height)).toBeLessThanOrEqual(1);
@@ -89,11 +93,15 @@ test.describe("Profile's hero card while it loads", () => {
     await expect(busy.locator('.astryx-skeleton')).not.toHaveCount(0);
     // It is announced once, politely, and the pulses themselves are hidden from a screen reader.
     await expect(page.getByRole('status').filter({ hasText: 'Loading' })).toHaveCount(1);
+    // The pulses arrive with the screen's own rise (8px): the baseline is where it ends, as the real card's will be.
+    await arrived(busy);
     const skeletonBox = (await busy.boundingBox())!;
 
     const card = page.getByRole('heading', { name: 'Marcus', level: 2 }).locator('xpath=ancestor::*[contains(@class,"astryx-card")][1]');
     await expect(card).toBeVisible({ timeout: 5000 });
     await expect(card.getByText('400', { exact: true })).toBeVisible();
+    // The real card rises 8px as it arrives: measure it where it ends, not where it starts.
+    await arrived(card);
     const realBox = (await card.boundingBox())!;
     expect(Math.abs(realBox.height - skeletonBox.height)).toBeLessThanOrEqual(2);
     expect(realBox.y).toBeCloseTo(skeletonBox.y, 0);
