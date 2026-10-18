@@ -27,6 +27,12 @@ export const APP_ERROR_ACTIONS = [
   'alerts.agree',
   'reminders.agree',
   'reminders.decline',
+  'function.dispatch-sms',
+  'pam.hours.save',
+  'pam.thread.status',
+  'directory.demo-view',
+  'requests.review',
+  'invite.create',
 ] as const;
 
 export type AppErrorAction = (typeof APP_ERROR_ACTIONS)[number];
