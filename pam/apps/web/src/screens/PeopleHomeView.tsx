@@ -20,6 +20,7 @@ import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { PersonRow } from '../app/PersonRow';
 import { ConfirmDialog } from './ConfirmDialog';
+import { StatusBadge } from '@pam/ui/StatusBadge';
 
 /**
  * A staff member's home since the redesign (D-212): their people, under the
@@ -96,7 +97,6 @@ const styles = stylex.create({
   search: { flexGrow: 1, minWidth: 0 },
   heading: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700 },
   count: { fontSize: '16px' },
-  note: { fontSize: '15px', lineHeight: 1.5 },
   state: { paddingBlock: '32px' },
   star: { width: '48px', height: '48px', color: colorVars['--color-text-secondary'] },
   message: { width: '48px', height: '48px', color: colorVars['--color-icon-accent'] },
@@ -183,6 +183,8 @@ export function PeopleHomeView({
               {countLabel(people.length)}
             </Text>
           ) : null}
+          {/* Over the list, not under it: made-up people are marked before anyone reads a name (D-608). */}
+          {note ? <StatusBadge label={note} /> : null}
         </VStack>
 
         {!query.trim() ? strip : null}
@@ -249,11 +251,6 @@ export function PeopleHomeView({
                 }
               />
             ))}
-            {note ? (
-              <Text type="supporting" xstyle={styles.note}>
-                {note}
-              </Text>
-            ) : null}
           </VStack>
         ) : null}
         {footer}
