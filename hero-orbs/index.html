@@ -40,11 +40,14 @@
  *                     // path, drawn white on a coloured disc — placeholder art).
  *                     // Defaults to OrbHero.BUILTIN_ICONS.
  *    fill:    ['#2a2d36']  // disc colour behind { path } placeholders, cycled by slot
- *    count:   10           // total circles, hero included
+ *    rows:    [4, 5, 4]    // circles per row, top to bottom; the hero is the centre of the
+ *                          // middle row (so it must be odd). Rows are centred: a hex lattice.
+ *    empty:   [[0,0],[1,0],[1,4]]  // [row, column] of circles left empty (no icon)
+ *    emptyFill: '#2a2d36'  // colour of an empty circle
  *    center:  [0.5, 0.5]   // hero centre, as a fraction of the canvas
- *    pitch:   0.24         // lattice spacing, in canvas widths
+ *    pitch:   0.195        // distance between neighbours, in canvas widths
  *    heroSize: 0.34        // peak hero radius, in canvas widths
- *    restSize: 0.105       // circle radius once the lattice is out (hero rests 12% larger)
+ *    restSize: 0.09        // circle radius once the lattice is out (hero rests 12% larger)
  *    iconRes: 512          // px per icon layer (the hero peaks near 540 device px)
  *  })
  *  hero.play()   // entrance
@@ -63,6 +66,7 @@ class OrbHero {
     { path: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' },                       // chat
     { path: 'M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z' }, // camera
     { path: 'M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z' }, // music
+    { path: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z' },                                                     // zap
   ];
 
   // Timeline, seconds (read off the reference recording).
@@ -75,8 +79,9 @@ class OrbHero {
   constructor(canvas, opts = {}) {
     this.canvas = canvas;
     this.opts = Object.assign({
-      icons: OrbHero.BUILTIN_ICONS, center: [0.5, 0.5], fill: ['#2a2d36'], count: 10,
-      pitch: 0.24, heroSize: 0.34, restSize: 0.105, startSize: 0.15, iconRes: 512, maxDpr: 2,
+      icons: OrbHero.BUILTIN_ICONS, center: [0.5, 0.5], fill: ['#2a2d36'],
+      rows: [4, 5, 4], empty: [[0, 0], [1, 0], [1, 4]], emptyFill: '#2a2d36',
+      pitch: 0.195, heroSize: 0.34, restSize: 0.09, startSize: 0.15, iconRes: 512, maxDpr: 2,
     }, opts);
     const gl = this.gl = canvas.getContext('webgl2', { alpha: true, premultipliedAlpha: true, antialias: false });
     if (!gl) throw new Error('WebGL2 unavailable');
@@ -161,7 +166,7 @@ class OrbHero {
 
     const tex = this.tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D_ARRAY, tex);
-    gl.texStorage3D(gl.TEXTURE_2D_ARRAY, Math.floor(Math.log2(R)) + 1, gl.RGBA8, R, R, n);
+    gl.texStorage3D(gl.TEXTURE_2D_ARRAY, Math.floor(Math.log2(R)) + 1, gl.RGBA8, R, R, n + 1);   // +1: the empty circle
     gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
 
     for (let i = 0; i < n; i++) {
@@ -184,6 +189,12 @@ class OrbHero {
       }
       gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, i, R, R, 1, gl.RGBA, gl.UNSIGNED_BYTE, cv);
     }
+    // Last layer: a plain disc, for circles left empty.
+    ctx.clearRect(0, 0, R, R);
+    ctx.fillStyle = this.opts.emptyFill;
+    ctx.beginPath(); ctx.arc(R / 2, R / 2, R / 2, 0, Math.PI * 2); ctx.fill();
+    gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, n, R, R, 1, gl.RGBA, gl.UNSIGNED_BYTE, cv);
+
     gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -199,31 +210,28 @@ class OrbHero {
   }
 
   /* ----------------------------- layout ---------------------------- */
-  // Hex lattice in canvas-width units, centred on the hero; size eases down with distance.
+  // Explicit rows, each centred, so the lattice is exactly symmetric. Row spacing is the
+  // hex one (pitch * 0.87); the hero is the centre circle of the middle row.
   _layout() {
     if (!this.slots) return;
-    const { pitch, restSize, center } = this.opts;
-    const aspect = this.H / this.W;
-    const dx = pitch, dy = pitch * 0.87;
-    const cx = center[0] - 0.5, cy = (center[1] - 0.5) * aspect;
+    const { pitch, restSize, rows, empty } = this.opts;
+    const dy = pitch * 0.87, mid = (rows.length - 1) / 2;
     let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-    const sm = (a, b, x) => { x = Math.min(1, Math.max(0, (x - a) / (b - a))); return x * x * (3 - 2 * x); };
 
     const orbs = [];
-    const rowsN = Math.ceil(aspect / dy) + 2, colsN = Math.ceil(1 / dx) + 2;
-    for (let j = -rowsN; j <= rowsN; j++) for (let i = -colsN; i <= colsN; i++) {
-      if (!i && !j) continue;
-      const jit = 0.012;
-      const x = i * dx + (j & 1 ? dx / 2 : 0) + (rnd() - 0.5) * jit * 2;
-      const y = j * dy + (rnd() - 0.5) * jit * 2;
-      const d = Math.hypot(x, y);
-      const r = restSize * (1 - 0.3 * sm(0.1, 1.1, d)) * (0.94 + rnd() * 0.12);
-      if (Math.abs(x + cx) + r > 0.5 || Math.abs(y + cy) + r > aspect / 2) continue;   // only whole circles
-      orbs.push({ x, y, d, r, phase: rnd() * 6.283 });
-    }
+    rows.forEach((n, j) => {
+      for (let i = 0; i < n; i++) {
+        if (j === mid && i === (n - 1) / 2) continue;   // the hero
+        const x = (i - (n - 1) / 2) * pitch, y = (j - mid) * dy;
+        orbs.push({ x, y, d: Math.hypot(x, y), r: restSize, phase: rnd() * 6.283,
+                    empty: empty.some(([a, b]) => a === j && b === i) });
+      }
+    });
     orbs.sort((a, b) => a.d - b.d);
-    orbs.length = Math.min(orbs.length, Math.max(0, this.opts.count - 1));   // hero is the +1
-    orbs.forEach((o, k) => { o.slot = this.slots > 1 ? 1 + (k % (this.slots - 1)) : 0; });
+    let k = 0;
+    for (const o of orbs) {
+      o.slot = o.empty ? this.slots : (this.slots > 1 ? 1 + (k++ % (this.slots - 1)) : 0);
+    }
     this.orbs = orbs; this.maxD = orbs.length ? orbs[orbs.length - 1].d : 1;
     this.data = new Float32Array((orbs.length + 1) * 8);
   }

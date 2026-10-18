@@ -15,17 +15,20 @@
 
 Recreate the entrance animation in a screen recording he made (a glass-orb
 lattice) in WebGL, as a **hero section for the mobile app**, with **icons inside the
-circles**. He then changed it three times:
+circles**. He then changed it four times:
 
 1. "Ignore the colour rainbow treatment for now, I'll just add circles with icons on them."
-2. "Just 10 circles."
-
+2. "Just 10 circles." (superseded by 4 below)
 3. A **4:3 banner** at the top of the page, with the circles "more horizontal than
    vertical". Icons he will supply **fill the whole circle**; use that sizing.
    He also reported a flicker and a faint border around the icons; fixed, see below.
+4. "Add an empty circle on the top left and two empty circles on each edge of the middle.
+   Then the top has four, the middle has five, and the bottom has four: fourfold
+   symmetry." Read as: one empty circle at the top left, and one empty circle at each end
+   of the middle row (two in all). Rows are 4 / 5 / 4 = 13 circles.
 
-So the deliverable is **10 circles, each filled by its icon, in a 4:3 banner, doing this
-entrance.** The glass/rainbow look was built, shown, and deliberately dropped. Do not
+So the deliverable is **13 circles in a 4:3 banner, 10 of them filled by an icon and 3
+left empty**, doing this entrance. The glass/rainbow look was built, shown, and deliberately dropped. Do not
 bring it back.
 
 The source recording is not in the repo (it was a chat upload). The timeline below was
@@ -45,9 +48,11 @@ Timeline, in seconds (the constants live in `OrbHero.T`):
 
 Layout: the canvas is the banner (4:3, `aspect-ratio` set by CSS; the engine lays out
 to whatever size the canvas is, via `ResizeObserver`). A hex lattice in canvas-width
-units (pitch 0.24), jittered a little, circle size easing down slightly with distance.
-Only circles that fit **whole** inside the frame are kept, and `count: 10` takes the hero
-plus the 9 nearest: three rows, wider than tall.
+units (pitch 0.195). Rows are explicit, `rows: [4, 5, 4]`, each centred, so the lattice is
+exactly mirror-symmetric (no jitter, one circle size); the hero is the centre of the middle
+row. `empty: [[0,0],[1,0],[1,4]]` lists `[row, column]` of the empty circles, drawn as a
+plain disc (`emptyFill`). Five across leaves about 8px of margin each side on a 402px
+banner; widen the banner or lower `pitch`/`restSize` together if more room is wanted.
 
 All circles are drawn in **one instanced WebGL2 call**. Each icon is one layer of a
 **texture array** (512px per layer), mapped across the whole circle, cover-fit.
@@ -55,7 +60,7 @@ All circles are drawn in **one instanced WebGL2 call**. Each icon is one layer o
 Public API (`class OrbHero`, constructor options in the header comment of the file):
 
 ```js
-const hero = new OrbHero(canvas, { icons, fill, count, center, pitch, heroSize, restSize });
+const hero = new OrbHero(canvas, { icons, fill, rows, empty, emptyFill, center, pitch, heroSize, restSize });
 hero.play();   hero.exit();   hero.seek(t, exitT);   hero.destroy();
 hero.ready     // Promise: atlas built, loop started
 ```
@@ -101,7 +106,7 @@ These are gaps in the prototype, not design choices:
 - **Clean up properly.** `destroy()` stops the loop and the resize listener but does
   not delete GL buffers/texture. React strict mode mounts twice in dev.
 - **WebGL context loss and no-WebGL2 fallback.** Today a failure just shows a text
-  line. Render the same 10 circles statically with Astryx components instead.
+  line. Render the same 13 circles statically with Astryx components instead.
 - **Callbacks.** None. A screen will want `onSettled` (to enable taps) and
   `onExited`.
 - **No tilt/parallax.** It was in an earlier version and was removed with the flicker fix;
@@ -130,7 +135,7 @@ lands on a specific screen, that screen's lane owns the wiring; that is two jobs
 
 1. Which screen is this the hero for (sign-in, Home, a hero-template page)? That decides
    the help and navigation rules, and which lane wires it.
-2. What do the 10 circles represent: fixed brand icons, or the user's categories /
+2. What do the 10 icon circles represent: fixed brand icons, or the user's categories /
    services? That decides whether they are tappable.
 3. Should the circles take any of Pam's illustration style, or stay plain?
 4. Does the exit animation ship, or only the entrance? (The recording shows both.)
