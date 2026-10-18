@@ -7,7 +7,8 @@ import { useStoryText } from '../support/useStoryText';
 /** Its words are the app's own, read from the bundle (args are keys), so they follow the Language toolbar and cannot drift. */
 function Localised(props: ComponentProps<typeof SetupCard>) {
   const tr = useStoryText();
-  return <SetupCard {...props} title={tr(props.title)} body={tr(props.body)} />;
+  // body is optional since D-608 (the photo and calendar cards have none), so it is passed only when a story has one.
+  return <SetupCard {...props} title={tr(props.title)} {...(props.body ? { body: tr(props.body) } : {})} />;
 }
 
 /**
