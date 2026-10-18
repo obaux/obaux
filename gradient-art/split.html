@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Split Bloom</title>
+<style>
+  html { color-scheme: dark; }
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; font: 12px/1.3 system-ui, sans-serif; }
+  #stage { position: fixed; inset: 0; display: grid; place-items: center; }
+  canvas { display: block; }
+
+  /* counter in the middle; difference blending keeps it readable over both the white halves and the sky in the gap */
+  #guide {
+    position: fixed; inset: 0; display: grid; place-content: center; justify-items: center; gap: .15em;
+    pointer-events: none; color: #fff; mix-blend-mode: difference; text-align: center;
+  }
+  #phase { font-size: clamp(12px, 2.3vmin, 20px); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; }
+  #count { font-size: clamp(30px, 8vmin, 68px); font-weight: 300; line-height: 1; font-variant-numeric: tabular-nums; }
+
+  #dock {
+    position: fixed; left: 0; right: 0; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 5;
+    display: flex; justify-content: center; padding: 0 16px; pointer-events: none; transition: opacity .2s;
+  }
+  #dock > * { pointer-events: auto; }
+  #dock.open { opacity: 0; }
+  #dock.open > * { pointer-events: none; }
+  #panel {
+    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); width: 300px; max-height: 70%; overflow: auto;
+    padding: 12px; border-radius: 10px; background: rgba(20,18,20,.82); color: #eee;
+    backdrop-filter: blur(8px); transition: opacity .2s, transform .25s; touch-action: pan-y; z-index: 6;
+  }
+  #panel.hidden { opacity: 0; pointer-events: none; transform: translate(-50%, 16px); }
+  #panel h2 { margin: 0 0 8px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #aaa; }
+  #panel .close { float: right; margin: -4px 0 0; padding: 4px 10px; }
+  .row { display: flex; align-items: center; justify-content: space-between; margin: 5px 0; }
+  .row input[type=color] { width: 44px; height: 28px; padding: 0; border: 0; background: none; cursor: pointer; }
+  .row input[type=range] { width: 110px; accent-color: #fff; }
+  select { background: #333; color: #eee; border: 0; border-radius: 6px; padding: 6px 8px; font: inherit; max-width: 170px; }
+  button { background: #333; color: #eee; border: 0; border-radius: 6px; padding: 5px 9px; cursor: pointer; margin: 6px 6px 0 0; }
+  button:hover { background: #444; }
+  #toggle { margin: 0; min-height: 44px; padding: 0 24px; border-radius: 999px; font-size: 14px; background: rgba(20,18,20,.72); backdrop-filter: blur(8px); touch-action: manipulation; }
+  #hint { position: fixed; left: 12px; bottom: 10px; color: #ffffff66; }
+  @media (max-width: 640px) {
+    #panel { left: 0; right: 0; bottom: 0; transform: none; width: auto; max-height: 62%; border-radius: 14px 14px 0 0; padding: 14px 16px 22px; }
+    #panel.hidden { transform: translateY(100%); }
+    #hint { display: none; }
+  }
+  @media (pointer: coarse), (max-width: 640px) {
+    #panel { padding-bottom: calc(22px + env(safe-area-inset-bottom, 0px)); }
+    #panel button { min-height: 44px; padding: 0 18px; font-size: 14px; }
+    #panel select { min-height: 44px; font-size: 15px; max-width: 62%; }
+    #panel .row { min-height: 48px; margin: 2px 0; font-size: 14px; }
+    #panel .row input[type=color] { width: 56px; height: 40px; }
+    #panel .row input[type=range] { height: 44px; width: 55%; }
+    #panel h2 { font-size: 12px; margin-bottom: 4px; }
+  }
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="c"></canvas></div>
+<div id="guide" aria-live="off"><div id="phase">Breathe out</div><div id="count">4</div></div>
+<div id="dock"><button id="toggle" type="button">Controls</button></div>
+<div id="panel"></div>
+<div id="hint">press C for controls · space to pause</div>
+
+<script id="fs" type="x-shader/x-fragment">
+precision highp float;
+uniform vec2  uRes;
+uniform float uTime;      // seconds
+uniform float uMotion;    // 0 = perfectly still, 1 = full gentle sway of the gap edges
+uniform float uBreath;    // 0 = fully exhaled (wide gap), 1 = fully inhaled (thin gap)
+uniform float uSoft;      // 0 = crisp, 1 = very blurred bloom
+uniform float uGapMin;    // half-width of the gap on a full inhale (uv)
+uniform float uGapMax;    // half-width of the gap on a full exhale (uv)
+
+uniform vec3 uBg;         // sky: top
+uniform vec3 uGlowRed;    // sky: upper glow
+uniform vec3 uGlowOrange; // sky: lower glow
+uniform vec3 uTop;        // bloom rim green
+uniform vec3 uCore;       // bloom centre, white
+
+float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+
+float sstep(float a, float b, float x) {          // quintic ease
+  float t = clamp((x - a) / (b - a), 0.0, 1.0);
+  return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
+}
+
+void main() {
+  vec2 p = gl_FragCoord.xy / uRes;     // 0..1, y up (canvas is square)
+  float t = uTime * uMotion;
+  float b = uBreath;
+  vec2 v = p - 0.5;
+
+  // ---- sky: the horizon gradient, without the landscape line or water ----
+  const float HY = 0.24;
+  float skyK = smoothstep(0.85, HY, p.y);
+  vec3 sky = mix(uBg, mix(uGlowRed, uGlowOrange, smoothstep(0.55, HY, p.y)), skyK * (0.35 + 0.65 * b));
+  sky *= 1.0 - 0.25 * smoothstep(0.45, 0.80, length(v * vec2(1.0, 0.8)));
+
+  // ---- one tall figure, cut down the middle into two halves ----
+  float rx = mix(0.26, 0.29, b);                      // halves widen a touch as you breathe in
+  float ry = 0.38;
+  float en = length(v / vec2(rx, ry));                // 1.0 at the figure's edge
+  float outer = 1.0 - smoothstep(1.0 - uSoft, 1.05, en);          // wide feather: no outline anywhere
+
+  float g = mix(uGapMax, uGapMin, b) + 0.004 * uMotion * sin(p.y * 9.0 + t * 0.8);   // gap half-width
+  float f = 0.012 + 0.04 * uSoft;                     // gap edge blur
+  float gx = abs(v.x);
+  float body = smoothstep(g - f, g + f, gx);          // 0 inside the gap
+
+  vec3 c = mix(uCore, uTop, sstep(0.18, 1.12, en));   // white centre, green toward the rim
+
+  // green halo around the figure, and light spilling from the white inner edges into the gap
+  sky = mix(sky, uTop * 0.55, 0.18 * (0.5 + 0.5 * b) * exp(-max(en - 1.0, 0.0) * 3.0) * smoothstep(0.85, 1.1, en));
+  float spill = exp(-max(g - gx, 0.0) / (0.02 + 0.03 * uSoft)) * (1.0 - body) * outer;
+  sky += c * spill * 0.35;
+
+  vec3 col = mix(sky, c, outer * body);
+
+  // dither to hide banding in the big gradients
+  col += (hash(gl_FragCoord.xy + fract(uTime)) + hash(gl_FragCoord.yx + 7.3 + fract(uTime * 1.7)) - 1.0) / 255.0;
+  gl_FragColor = vec4(col, 1.0);
+}
+</script>
+
+<script>
+// ===================================================================
+//  Palette — every key becomes a colour picker and a shader uniform.
+//  Edit here, use the panel, or call  art.setColors({ uTop: '#ff0' })
+// ===================================================================
+const PALETTE = {
+  uBg:         '#110c0e',
+  uGlowRed:    '#c43c47',
+  uGlowOrange: '#c8703e',
+  uTop:        '#7ff04f',
+  uCore:       '#ffffff',
+};
+const LABELS = { uBg: 'Sky · top', uGlowRed: 'Sky · upper glow', uGlowOrange: 'Sky · lower glow', uTop: 'Rim green', uCore: 'Centre' };
+
+// ===================================================================
+//  Breathing patterns — seconds per phase, in order.
+//  kind: in (gap thins) · out (gap widens) · full (hold, thin) · empty (hold, wide)
+// ===================================================================
+const PATTERNS = {
+  calm:      { label: 'Calm · in 4, out 6',      phases: [['in', 4], ['out', 6]] },
+  coherent:  { label: 'Coherent · 5.5 / 5.5',    phases: [['in', 5.5], ['out', 5.5]] },
+  relax:     { label: 'Relax · 4-7-8',           phases: [['in', 4], ['full', 7], ['out', 8]] },
+  box:       { label: 'Box · 4-4-4-4',           phases: [['in', 4], ['full', 4], ['out', 4], ['empty', 4]] },
+};
+const CUES = { in: 'Breathe in', out: 'Breathe out', full: 'Hold', empty: 'Hold' };
+const ease = u => 0.5 - 0.5 * Math.cos(Math.PI * u);      // slow start, slow finish, like a real breath
+
+// returns { v: 0..1 (1 = fully inhaled), kind, left: whole seconds remaining }
+function breathAt(pattern, clock) {
+  const total = pattern.phases.reduce((s, p) => s + p[1], 0);
+  let tt = clock % total;
+  for (const [kind, dur] of pattern.phases) {
+    if (tt < dur) {
+      const u = tt / dur;
+      const v = kind === 'in' ? ease(u) : kind === 'out' ? 1 - ease(u) : kind === 'full' ? 1 : 0;
+      return { v, kind, left: Math.max(1, Math.ceil(dur - tt - 1e-6)) };
+    }
+    tt -= dur;
+  }
+  return { v: 0, kind: 'empty', left: 1 };
+}
+
+// ---------------------------------------------------------------- GL
+const canvas = document.getElementById('c');
+const gl = canvas.getContext('webgl', { antialias: true, preserveDrawingBuffer: true });
+const compile = (type, src) => {
+  const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+  return s;
+};
+const prog = gl.createProgram();
+gl.attachShader(prog, compile(gl.VERTEX_SHADER, 'attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}'));
+gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, document.getElementById('fs').textContent));
+gl.linkProgram(prog); gl.useProgram(prog);
+gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+const loc = gl.getAttribLocation(prog, 'a');
+gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+const U = n => gl.getUniformLocation(prog, n);
+
+const hex2rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
+const state = {
+  motion: 0.45, soft: 0.35, gapMin: 0.010, gapMax: 0.075,   // look
+  playing: true, time: 0, clock: 0, pattern: 'calm',       // clock = seconds of breathing
+};
+const params = new URLSearchParams(location.search);
+if (params.has('t'))       state.clock = +params.get('t');      // jump to a moment in the breath cycle
+if (params.has('motion'))  state.motion = +params.get('motion');
+if (params.has('pattern') && PATTERNS[params.get('pattern')]) state.pattern = params.get('pattern');
+
+function resize() {
+  const s = Math.min(innerWidth, innerHeight), dpr = Math.min(devicePixelRatio || 1, 2);
+  canvas.style.width = canvas.style.height = s + 'px';
+  canvas.width = canvas.height = Math.round(s * dpr);
+  gl.viewport(0, 0, canvas.width, canvas.height);
+}
+addEventListener('resize', resize); resize();
+
+const phaseEl = document.getElementById('phase'), countEl = document.getElementById('count');
+let shown = '';
+function updateGuide(b) {
+  const key = b.kind + b.left;
+  if (key === shown) return;
+  shown = key; phaseEl.textContent = CUES[b.kind]; countEl.textContent = b.left;
+}
+
+function draw(b) {
+  gl.uniform2f(U('uRes'), canvas.width, canvas.height);
+  gl.uniform1f(U('uTime'), state.time);
+  gl.uniform1f(U('uMotion'), state.motion);
+  gl.uniform1f(U('uBreath'), b.v);
+  gl.uniform1f(U('uSoft'), state.soft);
+  gl.uniform1f(U('uGapMin'), state.gapMin);
+  gl.uniform1f(U('uGapMax'), state.gapMax);
+  for (const k in PALETTE) gl.uniform3fv(U(k), hex2rgb(PALETTE[k]));
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+}
+let last = performance.now();
+(function frame(now) {
+  const dt = Math.min((now - last) / 1000, 0.05);
+  last = now;
+  if (state.playing) { state.time += dt; state.clock += dt; }
+  const b = breathAt(PATTERNS[state.pattern], state.clock);
+  updateGuide(b); draw(b); requestAnimationFrame(frame);
+})(last);
+
+// ------------------------------------------------------------- panel
+const panel = document.getElementById('panel');
+panel.innerHTML = `<button class="close" id="close" type="button">Done</button><h2>Breathing</h2>
+  <div class="row"><span>Pattern</span><select id="pattern">${
+    Object.entries(PATTERNS).map(([k, p]) => `<option value="${k}">${p.label}</option>`).join('')}</select></div>
+  <button id="restart" type="button">Restart</button><button id="pause" type="button">Pause</button>
+  <h2 style="margin-top:14px">Colours</h2>`;
+const inputs = {};
+for (const k in PALETTE) {
+  const row = document.createElement('label'); row.className = 'row';
+  row.innerHTML = `<span>${LABELS[k]}</span><input type="color" value="${PALETTE[k]}">`;
+  const inp = row.querySelector('input'); inputs[k] = inp;
+  inp.addEventListener('input', () => { PALETTE[k] = inp.value; });
+  panel.appendChild(row);
+}
+const slider = (id, label, min, max, step, value) =>
+  `<div class="row"><span>${label}</span><input id="${id}" type="range" min="${min}" max="${max}" step="${step}" value="${value}"></div>`;
+panel.insertAdjacentHTML('beforeend', `<h2 style="margin-top:12px">Shape</h2>
+  ${slider('gapMin', 'Gap · inhale', 0, 0.04, 0.002, state.gapMin)}
+  ${slider('gapMax', 'Gap · exhale', 0.03, 0.16, 0.005, state.gapMax)}
+  ${slider('soft', 'Softness', 0.1, 0.9, 0.05, state.soft)}
+  ${slider('motion', 'Sway', 0, 2, 0.05, state.motion)}`);
+for (const k of ['gapMin', 'gapMax', 'soft', 'motion']) panel.querySelector('#' + k).oninput = e => { state[k] = +e.target.value; };
+const patternSel = panel.querySelector('#pattern');
+patternSel.value = state.pattern;
+patternSel.onchange = () => { state.pattern = patternSel.value; state.clock = 0; };
+panel.querySelector('#restart').onclick = () => { state.clock = 0; };
+const pauseBtn = panel.querySelector('#pause');
+const togglePlay = () => { state.playing = !state.playing; pauseBtn.textContent = state.playing ? 'Pause' : 'Resume'; };
+pauseBtn.onclick = togglePlay;
+const toggleBtn = document.getElementById('toggle'), dockEl = document.getElementById('dock');
+const setPanel = open => { panel.classList.toggle('hidden', !open); dockEl.classList.toggle('open', open); };
+toggleBtn.onclick = () => setPanel(true);
+panel.querySelector('#close').onclick = () => setPanel(false);
+setPanel(false);   // the breath is the page; controls stay out of the way until asked for
+addEventListener('keydown', e => {
+  if (e.key === 'c' || e.key === 'C') setPanel(panel.classList.contains('hidden'));
+  if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+});
+if (params.has('clean')) { dockEl.remove(); document.getElementById('hint').remove(); }
+
+// ------------------------------------------------------- public API
+window.art = {
+  state, PALETTE, PATTERNS,
+  setColors(map) { for (const k in map) if (k in PALETTE) { PALETTE[k] = map[k]; if (inputs[k]) inputs[k].value = map[k]; } },
+  setPattern(name) { if (PATTERNS[name]) { state.pattern = name; state.clock = 0; patternSel.value = name; } },
+  addPattern(name, label, phases) { PATTERNS[name] = { label, phases }; patternSel.add(new Option(label, name)); },
+  play()  { state.playing = true; },
+  pause() { state.playing = false; },
+  restart() { state.clock = 0; },
+};
+</script>
+</body>
+</html>
