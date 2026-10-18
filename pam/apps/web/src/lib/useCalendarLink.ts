@@ -4,14 +4,27 @@ import { useCallback, useEffect, useState } from 'react';
 import { SUPABASE_URL } from './project';
 
 /**
- * A member's calendar link (D-538): a secret address that a calendar app follows to show their Pam
- * visits. Pam keeps only a hash of it, so the address is shown once, when it is made; it is held here
- * in memory for as long as the page is open and never written anywhere on the phone.
+ * A member's calendar link (D-538, D-604): a secret address that a calendar app follows to show their Pam visits, each one the place's name,
+ * its address and the time. Pam keeps only the link's version, which calendar the member said they use and the day they linked it: the address
+ * itself is worked out by the database for the member who asks, so it can be shown again whenever the page is open. It is held here in memory
+ * and never written anywhere on the phone. A member whose link was made before D-604 (hash-only) has a `legacy` one: Pam has no address to
+ * show, and it keeps saying "Pam visit" and the time until they make a new one.
  */
+export type CalendarKind = 'apple' | 'google' | 'outlook' | 'other';
+
 export type CalendarLinkState =
   | { readonly status: 'loading' }
   | { readonly status: 'off' }
-  | { readonly status: 'on'; readonly showDetails: boolean; readonly token: string | null }
+  | {
+      readonly status: 'on';
+      readonly isLegacy: boolean;
+      /** The calendar the member said they use; null for a legacy link. */
+      readonly calendar: CalendarKind | null;
+      /** The day it was linked, `YYYY-MM-DD`. */
+      readonly linkedOn: string | null;
+      /** The address, for a link made the new way; null for a legacy one. */
+      readonly token: string | null;
+    }
   | { readonly status: 'error' };
 
 export const feedUrl = (token: string): string => `${SUPABASE_URL}/functions/v1/calendar-feed/${token}.ics`;
@@ -30,9 +43,21 @@ export function isAppleDevice(userAgent: string, platform = ''): boolean {
   return true;
 }
 
-interface StatusRow {
+interface StateRow {
   readonly is_on: boolean;
-  readonly show_details: boolean;
+  readonly is_legacy: boolean;
+  readonly calendar: CalendarKind | null;
+  readonly linked_on: string | null;
+  readonly token: string | null;
+}
+
+/** The member's own time zone, so "since 12 October" is their day. */
+function localTimeZone(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/New_York';
+  } catch {
+    return 'America/New_York';
+  }
 }
 
 export function useCalendarLink(enabled: boolean) {
@@ -42,16 +67,22 @@ export function useCalendarLink(enabled: boolean) {
 
   const client = useCallback(async () => (await import('./supabase')).createClient(), []);
 
+  const read = useCallback(async (): Promise<CalendarLinkState> => {
+    const { data, error } = await (await client()).rpc('calendar_link_state');
+    const row = (Array.isArray(data) ? data[0] : data) as StateRow | undefined;
+    if (error || !row) return { status: 'error' };
+    return row.is_on
+      ? { status: 'on', isLegacy: row.is_legacy, calendar: row.calendar, linkedOn: row.linked_on, token: row.token }
+      : { status: 'off' };
+  }, [client]);
+
   useEffect(() => {
     if (!enabled) return;
     let live = true;
     void (async () => {
       try {
-        const { data, error } = await (await client()).rpc('calendar_link_status');
-        if (!live) return;
-        const row = (Array.isArray(data) ? data[0] : data) as StatusRow | undefined;
-        if (error || !row) return setState({ status: 'error' });
-        setState(row.is_on ? { status: 'on', showDetails: row.show_details, token: null } : { status: 'off' });
+        const next = await read();
+        if (live) setState(next);
       } catch {
         if (live) setState({ status: 'error' });
       }
@@ -59,37 +90,32 @@ export function useCalendarLink(enabled: boolean) {
     return () => {
       live = false;
     };
-  }, [enabled, client]);
+  }, [enabled, read]);
 
-  /** Makes a link, or a new one (the old stops at once). Keeps the member's choice about details. */
-  const make = useCallback(async () => {
-    setBusy(true);
-    setFailed(false);
-    try {
-      const { data, error } = await (await client()).rpc('calendar_link_make');
-      if (error || typeof data !== 'string') throw new Error('make');
-      setState((s) => ({ status: 'on', showDetails: s.status === 'on' ? s.showDetails : false, token: data }));
-    } catch {
-      setFailed(true);
-    } finally {
-      setBusy(false);
-    }
-  }, [client]);
-
-  const setShowDetails = useCallback(
-    async (show: boolean) => {
+  /**
+   * Makes a link, or a new one (the old address stops at once). Say which calendar for a first link; leave it out on a new one to keep
+   * the calendar already chosen.
+   */
+  const make = useCallback(
+    async (calendar?: CalendarKind) => {
+      setBusy(true);
       setFailed(false);
       try {
-        const { error } = await (await client()).rpc('calendar_link_set_details', { p_show: show });
-        if (error) throw new Error('details');
-        setState((s) => (s.status === 'on' ? { ...s, showDetails: show } : s));
+        const { error } = await (await client()).rpc('calendar_link_issue', { p_calendar: calendar ?? null, p_timezone: localTimeZone() });
+        if (error) throw new Error('make');
+        const next = await read();
+        if (next.status !== 'on') throw new Error('make');
+        setState(next);
       } catch {
         setFailed(true);
+      } finally {
+        setBusy(false);
       }
     },
-    [client],
+    [client, read],
   );
 
+  /** Disconnect: Pam forgets the link, the calendar chosen and the day. */
   const turnOff = useCallback(async () => {
     setBusy(true);
     setFailed(false);
@@ -104,5 +130,5 @@ export function useCalendarLink(enabled: boolean) {
     }
   }, [client]);
 
-  return { state, busy, failed, make, setShowDetails, turnOff };
+  return { state, busy, failed, make, turnOff };
 }

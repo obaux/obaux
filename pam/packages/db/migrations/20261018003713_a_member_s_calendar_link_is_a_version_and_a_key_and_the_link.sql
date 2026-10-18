@@ -4,14 +4,15 @@
 -- address again and the Calendar screen had to say "make a new link". Will, 18 October: show it again, put the place's name and address in
 -- every event ("it's obviously a yes"), and say which calendar the member chose.
 --
--- THE LINK. Its token is the member's id (22 characters of base64url) and then the HMAC-SHA256 of "member id:version" under one key held in
--- Supabase Vault (`calendar_link_key`, 43 characters): 65 in all. Pam stores only the version number, so there is no hash and no copy of the
--- link on any row: Pam works the address out again when the member opens the screen, with a key nobody reads. "Get a new link" adds one to
+-- THE LINK. Its token is a random lookup id (22 characters of base64url; made fresh with every new link, so the address never names the account:
+-- Apple, Google and Microsoft see it in every request) and then the HMAC-SHA256 of "lookup id:version" under one key held in Supabase Vault
+-- (`calendar_link_key`, 43 characters): 65 in all. The database checks the HMAC; the edge function never sees the key. Pam stores only the lookup id
+-- and the version number, so there is no hash and no copy of the link on any row: Pam works the address out again when the member opens the screen, with a key nobody reads. "Get a new link" adds one to
 -- the version and the old address stops at once; disconnecting deletes the row. The version comes from a sequence, so a number is never used twice:
 -- an address that was ever disconnected or replaced does not come back to life when the member links again. The key is made here, in the database, from random bytes
 -- (the same way as `dispatch_secret`, 20261010144844): its value never appears in this repository, a log or any session.
 --
--- WHAT THE ROW HOLDS. `calendar_links(member_id, version, calendar, linked_on)` and nothing else: which calendar the member said they use
+-- WHAT THE ROW HOLDS. `calendar_links(member_id, lookup_id, version, calendar, linked_on)` and nothing else: which calendar the member said they use
 -- (apple, google, outlook or other, their own choice: Pam cannot know that a calendar asked for the feed) and the day they linked it, in
 -- their own time zone. No time of any request, no show_details, no hash.
 --
@@ -33,6 +34,7 @@ revoke all on sequence public.calendar_link_versions from public, anon, authenti
 
 create table if not exists public.calendar_links (
   member_id uuid primary key references public.profiles (id) on delete cascade,
+  lookup_id uuid not null unique default gen_random_uuid(),
   version   bigint not null default nextval('public.calendar_link_versions') check (version >= 1),
   calendar  text not null check (calendar in ('apple', 'google', 'outlook', 'other')),
   linked_on date not null default current_date
@@ -80,20 +82,20 @@ begin
 end;
 $$;
 
--- The token for a member's link at a version: their id, then the HMAC. Internal.
-create or replace function public.calendar_link_token(p_member uuid, p_version bigint)
+-- The token for a link: its lookup id, then the HMAC of the lookup id and version. Internal.
+create or replace function public.calendar_link_token(p_lookup uuid, p_version bigint)
 returns text
 language sql
 stable
 security definer
 set search_path = public, extensions
 as $$
-  select translate(rtrim(encode(decode(replace(p_member::text, '-', ''), 'hex'), 'base64'), '='), '+/', '-_')
-      || translate(rtrim(encode(extensions.hmac(p_member::text || ':' || p_version::text, public.calendar_link_key(), 'sha256'), 'base64'), '='), '+/', '-_');
+  select translate(rtrim(encode(decode(replace(p_lookup::text, '-', ''), 'hex'), 'base64'), '='), '+/', '-_')
+      || translate(rtrim(encode(extensions.hmac(p_lookup::text || ':' || p_version::text, public.calendar_link_key(), 'sha256'), 'base64'), '='), '+/', '-_');
 $$;
 
--- The member a token names (not yet proved), or null for anything that is not shaped like one. Internal.
-create or replace function public.calendar_link_member_of(p_token text)
+-- The lookup id a token names (not yet proved), or null for anything that is not shaped like one. Internal.
+create or replace function public.calendar_link_lookup_of(p_token text)
 returns uuid
 language plpgsql
 immutable
@@ -122,6 +124,7 @@ declare
   zone   text := p_timezone;
   cal    text;
   v      bigint;
+  lid    uuid;
 begin
   if caller is null then
     raise exception 'Sign in first';
@@ -145,12 +148,12 @@ begin
   end if;
   -- A legacy hash-only link is replaced by this one.
   delete from public.calendar_feeds where member_id = caller;
-  insert into public.calendar_links (member_id, version, calendar, linked_on)
-  values (caller, nextval('public.calendar_link_versions'), cal, (now() at time zone zone)::date)
+  insert into public.calendar_links (member_id, lookup_id, version, calendar, linked_on)
+  values (caller, gen_random_uuid(), nextval('public.calendar_link_versions'), cal, (now() at time zone zone)::date)
   on conflict (member_id) do update
-    set version = excluded.version, calendar = excluded.calendar, linked_on = excluded.linked_on
-  returning version into v;
-  return public.calendar_link_token(caller, v);
+    set lookup_id = excluded.lookup_id, version = excluded.version, calendar = excluded.calendar, linked_on = excluded.linked_on
+  returning lookup_id, version into lid, v;
+  return public.calendar_link_token(lid, v);
 end;
 $$;
 
@@ -173,7 +176,7 @@ begin
   end if;
   select l.* into link from public.calendar_links l where l.member_id = me;
   if link.member_id is not null then
-    return query select true, false, link.calendar, link.linked_on, public.calendar_link_token(me, link.version);
+    return query select true, false, link.calendar, link.linked_on, public.calendar_link_token(link.lookup_id, link.version);
     return;
   end if;
   select f.* into legacy from public.calendar_feeds f where f.member_id = me;
@@ -211,17 +214,21 @@ security definer
 set search_path = public, extensions
 as $$
 declare
-  member uuid := public.calendar_link_member_of(p_token);
+  lookup uuid := public.calendar_link_lookup_of(p_token);
   link   public.calendar_links;
+  member uuid;
+  lang   text;
   visits jsonb;
 begin
-  if member is null then
+  if lookup is null then
     return null;
   end if;
-  select l.* into link from public.calendar_links l where l.member_id = member;
-  if link.member_id is null or p_token <> public.calendar_link_token(member, link.version) then
+  select l.* into link from public.calendar_links l where l.lookup_id = lookup;
+  if link.member_id is null or p_token <> public.calendar_link_token(link.lookup_id, link.version) then
     return null;
   end if;
+  member := link.member_id;
+  select p.preferred_language into lang from public.profiles p where p.id = member;
   select coalesce(jsonb_agg(jsonb_build_object(
            'id', a.id,
            'starts_at', a.starts_at,
@@ -236,14 +243,14 @@ begin
     and a.status <> 'cancelled'
     and a.starts_at >= now() - interval '7 days'
     and a.starts_at < now() + interval '6 months';
-  return jsonb_build_object('kind', 'link', 'visits', visits);
+  return jsonb_build_object('kind', 'link', 'language', coalesce(lang, 'en'), 'visits', visits);
 end;
 $$;
 
 -- Who can call what. The key and the token are internal: no client role. The member's own doors are for signed-in members.
 revoke all on function public.calendar_link_key() from public, anon, authenticated, service_role;
 revoke all on function public.calendar_link_token(uuid, bigint) from public, anon, authenticated, service_role;
-revoke all on function public.calendar_link_member_of(text) from public, anon, authenticated;
+revoke all on function public.calendar_link_lookup_of(text) from public, anon, authenticated;
 revoke all on function public.calendar_link_issue(text, text) from public, anon;
 revoke all on function public.calendar_link_state() from public, anon;
 revoke all on function public.calendar_link_off() from public, anon;

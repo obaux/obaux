@@ -271,3 +271,12 @@ describe('the function, for a link', () => {
     expect(asked[0]!.url).toBe('https://stub.supabase.co/rest/v1/rpc/calendar_feed_read');
   });
 });
+
+describe('the calendar name follows the member\'s language (a98 plan C)', () => {
+  it('has a name for every language Pam speaks, and a link feed uses the one for its language', async () => {
+    const { LINK_CALENDAR_NAMES, buildCalendar } = await import('../../../supabase/functions/calendar-feed/ics');
+    expect(Object.keys(LINK_CALENDAR_NAMES).sort()).toEqual(['ar', 'en', 'es', 'pt-BR', 'ru', 'zh-CN', 'zh-HK']);
+    const feed = { kind: 'link', language: 'es', visits: [] } as never;
+    expect(buildCalendar(feed, new Date('2026-10-18T00:00:00Z'))).toContain(`X-WR-CALNAME:${LINK_CALENDAR_NAMES.es}`);
+  });
+});

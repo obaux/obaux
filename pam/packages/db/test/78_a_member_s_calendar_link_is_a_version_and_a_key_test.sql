@@ -4,9 +4,9 @@
 -- on one database: choose ids and phone numbers no other file uses (grep this folder),
 -- and count only your own rows.
 --
--- The address is the member's id and an HMAC of it and the link's version under a key in the vault; Pam stores the version, the calendar the
+-- The address is a random lookup id (never the member's id) and an HMAC of it and the link's version under a key in the vault; Pam stores the version, the calendar the
 -- member chose and the day, and nothing that makes the address. These attack that: the address can be shown again and is the same each time;
--- a new link stops the old one; a wrong or tampered or another member's address finds nothing; the row holds exactly four columns; only a
+-- a new link stops the old one; a wrong or tampered or another member's address finds nothing; the row holds exactly five columns; only a
 -- member reaches a link, and only their own; disconnecting deletes the row; and a legacy hash-only link keeps answering as it did.
 
 \set ON_ERROR_STOP on
@@ -64,7 +64,7 @@ select test.check('one key exists in the vault', (select count(*) from vault.sec
 select test.check('...it is 64 hex characters, made from random bytes', (select length(secret) from vault.secrets where name = 'calendar_link_key'), 64);
 set role authenticated;
 select test.check_raises_like('a client cannot call for the key', $$select public.calendar_link_key()$$, '%permission denied%');
-select test.check_raises_like('...nor for a token', format($$select public.calendar_link_token(%L, 1)$$, :'ana'), '%permission denied%');
+select test.check_raises_like('...nor for a token', format($$select public.calendar_link_token(%L, 1)$$, gen_random_uuid()), '%permission denied%');
 reset role;
 set role service_role;
 select test.check_raises_like('the service role cannot call for the key either', $$select public.calendar_link_key()$$, '%permission denied%');
@@ -87,21 +87,23 @@ reset role;
 set role authenticated;
 select set_config('request.jwt.claim.sub', :'ana', false);
 insert into tok select 'ana', 1, public.calendar_link_issue('google', 'America/Los_Angeles');
-select test.check('the address is 65 characters of base64url: the member, then the HMAC',
+select test.check('the address is 65 characters of base64url: the lookup id, then the HMAC',
   (select (t ~ '^[A-Za-z0-9_-]{65}$')::int from tok where who = 'ana' and n = 1), 1);
 select test.check('the state says it is on, not legacy, Google, and gives the same address again',
   (select count(*) from public.calendar_link_state() s where s.is_on and not s.is_legacy and s.calendar = 'google' and s.token = (select t from tok where who = 'ana' and n = 1)), 1::bigint);
 select test.check('...and the same again the next time (it is worked out, not remade)',
   (select count(*) from public.calendar_link_state() s where s.token = (select t from tok where who = 'ana' and n = 1)), 1::bigint);
 reset role;
-select test.check('the row holds exactly four columns: the member, the version, the calendar and the day',
-  ((select string_agg(column_name, ',' order by column_name) from information_schema.columns where table_schema = 'public' and table_name = 'calendar_links') = 'calendar,linked_on,member_id,version')::int, 1);
+select test.check('the row holds exactly five columns: the member, the lookup id, the version, the calendar and the day',
+  ((select string_agg(column_name, ',' order by column_name) from information_schema.columns where table_schema = 'public' and table_name = 'calendar_links') = 'calendar,linked_on,lookup_id,member_id,version')::int, 1);
 select test.check('...the calendar is google and the day is the member''s own',
   (select count(*) from public.calendar_links where member_id = :'ana' and version >= 1 and calendar = 'google' and linked_on = (now() at time zone 'America/Los_Angeles')::date), 1::bigint);
 select test.check('the address is stored nowhere: not in the table, in any column',
   (select count(*) from public.calendar_links l where l::text like '%' || (select t from tok where who = 'ana' and n = 1) || '%'), 0::bigint);
-select test.check('...nor the first half, the part that is the member''s id, nor the HMAC half',
+select test.check('...nor the first half (the lookup id), nor the HMAC half',
   (select count(*) from public.calendar_links l where l::text like '%' || left((select t from tok where who = 'ana' and n = 1), 22) || '%' or l::text like '%' || right((select t from tok where who = 'ana' and n = 1), 43) || '%'), 0::bigint);
+select test.check('the address never names the account: the member''s id, in base64url or hex, is not in it',
+  (select count(*) from tok where who = 'ana' and (t like '%' || translate(rtrim(encode(decode(replace(:'ana', '-', ''), 'hex'), 'base64'), '='), '+/', '-_') || '%' or t like '%' || replace(:'ana', '-', '') || '%')), 0::bigint);
 select test.check('the old legacy table has nothing for her', (select count(*) from public.calendar_feeds where member_id = :'ana'), 0::bigint);
 
 \echo ''
@@ -114,8 +116,8 @@ select test.check('the visit has the place''s name and address',
     where v ->> 'name' = 'Plan C Kitchen' and v ->> 'address' = '7 Plan St, Philadelphia'), 1::bigint);
 select test.check('...and its keys are exactly id, starts_at, ends_at, name and address',
   ((select string_agg(k, ',' order by k) from (select jsonb_object_keys(v) k from jsonb_array_elements(public.calendar_feed_read_link((select t from tok where who = 'ana' and n = 1)) -> 'visits') v) x) = 'address,ends_at,id,name,starts_at')::int, 1);
-select test.check('the answer says it is a versioned link and has nothing but its visits',
-  ((select string_agg(k, ',' order by k) from jsonb_object_keys(public.calendar_feed_read_link((select t from tok where who = 'ana' and n = 1))) k) = 'kind,visits')::int, 1);
+select test.check('the answer says it is a versioned link and has nothing but its language and its visits',
+  ((select string_agg(k, ',' order by k) from jsonb_object_keys(public.calendar_feed_read_link((select t from tok where who = 'ana' and n = 1))) k) = 'kind,language,visits')::int, 1);
 select test.check('the note, the first name and another member''s visit are nowhere in it',
   (select count(*) from (select public.calendar_feed_read_link((select t from tok where who = 'ana' and n = 1))::text as t) x
     where t like '%private note%' or t like '%Ana%' or t like '%000000007804%'), 0::bigint);
@@ -156,8 +158,8 @@ reset role;
 select test.check('the version is a new number (it goes up and is never used twice)',
   ((select version from public.calendar_links where member_id = :'ana') > (select version from public.calendar_links where member_id = :'ben'))::int, 1);
 select test.check('the new address is different', (select (a.t <> b.t)::int from tok a, tok b where a.who = 'ana' and a.n = 1 and b.who = 'ana' and b.n = 2), 1);
-select test.check('...and has the same first half: it is still her',
-  (select (left(a.t, 22) = left(b.t, 22))::int from tok a, tok b where a.who = 'ana' and a.n = 1 and b.who = 'ana' and b.n = 2), 1);
+select test.check('...and a new lookup id too: nothing of the old address is left',
+  (select (left(a.t, 22) <> left(b.t, 22))::int from tok a, tok b where a.who = 'ana' and a.n = 1 and b.who = 'ana' and b.n = 2), 1);
 set role service_role;
 select test.check('the old address finds nothing now', (select (public.calendar_feed_read_link((select t from tok where who = 'ana' and n = 1)) is null)::int), 1);
 select test.check('the new one finds her visit', (select jsonb_array_length(public.calendar_feed_read_link((select t from tok where who = 'ana' and n = 2)) -> 'visits')), 1);

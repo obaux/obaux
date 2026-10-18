@@ -46,6 +46,9 @@ const nextConfig = {
   // build come out in browser-default serif.
   transpilePackages: ['@pam/ui', '@pam/config', '@pam/db'],
 
+  // The calendar module the edge function and the app share (supabase/functions/calendar-feed/ics.ts, D-604) lives outside this app.
+  experimental: { externalDir: true },
+
   eslint: { ignoreDuringBuilds: false },
   typescript: { ignoreBuildErrors: false },
 

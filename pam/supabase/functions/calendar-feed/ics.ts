@@ -24,6 +24,7 @@ export interface FeedVisit {
 export interface Feed {
   /** 'link' for a versioned address (D-604); absent for a legacy one. */
   readonly kind?: 'link';
+  readonly language?: string;
   readonly show_details?: boolean;
   readonly visits: readonly FeedVisit[];
 }
@@ -82,6 +83,17 @@ export function linkEventLines(visit: FeedVisit, now: Date): string[] {
 /** The calendar's name in the member's own calendar list: neutral, not "Pam" (D-604; Sage's word to confirm). */
 export const LINK_CALENDAR_NAME = 'Visits';
 
+/** The calendar's name in the member's saved language (read when the feed is fetched; nothing new is stored). English stands in until Lena translates. */
+export const LINK_CALENDAR_NAMES: Readonly<Record<string, string>> = {
+  en: 'Visits',
+  es: 'Visits',
+  'pt-BR': 'Visits',
+  ru: 'Visits',
+  ar: 'Visits',
+  'zh-CN': 'Visits',
+  'zh-HK': 'Visits',
+};
+
 /** One visit as a calendar file, made on the phone for Apple Calendar or Outlook to open (D-604): the same event as the feed's. */
 export function buildVisitFile(visit: FeedVisit, now: Date = new Date()): string {
   if (Number.isNaN(new Date(visit.starts_at).getTime())) return '';
@@ -111,7 +123,7 @@ export function buildCalendar(feed: Feed, now: Date = new Date()): string {
     'PRODID:-//Pam//Visits//EN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
-    `X-WR-CALNAME:${isLink ? LINK_CALENDAR_NAME : 'Pam visits'}`,
+    `X-WR-CALNAME:${isLink ? (LINK_CALENDAR_NAMES[feed.language ?? 'en'] ?? LINK_CALENDAR_NAME) : 'Pam visits'}`,
     'REFRESH-INTERVAL;VALUE=DURATION:PT12H',
     'X-PUBLISHED-TTL:PT12H',
   ];

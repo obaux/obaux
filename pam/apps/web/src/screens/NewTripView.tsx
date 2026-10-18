@@ -33,6 +33,7 @@ import { countdown } from '@/lib/when';
 import { FRIEND_BANNER, FRIEND_BANNER_SRCSET } from '@/lib/friendBanner';
 import { usePlaceHasLead } from '@/lib/usePlaceHasLead';
 import { useServices } from '@/lib/useServices';
+import { AddVisitToCalendar } from './AddVisitToCalendar';
 import { HelpButton } from './HelpButton';
 import { BigCategoryIcon, CategoryPicture } from './SavedView';
 import { ProgramVisitCard } from '@pam/ui/ProgramVisitCard';
@@ -386,20 +387,25 @@ export function NewTripView({
           7 October, D-337), named for the program, with how soon and a way
           to move it right here.
         */}
-        <VisitCard
-          eyebrow={place.name}
-          day={dayLong.format(confirmed.at)}
-          time={timeFmt.format(confirmed.at)}
-          service={chosenService?.name ?? null}
-          countdown={countdown(confirmed.at, t)}
-          changeLabel={t('place.visit.change')}
-          changeHref={`/trips/new/?${new URLSearchParams({
-            place: place.id,
-            name: place.name,
-            category: place.category,
-            ...(place.address ? { address: place.address } : {}),
-            change: confirmed.id,
-          }).toString()}`}
+        <AddVisitToCalendar
+          visit={{ id: confirmed.id, placeName: place.name, address: place.address ?? null, startsAt: confirmed.at }}
+          card={
+          <VisitCard
+            eyebrow={place.name}
+            day={dayLong.format(confirmed.at)}
+            time={timeFmt.format(confirmed.at)}
+            service={chosenService?.name ?? null}
+            countdown={countdown(confirmed.at, t)}
+            changeLabel={t('place.visit.change')}
+            changeHref={`/trips/new/?${new URLSearchParams({
+              place: place.id,
+              name: place.name,
+              category: place.category,
+              ...(place.address ? { address: place.address } : {}),
+              change: confirmed.id,
+            }).toString()}`}
+          />
+          }
         />
         {hasLead ? (
           forMember ? null : <Banner status="info" title={t('trips.booked.hasLead', { place: place.name })} />
