@@ -1624,6 +1624,10 @@ only the alert texts Will signed: no "introduced to your program", no "your acco
 
 Stretched-link cards, service choices and tabs press (D-602 addendum). Branch `claude/pam-design-press-layer-2`; waits on Mira.
 
+## Design system & Storybook · Message Pam, drawings (18 October)
+
+The member's Messages with Pam as a row, the Pam thread, Contact Pam, the super admin's inbox and thread, and starting a conversation: pictures only, for Will's card (`docs/design/review/2026-10-18-message-pam/`). Nothing built; words are stand-ins. On `claude/pam-design-message-pam`.
+
 ## Design system & Storybook · counts on a row (16 October)
 
 A count at the end of a row is a plain number (`value`); the red badge is for what is new (D-586). The super admin Home's two rows follow it: Reported places changes (Piper), Programs to check stays (Ava). On `claude/pam-design-count-style`.
