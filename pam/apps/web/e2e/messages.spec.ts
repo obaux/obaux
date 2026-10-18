@@ -828,6 +828,8 @@ test.describe('a conversation', () => {
     await page.getByRole('button', { name: 'Block this person' }).click();
     await page.getByRole('button', { name: 'Block', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Blocked' }).first()).toBeVisible();
+    // The title says it (D-608): no second paragraph about what blocking does.
+    await expect(page.getByText(/Neither of you can send messages here now/)).toHaveCount(0);
     expect(calls).toEqual(['block']);
     await expect(page.getByRole('link', { name: 'Back to the conversation' }).first()).toBeVisible();
 
@@ -835,8 +837,11 @@ test.describe('a conversation', () => {
     await page.goto(`/messages/thread/options/?id=${CONVO}`);
     await settled(page);
     await page.getByRole('button', { name: 'Unblock this person' }).click();
+    await expect(page.getByRole('heading', { name: 'Unblock this person?' })).toBeVisible();
+    await expect(page.getByText(/You will both be able to send messages here again/)).toHaveCount(0);
     await page.getByRole('button', { name: 'Unblock', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Unblocked' }).first()).toBeVisible();
+    await expect(page.getByText(/You can send messages here again/)).toHaveCount(0);
     expect(calls).toEqual(['block', 'unblock']);
   });
 
@@ -1411,6 +1416,8 @@ test.describe('the conversation, drawn closer (D-400, D-401)', () => {
     await settled(page);
     const line = page.getByText(/^Program lead at Example Food Pantry of North Philadelphia and the Neighborhoods Around It$/);
     await expect(line).toBeVisible();
+    // Will signed this line (D-541, a102 waits on his answer): a member writing to a program is told what the program sees.
+    await expect(page.getByText('This program sees your first name and what you write.')).toBeVisible();
     const box = (await line.boundingBox())!;
     // Inside the screen, and nothing clipped: it grows to a second line rather than being cut.
     expect(box.x).toBeGreaterThanOrEqual(0);

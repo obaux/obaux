@@ -330,7 +330,7 @@ function ThreadScreen() {
               {trueRole === 'member' && state.otherRole === 'provider' ? (
                 <ThreadVisit programName={state.otherProgramName ?? null} threadId={conversationId ?? ''} />
               ) : null}
-              {/* What the program sees, said where a member writes (D-541): a first name and these words. */}
+              {/* What the program sees, said where a member writes (D-541): a first name and these words. Kept: Will signed this line (a102 waits on him). */}
               {trueRole === 'member' && state.otherRole === 'provider' ? (
                 <Text type="supporting" dir="auto">
                   {t('messages.program.note')}
