@@ -1445,6 +1445,16 @@
   23:17): a row darkens, a card, tile or button presses in to 97%, a switch's segment shades without moving, and
   reduced motion keeps only the shade. Ava's 92c978bf (Iris's P5): sign-up's "Pam is only in these cities for now."
   is a line under the city field, not a row in its list. No new words, no migrations.
+- **Card a98 approved (18 October, 00:30).** Will: plan C, with the booked card's own calendar mark gone and the
+  corner a real "Add to calendar" button (Dot efc93e50). The three Privacy lines (Sage f5d64686, bb474f6d, e1956821)
+  wait for his "sign 1, 2, 3". Sage signed the screen words (ef40b2fb) and "Visits" as the calendar's name (9190aac3).
+  Piper builds: a new calendar_links table (calendar_feeds untouched, no DROP), a link made of a random lookup id and
+  an HMAC under a Vault key (never the account id), each event only the place's name, address and times, one visit
+  as an .ics made on the phone or a Google link. Nothing ships before the signature and Will's own iPhone try.
+- **Batch b63 (18 October, 00:36 to 01:07).** Piper's 9bbbef37 (Iris's W1, P3, P4: a visit row opens the member
+  from anywhere but the check-in circle; the pins the Trips sheet covers are out of a screen reader's reach; the
+  ProgramLead story's people), Dot's ee6677bd (W2, P2: every menu item 48px; the legal jump links 48px), and Iris's
+  re-test of b61 and b62 (77965802, docs). Lena's S1 was in b63's first form and came out (below).
 
 ## What was wrong, and what missed it
 
@@ -1676,6 +1686,16 @@
 - **A cleanup that the safety check stopped (b61 proof, 22:50).** A proof command ended in `rm -rf test-results/*`
   after a `cd`, a relative glob the check cannot resolve; the whole command was refused and nothing ran. Re-run without
   it (Playwright clears its own results). Lesson: no relative `rm` after a `cd`; there was nothing to clean.
+- **"Cards press in", told to Will before it was true (b62, 23:58).** The desk told Will a card, tile or button
+  presses in. press-layer.spec had sampled one element of each Astryx kind, and Explore's program cards (an
+  astryx-card with a stretched link) are not that kind; Iris's re-test found them, the case manager's and the lead's
+  cards, service choices and the tab bar unpressed. Will was told the same night. Lesson: a test for "everything you
+  can tap" samples the screens people tap most, not one of each component, and the desk says what was proven.
+- **A READY proven on a base two batches old (b63's first form, 00:28).** Lena's S1 passed 24 of 24 on its own base
+  (b60's main) and failed 6 on top of b62: b62's city note made the sign-up page long enough that a tap scrolls the
+  language field to the middle of a 320×568 screen, where seven rows fit neither above nor below. It was not pushed;
+  b63 went without it and S1 is reworked for b64. Lesson: prove and run a READY on the base it lands on.
+- **A push time written before the push (b62's records).** The records said 23:56; the push was 23:54.
 
 ## Decisions
 
@@ -1896,9 +1916,18 @@
 | b62 proof: press-layer.spec from b4e48c1a, on main bf23451b's build, --retries=0 | 12 failed (4 tests × 3 projects), each on its assertion (a card at scale 1, not 0.97; a row with no shade) |
 | b62 proof: join.spec from 92c978bf, on main bf23451b's build, --retries=0 | 3 failed (the new test × 3 projects, on toBeVisible: no note under the city field), 72 passed |
 | Batch b62, full run (ae016693: Dot b4e48c1a, Ava 92c978bf): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1386 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 188 / 10.3 kB spare / 2123 passed, 19 skipped, 0 failed / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
+| b62 main CI (24f3124a) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (00:30); Vercel web (23:57) and pam-site success |
+| b63 first form, full run (5ebc4aba: main 24f3124a + Lena 95d3fb42) | 6 failed (language-list-fits:127, Sign up at 320×568, en and ar × 3 projects, both tries, on the check: Russian and Arabic off the screen), 2141 passed, 19 skipped; not pushed |
+| S1 proof: language-list-fits from 95d3fb42 on b62's build, --retries=0 | 24 failed (8 × 3), each on "rows the list hides, cuts off or lets run off the screen", none on the wait |
+| b63 proof: visit-row-taps and trips-covered-pins (97ca390e), menu-items and legal-toc-targets (ee6677bd), on main's build with S1's list rule (which none of these screens use), --retries=0 | 18 failed (6 tests × 3), each on its assertion (a row's top-left tap that opens nothing; covered pins still reachable; "Flag something" under 48px; a tap 3px above "What Pam is"); 6 passed (the check-in circle and Members interested, unchanged by design) |
+| Batch b63, full run (0b345c39: Piper 9bbbef37, Dot ee6677bd, Iris 77965802): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1386 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 188 / 10.3 kB spare / 2147 passed, 19 skipped, 0 failed / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
 
 ## Left undone
 
+- **As of b63 (18 October, 01:07):** b64 takes Lena's S1 rework (the list fills the screen when neither side has
+  room; READY after its full run), Piper's Sunday fix for the example schedule (4785216f), and Dot's press layer part 2
+  (f88e5bed: stretched cards, service choices, the tab bar). Piper: plan C. Lena: S1, then plan C's words and lines
+  once Will signs. Iris: re-test b63. With Will: a98's "sign 1, 2, 3"; a86, a91, a93, a97, a84, a88.
 - **As of b62 (17 October, 23:56):** b63 takes Lena's S1 (95d3fb42: the language lists show all seven; its spec
   fails 24 of 24 on b62's build, on its check). Lena then: Nico's dictation lines in six languages on 8f7102c7, one
   READY with Nico. Piper: W1, P3, P4, on one branch. Dot: W2 and P2 (f9b12280, e2e re-running), and plan C's small

@@ -367,6 +367,15 @@
   .astryx-selector-option-row {
     min-height: var(--pam-touch-target-min);
   }
+
+  /*
+   * The items of a drop-down menu (a place's More options, Home's +, What you sent's More, the role and language menus) were 34px, with
+   * "Delete and start over" sitting directly above Help (Iris, W2, 17 October): each is a tap, so each meets the 48px floor like
+   * every other control and the dropdown options above.
+   */
+  .astryx-dropdown-menu-item {
+    min-height: var(--pam-touch-target-min);
+  }
   .astryx-selector-option-row[data-selected] > span:last-child .astryx-icon svg {
     stroke-width: 2.5;
   }
