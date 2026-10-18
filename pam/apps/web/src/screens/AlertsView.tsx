@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
+import { Badge } from '@astryxdesign/core/Badge';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Switch } from '@astryxdesign/core/Switch';
 import { Text } from '@astryxdesign/core/Text';
@@ -86,15 +87,14 @@ export function hasTextAlerts(who: 'member' | 'admin' | 'provider'): boolean {
 }
 
 const styles = stylex.create({
-  intro: { fontSize: '18px', lineHeight: 1.5 },
   small: { fontSize: '15px', lineHeight: 1.5 },
-  soon: { fontSize: '15px', lineHeight: 1.5, fontWeight: 600 },
   label: { fontSize: '17px', lineHeight: 1.35, fontWeight: 600 },
   words: { flexGrow: 1, minWidth: 0 },
 });
 
 export function AlertsView() {
   const { t } = useI18n();
+  const soonId = useId();
   const textsLive = useTextsLive();
   const LIVE = textsLive ? LIVE_KINDS : NONE_LIVE;
   const { state: session } = useSession();
@@ -168,11 +168,12 @@ export function AlertsView() {
             <Text xstyle={styles.small}>{t('reminders.stopped.body')}</Text>
           </VStack>
         </Card>
-      ) : (
-        <Text xstyle={styles.intro}>{t('alerts.intro')}</Text>
-      )}
+      ) : null}
       <Card padding={6}>
         <VStack gap={5}>
+          <Text type="supporting" xstyle={styles.small}>
+            {t('alerts.kinds')}
+          </Text>
           {KINDS.map((kind) => {
             const live = LIVE.has(kind);
             return (
@@ -185,14 +186,19 @@ export function AlertsView() {
                   <Text xstyle={styles.label}>{t(`alerts.${kind}`)}</Text>
                   {TERM_FOR[kind] ? <TermInfo term={TERM_FOR[kind]} /> : null}
                 </HStack>
-                <Text type="supporting" xstyle={styles.small}>
-                  {t(`alerts.${kind}.body`)}
-                </Text>
-                {live ? null : (
-                  <Text xstyle={styles.soon}>{t('alerts.comingSoon')}</Text>
-                )}
               </VStack>
+              {live ? null : (
+                <HStack id={`${soonId}-${kind}`}>
+                  <Badge label={t('alerts.comingSoon')} />
+                </HStack>
+              )}
               <Switch
+                ref={(input) => {
+                  // The badge is the switch's description, so a screen reader hears "{row}, switch, off, Coming soon" (D-608).
+                  if (!input) return;
+                  if (live) input.removeAttribute('aria-describedby');
+                  else input.setAttribute('aria-describedby', `${soonId}-${kind}`);
+                }}
                 label={t(`alerts.${kind}`)}
                 isLabelHidden
                 value={live && isOn(kind)}
