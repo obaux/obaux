@@ -8,6 +8,10 @@ import { TaggedWords } from './OptionTag.js';
  * dropdown). Pam's `Dropdown` (D-370), so it is the same box as "City you live in": 56px, 12px corners, the list under it,
  * 48px rows, the chosen one ticked.
  *
+ * - **The list is a bottom sheet, not a popover under the field** (S1, 18 October): the field is on a form that scrolls, so after a
+ *   tap it can be anywhere on a 568px screen, and seven 48px rows (344px) fit neither under it nor over it; a sheet has the whole
+ *   screen to its width and needs no room next to the field. Astryx's own `presentation="bottom-sheet"`: nothing here overrides it.
+ *   This field only: the globe on Sign in keeps its menu, and every other dropdown (City) keeps its popover.
  * - **Each language by its own name**: "Español", "العربية", "简体中文（普通话）". The closed box shows the current one.
  * - **The English tag before the name in the list** ("EN", "PT-BR", "AR"; D-451, D-455), hidden from a screen reader, so a
  *   row reads as the language's own name alone. The closed box has only the name: with the tag it read as two things in a
@@ -39,6 +43,7 @@ export function LanguageField({ label, options, value, onChange }: LanguageField
     <Dropdown
       label={label}
       width="100%"
+      presentation="bottom-sheet"
       value={value}
       options={options.map((option) => ({ value: option.code, label: option.name }))}
       renderOption={(option) => {
