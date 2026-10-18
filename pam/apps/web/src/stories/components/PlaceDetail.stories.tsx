@@ -17,6 +17,7 @@ import type { PlaceHours } from '@pam/config/hours';
 import { useI18n } from '@/lib/i18n';
 import { weekLines } from '@/lib/usePlaceStatus';
 import { useStoryText } from '../support/useStoryText';
+import { CalendarVisitCard } from '../support/CalendarAction';
 
 /**
  * One place, on its own screen — the profile (D-440): what it is and who it is
@@ -267,3 +268,12 @@ export const Spanish: Story = { ...LongName, globals: { locale: 'es' } };
  * right-to-left page, and the copy button and Apple Maps link sit beside it.
  */
 export const ArabicAddress: Story = { globals: { locale: 'ar' } };
+
+/**
+ * The place a booked visit belongs to, with the green card on top and the calendar button in its corner (a98, Will 18 October):
+ * before adding ("Add to calendar") and after ("Added to calendar"). Drawings; the real card is wired by Piper.
+ */
+export const VisitBooked: Story = { args: { notice: <CalendarVisitCard /> } };
+export const VisitBookedAdded: Story = { args: { notice: <CalendarVisitCard added /> } };
+export const VisitBookedArabic: Story = { ...VisitBooked, globals: { locale: 'ar' } };
+export const VisitBookedAddedArabic: Story = { ...VisitBookedAdded, globals: { locale: 'ar' } };

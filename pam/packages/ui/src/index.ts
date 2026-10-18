@@ -79,6 +79,7 @@ export {
   SyncIcon,
   RefreshIcon,
   CalendarAddIcon,
+  CalendarCheckIcon,
   MailIcon,
   PlacesIcon,
   ExploreIcon,
