@@ -22,10 +22,37 @@ async function open(page: Page, language: string | null = null) {
   const opener = page.locator(`button[aria-label^="${prefix}"]`).first();
   await opener.click();
   await expect(page.locator('dialog[open] input').first()).toBeVisible();
+  await sheetHasArrived(page);
   return opener;
 }
 
 const panel = (page: Page) => page.locator('dialog[open] .astryx-bottom-sheet');
+
+/**
+ * The sheet has finished arriving. The `<dialog>` itself runs `pam-rise` (it rises 8px as it fades in), and that animation is on the
+ * panel's ANCESTOR, so asking the panel for its animations never sees it: every measurement below that reads the panel's box and then
+ * a point or a child (two moments) could straddle the 8px move. Under load that happened: a point 40px into the panel landed on the
+ * title instead of the band, and a child's offset read 8px for 16 (full runs only; the box was read at y=59, the child at y=51).
+ * So wait on the state itself: no animation or transition left on the dialog or anything in it, the fonts loaded, and the panel's
+ * box the same on three frames running.
+ */
+async function sheetHasArrived(page: Page) {
+  await page.evaluate(async () => {
+    const dialog = document.querySelector('dialog[open]')!;
+    const el = dialog.querySelector('.astryx-bottom-sheet')!;
+    await document.fonts.ready;
+    let previous = '';
+    let still = 0;
+    while (still < 3) {
+      await Promise.all(dialog.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined)));
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+      const r = el.getBoundingClientRect();
+      const now = `${r.x},${r.y},${r.width},${r.height}`;
+      still = now === previous ? still + 1 : 0;
+      previous = now;
+    }
+  });
+}
 
 test.describe('the drawer standard', () => {
   test('the top of the sheet is a 48px band the full width, and a tap on it closes the drawer', async ({ page }) => {

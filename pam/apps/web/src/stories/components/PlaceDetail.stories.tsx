@@ -275,5 +275,7 @@ export const ArabicAddress: Story = { globals: { locale: 'ar' } };
  */
 export const VisitBooked: Story = { args: { notice: <CalendarVisitCard /> } };
 export const VisitBookedAdded: Story = { args: { notice: <CalendarVisitCard added /> } };
+export const VisitBookedMoved: Story = { args: { notice: <CalendarVisitCard moved /> } };
+export const VisitBookedMovedArabic: Story = { ...VisitBookedMoved, globals: { locale: 'ar' } };
 export const VisitBookedArabic: Story = { ...VisitBooked, globals: { locale: 'ar' } };
 export const VisitBookedAddedArabic: Story = { ...VisitBookedAdded, globals: { locale: 'ar' } };

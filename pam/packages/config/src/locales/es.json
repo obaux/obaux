@@ -363,6 +363,16 @@
   "messages.thread.you": "Tú",
   "messages.thread.dictate": "Di tu mensaje",
   "messages.thread.dictateStop": "Dejar de escuchar",
+  "messages.thread.dictate.problem.blocked.title": "Pam no puede usar el micrófono",
+  "messages.thread.dictate.problem.blocked.hint": "Permite el micrófono para Pam en los ajustes de tu navegador y vuelve a tocar el micrófono. Puedes escribir tu mensaje en su lugar.",
+  "messages.thread.dictate.problem.noMic.title": "Pam no encuentra un micrófono",
+  "messages.thread.dictate.problem.noMic.hint": "Revisa que haya uno conectado y vuelve a tocar el micrófono. Puedes escribir tu mensaje en su lugar.",
+  "messages.thread.dictate.problem.offline.title": "Hablar necesita conexión a internet",
+  "messages.thread.dictate.problem.offline.hint": "Revisa tu conexión y vuelve a tocar el micrófono. Puedes escribir tu mensaje en su lugar.",
+  "messages.thread.dictate.problem.language.title": "Este navegador no puede escuchar en tu idioma",
+  "messages.thread.dictate.problem.language.hint": "Puedes escribir tu mensaje en su lugar.",
+  "messages.thread.dictate.problem.failed.title": "El micrófono no empezó a funcionar",
+  "messages.thread.dictate.problem.failed.hint": "Vuelve a tocar el micrófono o escribe tu mensaje en su lugar.",
   "messages.translated.label": "Traducido",
   "messages.translated.original": "Original",
   "messages.translated.showOriginal": "Ver el original",
@@ -1731,5 +1741,5 @@
   "calendar.addOne.syncAll": "Agrega todas tus próximas visitas",
   "calendar.addOne.syncAll.hint": "Configura un enlace de calendario una sola vez.",
   "calendar.addOne.changed": "Tu calendario tiene la hora anterior.",
-  "calendar.addOne.changed.label": "Esta visita cambió después de que la agregaste. Tu calendario tiene la hora anterior."
+  "calendar.addOne.changed.lead": "Esta visita cambió después de que la agregaste."
 }

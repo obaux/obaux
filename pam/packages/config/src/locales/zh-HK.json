@@ -366,6 +366,16 @@
   "messages.thread.you": "您",
   "messages.thread.dictate": "說出您的訊息",
   "messages.thread.dictateStop": "停止聆聽",
+  "messages.thread.dictate.problem.blocked.title": "Pam無法使用麥克風",
+  "messages.thread.dictate.problem.blocked.hint": "請在瀏覽器設定中允許Pam使用麥克風，然後再點按一次麥克風。您也可以改為輸入訊息。",
+  "messages.thread.dictate.problem.noMic.title": "Pam找不到麥克風",
+  "messages.thread.dictate.problem.noMic.hint": "請檢查麥克風是否已連接，然後再點按一次麥克風。您也可以改為輸入訊息。",
+  "messages.thread.dictate.problem.offline.title": "語音輸入需要網絡連線",
+  "messages.thread.dictate.problem.offline.hint": "請檢查網絡連線，然後再點按一次麥克風。您也可以改為輸入訊息。",
+  "messages.thread.dictate.problem.language.title": "此瀏覽器聽不懂您的語言",
+  "messages.thread.dictate.problem.language.hint": "您可以改為輸入訊息。",
+  "messages.thread.dictate.problem.failed.title": "麥克風沒有啟動",
+  "messages.thread.dictate.problem.failed.hint": "請再點按一次麥克風，或改為輸入訊息。",
   "messages.translated.label": "已翻譯",
   "messages.translated.original": "原文",
   "messages.translated.showOriginal": "查看原文",
@@ -1731,5 +1741,5 @@
   "calendar.addOne.syncAll": "加入您之後的所有到訪",
   "calendar.addOne.syncAll.hint": "只需設定一次日曆連結。",
   "calendar.addOne.changed": "您的日曆上仍是舊的時間。",
-  "calendar.addOne.changed.label": "這次到訪在您加入之後有變動。您的日曆上仍是舊的時間。"
+  "calendar.addOne.changed.lead": "這次到訪在您加入之後有變動。"
 }

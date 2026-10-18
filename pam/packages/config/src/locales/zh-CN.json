@@ -366,6 +366,16 @@
   "messages.thread.you": "您",
   "messages.thread.dictate": "说出您的消息",
   "messages.thread.dictateStop": "停止聆听",
+  "messages.thread.dictate.problem.blocked.title": "Pam无法使用麦克风",
+  "messages.thread.dictate.problem.blocked.hint": "请在浏览器设置中允许Pam使用麦克风，然后再点按一次麦克风。您也可以改为输入消息。",
+  "messages.thread.dictate.problem.noMic.title": "Pam找不到麦克风",
+  "messages.thread.dictate.problem.noMic.hint": "请检查麦克风是否已连接，然后再点按一次麦克风。您也可以改为输入消息。",
+  "messages.thread.dictate.problem.offline.title": "语音输入需要网络连接",
+  "messages.thread.dictate.problem.offline.hint": "请检查网络连接，然后再点按一次麦克风。您也可以改为输入消息。",
+  "messages.thread.dictate.problem.language.title": "此浏览器听不懂您的语言",
+  "messages.thread.dictate.problem.language.hint": "您可以改为输入消息。",
+  "messages.thread.dictate.problem.failed.title": "麦克风没有启动",
+  "messages.thread.dictate.problem.failed.hint": "请再点按一次麦克风，或改为输入消息。",
   "messages.translated.label": "已翻译",
   "messages.translated.original": "原文",
   "messages.translated.showOriginal": "查看原文",
@@ -1731,5 +1741,5 @@
   "calendar.addOne.syncAll": "添加您之后的所有预约",
   "calendar.addOne.syncAll.hint": "只需设置一次日历链接。",
   "calendar.addOne.changed": "您的日历里还是旧的时间。",
-  "calendar.addOne.changed.label": "这次预约在您添加之后有变动。您的日历里还是旧的时间。"
+  "calendar.addOne.changed.lead": "这次预约在您添加之后有变动。"
 }

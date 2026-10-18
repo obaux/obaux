@@ -551,8 +551,8 @@ function PlaceScreen() {
                 visit && visitAhead ? (
                   <AddVisitToCalendar
                     visit={{ id: visit.id, placeName: place!.name, address: address ?? null, startsAt: new Date(visit.startsAt) }}
-                    card={({ action, actionOwnRow }) => (
-                      <VisitCard {...visitCardProps} action={action} actionOwnRow={actionOwnRow} />
+                    card={({ action, actionOwnRow, note }) => (
+                      <VisitCard {...visitCardProps} action={action} actionOwnRow={actionOwnRow} note={note} />
                     )}
                   />
                 ) : (

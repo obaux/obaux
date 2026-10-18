@@ -378,6 +378,16 @@
   "messages.thread.you": "Вы",
   "messages.thread.dictate": "Продиктуйте сообщение",
   "messages.thread.dictateStop": "Перестать слушать",
+  "messages.thread.dictate.problem.blocked.title": "Pam не может использовать микрофон",
+  "messages.thread.dictate.problem.blocked.hint": "Разрешите Pam доступ к микрофону в настройках браузера и снова нажмите на микрофон. Вместо этого можно написать сообщение.",
+  "messages.thread.dictate.problem.noMic.title": "Pam не находит микрофон",
+  "messages.thread.dictate.problem.noMic.hint": "Проверьте, что микрофон подключён, и снова нажмите на него. Вместо этого можно написать сообщение.",
+  "messages.thread.dictate.problem.offline.title": "Для голосового ввода нужен интернет",
+  "messages.thread.dictate.problem.offline.hint": "Проверьте подключение и снова нажмите на микрофон. Вместо этого можно написать сообщение.",
+  "messages.thread.dictate.problem.language.title": "Этот браузер не понимает речь на вашем языке",
+  "messages.thread.dictate.problem.language.hint": "Вместо этого можно написать сообщение.",
+  "messages.thread.dictate.problem.failed.title": "Микрофон не включился",
+  "messages.thread.dictate.problem.failed.hint": "Снова нажмите на микрофон или напишите сообщение.",
   "messages.translated.label": "Переведено",
   "messages.translated.original": "Оригинал",
   "messages.translated.showOriginal": "Показать оригинал",
@@ -1814,5 +1824,5 @@
   "calendar.addOne.syncAll": "Добавьте все свои будущие визиты",
   "calendar.addOne.syncAll.hint": "Настройте ссылку на календарь один раз.",
   "calendar.addOne.changed": "В вашем календаре старое время.",
-  "calendar.addOne.changed.label": "Этот визит изменился после того, как вы его добавили. В вашем календаре старое время."
+  "calendar.addOne.changed.lead": "Этот визит изменился после того, как вы его добавили."
 }

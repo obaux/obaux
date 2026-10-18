@@ -1473,6 +1473,54 @@
   so, in Sage's signed words (01:54, "Goes to {calendar}": Pam offers the visits and cannot see the calendar take
   them, so not "Syncing"). Dot drew it (e10e64cf, on its own row) and Piper builds it. Plan C's sheet is the
   a97 drawer (Dot's calendar branch carries it), so plan C ships with a97, which waits on Will's yes.
+- **Will's change to the calendar button (18 October, 02:33 to 03:11).** Will did not want the synced row ("Goes
+  to {calendar}" on its own row): the corner button stays where it was tapped and, once added, says "Added to
+  calendar" (Will's words) with no calendar name and no white background, and opens Calendar settings. "Sync all
+  future trip details?" leaves the foot of the card and becomes the drawer's last row, "Add all your future visits"
+  (Sage 4aef64a9), its hint cut by Will to "Set up a calendar link once." (03:11). The button goes on the place
+  page's green card too, and the card's month is short ("Thursday, Oct 22"). "Added" shows with a calendar link,
+  or for a visit added on this phone, a note kept in the browser that holds only that it was added; Lena checked
+  that no signed line changes. Dot drew it (12648c0a, on card a98); Piper built it (dd970847, full run under way).
+  "Your trip is booked" is not a new page: it has closed every booking since D-334.
+- **Message Pam (Will, 02:39).** Anyone in the app can message Pam, into the super admin's inbox, and the super admin
+  can message members and programs. Plans, no code: Nico's (00daebd0: a one-member 'support' conversation per
+  person, policies scoped to it through is_pam_team(), six expand migrations, nine questions), Ava's inbox (b71ff657,
+  five questions), Iris's research (90eb554a: the smallest safe first version has the person write first), Sage's
+  draft words (d9174a60) and Dot's drawings (5ff6849c). It is the first place the Pam team reads message bodies, a
+  widening of ADMIN_CAN_SEE, and Pam writing first reverses D-171 and D-262 for members, so Will signs it and
+  members are told first (D-413). The live project has no conversations yet (read-only count, 02:48). One card for
+  Will, with Lena's lines; nothing is built before Will picks.
+- **Batch b65 (18 October, 02:37 to 03:14).** W4 (D-603): when speaking a message cannot start, the conversation
+  says why and what to try, in seven languages (Nico e3b04c4f, Lena dbe32f83: Sage's ten lines, a test that fails
+  when a kind has no words, five stories). Iris's re-test of b64 (5c4d74d9, docs): press part 2 and the Sunday
+  schedule pass; Trips' map pins show no press (polish, for Dot).
+- **Message Pam, continued (03:01 to 03:21).** Ava's inbox plan is now cc375f7f (Q1: A or B, Ava recommends A; the
+  waiting list oldest first, with "Waiting since"; saved replies; reply times kept for a median; a "Read by Pam"
+  marker only if Will picks it; Q6's away switch is a status line in the person's conversation, not an automatic
+  reply, which would be a message nobody wrote ringing the person's bell). Nico's plan took Ava's three asks
+  (0c024637); nothing is open between them. Sage drafted option C's words (7b280684: a notice that the Pam team
+  can now start a conversation, and a Profile switch, "Pam can write to me first"), in line with Lena's. Lena's drafts
+  (7a11a3cc: the Privacy, What others can see and Terms lines, L1 to L5, none signed) recommend a separate
+  PAM_TEAM_CAN_READ list, so the guide's list never widens and the two cannot be confused. The desk took it (03:21):
+  ADMIN_CAN_SEE stays as it is, and Nico's plan (6347e200) puts messages_written_to_pam in the new list beside it, a
+  separate line on the member's transparency screen, and a contract test that fails if the entry ever reaches
+  ADMIN_CAN_SEE; the photo option would add two more entries to the new list. Widening either list still needs Will,
+  and members are told first (D-413). Dot's drawings are final (e7769915: A, B and C, a text-only composer with the
+  microphone, Pam's name at the top, "Write to Pam" under Help's answers). Lena's lines are at c4aa8150 with Sage's
+  edit to L1 (d849470f); before card a100 goes up, Lena and Sage close four gaps (L4 to match L1, the notices for A
+  and C, the Terms' own limited-account sentence, L2 under A).
+- **Card a98 (03:20).** Picture 3 is now the drawer with Will's 03:11 cut: under "Add all your future visits", only
+  "Set up a calendar link once." (Dot 36abc895). Dot noted that a visit added on this phone still says "Added" if
+  it later moves, while the copy in the calendar keeps the old time (the signed line 2 says the copy does not
+  change). Piper's build answers it (97cbce51): the note holds the visit's start time, so a moved visit shows "Add to
+  calendar" again, with Sage's "This visit changed after you added it. Add it again." (That line moves inside the
+  card; see below.)
+- **Batch b66 (18 October, 03:17 to 03:53).** S1 (Lena cd71d729, from Iris's run-through): Sign up's language list
+  opens as Astryx's own bottom sheet, with all seven languages on any phone, and the Sign in globe's list is no longer
+  cut at 300px (a list of languages only may be nine 48px rows tall, or the screen less 32px); no `!important` (Lena's
+  notes corrected to the rule, 0bdd646b). Iris's b63 follow-ups (Piper 2cec036c): with the Trips sheet fully up, the
+  map it covers is out of Tab and the screen reader's reach (P3); the lead stories' example people open a card (P4,
+  stories only). No new words, no new field, no migration.
 
 ## What was wrong, and what missed it
 
@@ -1726,6 +1774,17 @@
   Change appointment, judged from a small screenshot. Dot checked main's real build and the pixels: it points left, as
   it should, so Dot made no change and wrote no test that would pass on main. Lesson: look at the pixels before
   filing a visual bug.
+- **A CI watcher that stopped before CI did (b64, 02:38).** The watcher ran with the 30-minute background limit and
+  was stopped while Accessibility was still running; nothing said so until its notice. Restarted with an hour, and
+  b65 waited for the green. Lesson: give a CI watcher the full hour.
+- **A test that failed on main only because its function was missing (02:58).** Piper's first P4 test imported
+  programMemberCardFor, which main does not have, so on main it failed on the import, not on what the stories show.
+  Rewritten (2cec036c) to call the journey mock's program_member_card, it fails on main's mock and fixtures on its
+  assertion. Lesson: a missing name is not a failing behaviour; old code includes old fixtures.
+- **A READY that did not match its drawing (plan C, 03:51).** Piper's READY passed every check, but its built
+  pictures, asked for after it, put the place page's button on its own row rather than the corner Will approved, and
+  a new line under the card where Will had asked for nothing. The specs check behaviour, not placement. Lesson: a
+  READY for a drawn screen comes with built pictures, and the desk compares them with the drawing before taking it.
 
 ## Decisions
 
@@ -1956,9 +2015,34 @@
 | b64 proof, first form: press-layer.spec from f88e5bed on b63's build, --retries=0 | 15 failed, 9 of them hollow (timed out waiting for `a[data-pam-stretch]`, which only the new code sets); sent back |
 | b64 proof: press-layer.spec from 6581d593 on b63's build, --retries=0 | 15 failed, each on its assertion (12 at scale 1, not 0.97: Explore's card, a service choice, a case manager's member card, a lead's setup card, × 3; 3 a tab with no shade); 12 passed (b62's cases) |
 | Batch b64, full run (73026a81: Piper 4785216f, Dot 6581d593, Iris 9a349d9d): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1391 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 188 / 10.2 kB spare / 2162 passed, 19 skipped, 0 failed / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
+| b64 main CI (c67be570, pushed 02:07:27) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (02:45); Vercel web and pam-site success (02:13) |
+| Iris's re-test of b64 (5c4d74d9) | Press part 2 PASS (Explore's, the case manager's and the lead's cards, service choices: 97% and a shade, light and dark, 390 and 320; the tab bar shades; reduced motion shade only); the example schedule PASS (six pinned days, 18 October to 1 November) |
+| W4 proof: messages.spec's "speaking a message that cannot start" from dbe32f83 on main's build (c67be570), --retries=0 | 33 failed (11 tests × 3), each on toBeVisible of the line's words; 3 passed ("a browser with no speech recognition has no mic to tap", already true on main) |
+| Batch b65, full run (dd85a115: W4 a2f5f480, Iris 5c4d74d9): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1403 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 192 / 10.0 kB spare / 2198 passed, 19 skipped, 0 failed / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
+| b65 main CI (61046033, pushed 03:15:37) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (03:51); Vercel web and pam-site success (03:19, 03:21) |
+| S1 proof: language-list-fits.spec from cd71d729 on main's build (61046033), --retries=0 | 39 of 42 failed, each on the spec's own check (36 on rows the list hides, 3 on the list ending off the screen); 3 passed (Escape and a pick, which main does too) |
+| P3 proof: trips-covered-pins.spec from 2cec036c on main's build (61046033), --retries=0 | 3 of 3 failed on toHaveCount (the covered map's region counted 1, not 0) |
+| P4 proof: example-people.test from 2cec036c against main's mock and fixtures (vitest) | failed on its assertion, "Marcus: expected null not to be null"; the stranger case passed on both |
+| Batch b66, full run (2cdc72e6: S1 622c780a, Piper 2cdc72e6; then Lena's docs-only 0bdd646b): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1403 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 194 / 10.0 kB spare / 2249 passed, 19 skipped, 0 failed / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
 
 ## Left undone
 
+- **As of b66 (18 October, 03:53):** Plan C is built (Piper 97cbce51; Lena's words, lines and pins 4434a659) but not
+  ready: its built pictures put the place page's button on its own row, not in the corner, and the moved-visit line
+  under the card. Piper moves the button back to the corner (own row only when the header can't hold it); Dot draws
+  where the line goes inside the card, and Sage may shorten it; then Piper re-shoots for card a98. Dot also finds why
+  drawers.spec fails under load (two tests in Piper's full run, a97's spec). Then Will's "yes a97" and the iPhone
+  try, and the desk proves it on main; the batch applies 20261018003713, checks the Vault key and redeploys
+  calendar-feed, with the ship day in p6. Message Pam: card a100 for Will (pictures from Dot e7769915, lines from
+  Lena c4aa8150 and Sage d849470f, once Lena and Sage close the four gaps). Dot: Trips' map pins press (polish).
+  Iris: re-test b65's W4 and b66's S1, P3 and P4. With Will: "yes a97", the iPhone try, a100; a86, a91, a93, a84,
+  a88.
+- **As of b65 (18 October, 03:14):** b66 takes Piper's two b63 follow-ups (2cec036c, its stories test proven by the
+  desk) and Lena's S1 (Sign up's language list as Astryx's bottom sheet) when its READY comes in. Piper: plan C's
+  READY after its full run, with Will's 03:11 hint. Dot: the drawer with the short hint, then Message Pam's version
+  A and Sage's words. Lena: S1, plan C's lines and words, then Message Pam's lines with Sage. Iris: re-test b65's
+  W4. With Will: "yes a97" (plan C ships with it), an iPhone try of one visit, the Message Pam card when it is
+  ready; a86, a91, a93, a84, a88.
 - **As of b64 (18 October, 02:07):** b65 takes Lena's S1 once proven on b64's build. Piper: plan C's booked-card
   action and its synced state (Sage's words signed, Dot's e10e64cf), full checks and a real picture; then Iris's two
   b63 follow-ups and the "Change the time" link. Lena: S1 as a bottom sheet (Astryx's own presentation, no
