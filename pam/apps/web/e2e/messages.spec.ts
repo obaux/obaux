@@ -1416,6 +1416,8 @@ test.describe('the conversation, drawn closer (D-400, D-401)', () => {
     await settled(page);
     const line = page.getByText(/^Program lead at Example Food Pantry of North Philadelphia and the Neighborhoods Around It$/);
     await expect(line).toBeVisible();
+    // Will signed this line (D-541, a102 waits on his answer): a member writing to a program is told what the program sees.
+    await expect(page.getByText('This program sees your first name and what you write.')).toBeVisible();
     const box = (await line.boundingBox())!;
     // Inside the screen, and nothing clipped: it grows to a second line rather than being cut.
     expect(box.x).toBeGreaterThanOrEqual(0);
