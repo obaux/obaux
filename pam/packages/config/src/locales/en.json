@@ -1726,8 +1726,6 @@
   "appError.action.trips.cancel": "Cancelling a visit",
   "appError.action.schedule.checkin": "Marking someone as there",
   "appError.action.schedule.undo": "Undoing a mark as there",
-  "appError.action.calendar.link": "Making a calendar link",
-  "appError.action.calendar.link.off": "Turning off a calendar link",
   "notify.app_error": "{action} didn't go through {count} times in the last hour.",
   "notify.app_error.one": "{action} didn't go through in the last hour.",
   "waitingCities.empty.title": "Nobody is waiting yet",

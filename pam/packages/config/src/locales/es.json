@@ -1726,8 +1726,6 @@
   "appError.action.trips.cancel": "Cancelar una visita",
   "appError.action.schedule.checkin": "Registrar la llegada de alguien",
   "appError.action.schedule.undo": "Deshacer un registro de llegada",
-  "appError.action.calendar.link": "Crear un enlace de calendario",
-  "appError.action.calendar.link.off": "Desactivar un enlace de calendario",
   "notify.app_error": "{action}: no salió {count} veces en la última hora.",
   "notify.app_error.one": "{action}: no salió en la última hora.",
   "waitingCities.empty.title": "Todavía nadie espera",

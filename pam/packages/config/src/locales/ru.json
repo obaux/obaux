@@ -1811,8 +1811,6 @@
   "appError.action.trips.cancel": "Отмена визита",
   "appError.action.schedule.checkin": "Отметка о приходе человека",
   "appError.action.schedule.undo": "Отмена отметки о приходе",
-  "appError.action.calendar.link": "Создание ссылки на календарь",
-  "appError.action.calendar.link.off": "Отключение ссылки на календарь",
   "notify.app_error": "{action}: не получилось {count} раз за последний час.",
   "notify.app_error.one": "{action}: не получилось {count} раз за последний час.",
   "notify.app_error.few": "{action}: не получилось {count} раза за последний час.",

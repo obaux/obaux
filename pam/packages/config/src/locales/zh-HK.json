@@ -1726,8 +1726,6 @@
   "appError.action.trips.cancel": "取消到訪",
   "appError.action.schedule.checkin": "為某人簽到",
   "appError.action.schedule.undo": "取消簽到",
-  "appError.action.calendar.link": "建立日曆連結",
-  "appError.action.calendar.link.off": "關閉日曆連結",
   "notify.app_error": "過去一小時內，{action}未能完成{count}次。",
   "notify.app_error.one": "過去一小時內，{action}未能完成。",
   "waitingCities.empty.title": "暫時沒有人在等候",

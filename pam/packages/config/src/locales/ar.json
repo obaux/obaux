@@ -1869,8 +1869,6 @@
   "appError.action.trips.cancel": "إلغاء زيارة",
   "appError.action.schedule.checkin": "تسجيل حضور شخص",
   "appError.action.schedule.undo": "التراجع عن تسجيل حضور",
-  "appError.action.calendar.link": "إنشاء رابط تقويم",
-  "appError.action.calendar.link.off": "إيقاف رابط التقويم",
   "notify.app_error": "{action}: لم تتم العملية {count} مرة خلال الساعة الماضية.",
   "notify.app_error.one": "{action}: لم تتم العملية خلال الساعة الماضية.",
   "notify.app_error.two": "{action}: لم تتم العملية مرتين خلال الساعة الماضية.",
