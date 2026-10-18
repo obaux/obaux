@@ -170,6 +170,17 @@ information that the transparency screen doesn't say, and nothing that sounds li
 
 ## 4. Patterns
 
+### Screens don't explain (D-608, Will, 18 October 2026)
+The rule above every pattern below. Will: "they explain too many things in the app that should just be explained
+inside privacy or legal pages."
+- **No intro paragraph under a title.** A short label over a list is fine when it says what the list is ("Kinds of texts").
+- **What Pam does, doesn't do or never does goes in Privacy or Terms**, never on the screen ("Only that…, never who",
+  "Pam does not…"). Send it to Lena; Will signs it.
+- **Not on yet? A "Coming soon" badge**, never a sentence.
+- **A row is its name.** A second line only when someone needs it to choose. A promise is never that reason.
+- Still on screens: errors, carrier consent lines (STOP, HELP, rates) where texts are turned on, and a step's
+  instruction mid-task.
+
 ### Buttons
 - **A verb, then the thing:** "Send me a code", "Save my city", "Contact Pam", "Ask to join".
 - **Two to four words.** It must still fit at 40% longer (the pseudo-language).
@@ -184,7 +195,7 @@ information that the transparency screen doesn't say, and nothing that sounds li
 - Sentence case, no full stop, no exclamation mark.
 
 ### Empty states
-Title says what isn't here yet; body says what will appear and how.
+Title says what isn't here yet. Add one line only if it says how to fill the list (D-608).
 > **No trips yet** — When you plan a visit to a place, it shows up here with the time and how to get there. (`trips.empty.*`)
 
 ### Errors
@@ -198,8 +209,8 @@ A confirmation is not "Success". It says what is now true and what comes next.
 > "Saved. Your new name or address is waiting for Pam. Members still see the old one until then." (`program.saved.change`)
 > "We check every request by hand before we open an account. It takes a day or two." (`join.staff.body`)
 
-If something will *not* happen, say so ("Nothing else is sent unless they join",
-`book.new.note`).
+What will *not* happen belongs in Privacy or Terms, not on the screen (D-608). The confirmation says what is true
+now and what comes next, then stops.
 
 ### Help
 - Lead with the person: "Someone at Pam can help you."
@@ -314,7 +325,7 @@ fit at 320px.
 Before you send words to Will:
 
 - [ ] Would someone who hasn't used a phone in 8 years understand every word?
-- [ ] One idea per sentence; can any word go?
+- [ ] One idea per sentence; can any word go? Can the whole line go (D-608: no intro, no explaining, "Coming soon" is a badge)?
 - [ ] Does the title ask the question (task) or say the outcome (result)?
 - [ ] Does the button start with a verb and say what the tap does?
 - [ ] Does a confirmation say what happens next? Does an error say it's not their fault, what to do, and how to reach a person (Contact Pam, never a phone)?
