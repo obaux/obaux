@@ -170,7 +170,7 @@ test.describe("Message Pam, the team's side (card a100)", () => {
   });
 
   // Iris T3: a refusal by name is said calmly, without "Try again" in the words.
-  for (const [code, line] of [['NOT_ALLOWED', "Pam doesn't write to the Pam team."], ['PAM_OFF', 'Message Pam is off.']] as const) {
+  for (const [code, line] of [['NOT_ALLOWED', "You can't message the Pam team as Pam."], ['PAM_OFF', 'Message Pam is off.']] as const) {
     test(`a ${code} refusal says so in one calm line, not an error card`, async ({ page }) => {
       await team(page, { failStart: code });
       await page.goto(`/pam/start/?profile=${ASKER}&name=Sam`);
