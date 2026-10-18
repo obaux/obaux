@@ -1730,5 +1730,6 @@
   "calendar.addOne.added.label": "Adicionado ao calendário. Abre as configurações do calendário.",
   "calendar.addOne.syncAll": "Adicione todas as suas próximas visitas",
   "calendar.addOne.syncAll.hint": "Configure um link de calendário só uma vez.",
-  "calendar.addOne.changed": "Esta visita mudou depois que você a adicionou. Adicione-a de novo."
+  "calendar.addOne.changed": "Seu calendário está com o horário antigo.",
+  "calendar.addOne.changed.label": "Esta visita mudou depois que você a adicionou. Seu calendário está com o horário antigo."
 }

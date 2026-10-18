@@ -1869,5 +1869,6 @@
   "calendar.addOne.added.label": "أُضيف إلى التقويم. يفتح إعدادات التقويم.",
   "calendar.addOne.syncAll": "أضف كل زياراتك القادمة",
   "calendar.addOne.syncAll.hint": "قم بإعداد رابط تقويم مرة واحدة فقط.",
-  "calendar.addOne.changed": "تغيرت هذه الزيارة بعد أن أضفتها. أضفها مرة أخرى."
+  "calendar.addOne.changed": "في تقويمك الوقت القديم.",
+  "calendar.addOne.changed.label": "تغيرت هذه الزيارة بعد أن أضفتها. في تقويمك الوقت القديم."
 }

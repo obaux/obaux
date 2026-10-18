@@ -138,7 +138,9 @@ test('the drawer ends with "Add all your future visits" and its hint, opening th
   expect(names.map((text) => text.replace(/Set up a calendar link once\.$/, '').trim())).toEqual(['Apple Calendar', 'Google Calendar', 'Outlook', SYNC]);
   await expect(sheet.getByText('Set up a calendar link once.')).toBeVisible();
   const row = sheet.getByRole('link', { name: new RegExp(SYNC) });
-  expect((await row.boundingBox())!.height).toBeGreaterThanOrEqual(47.5);
+  // The whole row is the tap (b60's row taps): measure the row, not the words' link inside it.
+  const whole = row.locator('xpath=ancestor-or-self::*[contains(@class, "astryx-item")][1]');
+  expect((await whole.boundingBox())!.height).toBeGreaterThanOrEqual(47.5);
   await row.click();
   await expect(page).toHaveURL(/\/calendar\/$/);
 });
@@ -187,13 +189,20 @@ test('a visit that moved after it was added asks to be added again', async ({ pa
   await page.reload();
   await settled(page);
   await expect(page.getByRole('button', { name: 'Add to calendar' })).toBeVisible();
-  await expect(page.getByText('This visit changed after you added it. Add it again.')).toBeVisible();
+  await expect(page.getByText('Your calendar has the old time.', { exact: true })).toBeVisible();
+  // A screen reader gets the whole sentence.
+  await expect(page.getByText('This visit changed after you added it. Your calendar has the old time.')).toHaveCount(1);
 });
 
 test('the place page\'s green card has the same button, and Added after one is added', async ({ page }) => {
   await page.goto('/place/?id=dummy-place-learning&from=trips&trip=dummy-trip-1');
   await settled(page);
   await expect(page.getByText('Your next visit')).toBeVisible();
+  // In the card's corner beside "Your next visit", not on a row of its own (Will; Dot's drawing): the same line, measured.
+  const title = (await page.getByText('Your next visit').boundingBox())!;
+  const corner = (await page.getByRole('button', { name: 'Add to calendar' }).boundingBox())!;
+  expect(Math.abs(corner.y + corner.height / 2 - (title.y + title.height / 2))).toBeLessThan(30);
+  expect(corner.x).toBeGreaterThan(title.x + title.width - 1);
   await page.getByRole('button', { name: 'Add to calendar' }).click();
   const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('dialog').getByText('Apple Calendar', { exact: true }).click()]);
   expect(download.suggestedFilename()).toBe('visit.ics');

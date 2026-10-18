@@ -1730,5 +1730,6 @@
   "calendar.addOne.added.label": "已加入日曆。開啟日曆設定。",
   "calendar.addOne.syncAll": "加入您之後的所有到訪",
   "calendar.addOne.syncAll.hint": "只需設定一次日曆連結。",
-  "calendar.addOne.changed": "這次到訪在您加入之後有變動。請重新加入。"
+  "calendar.addOne.changed": "您的日曆上仍是舊的時間。",
+  "calendar.addOne.changed.label": "這次到訪在您加入之後有變動。您的日曆上仍是舊的時間。"
 }

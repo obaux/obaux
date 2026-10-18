@@ -1730,5 +1730,6 @@
   "calendar.addOne.added.label": "已添加到日历。打开日历设置。",
   "calendar.addOne.syncAll": "添加您之后的所有预约",
   "calendar.addOne.syncAll.hint": "只需设置一次日历链接。",
-  "calendar.addOne.changed": "这次预约在您添加之后有变动。请重新添加。"
+  "calendar.addOne.changed": "您的日历里还是旧的时间。",
+  "calendar.addOne.changed.label": "这次预约在您添加之后有变动。您的日历里还是旧的时间。"
 }
