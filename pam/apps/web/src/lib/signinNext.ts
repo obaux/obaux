@@ -9,8 +9,11 @@
  *
  * `/messages/pam/` (D-605) is the second: the website's "Open Pam" sends a signed-out person through Sign in and back to their conversation
  * with Pam. Unlike Add my program it is for every role but the Pam team (they have no conversation with themselves).
+ *
+ * `/alerts/` (D-615) is the third: a Text alerts switch tapped before anybody has agreed to texts goes to the consent screen and comes back
+ * here once they have. For the roles that have Text alerts (member, case manager, program lead).
  */
-export const NEXT_ALLOWED: readonly string[] = ['/profile/add-program/', '/messages/pam/'];
+export const NEXT_ALLOWED: readonly string[] = ['/profile/add-program/', '/messages/pam/', '/alerts/'];
 
 const KEY = 'pam.signin-next';
 
@@ -43,6 +46,7 @@ export function takeNext(role?: string | null): string | null {
     const next = safeNext(stored);
     // Their conversation with Pam is for anyone with an account but the Pam team; Add my program is for members alone.
     if (next === '/messages/pam/') return role === 'super_admin' ? null : next;
+    if (next === '/alerts/') return role === 'super_admin' ? null : next;
     if (role !== undefined && role !== 'member') return null;
     return next;
   } catch {
