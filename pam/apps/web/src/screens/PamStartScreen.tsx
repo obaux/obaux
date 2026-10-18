@@ -150,9 +150,12 @@ export function PamStartScreen() {
         otherName={name}
         intro={
           <ThreadIntro name={name} context={null}>
-            <Text type="supporting" dir="auto">
-              {serviceId ? t('pam.start.programNote') : t('pam.start.note', { name })}
-            </Text>
+            {/* A program's leads each get it; for a person, the button and the box already say it is from Pam (Sage, D-608). */}
+            {serviceId ? (
+              <Text type="supporting" dir="auto">
+                {t('pam.start.programNote')}
+              </Text>
+            ) : null}
             {failed ? (
               <Text type="supporting" role="alert">
                 {t('pam.thread.statusFailed')}

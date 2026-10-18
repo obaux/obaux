@@ -1755,11 +1755,10 @@
   "pam.thread.statusFailed": "That didn't go through. Try again.",
   "pam.thread.placeholder": "Reply as Pam",
   "pam.start.action": "Message {name} as Pam",
-  "pam.start.note": "{name} sees this as from Pam.",
-  "pam.start.programNote": "This goes to each of the program's leads. They see it as from Pam.",
+  "pam.start.programNote": "Goes to each of the program's leads.",
   "pam.start.placeholder": "Write as Pam",
   "pam.program.action": "Message this program",
-  "pam.program.noLead": "Nobody runs this program in Pam right now, so it can't get messages.",
+  "pam.program.noLead": "Nobody runs this program in Pam right now.",
   "pam.inbox.sent": "Sent to {count} leads.",
   "pam.inbox.sent.one": "Sent to {count} lead.",
   "pam.inbox.off": "Message Pam is off.",
@@ -1774,5 +1773,5 @@
   "pam.hours.said.saved": "Saved.",
   "pam.hours.said.failed": "That didn't go through. Try again.",
   "pam.hours.said.noDays": "Pick at least one day.",
-  "pam.hours.said.order": "Pam has to close after it opens."
+  "pam.hours.said.order": "Pick a closing time after the opening time."
 }

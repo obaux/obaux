@@ -131,7 +131,7 @@ test.describe("Message Pam, the team's side (card a100)", () => {
     const server = await team(page);
     await page.goto(`/pam/start/?profile=${ASKER}&name=Aaliyah`);
     await settled(page);
-    await expect(page.getByText('Aaliyah sees this as from Pam.')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Aaliyah', level: 1 })).toBeVisible();
     // Words only before there is a conversation.
     await expect(page.getByRole('textbox')).toHaveAccessibleName('Write as Pam');
     await expect(page.getByRole('button', { name: 'Add a photo' })).toHaveCount(0);
@@ -152,7 +152,7 @@ test.describe("Message Pam, the team's side (card a100)", () => {
     const server = await team(page);
     await page.goto('/pam/start/?service=svc-1&name=Fresh%20Start%20Kitchen');
     await settled(page);
-    await expect(page.getByText("This goes to each of the program's leads. They see it as from Pam.")).toBeVisible();
+    await expect(page.getByText("Goes to each of the program's leads.")).toBeVisible();
     await page.getByRole('textbox').fill('Your hours look out of date.');
     await page.getByRole('button', { name: /send/i }).click();
     await expect(page).toHaveURL(/\/pam\/messages\/\?sent=2/);
@@ -163,7 +163,7 @@ test.describe("Message Pam, the team's side (card a100)", () => {
   test('a program nobody runs says so in one line and offers no composer', async ({ page }) => {
     await team(page, { hasLead: false });
     await page.goto('/pam/start/?service=svc-2&name=Northside%20Library');
-    await expect(page.getByText("Nobody runs this program in Pam right now, so it can't get messages.")).toBeVisible();
+    await expect(page.getByText('Nobody runs this program in Pam right now.')).toBeVisible();
     await expect(page.getByRole('textbox')).toHaveCount(0);
   });
 
