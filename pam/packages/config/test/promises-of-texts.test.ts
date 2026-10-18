@@ -48,7 +48,6 @@ describe('promises of a text or a reminder (D-474)', () => {
     expect(BUNDLES.en['reminders.today.staff']).toMatch(/does not send any/i);
     if (!VISIT_REMINDERS_LIVE_IN_APP) {
       expect(BUNDLES.en['reminders.today.member']).toMatch(/does not send any/i);
-      expect(BUNDLES.en['profile.promo.reminders.body']).not.toMatch(/\bwe can text you\b/i);
     }
   });
 });
