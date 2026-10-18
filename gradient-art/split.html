@@ -77,7 +77,7 @@ uniform float uReachMax;  // ... and on a full inhale
 uniform vec3 uBg;         // sky: top
 uniform vec3 uGlowRed;    // sky: upper glow
 uniform vec3 uGlowOrange; // sky: lower glow
-uniform vec3 uTop;        // bloom rim green
+uniform vec3 uTop;        // bloom rim orange
 uniform vec3 uCore;       // bloom centre, white
 
 float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
@@ -107,9 +107,9 @@ void main() {
   float en = length(vec2(xe / reach, q.y / ry));       // 1.0 on the curved edge
   float body = 1.0 - smoothstep(1.0 - uSoft, 1.05, en);   // wide feather: no outline anywhere
 
-  vec3 c = mix(uCore, uTop, sstep(0.18, 1.12, en));    // white along the screen edge, green toward the curve
+  vec3 c = mix(uCore, uTop, sstep(0.18, 1.12, en));    // white along the screen edge, orange toward the curve
 
-  // soft green halo past the curved edges
+  // soft orange halo past the curved edges
   sky = mix(sky, uTop * 0.55, 0.18 * (0.5 + 0.5 * b) * exp(-max(en - 1.0, 0.0) * 3.0) * smoothstep(0.85, 1.1, en));
 
   vec3 col = mix(sky, c, body);
@@ -129,10 +129,10 @@ const PALETTE = {
   uBg:         '#110c0e',
   uGlowRed:    '#c43c47',
   uGlowOrange: '#c8703e',
-  uTop:        '#7ff04f',
+  uTop:        '#ff8a3a',
   uCore:       '#ffffff',
 };
-const LABELS = { uBg: 'Sky · top', uGlowRed: 'Sky · upper glow', uGlowOrange: 'Sky · lower glow', uTop: 'Rim green', uCore: 'Centre' };
+const LABELS = { uBg: 'Sky · top', uGlowRed: 'Sky · upper glow', uGlowOrange: 'Sky · lower glow', uTop: 'Rim orange', uCore: 'Centre' };
 
 // ===================================================================
 //  Breathing patterns — seconds per phase, in order.
