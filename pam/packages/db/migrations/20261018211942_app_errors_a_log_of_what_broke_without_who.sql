@@ -129,7 +129,7 @@ begin
     v_role := coalesce(v_role, 'member');
   end if;
 
-  -- The counters only matter for the minute they count: anything older than five minutes is dropped on each report (and again by the nightly sweep).
+  -- The counters only matter for the minute they count: anything older than five minutes is dropped on each report (and by a job every five minutes).
   delete from public.app_error_limits where minute < now() - interval '5 minutes';
   -- The rate limit: ten a minute for one signed-in account, thirty a minute shared by everyone signed out (no key per person or per
   -- network address: an address is personal data, and a hash of one can be reversed), sixty for the service, two hundred overall.
@@ -224,7 +224,18 @@ end $$;
 revoke all on function public.app_errors_grouped(integer) from public, anon;
 grant execute on function public.app_errors_grouped(integer) to authenticated, service_role;
 
--- Thirty days, then gone; the per-minute counters a few minutes (the report itself clears older ones).
+-- The per-minute counters: gone after five minutes, by a job every five minutes (and by the next report), so they never wait for the nightly sweep.
+create or replace function public.sweep_app_error_counters()
+returns void
+language sql
+security definer
+set search_path = public, extensions
+as $$ delete from public.app_error_limits where minute < now() - interval '5 minutes' $$;
+
+revoke all on function public.sweep_app_error_counters() from public, anon, authenticated;
+grant execute on function public.sweep_app_error_counters() to service_role;
+
+-- Thirty days, then gone.
 create or replace function public.sweep_app_errors()
 returns integer
 language plpgsql
@@ -236,7 +247,7 @@ declare
 begin
   delete from public.app_errors where created_at < now() - make_interval(days => public.app_errors_keep_days());
   get diagnostics n = row_count;
-  delete from public.app_error_limits where minute < now() - interval '1 hour';
+  perform public.sweep_app_error_counters();
   delete from public.notifications where kind = 'app_error' and created_at < now() - make_interval(days => public.app_errors_keep_days());
   return n;
 end;
@@ -253,5 +264,7 @@ begin
   end if;
   perform cron.unschedule(jobid) from cron.job where jobname = 'sweep-app-errors';
   perform cron.schedule('sweep-app-errors', '20 4 * * *', 'select public.sweep_app_errors()');
+  perform cron.unschedule(jobid) from cron.job where jobname = 'sweep-app-error-counters';
+  perform cron.schedule('sweep-app-error-counters', '*/5 * * * *', 'select public.sweep_app_error_counters()');
 end;
 $do$;

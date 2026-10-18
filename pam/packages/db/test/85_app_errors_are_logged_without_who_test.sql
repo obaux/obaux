@@ -115,6 +115,11 @@ select public.report_app_error('/', 'stale.check', '500', 'b75', 'web', 'en');
 select test.check('a report clears counters older than five minutes',
   (select count(*) from public.app_error_limits where bucket = 'u:stale'), 0);
 delete from public.app_errors where action = 'stale.check';
+insert into public.app_error_limits (bucket, minute, n) values ('u:stale2', now() - interval '10 minutes', 3), ('u:fresh', now(), 1);
+select public.sweep_app_error_counters();
+select test.check('the counter job removes counters older than five minutes without waiting for a report, and keeps the fresh one',
+  (select count(*) from public.app_error_limits where bucket = 'u:stale2') * 10 + (select count(*) from public.app_error_limits where bucket = 'u:fresh'), 1);
+delete from public.app_error_limits where bucket = 'u:fresh';
 
 \echo ''
 \echo '--- What comes in is checked: no free text gets through ---'
