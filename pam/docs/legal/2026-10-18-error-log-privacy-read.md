@@ -28,6 +28,8 @@
 When · area (the route) · action key · error code · a short detail with no user content · app build · platform · role · locale. No account id, phone,
 message text or place name. Kept 30 days. Super admins get a bell and a list. Behind `app_errors_live`, which starts off.
 
+*(This is the description I was given. The table Nico built has **no detail column**: it keeps when, route pattern, action, code, build, platform, role and locale, and nothing else. Section 3a is the check against the migration.)*
+
 ## 1. Does the line belong in Privacy?
 
 | Question | Answer |
@@ -55,7 +57,7 @@ Why each clause is there, and what makes it true:
 | "a short note … when, which screen and action, the kind of error" | `occurred_at`, `area`, `action`, `code` are the columns, and `area` is a route **pattern** (`/person/[id]/`), never a URL with an id or a query. |
 | "the version of Pam, your kind of phone" | `build` and `platform`. `platform` is a coarse value (iOS, Android, desktop, and the browser family), like p11's "kind of phone or browser". Not a user-agent string, which can carry a model and an OS patch level. |
 | "whether you are a member, a case manager or a program, and your language" | `role` and `locale`, nothing else about the person. |
-| "no name, phone number, account, message or place in it" | No account or user column. The `detail` is from a closed list or scrubbed (section 3). The route has no ids. |
+| "no name, phone number, account, message or place in it" | No account or user column, and **no detail column at all**: the only words in a row are the action key from a closed list and a code that is an HTTP status, a database error number or `offline`/`timeout`/`unknown`. The route is a pattern with no ids. |
 | "Only the Pam team reads these notes" | Row-level security lets only super admins select; no member, case manager or program lead can, through a table or a function. A database test holds it. |
 | "we delete them after 30 days" | A scheduled job deletes rows older than 30 days, and a test reads the job. |
 
@@ -66,7 +68,7 @@ Why each clause is there, and what makes it true:
 | 1 | The detail is never an error's own message | **Met.** There is no detail column and the function takes none. The code must be an HTTP status, a SQLSTATE or `offline`/`timeout`/`unknown`; anything else is stored as `unknown`. The app's closed list (`APP_ERROR_ACTIONS`) and `appErrorCode` match the database's shape, and test 85 offers an error whose message holds a phone, an email, a first name and a street and finds none of it. |
 | 2 | The route is a pattern | **Met.** The query and fragment are cut, a uuid or a run of four or more digits becomes `[id]`, anything outside `/[A-Za-z0-9/_[]-]` becomes `/unknown`. Pam's app has **no dynamic path segment** (it is a static export: ids travel in the query, `/person/?id=…`), so a real pathname never holds an id; the database's cut is a second guard. |
 | 3 | The action is from a closed list | **Met.** Closed list in the app; the database refuses a key that is not lowercase words and dots. |
-| 4 | Size limits and a rate limit | **Met.** Length limits on every field (the table's own checks); ten reports a minute per caller (the account, or a hash of the network address), two hundred overall. |
+| 4 | Size limits and a rate limit | **Met.** Length limits on every field (the table's own checks); ten reports a minute for a signed-in account, thirty a minute shared by everyone signed out, two hundred overall. **No network address is read or kept, not even as a hash** (`0160c1b5`, `f71a4665`); the counters are deleted after five minutes. |
 | 5 | Only super admins read | **Met.** Forced row security, a deny-all policy, no grants; the one read is `app_errors_grouped()`, which refuses everyone but a super admin, and returns counts by route, action and code. Test 85 refuses anon, member, case manager, program lead, and even a super admin on the table directly. |
 | 6 | Thirty days is enforced | **Met.** `app_errors_keep_days()` is 30; `sweep_app_errors()` deletes older rows; `pg_cron` schedules it nightly at 04:20, and **`pg_cron` 1.6.4 is installed on the live project** (checked 21:44; the migration skips the schedule silently where it is not, so this was worth asking). The bell rows go at the same age. |
 | 7 | The bell holds nothing the log does not | **Met.** `body_vars` is `{action, count}`. |
