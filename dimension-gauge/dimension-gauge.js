@@ -8,15 +8,14 @@
  * Attributes
  *   value       0–100. Changing it animates the level to the new value.
  *   label       Accessible name (e.g. "Housing"). Required for screen readers.
- *   show-value  Boolean. Prints the number under the icon.
  *   static      Boolean. No wave motion (also automatic under prefers-reduced-motion).
  *
  * Theming (CSS custom properties, set on the element or any ancestor)
  *   --dg-size   Diameter. Default 120px.
- *   --dg-fill   Front wave / body.  Default #4561de
- *   --dg-wave   Back wave sliver.   Default #bfe6ff
+ *   --dg-color  The one brand color. Front wave / body. Default #4561de
+ *   --dg-wave   Optional override for the pale back wave. Default: --dg-color mixed 75% with white
  *   --dg-track  Empty circle.        Default translucent white
- *   --dg-icon   Icon + value color.  Default #fff
+ *   --dg-icon   Icon color.          Default #fff
  *
  * No dependencies. One file. Works in any framework as a plain custom element.
  */
@@ -38,18 +37,14 @@ const css = `
   color:var(--dg-icon,#fff)}
 svg.disc{display:block;width:100%;height:100%}
 .track{fill:var(--dg-track,rgba(255,255,255,.08))}
-.back{fill:var(--dg-wave,#bfe6ff)}
-.front{fill:var(--dg-fill,#4561de)}
-.overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:calc(var(--dg-size)*.02);pointer-events:none}
+.back{fill:var(--dg-wave,color-mix(in srgb,var(--dg-color,#4561de) 25%,#fff))}
+.front{fill:var(--dg-color,#4561de)}
+.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
 ::slotted([slot=icon]){width:34%;height:34%;color:inherit}
-.num{font:600 calc(var(--dg-size)*.14)/1 system-ui,sans-serif;font-variant-numeric:tabular-nums;
-  text-shadow:0 1px 2px rgba(0,0,12,.35)}
-.num[hidden]{display:none}
 `;
 
 class DimensionGauge extends HTMLElement {
-  static observedAttributes = ['value', 'label', 'show-value', 'static'];
+  static observedAttributes = ['value', 'label', 'static'];
 
   constructor() {
     super();
@@ -60,10 +55,9 @@ class DimensionGauge extends HTMLElement {
         <circle class="track" cx="50" cy="50" r="${R}"/>
         <g clip-path="url(#c)"><path class="back"/><path class="front"/></g>
       </svg>
-      <div class="overlay"><slot name="icon"></slot><span class="num" hidden></span></div>`;
+      <div class="overlay"><slot name="icon"></slot></div>`;
     this._back = root.querySelector('.back');
     this._front = root.querySelector('.front');
-    this._num = root.querySelector('.num');
     this._shown = 0;          // value currently drawn (animated)
     this._from = 0; this._to = 0; this._t0 = 0;
     this._raf = 0; this._t = 0;
@@ -105,7 +99,6 @@ class DimensionGauge extends HTMLElement {
     this.setAttribute('aria-valuetext', `${v}%`);
     const label = this.getAttribute('label');
     if (label) this.setAttribute('aria-label', label);
-    this._num.hidden = !this.hasAttribute('show-value');
   }
 
   _kick() { if (!this._raf && this._visible !== false) this._raf = requestAnimationFrame(n => this._frame(n)); }
@@ -129,7 +122,6 @@ class DimensionGauge extends HTMLElement {
     const v = this._shown;
     this._back.setAttribute('d', this._wave(v, BACK));
     this._front.setAttribute('d', this._wave(v, FRONT));
-    this._num.textContent = `${Math.round(v)}%`;
   }
 
   _wave(v, w) {

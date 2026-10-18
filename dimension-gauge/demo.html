@@ -7,13 +7,11 @@
   h1{font-size:18px;margin:0 0 24px;text-align:center;font-weight:600}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:28px 16px;max-width:760px;margin:0 auto}
   .cell{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
-  .cell span{font-size:13px;opacity:.85}
   dimension-gauge{--dg-size:112px}
-  .alt dimension-gauge{--dg-fill:#1f9d8a;--dg-wave:#b9f3e6}
+  .alt dimension-gauge{--dg-color:#1f9d8a}
   p{text-align:center;margin-top:32px}
   button{font:inherit;padding:8px 14px;border-radius:8px;border:0;background:#4561de;color:#fff;cursor:pointer}
 </style>
-<h1>Life dimensions</h1>
 <div class="grid" id="grid"></div>
 <p><button id="shuffle">Randomize values</button></p>
 
@@ -31,7 +29,7 @@
   ];
   const grid = document.getElementById('grid');
   grid.innerHTML = dims.map(([n, v, p], i) =>
-    `<div class="cell ${i % 2 ? 'alt' : ''}"><dimension-gauge value="${v}" label="${n}" ${i < 3 ? 'show-value' : ''}>${ic(p)}</dimension-gauge><span>${n}</span></div>`).join('');
+    `<div class="cell ${i % 2 ? 'alt' : ''}"><dimension-gauge value="${v}" label="${n}" >${ic(p)}</dimension-gauge></div>`).join('');
   document.getElementById('shuffle').onclick = () =>
     grid.querySelectorAll('dimension-gauge').forEach(g => g.value = Math.round(Math.random() * 100));
 </script>
