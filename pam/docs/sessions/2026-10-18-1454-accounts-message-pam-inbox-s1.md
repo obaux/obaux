@@ -58,7 +58,7 @@ B on 07:04, and Mira said "go on S1" at 07:25.
   - the empty and no-replies lines;
   - a member and a case manager refused, with the inbox never asked;
   - axe.
-- Full e2e: see the READY.
+- Full e2e at the merge (before the round-up fix): 2336 passed, 19 skipped, 0 failed. After the fix, pam-inbox and waiting-cities: 30 passed.
 - Pictures at 390 light, 320 dark and 320 Arabic, for Home, the inbox, closed and empty:
   `docs/design/review/2026-10-18-pam-inbox/`.
 
