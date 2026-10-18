@@ -89,7 +89,7 @@ test.describe('the press layer', () => {
 
   test('Explore\'s program card presses in as a whole, by its stretched link', async ({ page }) => {
     await explore(page);
-    const card = '.astryx-card:has(a[data-pam-stretch])';
+    const card = '.astryx-card:has(h3 a)';
     await page.locator(card).first().waitFor();
     await page.locator(card).first().scrollIntoViewIfNeeded();
     expect(await scaleOf(page, card)).toBe(1);
@@ -160,7 +160,7 @@ test.describe('the press layer', () => {
         : route.fallback(),
     );
     await page.goto('/');
-    await pressesAsAWhole(page, '.astryx-card:has(a[data-pam-stretch][href*="person"])');
+    await pressesAsAWhole(page, '.astryx-card:has(h3 a[href*="person"])');
   });
 
   test('a program lead\'s Finish setting up card presses in as a whole', async ({ page }) => {
@@ -171,6 +171,6 @@ test.describe('the press layer', () => {
       route.fulfill(json({ id: 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b', org_id: '22222222-0000-0000-0000-0000000000aa', role: 'provider', first_name: 'Lou', region_id: null, regions: null, access_status: 'active', onboarded_at: '2026-09-14T00:00:00Z' })),
     );
     await page.goto('/');
-    await pressesAsAWhole(page, '.astryx-card:has(a[data-pam-stretch])');
+    await pressesAsAWhole(page, '.astryx-card:has(h3 a)');
   });
 });
