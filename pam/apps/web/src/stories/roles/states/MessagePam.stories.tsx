@@ -67,7 +67,7 @@ const WORDS = {
     // Option B, clean (Will, 18 October): a welcome from day one, an automatic reply out of hours, a thread like any other. Sage's words to come.
     // Sage's words (fb410c60, signed-english.md): "Hi {name}, it's Pam. If you need help with anything, reply here."
     welcome: "Hi Marcus, it's Pam. If you need help with anything, reply here.",
-    outHours: "Thanks for writing. Pam is here weekdays, 9 AM to 5 PM, and we'll read your message then. In a crisis, call or text 988.",
+    outHours: "Thanks for writing. Pam is here Monday to Friday, 9am to 5pm Eastern time, and we'll read your message then. In a crisis, call or text 988.",
     notSent: 'Not sent',
     tryAgain: 'Try again',
     sendingLabel: 'Sending…',
@@ -159,7 +159,7 @@ const WORDS = {
     helpHint: '',
     rowLine: 'اكتب إلى Pam',
     welcome: 'أهلًا ماركوس، معك Pam. إن احتجت مساعدة في أي شيء فردّ هنا.',
-    outHours: 'شكرًا لكتابتك. Pam متاح أيام الأسبوع من 9 ص إلى 5 م، وسنقرأ رسالتك حينها. في أزمة اتصل أو أرسل رسالة إلى 988.',
+    outHours: 'شكرًا لكتابتك. Pam متاح من الاثنين إلى الجمعة، من 9 صباحًا إلى 5 مساءً بتوقيت الشرق، وسنقرأ رسالتك حينها. في أزمة اتصل أو أرسل رسالة إلى 988.',
     notSent: 'لم تُرسل',
     tryAgain: 'حاول مرة أخرى',
     sendingLabel: 'جارٍ الإرسال…',
