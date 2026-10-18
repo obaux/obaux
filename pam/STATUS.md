@@ -1642,6 +1642,10 @@ connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merge
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
 
+## Design system & Storybook · settings list, Text alerts (18 October)
+
+`SettingsList` is the pattern for a list of switches: no card, thin lines, badge under the name (D-615; Foundations › Patterns). Text alerts uses it, without the STOP line or the Privacy link. Branch `claude/pam-design-settings-list`; waits on Sage's `alerts.kinds` words and Will's look at the pictures.
+
 ## Design system & Storybook · Coming soon and Example badges (18 October)
 
 `StatusBadge` replaces the "coming soon" and "example" sentences on Profile and the example lists (D-612, D-608). Branch `claude/pam-design-d608-badges` (main + Sage's b50e386a); waits on Mira. Text alerts and six languages are others'.

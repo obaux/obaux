@@ -60,7 +60,6 @@ test.describe('Text alerts say little (D-608, Will 18 October: "we don\'t need a
     await signedInAs(page, 'member', null, 'off');
     await page.goto('/alerts/');
     await settled(page);
-    await expect(page.getByText('Kinds of texts', { exact: true })).toBeVisible();
     // No introduction, no second line under a row, no sentence about what Pam does not send yet.
     await expect(page.getByText('Choose what Pam texts you about')).toHaveCount(0);
     await expect(page.getByText('So you do not go to the wrong door.')).toHaveCount(0);
@@ -69,11 +68,53 @@ test.describe('Text alerts say little (D-608, Will 18 October: "we don\'t need a
     // The badge is the switch's description: a screen reader hears "{row}, switch, off, Coming soon".
     const toggle = page.getByRole('switch', { name: 'Someone messages you' });
     await expect(toggle).toHaveAccessibleDescription('Coming soon');
-    await expect(page.getByText('Pam sends one text each time something you turned on happens. Reply STOP to stop, or HELP for help. Text and data rates may apply.')).toBeVisible();
-    // A link to what a text says and never says, named for a screen reader as "Privacy: Text messages".
-    const privacy = page.getByRole('link', { name: 'Privacy: Text messages' });
-    await expect(privacy).toHaveText('Privacy');
-    await expect(privacy).toHaveAttribute('href', '/privacy/#texts');
+  });
+
+  // Sage signs the words and Lena puts them in key alerts.kinds; this stays red until they are there, and says why.
+  test('the line over the list is the one Will asked for', async ({ page }) => {
+    await signedInAs(page, 'member', null, 'off');
+    await page.goto('/alerts/');
+    await settled(page);
+    await expect(page.getByText(/^Please select when you.d like to receive a text notification\.$/)).toBeVisible();
+  });
+
+  async function openAlerts(page: import('@playwright/test').Page) {
+    await signedInAs(page, 'member', null, 'off');
+    await page.goto('/alerts/');
+    await settled(page);
+    await expect(page.getByRole('switch', { name: 'Someone messages you' })).toBeVisible();
+  }
+
+  test('no card around the list: each kind is its own row, divided by a thin line (D-615, Will, 18 October)', async ({ page }) => {
+    await openAlerts(page);
+    await expect(page.locator('.astryx-card')).toHaveCount(0);
+    const kinds = await page.getByRole('switch').count();
+    await expect(page.getByRole('separator')).toHaveCount(kinds - 1);
+  });
+
+  test('no instructions repeated: the STOP, HELP and rates line was seen when texts were agreed to', async ({ page }) => {
+    await openAlerts(page);
+    await expect(page.getByText(/Reply STOP/)).toHaveCount(0);
+    await expect(page.getByText(/data rates/i)).toHaveCount(0);
+  });
+
+  test('no Privacy link on the task: it is in Profile', async ({ page }) => {
+    await openAlerts(page);
+    await expect(page.getByRole('main').getByRole('link', { name: /Privacy/ })).toHaveCount(0);
+  });
+
+  test('the badge sits under the name, not beside it', async ({ page }) => {
+    await signedInAs(page, 'member', null, 'off');
+    await page.goto('/alerts/');
+    await settled(page);
+    const name = page.getByText('Someone messages you', { exact: true }).first();
+    const row = name.locator('xpath=ancestor::*[.//*[@role="switch"]][1]');
+    const badge = row.locator('.astryx-badge').first();
+    const n = (await name.boundingBox())!;
+    const b = (await badge.boundingBox())!;
+    expect(b.y).toBeGreaterThanOrEqual(n.y + n.height - 1);
+    // Starts where the name starts.
+    expect(Math.abs(b.x - n.x)).toBeLessThan(2);
   });
 });
 
