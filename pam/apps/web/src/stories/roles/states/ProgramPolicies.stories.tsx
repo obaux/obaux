@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
+import en from '@pam/config/locales/en.json';
 import { asRole } from '../../journeys/journey';
 import { REDESIGN_ROUTES } from '../../prototype/routes';
 
 /**
- * A program's policies for participants, kept for real (D-261, Will's card a25).
+ * A program's policies for members, kept for real (D-261, Will's card a25).
  * A lead with a program on file adds, reads and takes off policies in the
  * database: each is a PDF or a photo of each page, up to five files of 10 MB,
  * kept privately. A policy is never edited — a new version replaces it and
@@ -25,6 +26,6 @@ function onRoute(name: string, pathname: string, query: Record<string, string> =
   };
 }
 
-export const ThePolicies: Story = onRoute('Policies for participants', '/program/policies/');
+export const ThePolicies: Story = onRoute(en['policies.title'], '/program/policies/');
 export const OnePolicy: Story = onRoute('A policy: its version, its pages, and Replace', '/program/policies/view/', { id: 'policy-1' });
 export const ThePoliciesSpanish: Story = { ...ThePolicies, name: 'Policies — Spanish', globals: { locale: 'es' } };

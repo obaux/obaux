@@ -631,8 +631,9 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   *Done*) maybe still the "PAM:" prefix. Pam now texts in seven languages, and
   three reminders take two segments in Chinese, Russian and Arabic. A text that does
   not match what was registered is how an approved campaign gets filtered or
-  suspended, so this goes first. **The filing is ready to paste:
-  `docs/sms-campaign-samples.md`** (its description is 1015 of 1,024 characters).
+  suspended, so this goes first. **The filing is in
+  `docs/sms-refile-packet.md`** (18 October 2026: field by field, read from the code on main; the older
+  `docs/sms-campaign-samples.md` is the history and has three statements that are wrong against the screens).
   Only Will can do the filing: the Twilio account and the brand (Oba) are his.
   1. **Open the Twilio console and find the A2P 10DLC campaign for the Oba brand**
      (Messaging → Regulatory Compliance → A2P 10DLC → Campaigns; Twilio moves its

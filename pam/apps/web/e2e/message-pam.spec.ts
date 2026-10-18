@@ -193,6 +193,29 @@ test.describe('Message Pam, the person\'s side', () => {
     expect(server.sent()).toHaveLength(0);
   });
 
+  for (const locale of LOCALES) {
+    test(`in ${locale}: the limit's calm line is whole and inside the screen, the words stay in the box, nothing scrolls sideways (Iris W4)`, async ({ page }) => {
+      await world(page, { locale, rateLimited: true });
+      const words = bundle(locale);
+      await page.goto(`/messages/thread/?id=${PAM_C}`);
+      await settled(page);
+      await page.getByRole('textbox').fill('One more thing');
+      // The send button's name is the language's own: it is the composer's one primary button.
+      await page.locator('.astryx-chat-composer button[data-variant="primary"]').click();
+      // The signed line in this language, read from the bundle and not typed.
+      const line = page.getByText(words['messages.thread.rateLimited']!, { exact: true });
+      await expect(line).toBeVisible();
+      const box = (await line.boundingBox())!;
+      const width = page.viewportSize()!.width;
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(width);
+      // Whole: nothing cut by the box it sits in.
+      expect(await line.evaluate((el) => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
+      await expect(page.getByRole('textbox')).toHaveText('One more thing');
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    });
+  }
+
   test('with the switch on, Help\'s Contact Pam and Your safety\'s Talk to someone now open the conversation, not the website (Iris W2)', async ({ page }) => {
     await world(page);
     await page.goto('/help/');

@@ -1,5 +1,7 @@
 # Sample messages for the carrier registration
 
+> **For the next filing use `docs/sms-refile-packet.md` (18 October 2026).** It is read from the code on `main`, in the form's order. Three statements below are wrong against the screens and must not be pasted again: the sign-in screen does **not** say how to stop (it says "Pam texts you a code to sign in"); STOP is not "permanent" and HELP does not "reach a person"; and staff **do** type an invited person's number. This page stays as the history of the earlier filings.
+
 Everything Pam can send, in the order a person is likely to meet it. Paste these
 into the A2P campaign's sample-message boxes exactly as they appear — carriers
 compare them against real traffic later, and a sample that does not match what

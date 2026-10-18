@@ -161,7 +161,7 @@ function ThreadScreen() {
     if (state.status !== 'ready') return NO_MESSAGES;
     return state.messages.map((m) => {
       if (m.systemKey === null) return m;
-      const text = pamSystemText(m.systemKey, { t, tPlain, locale, firstName: state.teamView ? null : firstName, hours });
+      const text = pamSystemText(m.systemKey, { t, tPlain, locale, firstName: state.teamView ? null : firstName, hours }, m.systemVars);
       // The team reads Pam's automatic messages as Pam's, on the person's side, never as its own "You" (Iris W6, Nico 09db914f).
       return state.teamView ? { ...m, body: text, author: { name: tPlain('pam.name'), photoUrl: PAM_MARK } } : { ...m, body: text };
     });
