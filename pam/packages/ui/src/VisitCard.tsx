@@ -50,6 +50,11 @@ export interface VisitCardProps {
    * 320 decides): the same button, on a row of its own under the date, not a second design. Off by default.
    */
   readonly actionOwnRow?: boolean;
+  /**
+   * One short line inside the card, under the time and the countdown (plan C, a98): "Your calendar has the old time." for a visit that
+   * moved after it was added on this phone. Nothing sits under the card (Will, 18 October), so a state that needs a word goes in it.
+   */
+  readonly note?: ReactNode;
 }
 
 const styles = stylex.create({
@@ -76,6 +81,8 @@ const styles = stylex.create({
   // weight, smaller, in the body colour. Not the secondary grey — on the
   // dark-mode green that is 4.08:1, under AA's 4.5.
   countdown: { fontSize: '16px', lineHeight: 1.3, fontWeight: 400, color: colorVars['--color-text-primary'] },
+  // A state, not a title: the body colour, a little heavier than the countdown so it is read, still 16px.
+  note: { fontSize: '16px', lineHeight: 1.3, fontWeight: 600, color: colorVars['--color-text-primary'] },
   rule: {
     borderTopWidth: '1px',
     borderTopStyle: 'solid',
@@ -100,7 +107,7 @@ const styles = stylex.create({
   },
 });
 
-export function VisitCard({ eyebrow, day, time, service = null, countdown = null, changeLabel, changeHref = null, action = null, actionOwnRow = false }: VisitCardProps) {
+export function VisitCard({ eyebrow, day, time, service = null, countdown = null, changeLabel, changeHref = null, action = null, actionOwnRow = false, note = null }: VisitCardProps) {
   return (
     <Card padding={5} xstyle={styles.card}>
       {/* Room between each line (Will, 7 October, D-339: "so things aren't
@@ -119,6 +126,7 @@ export function VisitCard({ eyebrow, day, time, service = null, countdown = null
           <Text xstyle={styles.day}>{day}</Text>
           <Text xstyle={styles.time}>{service ? `${time} · ${service}` : time}</Text>
           {countdown ? <Text xstyle={styles.countdown}>{countdown}</Text> : null}
+          {note ? <Text xstyle={styles.note}>{note}</Text> : null}
         </VStack>
         {actionOwnRow ? <HStack>{action}</HStack> : null}
         {changeLabel && changeHref ? (

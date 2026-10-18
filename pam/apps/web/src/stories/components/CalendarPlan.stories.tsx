@@ -126,11 +126,11 @@ const styles = stylex.create({
 });
 
 /** `added`: the visit is in the calendar (a link, or added on this phone): the same corner, "Added to calendar", no fill, opens Calendar. */
-function BookedScreen({ added = false }: { readonly added?: boolean }) {
+function BookedScreen({ added = false, moved = false }: { readonly added?: boolean; readonly moved?: boolean }) {
   const w = useWords();
   return (
     <SubPage title={w.booked} backHref="/trips/" backLabel={w.close} backIcon="close">
-      <CalendarVisitCard added={added} />
+      <CalendarVisitCard added={added} moved={moved} />
     </SubPage>
   );
 }
@@ -241,6 +241,8 @@ export const C_Booked: Story = { render: () => <BookedScreen /> };
 /** What the icon opens: pick a calendar and the visit is on the phone. */
 /** The corner button once the visit is added: "Added to calendar", no fill, opens the Calendar screen. */
 export const C_Booked_Added: Story = { render: () => <BookedScreen added /> };
+/** A visit added on this phone that later moved: the button is back to "Add to calendar", and the card says "Your calendar has the old time." inside it. */
+export const C_Booked_Moved: Story = { render: () => <BookedScreen moved /> };
 export const C_Sheet: Story = { render: () => <AddSheet /> };
 /** Profile › Calendar, nothing linked. */
 export const C_CalendarNone: Story = { render: () => <CalendarScreen which="none" /> };
@@ -252,6 +254,7 @@ export const C_CalendarGoogle: Story = { render: () => <CalendarScreen which="go
 const arabic = { globals: { locale: 'ar' } } as const;
 export const C_Booked_Arabic: Story = { ...C_Booked, ...arabic };
 export const C_Booked_Added_Arabic: Story = { ...C_Booked_Added, ...arabic };
+export const C_Booked_Moved_Arabic: Story = { ...C_Booked_Moved, ...arabic };
 export const C_Sheet_Arabic: Story = { ...C_Sheet, ...arabic };
 export const C_CalendarNone_Arabic: Story = { ...C_CalendarNone, ...arabic };
 export const C_CalendarApple_Arabic: Story = { ...C_CalendarApple, ...arabic };
