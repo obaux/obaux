@@ -71,8 +71,9 @@ class OrbHero {
 
   // Timeline, seconds (read off the reference recording).
   static T = {
-    heroGrow: 1.15, heroShrinkEnd: 1.9,
-    latticeStart: 1.2, latticeDur: 0.8, latticeStagger: 0.45,
+    heroGrow: 1.15, heroShrinkEnd: 2.15,          // hero and lattice settle together, ~2.2s
+    latticeStart: 1.2, latticeDur: 0.9, latticeStagger: 0.4,
+    bobFade: 1.2,                                  // idle bob eases in over this long after a circle lands
     exitDur: 0.6, exitStagger: 0.35,
   };
 
@@ -254,9 +255,11 @@ class OrbHero {
 
   static ease = {
     outCubic: x => 1 - Math.pow(1 - x, 3),
+    // Starts and ends at rest, with a longer glide than lift-off: no pop at either end.
+    soft: x => { const g = x * x * (3 - 2 * x); return 1 - (1 - g) * (1 - g); },
+    smooth: x => x * x * (3 - 2 * x),
     inCubic: x => x * x * x,
     inOutCubic: x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2,
-    outBack: x => { const c1 = 1.2, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); },
   };
 
   _frame(now) {
@@ -287,8 +290,12 @@ class OrbHero {
     for (const orb of this.orbs) {
       const k = clamp01((t - (T.latticeStart + orb.d * T.latticeStagger)) / T.latticeDur);
       if (k <= 0) continue;
-      const e = E.outCubic(k), s = E.outBack(k) * out(orb.d);
-      const bob = t > 2.4 ? Math.sin(clock * 0.9 + orb.phase) * 0.006 : 0;
+      // One curve for position and size, no overshoot, so nothing bounces back as it lands.
+      const e = E.soft(k), s = e * out(orb.d);
+      // The idle bob fades in from the moment this circle lands; switching it on at full
+      // strength made every circle step by a few pixels at once.
+      const landed = T.latticeStart + orb.d * T.latticeStagger + T.latticeDur;
+      const bob = Math.sin(clock * 0.9 + orb.phase) * 0.006 * E.smooth(clamp01((t - landed) / T.bobFade));
       push(ccx + orb.x * e * W, ccy + (orb.y * e + bob) * W, orb.r * s, orb.slot);
     }
 

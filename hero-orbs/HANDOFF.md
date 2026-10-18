@@ -41,9 +41,11 @@ Timeline, in seconds (the constants live in `OrbHero.T`):
 | When | What |
 |---|---|
 | 0 – 1.15 | Hero circle grows from 15% to 34% radius (as a share of the banner's width), ease-out |
-| 1.15 – 1.9 | Hero shrinks to its resting size (11.8%, 12% larger than the rest), ease-in-out |
-| 1.2 – 2.0+ | The other 9 circles spread out from the hero's centre to their lattice spots, nearest first (0.45s per unit of distance), small overshoot on size |
-| after ~2.4 | Idle: a slow vertical bob per circle |
+| 1.15 – 2.15 | Hero shrinks to its resting size (10.1%, 12% larger than the rest), ease-in-out |
+| 1.2 – 2.2 | The other 12 circles spread out from the hero's centre to their lattice spots, nearest first (0.4s per unit of distance, 0.9s each). One eased curve moves and sizes each circle, starts and ends at rest, **no overshoot** |
+| after each circle lands | Idle: a slow vertical bob that **fades in over 1.2s** per circle |
+
+**Smoothness (18 Oct, "a little jump" in the middle row).** Cause: the idle bob switched on at full strength at a fixed 2.4s, so every circle stepped a few pixels at once; the size overshoot also made circles bounce back as they landed. Both removed; the hero's shrink was lengthened so it and the lattice finish together. To re-check, step `hero.seek(t)` at 60fps, read each circle's x/y/radius from `hero.data`, and look for spikes in the frame-to-frame change: the old bob start showed ~4.8 device px/frame², now the worst is ~1 and it is a smooth curve.
 | `exit()` | Everything shrinks away, outer circles first, hero last (0.6s each) |
 
 Layout: the canvas is the banner (4:3, `aspect-ratio` set by CSS; the engine lays out
