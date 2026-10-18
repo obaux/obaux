@@ -157,7 +157,7 @@ Checked against the code by Lena, 15:45.
 2. ~~From `book.new.note`~~ withdrawn. It described something Pam doesn't do; the screen line is cut instead.
 3. From `policy.replace.hint`: **When a program replaces a policy, what you signed before stays on record.** Placed with `what-we-keep.p8`. True (Lena).
 4. Reported messages, so `messages.report.*` can shorten. Add to `who-can-see.p3`, after "Then they see that message, and its photo or document if it has one.": **The Pam team can too, and so can the guide of the person who wrote it.** True (`report_visible_to_me()`, 0065), and today the screen line understates it. The transparency screen's Pam card (a101) would take the guide's line, which is Will's to widen.
-5. `reminders.how`: signed 15:45 ("…each time something on this list happens"). `reminders.intro` is cut, with the carrier check done.
+5. `reminders.how`: signed 15:45 ("…each time something on this list happens"). `reminders.intro` is cut. (This line first said "with the carrier check done" before Lena had ruled on the intro. Her ruling came at 17:47: yes, cut. Both consent screens: ledger 1c09f1de.)
 
 Everything marked "covered" can go as soon as its lane takes it, because a live Privacy line already says it.
 
