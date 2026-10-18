@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
@@ -36,6 +36,7 @@ const styles = stylex.create({
     borderRadius: '24px',
   },
   // Added: no fill, the card's own green showing through; the same size and weight, still 48px to tap (Dot's story).
+  slot: { flexShrink: 0 },
   added: { flexShrink: 0, minHeight: '48px', paddingInline: '4px', fontSize: '16px', fontWeight: 700, color: colorVars['--color-text-green'] },
   changed: { fontSize: '15px', lineHeight: 1.4, color: colorVars['--color-text-secondary'], textAlign: 'center' },
   sheet: { width: '100%', paddingInline: '20px', paddingBlockEnd: '28px' },
@@ -85,12 +86,28 @@ export interface CalendarSlot {
   readonly actionOwnRow: boolean;
 }
 
-/** A long place name, or a long label, leaves the button no room beside the title at 320 wide: it takes a row of its own. */
-const ownRowFor = (placeName: string, label: string): boolean => placeName.length + label.length > 30;
+/**
+ * Whether the card's header can hold its title and the button (Dot's rule, Mira 18 October): the button sits in the corner beside the title, and
+ * takes a row of its own only when the label wraps or the title would run past two lines. Measured on the card as drawn, at this width, in this
+ * language, not guessed from the words: the place page's title is "Your next visit", which fits beside it at 390, the booked screen's is the place's
+ * name, which often does not.
+ */
+function headerCannotHold(wrap: HTMLElement | null): boolean {
+  const action = wrap?.querySelector<HTMLElement>('[data-calendar-action]');
+  const header = action?.parentElement;
+  const title = header?.firstElementChild as HTMLElement | null | undefined;
+  if (!action || !header || !title || title === action) return false;
+  const lineHeight = parseFloat(getComputedStyle(title).lineHeight) || parseFloat(getComputedStyle(title).fontSize) * 1.3;
+  const titleLines = Math.round(title.getBoundingClientRect().height / lineHeight);
+  const labelWraps = action.getBoundingClientRect().height > 56;
+  return titleLines > 2 || labelWraps;
+}
 
 export function AddVisitToCalendar({ card, visit }: { readonly card: (slot: CalendarSlot) => ReactNode; readonly visit: VisitToAdd }) {
   const { t, tPlain } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
+  const wrap = useRef<HTMLDivElement>(null);
+  const [ownRow, setOwnRow] = useState(false);
   // "Added" is true for a member with a calendar link (every visit reaches their calendar by itself, a moved one too), or for a visit added from
   // this sheet on this phone at its present time. Read after the page is up, so the static page and the first paint agree.
   const { state: session } = useSession();
@@ -108,10 +125,18 @@ export function AddVisitToCalendar({ card, visit }: { readonly card: (slot: Cale
     setIsOpen(false);
   };
   const label = tPlain(isAdded ? 'calendar.addOne.added' : 'trips.addToCalendar');
+  // Back in the corner whenever the words change, then measured: the button goes to its own row only if the header cannot hold both.
+  useLayoutEffect(() => setOwnRow(false), [label, visit.placeName]);
+  useLayoutEffect(() => {
+    if (!ownRow && headerCannotHold(wrap.current)) setOwnRow(true);
+  });
   return (
     <VStack gap={1}>
+      <div ref={wrap}>
       {card({
-        action: isAdded ? (
+        action: (
+          <div data-calendar-action {...stylex.props(styles.slot)}>
+          {isAdded ? (
           <Button
             label={label}
             aria-label={tPlain('calendar.addOne.added.label')}
@@ -128,9 +153,12 @@ export function AddVisitToCalendar({ card, visit }: { readonly card: (slot: Cale
             onClick={() => setIsOpen(true)}
             xstyle={styles.calendar}
           />
+          )}
+          </div>
         ),
-        actionOwnRow: ownRowFor(visit.placeName, label),
+        actionOwnRow: ownRow,
       })}
+      </div>
       {hasChanged ? (
         <Text type="supporting" xstyle={styles.changed}>
           {t('calendar.addOne.changed')}

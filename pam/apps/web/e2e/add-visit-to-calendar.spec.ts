@@ -196,6 +196,11 @@ test('the place page\'s green card has the same button, and Added after one is a
   await page.goto('/place/?id=dummy-place-learning&from=trips&trip=dummy-trip-1');
   await settled(page);
   await expect(page.getByText('Your next visit')).toBeVisible();
+  // In the card's corner beside "Your next visit", not on a row of its own (Will; Dot's drawing): the same line, measured.
+  const title = (await page.getByText('Your next visit').boundingBox())!;
+  const corner = (await page.getByRole('button', { name: 'Add to calendar' }).boundingBox())!;
+  expect(Math.abs(corner.y + corner.height / 2 - (title.y + title.height / 2))).toBeLessThan(30);
+  expect(corner.x).toBeGreaterThan(title.x + title.width - 1);
   await page.getByRole('button', { name: 'Add to calendar' }).click();
   const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('dialog').getByText('Apple Calendar', { exact: true }).click()]);
   expect(download.suggestedFilename()).toBe('visit.ics');
