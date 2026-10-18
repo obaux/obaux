@@ -427,7 +427,7 @@ export function useThread(conversationId: string | null): {
         const found = ((recent ?? []) as unknown as MessageRow[]).find(
           (row) =>
             (row.body ?? '') === item.body &&
-            (item.attachment ? row.attachment_kind === item.attachment.kind : row.attachment_kind === null),
+            (item.attachment ? row.attachment_kind === item.attachment.kind : (row.attachment_kind ?? null) === null),
         );
         if (found) {
           const message = toMessage(found, loaded.meId, {}, item.photoUrl, loaded.askerId);
