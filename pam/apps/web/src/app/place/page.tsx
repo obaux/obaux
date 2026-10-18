@@ -18,6 +18,7 @@ import {
   googlePlaceHref,
 } from '@pam/ui';
 import { usePlaceLead } from '@/lib/usePlaceHasLead';
+import { usePamStatus } from '@/lib/pam';
 import { PlaceBarActions, leadMessageFor, messageHrefFor, newMessageFrom } from '../../screens/PlaceBarActions';
 import { PlaceDetailSkeleton } from '@pam/ui/Skeletons';
 import { SubPageHeader } from '@pam/ui/SubPage';
@@ -234,6 +235,7 @@ function PlaceScreen() {
   const signedIn = session.status === 'signed-in';
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { demoRole } = useRoleView(trueRole);
+  const pam = usePamStatus(trueRole === 'super_admin' && (demoRole ?? trueRole) === 'super_admin');
   const { isSaved, save, unsave } = useSavedPlaces(signedIn, demoRole);
 
   const place = state.status === 'ready' ? state.place : null;
@@ -441,6 +443,8 @@ function PlaceScreen() {
   // Only a member is written to by a program here (D-305).
   const unread = (demoRole ?? trueRole) === 'member' ? newMessageFrom(place!.name) : null;
   const leadMessage = leadMessageFor(place!.name, place!.id);
+  // The Pam team, really (not a role it is viewing as), with Message Pam switched on.
+  const pamLive = pam.status === 'ready';
   const directions =
     (service?.address
       ? directionsHref(service.address, null, null, null)
@@ -608,7 +612,18 @@ function PlaceScreen() {
           // would (D-349): "Message Sandra", to coordinate how they use Pam.
           // No lead known, no row.
           ...((demoRole ?? trueRole) === 'super_admin'
-            ? leadMessage
+            ? pamLive
+              ? [
+                  // While Message Pam is on, the Pam team writes to the program as Pam: to each of its active leads,
+                  // each in their own conversation (card a100, D-605; Piper, 16:41). Off, it is D-349's row as before.
+                  {
+                    id: 'message',
+                    label: t('pam.program.action'),
+                    icon: <MessagesIcon {...QUICK} />,
+                    href: `/pam/start/?service=${encodeURIComponent(place!.id)}&name=${encodeURIComponent(place!.name)}`,
+                  },
+                ]
+              : leadMessage
               ? [
                   {
                     id: 'message',
