@@ -1,5 +1,4 @@
 import { appErrorCode, isAppErrorAction } from '@pam/config';
-import { createClient } from './supabase';
 
 /**
  * Tells the team that something a person did did not work (D-616; Will: "if something breaks, create an error log so the team can
@@ -123,6 +122,9 @@ function platform(): string {
 
 export const reportAppError = createReporter({
   send: async (wire) => {
+    // Loaded when a report goes, not with the page: every route's Providers import this file (through the malfunction alert),
+    // and a static import put the whole Supabase client in the root layout's chunk, 84 kB over §12's budget (b76).
+    const { createClient } = await import('./supabase');
     const { error } = await createClient().rpc('report_app_error', wire);
     // A refusal from the database (switch off, rate limit, bad value) is an answer, not a network failure.
     // A PostgREST answer carries a code; a network failure does not.
