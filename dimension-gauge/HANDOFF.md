@@ -22,8 +22,9 @@ A flat "liquid fill" circle that shows one life dimension's amount (0–100) on 
 | `label` | Accessible name. Set it. |
 | `max-fill` | Highest level the circle can reach. Default **92**, so a gauge never fills to the top (there is always room to grow). `max-fill="100"` allows a full circle. `aria-valuenow` still reports the real value. |
 | `energy` | Wave liveliness 0.4–1.6, default 1. Used for the weak (0.6) / steady (1) / strong (1.35) examples. |
-| `fill-duration` | ms for the first fill from empty. Default **3600**: a slow rise, easing out near the level. Later `value` changes use a shorter tween (max 1400 ms). |
-| `delay` | ms before the first fill starts. Stagger a row with `delay = index * 220`. |
+| `fill-duration` | ms for the first fill from empty. Default **7000**. The first fill is split into micro-steps (see `steps`). Later `value` changes use one shorter tween (max 1400 ms). |
+| `steps` | Micro-steps in the first fill, 1–12, default 5. Each step eases in and out, then pauses briefly (68% rising / 32% holding). Steps taper: the first is the biggest, the last the smallest, with a small per-gauge jitter so ten gauges don't move in lockstep. `steps="1"` gives one smooth rise. |
+| `delay` | ms before the first fill starts. Stagger a row with `delay = index * 320`. |
 | `static` | Disables wave motion. Also applied automatically under `prefers-reduced-motion`. |
 
 CSS custom properties (set on the element or an ancestor): `--dg-size` (default 120px), `--dg-color` (#4561de), `--dg-track` (empty circle, translucent white), `--dg-icon` (#fff). Optional `--dg-wave` overrides the pale back wave.
@@ -44,7 +45,7 @@ Alternative if buckets should drive the fill too: map weak / steady / strong to 
 ## Report page: ten gauges filling in
 Intended flow: user finishes the questions, lands on the report, and sees all ten dimensions fill slowly as the result. For that:
 - Render all ten `<dimension-gauge>` elements with their final `value` and `energy` already set (from `scoreDimension` / `gaugeProps`). Do not set `value` to 0 first and then update it; the element always fills from empty on its own.
-- Stagger with `delay="${i * 220}"` (about 2.2 s of lead-in across ten, then 3.6 s per fill).
+- Stagger with `delay="${i * 320}"` (about 2.9 s of lead-in across ten, then 7 s per fill, so the whole report settles in roughly 10 s).
 - A gauge starts filling only when it is first on screen (IntersectionObserver), so ones below the fold fill as they are scrolled to.
 - Under `prefers-reduced-motion` or `static`, the gauge draws at its final level with no animation.
 - The demo artifact's "The report" section is a working example with placeholder dimension names, icons and scores. The real ten dimensions were not provided.

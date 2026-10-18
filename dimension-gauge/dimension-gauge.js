@@ -11,8 +11,10 @@
  *   max-fill    Highest level the circle can reach, 0–100. Default 92, so there is always
  *               a little room left at the top. Use max-fill="100" to allow a full circle.
  *   energy      Wave liveliness, 0.4–1.6. Default 1. Low = slow, shallow swell; high = brisk, taller waves.
- *   fill-duration  ms for the first fill from empty. Default 3600: a slow rise, like water filling a sphere.
- *                  Later changes to `value` use a shorter tween (max 1400 ms).
+ *   fill-duration  ms for the first fill from empty. Default 7000: a slow rise, like water filling a sphere.
+ *   steps       Number of micro-steps the first fill is broken into (1–12). Default 5. Each step eases
+ *               in and out, then pauses briefly, so the level builds up gradually instead of all at once.
+ *               Later changes to `value` use one shorter tween (max 1400 ms).
  *   delay       ms to wait before the first fill starts. Stagger a row of gauges with delay="${i*180}".
  *   static      Boolean. No wave motion (also automatic under prefers-reduced-motion).
  *
@@ -33,6 +35,26 @@ const REDUCED = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
 // Water-fill feel: starts steadily, then slows gently as it nears the level.
 const easeFill = t => 1 - Math.pow(1 - t, 2.2);
+const easeInOut = t => 0.5 - 0.5 * Math.cos(Math.PI * t);
+const MOVE = 0.68;           // share of each step spent rising; the rest is a pause
+
+// Level fraction (0–1) at overall progress p, for a fill split into `weights.length` equal time slices.
+// Slice i raises the level by weights[i] (ease in-out), then holds. Later slices are smaller, so the fill tapers.
+function stepped(p, weights) {
+  const n = weights.length, x = clamp(p, 0, 1) * n, i = Math.min(n - 1, Math.floor(x));
+  const u = x - i, mv = i === n - 1 ? 1 : MOVE;
+  let base = 0; for (let k = 0; k < i; k++) base += weights[k];
+  return base + weights[i] * easeInOut(clamp(u / mv, 0, 1));
+}
+// Steps taper (big first, small last) with a small per-gauge jitter, so ten gauges don't move in lockstep.
+function stepWeights(n, seed) {
+  const raw = Array.from({ length: n }, (_, i) => {
+    const j = Math.sin(seed * 12.9898 + i * 78.233) * 43758.5453; const r = j - Math.floor(j);
+    return (1 + (n - 1 - i) * 0.55) * (0.85 + 0.3 * r);
+  });
+  const sum = raw.reduce((a, b) => a + b, 0);
+  return raw.map(w => w / sum);
+}
 
 // Wave layers: [amplitude, wavelengths across the circle, speed rad/s, phase offset, level offset]
 // The back (pale) layer sits slightly higher and moves against the front so it peeks out as a sliver.
@@ -51,7 +73,7 @@ svg.disc{display:block;width:100%;height:100%}
 `;
 
 class DimensionGauge extends HTMLElement {
-  static observedAttributes = ['value', 'label', 'static', 'max-fill', 'energy', 'fill-duration', 'delay'];
+  static observedAttributes = ['value', 'label', 'static', 'max-fill', 'energy', 'fill-duration', 'delay', 'steps'];
 
   constructor() {
     super();
@@ -67,6 +89,7 @@ class DimensionGauge extends HTMLElement {
     this._front = root.querySelector('.front');
     this._shown = 0;          // value currently drawn (animated)
     this._from = 0; this._to = 0; this._t0 = 0; this._D = 0;
+    this._rise = 0;
     this._started = false;    // first fill waits until the gauge is on screen
     this._raf = 0; this._t = 0;
   }
@@ -91,7 +114,9 @@ class DimensionGauge extends HTMLElement {
   _start() {
     this._started = true;
     this._from = 0; this._to = this._value();
-    this._D = this._still() ? 0 : this._num('fill-duration', 3600, 0, 20000);
+    this._D = this._still() ? 0 : this._num('fill-duration', 7000, 0, 30000);
+    const n = Math.round(this._num('steps', 5, 1, 12));
+    this._weights = n > 1 && !this._still() ? stepWeights(n, this._to) : null;
     this._t0 = performance.now() + this._num('delay', 0, 0, 20000);
   }
 
@@ -105,7 +130,8 @@ class DimensionGauge extends HTMLElement {
       this._sync();
       if (!this._started) return;                     // first fill picks up the latest value when it starts
       this._from = this._shown; this._to = this._value(); this._t0 = performance.now();
-      this._D = this._still() ? 0 : Math.min(this._num('fill-duration', 3600, 0, 20000), 1400);
+      this._D = this._still() ? 0 : Math.min(this._num('fill-duration', 7000, 0, 30000), 1400);
+      this._weights = null;
       this._kick();
     } else { this._sync(); this._kick(); }
   }
@@ -135,8 +161,12 @@ class DimensionGauge extends HTMLElement {
     if (!this._still()) this._t += dt * this._energy();
 
     const p = this._D ? clamp((now - this._t0) / this._D, 0, 1) : (now >= this._t0 ? 1 : 0);
-    this._shown = this._from + (this._to - this._from) * easeFill(p);
-    this._rise = p > 0 && p < 1 ? 1 - p : 0;         // waves swell a little while the level is rising
+    const f = this._weights ? stepped(p, this._weights) : easeFill(p);
+    const prev = this._shown;
+    this._shown = this._from + (this._to - this._from) * f;
+    // Waves swell a little while the level is moving and calm during the pauses; eased so it never pops.
+    const moving = p > 0 && p < 1 && Math.abs(this._shown - prev) > 0.004 ? 1 : 0;
+    this._rise += (moving - this._rise) * Math.min(1, dt * 3);
     this._draw();
 
     // Keep looping while the waves move or the level is still tweening.
@@ -152,7 +182,7 @@ class DimensionGauge extends HTMLElement {
   _wave(v, w) {
     // Waves flatten near 0 and 100 so the circle reads as truly empty / truly full.
     const edge = Math.min(1, v / 6, (100 - v) / 6);
-    const amp = w.amp * clamp(edge, 0, 1) * (0.55 + 0.45 * this._energy()) * (1 + 0.3 * (this._rise || 0));
+    const amp = w.amp * clamp(edge, 0, 1) * (0.55 + 0.45 * this._energy()) * (1 + 0.3 * this._rise);
     const level = 100 - v;                            // y of the surface (0 = top)
     const y0 = v >= 99.5 ? -w.amp - 1 : level - w.lift * clamp(edge, 0, 1);
     let d = `M-2 102 L-2 ${y0.toFixed(2)}`;
