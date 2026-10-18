@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import path from 'node:path';
 import { test, expect, type Page } from '@playwright/test';
 import { settled } from './settled';
 
@@ -17,7 +17,7 @@ const PAM_C = 'c0c0c0c0-0000-4000-8000-00000000a001';
 const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
 const LOCALES = ['en', 'es', 'pt-BR', 'zh-CN', 'zh-HK', 'ru', 'ar'] as const;
 const bundle = (locale: string): Record<string, string> =>
-  JSON.parse(readFileSync(fileURLToPath(new URL(`../../../packages/config/src/locales/${locale}.json`, import.meta.url)), 'utf8'));
+  JSON.parse(readFileSync(path.join(process.cwd(), '../../packages/config/src/locales', `${locale}.json`), 'utf8'));
 
 interface Row { id: string; conversation_id: string; sender_id: string | null; system_key: string | null; system_vars: unknown; body: string; attachment_url: null; attachment_kind: null; created_at: string }
 
@@ -84,7 +84,7 @@ test.describe('Message Pam, the person\'s side', () => {
     await expect(page.getByText("Hi Will, it's Pam. If you need help with anything, reply here.").first()).toBeVisible();
     await expect(row).toHaveAttribute('href', new RegExp(`/messages/thread/\\?id=${PAM_C}`));
     // The Messages tab is there although there is no one else to message.
-    await expect(page.getByRole('link', { name: /^Messages/ }).first()).toBeVisible();
+    await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: /Messages/ })).toBeVisible();
   });
 
   test('the thread reads like any other: Pam\'s mark and name, the welcome, "Write to Pam", a photo button, no document, no ⋯, no notice', async ({ page }) => {
@@ -148,6 +148,25 @@ test.describe('Message Pam, the person\'s side', () => {
     await write.click();
     await expect(page).toHaveURL(new RegExp(`/messages/thread/\\?id=${PAM_C}`));
     await expect(page.getByRole('textbox')).toHaveAccessibleName('Write to Pam');
+  });
+
+  test('/messages/pam/ opens the conversation', async ({ page }) => {
+    await world(page);
+    await page.goto('/messages/pam/');
+    await expect(page).toHaveURL(new RegExp(`/messages/thread/\\?id=${PAM_C}`));
+    await expect(page.getByRole('textbox')).toHaveAccessibleName('Write to Pam');
+  });
+
+  test('/messages/pam/ with the switch off lands on Messages', async ({ page }) => {
+    await world(page, { live: false });
+    await page.goto('/messages/pam/');
+    await expect(page).toHaveURL(/\/messages\/$/);
+  });
+
+  test('/messages/pam/ signed out goes through Sign in and back', async ({ page }) => {
+    await page.route('**/rest/v1/**', (route) => route.fulfill(json([])));
+    await page.goto('/messages/pam/');
+    await expect(page).toHaveURL(/\/signin\/\?next=(%2F|\/)messages(%2F|\/)pam(%2F|\/)/);
   });
 
   test('with the switch off nothing of Pam is shown: no row, no Write to Pam, the tab hides with nobody to message', async ({ page }) => {

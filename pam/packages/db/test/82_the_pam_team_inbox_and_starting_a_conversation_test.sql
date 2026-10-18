@@ -44,6 +44,7 @@ grant execute on function test.check_text(text, text, text) to authenticated, an
 \set dana   '33333333-0000-0000-0000-00000000000a'
 \set root   '33333333-0000-0000-0000-000000000020'
 \set ivy    'cccccccc-0000-0000-0000-000000008201'
+\set wes    'cccccccc-0000-0000-0000-000000008205'
 \set lead_a 'cccccccc-0000-0000-0000-000000008202'
 \set lead_b 'cccccccc-0000-0000-0000-000000008203'
 \set lead_c 'cccccccc-0000-0000-0000-000000008204'
@@ -58,7 +59,7 @@ grant execute on function test.check_text(text, text, text) to authenticated, an
 reset role;
 select set_config('request.jwt.claim.sub', '', false);
 insert into auth.users (id, phone) values
-  (:'ivy', '12675550821'), (:'lead_a', '12675550822'), (:'lead_b', '12675550823'), (:'lead_c', '12675550824');
+  (:'ivy', '12675550821'), (:'lead_a', '12675550822'), (:'lead_b', '12675550823'), (:'lead_c', '12675550824'), (:'wes', '12675550825');
 insert into public.orgs (id, name, type, region_id) values
   (:'org_a', 'Pam Msg Org A', 'program', :'region_north'),
   (:'org_c', 'Pam Msg Org C', 'program', :'region_north'),
@@ -67,7 +68,8 @@ insert into public.profiles (id, role, first_name, region_id, phone, access_stat
   (:'ivy', 'member', 'Ivy', :'region_north', '+12675550821', 'active', null),
   (:'lead_a', 'provider', 'Lia', :'region_north', '+12675550822', 'active', :'org_a'),
   (:'lead_b', 'provider', 'Lob', :'region_north', '+12675550823', 'limited', :'org_a'),
-  (:'lead_c', 'provider', 'Lic', :'region_north', '+12675550824', 'active', :'org_c');
+  (:'lead_c', 'provider', 'Lic', :'region_north', '+12675550824', 'active', :'org_c'),
+  (:'wes', 'member', 'Wes', :'region_north', '+12675550825', 'active', null);
 insert into public.services (id, org_id, name, category, address, source, source_ref, needs_review, is_active) values
   (:'svc_a', :'org_a', 'Pam Msg Program A', 'workforce', '1 Pam St', 'manual', null, false, true),
   (:'svc_n', :'org_n', 'Pam Msg No Lead', 'workforce', '2 Pam St', 'manual', null, false, true),
@@ -139,9 +141,8 @@ select test.check('Ivy answers: she is waiting, and the preview is the first lin
 insert into public.messages (conversation_id, sender_id, body) values ((select v from t82 where k = 'ivy'), :'root', 'Great');
 select test.check('the team answers: nobody is waiting',
   (select count(*) from public.pam_inbox() where asker_id = :'ivy' and last_from = 'team' and waiting_since is null), 1);
-select test.check('a conversation with only the welcome (Rosa''s, from test 81) has no last message and nobody waiting',
-  (select count(*) from public.pam_inbox() where asker_id = 'cccccccc-0000-0000-0000-000000008101'
-     and last_from is null and last_message_at is null and waiting_since is null and preview is null), 1);
+select test.check('a conversation with only Pam''s welcome (Wes''s, made here) is not in the inbox: nobody has written',
+  (select count(*) from public.pam_inbox() where asker_id = :'wes'), 0);
 select public.pam_set_thread_status((select v from t82 where k = 'ivy'), 'closed');
 select test.check_text('close: the inbox says closed',
   (select status from public.pam_inbox() where asker_id = :'ivy'), 'closed');

@@ -46,5 +46,5 @@ export function useWriteToPamItem(): MenuItem | null {
   const signedIn = session.status === 'signed-in' && session.session.role !== 'super_admin';
   const pam = usePamStatus(signedIn);
   if (!signedIn || pam.status !== 'ready') return null;
-  return { id: 'pam', label: t('help.writeToPam'), href: '/messages/thread/?pam=1', icon: <MessagesIcon {...ICON} /> };
+  return { id: 'pam', label: t('help.writeToPam'), href: '/messages/pam/', icon: <MessagesIcon {...ICON} /> };
 }

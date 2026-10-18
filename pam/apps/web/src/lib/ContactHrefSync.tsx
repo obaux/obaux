@@ -22,7 +22,7 @@ export function ContactHrefSync({ set }: { readonly set: (href: string) => void 
   const pamLive = pam.status === 'ready';
   useEffect(() => {
     if (!settled) return;
-    set(signedIn ? (pamLive ? '/messages/thread/?pam=1' : '/help/') : `${SITE_URL}/support/`);
+    set(signedIn ? (pamLive ? '/messages/pam/' : '/help/') : `${SITE_URL}/support/`);
   }, [signedIn, settled, pamLive, set]);
   return null;
 }
