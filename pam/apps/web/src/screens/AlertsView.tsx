@@ -113,7 +113,10 @@ function AlertsList() {
   /** The four alert switches, each its own yes (D-478). */
   const [alerts, setAlerts] = useState<AlertFlags>({ message: false, booked: false, changed: false, trip: false });
   const [saved, setSaved] = useState(false);
-  const [failed, setFailed] = useState(false);
+  /** The input id Astryx gave each switch, so the row's name can be its label. */
+  const [switchIds, setSwitchIds] = useState<Partial<Record<Kind, string>>>({});
+  /** The row whose write failed: its error is drawn under it, where the finger was, not at the foot of the page. */
+  const [failedKind, setFailedKind] = useState<Kind | null>(null);
   /** They replied STOP (D-453): the switches are off and cannot be turned on from here. */
   const [stopped, setStopped] = useState(false);
 
@@ -156,26 +159,26 @@ function AlertsList() {
       return;
     }
     setSaved(false);
-    setFailed(false);
+    setFailedKind(null);
     if (ALERT_KINDS.has(kind)) {
       const key = kind as AlertKind;
       const before = alerts;
       setAlerts({ ...alerts, [key]: on });
       if (on) setConsent(true);
       const ok = await setTextAlert(userId, key, on, before, who !== 'member');
-      setFailed(!ok);
+      setFailedKind(ok ? null : kind);
       setSaved(ok);
       if (!ok) {
         setAlerts(before);
         setConsent(consent);
-      } else if (!on && who !== 'member' && !Object.entries({ ...before, [key]: false }).some(([, v]) => v)) {
-        setConsent(false);
       }
+      // The last alert going off keeps the yes to texts: only a STOP ends it (Nico, 21b053e9), so the screen's own yes is left as it
+      // was and follows the database; turning one back on in this visit does not open the agree screen.
       return;
     }
     setConsent(on);
     const ok = await setReminderConsent(userId, on);
-    setFailed(!ok);
+    setFailedKind(ok ? null : kind);
     setSaved(ok);
     if (!ok) setConsent(!on);
   };
@@ -209,11 +212,24 @@ function AlertsList() {
               adornment={TERM_FOR[kind] ? <TermInfo term={TERM_FOR[kind]} /> : null}
               badge={live ? undefined : t('common.comingSoon')}
               badgeId={badgeId}
+              labelFor={live ? switchIds[kind] : undefined}
+              below={
+                failedKind === kind ? (
+                  <Notice
+                    notice="something_went_wrong"
+                    title={t('notice.something_went_wrong.title')}
+                    body={t('notice.something_went_wrong.body')}
+                    contactLabel={t('help.contact.action')}
+                  />
+                ) : null
+              }
               control={
                 <Switch
                   ref={(input) => {
                     // The badge is the switch's description, so a screen reader hears "{row}, switch, off, Coming soon" (D-608).
                     if (!input) return;
+                    // The row's name is this switch's label (a tap on it works the switch): Astryx's own id for the input is what ties them.
+                    if (input.id && switchIds[kind] !== input.id) setSwitchIds((previous) => ({ ...previous, [kind]: input.id }));
                     if (live) input.removeAttribute('aria-describedby');
                     else input.setAttribute('aria-describedby', badgeId);
                   }}
@@ -228,18 +244,10 @@ function AlertsList() {
           );
         })}
       </SettingsList>
-      {saved && !failed ? (
+      {saved && !failedKind ? (
         <Text type="supporting" xstyle={styles.small}>
           {t('alerts.saved')}
         </Text>
-      ) : null}
-      {failed ? (
-        <Notice
-          notice="something_went_wrong"
-          title={t('notice.something_went_wrong.title')}
-          body={t('notice.something_went_wrong.body')}
-          contactLabel={t('help.contact.action')}
-        />
       ) : null}
     </SubPage>
   );

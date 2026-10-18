@@ -222,6 +222,45 @@ test.describe('The agree screen is the only opt-in (D-615, Lena, 18 October)', (
   });
 });
 
+test.describe('Text alerts: what Iris found in b74 (B3, B6)', () => {
+  const CLOSED = 'A saved place closes or moves';
+  const ON = { sms_enabled: true, sms_stopped_at: null, alert_message: false, alert_booked: false, alert_changed: false, alert_trip: false };
+
+  test('B3: when a write fails the error is under the row that failed, in view on a 320x568 screen', async ({ page }) => {
+    await signedInAs(page, 'member', ON, 'on');
+    // Reads work; every write is refused.
+    await page.route(PREFS, (route) => (route.request().method() === 'GET' ? route.fulfill(json(ON)) : route.fulfill({ status: 500, contentType: 'application/json', body: '{}' })));
+    await page.setViewportSize({ width: 320, height: 568 });
+    await page.goto('/alerts/');
+    await settled(page);
+    const toggle = page.getByRole('switch', { name: CLOSED });
+    await expect(toggle).toBeChecked();
+    await toggle.click();
+    // The switch goes back, and the person is told where they are looking.
+    await expect(toggle).toBeChecked();
+    const alert = page.getByRole('alert').filter({ hasText: 'Something went wrong' });
+    await expect(alert).toBeVisible();
+    const box = (await alert.boundingBox())!;
+    const row = (await toggle.boundingBox())!;
+    expect(box.y).toBeGreaterThanOrEqual(row.y);
+    expect(box.y + box.height).toBeLessThanOrEqual(568);
+  });
+
+  test('B6: a tap on the row\'s name works the switch (the name is its label: one control)', async ({ page }) => {
+    const writes = await signedInAs(page, 'member', ON, 'on');
+    await page.goto('/alerts/');
+    await settled(page);
+    const toggle = page.getByRole('switch', { name: CLOSED });
+    await expect(toggle).toBeChecked();
+    await page.getByText(CLOSED, { exact: true }).first().click();
+    await expect(toggle).not.toBeChecked();
+    await expect.poll(() => writes.length).toBe(1);
+    expect(writes[0]).toMatchObject({ sms_enabled: false });
+    // Still one control for a screen reader: the switch, named once.
+    await expect(page.getByRole('switch', { name: CLOSED })).toHaveCount(1);
+  });
+});
+
 test.describe('Text alerts, held until the day (D-478)', () => {
   test.skip(ALERT_TEXTS_LIVE, 'the alerts are live: the held-state checks do not apply');
 
@@ -301,6 +340,22 @@ test.describe('Text alerts', () => {
     expect(writes[0]).toMatchObject({ alert_booked: false });
     // The yes is not withdrawn by the last switch going off: only a STOP ends it.
     expect(writes[0]).not.toHaveProperty('sms_enabled');
+  });
+
+  test('a lead turns the last alert off and one back on in the same visit: no agree screen, the yes follows the database (Iris, b74)', async ({ page }) => {
+    const writes = await signedInAs(page, 'provider', { sms_enabled: true, sms_stopped_at: null, alert_booked: true, alert_message: false, alert_changed: false, alert_trip: false });
+    await page.goto('/alerts/');
+    await settled(page);
+    const booked = page.getByRole('switch', { name: 'Someone books a visit' });
+    await booked.click();
+    await expect(booked).not.toBeChecked();
+    await expect.poll(() => writes.length).toBe(1);
+    // The yes to texts is kept (Nico, 21b053e9), so this is not a first yes: the switch just turns on.
+    await page.getByRole('switch', { name: 'Someone messages you' }).click();
+    await expect(page).toHaveURL(/\/alerts\/$/);
+    await expect(page.getByRole('switch', { name: 'Someone messages you' })).toBeChecked();
+    await expect.poll(() => writes.length).toBe(2);
+    expect(writes[1]).toMatchObject({ alert_message: true });
   });
 
   test('turning one off while another is on leaves the yes alone', async ({ page }) => {
