@@ -882,5 +882,101 @@
   {
     "key": "es|cut|member-created-states-program-booked-a-visit--on-trips|12:00",
     "reason": "At 320×568 the Trips drawer scrolls and fades out at its foot, and the second trip card sits half under the tab bar, so the detector sees whichever of its words land on that edge partly hidden (partial=true, 0 in, 0 out); since b55 the time is its own no-wrap text node (\"13:00\", \"12:00\"), so it is the time that is reported in Spanish. It is reached by scrolling and nothing is lost. Same class as the Trips entries above; found by the a94 audit on c780d42b (the new story Program booked a visit › On Trips is the second card there)."
+  },
+  {
+    "key": "ru|title|case-manager-screens--add-program|Добавить программу",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|case-manager-screens--invite|Пригласить человека",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|case-manager-screens--invite-one|Ссылка для участника",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|case-manager-screens--invite-program|Пригласить человека",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|member-created--add-my-program|Добавить программу",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|member-created--new-trip|Запланировать визит",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|member-created--privacy|Конфиденциальность",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|member-created--report-message|Пожаловаться на подозрительные действия",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|member-created--terms|Условия использования",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|onboarding--expired-link|Срок действия этой ссылки истёк",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|onboarding--expired-link-sent|Срок действия этой ссылки истёк",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|program-lead-screens--add-person|Добавить человека",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|program-lead-screens--add-program|Добавить программу",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|program-lead-screens--invite|Пригласить человека",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|program-lead-screens--member-policies|Подписанные правила",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|program-lead-screens--program-changes|Нужно внести несколько изменений",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|program-lead-states-program-more-than-one--the-program-tab|Fresh Start Kitchen",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|program-lead-states-program-on-file--live|Fresh Start Kitchen",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|program-lead-states-program-on-file--live-with-a-change-waiting|Fresh Start Kitchen",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|program-lead-states-program-sent-for-review--needs-changes|Нужно внести несколько изменений",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|program-lead-states-program-services--the-program-tab|Fresh Start Kitchen",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|super-admin-screens--invite|Пригласить человека",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|super-admin-screens--invite-one|Ссылка для участника",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
+  },
+  {
+    "key": "ru|title|super-admin-screens--programs-to-check|Программы на проверку",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
   }
 ]
