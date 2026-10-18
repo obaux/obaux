@@ -145,7 +145,7 @@ index a1ec2609..125da82a 100644
          />
          <ReadMore label="More: Case manager assignments" href="/support/case-manager-assignments/" />
 diff --git a/pam/apps/site/src/content/TalkingToPam.tsx b/pam/apps/site/src/content/TalkingToPam.tsx
-index 5e2b31f6..0eff1ee7 100644
+index 5e2b31f6..122833e1 100644
 --- a/pam/apps/site/src/content/TalkingToPam.tsx
 +++ b/pam/apps/site/src/content/TalkingToPam.tsx
 @@ -12,6 +12,16 @@ export function TalkingToPam() {
@@ -159,13 +159,13 @@ index 5e2b31f6..0eff1ee7 100644
 +            'Type your message and tap Send. You can add a photo, like a screenshot of what you see.',
 +          ]}
 +        />
-+        <P>A person at Pam reads every message. Pam answers in the app, not by text.</P>
++        <P>A person at Pam reads every message. Pam’s answer comes in the app.</P>
 +      </Section>
 +
        <Section title="Start here, on the help desk">
          <HowTo
            title="Find an answer"
-@@ -22,7 +32,7 @@ export function TalkingToPam() {
+@@ -22,12 +32,12 @@ export function TalkingToPam() {
          />
        </Section>
  
@@ -174,8 +174,14 @@ index 5e2b31f6..0eff1ee7 100644
          <P>
            At the end of every article, and when a search finds nothing, “Still stuck?” lets you write to Pam. Tell us
            what happened and what you see on the screen. A person at Pam reads every message.
+         </P>
+-        <P>Pam has no phone line. Writing to us is the way to reach a person.</P>
++        <P>Pam has no phone line. If you can’t use the app, writing to us here is how you reach a person.</P>
+       </Section>
+ 
+       <Section title="What we can help with">
 diff --git a/pam/apps/site/src/content/post-updated.json b/pam/apps/site/src/content/post-updated.json
-index f3277e3a..3da7adb0 100644
+index f3277e3a..fd857fe5 100644
 --- a/pam/apps/site/src/content/post-updated.json
 +++ b/pam/apps/site/src/content/post-updated.json
 @@ -4,8 +4,8 @@
@@ -223,7 +229,7 @@ index f3277e3a..3da7adb0 100644
 -    "date": "2026-10-11",
 -    "words": "f78f84fc60054feda2e833b190bab421d9f69ffb7ffddf7e40a57c3bf1fbad1f"
 +    "date": "2026-10-18",
-+    "words": "cf9150c8be5b2a0903754e4aa65dfd5e430051ef185e3ffc47e91eee92aad44b"
++    "words": "2b9db3e50e470d3ea4a98877873d79d22438c323ca87810b56361dae3a04afc1"
    },
    "texts-from-pam": {
      "date": "2026-10-17",

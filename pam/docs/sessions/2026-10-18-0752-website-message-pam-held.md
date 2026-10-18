@@ -13,8 +13,11 @@ A held patch for Message Pam (card a100, Will 18 Oct 07:04), `docs/design/review
 ## Verified
 Site tsc 0, tests 124 pass, build 0, a11y 0 (125 scans, 0 problems), usability 0, scrollspy 0, on the patched tree. A first usability run failed: the new "Open Pam" link was the first link in the card, so focus returned to it after Esc instead of "Write to us"; fixed by returning focus to the button.
 
+## Revised (07:57)
+Sage's two Getting help from Pam lines (ledger 67fea9ad) are folded in: "Pam has no phone line. If you can’t use the app, writing to us here is how you reach a person." and "Pam’s answer comes in the app." (replacing "…not by text", which would be false once texts_live is on). The same checks pass again on the revised tree (tsc 0, tests 124, build 0, a11y 0, usability 0, scrollspy 0).
+
 ## Left undone
 - The dates are 2026-10-18; if the app ships on another day, run `pnpm --filter @pam/site posts:date <slug>=<day>` for the five slugs.
 - "Open Pam" should point to Pam's conversation when the app has a route for it.
-- "Pam has no phone line. Writing to us is the way to reach a person." in Getting help from Pam is still there; Sage did not change it.
+- When message texts go on (texts_live), Messages in Pam's "Pam does not send a text for a message" has to change (Sage).
 - No hours or reply time anywhere (Will has not signed any). Screenshots of the new screens wait for the app.
