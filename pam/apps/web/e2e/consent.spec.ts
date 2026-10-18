@@ -532,6 +532,8 @@ test.describe('after STOP', () => {
     await expect(page.getByText(/Nothing in the app can turn texts back on/)).toBeVisible();
     await expect(page.getByRole('button', { name: 'Agree to receive texts' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Not now' })).toHaveCount(0);
-    await expect(page.getByText(/You can change this whenever you want/)).toHaveCount(0);
+    // Nothing is saved or promised once texts are stopped: no switch to save, so no "Saved." line either.
+    await expect(page.getByText('Saved.', { exact: true })).toHaveCount(0);
+    await expect(page.getByRole('switch')).toHaveCount(0);
   });
 });

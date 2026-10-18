@@ -15,6 +15,7 @@ import { useSession } from '@/lib/useSession';
 import { useExamplesOn } from '@/lib/useExamplesOn';
 import { useRoleView } from '@/lib/useViewedRole';
 import { whenHappened } from '@/lib/when';
+import { StatusBadge } from '@pam/ui/StatusBadge';
 
 /**
  * People interested in your program.
@@ -30,7 +31,6 @@ import { whenHappened } from '@/lib/when';
  */
 
 const styles = stylex.create({
-  note: { fontSize: '15px', lineHeight: 1.5 },
 });
 
 export default function InterestedPage() {
@@ -168,9 +168,7 @@ export default function InterestedPage() {
               ]}
             />
           ))}
-          <Text type="supporting" xstyle={styles.note}>
-            {t('example.people.note')}
-          </Text>
+          <StatusBadge label={t('common.example')} />
         </VStack>
       )}
     </Page>

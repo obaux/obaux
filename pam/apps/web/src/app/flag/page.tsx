@@ -114,7 +114,7 @@ function FlagForm() {
           implies the member has a problem they have just created, which is the
           opposite of what they did.
         */}
-        <Notice notice="service_not_available" title={t('flag.done.title')} body={t('flag.done.body')} />
+        <Notice notice="service_not_available" title={t('flag.done.title')} />
         <BigButton label={t('action.goBack')} href={`/place/?id=${encodeURIComponent(serviceId)}`} />
       </Page>
     );
@@ -123,10 +123,6 @@ function FlagForm() {
   return (
     <Page gap={4}>
       {header}
-
-      <Text type="supporting" xstyle={styles.intro}>
-        {t('flag.intro')}
-      </Text>
 
       {status === 'failed' ? (
         <Notice

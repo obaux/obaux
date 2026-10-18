@@ -74,7 +74,6 @@ export function ProgramSwitchView() {
             {
               id: 'add',
               label: t('program.switch.add'),
-              description: t('program.switch.add.body'),
               icon: <PlusIcon {...ICON} />,
               href: '/programs/new/',
             },

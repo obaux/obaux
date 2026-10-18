@@ -708,7 +708,6 @@ function PlaceScreen() {
       <ConfirmDialog
         isOpen={askingCancel}
         title={t('place.visit.cancel.title', { place: place!.name })}
-        body={t('place.visit.cancel.body')}
         confirmLabel={t('place.visit.cancel.yes')}
         onConfirm={async () => {
           setAskingCancel(false);

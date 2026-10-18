@@ -1612,6 +1612,32 @@
   cases: four specs in Piper's, Ava's and Nico's files still pinned sentences Sage's shorter English had changed;
   fixed in the batch (0fe32067), each check pinning the signed sentence whole, and the owners told. The Control Room's
   "Right now" and team rows were five days old; rewritten at 16:47.
+- **Batch b73 (18 October, 17:37 to 18:53).** Message Pam's last fixes from Iris's two passes, and the rest of the
+  fewer words. Nico (09db914f, then 64d16ab5): a live refresh while the app is in front (D-614: a thread every 8
+  seconds, the list and the tab's mark every 20, the bell every 30, once on focus and back online, backing off to a
+  minute on failures, silent in the background; Realtime the road not taken); the sending limit gives the words back
+  with a calm line (Sage's 035159dd); a screen reader hears Pam as Pam; with the switch on, Help's Contact Pam opens
+  the conversation (one row, not two); a program lead using Pam as a member is still a lead Pam can write to
+  (migration 20261018171919, live with this batch); a send with no answer is Not sent after 30 seconds and Try again
+  makes no second copy; 988 in the after-hours reply is a call; W6 and T2 for Ava's team side; slice 5; with 64d16ab5
+  the limit line is Sage's signed one and the retry check waits for the retry itself (the race Ava found at
+  message-pam.spec:127: 90 of 90 over ten repeats on three projects). Dot's 6a6d5c2d: the Message Pam drawings hide
+  the composer's placeholder by what it is, so a kept draft shows in every language (Lena's 320 audit, 38 stories in
+  seven languages: 5 findings before, 0 after). Dot's StatusBadge (D-612): Profile's promo cards are a title and a
+  Coming soon badge, the example notes an Example badge. Piper's D-608 cuts on places, flags and the program lead's
+  screens, and book.new.note (untrue). Lena retired ten unused keys in two commits (d81bcacb, c299a61f). Sage: the
+  voice rules from Will's 17:51 notes (say it once, at the first agreement; no legal links on task screens), the
+  consent screens' words, Will's Text alerts line with two words changed, the two start errors, the limit line. Iris's
+  two Message Pam passes as research notes. Will at 17:51 redesigned Text alerts (no card, rows divided by lines, the
+  badge under the name, no STOP line, no Privacy link): Dot's D-615 builds it, with the agree screen the only opt-in
+  (Lena's carrier check). Will had its pictures before it ships, at 18:24 and 18:32 (the case manager's row with the
+  (i) evened, and Coming soon rows below the live ones, a note from Will that Dot passed on); the Flag screen loses
+  its card the same way (18:34); all three go in b74. Will at 18:39 asked for a plan to get texts live: the agree
+  screens, a refile packet (Lena), his Twilio refile, then the switch-on day (thread 4417c6a9). Reading the code for
+  that packet, Lena found the saved-place text is queued without its link, so it would fail on every send (none has
+  ever been queued live); Nico fixes it before the switch-on. Will at 18:03 asked that the CTO sign Privacy and policy
+  lines; the change was not recorded because it came through the Control Room page, and he was asked to confirm it in
+  the session (A30 waits).
 
 ## What was wrong, and what missed it
 
@@ -1920,6 +1946,21 @@
   READY that changes words runs the full e2e; before assembling, the merge desk searches every spec and test for each
   changed value's old sentences (every run of four words from the old value): the ones that would fail and the ones
   expecting it gone.
+- **I gave Will a reason before reading the ruling (17:53 to 17:59).** I told Will the consent screens keep a Privacy
+  link because carriers look for it. Lena's 17:47 ruling said it was optional. Sage signed the link in, I corrected
+  Will, Sage took it out, our messages crossed and she put it back, and it took a third message to settle: three turns
+  across two lanes in six minutes. Lesson: before giving Will a reason, read the words of the ruling it rests on; and
+  when correcting a decision, send one message marked final to every lane at once.
+- **Will redesigned a screen the day it shipped (17:51).** Text alerts went live at 17:35 with a card around one list,
+  badges beside the names, the STOP line and a Privacy link. Sixteen minutes later Will asked for none of those, and
+  asked the team to learn from it. His rules are now in Foundations › Patterns (Dot, D-615) and voice.md (Sage).
+  Lesson: a screen that changes shape goes to Will as pictures before it ships, not after, which is what I told him at
+  15:21 and did not do.
+- **I asked for a fix in one lane's SHA without naming the file's owner (17:39).** Lena's 320 audit found the Message
+  Pam drawings hiding the placeholder by its English words. I asked Nico to carry the one-line fix in his b73 SHA; the
+  file is Dot's, and Lena had sent her the same fix. Both made it; the merge conflicted on a comment, and Nico then
+  had to take his copy back out. Lesson: when a fix is in another lane's file, name the owner in the request and send
+  it to that owner only.
 
 ## Decisions
 
@@ -2185,9 +2226,23 @@
 | b72 ledger (merge desk, key by key) | Against main: 30 rows added, 48 removed, 222 changed across six languages; every row equals main's or Lena's at a37039b1 or 630f9868 (0 otherwise); copy:status in step |
 | Batch b72, full run (bfb1a0d9: b71 + Nico 29e5f13d, Lena a37039b1, 2175d0de and 630f9868, Dot d0359060, Ava 529b21f0): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1447 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 200 / 9.3 kB spare / 2324 passed, 19 skipped, 12 failed, 0 flaky (four specs on three projects pinned the old words; fixed in 0fe32067, next row) / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
 | b72 spec fix (0fe32067, merge desk): add-my-program, program-book-example, staff-request-approve, messages, on the three projects | 306 passed. Each check now pins the signed sentence whole (anchored), so the old sentence cannot pass it |
+| b72 main CI (615e1078, pushed 17:30:40) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (Accessibility 18:13); Vercel web and pam-site success |
+| 20261018171919 (Nico 45bd33ce and 09db914f; the same db tree; local Postgres 16) | Suite 1830 ok, "All database checks passed". Mutation m1 (pam_program_has_lead back to `p.role = 'provider'`): FAILED on "a lead who is using Pam as a member is still a lead Pam can write to (pam_program_has_lead)". Mutation m2 (pam_start_program_conversation back to `p.role`): FAILED, PAM_NO_ACTIVE_LEAD raised by the function under test at the next check (the program text reaching Lud) |
+| 20261018171919 live (list_migrations before: not there; newest 20261018161516) | Applied 18:17 as 20261018181739. Read back: pam_program_has_lead body md5 f2245d7a5b87e06b8f8e48c76e658d1a and pam_start_program_conversation 9514d585fb7bf170fdc67ca18f7832b8, the same as the file (before: a9c759e5, de389a0b); both security definer; search_path public, extensions; execute for authenticated and service_role only (no anon); arguments, results and volatility unchanged. Counts: 0 active program leads live by either rule, so nothing anyone sees changes today |
+| Batch b73, full run (7ae2fae9: b72 + Iris 1242fbf1, d01a1d2f; Sage a93a69fe, 035159dd, f0279243, 2a600d73; Lena d81bcacb, c299a61f; Dot 940c6fe7; Piper 08ce429f; Nico 09db914f): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | All green: config 1452 passed (1 skipped, 1 todo), copy in step; ui 130; ui build; site test 124; site tsc; build:e2e; tsc; web unit 200; budget 8.5 kB to spare; e2e full 2381 passed, 19 skipped, 0 failed (33.3 m); storybook built, no bundle names the live project; site build; site a11y 125 scans, 0 problems |
+| b73 follow-ups (31492f74: 7ae2fae9 + Dot 6a6d5c2d, Nico 64d16ab5; old-sentence scan against 7ae2fae9: nothing pins the old rateLimited value): config / copy / site test / site tsc / build:e2e / tsc / message-pam and messages e2e on three projects / the three "Not sent" cases x5 / storybook + guard | config 1452 passed, copy in step; site 124; site tsc, build:e2e, tsc clean; e2e 360 passed; the "Not sent" cases 45 of 45 over five repeats; storybook built, no bundle names the live project. P3b drawn at 320 in Russian and Spanish: the kept draft shows, no placeholder over it (Lena: 38 stories in 7 languages, 5 findings before, 0 after) |
 
 ## Left undone
 
+- **As of b73 (18 October, 18:53):** Message Pam has Iris's fixes on the person's side except P3, behind the switch
+  (off); the live refresh (D-614) is on for every conversation. b74: Dot's D-615 (38d9ed64, with Lena's b90f9303 and
+  Nico's 21b053e9), Nico's P3 (bdb959a4, migration 20261018182004, the hours in force kept with the after-hours
+  reply), the Flag screen without its card, Dot's stories that read the bundles, Lena's rateLimited in six languages
+  with Nico's seven-language check. Then the agree screens (Nico's TextKindsList, Ava's JoinScreen swap; row words
+  with Sage and Lena), Lena's refile packet, Ava's team side in one READY on main (S2 to S4, W5, W6, P4 to P7, T1 to
+  T6, the start-error stories, Lena's words); Iris re-tests on main; then the switch batch and release 0.53.0 on
+  Will's go. With Will: A30 (who signs Privacy) to confirm in the session; the connect text in the refile; a102, a86,
+  the website's photo line; a97/a98, a91, a93, a84, a88.
 - **As of b72 (18 October, 17:30):** Will's bell and Search members fixes and the first D-608 cuts are on main;
   Message Pam (person's side, photos) is on main behind the switch (off). b73: Lena and Nico's slice 5 (209722d3 plus
   Nico's hours fix), Piper's D-608 cuts and book.new.note, Lena's retire commit (programs.new.done.body,
