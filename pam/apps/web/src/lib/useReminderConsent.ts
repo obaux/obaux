@@ -95,12 +95,11 @@ export async function setReminderConsent(memberId: string, enabled: boolean): Pr
 }
 
 /**
- * Turns one Text alerts switch on or off (D-478). Turning one on records the yes
- * to texts too, as it always has; turning the last one off withdraws it, but only
- * when `alertsAreAllTheyGetTexts` (a case manager or program: for them the yes
- * exists for the alerts). A member's yes also covers their reminders and saved
- * places, so one alert going off never withdraws it. Always false for a yes after
- * a STOP; the database holds the same line.
+ * Turns one Text alerts switch on or off (D-478). Turning one on records the yes to texts too, as it always has. Turning one off
+ * only turns that switch off: it never withdraws the yes (Lena, 18 October, D-615: a switch is only on once the person has agreed on
+ * the consent screen, and no text goes without a switch on, so a staff member who turns the last one off has not left a way to be
+ * texted, and does not have to agree again to turn one back on; a STOP still ends everything). `alertsAreAllTheyGetTexts` is kept for
+ * callers and no longer changes anything. Always false for a yes after a STOP; the database holds the same line.
  */
 export async function setTextAlert(
   memberId: string,
@@ -112,10 +111,10 @@ export async function setTextAlert(
   try {
     if (on && (await getTextStatus(memberId)).stopped) return false;
     const { createClient } = await import('./supabase');
-    const anyOther = (Object.keys(current) as AlertKind[]).some((k) => k !== kind && current[k]);
+    void current;
+    void alertsAreAllTheyGetTexts;
     const row: Record<string, unknown> = { member_id: memberId, [ALERT_COLUMN[kind]]: on };
     if (on) row.sms_enabled = true;
-    else if (alertsAreAllTheyGetTexts && !anyOther) row.sms_enabled = false;
     const { error } = await createClient().from('notification_preferences').upsert(row, { onConflict: 'member_id' });
     return !error;
   } catch {
