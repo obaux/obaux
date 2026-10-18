@@ -14,6 +14,8 @@ import { StatusBadge } from './StatusBadge.js';
  * name in another language has the whole width — the badge when the setting is not on yet, and the
  * switch (or whatever controls it) at the end.
  *
+ * Rows that are not on yet (a badge) go below the rows that are, in their own order (Will, 18 October); the caller orders them.
+ *
  * Laid out in logical directions only, so it mirrors in Arabic; the name wraps and the row grows
  * rather than cutting words (320px, the longest language). The control keeps its 48px target.
  */

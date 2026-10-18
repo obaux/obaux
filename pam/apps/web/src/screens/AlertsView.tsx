@@ -102,6 +102,8 @@ function AlertsList() {
   const role = session.status === 'signed-in' ? session.session.role : null;
   const who = role === 'provider' ? 'provider' : role === 'admin' ? 'admin' : 'member';
   const KINDS = KINDS_FOR[who];
+  // What is on comes first; "Coming soon" rows go to the bottom (Will, 18 October), in their own order (the sort is stable).
+  const ORDERED = [...KINDS].sort((a, b) => Number(!LIVE.has(a)) - Number(!LIVE.has(b)));
   const router = useRouter();
   const query = useSearchParams();
   /** The account's one yes/no for texts (`notification_preferences`), which every sent kind shares. */
@@ -197,7 +199,7 @@ function AlertsList() {
       </Text>
       {/* No card, no instructions, no Privacy link (D-615, Will, 18 October): a list of rows, each its own setting. */}
       <SettingsList>
-        {KINDS.map((kind) => {
+        {ORDERED.map((kind) => {
           const live = LIVE.has(kind);
           const badgeId = `${soonId}-${kind}`;
           return (

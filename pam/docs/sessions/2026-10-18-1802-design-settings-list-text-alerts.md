@@ -13,6 +13,8 @@
 
 - Mira's 18:05/18:11 follow-ups: `alerts.kinds` is in en.json ("Please choose when you'd like to get a text.") with my drafts in the other six, acked in the ledger (Lena needs a native reader); `useSearchParams` (with a Suspense fallback of the real header) replaces `window.location` in AlertsView and /reminders/ so the prototype can draw the return too; story `Case manager/Created/States/Text alerts: agree first` (case manager, program lead); the pictures are built, with no text edited in. The fourth row's badge follows `texts_live` (D-481), so it shows on all four while it is off; the `-texts-live` picture shows it on.
 
+- Will, directly, after the pictures: "Move coming soon to the bottom of list." What is on comes first, badged rows below, each in their own order (a stable sort in `AlertsView`); Patterns' fifth rule; a spec (the live row is above every badge; fails on main, where the saved-place row is last). alerts.spec 48 pass.
+
 ## What was wrong, and what missed it
 
 A card around a one-list screen, a badge beside a name that needs the room, and instructions repeated after consent: the first drawing followed the old card habit and nothing named it a pattern until Will did.

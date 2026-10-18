@@ -107,6 +107,22 @@ test.describe('Text alerts say little (D-608, Will 18 October: "we don\'t need a
     await expect(page.getByRole('main').getByRole('link', { name: /Privacy/ })).toHaveCount(0);
   });
 
+  test('"Coming soon" rows go to the bottom: what is on comes first (Will, 18 October)', async ({ page }) => {
+    await signedInAs(page, 'member', null, 'on');
+    await page.goto('/alerts/');
+    await settled(page);
+    const names = await page.getByRole('switch').evaluateAll((els) => els.map((el) => el.getAttribute('aria-label') ?? el.closest('label')?.textContent ?? ''));
+    const live = page.getByRole('switch', { name: 'A saved place closes or moves' });
+    const soon = page.getByRole('switch', { name: 'Someone messages you' });
+    const liveY = (await live.boundingBox())!.y;
+    const soonY = (await soon.boundingBox())!.y;
+    expect(names.length).toBe(4);
+    expect(liveY).toBeLessThan(soonY);
+    // And every badged row sits below every row without one.
+    const badges = await page.locator('.astryx-badge').evaluateAll((els) => els.map((el) => el.getBoundingClientRect().y));
+    expect(Math.min(...badges)).toBeGreaterThan(liveY);
+  });
+
   test('the badge sits under the name, not beside it', async ({ page }) => {
     await signedInAs(page, 'member', null, 'off');
     await page.goto('/alerts/');
