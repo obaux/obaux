@@ -62,6 +62,8 @@ export interface ThreadMessage {
   readonly systemVars: Readonly<Record<string, unknown>> | null;
   /** The message's photo, as an on-phone link (D-394), or null. */
   readonly photoUrl: string | null;
+  /** How much of its photo has gone (0 to 1) while it is uploading, or null. */
+  readonly progress: number | null;
   /** The message's document (D-399), not yet downloaded, or null. */
   readonly file: MessageFile | null;
   readonly createdAt: string;
@@ -137,6 +139,8 @@ interface OutboxItem {
   readonly status: 'sending' | 'failed';
   /** A photo being sent, shown from the phone while it goes. */
   readonly photoUrl: string | null;
+  /** How much of a photo has gone (0 to 1) while it is uploading, or null. */
+  readonly progress?: number | null;
 }
 
 const toMessage = (
@@ -153,6 +157,7 @@ const toMessage = (
   systemKey: row.system_key ?? null,
   systemVars: row.system_vars ?? null,
   photoUrl: photoUrl !== undefined ? photoUrl : (links[photoPathOf(row) ?? ''] ?? null),
+  progress: null,
   file: fileOf(row),
   createdAt: row.created_at,
   // Read by the Pam team, everything that is not the person's is Pam's (including the system's); otherwise mine is what I wrote.
@@ -328,7 +333,10 @@ export function useThread(conversationId: string | null): {
         if (attachment?.kind === 'photo') {
           shrunk = attachment.isReady ? attachment.file : await shrinkPhoto(attachment.file);
           if (!shrunk) throw new Error('could not read the photo');
-          const path = await uploadMessagePhoto(conversationId, shrunk);
+          const setProgress = (fraction: number) =>
+            setOutbox((prev) => prev.map((o) => (o.id === item.id ? { ...o, progress: fraction } : o)));
+          setProgress(0);
+          const path = await uploadMessagePhoto(conversationId, shrunk, setProgress);
           if (!path) throw new Error('upload failed');
           stored = { path, kind: 'photo' };
         } else if (attachment?.kind === 'file') {
@@ -461,6 +469,7 @@ export function useThread(conversationId: string | null): {
       systemKey: null,
       systemVars: null,
       photoUrl: o.photoUrl,
+      progress: o.status === 'sending' && o.attachment?.kind === 'photo' ? (o.progress ?? null) : null,
       file: o.attachment?.kind === 'file'
         ? { path: '', name: displayFileName(o.attachment.file.name), bytes: o.attachment.file.size }
         : null,

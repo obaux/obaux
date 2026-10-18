@@ -137,6 +137,27 @@ test.describe('Message Pam, the person\'s side', () => {
     expect(server.sent().map((m) => m.body)).toEqual(['I lost my paperwork']);
   });
 
+  test('a photo to Pam goes with its progress, and one that did not go stays "Not sent" until Try again (slice 3)', async ({ page }) => {
+    const server = await world(page);
+    let uploads = 0;
+    await page.route('**/storage/v1/object/message-photos/**', (route) => {
+      uploads += 1;
+      if (uploads === 1) return route.fulfill({ status: 500, contentType: 'application/json', body: '{}' });
+      return route.fulfill(json({ Key: 'message-photos/x.jpg' }));
+    });
+    await page.goto(`/messages/thread/?id=${PAM_C}`);
+    await settled(page);
+    const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64');
+    await page.locator('.astryx-chat-composer input[type="file"]').first().setInputFiles({ name: 'screenshot.png', mimeType: 'image/png', buffer: png });
+    await page.getByRole('button', { name: /send/i }).click();
+    await expect(page.getByText('Not sent', { exact: true })).toBeVisible();
+    expect(server.sent()).toHaveLength(0);
+    await page.getByRole('button', { name: 'Not sent. Try again.' }).click();
+    await expect.poll(() => server.sent().length).toBe(1);
+    await expect(page.getByText('Not sent', { exact: true })).toHaveCount(0);
+    expect(uploads).toBe(2);
+  });
+
   test('Help ends with Write to Pam, which opens the conversation; Contact Pam goes there too', async ({ page }) => {
     await world(page);
     await page.goto('/help/');
