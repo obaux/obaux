@@ -9,6 +9,10 @@ Lena, on `claude/lena-limited-notice`, off main `2bcb2e39`. **Held: it ships in 
 - **The e2e that quotes the old words** (`messages.spec.ts`, "a limited account reads, and the composer says what is off and who to call", Nico's) now reads the new two sentences.
 - `notices.test.ts` (reading grade 6) and the whole config suite pass: 60 files, 1,403 tests. `copy:status` in step.
 
+## Verified
+
+On the real build of this branch (`d77278fc`): `messages.spec.ts -g limited` passes, 12 of 12 (the four limited-account tests in three projects, including the one whose words changed). The 320 fit audit on the notice stories (21 stories × 7 languages, at 760 and 568 tall) finds nothing: no clipping in any language.
+
 ## What it does not change
 
 The three website posts (`StartHere`, `CaseManagerAssignments`, `PamWords`; Wren, signed at Sage's `fa8df003`) and the Privacy and Terms `limits.p2` lines (Will's, nothing translated until he signs) ride in the same batch; none is on this branch.
