@@ -49,13 +49,13 @@ Owner lanes are the merge desk's to assign. The column says where the screen liv
 | Place | `memberPolicies.intro` | {place} asks everyone to sign these before a visit. Read them now, and sign when you are ready. | **Shorten** | **Sign before your visit.** (same as `place.policies.toSign.body`) |
 | Place | `place.quick.message.body`, `place.quick.directions.body` | Ask a question before you go · Open in Google Maps | **Keep** | Second lines that help choose between two rows. |
 | Place | `friend.body` | Going is easier with someone. Send this link so they can come too. | **Shorten** | **Send this link so they can come too.** |
-| Report a place | `flag.intro` | Tell us what is wrong and we will check it. Nobody at the place is told who said so. | **Cut**, covered | `what-we-keep.p15` ("Nobody at the place is told who…"). The reasons list asks the question. |
+| Report a place | `flag.intro` | Tell us what is wrong and we will check it. Nobody at the place is told who said so. | **Cut**, covered | `what-we-keep.p15` ("Nobody at the place is told who…"). e2e `flag.spec.ts` line 82 expects this sentence; change it in the same commit. The reasons list asks the question. |
 | Report a place | `flag.done.body` | Somebody at Pam looks at every one of these. | **Cut** | Title "Thanks" says enough. A28 §3's "a person reads" stays on the site. |
 | Trips | `trips.new.done.body` | It is on your map. | **Keep** | Says where it went: what comes next. |
 | Trips | `trips.moved.note` | Taking you home in a few seconds. | **Keep** | Tells someone the screen is about to move. |
 | Messages | `messages.report.intro`, `messages.report.thread.intro` | Pick what is wrong. Pam and your guide see this one message… Nothing else from the chat. | **Shorten** — Lena | **Pick what is wrong.** But `who-can-see.p3` speaks only of the guide, and no live Privacy line says the Pam team sees a reported message (Lena, 15:40). The rest stays on screen until Lena has a line and Will signs it. |
 | Messages | `messages.report.done.body` | Pam and your guide can now see this one message… Nothing else from the chat. | **Cut** — Lena | Title "Thank you. Pam will look at it." is enough, once Lena's Privacy line for the Pam team exists (see the row above). |
-| Messages | `messages.program.note` | This program sees your first name and what you write. | **Cut**, covered | `sharing.p2`. |
+| Messages | `messages.program.note` | This program sees your first name and what you write. | **Cut**, covered | `sharing.p2` and the transparency cards. Nico put it there on purpose (D-541, "said where a member writes"), so Will may want to see it go: it's on his card. |
 | Messages | `messages.block.body` | Neither of you will be able to send messages… You can unblock them any time from this menu. | **Shorten** | **Neither of you can send messages here. You can unblock them later.** A confirm dialog before a hard-to-undo act needs its consequence. |
 | Messages | `messages.block.done.body` | Neither of you can send messages here now. You can unblock any time from the ⋯ menu. | **Cut** | The changed composer shows it. |
 | Messages | `messages.unblock.body`, `.done.body` | You will both be able to send messages here again. | **Cut** | The title "Unblock?" says it. |
@@ -89,7 +89,7 @@ Owner lanes are the merge desk's to assign. The column says where the screen liv
 | Invite | `invite.who.note` | Only this number can use the link. If they sign in to Pam with it, Pam finds the invite even without the link. | **Shorten** | **Only this number can use the link.** The second sentence explains the system. |
 | Invite | `invite.link.body` | Send it by text. It opens Pam's sign in, ready for them. Works until {date}. One person, once. | **Shorten** | **Works until {date}, for one person.** |
 | Invite | `invite.member.body` etc. | People looking for resources · Someone who runs a program · Someone who helps people find programs | **Keep** | Help choose the kind. |
-| Reported messages | `reports.intro` | A message shows here only because someone said it was not safe. That is the only way a message reaches Pam. | **Move**, covered | `who-can-see.p3` says it. The empty state already says how a message gets here. |
+| Reported messages | `reports.intro` | A message shows here only because someone said it was not safe. That is the only way a message reaches Pam. | **Cut**, now | Untrue once Message Pam is on: the Pam team reads the conversation with Pam (a101 L1), so "the only way a message reaches Pam" contradicts Will's signed line (Lena, 15:45). The empty state says how a message gets here. |
 | Reported places | `places.reported.keep.hint`, `.remove.hint`, `.remove.confirm.body` | The place goes back on the list for members. · Members won't find it in Pam anymore. | **Keep** | They say what each choice does. Choosing between them is the job. |
 | Messages | `messages.empty.body.admin` | When someone you invited writes to you, or you message them, it shows up here. | **Cut** | Pam's conversation means the list is never empty. |
 | Glossary | `guide.body` | Your guide is the person who invited you, or a staff member responsible for guiding you. | **Keep** | A definition someone opens on purpose (TermInfo). |
@@ -119,13 +119,13 @@ Owner lanes are the merge desk's to assign. The column says where the screen liv
 | Program | `program.switch.add.body`, `program.switch.row.body` | Tell Pam about another program you run. · Switch to another program, or add one. | **Cut** | Rows are their names. |
 | Program | `program.tools.needsProgram.body` | This part is for your own program. Add it, and it will be here. | **Shorten** | **Add your program first.** |
 | Policies | `policies.intro` | Documents members read and sign before they take part. They sign in Pam, and you can see who has. | **Cut** | The list and the "signed" counts show it. |
-| Policies | `policy.replace.hint` | A policy is not edited once people can sign it. Add the new version… what they signed before stays on record. | **Shorten** | **People are asked to sign the new version.** The "stays on record" fact goes to Terms (Lena). |
+| Policies | `policy.replace.hint` | A policy is not edited once people can sign it. Add the new version… what they signed before stays on record. | **Shorten** | **People are asked to sign the new version.** Lena checked the record line (15:45: true; `add_policy` archives the old policy and the signatures stay). It goes to Will for Terms/Privacy. The "stays on record" fact goes to Terms (Lena). |
 | Policies | `policies.remove.body` | People who signed it keep their copy. New people will not be asked to sign it. | **Keep** | The consequence of removing. |
 | Person | `person.policies.intro` | What {name} has signed of your policies. They sign on their own device. | **Cut** | The list shows it. |
 | Person | `person.card.note` | Here you see their first name and the visits they plan at your program. | **Move**, covered | `sharing.p2`, and the transparency screen for programs. |
 | Book a visit | `book.intro` | Members who wrote to your program, signed up with it or planned a visit there. Pick one, then the day and time. | **Shorten** | **Pick a member, then the day and time.** Who's eligible is `sharing.p9`. |
-| Book a visit | `book.new.intro` | Someone who has not used Pam yet. Their name and number, then the day and time. Pam texts them a link… | **Shorten** | **Their name and number, then the day and time.** |
-| Book a visit | `book.new.note` | They get one text from Pam with a link. Nothing else is sent unless they join. | **Move** — Lena | A promise about texts to a non-member. It needs a Privacy/Terms line for Will before it leaves the screen. |
+| Book a visit | `book.new.intro` | Someone who has not used Pam yet. Their name and number, then the day and time. Pam texts them a link… | **Shorten**, now | **Their name and number, then the day and time.** "Pam texts them a link" is untrue today: "Add a person" books nothing and texts nobody (D-322; Lena, 15:45). |
+| Book a visit | `book.new.note` | They get one text from Pam with a link. Nothing else is sent unless they join. | **Cut**, now | Untrue on a live screen: no text is sent and no visit is saved (D-322, `trips.booked.example.*`). Cutting it breaks no promise. Building the real flow is a decision for Will and a carrier filing (staff-entered numbers), not a Privacy line (Lena, 15:45). |
 | Book a visit | `trips.booked.example.body` | …This is only an example: nothing was booked with the program, and nobody was texted. | **Shorten** | **Example. Nothing was booked.** |
 | Interested | `interested.empty.body` | When members can tell Pam they are interested in your program, you will see them here. | **Shorten** | **Members who are interested show up here.** |
 | Messages | `messages.empty.body.provider` | When a member writes to you about your program, or you message someone… | **Cut** | Never empty with Pam's conversation. |
@@ -151,10 +151,13 @@ Owner lanes are the merge desk's to assign. The column says where the screen liv
 
 ## For Lena (new legal lines, Will's signature)
 
-1. `privacy.s.texts.p4` — a text alert says only that something happened, never who or what (from Text alerts; sent 15:27).
-2. From `book.new.note`: **A program can book a visit for someone who isn't on Pam yet. That person gets one text with a link to the visit, and nothing else unless they join.** Placed with `sharing.p9`.
-3. From `policy.replace.hint`: **When a program replaces a policy, what you signed before stays on record.** Placed with `what-we-keep.p8`.
-4. `reminders.how` / `reminders.intro`: the carrier check, the same as `alerts.how`.
+Checked against the code by Lena, 15:45.
+
+1. ~~`privacy.s.texts.p4`~~ withdrawn (untrue for the visit reminder and the closed-place text). Lena's a102 line replaces it.
+2. ~~From `book.new.note`~~ withdrawn. It described something Pam doesn't do; the screen line is cut instead.
+3. From `policy.replace.hint`: **When a program replaces a policy, what you signed before stays on record.** Placed with `what-we-keep.p8`. True (Lena).
+4. Reported messages, so `messages.report.*` can shorten. Add to `who-can-see.p3`, after "Then they see that message, and its photo or document if it has one.": **The Pam team can too, and so can the guide of the person who wrote it.** True (`report_visible_to_me()`, 0065), and today the screen line understates it. The transparency screen's Pam card (a101) would take the guide's line, which is Will's to widen.
+5. `reminders.how`: signed 15:45 ("…each time something on this list happens"). `reminders.intro` is cut, with the carrier check done.
 
 Everything marked "covered" can go as soon as its lane takes it, because a live Privacy line already says it.
 
@@ -162,7 +165,7 @@ Everything marked "covered" can go as soon as its lane takes it, because a live 
 
 Lines he signed at the moment of choice that the rule would cut: a98's `calendar.intro`, `calendar.warn`,
 `calendar.secret` and `calendar.details.hint` (all covered by `sharing.p6`/`what-we-keep.p12`); a91's `place.lead.sees`
-and `place.noLead` (covered by `sharing.p2`; a91 still open); `help.intro`. My recommendation: cut the a98 four and
+and `place.noLead` (covered by `sharing.p2`; a91 still open); `messages.program.note` (covered, but put where a member writes on purpose, D-541); `help.intro`. Plus Lena's line 4 above (reported messages), and the matching widening of the Pam card. My recommendation: cut the a98 four and
 fold the a91 cut into the open a91 card. Keep `help.intro`.
 
 ## Counts
