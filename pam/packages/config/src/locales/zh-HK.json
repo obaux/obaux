@@ -355,7 +355,7 @@
   "messages.report.failed.title": "未能傳送",
   "messages.report.failed.body": "您的網絡連線中斷了，或這則訊息已被舉報過。請再試一次，或聯絡Pam。",
   "messages.start.member.title": "傳訊息給您的個案經理或計劃",
-  "messages.thread.from": "{name}, {time}",
+  "messages.thread.from": "{name}，{time}",
   "messages.thread.lead": "計劃負責人",
   "messages.thread.leadAt": "計劃負責人：{program}",
   "messages.thread.photo.add": "新增相片",
