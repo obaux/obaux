@@ -1304,7 +1304,7 @@
   "alerts.kinds": "Tipos de mensajes",
   "alerts.comingSoon": "Próximamente",
   "profile.promo.alerts.body.providerList": "Próximamente: textos sobre reservas, cambios y mensajes.",
-  "alerts.how": "Pam envía un mensaje cada vez, solo para lo que esté encendido. Responde STOP para dejar de recibirlos, o HELP para pedir ayuda. Pueden aplicar tarifas de mensajes y datos.",
+  "alerts.how": "Pam envía un mensaje cada vez que ocurre algo que activaste. Responde STOP para dejar de recibirlos, o HELP para pedir ayuda. Pueden aplicar tarifas de mensajes y datos.",
   "alerts.privacy": "Privacidad",
   "alerts.privacy.label": "Privacidad: mensajes de texto",
   "invite.expired.title": "Este enlace venció",
