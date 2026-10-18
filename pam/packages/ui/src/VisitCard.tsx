@@ -45,6 +45,11 @@ export interface VisitCardProps {
    * at the top left, so the card does not carry two calendar icons (Will, 18 October).
    */
   readonly action?: ReactNode;
+  /**
+   * The fallback for a language whose button label wraps or pushes the header past two lines (Mira, 18 October; the fit audit at
+   * 320 decides): the same button, on a row of its own under the date, not a second design. Off by default.
+   */
+  readonly actionOwnRow?: boolean;
 }
 
 const styles = stylex.create({
@@ -95,7 +100,7 @@ const styles = stylex.create({
   },
 });
 
-export function VisitCard({ eyebrow, day, time, service = null, countdown = null, changeLabel, changeHref = null, action = null }: VisitCardProps) {
+export function VisitCard({ eyebrow, day, time, service = null, countdown = null, changeLabel, changeHref = null, action = null, actionOwnRow = false }: VisitCardProps) {
   return (
     <Card padding={5} xstyle={styles.card}>
       {/* Room between each line (Will, 7 October, D-339: "so things aren't
@@ -107,14 +112,15 @@ export function VisitCard({ eyebrow, day, time, service = null, countdown = null
               <Icon icon="calendar" size="md" />
             </HStack>
           )}
-          <Text xstyle={[styles.eyebrow, action ? styles.eyebrowGrow : null]}>{eyebrow}</Text>
-          {action}
+          <Text xstyle={[styles.eyebrow, action && !actionOwnRow ? styles.eyebrowGrow : null]}>{eyebrow}</Text>
+          {actionOwnRow ? null : action}
         </HStack>
         <VStack gap={2}>
           <Text xstyle={styles.day}>{day}</Text>
           <Text xstyle={styles.time}>{service ? `${time} · ${service}` : time}</Text>
           {countdown ? <Text xstyle={styles.countdown}>{countdown}</Text> : null}
         </VStack>
+        {actionOwnRow ? <HStack>{action}</HStack> : null}
         {changeLabel && changeHref ? (
           <VStack xstyle={styles.rule}>
             <Button
