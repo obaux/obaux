@@ -41,12 +41,17 @@ Timeline, in seconds (the constants live in `OrbHero.T`):
 | When | What |
 |---|---|
 | 0 – 1.15 | Hero circle grows from 15% to 34% radius (as a share of the banner's width), ease-out |
-| 1.15 – 2.15 | Hero shrinks to its resting size (10.1%, 12% larger than the rest), ease-in-out |
-| 1.2 – 2.2 | The other 12 circles spread out from the hero's centre to their lattice spots, nearest first (0.4s per unit of distance, 0.9s each). One eased curve moves and sizes each circle, starts and ends at rest, **no overshoot** |
-| after each circle lands | Idle: a slow vertical bob that **fades in over 1.2s** per circle |
-
-**Smoothness (18 Oct, "a little jump" in the middle row).** Cause: the idle bob switched on at full strength at a fixed 2.4s, so every circle stepped a few pixels at once; the size overshoot also made circles bounce back as they landed. Both removed; the hero's shrink was lengthened so it and the lattice finish together. To re-check, step `hero.seek(t)` at 60fps, read each circle's x/y/radius from `hero.data`, and look for spikes in the frame-to-frame change: the old bob start showed ~4.8 device px/frame², now the worst is ~1 and it is a smooth curve.
+| 1.15 – ~2.2 | Hero springs back to its resting size (10.1%, 12% larger than the rest), dipping about 6% under it before settling |
+| 1.2 – ~2.3 | The other 12 circles spread out from the hero's centre, nearest first (0.4s per unit of distance). Each follows **damped springs**: position overshoots ~1.3%, size ~7.6%, then both settle. Springs are driven through a 0.3s ramp so they leave rest smoothly |
+| after each circle lands | Idle: a slow two-axis float (about 3px) plus ~1% breathing, faded in over 1.2s |
+| any time after ~2.2 | Touch / hover: nearby circles are pushed away (up to ~23px on a press) and spring back with a small wobble. `interactive: false` turns it off. Pointer only; no device tilt |
 | `exit()` | Everything shrinks away, outer circles first, hero last (0.6s each) |
+
+**Physics (18 Oct).** First pass was eased curves with a sine bob, which felt stiff once settled. Now: springs (`OrbHero.SPRING`; `zeta` below 1 overshoots, overshoot = exp(-pi*zeta/sqrt(1-zeta^2))), a tiny float after landing, and a touch response (`OrbHero.TOUCH`). The springs are precomputed into 480Hz tables, so any frame is drawn from `t` alone and `seek()` stays deterministic; touch is real-time state and is skipped when frozen. Two earlier jumps to avoid repeating: never switch a motion on at full strength (fade it in; the old bob switched on at 2.4s and every circle stepped ~5px), and never start a spring with a kick (the ramp).
+
+**How it was checked.** Step `hero.seek(t)` then `hero._frame(t*1000)` at 60fps, read each circle's x/y/radius from `hero.data`, and look at the frame-to-frame change of the change (acceleration). Entrance: smooth, worst ~1.5 device px/frame² on the outer circles' long travel. After landing: ~0.04. Touch was driven with a synthetic pointer: a circle pushed 23px, released, returned through -6, +2, -1px.
+
+**Not tried:** a real finger on a real phone. Touch and hover strengths (`TOUCH.hover`, `press`, `tap`) are guesses to tune by feel.
 
 Layout: the canvas is the banner (4:3, `aspect-ratio` set by CSS; the engine lays out
 to whatever size the canvas is, via `ResizeObserver`). A hex lattice in canvas-width
