@@ -2250,7 +2250,7 @@ test.describe("the bell's rows land on real screens in the new layout", () => {
 test.describe('a real account sees only its real things (Will, 11 October 2026)', () => {
   const EXAMPLES = /Teresa|Sandra|Renee|Example people|People who offered help/;
 
-  test('a member with no one to message has no Messages tab, no examples, a short empty state, and the bell is on Home', async ({ page }) => {
+  test('a member with no one to message has no Messages tab, no examples, a short empty state, and no bell on Home until something is new', async ({ page }) => {
     await signedInAs(page, 'member');
     await page.route(MEMBERS, (route) => route.fulfill(json([])));
     await page.route(PEOPLE, (route) => route.fulfill(json([])));
@@ -2267,10 +2267,13 @@ test.describe('a real account sees only its real things (Will, 11 October 2026)'
     await expect(bar.getByRole('link', { name: 'Profile' })).toBeVisible();
     await expect(bar.getByRole('link', { name: /Messages/ })).toHaveCount(0);
 
-    // Notifications are still reachable: the bell is in Home's header.
+    // Home's header draws the bell only while something is unread (Will, 18 October); with nothing new it has none,
+    // and the list stays one tap away from Profile.
     await page.goto('/');
     await settled(page);
-    await expect(page.getByRole('link', { name: /Notifications/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Notifications/ })).toHaveCount(0);
+    await page.goto('/profile/');
+    await settled(page);
     await expect(page.getByRole('link', { name: /Notifications/ })).toHaveAttribute('href', '/notifications/');
   });
 
