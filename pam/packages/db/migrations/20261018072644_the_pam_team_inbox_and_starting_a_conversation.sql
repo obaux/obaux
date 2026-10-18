@@ -62,7 +62,7 @@ begin
          when lm.sender_id = t.asker_id then 'asker'
          else 'team' end,
     ws.waiting_since,
-    case when lm.system_key is null then left(split_part(coalesce(lm.body, ''), E'\n', 1), 140) else null end
+    case when lm.created_at is not null and lm.system_key is null then left(split_part(coalesce(lm.body, ''), E'\n', 1), 140) else null end
   from public.pam_threads t
   join public.profiles p on p.id = t.asker_id
   left join public.regions r on r.id = p.region_id
