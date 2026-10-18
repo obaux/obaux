@@ -189,7 +189,9 @@ test('a visit that moved after it was added asks to be added again', async ({ pa
   await page.reload();
   await settled(page);
   await expect(page.getByRole('button', { name: 'Add to calendar' })).toBeVisible();
-  await expect(page.getByText('This visit changed after you added it. Add it again.')).toBeVisible();
+  await expect(page.getByText('Your calendar has the old time.', { exact: true })).toBeVisible();
+  // A screen reader gets the whole sentence.
+  await expect(page.getByText('This visit changed after you added it. Your calendar has the old time.')).toHaveCount(1);
 });
 
 test('the place page\'s green card has the same button, and Added after one is added', async ({ page }) => {

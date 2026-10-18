@@ -1882,5 +1882,6 @@
   "calendar.addOne.added.label": "Added to calendar. Opens Calendar settings.",
   "calendar.addOne.syncAll": "Add all your future visits",
   "calendar.addOne.syncAll.hint": "Set up a calendar link once.",
-  "calendar.addOne.changed": "This visit changed after you added it. Add it again."
+  "calendar.addOne.changed": "Your calendar has the old time.",
+  "calendar.addOne.changed.label": "This visit changed after you added it. Your calendar has the old time."
 }

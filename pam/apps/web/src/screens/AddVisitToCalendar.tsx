@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 're
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
+import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { CalendarAddIcon, CalendarCheckIcon, SyncIcon, TripsIcon } from '@pam/ui';
@@ -161,7 +162,8 @@ export function AddVisitToCalendar({ card, visit }: { readonly card: (slot: Cale
       </div>
       {hasChanged ? (
         <Text type="supporting" xstyle={styles.changed}>
-          {t('calendar.addOne.changed')}
+          <span aria-hidden>{t('calendar.addOne.changed')}</span>
+          <VisuallyHidden>{t('calendar.addOne.changed.label')}</VisuallyHidden>
         </Text>
       ) : null}
       <PamSheet isOpen={isOpen} onOpenChange={setIsOpen} label={tPlain('trips.addToCalendar')} kind="act" actionLabel={t('trips.confirm.close')}>
