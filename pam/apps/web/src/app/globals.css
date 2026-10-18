@@ -381,44 +381,18 @@
   }
 
   /*
-   * A list of languages shows all of them (S1, Iris's interaction run-through, 17 October 2026). Astryx stops a menu and a
-   * dropdown's list at 300px, which is six rows of 48px and a bit: on the way in Russian was cut in half and Arabic was
-   * under the edge, with nothing to say there was more, and the person who needs Arabic may read nothing else on the
-   * screen. These lists are found by their rows (`TaggedWords` marks the ones that start with the English tag), so the
-   * City list and every other menu keep the cap. 400px is seven rows and a bit more; the viewport still limits it.
-   * Three selectors because the cap is in three places: the menu, the popover round it (which decides where the menu
-   * opens), and a dropdown's list.
+   * The globe's list of languages shows all of them (S1, Iris's interaction run-through, 17 October 2026). Astryx stops a menu
+   * at 300px, which is six rows of 48px and a bit: on the way in Russian was cut in half and Arabic was under the edge, with
+   * nothing to say there was more, and the person who needs Arabic may read nothing else on the screen. The menu is found by
+   * its rows (`TaggedWords` marks the ones that start with the English tag), so the City list and every other menu keep the
+   * cap. 400px is seven rows and a bit more; the viewport still limits it. Two selectors because the cap is in two places:
+   * the menu, and the popover round it (which decides where the menu opens). Sign up's "Choose a language" is not a menu
+   * but a sheet (`LanguageField`), so it has no cap to lift.
    */
   .astryx-dropdown-menu:has([data-pam-tagged]),
-  [popover]:has(.astryx-dropdown-menu [data-pam-tagged]),
-  [role='listbox']:has([data-pam-tagged]) {
+  [popover]:has(.astryx-dropdown-menu [data-pam-tagged]) {
     max-block-size: min(400px, calc(100vh - 32px));
     max-block-size: min(400px, calc(100dvh - 32px));
-  }
-
-  /*
-   * A dropdown of languages low or mid-screen on a short phone (Sign up at 320x568, once the field has been scrolled to):
-   * seven rows are 344px, and the room under the field and the room over it can both be less. Astryx tries under, then over
-   * (`flip-block`), and when neither fits it stays under and runs off the screen. This adds a last resort: the list over
-   * the whole height of the screen, centred on the field (`--pam-list-centre`, below), so every row is on the screen, with
-   * 16px to spare. It covers the field while it is open, as a native picker does; it only happens when neither side has
-   * the room. Astryx writes its fallbacks on the element (`style=`), so this one needs `!important` to replace them. On a
-   * screen shorter than the list, the list keeps 16px each side and scrolls inside: the rows are a flex column that may
-   * shrink, in the popover and in the box round the list.
-   */
-  [popover]:popover-open:has([role='listbox'] [data-pam-tagged]) {
-    position-try-fallbacks: flip-block, --pam-list-centre !important;
-    display: flex;
-    flex-direction: column;
-  }
-  [popover]:popover-open:has([role='listbox'] [data-pam-tagged]) > * {
-    display: flex;
-    flex-direction: column;
-    min-block-size: 0;
-  }
-  [role='listbox']:has([data-pam-tagged]) {
-    flex: 0 1 auto;
-    min-block-size: 0;
   }
 
   /* The closed box's chevron (D-372): larger and bolder, tucked 20px in
@@ -742,17 +716,4 @@
       transform: none;
     }
   }
-}
-
-/*
- * The last-resort place for a list of languages (see "A dropdown of languages low or mid-screen" above): the column of the
- * field over the whole screen, the list centred on the field and kept 16px from the top and bottom. Outside the layer, as
- * an at-rule's name is not cascaded. `span-self-inline-end` keeps what Astryx's Selector does across: the list starts at
- * the field's start edge.
- */
-@position-try --pam-list-centre {
-  position-area: span-all span-self-inline-end;
-  align-self: anchor-center;
-  margin-block: 16px;
-  max-block-size: calc(100% - 32px);
 }

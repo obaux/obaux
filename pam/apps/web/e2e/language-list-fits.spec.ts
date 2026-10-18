@@ -2,6 +2,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 import { SUPPORTED_LOCALES } from '@pam/config';
 import en from '@pam/config/locales/en.json';
 import ar from '@pam/config/locales/ar.json';
+import es from '@pam/config/locales/es.json';
 import { settled } from './settled';
 
 /**
@@ -11,17 +12,17 @@ import { settled } from './settled';
  * Astryx stops a menu and a dropdown's list at 300px, which is six rows of 48px and a bit: Russian was cut in half and Arabic
  * was below the edge, with nothing to say there was more. The person who needs Arabic may read nothing else on the screen.
  *
- * So this opens each list, on the two screens that offer it before sign-in (the Sign in globe, and Sign up's "Choose a
- * language"), at the smallest phone Pam is built for (320×568) and at 390×844, in English and in Arabic (where the globe moves to
- * the other corner and the list is drawn right to left), and checks that every language's row is inside the list's own box,
- * inside the screen, and that the list has nothing to scroll to. The checks are on the boxes, so a language added later that
- * does not fit fails here too.
+ * So this opens each list, on the two screens that offer it before sign-in (the Sign in globe, a menu; and Sign up's "Choose a
+ * language", a bottom sheet), at the smallest phone Pam is built for (320×568) and at 390×844, in English and in Arabic (where
+ * the globe moves to the other corner and the list is drawn right to left), and checks that every language's row is inside the
+ * list's own box, inside the screen, and that the list has nothing to scroll to. The checks are on the boxes, so a language added
+ * later that does not fit fails here too.
  *
  * Sign up's field can be anywhere on a 568px screen, because the form scrolls (and a person, or Playwright, scrolls it clear of
- * the Next bar): so the list is opened with the field where it is, with the field low enough that the list opens over it, and
- * with the field in the middle, where neither the room under it nor the room over it holds seven rows (b62 moved the field
- * there, and the list ran off the screen). On a screen too short for the whole list, it must stay on the screen and every row
- * must be reachable by scrolling inside it.
+ * the Next bar). A list opened under or over the field has seven rows (344px) of room on neither side at the middle of a 568px
+ * screen: b62 moved the field there, and the popover ran off the screen. A sheet needs no room next to the field, so the list is
+ * opened with the field where a click leaves it, 400px down and 256px down, and must be the same. On a screen too short for the
+ * whole list, the sheet must stay on the screen and every row must be reachable by scrolling it.
  */
 
 const SIZES = [
@@ -192,7 +193,7 @@ for (const size of SIZES) {
   }
 }
 
-// A screen too short for seven rows (a phone on its side): the list keeps to the screen and scrolls inside, every row reachable.
+// A screen too short for seven rows (a phone on its side): the sheet keeps to the screen and scrolls, every row reachable.
 test.describe('320×320', () => {
   test.use({ viewport: { width: 320, height: 320 } });
 
@@ -203,8 +204,34 @@ test.describe('320×320', () => {
     await page.getByRole('combobox', { name: en['onboarding.language.title'] }).click();
     const m = await measure(page, 'listbox', 'option');
     expect(m.list, 'a list was found').not.toBeNull();
-    expect(m.list!.top, 'the list starts on the screen').toBeGreaterThanOrEqual(0);
-    expect(m.list!.bottom, 'the list ends on the screen').toBeLessThanOrEqual(m.screen.height);
+    const sheet = await page.getByRole('dialog', { name: en['onboarding.language.title'] }).boundingBox();
+    expect(sheet, 'the sheet was found').not.toBeNull();
+    expect(sheet!.y, 'the sheet starts on the screen').toBeGreaterThanOrEqual(0);
+    expect(sheet!.y + sheet!.height, 'the sheet ends on the screen').toBeLessThanOrEqual(m.screen.height + 1);
     expect(await unreachable(page, 'listbox', 'option'), 'languages that cannot be scrolled to').toEqual([]);
+  });
+});
+
+// What happens on a pick and on Escape: the sheet closes either way, and focus goes back to the field it opened from.
+test.describe('Sign up: the sheet closes', () => {
+  test.use({ viewport: { width: 320, height: 568 } });
+
+  test('Escape closes it and focus goes back to the field; picking a language closes it and switches the page', async ({ page }) => {
+    await newcomer(page);
+    await page.goto('/join/');
+    await settled(page);
+    const field = page.getByRole('combobox', { name: en['onboarding.language.title'] });
+    const sheet = page.getByRole('dialog', { name: en['onboarding.language.title'] });
+
+    await field.click();
+    await expect(sheet).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(sheet).toBeHidden();
+    await expect(field).toBeFocused();
+
+    await field.click();
+    await page.getByRole('option', { name: 'Español' }).click();
+    await expect(sheet).toBeHidden();
+    await expect(page.getByRole('combobox', { name: es['onboarding.language.title'] })).toBeVisible();
   });
 });
