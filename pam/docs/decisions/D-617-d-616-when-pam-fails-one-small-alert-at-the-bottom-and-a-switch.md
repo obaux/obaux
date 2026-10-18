@@ -36,8 +36,7 @@ act on (try again). The old way put a card under the row, which pushed the list 
 
 - The 15 s limit (it is a guess from how long a person waits before tapping again).
 - No reason in the alert: if the log shows one cause dominating (offline), a second line for that cause alone could help.
-- The save functions still return only true or false, so the log can say only offline / unknown / timeout for Text alerts
-  until Nico's `useReminderConsent.ts` returns the error.
+- A yes refused because of a STOP is not a malfunction: no alert, no log (Nico's `SaveResult.stopped`).
 
 Proofs: `e2e/alerts.spec.ts` (B3, saving, A6, dismissal), each failing on `main` at 4d39ccca. Pictures:
 `docs/design/review/2026-10-18-d616-*`.

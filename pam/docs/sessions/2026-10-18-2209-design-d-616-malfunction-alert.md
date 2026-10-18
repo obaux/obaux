@@ -28,7 +28,7 @@ D-617 (Will's D-616 job, 18 October 21:14). Astryx `Switch.changeAction` is opti
 ## Left undone
 
 - Instant-save controls (person star, saved heart, language picker, role switcher) are named in the rule; their owners convert them.
-- The save functions return only a boolean, so the log gets offline, timeout or unknown for Text alerts; real codes need `useReminderConsent.ts` (Nico) to return the error.
+- (Done in `d8a61dcb`+) The saves now return Nico's `SaveResult`; the log gets the save's own code. A yes refused because of a STOP is not shown or logged: the screen reads the STOP back.
 - Other failed-action rows in `docs/design/2026-10-18-something-went-wrong-audit.md` are not converted.
 - Seven-language 48px check against Lena's cap; BigButton `tPlain` (D-435).
 

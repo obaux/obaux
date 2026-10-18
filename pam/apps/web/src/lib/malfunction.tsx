@@ -6,7 +6,7 @@ import * as stylex from '@stylexjs/stylex';
 import { CompactNotice } from '@pam/ui';
 import { useI18n } from './i18n';
 import type { AppErrorAction } from '@pam/config';
-import { reportAppError } from './reportAppError';
+import { codeFromError, reportAppError } from './reportAppError';
 
 /**
  * When Pam fails (D-616, Will, 18 October: "Let's use the smaller alert banner. Overlaid below at bottom of page. Let's
@@ -26,19 +26,6 @@ import { reportAppError } from './reportAppError';
 
 /** A save, a switch or a tap that has not been answered in this long counts as failed; a send keeps its 30 (D-616). */
 export const SAVE_TIMEOUT_MS = 15_000;
-
-/** What the log is told about a failure: only a code (Nico: never the message, details, hint or a URL). */
-export function codeFromError(error: unknown): string | number {
-  if (typeof navigator !== 'undefined' && navigator.onLine === false) return 'offline';
-  if (error && typeof error === 'object') {
-    const { code, status } = error as { code?: unknown; status?: unknown };
-    if (typeof code === 'string' && /^[0-9A-Z]{5}$/.test(code)) return code;
-    if (typeof status === 'number' && status >= 100 && status <= 599) return status;
-    if (error instanceof TypeError) return 'offline';
-    if ((error as { name?: unknown }).name === 'TimeoutError') return 'timeout';
-  }
-  return 'unknown';
-}
 
 export type Settled<T> =
   | { readonly status: 'ok'; readonly value: T }

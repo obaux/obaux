@@ -857,6 +857,28 @@ test.describe('a conversation', () => {
     await expect(page.getByText('That did not send')).toHaveCount(0);
   });
 
+  test('a send that fails tells the error log which action and what code, and nothing they wrote (D-616)', async ({ page }) => {
+    const reports: Record<string, unknown>[] = [];
+    await page.route('**/rest/v1/rpc/report_app_error', (route) => {
+      reports.push(route.request().postDataJSON() as Record<string, unknown>);
+      return route.fulfill(json(false));
+    });
+    await signedInAs(page, 'member');
+    await withOneConversation(page);
+    await failingSend(page, 'never-lands');
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await page.getByRole('textbox').fill('My number is 2155550100.');
+    await page.getByRole('button', { name: /send/i }).click();
+    await expect(page.getByText('Not sent', { exact: true })).toBeVisible();
+
+    await expect.poll(() => reports.length).toBe(1);
+    expect(reports[0]).toMatchObject({ p_action: 'messages.send', p_area: '/messages/thread/', p_platform: 'web' });
+    expect(String(reports[0]!['p_code'])).toMatch(/^([0-9]{3}|[0-9A-Z]{5}|offline|timeout|unknown)$/);
+    expect(JSON.stringify(reports)).not.toMatch(/2155550100|My number/);
+  });
+
   test('Try again sends it once: the message appears once, "Not sent" goes, a quiet "Sent" follows', async ({ page }) => {
     await signedInAs(page, 'member');
     await withOneConversation(page);

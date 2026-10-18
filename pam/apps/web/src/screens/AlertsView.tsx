@@ -184,7 +184,7 @@ function AlertsList() {
       next.delete(kind);
       return next;
     });
-    if (settled.status === 'ok' && settled.value) {
+    if (settled.status === 'ok' && settled.value.ok) {
       if (ALERT_KINDS.has(kind)) {
         setAlerts((previous) => ({ ...previous, [kind as AlertKind]: on }));
         if (on) setConsent(true);
@@ -197,9 +197,14 @@ function AlertsList() {
       malfunction.clear();
       return;
     }
-    // Nothing moved. The error object never leaves this screen: the log gets a code only (D-616, Nico).
-    const error = settled.status === 'failed' ? settled.error : settled.status === 'timeout' ? { name: 'TimeoutError' } : undefined;
-    malfunction.show(`alerts.switch.${kind}`, error, control);
+    // A yes refused because of a STOP is not a failure: nothing is shown or logged, and the screen reads the STOP back.
+    if (settled.status === 'ok' && !settled.value.ok && settled.value.stopped) {
+      void reread();
+      return;
+    }
+    // Nothing moved. Only a code leaves this screen for the log (D-616, Nico): the save's own, or 'timeout'.
+    const code = settled.status === 'ok' ? (settled.value.ok ? 'unknown' : settled.value.code) : settled.status === 'timeout' ? 'timeout' : 'unknown';
+    malfunction.show(`alerts.switch.${kind}`, { code }, control);
     if (settled.status === 'timeout') void settled.late.then(() => reread());
   };
 
