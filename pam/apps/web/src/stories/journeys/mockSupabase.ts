@@ -12,6 +12,7 @@ import { SUPABASE_URL } from '../../lib/project';
 import { isFreshAccount } from '../../lib/programSetup';
 import {
   CASELOAD,
+  programMemberCardFor,
   CONVO_ID,
   DIRECTORY_PEOPLE,
   ME_ID,
@@ -450,19 +451,16 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     // A program lead's own visits (D-526): none in a story.
     on('/rpc/my_program_visits', () => ({ body: [] })),
     on('/rpc/service_has_lead', () => ({ body: options.hasLead === true })),
-    // The program's small card for a linked member (D-542): a story's people are examples, so no real member is linked.
-    on('/rpc/program_member_card', () => ({
-      body: options.programMemberCard
-        ? {
-            member_id: 'story-member-1',
-            first_name: 'Marcus',
-            visits: [
-              { appointment_id: 'story-visit-1', starts_at: onTheHour(1, 10), ends_at: onTheHour(1, 11), service_name: 'GED classes' },
-              { appointment_id: 'story-visit-2', starts_at: onTheHour(4, 14), ends_at: null, service_name: 'Computer room' },
-            ],
-          }
-        : null,
-    })),
+    // The program's small card for a linked member (D-542): the example caseload is linked to the example program.
+    on('/rpc/program_member_card', (_url, _method, body) => {
+      const visits = [
+        { appointment_id: 'story-visit-1', starts_at: onTheHour(1, 10), ends_at: onTheHour(1, 11), service_name: 'GED classes' },
+        { appointment_id: 'story-visit-2', starts_at: onTheHour(4, 14), ends_at: null, service_name: 'Computer room' },
+      ];
+      if (options.programMemberCard) return { body: { member_id: 'story-member-1', first_name: 'Marcus', visits } };
+      // The caseload people are the example program's own: each opens a page, never "not found".
+      return { body: programMemberCardFor(((body ?? {}) as { p_member_id?: string }).p_member_id, visits.slice(0, 1)) };
+    }),
     // Neither has blocked the other: the card offers Message (D-542).
     on('/rpc/is_blocked_between', () => ({ body: false })),
     // "I'm here" and "I went" (D-535): the pretend database says yes. No position is ever kept.

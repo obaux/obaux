@@ -204,6 +204,15 @@ export const CASELOAD = [
   { id: 'm2', first_name: 'Tanya', access_status: 'active', last_active_at: null },
 ];
 
+/**
+ * The small card a program lead gets for a member on the caseload (D-542). In a story the caseload people are examples linked to the
+ * example program, so every circle the lead's Home draws opens a page (Iris's b63 re-test, P4: Tanya and Marcus said "not found").
+ */
+export function programMemberCardFor(memberId: string | null | undefined, visits: readonly unknown[]) {
+  const member = CASELOAD.find((m) => m.id === memberId);
+  return member ? { member_id: member.id, first_name: member.first_name, visits } : null;
+}
+
 export const DIRECTORY_PEOPLE = [
   { id: 'd1', first_name: 'Marcus', role: 'member', region_name: 'Philadelphia', access_status: 'active', last_active_at: hoursAgo(0), is_demo: false },
   { id: 'd2', first_name: 'Alice', role: 'provider', region_name: 'Philadelphia', access_status: 'active', last_active_at: null, is_demo: false },

@@ -28,7 +28,8 @@ test.beforeEach(async ({ page }) => {
 test('half open, the pins show above the sheet and are reachable; fully up, the ones it covers are out of reach', async ({ page }) => {
   await page.goto('/trips/');
   await settled(page);
-  const pins = page.getByRole('region', { name: 'Map of your trips' }).locator('a[href]');
+  // By attribute, not by role: fully up the whole map is hidden from the accessibility tree, and these checks are about its pins.
+  const pins = page.locator('[aria-label="Map of your trips"] a[href]');
   // Half open: the pins sit above the sheet, so a person can find and tap them. (On the narrowest phones two near pins are drawn as one,
   // "2 trips", so how many there are depends on the screen: at least one.)
   await expect(pins.first()).toBeVisible();
@@ -48,4 +49,30 @@ test('half open, the pins show above the sheet and are reachable; fully up, the 
   await page.getByRole('button', { name: 'Show the map' }).click();
   await page.waitForTimeout(400);
   await expect(page.getByRole('region', { name: 'Map of your trips' }).getByRole('link')).toHaveCount(shownAtHalf);
+});
+
+test('fully up, Tab never lands in the map the sheet covers, and the map is hidden from a screen reader (Iris, P3 polish)', async ({ page }) => {
+  await page.goto('/trips/');
+  await settled(page);
+  await page.getByRole('button', { name: 'Show more of your trips' }).click();
+  await page.getByRole('button', { name: 'Show the map' }).waitFor();
+  await page.waitForTimeout(400);
+  const landed: string[] = [];
+  for (let i = 0; i < 14; i++) {
+    await page.keyboard.press('Tab');
+    landed.push(
+      await page.evaluate(() => {
+        const el = document.activeElement as HTMLElement | null;
+        const inMap = Boolean(el?.closest('[aria-label="Map of your trips"]'));
+        return `${inMap ? 'MAP ' : ''}${el?.tagName ?? ''} ${(el?.getAttribute('aria-label') ?? el?.textContent ?? '').slice(0, 30)}`;
+      }),
+    );
+  }
+  expect(landed.filter((where) => where.startsWith('MAP'))).toEqual([]);
+  // Nothing in it is read either: the map as a whole is hidden while the sheet covers it.
+  await expect(page.getByRole('region', { name: 'Map of your trips' })).toHaveCount(0);
+  // Back to half: it is there again.
+  await page.getByRole('button', { name: 'Show the map' }).click();
+  await page.waitForTimeout(400);
+  await expect(page.getByRole('region', { name: 'Map of your trips' })).toHaveCount(1);
 });
