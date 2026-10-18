@@ -1314,7 +1314,7 @@
   "glossary.trip.definition": "A trip is a visit a member plans to a program: the place, the day and the time. It shows on their Trips map, and the program sees it too.",
   "glossary.whatIs": "What is a {term}?",
   "alerts.trip": "Someone plans a trip",
-  "alerts.visit": "Before your trip",
+  "alerts.visit": "A reminder before your trip",
   "alerts.closed": "A saved place closes or moves",
   "alerts.connect": "Someone wants to connect",
   "program.quick.phone": "Contact phone number",
