@@ -1,0 +1,37 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dimension gauge demo</title>
+<style>
+  body{margin:0;padding:32px 16px;background:#000230;color:#fff;font:15px system-ui,sans-serif}
+  h1{font-size:18px;margin:0 0 24px;text-align:center;font-weight:600}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:28px 16px;max-width:760px;margin:0 auto}
+  .cell{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+  .cell span{font-size:13px;opacity:.85}
+  dimension-gauge{--dg-size:112px}
+  .alt dimension-gauge{--dg-fill:#1f9d8a;--dg-wave:#b9f3e6}
+  p{text-align:center;margin-top:32px}
+  button{font:inherit;padding:8px 14px;border-radius:8px;border:0;background:#4561de;color:#fff;cursor:pointer}
+</style>
+<h1>Life dimensions</h1>
+<div class="grid" id="grid"></div>
+<p><button id="shuffle">Randomize values</button></p>
+
+<script type="module">
+  import './dimension-gauge.js';
+  // Placeholder 24px stroke icons (Lucide-style). Swap for your icon set; any inline <svg slot="icon"> works.
+  const ic = p => `<svg slot="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+  const dims = [
+    ['Housing',   72, '<path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/>'],
+    ['Health',    58, '<path d="M20.8 5.6a5.5 5.5 0 0 0-7.8 0L12 6.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 22l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/>'],
+    ['Income',    44, '<circle cx="12" cy="12" r="9"/><path d="M14.5 9a2.5 2 0 0 0-2.5-1.5c-1.5 0-2.5.8-2.5 2s1 1.7 2.5 2 2.5.8 2.5 2-1 2-2.5 2A2.5 2 0 0 1 9.500 15M12 6v1.500M12 16.500V18"/>'],
+    ['Community', 86, '<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.500"/><path d="M3 20c0-3.300 2.700-6 6-6s6 2.700 6 6M15 14.500c3 0 6 1.500 6 5.500"/>'],
+    ['Learning',  100, '<path d="M2 9l10-5 10 5-10 5-10-5Z"/><path d="M6 11.500V16c0 1.500 3 3 6 3s6-1.500 6-3v-4.500"/>'],
+    ['Wellbeing', 0,  '<circle cx="12" cy="12" r="9"/><path d="M8 14s1.500 2 4 2 4-2 4-2M9 9.500h.01M15 9.500h.01"/>'],
+  ];
+  const grid = document.getElementById('grid');
+  grid.innerHTML = dims.map(([n, v, p], i) =>
+    `<div class="cell ${i % 2 ? 'alt' : ''}"><dimension-gauge value="${v}" label="${n}" ${i < 3 ? 'show-value' : ''}>${ic(p)}</dimension-gauge><span>${n}</span></div>`).join('');
+  document.getElementById('shuffle').onclick = () =>
+    grid.querySelectorAll('dimension-gauge').forEach(g => g.value = Math.round(Math.random() * 100));
+</script>
