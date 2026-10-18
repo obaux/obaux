@@ -32,7 +32,7 @@ async function signedInAs(page: import('@playwright/test').Page, role: 'super_ad
   }, ME);
   await page.route(NOTIFICATIONS, (route) => route.fulfill(json([])));
   await page.route(CONTROLS, (route) => route.fulfill(json([])));
-  await page.route(USER, (route) => route.fulfill(json({ id: ME, phone: '12673095265' })));
+  await page.route(USER, (route) => route.fulfill(json({ id: ME, phone: '12155550191' })));
   await page.route(POINTS, (route) => route.fulfill(json(250)));
   await page.route(PROFILES, (route) =>
     route.fulfill(
@@ -49,16 +49,16 @@ test.describe('Answer by text', () => {
       calls.push(JSON.parse(route.request().postData() ?? '{}'));
       return route.fulfill(json('11111111-1111-4111-8111-111111111111'));
     });
-    await page.goto('/reply/?to=%2B12675559601');
+    await page.goto('/reply/?to=%2B12155550192');
     await settled(page);
-    await expect(page.getByText('To (267) 555-9601')).toBeVisible();
+    await expect(page.getByText('To (215) 555-0192')).toBeVisible();
     const send = page.getByRole('button', { name: 'Send text' });
     await expect(send).toBeDisabled();
     await page.getByLabel('Your answer').fill('We can help. Write to hello@joinpam.org.');
     await expect(page.getByText('40 of 120')).toBeVisible();
     await send.click();
     await expect(page.getByText('Queued. It goes out within five minutes.')).toBeVisible();
-    expect(calls).toEqual([{ p_phone: '+12675559601', p_words: 'We can help. Write to hello@joinpam.org.' }]);
+    expect(calls).toEqual([{ p_phone: '+12155550192', p_words: 'We can help. Write to hello@joinpam.org.' }]);
   });
 
   test('words the dispatcher would refuse are explained before anything is sent', async ({ page }) => {
@@ -68,7 +68,7 @@ test.describe('Answer by text', () => {
       called += 1;
       return route.fulfill(json(null));
     });
-    await page.goto('/reply/?to=%2B12675559601');
+    await page.goto('/reply/?to=%2B12155550192');
     await settled(page);
     await page.getByLabel('Your answer').fill('x'.repeat(130));
     await expect(page.getByText('130 of 120')).toBeVisible();
@@ -81,7 +81,7 @@ test.describe('Answer by text', () => {
     await page.route(SEND, (route) =>
       route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ message: "Pam's texts are not on yet" }) }),
     );
-    await page.goto('/reply/?to=%2B12675559601');
+    await page.goto('/reply/?to=%2B12155550192');
     await settled(page);
     await page.getByLabel('Your answer').fill('We can help.');
     await page.getByRole('button', { name: 'Send text' }).click();
@@ -98,7 +98,7 @@ test.describe('Answer by text', () => {
 
   test('anybody who is not a super admin meets the closed door', async ({ page }) => {
     await signedInAs(page, 'member');
-    await page.goto('/reply/?to=%2B12675559601');
+    await page.goto('/reply/?to=%2B12155550192');
     await settled(page);
     await expect(page.getByRole('button', { name: 'Send text' })).toHaveCount(0);
     await expect(page.getByLabel('Your answer')).toHaveCount(0);

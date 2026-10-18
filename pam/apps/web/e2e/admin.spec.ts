@@ -63,7 +63,7 @@ async function signedInAs(
   await page.route(NOTIFICATIONS, (route) => route.fulfill(json(notifications)));
   await page.route(CONTROLS, (route) => route.fulfill(json(controls)));
   await page.route(ENROLLMENTS, (route) => route.fulfill(json([])));
-  await page.route(USER, (route) => route.fulfill(json({ id: ADMIN_ID, phone: '12673095265' })));
+  await page.route(USER, (route) => route.fulfill(json({ id: ADMIN_ID, phone: '12155550191' })));
   await page.route(POINTS, (route) => route.fulfill(json(250)));
   await page.route(PROFILES, (route) => {
     const url = route.request().url();

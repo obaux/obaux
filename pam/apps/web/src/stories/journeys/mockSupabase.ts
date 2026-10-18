@@ -814,7 +814,7 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
       }
       return { body: { id: 'new', sender_id: ME_ID, body: 'Sent from Storybook', created_at: new Date().toISOString() } };
     }),
-    on('/rest/v1/app_settings', (url) => ({ body: { value: url.includes('texts_live') ? 'on' : '+12673095265' } })),
+    on('/rest/v1/app_settings', (url) => ({ body: { value: url.includes('texts_live') ? 'on' : '+12155550191' } })),
     on('/rest/v1/regions', () => ({ body: [{ id: REGION_ID, name: 'Philadelphia' }] })),
     on('/rest/v1/staff_requests', () => ({ body: STAFF_REQUESTS })),
     // Invite links (0071, D-258): PAM-OLD1 is the example expired link; any

@@ -268,7 +268,7 @@ describe('the dispatcher and the config package say the same words', () => {
       adminFirstName: 'Cassandra',
       time: '10:00 AM',
       address: '18200 Northwest Martin Luther King Junior Memorial Boulevard',
-      supportPhone: '+12673095265',
+      supportPhone: '+12155550191',
       reply: 'We can help.',
     };
   };
