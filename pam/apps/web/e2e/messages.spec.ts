@@ -638,8 +638,10 @@ test.describe('a conversation', () => {
     await expect(page.getByRole('alert').getByText('Some things are turned off')).toBeVisible();
     // It begins with what is off, says why, then points to Pam (Will, 9 October).
     const notice = page.getByRole('alert');
-    await expect(notice.getByText(/^You cannot send messages right now\./)).toBeVisible();
-    await expect(notice.getByText(/Your guide turned this off for your account\./)).toBeVisible();
+    // A limited account can still write to Pam (D-605), so the notice says so instead of "cannot send messages" flat (Iris W3; Lena's line).
+    await expect(notice.getByText(/^You cannot send messages right now, except to Pam\./)).toBeVisible();
+    await expect(notice.getByText(/Write to Pam and we will help you reach your guide\./)).toBeVisible();
+    await expect(notice.getByText(/Your guide turned this off for your account\./)).toHaveCount(0);
     await expect(notice.getByText(/your plan/i)).toHaveCount(0);
     const call = notice.getByRole('link', { name: /Contact Pam/ });
     await expect(call).toHaveAttribute('href', '/help/');
