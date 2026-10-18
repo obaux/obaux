@@ -1760,12 +1760,5 @@
   "pam.inbox.waiting.hours": "Esperando {count} horas",
   "pam.inbox.waiting.hours.one": "Esperando {count} hora",
   "pam.inbox.waiting.days": "Esperando {count} días",
-  "pam.inbox.waiting.days.one": "Esperando {count} día",
-  "pam.inbox.replyTime.minutes": "Últimos 30 días: la mitad de las primeras respuestas de Pam llegó en {count} minutos o menos.",
-  "pam.inbox.replyTime.minutes.one": "Últimos 30 días: la mitad de las primeras respuestas de Pam llegó en {count} minuto o menos.",
-  "pam.inbox.replyTime.hours": "Últimos 30 días: la mitad de las primeras respuestas de Pam llegó en {count} horas o menos.",
-  "pam.inbox.replyTime.hours.one": "Últimos 30 días: la mitad de las primeras respuestas de Pam llegó en {count} hora o menos.",
-  "pam.inbox.replyTime.days": "Últimos 30 días: la mitad de las primeras respuestas de Pam llegó en {count} días o menos.",
-  "pam.inbox.replyTime.days.one": "Últimos 30 días: la mitad de las primeras respuestas de Pam llegó en {count} día o menos.",
-  "pam.inbox.replyTime.none": "Últimos 30 días: todavía no hay respuestas."
+  "pam.inbox.waiting.days.one": "Esperando {count} día"
 }

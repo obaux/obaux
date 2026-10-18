@@ -1760,12 +1760,5 @@
   "pam.inbox.waiting.hours": "已等候{count}小時",
   "pam.inbox.waiting.hours.one": "已等候{count}小時",
   "pam.inbox.waiting.days": "已等候{count}日",
-  "pam.inbox.waiting.days.one": "已等候{count}日",
-  "pam.inbox.replyTime.minutes": "過去30日：Pam一半的首次回覆在{count}分鐘內發出。",
-  "pam.inbox.replyTime.minutes.one": "過去30日：Pam一半的首次回覆在{count}分鐘內發出。",
-  "pam.inbox.replyTime.hours": "過去30日：Pam一半的首次回覆在{count}小時內發出。",
-  "pam.inbox.replyTime.hours.one": "過去30日：Pam一半的首次回覆在{count}小時內發出。",
-  "pam.inbox.replyTime.days": "過去30日：Pam一半的首次回覆在{count}日內發出。",
-  "pam.inbox.replyTime.days.one": "過去30日：Pam一半的首次回覆在{count}日內發出。",
-  "pam.inbox.replyTime.none": "過去30日：暫時未有回覆。"
+  "pam.inbox.waiting.days.one": "已等候{count}日"
 }

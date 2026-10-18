@@ -472,7 +472,6 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/pam_program_has_lead', () => ({ body: true })),
     on('/rpc/pam_start_program_conversation', () => ({ body: 2 })),
     on('/rpc/pam_set_hours', () => ({ body: null })),
-    on('/rpc/pam_reply_times', () => ({ body: [{ median_seconds: 5400, mean_seconds: 7200, answered: 12 }] })),
     on('/rpc/review_program_submission', (_url, _method, body) => {
       const args = (body ?? {}) as { p_id: string };
       programsToCheck = programsToCheck.filter((row) => row.id !== args.p_id);

@@ -1849,18 +1849,5 @@
   "pam.inbox.waiting.days": "Ждёт {count} дня",
   "pam.inbox.waiting.days.one": "Ждёт {count} день",
   "pam.inbox.waiting.days.few": "Ждёт {count} дня",
-  "pam.inbox.waiting.days.many": "Ждёт {count} дней",
-  "pam.inbox.replyTime.minutes": "За последние 30 дней: половина первых ответов Pam пришла в течение {count} минуты.",
-  "pam.inbox.replyTime.minutes.one": "За последние 30 дней: половина первых ответов Pam пришла в течение {count} минуты.",
-  "pam.inbox.replyTime.minutes.few": "За последние 30 дней: половина первых ответов Pam пришла в течение {count} минут.",
-  "pam.inbox.replyTime.minutes.many": "За последние 30 дней: половина первых ответов Pam пришла в течение {count} минут.",
-  "pam.inbox.replyTime.hours": "За последние 30 дней: половина первых ответов Pam пришла в течение {count} часа.",
-  "pam.inbox.replyTime.hours.one": "За последние 30 дней: половина первых ответов Pam пришла в течение {count} часа.",
-  "pam.inbox.replyTime.hours.few": "За последние 30 дней: половина первых ответов Pam пришла в течение {count} часов.",
-  "pam.inbox.replyTime.hours.many": "За последние 30 дней: половина первых ответов Pam пришла в течение {count} часов.",
-  "pam.inbox.replyTime.days": "За последние 30 дней: половина первых ответов Pam пришла в течение {count} дня.",
-  "pam.inbox.replyTime.days.one": "За последние 30 дней: половина первых ответов Pam пришла в течение {count} дня.",
-  "pam.inbox.replyTime.days.few": "За последние 30 дней: половина первых ответов Pam пришла в течение {count} дней.",
-  "pam.inbox.replyTime.days.many": "За последние 30 дней: половина первых ответов Pam пришла в течение {count} дней.",
-  "pam.inbox.replyTime.none": "За последние 30 дней: ответов пока нет."
+  "pam.inbox.waiting.days.many": "Ждёт {count} дней"
 }

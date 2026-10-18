@@ -10,16 +10,14 @@ import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { ClockIcon, Loading, MessagesIcon, Notice, Page } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPageHeader } from '@pam/ui/SubPage';
-import { NOTICES } from '@pam/config';
+import { NOTICES, splitIsolated } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { whenHappened } from '@/lib/when';
 import { usePamInbox, usePamStatus, type PamInboxRow } from '@/lib/pam';
-import { inboxGroups, replyDuration, waitedFor } from '@/lib/pamInbox';
-import { usePamReplyTimes } from '@/lib/usePamReplyTimes';
+import { inboxGroups, waitedFor } from '@/lib/pamInbox';
 import { NotIn } from '../app/NotIn';
-import { HelpButton } from './HelpButton';
 
 /**
  * Messages to Pam (card a100, Dot's x5): what people wrote to Pam, for the Pam team. Waiting for Pam comes first,
@@ -38,9 +36,11 @@ const styles = stylex.create({
   nameWaiting: { fontSize: '19px', fontWeight: 700 },
   context: { fontSize: '15px', lineHeight: 1.3 },
   waiting: { fontSize: '15px', fontWeight: 700, lineHeight: 1.3 },
-  line: { fontSize: '17px', lineHeight: 1.35, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', unicodeBidi: 'plaintext' },
+  line: { fontSize: '17px', lineHeight: 1.35, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+  // "You:" and the words: the words are cut at their own end, so in Arabic an English message loses its tail, not its start.
+  lineSplit: { display: 'flex', columnGap: '0.25em', minWidth: 0 },
+  body: { fontSize: 'inherit', color: 'inherit', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
   when: { fontSize: '14px', whiteSpace: 'nowrap' },
-  stat: { fontSize: '15px', lineHeight: 1.4, color: colorVars['--color-text-secondary'] },
   sent: { fontSize: '17px', lineHeight: 1.4, fontWeight: 600 },
 });
 
@@ -54,7 +54,6 @@ export function PamInboxScreen() {
   const pam = usePamStatus(isSuperAdmin);
   const live = pam.status === 'ready';
   const state = usePamInbox(isSuperAdmin && live);
-  const replyTimes = usePamReplyTimes(isSuperAdmin && live);
 
   const params = useSearchParams();
   const showClosed = params.get('show') === 'closed';
@@ -67,7 +66,7 @@ export function PamInboxScreen() {
       ? { backHref: '/', backLabel: t('nav.back.home') }
       : { backHref: '/messages/', backLabel: t('nav.back.messages') };
   const title = t(showClosed ? 'pam.inbox.closed.title' : 'pam.inbox.title');
-  const header = <SubPageHeader title={title} {...back} actions={<HelpButton />} />;
+  const header = <SubPageHeader title={title} {...back} />;
 
   if (session.status === 'loading') {
     return (
@@ -131,7 +130,23 @@ export function PamInboxScreen() {
       {list.map((row) => {
         const waited = row.waitingSince ? waitedFor(row.waitingSince) : null;
         const preview = row.preview ?? '';
-        const line = row.lastFrom === 'team' ? t('messages.preview.you', { text: preview }) : preview;
+        // The words someone wrote, laid out in their own direction (D-435): in Arabic, "أنت:" stays at the start and an English
+        // message keeps its full stop at its own end. Each value `t` wrote in is its own element with dir="auto", an isolate.
+        const pieces = row.lastFrom === 'team' ? splitIsolated(t('messages.preview.you', { text: preview })) : null;
+        const split = pieces !== null && pieces.some((piece) => piece.isValue);
+        const line = split
+          ? pieces.map((piece, i) =>
+              piece.isValue ? (
+                <Text key={i} dir="auto" xstyle={styles.body}>
+                  {piece.text}
+                </Text>
+              ) : (
+                piece.text
+              ),
+            )
+          : pieces
+            ? pieces.map((piece) => piece.text).join('')
+            : preview;
         return (
           <ListItem
             key={row.conversationId}
@@ -148,7 +163,7 @@ export function PamInboxScreen() {
                   {context(row)}
                 </Text>
                 {waited ? <Text xstyle={styles.waiting}>{t(`pam.inbox.waiting.${waited.unit}`, { count: waited.count })}</Text> : null}
-                <Text dir="auto" type="supporting" xstyle={styles.line}>
+                <Text dir={split ? undefined : 'auto'} type="supporting" xstyle={[styles.line, split && styles.lineSplit]}>
                   {line}
                 </Text>
               </VStack>
@@ -180,8 +195,6 @@ export function PamInboxScreen() {
     );
   }
 
-  // The median (Mira: one long wait should not move the line), said as what it is: half came within (Sage, b947f366).
-  const reply = replyTimes ? replyDuration(replyTimes.medianSeconds) : null;
   const nothingOpen = groups.waiting.length === 0 && groups.answered.length === 0;
 
   return (
@@ -219,9 +232,6 @@ export function PamInboxScreen() {
           ]}
         />
       ) : null}
-      <Text xstyle={styles.stat}>
-        {reply ? t(`pam.inbox.replyTime.${reply.unit}`, { count: reply.count }) : t('pam.inbox.replyTime.none')}
-      </Text>
       {/* When Pam is here: the hours the out-of-hours reply follows (S4). */}
       <MenuList
         label={tPlain('pam.hours.row')}

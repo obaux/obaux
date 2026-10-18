@@ -43,12 +43,12 @@ interface Setup {
   readonly role?: 'super_admin' | 'member' | 'admin';
   readonly live?: boolean;
   readonly inbox?: unknown[];
-  readonly median?: number | null;
+  readonly locale?: string;
 }
 
-async function signedIn(page: Page, { role = 'super_admin', live = true, inbox = INBOX, median = 3 * 3600 + 600 }: Setup = {}) {
+async function signedIn(page: Page, { role = 'super_admin', live = true, inbox = INBOX, locale }: Setup = {}) {
   const asked: string[] = [];
-  await page.addInitScript((userId: string) => {
+  await page.addInitScript(([userId, code]) => {
     const session = {
       access_token: 't',
       refresh_token: 'r',
@@ -58,10 +58,11 @@ async function signedIn(page: Page, { role = 'super_admin', live = true, inbox =
       user: { id: userId, aud: 'authenticated', role: 'authenticated' },
     };
     for (const ref of ['stub', 'shobqzuhicoiymtumiaz']) window.localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(session));
-  }, ME);
+    if (code) window.localStorage.setItem('pam.locale', code);
+  }, [ME, locale ?? null] as const);
   await page.route('**/auth/v1/user*', (route) => route.fulfill(json({ id: ME })));
   await page.route('**/rest/v1/profiles*', (route) =>
-    route.fulfill(json({ id: ME, role, first_name: 'Will', region_id: null, regions: null, access_status: 'active', onboarded_at: '2026-09-14T00:00:00Z' })),
+    route.fulfill(json({ id: ME, role, first_name: 'Will', region_id: null, regions: null, access_status: 'active', onboarded_at: '2026-09-14T00:00:00Z', preferred_language: locale ?? null })),
   );
   await page.route('**/rest/v1/notifications*', (route) => route.fulfill(json([])));
   await page.route('**/rest/v1/access_controls*', (route) => route.fulfill(json([])));
@@ -78,9 +79,6 @@ async function signedIn(page: Page, { role = 'super_admin', live = true, inbox =
     asked.push('pam_inbox');
     return route.fulfill(json(inbox));
   });
-  await page.route('**/rest/v1/rpc/pam_reply_times*', (route) =>
-    route.fulfill(json([{ median_seconds: median, mean_seconds: median, answered: median === null ? 0 : 12 }])),
-  );
   return asked;
 }
 
@@ -142,8 +140,9 @@ test.describe('Messages to Pam (card a100)', () => {
     await expect(page.getByText('Kofi')).toHaveCount(0);
     const closedRow = page.getByRole('link', { name: /Closed conversations/ });
     await expect(page.getByRole('listitem').filter({ has: closedRow })).toContainText('1');
-    // The median is 3 hours 10 minutes: "within" rounds up, never down to a time half of them missed.
-    await expect(page.getByText('Last 30 days: half of Pam’s first replies came within 4 hours.')).toBeVisible();
+    // No reply-time line in v1 (Dot's review, D-608: fewer words), and back only, no Help (x5).
+    await expect(page.getByText(/Last 30 days/)).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Help' })).toHaveCount(0);
 
     await closedRow.click();
     await expect(page.getByRole('heading', { name: 'Closed conversations', level: 1 })).toBeVisible();
@@ -161,13 +160,24 @@ test.describe('Messages to Pam (card a100)', () => {
     for (const word of ['Reeves', '2155550100', 'Camden']) await expect(page.getByRole('main')).not.toContainText(word);
   });
 
-  test('nobody waiting says so in one line, and the reply-time line says there is nothing to measure yet', async ({ page }) => {
-    await signedIn(page, { inbox: [], median: null });
+  test('nobody waiting says so in one line', async ({ page }) => {
+    await signedIn(page, { inbox: [] });
     await page.goto('/pam/messages/');
     await expect(page.getByText('Nobody is waiting for Pam.')).toBeVisible();
-    await expect(page.getByText('Last 30 days: no replies yet.')).toBeVisible();
-    await expect(page.getByText(/first replies came within/)).toHaveCount(0);
     await expect(page.getByRole('link', { name: /Closed conversations/ })).toHaveCount(0);
+  });
+
+  test('in Arabic at 320, an English message keeps its own order after "أنت:" (D-435)', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 700 });
+    await signedIn(page, { locale: 'ar' });
+    await page.goto('/pam/messages/');
+    const answered = page.getByRole('listitem').filter({ hasText: 'Dana' });
+    await expect(answered).toContainText('أنت:');
+    // The words Pam's team wrote are their own element, laid out in their own direction: the full stop stays at their end.
+    const body = answered.locator('[dir="auto"]').filter({ hasText: 'We have fixed your city.' });
+    await expect(body).toHaveCount(1);
+    expect(await body.evaluate((el) => getComputedStyle(el).direction)).toBe('ltr');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
   });
 
   for (const role of ['member', 'admin'] as const) {

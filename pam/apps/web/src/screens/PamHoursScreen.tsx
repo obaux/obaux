@@ -16,7 +16,6 @@ import { useRoleView } from '@/lib/useViewedRole';
 import { setPamHours, usePamStatus } from '@/lib/pam';
 import { pamSystemText } from '@/lib/pamMessages';
 import { NotIn } from '../app/NotIn';
-import { HelpButton } from './HelpButton';
 
 /**
  * When Pam is here (card a100, D-605): the days and the opening and closing times, which drive the out-of-hours reply.
@@ -53,7 +52,7 @@ export function PamHoursScreen() {
     }
   }, [pam, draft]);
 
-  const header = <SubPageHeader title={t('pam.hours.title')} backHref="/pam/messages/" backLabel={t('pam.inbox.title')} actions={<HelpButton />} />;
+  const header = <SubPageHeader title={t('pam.hours.title')} backHref="/pam/messages/" backLabel={t('pam.inbox.title')} />;
 
   if (session.status === 'loading' || (isTeam && pam.status === 'loading')) {
     return (

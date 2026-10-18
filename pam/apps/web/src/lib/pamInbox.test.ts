@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { PamInboxRow } from './pam';
-import { inboxGroups, pamWaitingCount, replyDuration, waitedFor, writtenIn } from './pamInbox';
+import { inboxGroups, pamWaitingCount, waitedFor, writtenIn } from './pamInbox';
 
 const row = (id: string, over: Partial<PamInboxRow>): PamInboxRow => ({
   conversationId: id,
@@ -56,16 +56,5 @@ describe('waitedFor', () => {
     expect(waitedFor('2026-10-18T11:00:30Z', now)).toEqual({ unit: 'minutes', count: 59 });
     expect(waitedFor('2026-10-18T11:00:00Z', now)).toEqual({ unit: 'hours', count: 1 });
     expect(waitedFor('2026-10-17T12:00:01Z', now)).toEqual({ unit: 'hours', count: 23 });
-  });
-});
-
-describe('replyDuration', () => {
-  it('rounds up, because the line says "within"', () => {
-    expect(replyDuration(5400)).toEqual({ unit: 'hours', count: 2 });
-    expect(replyDuration(3600)).toEqual({ unit: 'hours', count: 1 });
-    expect(replyDuration(3601)).toEqual({ unit: 'hours', count: 2 });
-    expect(replyDuration(30)).toEqual({ unit: 'minutes', count: 1 });
-    expect(replyDuration(59 * 60 + 1)).toEqual({ unit: 'hours', count: 1 });
-    expect(replyDuration(25 * 3600)).toEqual({ unit: 'days', count: 2 });
   });
 });
