@@ -91,9 +91,7 @@ export function MessagesInPam() {
         shots={[{ name: 'messages-in-pam/blocked.png', alt: "A conversation after the other person blocked it. The box for writing a message is gone. In its place: “You can’t send messages here. This person has blocked messages in this conversation. You can still read it. Questions? Contact Pam.” and a link, “Contact Pam”.", caption: "What the other person sees." }]}
         />
         <P>
-          Pam asks first. It says: “Neither of you will be able to send messages in this conversation or start
-          a new one. What has already been said stays here, and you can still report it. They will see that
-          messages are blocked. You can unblock them any time from this menu.”
+          Pam asks first. It says: “Neither of you can send messages here. You can unblock them later.”
         </P>
         <P>
           The other person is told. Where the box for writing a message was, they see “You can’t send messages

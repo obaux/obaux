@@ -42,7 +42,7 @@ describe('the Text alerts switches are held until the day (D-478)', () => {
     expect(view).toMatch(/ALERT_TEXTS_LIVE \? \[[^\]]*'message'[^\]]*\] : \['closed'\]/);
     // ...and none is live, the closed-place one included, while the server's own switch is off (D-481).
     expect(view).toMatch(/const LIVE = textsLive \? LIVE_KINDS : NONE_LIVE;/);
-    // And a change returns before it writes anything for a kind that is not live.
-    expect(view).toMatch(/if \(!LIVE\.has\(kind\) \|\| !userId \|\| stopped\) return;/);
+    // And a change returns before it writes anything for a kind that is not live (and, since D-616, while one is still saving).
+    expect(view).toMatch(/if \(kind === 'connect' \|\| !LIVE\.has\(kind\) \|\| !userId \|\| stopped \|\| pending\.has\(kind\)\) return;/);
   });
 });

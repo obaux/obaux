@@ -83,7 +83,7 @@ export function PlanningAVisit() {
       <Section title="Reminders">
         <P>
           {VISIT_REMINDERS_LIVE
-            ? 'Pam texts you a reminder the day before a visit, if you said yes to text reminders. If you change a visit, the reminder moves with it.'
+            ? 'Pam texts you a reminder the day before a visit, if you said yes to texts. If you change a visit, the reminder moves with it.'
             : 'Texts that remind you before a visit are coming. Pam does not send them yet. We will say here when they are ready.'}
         </P>
         <ReadMore label="Texts from Pam: which ones, and why one didn’t come" href="/support/texts-from-pam/" />

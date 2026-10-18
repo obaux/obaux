@@ -224,9 +224,10 @@ test.describe('The agree screen is the only opt-in (D-615, Lena, 18 October)', (
 
 test.describe('Text alerts: what Iris found in b74 (B3, B6)', () => {
   const CLOSED = 'A saved place closes or moves';
+  const MALFUNCTION = "That didn't go through. It's not your fault, so try again.";
   const ON = { sms_enabled: true, sms_stopped_at: null, alert_message: false, alert_booked: false, alert_changed: false, alert_trip: false };
 
-  test('B3: when a write fails the error is under the row that failed, in view on a 320x568 screen', async ({ page }) => {
+  test('B3 (D-616): when a write fails the switch stays put and the small alert is fixed at the bottom, clear of the switch', async ({ page }) => {
     await signedInAs(page, 'member', ON, 'on');
     // Reads work; every write is refused.
     await page.route(PREFS, (route) => (route.request().method() === 'GET' ? route.fulfill(json(ON)) : route.fulfill({ status: 500, contentType: 'application/json', body: '{}' })));
@@ -236,14 +237,94 @@ test.describe('Text alerts: what Iris found in b74 (B3, B6)', () => {
     const toggle = page.getByRole('switch', { name: CLOSED });
     await expect(toggle).toBeChecked();
     await toggle.click();
-    // The switch goes back, and the person is told where they are looking.
-    await expect(toggle).toBeChecked();
-    const alert = page.getByRole('alert').filter({ hasText: 'Something went wrong' });
+    // The switch did not move (it moves only after a save), and the person is told in one small alert, not under the row.
+    const alert = page.getByRole('alert').filter({ hasText: MALFUNCTION });
     await expect(alert).toBeVisible();
+    // Said once: one alert with words in it (Next's own route announcer is an empty alert).
+    await expect(alert).toHaveCount(1);
+    await expect(toggle).toBeChecked();
+    await expect(page.getByText('Something went wrong')).toHaveCount(0);
     const box = (await alert.boundingBox())!;
     const row = (await toggle.boundingBox())!;
-    expect(box.y).toBeGreaterThanOrEqual(row.y);
     expect(box.y + box.height).toBeLessThanOrEqual(568);
+    // Fixed to the bottom: it sits in the lower part of the screen, and does not cover the switch that failed.
+    expect(box.y).toBeGreaterThan(568 / 2);
+    expect(box.y >= row.y + row.height || box.y + box.height <= row.y).toBe(true);
+    // A screen you tap into has no tab bar; where there is one, the alert sits above it.
+    const bar = (await page.locator('[data-pam-tabbar]').count()) ? await page.locator('[data-pam-tabbar]').boundingBox() : null;
+    if (bar) expect(box.y + box.height).toBeLessThanOrEqual(bar.y + 1);
+  });
+
+  test('D-616: the switch shows it is saving and moves only when the save succeeds', async ({ page }) => {
+    await signedInAs(page, 'member', ON, 'on');
+    let release: (() => void) | undefined;
+    const held = new Promise<void>((resolve) => (release = resolve));
+    let current: Record<string, unknown> = ON;
+    await page.route(PREFS, async (route) => {
+      if (route.request().method() === 'GET') return route.fulfill(json(current));
+      await held;
+      current = { ...current, ...JSON.parse(route.request().postData() ?? '{}') };
+      return route.fulfill({ status: 201, body: '' });
+    });
+    await page.goto('/alerts/');
+    await settled(page);
+    const toggle = page.getByRole('switch', { name: CLOSED });
+    await expect(toggle).toBeChecked();
+    await toggle.click();
+    // Saving: still where it was, and the alert is not up.
+    await expect(toggle).toBeChecked();
+    await expect(page.getByRole('alert').filter({ hasText: MALFUNCTION })).toHaveCount(0);
+    release!();
+    await expect(toggle).not.toBeChecked();
+    await expect(page.getByRole('alert').filter({ hasText: MALFUNCTION })).toHaveCount(0);
+  });
+
+  test('A6 (D-616): no answer in 15 s is a failure; a save that lands late is read back and the switch follows it', async ({ page }) => {
+    await page.clock.install();
+    await signedInAs(page, 'member', ON, 'on');
+    let release: (() => void) | undefined;
+    const held = new Promise<void>((resolve) => (release = resolve));
+    let current: Record<string, unknown> = ON;
+    await page.route(PREFS, async (route) => {
+      if (route.request().method() === 'GET') return route.fulfill(json(current));
+      await held;
+      current = { ...current, ...JSON.parse(route.request().postData() ?? '{}') };
+      return route.fulfill({ status: 201, body: '' });
+    });
+    await page.goto('/alerts/');
+    await page.clock.runFor(500);
+    await settled(page);
+    const toggle = page.getByRole('switch', { name: CLOSED });
+    await expect(toggle).toBeChecked();
+    await toggle.click();
+    await page.clock.runFor(15_500);
+    await expect(page.getByRole('alert').filter({ hasText: MALFUNCTION })).toBeVisible();
+    await expect(toggle).toBeChecked();
+    // It lands at 45 s: the screen reads the saved value back.
+    await page.clock.runFor(29_000);
+    release!();
+    await page.clock.runFor(1_000);
+    await expect(toggle).not.toBeChecked();
+  });
+
+  test('D-616: the alert stays until the next tap, and leaving the screen clears it', async ({ page }) => {
+    await signedInAs(page, 'member', ON, 'on');
+    await page.route(PREFS, (route) => (route.request().method() === 'GET' ? route.fulfill(json(ON)) : route.fulfill({ status: 500, contentType: 'application/json', body: '{}' })));
+    await page.goto('/alerts/');
+    await settled(page);
+    const alert = page.getByRole('alert').filter({ hasText: MALFUNCTION });
+    await page.getByRole('switch', { name: CLOSED }).click();
+    await expect(alert).toBeVisible();
+    // No timer: still there a while later.
+    await page.waitForTimeout(3_000);
+    await expect(alert).toBeVisible();
+    // The next tap (anywhere) takes it away.
+    await page.getByRole('heading').first().click();
+    await expect(alert).toHaveCount(0);
+    await page.getByRole('switch', { name: CLOSED }).click();
+    await expect(alert).toBeVisible();
+    await page.getByRole('link', { name: /back/i }).first().click();
+    await expect(alert).toHaveCount(0);
   });
 
   test('B6: a tap on the row\'s name works the switch (the name is its label: one control)', async ({ page }) => {

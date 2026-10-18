@@ -11,6 +11,15 @@ STATUS row too.
 
 ## Open
 
+- [ ] **The error log: the Privacy line is signed before `app_errors_live` turns on** (Lena for Mira, 18 October 2026, D-616; Will).
+  Nico's `public.app_errors` keeps a short note when something breaks (when, route, action, error code, app build, platform,
+  role, locale; no account, phone, message or place) for 30 days, and super admins read it. It is off until `app_errors_live` is on.
+  (1) **Will signs the line** in `docs/legal/2026-10-18-error-log-privacy-read.md` section 2 (or Sage's edit of it) **before the switch turns
+  on**: nothing is kept while it is off, so the line goes live the same day (`legal:date privacy`), not earlier. (2) Lena translates it in six
+  languages after the signature. The migration is already pinned (`claude/lena-app-errors-pins`: nine columns, no free text, super admins only, thirty days
+  swept nightly by `pg_cron`, the switch off by default). (3) Thirty days is longer than the request log's week: say if a week would do.
+  (4) The line does not say the notes are anonymous: for the first week the request log also holds the call that wrote one.
+
 - [ ] **Google Calendar sync: waiting until Will wants it on** (a71, 12 October 2026: "wait until we switch sync on. Not now."). It is built and held on the branch `claude/places-programs-google-sync` (head 5f1e70ae; D-539): not merged, not deployed, no migration applied. When Will asks for it, its two Privacy lines come back on a card with the Google Cloud checklist (the full checklist is in that branch's `docs/before-launch.md`). The calendar link (D-538) is separate and does not need it.
 
 - [ ] **Calendar link: someone taps it on a real phone** (Piper, 11 October 2026, D-538). (1) On an Android phone, make a link on
@@ -560,7 +569,7 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   confirm it says exactly that and no more.
 
 - [ ] **A native reader for three new things of 17 October (Lena; Mira asked 10:25).** Six translations each, written by Claude, none read by a native speaker.
-  (1) **The case manager's search pill** (`home.caseload.search.placeholder` and `.label`, D-600): the words must fit 128px, so they are short: es "Buscar miembros" / "Buscar miembros por nombre"; pt-BR "Buscar membros" / "Buscar membros pelo nome"; zh-CN 搜索成员 / 搜索成员（按姓名）; zh-HK 搜尋會員 / 搜尋會員（按姓名）; ru «Поиск людей» / «Поиск людей по имени»; ar "ابحث في الأعضاء" / "ابحث في الأعضاء بالاسم". The label has to begin with the pill's words (voice control says them, WCAG 2.5.3). Check: does each read naturally, spoken aloud as the label; is Russian «людей» (people) acceptable where the rest of the app says «участники» for members (the pill has no room for «участников»); do 成员 and 會員 match the word the app uses for members.
+  (1) **The case manager's search pill** (`home.caseload.search.placeholder` and `.label`, D-600): the words must fit 124px (128px before D-610 made it a plain field), so they are short: es "Buscar personas" / "Buscar personas por nombre" (was "Buscar miembros", 126px; the field is 124px since D-610, so Spanish now says «personas» as Russian says «людей»); pt-BR "Buscar membros" / "Buscar membros pelo nome"; zh-CN 搜索成员 / 搜索成员（按姓名）; zh-HK 搜尋會員 / 搜尋會員（按姓名）; ru «Поиск людей» / «Поиск людей по имени»; ar "ابحث في الأعضاء" / "ابحث في الأعضاء بالاسم". The label has to begin with the pill's words (voice control says them, WCAG 2.5.3). Check: does each read naturally, spoken aloud as the label; is Russian «людей» (people), and now Spanish «personas», acceptable where the rest of the app says «участники» / «miembros» for members (the pill has no room for «участников»); do 成员 and 會員 match the word the app uses for members.
   (2) **The short version's second sentence** (`transparency.summary.program`): "It sees more once you sign up, sign its rules or plan a visit there." Check that each language's word for "rules"/"policies" is the one its Privacy page uses (`sharing.p2`), and that the sentence says a program sees more, not that it must.
   (3) **The case manager's visit line** (`caseload.visit.*`, Ava's a93, ships with her branch): "Marked as there" and "Not marked as there" say what the *program* marked, not whether the member went. es "Presencia marcada / sin marcar", pt-BR "Presença registrada / não registrada", zh 标记为已到场 / 未标记为已到场 (zh-HK 標記為已到場 / 未標記為已到場), ru «Присутствие отмечено / не отмечено», ar "تم تسجيل الحضور / لم يسجل الحضور". Check that none of them reads as "the member was absent".
 
