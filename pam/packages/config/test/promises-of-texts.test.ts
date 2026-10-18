@@ -47,8 +47,6 @@ describe('promises of a text or a reminder (D-474)', () => {
     // pins). Texts are held until Will says go (texts_live, D-481). The lines that said it in a sentence are retired, so nothing says
     // "Pam does not send any of these yet" on the screen any more.
     expect(BUNDLES.en['common.comingSoon']).toBe('Coming soon');
-    if (!VISIT_REMINDERS_LIVE_IN_APP) {
-      expect(BUNDLES.en['profile.promo.reminders.body']).not.toMatch(/\bwe can text you\b/i);
-    }
+    // (Profile's card says it with the same badge now: `profile.promo.reminders.body` is gone, so nothing there to pin.)
   });
 });
