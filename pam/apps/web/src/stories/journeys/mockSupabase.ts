@@ -109,6 +109,8 @@ export interface MockOptions {
   readonly staffReview?: 'pair' | 'city' | 'decided' | 'other' | 'addedToExisting';
   /** Nobody waiting for a city yet (D-593): the list's empty state. */
   readonly noWaitingCities?: boolean;
+  /** Nothing has broken in the app this week (D-616): Problems' empty state. */
+  readonly noProblems?: boolean;
   /** Message Pam is switched off (D-605): `pam_status` says so and nothing else about Pam is shown. */
   readonly pamOff?: boolean;
   /** The Pam team's inbox is empty. */
@@ -439,6 +441,14 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
         { place: 'Wilmington, DE', people: 6 },
         { place: 'Upper Darby Township, Delaware County', people: 2 },
         { place: 'Norristown', people: 1 },
+      ],
+    })),
+    // Problems (D-616): what broke, grouped by screen, action and code, newest first. No person, no free text.
+    on('/rpc/app_errors_grouped', () => ({
+      body: options.noProblems ? [] : [
+        { area: '/alerts/', action: 'alerts.switch.closed', code: '500', n: 4, first_seen: onTheHour(-2, 9), last_seen: onTheHour(0, 11) },
+        { area: '/messages/thread/', action: 'messages.photo', code: 'timeout', n: 2, first_seen: onTheHour(-1, 15), last_seen: onTheHour(-1, 16) },
+        { area: '/reminders/', action: 'reminders.agree', code: 'offline', n: 1, first_seen: onTheHour(-5, 10), last_seen: onTheHour(-5, 10) },
       ],
     })),
     // Message Pam (D-605, D-606): the switch and the hours, a person's own conversation, and the Pam team's inbox and actions.
