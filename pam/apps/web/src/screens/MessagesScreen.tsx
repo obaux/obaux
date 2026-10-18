@@ -169,12 +169,15 @@ function MessagesScreenInner() {
         rows={useExamples ? examples : real}
         // Said for who is reading (D-363): there is no "list below" yet for
         // somebody new, so the line says what will fill this screen.
-        emptyBody={
-          // A program lead's Messages is never empty to look at: nothing explains it (D-608).
-          role === 'provider'
-            ? undefined
-            : t(role === 'member' ? 'messages.empty.body.member' : role === 'admin' ? 'messages.empty.body.admin' : 'messages.empty.body.staff')
-        }
+        emptyBody={t(
+          role === 'member'
+            ? 'messages.empty.body.member'
+            : role === 'provider'
+              ? 'messages.empty.body.provider'
+              : role === 'admin'
+                ? 'messages.empty.body.admin'
+                : 'messages.empty.body.staff',
+        )}
         headerActions={<HeaderActions role={viewedRole} enabled={session.status === 'signed-in'} hasHelp={false} />}
         note={useExamples ? t('example.people.note') : null}
         {...(canReview
