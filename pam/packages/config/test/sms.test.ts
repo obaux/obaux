@@ -291,7 +291,7 @@ function varsFor(locale: Locale): Record<string, string> {
   return {
     ...WORST_CASE_VARS,
     link: gsm ? WORST_CASE_VARS['link']! : 'https://web-ten-umber-88.vercel.app/',
-    supportPhone: '+12673095265',
+    supportPhone: '+12155550191',
     adminFirstName: 'Maximilianoo',
     reason: longestReason(locale),
   };

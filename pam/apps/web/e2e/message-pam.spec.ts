@@ -14,6 +14,7 @@ import { settled } from './settled';
  */
 const ME = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
 const PAM_C = 'c0c0c0c0-0000-4000-8000-00000000a001';
+const ASKER = 'c0c0c0c0-0000-4000-8000-00000000a0ff';
 const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
 const LOCALES = ['en', 'es', 'pt-BR', 'zh-CN', 'zh-HK', 'ru', 'ar'] as const;
 const bundle = (locale: string): Record<string, string> =>
@@ -23,7 +24,7 @@ interface Row { id: string; conversation_id: string; sender_id: string | null; s
 
 async function world(
   page: Page,
-  opts: { live?: boolean; access?: 'active' | 'limited'; locale?: string; role?: 'member' | 'admin' | 'provider'; away?: boolean; failFirstPost?: boolean; rateLimited?: boolean } = {},
+  opts: { live?: boolean; access?: 'active' | 'limited'; locale?: string; role?: 'member' | 'admin' | 'provider' | 'super_admin'; team?: boolean; away?: boolean; failFirstPost?: boolean; rateLimited?: boolean } = {},
 ) {
   const live = opts.live ?? true;
   const messages: Row[] = live
@@ -49,6 +50,9 @@ async function world(
   await page.route('**/rest/v1/rpc/pam_status*', (route) =>
     route.fulfill(json([{ live, hours_tz: 'America/New_York', hours_days: [1, 2, 3, 4, 5], hours_open: '09:00:00', hours_close: '17:00:00', open_now: true, next_open: null }])),
   );
+  await page.route('**/rest/v1/rpc/pam_inbox*', (route) =>
+    route.fulfill(json([{ conversation_id: PAM_C, asker_id: ASKER, first_name: 'Marcus', role: 'member', region_name: 'Philadelphia', program_name: null, status: 'open', last_message_at: null, last_from: 'asker', waiting_since: null, preview: null }])),
+  );
   await page.route('**/rest/v1/rpc/open_pam_conversation*', (route) => route.fulfill(json(live ? PAM_C : null)));
   await page.route('**/rest/v1/rpc/conversation_partners*', (route) =>
     route.fulfill(json(live ? [{ conversation_id: PAM_C, profile_id: null, first_name: null, role: null, program_name: null }] : [])),
@@ -56,7 +60,8 @@ async function world(
   await page.route('**/rest/v1/conversation_members*', (route) => {
     if (route.request().method() === 'PATCH') return route.fulfill(json([]));
     if (!live) return route.fulfill(json([]));
-    if (route.request().url().includes('conversation_id=eq.')) return route.fulfill(json([{ profile_id: ME, conversations: { kind: 'support' } }]));
+    // The team reading a person's conversation: the one member it sees is the person, not the reader.
+    if (route.request().url().includes('conversation_id=eq.')) return route.fulfill(json([{ profile_id: opts.team ? ASKER : ME, conversations: { kind: 'support' } }]));
     return route.fulfill(json([{ conversation_id: PAM_C, last_read_at: null }]));
   });
   await page.route('**/rest/v1/messages*', (route) => {
@@ -178,6 +183,34 @@ test.describe('Message Pam, the person\'s side', () => {
     const call = page.getByRole('link', { name: 'Call or text 988' });
     await expect(call).toHaveAttribute('href', 'tel:988');
     await expect(call).toHaveText('988');
+    // The tap area is padded, but the padding does not open a gap before the full stop that follows ("text 988 .", Iris R3): the next
+    // character starts where the number's own letters end.
+    const gap = await call.evaluate((el) => {
+      const after = el.nextSibling;
+      if (!after || after.nodeType !== Node.TEXT_NODE) return null;
+      const range = document.createRange();
+      range.setStart(after, 0);
+      range.setEnd(after, 1);
+      const numberRange = document.createRange();
+      numberRange.selectNodeContents(el);
+      return range.getBoundingClientRect().left - numberRange.getBoundingClientRect().right;
+    });
+    expect(gap).not.toBeNull();
+    expect(Math.abs(gap!)).toBeLessThan(2);
+    const box = (await call.boundingBox())!;
+    expect(box.height).toBeGreaterThanOrEqual(47.5);
+    expect(box.width).toBeGreaterThanOrEqual(47.5);
+  });
+
+  test('the team reads Pam\'s welcome and the out-of-hours reply as Pam, with her mark, never as the person (Iris R1)', async ({ page }) => {
+    // Marcus wrote one line between the two; the team is a super admin looking at his conversation.
+    await world(page, { role: 'super_admin', team: true, away: true });
+    await page.goto(`/messages/thread/?id=${PAM_C}`);
+    await settled(page);
+    const log = page.getByRole('log');
+    // The welcome and the reply are Pam's: named Pam to a screen reader, drawn with her mark. The person's own line keeps the person's name.
+    await expect(log).toContainText('Pam, ');
+    await expect(log).not.toContainText('Marcus, ');
   });
 
   test('too many messages too fast: no "Not sent" and no Try again, the words go back in the box and a calm line says to wait (Iris W4)', async ({ page }) => {
@@ -186,7 +219,7 @@ test.describe('Message Pam, the person\'s side', () => {
     await settled(page);
     await page.getByRole('textbox').fill('One more thing');
     await page.getByRole('button', { name: /send/i }).click();
-    await expect(page.getByText("That's a lot at once. Wait a moment, then send it again.", { exact: true })).toBeVisible();
+    await expect(page.getByText("That's a lot at once. Try again later.", { exact: true })).toBeVisible();
     await expect(page.getByText('Not sent', { exact: true })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Not sent. Try again.' })).toHaveCount(0);
     await expect(page.getByRole('textbox')).toHaveText('One more thing');

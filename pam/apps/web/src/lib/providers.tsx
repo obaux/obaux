@@ -7,6 +7,7 @@ import { ContactHrefProvider, MotionProvider } from '@pam/ui';
 import { useRowTaps } from '@pam/ui/tapRows';
 import { I18nProvider } from './i18n';
 import { AlertBannerProvider } from './alertBanner';
+import { MalfunctionProvider } from './malfunction';
 import { ClientNav } from './ClientNav';
 
 /**
@@ -70,7 +71,9 @@ export function Providers({ children }: { children: ReactNode }) {
           {/* Screen to screen without a reload, inside a transition (D-269). */}
           <ClientNav />
           <ContactHrefProvider href={contactHref}>
-            <AlertBannerProvider>{children}</AlertBannerProvider>
+            <AlertBannerProvider>
+              <MalfunctionProvider>{children}</MalfunctionProvider>
+            </AlertBannerProvider>
           </ContactHrefProvider>
         </I18nProvider>
       </MotionProvider>

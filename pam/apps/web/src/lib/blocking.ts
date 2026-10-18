@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { codeFromError, reportAppError } from './reportAppError';
 
 /**
  * Blocking, from inside a conversation (0076, D-206; the control is D-463).
@@ -40,8 +41,10 @@ async function call(name: 'block_in_conversation' | 'unblock_in_conversation', c
   try {
     const { createClient } = await import('./supabase');
     const { error } = await createClient().rpc(name, { p_conversation: conversationId });
+    if (error) reportAppError({ action: name === 'block_in_conversation' ? 'messages.block' : 'messages.unblock', code: codeFromError(error) });
     return !error;
-  } catch {
+  } catch (caught) {
+    reportAppError({ action: name === 'block_in_conversation' ? 'messages.block' : 'messages.unblock', code: codeFromError(caught) });
     return false;
   }
 }

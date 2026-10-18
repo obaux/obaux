@@ -1,0 +1,3 @@
+# When a save fails: one small alert at the bottom, and a switch that waits for its save
+
+On Text alerts, a switch now stays where it was while it saves and shows that it is working. It moves only once the save has gone through. If the save fails, or nothing comes back in 15 seconds, the switch stays where it was and one small alert at the bottom of the screen says "That didn't go through. It's not your fault, so try again." It stays until the next tap or until the person leaves the screen, and it does not cover the switch. A save that lands late is read back, so the switch shows what Pam has. (D-617)

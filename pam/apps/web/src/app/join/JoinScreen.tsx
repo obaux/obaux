@@ -9,7 +9,7 @@ import { Banner } from '@astryxdesign/core/Banner';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BellIcon, BigButton, Loading, Notice, Page, HelpIcon, PointsBadge, StarIcon, TextField, TextLink, TripsIcon } from '@pam/ui';
+import { BigButton, Loading, Notice, Page, HelpIcon, PointsBadge, StarIcon, TextField, TextLink, TripsIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { LANGUAGE_TAGS, SUPPORTED_LOCALES, TRANSPARENCY_SCREEN, badgeForPoints, type Locale, intlLocale, nameJoinerOf } from '@pam/config';
@@ -41,6 +41,7 @@ import { markFreshAccount } from '@/lib/programSetup';
 import { SetupArt, type SetupArtKind } from '@pam/ui/SetupArt';
 import { InfoTip } from '@pam/ui/InfoTip';
 import { Dropdown } from '@pam/ui/Dropdown';
+import { TextKindsList } from '../../screens/TextKindsList';
 
 /**
  * Signing up: five steps, and four of them are one question each.
@@ -99,9 +100,7 @@ const STEP: Record<Phase, number> = {
 const PROVIDER_EXPECT: readonly SetupArtKind[] = ['calendar', 'message', 'policy', 'private', 'alerts'];
 
 const styles = stylex.create({
-  quietIntro: { fontSize: '16px', lineHeight: 1.5 },
   // The bell in the brand green, its middle on the first line's middle.
-  bell: { flexShrink: 0, paddingBlockStart: '3px', color: colorVars['--color-icon-accent'] },
   // A label that is not a field's own — the language chips, the code row with
   // its info tip — drawn like a field's (globals.css: 14px, 600), so the page
   // reads as one form (D-369).
@@ -423,7 +422,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
     }
     if (!userId) return;
     setBusy(true);
-    const saved = await setReminderConsent(userId, wants);
+    const saved = (await setReminderConsent(userId, wants)).ok;
     const finished = saved ? await finishSetup(userId, true) : false;
     setBusy(false);
     if (!saved || !finished) {
@@ -521,7 +520,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
       // words — nothing here is pre-selected, because there is nothing to select.
       <VStack gap={1} align="center">
         <BigButton
-          label={busy ? t('join.saving') : t('reminders.optIn')}
+          label={busy ? t('join.saving') : t('reminders.agree')}
           badge={progress}
           nameJoiner={nameJoinerOf(locale)}
           onPress={() => void answerTexts(true)}
@@ -550,7 +549,10 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 // manager is told they will see.
                 phase === 'privacy'
                 ? t(`join.privacy.title.${kind}`)
-                : t(`join.${phase}.title`)
+                : phase === 'texts'
+                  ? // The same words as Text reminders (/reminders/), so the step and the screen ask the same thing (Sage, A2P).
+                    t('reminders.title')
+                  : t(`join.${phase}.title`)
           }
           {...back}
         />
@@ -839,25 +841,13 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
         {phase === 'texts' ? (
           <>
             <VStack gap={3}>
-              {/* Easier to scan (Will, 7 October, D-359): a quieter intro, and
-                  what Pam would send as three bell bullets, evenly spaced. */}
-              <Text type="supporting" xstyle={styles.quietIntro}>
-                {t('reminders.intro')}
-              </Text>
+              {/* The same list as Text reminders (D-608, Sage 17:52; Will, a103: "keep the original layouts"): no introduction,
+                  the heading where it was, and the kinds of texts by their short names, each not sent yet with its badge. */}
               <VStack gap={3}>
                 <Heading level={2} xstyle={styles.heading}>
                   {t('reminders.what')}
                 </Heading>
-                <VStack gap={3} role="list">
-                  {[1, 2, 3].map((n) => (
-                    <HStack key={n} gap={3} align="start" wrap="nowrap" role="listitem">
-                      <HStack xstyle={styles.bell}>
-                        <BellIcon width={20} height={20} aria-hidden />
-                      </HStack>
-                      <Text xstyle={styles.item}>{t(`reminders.what.${n}`)}</Text>
-                    </HStack>
-                  ))}
-                </VStack>
+                <TextKindsList who="member" bare />
               </VStack>
               <Text type="supporting" xstyle={styles.small}>
                 {t('reminders.how')}

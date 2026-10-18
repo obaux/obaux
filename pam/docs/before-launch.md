@@ -11,6 +11,15 @@ STATUS row too.
 
 ## Open
 
+- [ ] **The error log: the Privacy line is signed before `app_errors_live` turns on** (Lena for Mira, 18 October 2026, D-616; Will).
+  Nico's `public.app_errors` keeps a short note when something breaks (when, route, action, error code, app build, platform,
+  role, locale; no account, phone, message or place) for 30 days, and super admins read it. It is off until `app_errors_live` is on.
+  (1) **Will signs the line** in `docs/legal/2026-10-18-error-log-privacy-read.md` section 2 (or Sage's edit of it) **before the switch turns
+  on**: nothing is kept while it is off, so the line goes live the same day (`legal:date privacy`), not earlier. (2) Lena translates it in six
+  languages after the signature. The migration is already pinned (`claude/lena-app-errors-pins`: nine columns, no free text, super admins only, thirty days
+  swept nightly by `pg_cron`, the switch off by default). (3) Thirty days is longer than the request log's week: say if a week would do.
+  (4) The line does not say the notes are anonymous: for the first week the request log also holds the call that wrote one.
+
 - [ ] **Google Calendar sync: waiting until Will wants it on** (a71, 12 October 2026: "wait until we switch sync on. Not now."). It is built and held on the branch `claude/places-programs-google-sync` (head 5f1e70ae; D-539): not merged, not deployed, no migration applied. When Will asks for it, its two Privacy lines come back on a card with the Google Cloud checklist (the full checklist is in that branch's `docs/before-launch.md`). The calendar link (D-538) is separate and does not need it.
 
 - [ ] **Calendar link: someone taps it on a real phone** (Piper, 11 October 2026, D-538). (1) On an Android phone, make a link on
@@ -99,6 +108,10 @@ STATUS row too.
      is done ("Reply STOP to stop, or HELP for help"; the consent paragraph in `docs/sms-campaign-samples.md` follows it).
      `reminders.how` is done too (the /reminders/ screen the registration shows, and the join step): the screenshot Will attaches
      must be of the new screen, and the consent paragraph in `docs/sms-campaign-samples.md` already follows it.
+     **Update, 18 October (D-615):** `alerts.how` is retired, because Text alerts no longer explains anything; the agree screen
+     (`/reminders/`, and the join step once Ava's swap lands) is the only place the STOP / HELP / rates line is shown, as
+     `reminders.how`. The consent paragraph to paste is now `docs/sms-refile-packet.md` §3, not `docs/sms-campaign-samples.md`.
+     This item stays open for Will for the HELP reply itself (it gives an address, not a person) and the START reply (§5 of the packet).
   3. **Ava's in-app copy and delete** (a fresh sign-in code to the account's phone). The day it ships,
      `privacy.copy.body` and `privacy.delete.body` change from "Contact Pam and ask…" to the in-app steps, and
      the Privacy › Copy / Delete pages lose their Contact Pam button (Lena carries the words).
@@ -114,7 +127,20 @@ STATUS row too.
   reminder, ten lines in the app say what Pam does today. The day it does (check the *live* function and
   database, as for the site's `VISIT_REMINDERS_LIVE`, D-458), do these together, then say so to the merge desk:
   1. Flip `VISIT_REMINDERS_LIVE` in `apps/site/src/content/flags.ts` **and** `VISIT_REMINDERS_LIVE_IN_APP` in
-     `packages/config/test/promises-of-texts.test.ts`. The test fails if only one is flipped.
+     `apps/web/src/lib/visitRemindersLive.ts` (it also takes the "Coming soon" badge off the trip-reminder row on the agree screens and Text alerts). The test fails if only one is flipped.
+  1b. **Text alerts' member switch "A reminder before your trip"** (Nico, 18 October; found when the badge was tied to this flag).
+     That kind has no column of its own (there is no `alert_visit`), and `AlertsView` (Dot's) draws its switch as off whatever the
+     account says. Before the flag is flipped, the switch must read and write the member's yes to texts (as the saved-place switch
+     does, `setReminderConsent`), or it stays a dead toggle next to a promise that is now true. Dot builds it when the day is set.
+  1c. **Rows already waiting when texts go on** (Nico, 18 October; live read at 20:37: `appointment_24h` has 3 cancelled and 1 still
+     `scheduled` with its `send_at` already past). `claim_outbound_messages` holds them while `texts_live` is off and decides on the
+     first claim after it is on (restated last in 20261011042645, built in 20261010130754, D-475): a reminder for a visit that has
+     already started is cancelled (`the visit has already started`), and a time-bound text more than 12 hours late is cancelled
+     (`it was more than 12 hours late`, an hour past the member's quiet window if that is longer). DB test 38 proves both with
+     `texts_live` on (a 24-hour reminder 13 hours late is cancelled, one 11 hours late is sent). **What it does NOT do:** a reminder
+     that is, say, 5 hours past due for a visit still to come IS sent, because it is still useful. So on the day, look at the past-due
+     `scheduled` rows first (`select id, send_at, appointment_id from outbound_messages where status = 'scheduled' and send_at < now()`)
+     and cancel by hand any that the visit has since made pointless, before the first claim.
   2. Put these back in `en.json` (English first; Will reads it, because it is a promise), then the other six.
      The six as they were before D-474 are in git: `git show 717ed79:pam/packages/config/src/locales/<locale>.json`
      (that is `main` just before this change). Take the key's value from there, or write it again and
@@ -260,6 +286,11 @@ STATUS row too.
   **The opt-in description Will files with the carrier must match `reminders.intro` and its list once those ship**
   (paste the answer under "How do end-users consent…" in `docs/sms-campaign-samples.md` only after it says the same).
   No booking text goes to members (the bell only), so there is no `reminders.what.4`.
+  **Update, 18 October (D-608, D-615): this is replaced.** The agree screens have no intro: `reminders.intro` and the
+  bullet list `reminders.what.1` to `.3` are retired (once Ava's join-step swap lands; the join step still draws them
+  today). The screen shows "Kinds of texts" and one row per kind in Text alerts' own names ("A reminder before your trip",
+  "A saved place closes or moves", and the staff ones), a "Coming soon" badge on any not yet live, and `reminders.how`.
+  The opt-in description Will files must match **that**: `docs/sms-refile-packet.md` §3.
   **Also the moment `texts_live` goes on (Sage, 67fea9ad, 18 October):** the website's Messages in Pam post
   (`apps/site/src/content/MessagesInPam.tsx`, the paragraph on how you hear about a message) says "Pam does not send a
   text for a message, so open Pam to read it". A person who opted in to message texts then gets the "message waiting"
@@ -506,6 +537,7 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   forwarding, a test and Will's go, D-450). Six translations each by Claude, with no native reader: promises, so the same
   native readers as below. The English says "rules" where the app says "policy"; the translations follow the app's word.
 
+- [ ] **A native reader for Arabic counts of two (Message Pam pass 1, P8 and the b73 re-test R4, 18 October 2026).** Arabic has a dual, and 32 keys carry it (`*.two`). Eighteen write the dual alone, as CLDR's `two` patterns do, with no digit: the four lengths of time ("منذ يومين", "منذ ساعتين", "منذ دقيقتين", "بعد يومين"), twelve counts before a noun ("نقطتان", "شخصان", "رسالتان جديدتان", "ميلان", "بلاغان", "سياستان", …), `trips.map.many.two` ("زيارتان"; it was the plural), and `pam.inbox.sent.two` ("مسؤولين اثنين": the dual of a sound masculine noun is spelled like its plural, so it says "two"). The other fourteen keep the digit because it is a value after a label ("المهتمون: {count}", "المتبقي: {count}", "حصلت على {count} من {total}"). Iris was not sure the dual alone is the house choice (R4); a reader should confirm it, and `copy.test.ts` (`AR_DUAL_WITHOUT_DIGIT`) is where a key moves from one list to the other.
 - [ ] **A native reader for the shortened lines that say what Pam does (D-608, 18 October 2026).** The six translations of the 34 values Sage shortened are by Claude with no native reader. Seven say what Pam does or will do, so they are promises and go to a reader first: `addProgram.ask.sent.body` and `programs.new.done.body` ("Sent. We'll text you when it's checked.", the second used by no screen), `addProgram.ask.waiting.body`, `requests.done.body` ("We texted them that they are in."), `invite.who.note` ("Only this number can use the link."), `invite.link.body` ("Works until {date}, for one person.") and `program.pending.body` ("Waiting for Pam. Members see the old one until then."). Check that "text" is the word a person uses for a text message in each language (es *texto* in the staff lines, *mensaje* elsewhere; pt-BR *mensagem*; zh-CN 短信, zh-HK 短訊; ru *сообщение*/*SMS*; ar *رسالة*), and that `schedule.checkin.undo.body` says "not marked as there" in the words `trips.notMarked` uses (zh *未标记为已到场*, not *签到*). Spanish staff screens are in *usted*.
 - [ ] **A native reader for the calendar link screen (D-538, 11 October 2026).** The 27 `calendar.*` strings are six translations by
   Claude with no native reader. Two things a reader must check against the real apps, in their own language, because the apps can
@@ -537,7 +569,7 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   confirm it says exactly that and no more.
 
 - [ ] **A native reader for three new things of 17 October (Lena; Mira asked 10:25).** Six translations each, written by Claude, none read by a native speaker.
-  (1) **The case manager's search pill** (`home.caseload.search.placeholder` and `.label`, D-600): the words must fit 128px, so they are short: es "Buscar miembros" / "Buscar miembros por nombre"; pt-BR "Buscar membros" / "Buscar membros pelo nome"; zh-CN 搜索成员 / 搜索成员（按姓名）; zh-HK 搜尋會員 / 搜尋會員（按姓名）; ru «Поиск людей» / «Поиск людей по имени»; ar "ابحث في الأعضاء" / "ابحث في الأعضاء بالاسم". The label has to begin with the pill's words (voice control says them, WCAG 2.5.3). Check: does each read naturally, spoken aloud as the label; is Russian «людей» (people) acceptable where the rest of the app says «участники» for members (the pill has no room for «участников»); do 成员 and 會員 match the word the app uses for members.
+  (1) **The case manager's search pill** (`home.caseload.search.placeholder` and `.label`, D-600): the words must fit 124px (128px before D-610 made it a plain field), so they are short: es "Buscar personas" / "Buscar personas por nombre" (was "Buscar miembros", 126px; the field is 124px since D-610, so Spanish now says «personas» as Russian says «людей»); pt-BR "Buscar membros" / "Buscar membros pelo nome"; zh-CN 搜索成员 / 搜索成员（按姓名）; zh-HK 搜尋會員 / 搜尋會員（按姓名）; ru «Поиск людей» / «Поиск людей по имени»; ar "ابحث في الأعضاء" / "ابحث في الأعضاء بالاسم". The label has to begin with the pill's words (voice control says them, WCAG 2.5.3). Check: does each read naturally, spoken aloud as the label; is Russian «людей» (people), and now Spanish «personas», acceptable where the rest of the app says «участники» / «miembros» for members (the pill has no room for «участников»); do 成员 and 會員 match the word the app uses for members.
   (2) **The short version's second sentence** (`transparency.summary.program`): "It sees more once you sign up, sign its rules or plan a visit there." Check that each language's word for "rules"/"policies" is the one its Privacy page uses (`sharing.p2`), and that the sentence says a program sees more, not that it must.
   (3) **The case manager's visit line** (`caseload.visit.*`, Ava's a93, ships with her branch): "Marked as there" and "Not marked as there" say what the *program* marked, not whether the member went. es "Presencia marcada / sin marcar", pt-BR "Presença registrada / não registrada", zh 标记为已到场 / 未标记为已到场 (zh-HK 標記為已到場 / 未標記為已到場), ru «Присутствие отмечено / не отмечено», ar "تم تسجيل الحضور / لم يسجل الحضور". Check that none of them reads as "the member was absent".
 
@@ -651,7 +683,7 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
        a reminder, the check-in, and one Chinese and one Russian or Arabic reminder:
        the point is that every script and the two-segment reminder appear.
      - **Opt-in description:** paste the answer under "How do end-users consent…" and
-       attach the **Text reminders** screenshot, not the sign-in one.
+       attach the **agree screen** screenshot (titled "Text alerts" since 18 October), not the sign-in one.
      - **Embedded links: Yes.** Rejected before when it said No.
      - **Embedded phone numbers: No** (A28: no text carries Pam's number any more).
      - **Help message:** the carrier's HELP auto-reply is set in the Twilio console

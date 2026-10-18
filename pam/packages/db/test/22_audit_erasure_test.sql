@@ -42,9 +42,9 @@ grant execute on function test.check_raises_like(text, text, text) to authentica
 
 reset role;
 insert into auth.users (id, phone) values
-  (:'quin', '12675559601'), (:'reed', '12675559602'), (:'sol', '12675559603'), (:'tess', '12675559604');
+  (:'quin', '12155550192'), (:'reed', '12675559602'), (:'sol', '12675559603'), (:'tess', '12675559604');
 insert into public.profiles (id, role, first_name, region_id, phone, access_status) values
-  (:'quin', 'member', 'Quin', :'region_north', '+12675559601', 'active'),
+  (:'quin', 'member', 'Quin', :'region_north', '+12155550192', 'active'),
   (:'reed', 'admin',  'Reed', :'region_north', '+12675559602', 'active'),
   (:'sol',  'member', 'Sol',  :'region_north', '+12675559603', 'active'),
   (:'tess', 'member', 'Tess', :'region_north', '+12675559604', 'active');
@@ -76,7 +76,7 @@ select test.check('...it says the role, as a fact about the account',
 select test.check('...with no name, phone or email in it',
   (select count(*) from public.audit_log
     where action = 'account.delete' and target_id = :'quin'
-      and (meta::text ilike '%quin%' or meta::text like '%2675559601%' or meta::text like '%@%')), 0);
+      and (meta::text ilike '%quin%' or meta::text like '%2155550192%' or meta::text like '%@%')), 0);
 
 -- Somebody who never acted is marked too, and just as easily deleted.
 delete from auth.users where id = :'tess';

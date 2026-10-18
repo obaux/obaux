@@ -42,10 +42,49 @@ describe('locale bundles', () => {
     expect(findDignityViolations(bundle)).toEqual([]);
   });
 
-  it.each(Object.entries(bundles))('%s keeps placeholders matched with English', (_l, bundle) => {
+  // Arabic says two with the dual alone: "منذ يومين" (two days ago), "نقطتان" (two points), not "2 يومين" or "{count} نقطتان" (Iris, Message Pam pass 1 P8 and
+  // the b73 re-test R4; CLDR's `two` patterns carry no number). These eighteen carry no {count}; every other placeholder stays. The label-then-number
+  // strings ("المهتمون: {count}") keep the digit, because there it is a value and not a count before a noun.
+  const AR_DUAL_WITHOUT_DIGIT = new Set([
+    'pam.inbox.waiting.minutes.two',
+    'pam.inbox.waiting.hours.two',
+    'pam.inbox.waiting.days.two',
+    'when.countdown.days.two',
+    'admin.points.two',
+    'directory.count.two',
+    'notify.demo.newInterest.two',
+    'person.message.unread.two',
+    'places.miles.two',
+    'points.subtitle.two',
+    'points.summary.two',
+    'places.reported.count.two',
+    'home.caseload.count.two',
+    'home.interested.count.two',
+    'program.policies.rowBody.two',
+    'trips.added.policies.title.two',
+    'trips.map.many.two',
+    'pam.inbox.sent.two',
+    'problems.times.two',
+    'notify.app_error.two',
+  ]);
+
+  // Russian's "one" is also 21, 31, 101..., so its `.one` writes the number even where English picks the singular itself and writes none.
+  const RU_ONE_WRITES_THE_NUMBER = new Set(['notify.app_error.one']);
+
+  it.each(Object.entries(bundles))('%s keeps placeholders matched with English', (locale, bundle) => {
     for (const [key, value] of Object.entries(bundle)) {
       const source = en[baseKey(key)];
       expect(source, `"${key}" has no English source`).toBeDefined();
+      if (locale === 'ru' && RU_ONE_WRITES_THE_NUMBER.has(key)) {
+        expect(placeholders(value), `"${key}" is Russian's one: the number added, every other placeholder kept`).toEqual([...placeholders(source!), 'count'].sort());
+        continue;
+      }
+      if (locale === 'ar' && AR_DUAL_WITHOUT_DIGIT.has(key)) {
+        expect(placeholders(value), `"${key}" is a dual: no digit, every other placeholder kept`).toEqual(
+          placeholders(source!).filter((name) => name !== 'count'),
+        );
+        continue;
+      }
       expect(placeholders(value), `placeholders drifted on "${key}"`).toEqual(placeholders(source!));
     }
   });

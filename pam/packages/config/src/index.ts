@@ -23,6 +23,8 @@ export * from './phone.js';
  */
 export * from './legal.js';
 export * from './pamHours.js';
+export * from './appErrors.js';
+export * from './pamSavedReplies.js';
 export * from './glossary.js';
 
 export * from './i18n.js';

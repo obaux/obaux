@@ -13,6 +13,7 @@ import { HelpButton } from '../../screens/HelpButton';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { setReminderConsent } from '@/lib/useReminderConsent';
+import { TextKindsList } from '../../screens/TextKindsList';
 
 /**
  * Do you want Pam to text you about your visits, the ones you plan and the ones a program books for you (D-595)?
@@ -47,7 +48,6 @@ import { setReminderConsent } from '@/lib/useReminderConsent';
  */
 
 const styles = stylex.create({
-  intro: { fontSize: '18px', lineHeight: 1.5 },
   card: { width: '100%' },
   heading: { fontSize: '17px' },
   item: { fontSize: '17px', lineHeight: 1.45 },
@@ -59,6 +59,8 @@ function RemindersForm() {
   const { t } = useI18n();
   const router = useRouter();
   const query = useSearchParams();
+  // Sent here from a Text alerts switch (D-615): Back goes where they came from, not to Profile (Iris B2).
+  const fromAlerts = query.get('next') === 'alerts';
   const { state: session } = useSession();
 
   /**
@@ -114,7 +116,7 @@ function RemindersForm() {
     if (session.status !== 'signed-in') return;
     setBusy(true);
     setFailed(false);
-    const saved = await setReminderConsent(session.session.userId, value);
+    const saved = (await setReminderConsent(session.session.userId, value)).ok;
 
     if (!saved) {
       setBusy(false);
@@ -139,8 +141,8 @@ function RemindersForm() {
       {/* The nested-page template (D-213, D-217) — reached from Profile. */}
       <SubPageHeader
         title={t('reminders.title')}
-        backHref="/profile/"
-        backLabel={t('nav.back.profile')}
+        backHref={fromAlerts ? '/alerts/' : '/profile/'}
+        backLabel={t(fromAlerts ? 'nav.back.alerts' : 'nav.back.profile')}
         actions={<HelpButton />}
       />
       {stopped ? (
@@ -153,29 +155,13 @@ function RemindersForm() {
           </VStack>
         </Card>
       ) : null}
-      {stopped ? null : <Text xstyle={styles.intro}>{t(isStaff ? 'reminders.introStaff' : 'reminders.intro')}</Text>}
-
+      {/* The card the kinds always sat in (Will, a103: "keep the original layouts"): its heading, the kinds with their badges, and the one
+          line about them, all inside it and above the buttons. No introduction and no "today" line (D-608). */}
       {stopped ? null : (
         <Card padding={6} xstyle={styles.card}>
           <VStack gap={2}>
             <Text xstyle={styles.heading}>{t('reminders.what')}</Text>
-            {isStaff ? (
-              <>
-                {/* Staff: a message first — what a case manager waits on (D-256). */}
-                <Text xstyle={styles.item}>{t('reminders.what.messages')}</Text>
-                {/* Only the texts that have wording Will approved (10 October, D-461): a visit booked or changed for a
-                    program, a visit planned by somebody on a case manager's list. Not "introduced to your program" or
-                    "your account changes": nothing is built for either (D-453). */}
-                <Text xstyle={styles.item}>{t(role === 'provider' ? 'reminders.what.visits' : 'reminders.what.trips')}</Text>
-              </>
-            ) : (
-              <>
-                <Text xstyle={styles.item}>{t('reminders.what.1')}</Text>
-                <Text xstyle={styles.item}>{t('reminders.what.2')}</Text>
-              </>
-            )}
-            {/* Said plainly: what is sent today, and what is not yet (D-453). */}
-            <Text xstyle={styles.small}>{t(isStaff ? 'reminders.today.staff' : 'reminders.today.member')}</Text>
+            <TextKindsList who={role === 'provider' ? 'provider' : isStaff ? 'admin' : 'member'} bare />
             <Text type="supporting" xstyle={styles.small}>
               {t('reminders.how')}
             </Text>

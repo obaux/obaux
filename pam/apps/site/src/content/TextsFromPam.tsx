@@ -61,8 +61,8 @@ export function TextsFromPam() {
           {VISIT_REMINDERS_LIVE
             ? 'Pam does not text you when someone messages you, and it does not text you when someone wants to connect.'
             : 'Pam does not send a reminder before each visit. It does not text you when someone messages you, and it does not text you when someone wants to connect.'}{' '}
-          The Text reminders screen lists what Pam would send, and says which of those it sends today. The Text
-          alerts screen says “Coming soon” beside the ones it does not send yet.
+          The Text alerts screen lists the kinds of texts Pam would send, and says “Coming soon” beside the ones it
+          does not send yet.
         </P>
         <P>Messages and notes about new messages show up inside Pam, on the bell and on the Messages tab. A case manager or program lead also sees the number on Home.</P>
       </Section>
@@ -70,7 +70,7 @@ export function TextsFromPam() {
       <Section title="The rules">
         <HowTo
           steps={[
-            'Pam texts you reminders only if you said yes. You choose when you join (“Yes, text me reminders” or “Not now”), or later, from the “Get text reminders” card on Profile (“Agree to receive texts” or “Not now”).',
+            'Pam texts you reminders only if you said yes. You choose when you join (“Agree to receive texts” or “Not now”), or later, from the “Get text alerts” card on Profile (“Agree to receive texts” or “Not now”).',
             'No texts go out from 9 pm to 7 am, Philadelphia time. A text that is due in those hours waits until the morning. If a sign-in code is more than 12 hours late, Pam cancels it instead of sending it. Ask for a new one.',
             'Reply STOP to any text and the texts stop. Nothing in the app can turn them back on. If you replied STOP by mistake, contact Pam.',
             'A sign-in code is not a reminder. It comes when you ask for it.',
@@ -84,13 +84,24 @@ export function TextsFromPam() {
             VISIT_REMINDERS_LIVE
               ? 'Think about which text it was. Pam does not text you about new messages or when someone wants to connect.'
               : 'Think about which text it was. Pam does not send visit reminders or message alerts yet.',
-            'Check that you said yes. Tap Profile. If you said yes, the list has a “Text reminders” row. If you chose “Not now”, you will see a “Get text reminders” card at the top instead: tap it to change your answer. If you replied STOP, that card opens a screen that says “Texts are off”, and you need to contact Pam. (A case manager or program lead sees “Get text alerts” on that card.)',
+            'Check that you said yes. Tap Profile. If you said yes, the list has a “Text alerts” row. If you chose “Not now”, you will see a “Get text alerts” card at the top instead: tap it to change your answer. If you replied STOP, that card opens a screen that says “Texts are off”, and you need to contact Pam.',
             'Check the time. Nothing is sent from 9 pm to 7 am, Philadelphia time.',
             'Check that the phone number on your account is the right one.',
             'For a sign-in code, wait for the “Send it again” timer to finish, then ask for a new code. Use the newest one.',
             'Still no text? Contact Pam.',
           ]}
-          shots={[{ name: 'texts-from-pam/reminders.png', alt: "The “Text reminders” screen in Pam. A list headed “What we would send”, then a line that says today Pam sends only a note when a place you saved closes or moves, then two buttons: “Agree to receive texts” and “Not now”.", caption: "The “Text reminders” screen." }, { name: 'texts-from-pam/texts-off.png', alt: "The “Text reminders” screen after someone replied STOP. It says “Texts are off” and that Pam does not text you, and that nothing in the app can turn texts back on.", caption: "After you reply STOP, the screen says “Texts are off”." }]}
+          shots={[
+            {
+              name: 'texts-from-pam/reminders.png',
+              alt: 'The “Get text alerts” screen in Pam. A list headed “Kinds of texts”, with “A reminder before your trip” and “A saved place closes or moves”. A “Coming soon” label sits beside each. Under the list, a line says Pam sends one text each time something on the list happens, that you can reply STOP to stop or HELP for help, and that text and data rates may apply. Then two buttons: “Agree to receive texts” and “Not now”.',
+              caption: 'The “Get text alerts” screen.',
+            },
+            {
+              name: 'texts-from-pam/texts-off.png',
+              alt: 'The “Get text alerts” screen after someone replied STOP. It says “Texts are off”, that you replied STOP so Pam does not text you, and that nothing in the app can turn texts back on.',
+              caption: 'After you reply STOP, the screen says “Texts are off”.',
+            },
+          ]}
         />
       </Section>
     </Body>

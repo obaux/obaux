@@ -109,6 +109,8 @@ export interface MockOptions {
   readonly staffReview?: 'pair' | 'city' | 'decided' | 'other' | 'addedToExisting';
   /** Nobody waiting for a city yet (D-593): the list's empty state. */
   readonly noWaitingCities?: boolean;
+  /** Nothing has broken in the app this week (D-616): Problems' empty state. */
+  readonly noProblems?: boolean;
   /** Message Pam is switched off (D-605): `pam_status` says so and nothing else about Pam is shown. */
   readonly pamOff?: boolean;
   /** The Pam team's inbox is empty. */
@@ -118,9 +120,17 @@ export interface MockOptions {
    * reply; or a message that did not go ("Not sent", Try again).
    */
   readonly pamThread?: 'welcome' | 'away' | 'notSent';
+  /** Pam writing first fails (Iris T1, T3): on the network, or refused by name. Unset: it goes. */
+  readonly pamStartFails?: 'error' | 'NOT_ALLOWED' | 'PAM_OFF';
 }
 
 const PAM_CONVO_ID = 'c0000000-0000-4000-8000-0000000000a1';
+
+/** How the database answers Pam writing first, when a story asks it to fail (Iris T1, T3). */
+function startAnswer(fails: MockOptions['pamStartFails']): { status: number; body: unknown } | null {
+  if (!fails) return null;
+  return fails === 'error' ? { status: 500, body: {} } : { status: 400, body: { code: 'P0001', message: fails } };
+}
 
 /** The rows of a person's Pam conversation for a story (D-605). */
 function pamThreadMessages(state: 'welcome' | 'away' | 'notSent') {
@@ -441,6 +451,14 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
         { place: 'Norristown', people: 1 },
       ],
     })),
+    // Problems (D-616): what broke, grouped by screen, action and code, newest first. No person, no free text.
+    on('/rpc/app_errors_grouped', () => ({
+      body: options.noProblems ? [] : [
+        { area: '/alerts/', action: 'alerts.switch.closed', code: '500', n: 4, first_seen: onTheHour(-2, 9), last_seen: onTheHour(0, 11) },
+        { area: '/messages/thread/', action: 'messages.photo', code: 'timeout', n: 2, first_seen: onTheHour(-1, 15), last_seen: onTheHour(-1, 16) },
+        { area: '/reminders/', action: 'reminders.agree', code: 'offline', n: 1, first_seen: onTheHour(-5, 10), last_seen: onTheHour(-5, 10) },
+      ],
+    })),
     // Message Pam (D-605, D-606): the switch and the hours, a person's own conversation, and the Pam team's inbox and actions.
     on('/rpc/pam_status', () => ({
       body: [{
@@ -468,11 +486,10 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
       ],
     })),
     on('/rpc/pam_set_thread_status', () => ({ body: null })),
-    on('/rpc/pam_start_conversation', () => ({ body: 'c0000000-0000-4000-8000-0000000000b9' })),
+    on('/rpc/pam_start_conversation', () => startAnswer(options.pamStartFails) ?? { body: 'c0000000-0000-4000-8000-0000000000b9' }),
     on('/rpc/pam_program_has_lead', () => ({ body: true })),
-    on('/rpc/pam_start_program_conversation', () => ({ body: 2 })),
+    on('/rpc/pam_start_program_conversation', () => startAnswer(options.pamStartFails) ?? { body: 2 }),
     on('/rpc/pam_set_hours', () => ({ body: null })),
-    on('/rpc/pam_reply_times', () => ({ body: [{ median_seconds: 5400, mean_seconds: 7200, answered: 12 }] })),
     on('/rpc/review_program_submission', (_url, _method, body) => {
       const args = (body ?? {}) as { p_id: string };
       programsToCheck = programsToCheck.filter((row) => row.id !== args.p_id);
@@ -814,7 +831,7 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
       }
       return { body: { id: 'new', sender_id: ME_ID, body: 'Sent from Storybook', created_at: new Date().toISOString() } };
     }),
-    on('/rest/v1/app_settings', (url) => ({ body: { value: url.includes('texts_live') ? 'on' : '+12673095265' } })),
+    on('/rest/v1/app_settings', (url) => ({ body: { value: url.includes('texts_live') ? 'on' : '+12155550191' } })),
     on('/rest/v1/regions', () => ({ body: [{ id: REGION_ID, name: 'Philadelphia' }] })),
     on('/rest/v1/staff_requests', () => ({ body: STAFF_REQUESTS })),
     // Invite links (0071, D-258): PAM-OLD1 is the example expired link; any

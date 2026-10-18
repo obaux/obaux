@@ -30,6 +30,8 @@ export interface SettingsRowProps {
   readonly badgeId?: string | undefined;
   /** The switch. */
   readonly control: ReactNode;
+  /** The id of the control, so a tap on the name works it too: the name is its label, one control and not two tap targets. */
+  readonly labelFor?: string | undefined;
 }
 
 const styles = stylex.create({
@@ -42,12 +44,14 @@ const styles = stylex.create({
   adornment: { height: '23px', flexShrink: 0, overflow: 'visible' },
 });
 
-export function SettingsRow({ label, adornment, badge, badgeId, control }: SettingsRowProps) {
+export function SettingsRow({ label, adornment, badge, badgeId, control, labelFor }: SettingsRowProps) {
   return (
     <HStack gap={3} align="center" wrap="nowrap" xstyle={styles.row}>
       <VStack gap={1} xstyle={styles.words}>
         <HStack gap={0} align="center" wrap="nowrap">
-          <Text xstyle={styles.label}>{label}</Text>
+          <Text {...(labelFor ? { as: 'label' as const, htmlFor: labelFor } : {})} xstyle={styles.label}>
+            {label}
+          </Text>
           {adornment ? (
             <HStack align="center" xstyle={styles.adornment}>
               {adornment}
