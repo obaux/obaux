@@ -74,12 +74,14 @@ test.describe('reporting a place', () => {
     await expect(page.getByRole('textbox', { name: /you can skip this/ })).toBeVisible();
   });
 
-  test('says nobody at the place is told who reported it', async ({ page }) => {
-    // The person doing this usually has the least power in the situation. It is
-    // stated rather than left to be assumed.
+  test('asks the question and does not explain: "nobody at the place is told" is on the Privacy page (D-608)', async ({ page }) => {
+    // The person doing this usually has the least power in the situation; what happens to who they are is said in Privacy
+    // (what-we-keep.p15), not above the reasons.
     await signedIn(page);
     await page.goto(`/flag/?place=${PLACE}`);
-    await expect(page.getByText(/Nobody at the place is told who said so/)).toBeVisible();
+    await expect(page.getByRole('radio', { name: 'It moved somewhere else' })).toBeVisible();
+    await expect(page.getByText(/Nobody at the place is told who said so/)).toHaveCount(0);
+    await expect(page.getByText(/Tell us what is wrong and we will check it/)).toHaveCount(0);
   });
 
   test('sends the reason the member picked, and says what happens next', async ({ page }) => {
@@ -90,6 +92,8 @@ test.describe('reporting a place', () => {
     await page.getByRole('button', { name: 'Send this to Pam' }).click();
 
     await expect(page.getByRole('heading', { name: 'Thank you. We will check it.' })).toBeVisible();
+    // The thank-you is the whole message (D-608).
+    await expect(page.getByText('Somebody at Pam looks at every one of these.')).toHaveCount(0);
     await expect.poll(() => sent[0]?.p_reason).toBe('moved');
     // An empty note is null, not "" — the database stores nothing rather than
     // an empty string somebody has to interpret later.

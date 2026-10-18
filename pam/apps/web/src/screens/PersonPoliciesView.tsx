@@ -67,9 +67,6 @@ export function PersonPoliciesView({ personId, firstName }: { readonly personId:
               description={t('person.policies.unfinished.body', { name: firstName, left: total - signed })}
             />
           ) : null}
-          <Text type="supporting" xstyle={styles.intro}>
-            {t('person.policies.intro', { name: firstName })}
-          </Text>
           <Text xstyle={styles.progress}>{t('memberPolicies.progress', { signed, total })}</Text>
           <MenuList
             label={t('person.policies.title')}

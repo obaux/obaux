@@ -195,6 +195,6 @@ test.describe('the people strip on Home', () => {
     await expect(links.nth(0)).toContainText('Saved a new place');
     await expect(links.nth(1)).toContainText('New message');
     await expect(links.nth(1)).toHaveAttribute('href', /\/messages\/thread\/\?id=dummy-conv-dummy-m2-dummy-a1/);
-    await expect(page.getByText('Example people, so you can see how this looks.')).toBeVisible();
+    await expect(page.getByText('Example', { exact: true })).toBeVisible();
   });
 });

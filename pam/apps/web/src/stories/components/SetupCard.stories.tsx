@@ -28,7 +28,6 @@ export const Photo: Story = {
   args: {
     kind: 'photo',
     title: 'Add your photo',
-    body: 'A friendly face helps people feel welcome before they walk in.',
     href: '/profile/',
   },
 };
@@ -36,7 +35,6 @@ export const Calendar: Story = {
   args: {
     kind: 'calendar',
     title: 'See who is coming in',
-    body: 'When members plan a trip to your program, you will see them here and check them in.',
     href: '/home/calendar/',
   },
 };

@@ -191,13 +191,8 @@ export function ProfileView({
         // member (D-444).
         <PromoCard
           title={t(role === 'admin' || role === 'provider' ? 'profile.promo.alerts.title' : 'profile.promo.reminders.title')}
-          body={t(
-            role === 'admin'
-              ? 'profile.promo.alerts.body.adminList'
-              : role === 'provider'
-                ? 'profile.promo.alerts.body.providerList'
-                : 'profile.promo.reminders.body',
-          )}
+          // Not on yet: a badge, not a sentence about what Pam does not do yet (D-608).
+          badge={t('common.comingSoon')}
           // Staff choose per kind on Text alerts (D-256, D-260). A member's
           // first yes is still the reminders screen — the one the SMS carrier
           // reviewed — and their switches are a row in settings after that.

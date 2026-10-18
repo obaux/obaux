@@ -25,6 +25,7 @@ import { useRoleView } from '@/lib/useViewedRole';
 import { useDemoView } from '@/lib/useDemoView';
 import { usePamStatus } from '@/lib/pam';
 import { navigate } from '@/lib/navigate';
+import { StatusBadge } from '@pam/ui/StatusBadge';
 
 /**
  * Everyone on Pam, for the person running it.
@@ -52,7 +53,6 @@ import { navigate } from '@/lib/navigate';
 const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
 
 const styles = stylex.create({
-  note: { fontSize: '15px', lineHeight: 1.5 },
   // The case manager Home's message button (D-227): 48px, the accent colour.
   message: { width: '48px', height: '48px', color: colorVars['--color-icon-accent'] },
 });
@@ -337,9 +337,7 @@ export default function DirectoryPage() {
               </ScrollReveal>
             );
           })}
-          <Text type="supporting" xstyle={styles.note}>
-            {t('example.people.note')}
-          </Text>
+          <StatusBadge label={t('common.example')} />
         </VStack>
       ) : null}
     </Page>
