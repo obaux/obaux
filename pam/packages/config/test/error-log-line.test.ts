@@ -27,7 +27,7 @@ function columnsOf(table: string): string[] {
     .map((line) => line.trim())
     .filter((line) => line && !line.startsWith('--'))
     .map((line) => line.split(/\s+/)[0]!)
-    .filter((word) => /^[a-z_]+$/.test(word));
+    .filter((word) => /^[a-z_]+$/.test(word) && !['primary', 'unique', 'check', 'constraint', 'foreign'].includes(word));
 }
 
 /** A function's text, from `create or replace function public.<name>(` to its `$$;` or `end $$;`. */
@@ -83,7 +83,19 @@ describe('the error log keeps what Privacy says it keeps (D-616)', () => {
     expect(sql).toMatch(/cron\.schedule\('sweep-app-errors', '[^']+', 'select public\.sweep_app_errors\(\)'\)/);
   });
 
-  it('keeps the per-account counters five minutes at most: they have their own sweep, every five minutes', () => {
+  it('counts a person\'s reports in a table nobody can read, which holds the account, the minute and a number, and is emptied within ten minutes', () => {
+    // Iris D4 (19 October): the rate limit keeps 'u:<account>' for a minute's count. That is not in the note and no role can read it; the line says
+    // the note has no account, and the request log (p11) already says the account is written down for a week, so the counter adds nothing to who.
+    expect(columnsOf('app_error_limits')).toEqual(['bucket', 'minute', 'n']);
+    expect(sql).toMatch(/alter table public\.app_error_limits enable row level security;/);
+    expect(sql).toMatch(/alter table public\.app_error_limits force row level security;/);
+    expect(sql).toMatch(/revoke all on public\.app_error_limits from anon, authenticated;/);
+    expect(sql).toMatch(/create policy app_error_limits_nobody on public\.app_error_limits for all to anon, authenticated using \(false\) with check \(false\);/);
+    // The key is the account or one shared word, never an address (the migration says why).
+    const fn = functionText('report_app_error');
+    expect(fn).toMatch(/when v_uid is not null then 'u:' \|\| v_uid::text/);
+    expect(fn).toMatch(/else 's:signed-out'/);
+    // Rows older than five minutes go, by a job every five minutes (and on each report): none lives past ten.
     expect(functionText('sweep_app_error_counters')).toMatch(/delete from public\.app_error_limits where minute < now\(\) - interval '5 minutes'/);
     expect(sql).toMatch(/cron\.schedule\('sweep-app-error-counters', '\*\/5 \* \* \* \*', 'select public\.sweep_app_error_counters\(\)'\)/);
   });
