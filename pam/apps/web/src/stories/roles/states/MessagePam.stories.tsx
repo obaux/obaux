@@ -51,6 +51,7 @@ const WORDS = {
     p4: "Only the Pam team reads this conversation. Your guide and your programs don't see it.",
     auto: "We got your message. A person on the Pam team will read it and answer here. We don't watch messages as they come in. In danger? Call 911. In crisis? Call or text 988.",
     autoLabel: 'Automatic reply',
+    composerPlaceholder: 'Write to Pam',
     helpRow: 'Write to Pam',
     helpHint: 'A person on the Pam team reads it.',
     rowLine: 'Write to Pam',
@@ -122,6 +123,7 @@ const WORDS = {
     p4: 'فريق Pam فقط يقرأ هذه المحادثة. مرشدك وبرامجك لا يرونها.',
     auto: 'وصلتنا رسالتك. سيقرأها شخص من فريق Pam ويرد هنا. لا نراقب الرسائل لحظة وصولها. في خطر؟ اتصل بـ 911. في أزمة؟ اتصل أو أرسل رسالة إلى 988.',
     autoLabel: 'رد تلقائي',
+    composerPlaceholder: 'اكتب إلى Pam',
     helpRow: 'اكتب إلى Pam',
     helpHint: 'يقرؤها شخص من فريق Pam.',
     rowLine: 'اكتب إلى Pam',
@@ -264,10 +266,39 @@ function Above({ lines }: { readonly lines: readonly string[] }) {
   );
 }
 
+/**
+ * The composer in a Pam thread (Mira, 03:16): the placeholder reads "Write to Pam"; no document button (Nico: no attachments in v1);
+ * the photo button only in the version Will can choose (Iris allows screenshots); the microphone stays. ThreadView's composer is not
+ * built for any of this yet, so the drawing rewrites it after it mounts: the build gives ThreadView these as props (Nico's).
+ */
+function PamComposer({ photo }: { readonly photo: boolean }) {
+  const w = useWords();
+  useEffect(() => {
+    const apply = () => {
+      const c = document.querySelector('.astryx-chat-composer');
+      if (!c) return;
+      const buttons = [...c.querySelectorAll<HTMLElement>('button.astryx-button')];
+      // Speak, Add a photo, Add a document, Send.
+      if (buttons.length >= 4) {
+        if (!photo) buttons[1]!.style.display = 'none';
+        buttons[2]!.style.display = 'none';
+      }
+      for (const el of c.querySelectorAll<HTMLElement>('div')) {
+        if (el.children.length === 0 && /^(Write a message|اكتب رسالة)/.test(el.textContent ?? '')) el.textContent = w.composerPlaceholder;
+      }
+    };
+    apply();
+    const observer = new MutationObserver(apply);
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    return () => observer.disconnect();
+  }, [photo, w.composerPlaceholder]);
+  return null;
+}
+
 type Msg = { readonly id: string; readonly body: string; readonly createdAt: string; readonly mine: boolean };
 
 /** A Pam thread as the person sees it: Pam's mark, the card at the top, the messages, the composer. */
-function PersonThread({ messages, intro }: { readonly messages: readonly Msg[]; readonly intro?: ReactNode }) {
+function PersonThread({ messages, intro, photo = false }: { readonly messages: readonly Msg[]; readonly intro?: ReactNode; readonly photo?: boolean }) {
   const w = useWords();
   const { locale } = useI18n();
   return (
@@ -291,13 +322,14 @@ function PersonThread({ messages, intro }: { readonly messages: readonly Msg[]; 
         sendFailed={false}
         speechLanguage={locale === 'ar' ? 'ar' : 'en-US'}
       />
+      <PamComposer photo={photo} />
     </ThreadFrame>
   );
 }
 
 /** The first view: nothing written yet, the card and the composer. */
-function ThreadEmpty() {
-  return <PersonThread messages={[]} />;
+function ThreadEmpty({ photo = false }: { readonly photo?: boolean }) {
+  return <PersonThread messages={[]} photo={photo} />;
 }
 
 /** After the first message: the automatic reply, then a person's answer. */
@@ -330,9 +362,15 @@ function ThreadPamStarted() {
 }
 
 /** Help, answers first, then the way to write to Pam (both versions). */
-function HelpWrite() {
+function HelpWrite({ first = false }: { readonly first?: boolean }) {
   const w = useWords();
   const icon = { width: 26, height: 26, 'aria-hidden': true } as const;
+  const answers = [
+    { id: 'topics', label: w.topics, href: '/help/topics/', icon: <HelpIcon {...icon} /> },
+    { id: 'safety', label: w.safety, href: '/help/safety/', icon: <ShieldIcon {...icon} /> },
+    { id: 'place', label: w.place, href: '/help/report-place/', icon: <PlacesIcon {...icon} /> },
+  ];
+  const write = { id: 'write', label: w.helpRow, description: w.helpHint, href: '/messages/thread/?pam=1', icon: <MessagesIcon {...icon} /> };
   return (
     <Page gap={4}>
       <LargeTitleHeader title={w.help} actions={<HeaderActions />} />
@@ -341,13 +379,12 @@ function HelpWrite() {
       </Text>
       <MenuList
         label={w.help}
-        items={[
-          { id: 'topics', label: w.topics, href: '/help/topics/', icon: <HelpIcon {...icon} /> },
-          { id: 'safety', label: w.safety, href: '/help/safety/', icon: <ShieldIcon {...icon} /> },
-          { id: 'place', label: w.place, href: '/help/report-place/', icon: <PlacesIcon {...icon} /> },
-          // Under the answers, never above them (Iris, A28): the help desk first, then a person.
-          { id: 'write', label: w.helpRow, description: w.helpHint, href: '/messages/thread/?pam=1', icon: <MessagesIcon {...icon} /> },
-        ]}
+        items={
+          first
+            ? [write, ...answers]
+            : // Under the answers, never above them (Iris, A28): the help desk first, then a person.
+              [...answers, write]
+        }
       />
     </Page>
   );
@@ -490,7 +527,7 @@ function AdminThread({ kind }: { readonly kind: 'answering' | 'new-member' | 'ne
   );
 }
 
-/** Everyone: a message button on a person's row. Version A has none on a member's row (Pam does not write first to a member). */
+/** Everyone: a message button on a person's row. Version A has none: the super admin only answers. */
 function Everyone({ version }: { readonly version: 'A' | 'B' }) {
   const w = useWords();
   const people = [
@@ -513,7 +550,7 @@ function Everyone({ version }: { readonly version: 'A' | 'B' }) {
               </Text>
             }
             endContent={
-              version === 'A' && p.member ? undefined : (
+              version === 'A' ? undefined : (
                 <IconButton label={w.messageAs(p.name)} variant="secondary" href="/messages/thread/?pam=1" icon={<MessagesIcon width={22} height={22} aria-hidden />} />
               )
             }
@@ -559,8 +596,13 @@ export const X6_AdminThread: Story = { ...admin('/messages/thread/'), render: ()
 export const A1_MessagesBeforeWriting: Story = { ...member('/messages/'), render: () => <MemberMessages kind="none" /> };
 /** A: once the person has written, Pam is a row, with the answer unread. */
 export const A2_MessagesAfterWriting: Story = { ...member('/messages/'), render: () => <MemberMessages kind="wrote" /> };
-/** A: Everyone has no message button on a member's row. Staff rows keep theirs. */
+/** A: the super admin can only answer, so Everyone has no message button on any row (Mira, 03:16; Ava's A kept staff rows' button). */
 export const A3_AdminEveryone: Story = { ...admin('/directory/'), render: () => <Everyone version="A" /> };
+
+/** A: Help with "Write to Pam" as the first row, as Mira's 03:16 note read; X3 has it under the answers, as Iris's research puts it. */
+export const A4_HelpWriteFirst: Story = { ...member('/help/'), render: () => <HelpWrite first /> };
+/** The composer with the photo button too, for the version Will can choose (Iris allows screenshots). */
+export const X7_ThreadWithPhoto: Story = { ...member('/messages/thread/'), render: () => <ThreadEmpty photo /> };
 
 // Version B (Nico's plan)
 /** B: Pam is in everyone's Messages from the start, "Write to Pam" until the first message. */
@@ -584,6 +626,8 @@ export const X2_ThreadAfterFirstMessage_Arabic: Story = { ...X2_ThreadAfterFirst
 export const X3_HelpWriteToPam_Arabic: Story = { ...X3_HelpWriteToPam, ...arabic };
 export const X4_AdminHome_Arabic: Story = { ...X4_AdminHome, ...arabic };
 export const X5_AdminInbox_Arabic: Story = { ...X5_AdminInbox, ...arabic };
+export const A4_HelpWriteFirst_Arabic: Story = { ...A4_HelpWriteFirst, ...arabic };
+export const X7_ThreadWithPhoto_Arabic: Story = { ...X7_ThreadWithPhoto, ...arabic };
 export const X6_AdminThread_Arabic: Story = { ...X6_AdminThread, ...arabic };
 export const A2_MessagesAfterWriting_Arabic: Story = { ...A2_MessagesAfterWriting, ...arabic };
 export const B1_MessagesPamRow_Arabic: Story = { ...B1_MessagesPamRow, ...arabic };
