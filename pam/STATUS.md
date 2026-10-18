@@ -928,7 +928,7 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Accounts & invites · Message Pam, the Pam team's side (18 October) — S1 to S4 READY, behind Nico's switch (card a100, D-613)
+## Accounts & invites · Message Pam, the Pam team's side (18 October) — S1 to S4 with Iris's passes 1 and 2 and Dot's review, one READY on main, behind Nico's switch (card a100, D-613)
 
 Built on `claude/pam-message-pam-admin` @ 1b67f588, stacked on Nico's `claude/messages-pam-s0-s1a`.
 
@@ -944,9 +944,16 @@ Built on `claude/pam-message-pam-admin` @ 1b67f588, stacked on Nico's `claude/me
   row reads "Message this program" while the switch is on).
 - **`/pam/hours/`:** Pam's hours, with the reply people get outside them.
 
-Open:
-- Sage signs the new words, then Lena translates them.
-- Nico: the team's composer should say "Reply as Pam" and take photos only; `profile_roles` in the two program functions.
+Since then:
+- **The thread:** the team writes "Reply as Pam" with photos only. Pam's automatic messages read as Pam's. Saved replies
+  go in at the cursor.
+- **Messages to Pam:** it looks again every 20 seconds. The switch off and failures each read calmly.
+- **Writing first:** when it fails, the words are kept with Try again. A refusal is one calm line.
+- **Pam's hours:** the preview is hidden while the hours are invalid.
+- **Words and proofs:** all words are signed and in seven languages. Old-code proofs are in
+  `docs/design/review/2026-10-18-pam-team/`.
+
+Next: swap the join step's texts block for Nico's `TextKindsList` once b74 lands.
 
 ## Accounts & invites · Sign up's city note is a line, not a row (17 October) — in b62 (run-through P5)
 
