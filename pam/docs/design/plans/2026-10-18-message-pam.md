@@ -52,7 +52,9 @@ Three options were weighed.
 
 ### What the team can read: only Pam conversations
 
-New policies, each of the shape `public.is_super_admin() and exists (select 1 from conversations c where c.id = conversation_id and c.kind = 'support')`:
+New policies, each of the shape `public.is_pam_team() and exists (select 1 from conversations c where c.id = conversation_id and c.kind = 'support')`:
+`is_pam_team()` is one small function that today returns exactly `is_super_admin()`. Every Pam policy and function calls it and not `is_super_admin()` directly (Ava's suggestion). If support staff are added later, that is the one place to widen who reads Pam conversations, without giving them the super admin's other powers, such as approving staff requests. Widening it would itself be two sign-offs from Will (a new reader of message bodies, and a new role).
+
 - `messages_select_pam_team` on `messages` (select);
 - `messages_insert_pam_team` on `messages` (insert, `sender_id = auth.uid()`, active account), for replies;
 - a select on `conversations` and `conversation_members` for the same case, so the inbox and the thread header can be read.
@@ -67,7 +69,7 @@ Everything else about `messages` stays. In particular **`messages_select_convers
 
 ### The super admin's side
 
-- **Inbox.** `pam_inbox()` (super admin only; security definer): one row per Pam conversation: the person's first name and role (and the program's name for a lead), `last_message_at`, who wrote last, status, whether it waits for a reply, and the first line of the last message (they read the messages anyway, and this is what makes an inbox usable). No last name, phone, email or city (D-588 keeps those to the Pam team through their own screens; the inbox does not add them).
+- **Inbox.** `pam_inbox()` (super admin only; security definer): one row per Pam conversation: the person's first name, role and region (and the program's name for a lead; the region is what tells two members called Marcus apart, and the Pam team already sees it in `directory_people`, so it is not a widening; Ava's ask), `last_message_at`, who wrote last, status, whether it waits for a reply, and the first line of the last message (they read the messages anyway, and this is what makes an inbox usable). No last name, phone, email or city beyond the region (D-588 keeps those to the Pam team through their own screens; the inbox does not add them).
 - **Reply.** The same `ThreadView` and the same composer, opened on a Pam conversation, with the header showing the asker. A reply is shown to the asker as from **Pam**.
 - **Close and reopen.** `pam_set_thread_status(conversation, 'closed' | 'open')`. Closed is a label; the thread stays readable and a new message from the asker reopens it.
 - **Start a conversation** with any member or any program. `pam_start_conversation(profile_id)` for a person: creates the person's Pam conversation (the same unique one) if it does not exist and writes the first message. For a program: the program's active leads; section 6 asks Will whether each lead gets their own Pam conversation or the program gets one. **A member is the case `can_message` forbids today (D-262: "never a member").** This plan does not widen `can_message`: a Pam conversation is not a `direct` one, so the rule that keeps the team out of members' own conversations is untouched; what changes is that the team can now write to a member **as Pam**, in the member's Pam conversation. That is a second thing to tell people (section 4).
