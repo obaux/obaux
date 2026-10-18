@@ -1757,6 +1757,8 @@
   "pam.start.action": "以 Pam 的身分傳訊息給{name}",
   "pam.start.programNote": "會傳送給該計劃的每位負責人。",
   "pam.start.placeholder": "以 Pam 的身分撰寫訊息",
+  "pam.start.failed": "您的訊息還在。請點按「再試一次」。",
+  "pam.start.notAllowed": "您不能以 Pam 的身分傳訊息給 Pam 團隊。",
   "pam.program.action": "傳訊息給這個計劃",
   "pam.program.noLead": "目前沒有人在 Pam 上負責這個計劃。",
   "pam.inbox.sent": "已傳送給{count}位負責人。",

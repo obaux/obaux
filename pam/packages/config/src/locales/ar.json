@@ -1905,6 +1905,8 @@
   "pam.start.action": "راسل {name} بصفة Pam",
   "pam.start.programNote": "تصل إلى كل مسؤول في البرنامج.",
   "pam.start.placeholder": "اكتب بصفة Pam",
+  "pam.start.failed": "رسالتك ما زالت هنا. اضغط على «حاول مرة أخرى».",
+  "pam.start.notAllowed": "لا يمكنك مراسلة فريق Pam بصفة Pam.",
   "pam.program.action": "راسل هذا البرنامج",
   "pam.program.noLead": "لا أحد يدير هذا البرنامج في Pam حاليا.",
   "pam.inbox.sent": "تم الإرسال إلى {count} مسؤول.",

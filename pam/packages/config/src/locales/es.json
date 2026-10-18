@@ -1757,6 +1757,8 @@
   "pam.start.action": "Escribir a {name} como Pam",
   "pam.start.programNote": "Se envía a cada líder del programa.",
   "pam.start.placeholder": "Escribir como Pam",
+  "pam.start.failed": "Su mensaje sigue aquí. Toque Intentar de nuevo.",
+  "pam.start.notAllowed": "No puede escribir al equipo de Pam como Pam.",
   "pam.program.action": "Escribir a este programa",
   "pam.program.noLead": "Nadie dirige este programa en Pam por ahora.",
   "pam.inbox.sent": "Enviado a {count} líderes.",

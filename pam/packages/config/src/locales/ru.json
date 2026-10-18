@@ -1844,6 +1844,8 @@
   "pam.start.action": "Написать от имени Pam: {name}",
   "pam.start.programNote": "Уйдёт каждому руководителю программы.",
   "pam.start.placeholder": "Написать от имени Pam",
+  "pam.start.failed": "Ваше сообщение осталось здесь. Нажмите «Попробовать снова».",
+  "pam.start.notAllowed": "Вы не можете писать команде Pam от имени Pam.",
   "pam.program.action": "Написать этой программе",
   "pam.program.noLead": "Сейчас никто не ведёт эту программу в Pam.",
   "pam.inbox.sent": "Отправлено {count} руководителя.",

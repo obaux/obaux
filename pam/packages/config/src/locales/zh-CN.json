@@ -1757,6 +1757,8 @@
   "pam.start.action": "以 Pam 的身份给{name}发消息",
   "pam.start.programNote": "会发送给该项目的每位负责人。",
   "pam.start.placeholder": "以 Pam 的身份写消息",
+  "pam.start.failed": "您的消息还在。请点按“再试一次”。",
+  "pam.start.notAllowed": "您不能以 Pam 的身份给 Pam 团队发消息。",
   "pam.program.action": "给这个项目发消息",
   "pam.program.noLead": "目前没有人在 Pam 上负责这个项目。",
   "pam.inbox.sent": "已发送给{count}位负责人。",
