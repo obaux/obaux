@@ -9,13 +9,16 @@ import type { Locator, Page } from '@playwright/test';
  * 175.09 against the skeleton's 167.09: both exactly 8). The animation may be on the element, inside it, or on an ancestor (the
  * dialog around a sheet, the section wrapper around a card), so all three are waited for.
  *
- * Infinite animations (a skeleton's pulse, a spinner) never finish and are not waited for: they do not move the box.
+ * Only an ARRIVAL is waited for: a finite animation that ends within a second (the rise is 260ms plus a stagger of up to 150ms). An
+ * infinite one (a skeleton's pulse, a spinner) never finishes, and a long one is a thing a spec is measuring (the file name that
+ * slides for up to five seconds, D-407), not an arrival; neither is waited for.
  *
  * - `arrived(locator)`: no finite animation or transition left on the element, inside it, or around it; fonts loaded; and its box the
  *   same on three frames running. Use before reading `boundingBox()` or `elementFromPoint` on something that has just appeared.
  * - `arrivedPage(page)`: the same for the whole document, without a box. `settled(page)` calls it.
  */
-const FINITE = `(a) => { const t = a.effect && a.effect.getComputedTiming ? a.effect.getComputedTiming() : null; return !t || t.iterations !== Infinity; }`;
+const ARRIVAL_MS = 1000;
+const FINITE = `(a) => { const t = a.effect && a.effect.getComputedTiming ? a.effect.getComputedTiming() : null; return !t || (t.iterations !== Infinity && t.endTime <= ${ARRIVAL_MS}); }`;
 
 export async function arrivedPage(page: Page): Promise<void> {
   await page.evaluate(async (finiteSource) => {
