@@ -14,6 +14,7 @@ import { useI18n } from '@/lib/i18n';
 import { placeStatus } from '@/lib/usePlaceStatus';
 import { ConfirmDialog } from '../../screens/ConfirmDialog';
 import { resolveFlag, type FlaggedPlace, type FlaggedPlacesState } from '@/lib/useFlaggedPlaces';
+import { StatusBadge } from '@pam/ui/StatusBadge';
 
 /**
  * The Reported places screen (D-189; it was a filter on the old `/places/` list, retired 13 October 2026): places somebody said are closed,
@@ -30,7 +31,6 @@ import { resolveFlag, type FlaggedPlace, type FlaggedPlacesState } from '@/lib/u
  */
 
 const styles = stylex.create({
-  note: { fontSize: '15px', lineHeight: 1.5 },
   action: { minHeight: '48px', fontSize: '16px' },
   // What was reported, at reading size (Iris's super admin pass, W4): it was a 12px badge.
   reason: { fontSize: '17px', lineHeight: 1.4, fontWeight: 600 },
@@ -226,9 +226,7 @@ export function ReportedPlaces({
       />
 
       {showDummy && rows.length > 0 ? (
-        <Text type="supporting" xstyle={styles.note}>
-          {t('example.people.note')}
-        </Text>
+        <StatusBadge label={t('common.example')} />
       ) : null}
     </VStack>
   );

@@ -185,7 +185,7 @@ function MessagesScreenInner() {
                 : 'messages.empty.body.staff',
         )}
         headerActions={<HeaderActions role={viewedRole} enabled={session.status === 'signed-in'} hasHelp={false} />}
-        note={useExamples ? t('example.people.note') : null}
+        note={useExamples ? t('common.example') : null}
         {...(canReview
           ? {
               reported: {

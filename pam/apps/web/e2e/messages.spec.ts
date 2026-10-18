@@ -297,7 +297,7 @@ test.describe('the conversation list', () => {
     // manager as "Case manager", the program by its name.
     await expect(page.getByRole('link', { name: /Teresa.*Case manager/ })).toBeVisible();
     await expect(page.getByRole('link', { name: /Sandra.*Example Learning Center/ })).toBeVisible();
-    await expect(page.getByText(/Example people/)).toHaveCount(1);
+    await expect(page.getByText('Example', { exact: true })).toHaveCount(1);
     // No Reported section for a member (D-184): a plain title, no switch.
     await expect(page.getByRole('heading', { level: 1, name: 'Messages' })).toBeVisible();
     await expect(page.getByRole('radio', { name: 'Reported' })).toHaveCount(0);
@@ -2120,7 +2120,7 @@ test.describe('reported messages', () => {
     await expect(page.getByRole('button', { name: 'New message' })).toHaveCount(0);
     await expect(page.getByText('Can you just give me your home address so I can drop it off.')).toBeVisible();
     await expect(page.getByRole('heading', { name: /About Keisha/ })).toBeVisible();
-    await expect(page.getByText(/Example people/)).toBeVisible();
+    await expect(page.getByText('Example', { exact: true })).toBeVisible();
   });
 
   test('the bell row for a reported message leads to the Reported section', async ({ page }) => {
@@ -2254,7 +2254,7 @@ test.describe("the bell's rows land on real screens in the new layout", () => {
 });
 
 test.describe('a real account sees only its real things (Will, 11 October 2026)', () => {
-  const EXAMPLES = /Teresa|Sandra|Renee|Example people|People who offered help/;
+  const EXAMPLES = /Teresa|Sandra|Renee|^Example$|People who offered help/;
 
   test('a member with no one to message has no Messages tab, no examples, a short empty state, and no bell on Home until something is new', async ({ page }) => {
     await signedInAs(page, 'member');
@@ -2291,7 +2291,7 @@ test.describe('a real account sees only its real things (Will, 11 October 2026)'
     await settled(page);
     await expect(page.getByRole('link', { name: 'Notifications' })).toHaveCount(0); // the page's own header has no bell link to itself
     await expect(page.getByText(/Place reported|saved place|points/i)).toHaveCount(0);
-    await expect(page.getByText('Example people', { exact: false })).toHaveCount(0);
+    await expect(page.getByText('Example', { exact: true })).toHaveCount(0);
   });
 
   test('with someone to message the tab shows, and the empty state offers New message', async ({ page }) => {
@@ -2347,7 +2347,7 @@ test.describe('a real account sees only its real things (Will, 11 October 2026)'
     await page.route(PEOPLE, (route) => route.fulfill(json([])));
     await page.goto('/messages/');
     await settled(page);
-    await expect(page.getByText('Example people', { exact: false })).toBeVisible();
+    await expect(page.getByText('Example', { exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: /Teresa/ })).toBeVisible();
   });
 });

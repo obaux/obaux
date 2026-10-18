@@ -33,6 +33,7 @@ import { useNotifications, unreadCount } from '@/lib/useNotifications';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useDemoView } from '@/lib/useDemoView';
 import { whenHappened } from '@/lib/when';
+import { StatusBadge } from '@pam/ui/StatusBadge';
 
 /**
  * Everything that has happened, as a log.
@@ -61,7 +62,6 @@ import { whenHappened } from '@/lib/when';
  */
 
 const styles = stylex.create({
-  note: { fontSize: '15px', lineHeight: 1.5 },
   // As Messages' empty state (MessagesView).
   state: { paddingBlock: '48px' },
 });
@@ -237,9 +237,7 @@ export default function NotificationsPage() {
               }))}
               labels={{ empty: t('notify.none'), new: t('notify.new'), earlier: t('notify.earlier') }}
             />
-            <Text type="supporting" xstyle={styles.note}>
-              {t('notify.example.note')}
-            </Text>
+            <StatusBadge label={t('common.example')} />
           </VStack>
         ) : null}
 

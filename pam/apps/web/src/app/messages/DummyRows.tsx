@@ -13,6 +13,7 @@ import type { Role } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { ReportsList } from './ReportsList';
 import type { PickablePerson } from './NewMessagePicker';
+import { StatusBadge } from '@pam/ui/StatusBadge';
 
 /**
  * Example reports, the example picker and the context lines — what
@@ -23,7 +24,6 @@ import type { PickablePerson } from './NewMessagePicker';
  */
 
 const styles = stylex.create({
-  note: { fontSize: '15px', lineHeight: 1.5 },
 });
 
 function person(id: string): DummyPerson | null {
@@ -85,9 +85,7 @@ export function DummyReports() {
           };
         })}
       />
-      <Text type="supporting" xstyle={styles.note}>
-        {t('example.people.note')}
-      </Text>
+      <StatusBadge label={t('common.example')} />
     </VStack>
   );
 }

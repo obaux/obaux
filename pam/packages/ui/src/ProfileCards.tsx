@@ -15,6 +15,7 @@ import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { CameraFilledIcon } from './icons.js';
 import { pam } from './tokens.stylex.js';
+import { StatusBadge } from './StatusBadge.js';
 
 /**
  * The Profile screen's cards (D-210): who you are, the two doors beside each
@@ -298,7 +299,8 @@ export function FeatureTileRow({ children }: { readonly children: ReactNode }) {
 
 export interface PromoCardProps {
   readonly title: string;
-  readonly body: string;
+  /** "Coming soon", when the offer is not on yet (D-608): a badge under the title, never a sentence. */
+  readonly badge?: string | undefined;
   readonly href: string;
   readonly art: ReactNode;
 }
@@ -318,21 +320,18 @@ const promo = stylex.create({
     backgroundColor: colorVars['--color-accent-muted'],
   },
   title: { fontSize: '18px', fontWeight: 700 },
-  body: { fontSize: '16px', lineHeight: 1.4 },
 });
 
-export function PromoCard({ title, body, href, art }: PromoCardProps) {
+export function PromoCard({ title, badge, href, art }: PromoCardProps) {
   return (
-    <ClickableCard label={title} href={href} padding={6} xstyle={promo.card}>
+    <ClickableCard label={badge ? `${title}. ${badge}` : title} href={href} padding={6} xstyle={promo.card}>
       <HStack gap={4} align="center" wrap="nowrap">
         <HStack align="center" justify="center" xstyle={promo.art}>
           {art}
         </HStack>
         <VStack gap={1}>
           <Text xstyle={promo.title}>{title}</Text>
-          <Text type="supporting" xstyle={promo.body}>
-            {body}
-          </Text>
+          {badge ? <StatusBadge label={badge} /> : null}
         </VStack>
       </HStack>
     </ClickableCard>

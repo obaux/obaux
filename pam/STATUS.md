@@ -1643,6 +1643,10 @@ connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merge
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
 
+## Design system & Storybook · Coming soon and Example badges (18 October)
+
+`StatusBadge` replaces the "coming soon" and "example" sentences on Profile and the example lists (D-612, D-608). Branch `claude/pam-design-d608-badges` (main + Sage's b50e386a); waits on Mira. Text alerts and six languages are others'.
+
 ## Design system & Storybook · Explore bell and staff search (18 October)
 
 A member's Explore draws the bell only while something is unread; the staff Home's member search is a plain field (D-610). Branch `claude/pam-design-explore-bell`; waits on Mira. a86 (`claude/pam-design-search-bar-look`) takes it by merge next.
