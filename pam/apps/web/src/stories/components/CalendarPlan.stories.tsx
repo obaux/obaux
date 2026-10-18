@@ -37,6 +37,7 @@ const WORDS = {
     countdown: 'In 2 days',
     change: 'Change appointment',
     addToCalendar: 'Add to calendar',
+    syncing: 'Syncing to Apple Calendar', // stand-in; Sage signs the words
     sync: 'Sync all future trip details?',
     sheetTitle: 'Add to calendar',
     done: 'Done',
@@ -74,6 +75,7 @@ const WORDS = {
     countdown: 'بعد يومين',
     change: 'غيّر الموعد',
     addToCalendar: 'أضف إلى التقويم',
+    syncing: 'تتم المزامنة مع تقويم Apple', // stand-in
     sync: 'مزامنة تفاصيل كل رحلاتك القادمة؟',
     sheetTitle: 'أضف إلى التقويم',
     done: 'تم',
@@ -121,6 +123,8 @@ const styles = stylex.create({
     color: colorVars['--color-text-green'],
     borderRadius: '24px',
   },
+  // Synced: no fill, the card's own green showing through; the words stay green and 16px bold, still 48px to tap.
+  synced: { flexShrink: 0, minHeight: '48px', paddingInline: '4px', fontSize: '16px', fontWeight: 700, color: colorVars['--color-text-green'] },
   // 48px high (the global button floor), so the whole line is the tap, not only its words.
   fine: { alignSelf: 'center', minHeight: '48px', paddingInline: '12px', fontSize: '15px', fontWeight: 600, color: colorVars['--color-text-secondary'] },
   tick: { width: '28px', height: '28px', borderRadius: '50%', backgroundColor: colorVars['--color-background-green'], color: colorVars['--color-icon-green'], flexShrink: 0 },
@@ -128,7 +132,8 @@ const styles = stylex.create({
   sheet: { width: '100%', paddingInline: '20px', paddingBlockEnd: '28px' },
 });
 
-function BookedScreen() {
+/** `synced`: the member has a calendar link, so the corner button is quieter (no white fill, the sync icon, "Syncing to …") and opens the Calendar screen. */
+function BookedScreen({ synced = false }: { readonly synced?: boolean }) {
   const w = useWords();
   return (
     <SubPage title={w.booked} backHref="/trips/" backLabel={w.close} backIcon="close">
@@ -140,9 +145,17 @@ function BookedScreen() {
           countdown={w.countdown}
           changeLabel={w.change}
           changeHref="/trips/"
-          action={<Button label={w.addToCalendar} variant="secondary" icon={<CalendarAddIcon width={22} height={22} aria-hidden />} xstyle={styles.calendar} />}
+          // The words are long, so the synced button takes its own row under the title (actionOwnRow) rather than squeezing it.
+          actionOwnRow={synced}
+          action={
+            synced ? (
+              <Button label={w.syncing} variant="ghost" href="/calendar/" icon={<SyncIcon width={22} height={22} aria-hidden />} xstyle={styles.synced} />
+            ) : (
+              <Button label={w.addToCalendar} variant="secondary" icon={<CalendarAddIcon width={22} height={22} aria-hidden />} xstyle={styles.calendar} />
+            )
+          }
         />
-        <Button label={w.sync} variant="ghost" icon={<SyncIcon width={18} height={18} aria-hidden />} href="/calendar/" xstyle={styles.fine} />
+        {synced ? null : <Button label={w.sync} variant="ghost" icon={<SyncIcon width={18} height={18} aria-hidden />} href="/calendar/" xstyle={styles.fine} />}
       </VStack>
     </SubPage>
   );
@@ -250,6 +263,8 @@ function CalendarScreen({ which }: { readonly which: 'none' | 'apple' | 'google'
 /** The booked screen: a calendar icon in the green card; under it, fine print and a sync icon. */
 export const C_Booked: Story = { render: () => <BookedScreen /> };
 /** What the icon opens: pick a calendar and the visit is on the phone. */
+/** The corner button once a calendar is linked: quieter, "Syncing to …", opens the Calendar screen. */
+export const C_Booked_Synced: Story = { render: () => <BookedScreen synced /> };
 export const C_Sheet: Story = { render: () => <AddSheet /> };
 /** Profile › Calendar, nothing linked. */
 export const C_CalendarNone: Story = { render: () => <CalendarScreen which="none" /> };
@@ -260,6 +275,7 @@ export const C_CalendarGoogle: Story = { render: () => <CalendarScreen which="go
 
 const arabic = { globals: { locale: 'ar' } } as const;
 export const C_Booked_Arabic: Story = { ...C_Booked, ...arabic };
+export const C_Booked_Synced_Arabic: Story = { ...C_Booked_Synced, ...arabic };
 export const C_Sheet_Arabic: Story = { ...C_Sheet, ...arabic };
 export const C_CalendarNone_Arabic: Story = { ...C_CalendarNone, ...arabic };
 export const C_CalendarApple_Arabic: Story = { ...C_CalendarApple, ...arabic };
