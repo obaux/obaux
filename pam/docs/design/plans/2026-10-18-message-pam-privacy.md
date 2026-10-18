@@ -1,6 +1,6 @@
 # Message Pam: the Privacy, transparency and Terms lines (one short card for Will, rewritten for his 7:04 answers)
 
-**Status:** draft English for Will to sign; nothing built, **nothing translated until he signs**. Lena (Languages & legal), 18 October 2026, against Nico's plan `2026-10-18-message-pam.md`, Ava's `2026-10-18-message-pam-admin.md`, Sage's ledgers (`d9174a60`, `d849470f`, `179bd706`, `ebc727f1`, `e8164a44`) and Will's answers on a100 (18 October, 07:04). The first versions of this file (with a pinned line, an in-app notice and a Profile switch) are in its history; Will's answers retire them.
+**Status:** English for Will to sign, **checked and signed by Sage (ledger `fa8df003`)**; nothing built, **nothing translated until he signs**. Lena (Languages & legal), 18 October 2026, against Nico's plan `2026-10-18-message-pam.md`, Ava's `2026-10-18-message-pam-admin.md`, Sage's ledgers (`d9174a60`, `d849470f`, `179bd706`, `ebc727f1`, `e8164a44`, `fa8df003`) and Will's answers on a100 (18 October, 07:04). The first versions of this file (with a pinned line, an in-app notice and a Profile switch) are in its history; Will's answers retire them.
 
 ## What Will answered, and what it does to the lines
 
@@ -16,7 +16,7 @@
 **L1, Privacy `what-we-keep.p17` (new).** Photos added to what is kept and to who reads it:
 > If you write to Pam in the app, or Pam writes to you, we keep what you both write, and any photos you send. Only the Pam team reads this conversation and sees its photos. Your guide and your programs don't see it. We keep it while you use Pam, and if you ask us to delete your account, we delete the whole conversation with it, photos too.
 
-- Sage's earlier edit stands ("or Pam writes to you"). The second sentence is her card sentence with "and sees its photos" added: **hers to sign again** (ledger to come).
+- Sage's earlier edit stands ("or Pam writes to you"). The second sentence is her card sentence with "and sees its photos" added; she signed it as written (ledger `fa8df003`).
 - "Pam writes to you" covers the welcome message and the after-hours reply (Pam's messages in the same conversation) and a conversation the team starts under B.
 - *Optional, one line, Will's call (not in the text above):* "A screenshot shows everything on your screen, so look at it before you send it." The documents line already says the same of a file (`what-we-keep.p5`: "look at what is in it first"); a screenshot of a phone can show other people's names and messages. It is on the legal page, not the screen, so it keeps the UI clean.
 - `what-we-keep.p4` ("Only the person you send it to can see it.") is left alone: for a photo sent to Pam, the person is the Pam team, which L1 says.
@@ -41,9 +41,9 @@
 
 **L4, "What others can see"** (the screen members were promised: the last step of signing up shows every line, Profile › What others can see shows the short version; `TransparencyReading.tsx`, `TRANSPARENCY_SCREEN`). The Pam team is a third card beside "A program can see:", never in the guide's list, and a line in the short version. Photos added; worded with L1 (both directions, photos):
 - Card heading `transparency.pam.heading`: **The Pam team can see:**
-- Card line `transparency.pam.messages`: **What you and Pam write to each other, and the photos you send there. Your guide and your programs cannot see it.** (The screen splits a two-sentence line at the full stop into a lead and a grey line.)
+- Card line `transparency.pam.messages`: **What you and Pam write to each other, and the photos you send there. Your guide and your programs cannot see any of it.** (The screen splits a two-sentence line at the full stop into a lead and a grey line.)
 - Short version `transparency.summary.pam`: **Only the Pam team can see what you and Pam write to each other, and the photos you send there.**
-- Sage signed "What you and Pam write to each other." (ledger `179bd706`); "can see" and the photos are the new words, hers to sign.
+- Sage signed "What you and Pam write to each other." (ledger `179bd706`) and the rest (ledger `fa8df003`), with "any of it": after a list a bare "it" can read as the photos alone.
 
 **L5, telling members first (D-413): no in-app notice.** Will: nothing in the app explains who reads it. **The a94 precedent applies, and I recommend dropping the notice.** What a94 (D-595, b58) established: a change to what is seen is told to members on the Privacy page and on the transparency screens ("What others can see"), in the same batch as the change, with no in-app notice. Here the same two places carry it: L1 on the Privacy page, and L4 on the screen the promise is printed on (`transparency.footer`: "If this changes, we will tell you first."; `who-can-see.p4`). Two differences, both in this case's favour: nothing a member already has becomes visible (the team reads only what someone sends to Pam, which does not exist until they send it); and a new member sees the Pam card on the last step of signing up.
 
@@ -71,7 +71,7 @@ The `messages` entry stays as it is (a Pam conversation uses the same composer; 
 
 ## What I will hold in tests once it is built, and what Nico's side must hold
 
-1. **`message-pam-line.test.ts`** (mine): L1 and L4 each say both directions ("or Pam writes to you … what you both write"; "What you and Pam write to each other") and photos ("any photos you send … sees its photos"; "the photos you send there"), and each says only the Pam team (L1: "Only the Pam team reads this conversation and sees its photos. Your guide and your programs don't see it."; L4: "Your guide and your programs cannot see it"; the short version "Only the Pam team"). It fails if either drops Pam's side or the photos. No pinned line or notice to hold: there is none.
+1. **`message-pam-line.test.ts`** (mine): L1 and L4 each say both directions ("or Pam writes to you … what you both write"; "What you and Pam write to each other") and photos ("any photos you send … sees its photos"; "the photos you send there"), and each says only the Pam team (L1: "Only the Pam team reads this conversation and sees its photos. Your guide and your programs don't see it."; L4: "Your guide and your programs cannot see any of it"; the short version "Only the Pam team"). It fails if either drops Pam's side or the photos. No pinned line or notice to hold: there is none.
 2. **L3 in seven places:** Privacy and Terms `limits.p2` both say "write to Pam"; the notice (`en.json` and `notices.ts`) is the same sentence; a test reads the three site posts (`StartHere.tsx`, `CaseManagerAssignments.tsx`, `PamWords.tsx`) and fails if one still says a limited account "cannot send" without Pam. (Today no test holds the posts to the policy.)
 3. **L1 is true of the policies** (Nico's DB tests, mine to read): every new read policy on `messages`, `conversations`, `conversation_members` **and the photo storage** names `is_pam_team()` and `kind = 'support'`; none names the case-manager role or a program; `messages_select_conversation_member` keeps its "deliberately NO admin policy" comment.
 4. **Erasure:** deleting the asker deletes the Pam conversation, its messages **and its photos in storage** (the same sweep as other conversations' photos, `how-long.p1`); L1 says "photos too".
@@ -80,7 +80,7 @@ The `messages` entry stays as it is (a Pam conversation uses the same composer; 
 
 ## For Sage, Nico, Wren, Mira
 
-- **Sage:** sign L1 again with the photo words, and L4's two new lines ("The Pam team can see:", the card line and the short-version line); the notice sentence and the three posts' steps are yours (mine above are proposals). The pinned line, the in-app notices (A, B, C) and the Profile switch are retired, so the notice words in `e8164a44` and `7b280684` are not used.
+- **Sage (signed, ledger `fa8df003`):** L1 as written, L4 (heading, short version, and the card line with "any of it"), the notice, and the three posts' sentences as proposed above. The optional screenshot line she would keep. The pinned line, the in-app notices (A, B, C) and the Profile switch are retired, so the notice words in `e8164a44` and `7b280684` are not used.
 - **Nico:** photos in a Pam conversation need the storage policies for the team and two `PAM_TEAM_CAN_READ` entries (plan question 5b); erasure must delete the conversation's photos; the D-262 comments ("never a member") say "except as Pam"; the e2e on the limited screen (`messages.spec.ts` 161 and 626, both citing `terms.s.limits.p3`) now has a Pam conversation with a composer.
 - **Wren:** the three posts above, same batch; and `MessagesInPam.tsx`, whose "Nobody else can [start a chat with you]" (line 24) and "A super admin: … Never a member." (line 36) are untrue under B and have no row for Pam.
 - **Mira:** one card. `legal:date privacy` and `legal:date terms` on the ship day; the lines ship in the same batch as the conversation or before it. I translate when Will signs.
