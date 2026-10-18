@@ -711,7 +711,7 @@ test.describe('a conversation', () => {
       }
       const theirs = { id: MSG_THEIRS, conversation_id: CONVO, sender_id: OTHER, body: 'Is the class still on Tuesday?', created_at: new Date(Date.now() - 60_000).toISOString() };
       // Filtered the way the database does: the retry's look for its own earlier message asks for the sender.
-      if (request.url().includes(`sender_id=eq.${ME}`)) return route.fulfill(json(stored.filter((m) => m.body === 'See you Thursday.')));
+      if (request.url().includes(`sender_id=eq.${ME}`)) return route.fulfill(json(stored));
       return route.fulfill(json([theirs, ...stored]));
     });
     return { posts: () => posts };

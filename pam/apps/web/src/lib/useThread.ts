@@ -383,16 +383,20 @@ export function useThread(conversationId: string | null): {
         // Try again never makes a duplicate.
         const { createClient } = await import('./supabase');
         const supabase = createClient();
-        let probe = supabase
+        // Asked by who and when only: what a person typed never goes in a URL the logs keep (a66), so the words are compared here.
+        const { data: recent } = await supabase
           .from('messages')
           .select(MESSAGE_COLUMNS)
           .eq('conversation_id', conversationId)
           .eq('sender_id', loaded.meId)
-          .gte('created_at', new Date(item.startedAt - 5000).toISOString());
-        probe = item.body ? probe.eq('body', item.body) : probe.is('body', null);
-        if (item.attachment) probe = probe.eq('attachment_kind', item.attachment.kind);
-        const { data: already } = await probe.order('created_at', { ascending: false }).limit(1);
-        const found = ((already ?? []) as unknown as MessageRow[])[0];
+          .gte('created_at', new Date(item.startedAt - 5000).toISOString())
+          .order('created_at', { ascending: false })
+          .limit(20);
+        const found = ((recent ?? []) as unknown as MessageRow[]).find(
+          (row) =>
+            (row.body ?? '') === item.body &&
+            (item.attachment ? row.attachment_kind === item.attachment.kind : row.attachment_kind === null),
+        );
         if (found) {
           const message = toMessage(found, loaded.meId, {}, item.photoUrl);
           setLoaded((prev) =>
