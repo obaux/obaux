@@ -928,6 +928,12 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Accounts & invites · Message Pam, the super admin's side (18 October) — PLAN, waits on Will's card
+
+`claude/pam-message-pam-admin-plan`: `docs/design/plans/2026-10-18-message-pam-admin.md`, with Nico's plan. No code. The
+Home row, the inbox, what each row shows, "Pam" as the sender, starting from Everyone, and support staff later. It
+names reversing D-171 for members (as Pam only) as Will's call.
+
 ## Accounts & invites · Sign up's city note is a line, not a row (17 October) — in b62 (run-through P5)
 
 `claude/pam-join-city-note`. "Pam is only in these cities for now." is small print under the city field, not a disabled
