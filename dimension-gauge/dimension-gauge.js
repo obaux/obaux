@@ -11,6 +11,9 @@
  *   max-fill    Highest level the circle can reach, 0–100. Default 92, so there is always
  *               a little room left at the top. Use max-fill="100" to allow a full circle.
  *   energy      Wave liveliness, 0.4–1.6. Default 1. Low = slow, shallow swell; high = brisk, taller waves.
+ *   fill-duration  ms for the first fill from empty. Default 3600: a slow rise, like water filling a sphere.
+ *                  Later changes to `value` use a shorter tween (max 1400 ms).
+ *   delay       ms to wait before the first fill starts. Stagger a row of gauges with delay="${i*180}".
  *   static      Boolean. No wave motion (also automatic under prefers-reduced-motion).
  *
  * Theming (CSS custom properties, set on the element or any ancestor)
@@ -28,7 +31,8 @@ const STEPS = 48;          // points per wave path
 const REDUCED = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
-const easeOut = t => 1 - Math.pow(1 - t, 3);
+// Water-fill feel: starts steadily, then slows gently as it nears the level.
+const easeFill = t => 1 - Math.pow(1 - t, 2.2);
 
 // Wave layers: [amplitude, wavelengths across the circle, speed rad/s, phase offset, level offset]
 // The back (pale) layer sits slightly higher and moves against the front so it peeks out as a sliver.
@@ -47,7 +51,7 @@ svg.disc{display:block;width:100%;height:100%}
 `;
 
 class DimensionGauge extends HTMLElement {
-  static observedAttributes = ['value', 'label', 'static', 'max-fill', 'energy'];
+  static observedAttributes = ['value', 'label', 'static', 'max-fill', 'energy', 'fill-duration', 'delay'];
 
   constructor() {
     super();
@@ -62,7 +66,8 @@ class DimensionGauge extends HTMLElement {
     this._back = root.querySelector('.back');
     this._front = root.querySelector('.front');
     this._shown = 0;          // value currently drawn (animated)
-    this._from = 0; this._to = 0; this._t0 = 0;
+    this._from = 0; this._to = 0; this._t0 = 0; this._D = 0;
+    this._started = false;    // first fill waits until the gauge is on screen
     this._raf = 0; this._t = 0;
   }
 
@@ -73,20 +78,35 @@ class DimensionGauge extends HTMLElement {
     this._sync();
     this._to = this._value();
     this._shown = this._from = 0;   // always fill up from empty on first paint
-    this._t0 = performance.now();
-    this._io = new IntersectionObserver(([e]) => { this._visible = e.isIntersecting; this._kick(); });
+    this._visible = false;          // nothing animates until the gauge is on screen
+    this._draw();
+    this._io = new IntersectionObserver(([e]) => {
+      this._visible = e.isIntersecting;
+      if (this._visible && !this._started) this._start();
+      this._kick();
+    });
     this._io.observe(this);
-    this._visible = true;
-    this._kick();
   }
+
+  _start() {
+    this._started = true;
+    this._from = 0; this._to = this._value();
+    this._D = this._still() ? 0 : this._num('fill-duration', 3600, 0, 20000);
+    this._t0 = performance.now() + this._num('delay', 0, 0, 20000);
+  }
+
+  _num(name, dflt, lo, hi) { const n = parseFloat(this.getAttribute(name)); return clamp(Number.isNaN(n) ? dflt : n, lo, hi); }
 
   disconnectedCallback() { cancelAnimationFrame(this._raf); this._raf = 0; this._io?.disconnect(); }
 
   attributeChangedCallback(name) {
     if (!this.isConnected) return;
     if (name === 'value' || name === 'max-fill') {
+      this._sync();
+      if (!this._started) return;                     // first fill picks up the latest value when it starts
       this._from = this._shown; this._to = this._value(); this._t0 = performance.now();
-      this._sync(); this._kick();
+      this._D = this._still() ? 0 : Math.min(this._num('fill-duration', 3600, 0, 20000), 1400);
+      this._kick();
     } else { this._sync(); this._kick(); }
   }
 
@@ -114,13 +134,13 @@ class DimensionGauge extends HTMLElement {
     this._last = now;
     if (!this._still()) this._t += dt * this._energy();
 
-    const D = 900;                                   // level tween, ms
-    const p = clamp((now - this._t0) / D, 0, 1);
-    this._shown = this._from + (this._to - this._from) * easeOut(p);
+    const p = this._D ? clamp((now - this._t0) / this._D, 0, 1) : (now >= this._t0 ? 1 : 0);
+    this._shown = this._from + (this._to - this._from) * easeFill(p);
+    this._rise = p > 0 && p < 1 ? 1 - p : 0;         // waves swell a little while the level is rising
     this._draw();
 
     // Keep looping while the waves move or the level is still tweening.
-    if (!this._still() || p < 1) this._kick(); else this._last = 0;
+    if (!this._still() || p < 1 || now < this._t0) this._kick(); else this._last = 0;
   }
 
   _draw() {
@@ -132,7 +152,7 @@ class DimensionGauge extends HTMLElement {
   _wave(v, w) {
     // Waves flatten near 0 and 100 so the circle reads as truly empty / truly full.
     const edge = Math.min(1, v / 6, (100 - v) / 6);
-    const amp = w.amp * clamp(edge, 0, 1) * (0.55 + 0.45 * this._energy());
+    const amp = w.amp * clamp(edge, 0, 1) * (0.55 + 0.45 * this._energy()) * (1 + 0.3 * (this._rise || 0));
     const level = 100 - v;                            // y of the surface (0 = top)
     const y0 = v >= 99.5 ? -w.amp - 1 : level - w.lift * clamp(edge, 0, 1);
     let d = `M-2 102 L-2 ${y0.toFixed(2)}`;
