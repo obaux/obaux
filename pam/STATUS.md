@@ -1320,6 +1320,10 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · Message Pam, slice 2: the person's side (18 October 2026)
+
+Built, not live (switch off): Pam's row and conversation in Messages, the welcome and out-of-hours reply from keys, the fixed address `/messages/pam/` (Sign in and back; switch off lands on Messages), Help's "Write to Pam", a limited account writing to Pam, and in every conversation a per-message state (Sending… / Not sent with Try again / Sent) where a failed send is kept and Try again sends once (D-609). Migration `20261018080342` makes `pam_inbox()` list only conversations somebody wrote in. Proof: `message-pam.spec.ts`, `messages.spec.ts`, DB tests 81 to 83, Storybook `States/Message Pam`. Next: photos with progress and retry (slice 3).
+
 ## Messages & notifications · Message Pam, slice 0 and the first migrations (18 October 2026)
 
 Built, not live: Will's card a100 (D-605) makes messaging Pam the app's main channel, behind a switch that is off (`app_settings.pam_messaging_live`). This slice: `PAM_TEAM_CAN_READ` (the Pam team's own list; `ADMIN_CAN_SEE` untouched, D-606), a `support` conversation kind, a message that may have no author and says what it is by a key (a person cannot write one), and the switch and hours settings. Nine migrations (`20261018071550` to `20261018073016`, the nullable sender alone in its file), tests 79 to 83: who reads what, `open_pam_conversation` and `pam_status`, the team's inbox and starting a conversation, the bell, the send limit, the out-of-hours reply, erasure, and no report on a Pam message. With the switch off nothing creates a Pam conversation. Photos' files are never swept for any conversation (found; slice 3). The plan: `docs/design/plans/2026-10-18-message-pam-slices.md`.
