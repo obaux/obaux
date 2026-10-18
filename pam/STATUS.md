@@ -928,14 +928,25 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Accounts & invites · Messages to Pam, the Pam team's inbox (18 October) — S1 READY, behind Nico's switch (card a100)
+## Accounts & invites · Message Pam, the Pam team's side (18 October) — S1 to S4 READY, behind Nico's switch (card a100, D-613)
 
-`claude/pam-message-pam-admin` (stacked on Nico's `claude/messages-pam-s0-s1a`). The super admin's Home has a first row,
-"Messages to Pam", with a plain count of conversations waiting (D-586). `/pam/messages/` lists who is waiting for Pam,
-longest first, with how long, then Answered, with Closed folded under a row. A row shows first name, role and region (or
-a lead's program) only. A line gives the median first reply, rounded up. Built on Nico's `lib/pam.ts`. Words: Sage
-b947f366 and Lena a2fc2638. Next: S2 (close and reopen, saved replies), S3 (starting as Pam), S4 (hours). Plan:
-`docs/design/plans/2026-10-18-message-pam-admin-build.md`.
+Built on `claude/pam-message-pam-admin` @ 1b67f588, stacked on Nico's `claude/messages-pam-s0-s1a`.
+
+- **Home:** the super admin's first row is "Messages to Pam", with a plain count of the conversations waiting (D-586).
+- **`/pam/messages/`:** who is waiting, longest first, with how long; then Answered; Closed is folded under one row.
+  - Each row shows only the first name, role, and region or program.
+  - In Arabic, an English preview keeps its order.
+  - No reply-time line in v1.
+  - Back only, no Help.
+- **In a person's Pam conversation**, the team has Saved replies (Sage's three; the legal reply is held), and its own ⋯ at
+  `/pam/thread/options/` with Close or Reopen and Stuff shared.
+- **`/pam/start/`:** Pam writes first to a person (from Everyone) or to a program's active leads (from its page, where the
+  row reads "Message this program" while the switch is on).
+- **`/pam/hours/`:** Pam's hours, with the reply people get outside them.
+
+Open:
+- Sage signs the new words, then Lena translates them.
+- Nico: the team's composer should say "Reply as Pam" and take photos only; `profile_roles` in the two program functions.
 
 ## Accounts & invites · Sign up's city note is a line, not a row (17 October) — in b62 (run-through P5)
 
