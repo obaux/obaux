@@ -16,4 +16,4 @@ Will, 18 October, 17:51 (Control Room), on the Text alerts screen: the line abov
 
 **Not proven by a spec: staff.** Staff kinds are not live yet, so no e2e can switch one. The code is the same path (`/reminders/` has its own staff branch) and `Case manager/Created/States/Text alerts: agree first` draws the staff agree screens; a staff routing spec goes in the day `ALERT_TEXTS_LIVE` is flipped.
 
-**Known cost.** A case manager or program lead who turns their last switch off withdraws the yes (as before), so the next switch-on sends them to the agree screen again. That is the rule, applied; it can be softened by not withdrawing on the last switch-off, which is a consent decision for Lena, not a design one.
+**Turning the last switch off keeps the yes (Nico, 21b053e9).** So the routing above only meets people who never agreed, chose "Not now", or have a withdrawn yes; only a STOP ends everything. The held test in `alerts.spec` expects `{alert_booked: false}` and no `sms_enabled`, and stays skipped while texts are held.

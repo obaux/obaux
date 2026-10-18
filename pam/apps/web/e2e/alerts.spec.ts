@@ -289,7 +289,7 @@ test.describe('Text alerts', () => {
     expect(results.violations).toEqual([]);
   });
 
-  test('turning the last one off withdraws the yes to texts, for a program', async ({ page }) => {
+  test('turning the last one off keeps the yes to texts, for a program (Nico 21b053e9: only STOP ends it)', async ({ page }) => {
     const writes = await signedInAs(page, 'provider', { sms_enabled: true, sms_stopped_at: null, alert_booked: true, alert_message: false, alert_changed: false, alert_trip: false });
     await page.goto('/alerts/');
     await settled(page);
@@ -298,7 +298,9 @@ test.describe('Text alerts', () => {
     await booked.click();
     await expect(booked).not.toBeChecked();
     await expect.poll(() => writes.length).toBe(1);
-    expect(writes[0]).toMatchObject({ alert_booked: false, sms_enabled: false });
+    expect(writes[0]).toMatchObject({ alert_booked: false });
+    // The yes is not withdrawn by the last switch going off: only a STOP ends it.
+    expect(writes[0]).not.toHaveProperty('sms_enabled');
   });
 
   test('turning one off while another is on leaves the yes alone', async ({ page }) => {
