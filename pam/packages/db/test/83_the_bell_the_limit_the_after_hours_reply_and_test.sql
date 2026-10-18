@@ -77,6 +77,8 @@ insert into public.messages (conversation_id, sender_id, body) values ((select v
 select test.check('Pam replies: Kai is told it was "Pam"',
   (select count(*) from public.notifications where subject_id = (select v from t83 where k = 'kai')
      and recipient_id = :'kai' and body_vars ->> 'name' = 'Pam'), 1);
+select test.check('control: the team member who wrote has a first name to leak',
+  (select count(*) from public.profiles where id = :'root' and nullif(first_name, '') is not null), 1);
 select test.check('...and nothing in the row says who on the team wrote it',
   (select count(*) from public.notifications where subject_id = (select v from t83 where k = 'kai') and recipient_id = :'kai'
      and body_vars::text ilike '%' || (select first_name from public.profiles where id = :'root') || '%'), 0);
@@ -93,6 +95,8 @@ insert into public.messages (conversation_id, sender_id, body) values ((select v
 select test.check('Pam writes to Kai, who asked for message texts: the "message waiting" text is queued, as from anyone',
   (select count(*) from public.outbound_messages where member_id = :'kai' and template_key = 'message_waiting'), 1);
 delete from public.outbound_messages where member_id = :'kai';
+-- The team member has asked for message texts too, so "no text for anyone" below counts something that could have been queued.
+insert into public.notification_preferences (member_id, sms_enabled, alert_message) values (:'root', true, true) on conflict (member_id) do update set sms_enabled = true, alert_message = true, sms_stopped_at = null;
 insert into public.messages (conversation_id, sender_id, body) values ((select v from t83 where k = 'kai'), :'kai', 'My own message queues nothing for me');
 select test.check('Kai writing to Pam queues nothing for anyone (Pam has no phone)',
   (select count(*) from public.outbound_messages where template_key = 'message_waiting' and member_id in (:'kai', :'root')), 0);
@@ -115,6 +119,8 @@ select test.check_raises_like('Kai cannot report what Pam wrote',
   format($$ select public.report_message(%L) $$, (select id from public.messages where conversation_id = (select v from t83 where k = 'kai') and sender_id = :'root' limit 1)),
   '%cannot be reported%');
 reset role;
+select test.check('control: there are messages in Kai''s Pam conversation to report (his, Pam''s and the system''s)',
+  (select (count(*) >= 3)::int from public.messages where conversation_id = (select v from t83 where k = 'kai')), 1);
 select test.check('...and no report was made',
   (select count(*) from public.reports where target_type = 'message'
      and target_id in (select id from public.messages where conversation_id = (select v from t83 where k = 'kai'))), 0);
