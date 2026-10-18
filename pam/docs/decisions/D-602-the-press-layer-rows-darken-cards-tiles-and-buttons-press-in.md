@@ -33,3 +33,6 @@ Checked by holding each: a trip card and a program card (both `ClickableCard`: s
 
 `e2e/press-layer.spec.ts` (a held mouse button sets `:active` as a finger does in Safari): a row's shade, a tile's and a button's scale 0.97 and their return, and reduced motion (shade, no scale). All four fail on main on the assertion they claim (no shade, scale 1) and pass on narrow-320, dark-320 and iphone-se-viewport. Pictures and a before-and-after clip (left before, right after) in `docs/design/review/2026-10-17-press/`.
 
+## Addendum, part 2 (18 October)
+
+A card whose heading is a stretched link (`data-pam-stretch`: Explore's program cards, the case manager's member cards and program list, the program lead's Finish setting up cards) presses as a whole through `.astryx-card:has(a[data-pam-stretch]:active)`. A service choice (`.astryx-selectable-card`) presses in; a tab (`a.astryx-tab`) shades. Same tokens as part 1. Only marked cards press, so an ordinary link in a card does not.

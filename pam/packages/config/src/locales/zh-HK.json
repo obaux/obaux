@@ -1722,9 +1722,13 @@
   "calendar.legacy.body": "它仍然有效。每次到訪只會顯示「Pam visit」和時間。如想顯示每次到訪的地點和地址，請在下方選擇您的日曆，取得新連結。",
   "trips.addToCalendar": "加入日曆",
   "trips.addToCalendar.hint": "地點、地址和時間，加入您選擇的日曆。",
-  "trips.syncAll": "要同步所有日後到訪的詳細資料嗎？",
   "calendar.keepPrivate": "請不要把這個連結告訴別人。",
   "calendar.newLink.title": "要取得新連結嗎？",
   "calendar.newLink.body": "舊連結會失效。請把新連結重新加入您的日曆。",
-  "calendar.newLink.confirm": "取得新連結"
+  "calendar.newLink.confirm": "取得新連結",
+  "calendar.addOne.added": "已加入日曆",
+  "calendar.addOne.added.label": "已加入日曆。開啟日曆設定。",
+  "calendar.addOne.syncAll": "加入您之後的所有到訪",
+  "calendar.addOne.syncAll.hint": "只需設定一次日曆連結。",
+  "calendar.addOne.changed": "這次到訪在您加入之後有變動。請重新加入。"
 }

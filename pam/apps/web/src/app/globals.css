@@ -689,14 +689,47 @@
     transition-duration: var(--pam-press-in), 125ms, 125ms, 125ms, 125ms;
   }
 
+  /*
+   * A card whose heading is a stretched link (`data-pam-stretch`: Explore's program cards, the case manager's member cards and
+   * program list, the program lead's "Finish setting up" cards) is an `astryx-card`, not a clickable card. Pressing the link
+   * (its ::after covers the card) presses the whole card. Only marked cards: an ordinary link inside a card does not.
+   */
+  /* A service choice. */
+  .astryx-card,
+  .astryx-selectable-card {
+    transition-property: transform, background-color, border-color, background-image;
+    transition-duration: var(--pam-press-out), 125ms, 125ms, 125ms;
+    transition-timing-function: var(--pam-press-ease);
+  }
+  .astryx-card:has(a[data-pam-stretch]:active),
+  .astryx-selectable-card:active {
+    transform: scale(var(--pam-press-scale));
+    background-image: linear-gradient(var(--pam-press-shade), var(--pam-press-shade));
+    transition-duration: var(--pam-press-in), 125ms, 125ms, 125ms;
+  }
+
+  /* A tab in the bar: shade while held, as a row. */
+  .astryx-tab {
+    transition: background-color var(--pam-press-out) var(--pam-press-ease);
+  }
+  .astryx-tab:active {
+    background-color: var(--pam-press-shade);
+    transition-duration: 60ms;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .astryx-item,
     .astryx-segmented-control-item,
     .astryx-clickable-card,
+    .astryx-card,
+    .astryx-selectable-card,
+    .astryx-tab,
     .astryx-button {
       transition: none;
     }
     .astryx-clickable-card:active,
+    .astryx-card:has(a[data-pam-stretch]:active),
+    .astryx-selectable-card:active,
     .astryx-button:active:not(:disabled, [aria-disabled='true']):not([data-pam-press] *) {
       transform: none;
     }

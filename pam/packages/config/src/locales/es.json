@@ -1722,9 +1722,13 @@
   "calendar.legacy.body": "Sigue funcionando. Cada visita dice solo “Pam visit” y la hora. Para mostrar el lugar y la dirección de cada visita, elige tu calendario abajo y obtén un enlace nuevo.",
   "trips.addToCalendar": "Agregar al calendario",
   "trips.addToCalendar.hint": "El lugar, la dirección y la hora, en el calendario que elijas.",
-  "trips.syncAll": "¿Sincronizar los detalles de todas tus próximas visitas?",
   "calendar.keepPrivate": "Mantén este enlace solo para ti.",
   "calendar.newLink.title": "¿Obtener un enlace nuevo?",
   "calendar.newLink.body": "El enlace anterior deja de funcionar. Vuelve a agregar el nuevo a tu calendario.",
-  "calendar.newLink.confirm": "Obtener un enlace nuevo"
+  "calendar.newLink.confirm": "Obtener un enlace nuevo",
+  "calendar.addOne.added": "Agregado al calendario",
+  "calendar.addOne.added.label": "Agregado al calendario. Abre los ajustes del calendario.",
+  "calendar.addOne.syncAll": "Agrega todas tus próximas visitas",
+  "calendar.addOne.syncAll.hint": "Configura un enlace de calendario una sola vez.",
+  "calendar.addOne.changed": "Esta visita cambió después de que la agregaste. Agrégala de nuevo."
 }

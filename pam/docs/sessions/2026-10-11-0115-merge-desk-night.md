@@ -1451,10 +1451,28 @@
   Piper builds: a new calendar_links table (calendar_feeds untouched, no DROP), a link made of a random lookup id and
   an HMAC under a Vault key (never the account id), each event only the place's name, address and times, one visit
   as an .ics made on the phone or a Google link. Nothing ships before the signature and Will's own iPhone try.
-- **Batch b63 (18 October, 00:36 to 01:07).** Piper's 9bbbef37 (Iris's W1, P3, P4: a visit row opens the member
+- **Batch b63 (18 October, 00:36 to 01:06).** Piper's 9bbbef37 (Iris's W1, P3, P4: a visit row opens the member
   from anywhere but the check-in circle; the pins the Trips sheet covers are out of a screen reader's reach; the
   ProgramLead story's people), Dot's ee6677bd (W2, P2: every menu item 48px; the legal jump links 48px), and Iris's
   re-test of b61 and b62 (77965802, docs). Lena's S1 was in b63's first form and came out (below).
+- **Batch b64 (18 October, 01:22 to 02:07).** Piper's 4785216f (the example schedule keys its pattern on the
+  date, so no week is empty when seen from a Sunday; found in the run-through), Dot's 6581d593 (press layer part 2,
+  D-602 addendum: Explore's program cards, the case manager's member cards, the lead's setup cards, service choices
+  and the tab bar press in; b62's layer covered one of each kind, not these), and Iris's re-test of b63 (9a349d9d,
+  docs: W1, P3, W2, P2 pass; P4's visit rows are fixed, with two follow-ups for Piper: the lead stories' Members
+  interested circles open "not found", and Tab stops on the covered Map preview). Lena's S1 (d092630d) is held: its
+  list rule needs `!important` to beat a style Astryx writes on the element, which pam/CLAUDE.md rules out. Lena
+  showed Astryx 0.6.0 has no seam for it (Layer/useLayer.js writes the fallbacks inline), so S1 becomes Astryx's own
+  bottom sheet on Sign up's language field (decided 01:44; Lena's pictures at 01:47 bear it out). Plan C: Piper's
+  branch now carries main and Dot's calendar card (c8cd0705, merged at the desk when Piper's own session refused the
+  merge).
+- **Card a98 signed (18 October, 01:46).** Will: "Signed 1,2,3": Sage's p12 (f5d64686), the one-visit line (bb474f6d)
+  and p6 (e1956821), word for word as on the card. Will asked whether the booked card's button says "Added to calendar"
+  once used. Decided: adding one visit leaves "Add to calendar" as it is, since Pam cannot see whether it was saved
+  and the signed line says it does not. With a calendar link, the button goes quieter, takes the sync icon and says
+  so, in Sage's signed words (01:54, "Goes to {calendar}": Pam offers the visits and cannot see the calendar take
+  them, so not "Syncing"). Dot drew it (e10e64cf, on its own row) and Piper builds it. Plan C's sheet is the
+  a97 drawer (Dot's calendar branch carries it), so plan C ships with a97, which waits on Will's yes.
 
 ## What was wrong, and what missed it
 
@@ -1696,6 +1714,18 @@
   language field to the middle of a 320×568 screen, where seven rows fit neither above nor below. It was not pushed;
   b63 went without it and S1 is reworked for b64. Lesson: prove and run a READY on the base it lands on.
 - **A push time written before the push (b62's records).** The records said 23:56; the push was 23:54.
+- **And again (b63's records).** They said 01:07; the push was 01:06:38. Records go in the batch they describe, so
+  the time they carry is when they were written. From b64 the "As of" time is that, from `date -u`, and the push
+  time is in the next batch's verified rows.
+- **A proof that failed on its own wait, again (press part 2, 01:12).** 9 of press-layer.spec's 15 failures on b63's
+  build were timeouts on `.astryx-card:has(a[data-pam-stretch])`, an attribute only the new code puts in the page:
+  the proof had taken out the new CSS but kept the new markup. Dot changed the locators to find the cards as main
+  renders them, and the re-proof failed 15 on assertions. Lesson: "prove on old code" means old markup too, not new
+  markup minus the rule; read the failure messages, not the count.
+- **A bug filed from a misread picture (01:55).** The desk sent Dot an Arabic chevron "pointing the wrong way" after
+  Change appointment, judged from a small screenshot. Dot checked main's real build and the pixels: it points left, as
+  it should, so Dot made no change and wrote no test that would pass on main. Lesson: look at the pixels before
+  filing a visual bug.
 
 ## Decisions
 
@@ -1921,10 +1951,20 @@
 | S1 proof: language-list-fits from 95d3fb42 on b62's build, --retries=0 | 24 failed (8 × 3), each on "rows the list hides, cuts off or lets run off the screen", none on the wait |
 | b63 proof: visit-row-taps and trips-covered-pins (97ca390e), menu-items and legal-toc-targets (ee6677bd), on main's build with S1's list rule (which none of these screens use), --retries=0 | 18 failed (6 tests × 3), each on its assertion (a row's top-left tap that opens nothing; covered pins still reachable; "Flag something" under 48px; a tap 3px above "What Pam is"); 6 passed (the check-in circle and Members interested, unchanged by design) |
 | Batch b63, full run (0b345c39: Piper 9bbbef37, Dot ee6677bd, Iris 77965802): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1386 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 188 / 10.3 kB spare / 2147 passed, 19 skipped, 0 failed / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
+| b63 main CI (6cc00c76, pushed 01:06:38) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (01:41); Vercel web and pam-site success |
+| Sunday-fix proof: dummy-appointments.test.ts from 4785216f against the branch's code with the old formula put back | 3 failed, each on its assertion (an empty week, Monday 22 December 2025, seen from Friday 2 January 2026; "expected 1 to be 3"; the Sunday "expected 0 > 0"); 2 passed (a weekend stays empty; today has four) |
+| b64 proof, first form: press-layer.spec from f88e5bed on b63's build, --retries=0 | 15 failed, 9 of them hollow (timed out waiting for `a[data-pam-stretch]`, which only the new code sets); sent back |
+| b64 proof: press-layer.spec from 6581d593 on b63's build, --retries=0 | 15 failed, each on its assertion (12 at scale 1, not 0.97: Explore's card, a service choice, a case manager's member card, a lead's setup card, × 3; 3 a tab with no shade); 12 passed (b62's cases) |
+| Batch b64, full run (73026a81: Piper 4785216f, Dot 6581d593, Iris 9a349d9d): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1391 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 188 / 10.2 kB spare / 2162 passed, 19 skipped, 0 failed / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
 
 ## Left undone
 
-- **As of b63 (18 October, 01:07):** b64 takes Lena's S1 rework (the list fills the screen when neither side has
+- **As of b64 (18 October, 02:07):** b65 takes Lena's S1 once proven on b64's build. Piper: plan C's booked-card
+  action and its synced state (Sage's words signed, Dot's e10e64cf), full checks and a real picture; then Iris's two
+  b63 follow-ups and the "Change the time" link. Lena: S1 as a bottom sheet (Astryx's own presentation, no
+  override), then plan C's three signed lines and words in six languages. Iris: re-test b64.
+  With Will: "yes a97" (plan C ships with it) and an iPhone try of one visit; a86, a91, a93, a84, a88.
+- **As of b63 (18 October, 01:06):** b64 takes Lena's S1 rework (the list fills the screen when neither side has
   room; READY after its full run), Piper's Sunday fix for the example schedule (4785216f), and Dot's press layer part 2
   (f88e5bed: stretched cards, service choices, the tab bar). Piper: plan C. Lena: S1, then plan C's words and lines
   once Will signs. Iris: re-test b63. With Will: a98's "sign 1, 2, 3"; a86, a91, a93, a97, a84, a88.

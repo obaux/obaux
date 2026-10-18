@@ -1722,9 +1722,13 @@
   "calendar.legacy.body": "它仍然有效。每次预约只显示“Pam visit”和时间。若想显示每次预约的地点和地址，请在下方选择您的日历，获取新链接。",
   "trips.addToCalendar": "添加到日历",
   "trips.addToCalendar.hint": "地点、地址和时间，添加到您选择的日历中。",
-  "trips.syncAll": "要同步所有未来预约的详细信息吗？",
   "calendar.keepPrivate": "请不要把这个链接告诉别人。",
   "calendar.newLink.title": "要获取新链接吗？",
   "calendar.newLink.body": "旧链接会失效。请把新链接重新添加到您的日历。",
-  "calendar.newLink.confirm": "获取新链接"
+  "calendar.newLink.confirm": "获取新链接",
+  "calendar.addOne.added": "已添加到日历",
+  "calendar.addOne.added.label": "已添加到日历。打开日历设置。",
+  "calendar.addOne.syncAll": "添加您之后的所有预约",
+  "calendar.addOne.syncAll.hint": "只需设置一次日历链接。",
+  "calendar.addOne.changed": "这次预约在您添加之后有变动。请重新添加。"
 }

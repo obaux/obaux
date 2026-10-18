@@ -6,7 +6,7 @@ import { settled } from './settled';
  * One visit, from the booked screen (D-604, a98 plan C): a calendar button in the green card opens a sheet of calendars. Apple Calendar and
  * Outlook get a calendar file made on the phone, Google gets a link to its own add-an-event page; the event is the place's name, its address and
  * the time, and nothing says Pam. It all happens on the phone: no request goes anywhere, nothing is stored about which calendar was tapped.
- * Under the card, "Sync all future trip details?" opens the Calendar screen.
+ * Nothing sits under the card: setting up the calendar link for every visit is the last row of the sheet. Once a visit is added the corner button says so.
  */
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => window.sessionStorage.setItem('pam.examples', '1'));
@@ -41,7 +41,7 @@ test('Apple Calendar gets a calendar file made on the phone: the place, its addr
   await page.getByRole('button', { name: 'Add to calendar' }).click();
   const requests: string[] = [];
   page.on('request', (r) => requests.push(r.url()));
-  const stored = () => page.evaluate(() => JSON.stringify([Object.entries(localStorage), Object.entries(sessionStorage)]));
+  const stored = () => page.evaluate(() => JSON.stringify([Object.entries(localStorage).filter(([key]) => !key.startsWith('pam.calendarAdded:')), Object.entries(sessionStorage)]));
   const before = await stored();
   const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('dialog').getByText('Apple Calendar', { exact: true }).click()]);
   expect(download.suggestedFilename()).toBe('visit.ics');
@@ -54,7 +54,8 @@ test('Apple Calendar gets a calendar file made on the phone: the place, its addr
   expect(lines.some((l) => l.startsWith('DTEND:'))).toBe(true);
   expect(text).not.toMatch(/Pam visit|URL:|DESCRIPTION|joinpam\.org\/|app\.joinpam/i);
   // Nothing left the phone for this (a file made here is a blob: address), and nothing was kept about which calendar was tapped.
-  expect(requests.filter((u) => !u.startsWith('blob:') && !u.startsWith('data:'))).toEqual([]);
+  expect(requests.filter((u) => !u.startsWith('blob:') && !u.startsWith('data:') && !new URL(u).pathname.match(/\.(svg|png|js|css|woff2?|ico)$/) && !u.includes('/_next/'))).toEqual([]);
+  // Nothing else was stored: only the visit's own note, which holds a time, never a calendar.
   expect(await stored()).toBe(before);
 });
 
@@ -77,15 +78,6 @@ test('Google gets a link to its own add-an-event page: the place, the address, t
   expect(url.searchParams.get('dates')).toMatch(/^\d{8}T\d{6}Z\/\d{8}T\d{6}Z$/);
   expect(url.searchParams.get('ctz')).toBeTruthy();
   await expect(link).toHaveAttribute('target', '_blank');
-});
-
-test('under the card, "Sync all future trip details?" opens the Calendar screen, a 48px target', async ({ page }) => {
-  await booked(page);
-  const sync = page.getByRole('link', { name: 'Sync all future trip details?' });
-  const box = (await sync.boundingBox())!;
-  expect(box.height).toBeGreaterThanOrEqual(47.5);
-  await sync.click();
-  await expect(page).toHaveURL(/\/calendar\/$/);
 });
 
 /** The longest example place name, at 320 wide, in the language with the longest words and in the one that reads right to left. */
@@ -131,4 +123,105 @@ test('the booked card still reads in Arabic, where months have no short form', a
   await page.getByRole('button', { name: /^إضافة هذه الزيارة/ }).click();
   const day = page.getByText(/^(الاثنين|الثلاثاء|الأربعاء|الخميس|الجمعة)[،,] .*[٠-٩0-9]/);
   await expect(day.first()).toBeVisible();
+});
+
+const SYNC = 'Add all your future visits';
+const ADDED = 'Added to calendar. Opens Calendar settings.';
+
+test('the drawer ends with "Add all your future visits" and its hint, opening the Calendar screen; nothing sits under the card', async ({ page }) => {
+  await booked(page);
+  await expect(page.getByText('Sync all future trip details?')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Add to calendar' }).click();
+  const sheet = page.getByRole('dialog');
+  const rows = await sheet.locator('a, button').evaluateAll((els) => els.map((el) => (el.textContent ?? '').trim()).filter(Boolean));
+  const names = rows.filter((text) => /Apple Calendar|Google Calendar|Outlook|Add all your future visits/.test(text));
+  expect(names.map((text) => text.replace(/Set up a calendar link once\.$/, '').trim())).toEqual(['Apple Calendar', 'Google Calendar', 'Outlook', SYNC]);
+  await expect(sheet.getByText('Set up a calendar link once.')).toBeVisible();
+  const row = sheet.getByRole('link', { name: new RegExp(SYNC) });
+  expect((await row.boundingBox())!.height).toBeGreaterThanOrEqual(47.5);
+  await row.click();
+  await expect(page).toHaveURL(/\/calendar\/$/);
+});
+
+test('adding a visit: the corner says Added, opens Calendar, is 48px; only the visit id and its start time are kept, and nothing is sent', async ({ page }) => {
+  await booked(page);
+  const requests: string[] = [];
+  page.on('request', (r) => requests.push(r.url()));
+  const keys = () => page.evaluate(() => Object.keys(localStorage).filter((key) => key.startsWith('pam.')).sort());
+  const before = await keys();
+  await page.getByRole('button', { name: 'Add to calendar' }).click();
+  const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('dialog').getByText('Apple Calendar', { exact: true }).click()]);
+  expect(download.suggestedFilename()).toBe('visit.ics');
+  const added = page.getByRole('link', { name: ADDED });
+  await expect(added).toBeVisible();
+  await expect(added).toContainText('Added to calendar');
+  await expect(added).toHaveAttribute('href', '/calendar/');
+  expect((await added.boundingBox())!.height).toBeGreaterThanOrEqual(47.5);
+  await expect(page.getByRole('button', { name: 'Add to calendar' })).toHaveCount(0);
+  // One new key, "pam.calendarAdded:<visit id>", and its value is the visit's start time, nothing else.
+  const after = await keys();
+  const fresh = after.filter((key) => !before.includes(key));
+  expect(fresh).toHaveLength(1);
+  expect(fresh[0]).toMatch(/^pam\.calendarAdded:./);
+  const value = await page.evaluate((key) => localStorage.getItem(key), fresh[0]!);
+  expect(value).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/);
+  // Nothing went anywhere for this: only the file made here.
+  // (The page's own icon and scripts are the page; nothing to Supabase, a function or another host.)
+  expect(requests.filter((u) => !u.startsWith('blob:') && !u.startsWith('data:') && !new URL(u).pathname.match(/\.(svg|png|js|css|woff2?|ico)$/) && !u.includes('/_next/'))).toEqual([]);
+  // It is still Added after the page is opened again.
+  await page.reload();
+  await settled(page);
+  await expect(page.getByRole('link', { name: ADDED })).toBeVisible();
+});
+
+test('a visit that moved after it was added asks to be added again', async ({ page }) => {
+  await booked(page);
+  await page.getByRole('button', { name: 'Add to calendar' }).click();
+  const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('dialog').getByText('Outlook', { exact: true }).click()]);
+  void download;
+  await expect(page.getByRole('link', { name: ADDED })).toBeVisible();
+  // The visit's time changes: the note holds the time it had when it was added.
+  await page.evaluate(() => {
+    for (const key of Object.keys(localStorage)) if (key.startsWith('pam.calendarAdded:')) localStorage.setItem(key, '2020-01-01T10:00:00.000Z');
+  });
+  await page.reload();
+  await settled(page);
+  await expect(page.getByRole('button', { name: 'Add to calendar' })).toBeVisible();
+  await expect(page.getByText('This visit changed after you added it. Add it again.')).toBeVisible();
+});
+
+test('the place page\'s green card has the same button, and Added after one is added', async ({ page }) => {
+  await page.goto('/place/?id=dummy-place-learning&from=trips&trip=dummy-trip-1');
+  await settled(page);
+  await expect(page.getByText('Your next visit')).toBeVisible();
+  await page.getByRole('button', { name: 'Add to calendar' }).click();
+  const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('dialog').getByText('Apple Calendar', { exact: true }).click()]);
+  expect(download.suggestedFilename()).toBe('visit.ics');
+  await expect(page.getByRole('link', { name: ADDED })).toBeVisible();
+  await expect(page.getByText('Sync all future trip details?')).toHaveCount(0);
+});
+
+/** A member who already has a calendar link: every visit reaches their calendar by itself, so the card says Added. */
+const ME = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
+const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
+test('a member with a calendar link sees Added at once', async ({ page }) => {
+  await page.addInitScript((userId: string) => {
+    const session = {
+      access_token: 't', refresh_token: 'r', token_type: 'bearer', expires_in: 3600,
+      expires_at: Math.floor(Date.now() / 1000) + 3600,
+      user: { id: userId, aud: 'authenticated', role: 'authenticated' },
+    };
+    for (const ref of ['stub', 'shobqzuhicoiymtumiaz']) window.localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(session));
+  }, ME);
+  await page.route('**/auth/v1/user*', (route) => route.fulfill(json({ id: ME })));
+  await page.route('**/rest/v1/profiles*', (route) =>
+    route.fulfill(json({ id: ME, role: 'member', first_name: 'Marcus', region_id: null, regions: null, access_status: 'active', onboarded_at: '2026-09-14T00:00:00Z' })),
+  );
+  await page.route('**/rest/v1/notifications*', (route) => route.fulfill(json([])));
+  await page.route('**/rest/v1/rpc/calendar_link_state*', (route) =>
+    route.fulfill(json([{ is_on: true, is_legacy: false, calendar: 'google', linked_on: '2026-10-12', token: 'A'.repeat(22) + 'b'.repeat(43) }])),
+  );
+  await booked(page);
+  await expect(page.getByRole('link', { name: ADDED })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Add to calendar' })).toHaveCount(0);
 });
