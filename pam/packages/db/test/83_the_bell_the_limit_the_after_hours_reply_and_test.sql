@@ -137,6 +137,9 @@ select test.check('...and the reply queues no text for Kai, who asked for them (
 select test.check('...carrying when Pam is next here',
   (select count(*) from public.messages where conversation_id = (select v from t83 where k = 'kai') and system_key = 'pam.away'
      and (system_vars ->> 'opensAt')::timestamptz = public.pam_next_open(now())), 1);
+select test.check('...and the hours that were in force when it was sent',
+  (select count(*) from public.messages where conversation_id = (select v from t83 where k = 'kai') and system_key = 'pam.away'
+     and system_vars -> 'hours' = (select value::jsonb from public.app_settings where key = 'pam_hours')), 1);
 select test.check('...and the conversation is open again (a closed one reopens when the person writes)',
   (select count(*) from public.pam_threads where conversation_id = (select v from t83 where k = 'kai') and status = 'open'), 1);
 insert into public.messages (conversation_id, sender_id, body) values ((select v from t83 where k = 'kai'), :'kai', 'Hello again');
