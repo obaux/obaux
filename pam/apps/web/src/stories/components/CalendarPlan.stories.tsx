@@ -42,7 +42,8 @@ const WORDS = {
     sync: 'Sync all future trip details?',
     // Sage's words (ledger 4aef64a9).
     syncTrips: 'Add all your future visits',
-    syncHint: 'Set up a calendar link once. Your visits go in by themselves, and change if one moves or is cancelled.',
+    // Will cut the hint to its first sentence (18 October).
+    syncHint: 'Set up a calendar link once.',
     sheetTitle: 'Add to calendar',
     done: 'Done',
     apple: 'Apple Calendar',
@@ -83,7 +84,7 @@ const WORDS = {
     syncingName: 'تتم المزامنة مع تقويم Apple عبر رابط التقويم. يفتح التقويم.', // stand-in
     sync: 'مزامنة تفاصيل كل رحلاتك القادمة؟',
     syncTrips: 'أضف كل زياراتك القادمة', // stand-in until Lena's translation
-    syncHint: 'أعدّ رابط التقويم مرة واحدة. تُضاف زياراتك تلقائيًا، وتتغير إذا تغيّرت زيارة أو أُلغيت.', // stand-in
+    syncHint: 'أعدّ رابط التقويم مرة واحدة.', // stand-in
     sheetTitle: 'أضف إلى التقويم',
     done: 'تم',
     apple: 'تقويم Apple',
