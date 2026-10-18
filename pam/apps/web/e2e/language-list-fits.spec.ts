@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { SUPPORTED_LOCALES } from '@pam/config';
 import en from '@pam/config/locales/en.json';
 import ar from '@pam/config/locales/ar.json';
@@ -16,6 +16,12 @@ import { settled } from './settled';
  * the other corner and the list is drawn right to left), and checks that every language's row is inside the list's own box,
  * inside the screen, and that the list has nothing to scroll to. The checks are on the boxes, so a language added later that
  * does not fit fails here too.
+ *
+ * Sign up's field can be anywhere on a 568px screen, because the form scrolls (and a person, or Playwright, scrolls it clear of
+ * the Next bar): so the list is opened with the field where it is, with the field low enough that the list opens over it, and
+ * with the field in the middle, where neither the room under it nor the room over it holds seven rows (b62 moved the field
+ * there, and the list ran off the screen). On a screen too short for the whole list, it must stay on the screen and every row
+ * must be reachable by scrolling inside it.
  */
 
 const SIZES = [
@@ -104,6 +110,35 @@ function problems(m: Measured): string[] {
   return found;
 }
 
+/** The rows that cannot be got to: each is scrolled into view inside the list, then must be inside the list and the screen. */
+async function unreachable(page: Page, listRole: 'menu' | 'listbox', rowRole: 'menuitemradio' | 'option'): Promise<string[]> {
+  return page.evaluate(
+    ({ listRole, rowRole }) => {
+      const rows = [...document.querySelectorAll<HTMLElement>(`[role="${rowRole}"]`)].filter((row) => row.getBoundingClientRect().height > 0);
+      const list = rows[0]?.closest<HTMLElement>(`[role="${listRole}"]`);
+      if (!list) return ['no list'];
+      const lost: string[] = [];
+      for (const row of rows) {
+        row.scrollIntoView({ block: 'nearest' });
+        const b = row.getBoundingClientRect();
+        const l = list.getBoundingClientRect();
+        if (b.top < l.top - 0.5 || b.bottom > l.bottom + 0.5 || b.top < -0.5 || b.bottom > window.innerHeight + 0.5) lost.push((row.textContent ?? '').trim());
+      }
+      return lost;
+    },
+    { listRole, rowRole },
+  );
+}
+
+/** Scroll the page until the field's top is `top` from the top of the screen, and say so if the page cannot go that far. */
+async function placeField(field: Locator, top: number): Promise<void> {
+  await field.evaluate((el, target) => window.scrollBy(0, el.getBoundingClientRect().top - target), top);
+  await expect.poll(() => field.evaluate((el) => Math.round(el.getBoundingClientRect().top)), { message: `the field is ${top}px from the top` }).toBeGreaterThan(top - 3);
+  expect(await field.evaluate((el) => Math.round(el.getBoundingClientRect().top))).toBeLessThan(top + 3);
+}
+
+const SIGN_UP = 'Sign up: "Choose a language"';
+
 for (const size of SIZES) {
   for (const locale of ['en', 'ar'] as const) {
     const words: Record<string, string> = locale === 'ar' ? ar : en;
@@ -124,15 +159,52 @@ for (const size of SIZES) {
         expect(problems(m), 'rows the list hides, cuts off or lets run off the screen').toEqual([]);
       });
 
-      test('Sign up: "Choose a language" opens a list with all seven languages in it, none cut off', async ({ page }) => {
+      async function signUp(page: Page): Promise<Locator> {
         await newcomer(page);
         await page.goto('/join/');
         await settled(page);
-        await page.getByRole('combobox', { name: words['onboarding.language.title'] }).click();
+        return page.getByRole('combobox', { name: words['onboarding.language.title'] });
+      }
+
+      test(`${SIGN_UP} opens a list with all seven languages in it, none cut off`, async ({ page }) => {
+        const field = await signUp(page);
+        // As a person gets there: the click scrolls the field clear of the Next bar if it has to, wherever that leaves it.
+        await field.click();
         const m = await measure(page, 'listbox', 'option');
         expect(m.rows.map((row) => row.name).length, 'every language has a row').toBe(SUPPORTED_LOCALES.length);
         expect(problems(m), 'rows the list hides, cuts off or lets run off the screen').toEqual([]);
       });
+
+      // Only a short screen has a middle where neither the room over the field nor the room under it holds seven rows.
+      if (size.height < 700) {
+        for (const top of [400, 256]) {
+          test(`${SIGN_UP} with the field ${top}px down opens a list with all seven languages in it, none cut off`, async ({ page }) => {
+            const field = await signUp(page);
+            await placeField(field, top);
+            await field.click();
+            const m = await measure(page, 'listbox', 'option');
+            expect(m.rows.map((row) => row.name).length, 'every language has a row').toBe(SUPPORTED_LOCALES.length);
+            expect(problems(m), 'rows the list hides, cuts off or lets run off the screen').toEqual([]);
+          });
+        }
+      }
     });
   }
 }
+
+// A screen too short for seven rows (a phone on its side): the list keeps to the screen and scrolls inside, every row reachable.
+test.describe('320×320', () => {
+  test.use({ viewport: { width: 320, height: 320 } });
+
+  test(`${SIGN_UP} on a screen too short for the whole list stays on the screen, and every language can be scrolled to`, async ({ page }) => {
+    await newcomer(page);
+    await page.goto('/join/');
+    await settled(page);
+    await page.getByRole('combobox', { name: en['onboarding.language.title'] }).click();
+    const m = await measure(page, 'listbox', 'option');
+    expect(m.list, 'a list was found').not.toBeNull();
+    expect(m.list!.top, 'the list starts on the screen').toBeGreaterThanOrEqual(0);
+    expect(m.list!.bottom, 'the list ends on the screen').toBeLessThanOrEqual(m.screen.height);
+    expect(await unreachable(page, 'listbox', 'option'), 'languages that cannot be scrolled to').toEqual([]);
+  });
+});
