@@ -1546,6 +1546,12 @@
   window the Sign in globe's menu keeps to the room under the globe and scrolls, and Sign up's sheet is the one box
   that scrolls; at 568 and 844 nothing moves. Iris's re-test of b65 and b66 (18b9ee37, docs): W4, S1, P3 and P4 pass,
   and Iris's b63 Tab-stop note is withdrawn (it was focus wrapping to the page).
+- **Batch b68 (18 October, 06:03 to 06:39).** Dot's settle wait for the whole e2e suite (5c169fa9):
+  `arrived()` waits until no arrival animation is left on an element, inside it or on any ancestor, fonts are loaded
+  and its box holds for three frames; `settled()` now calls it for the page, so every spec that goes through it waits
+  for the 8px rise to end. Only arrivals are waited for (finite, under a second), so a spec that times a longer
+  animation (messages.spec's sliding file name) is left alone. profile-skeleton.spec measures the card where it ends.
+  And the nightly flow map from main c13ddaca (14d1ce65): Cities people are waiting for on the Super admin page.
 
 ## What was wrong, and what missed it
 
@@ -2057,9 +2063,16 @@
 | b66 main CI (6defda30, pushed 03:55:00) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (04:35); Vercel web and pam-site success (03:58, 04:00) |
 | S1 polish proof: language-list-fits.spec from 272c3c4e on main's build (6defda30), -g "too short", --retries=0 | 6 of 6 new cases failed on their checks (3 "the boxes that scroll round the list": expected 1, got 2, ["listbox", "div"]; 3 "it ends on the screen": 364, not <= 320.5); 3 passed (Sign up's stays-on-screen case, true on main) |
 | Batch b67, full run (77d9e8a2: Lena 8933b153, Iris 77d9e8a2): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1403 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 194 / 10.0 kB spare / 2254 passed, 19 skipped, 0 failed, 1 flaky (profile-skeleton.spec:84 on narrow-320, the 8px rise; to Dot) / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
+| b67 main CI (c13ddaca, pushed 05:31:11) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (06:12); Vercel pam-site and web success (05:33, 05:36) |
+| Settle wait proof, Dot's run (not the desk's): profile-skeleton.spec with every animation slowed tenfold (CDP Animation.setPlaybackRate 0.1), narrow-320, --repeat-each=5 | Before 9 of 20 failed, each on toBeCloseTo at line 99, "Received difference: 8"; after 20 of 20 passed. The 37 other specs that read a box, slowed the same way: 449 passed, 2 failed (messages.spec's two tests that time an animation, which a slowed clock breaks by design) |
+| Batch b68, full run (afcc16de: Dot e4a02333, flow map afcc16de): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1403 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 194 / 10.0 kB spare / 2255 passed, 19 skipped, 0 failed, 0 flaky / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
 
 ## Left undone
 
+- **As of b68 (18 October, 06:39):** Plan C is READY (Piper 0e3b6169, Lena a8f5188d) and waits on Will's
+  "yes a97" and the iPhone try; its drawers.spec can use `arrived()` once both are on main. Message Pam: card a100
+  waits on Will's three answers and signature. Dot: Trips' map pins press (polish). With Will: a100, "yes a97", the
+  iPhone try; a86, a91, a93, a84, a88.
 - **As of b67 (18 October, 05:30):** Plan C is READY (Piper 0e3b6169, Lena a8f5188d) and waits on Will's "yes a97" and
   the iPhone try; then the desk proves its specs on main, and its batch applies 20261018003713, checks the Vault key
   and redeploys calendar-feed, with the ship day in p6. Message Pam: card a100 waits on Will's three answers and
