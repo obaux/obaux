@@ -181,8 +181,9 @@ inside privacy or legal pages."
 - **Say it once, at the first agreement (Will, 18 October 17:51).** Instructions people saw when they first agreed
   (STOP, HELP, rates) are not repeated on later settings screens. The first consent screen keeps them; Text alerts
   doesn't.
-- **No legal links on task screens (Will, 17:51).** Privacy and Terms live in Profile › Legal. A task screen doesn't
-  link to them, and neither does a consent screen.
+- **No legal links on task screens (Will, 17:51).** Privacy and Terms live in Profile › Legal, and a task screen doesn't
+  link to them. **The one exception is the first agreement to texts** (the two consent screens): a carrier reviewer looks
+  for Privacy there, so it keeps its one-word link.
 - Still on screens: errors, the carrier lines (STOP, HELP, rates) at the first agreement to texts, and a step's
   instruction mid-task.
 
