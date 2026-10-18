@@ -16,8 +16,8 @@ import { useTextsLive } from '@/lib/useTextsLive';
  * One list for `/reminders/` and for the join step, so the two screens say the same thing and the registered paragraph quotes one set
  * of words. Which rows carry the badge is DATA, not copy: a row loses its badge the day its text goes live, with no edit here.
  *
- *   - A reminder before each visit: not sent yet, whatever the switch (the visit reminders are not built).
- *   - A note when a saved place closes or moves: sent once `texts_live` is on (D-481).
+ *   - A reminder before a trip (alerts.visit): not sent yet, whatever the switch (the visit reminders are not built).
+ *   - A saved place closes or moves (alerts.closed): sent once `texts_live` is on (D-481).
  *   - A staff member's three (messages, a visit booked or changed, a visit planned): once `texts_live` is on AND the alert texts are
  *     switched on (`ALERT_TEXTS_LIVE`, D-478).
  * Rows that are on come first, the ones not yet below them (Will, 18 October, D-615).

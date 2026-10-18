@@ -76,8 +76,11 @@ test.describe('agreeing to reminders', () => {
     await page.goto('/reminders/');
     // Sage's signed line (a94, Will 17 October): "before each visit", so it covers a visit a program booked too. The old line, "a visit you
     // planned", must fail here: this list is what the carrier reads as the opt-in.
-    await expect(page.getByText('A reminder before each visit, with the address.', { exact: true })).toBeVisible();
+    // The kinds are Text alerts' own names (Sage 11175802), read from the bundle: one vocabulary, no full stops.
+    await expect(page.getByText(en['alerts.visit'], { exact: true })).toBeVisible();
+    await expect(page.getByText(en['alerts.closed'], { exact: true })).toBeVisible();
     await expect(page.getByText(/a visit you planned/i)).toHaveCount(0);
+    await expect(page.getByText('A reminder before each visit, with the address.', { exact: true })).toHaveCount(0);
     // No sentence about what is not sent yet: a "Coming soon" badge under each row whose text is not (D-608). Texts are held, so both.
     await expect(page.getByText(/Pam does not send any of these yet/i)).toHaveCount(0);
     await expect(page.getByText('Coming soon', { exact: true })).toHaveCount(2);
@@ -104,7 +107,7 @@ test.describe('agreeing to reminders', () => {
     // Hiding the question behind a sign-in explains nothing. What Pam would
     // send is shown; the thing to do next is sign in, so that is the button.
     await page.goto('/reminders/');
-    await expect(page.getByText('A reminder before each visit, with the address.', { exact: true })).toBeVisible();
+    await expect(page.getByText(en['alerts.visit'], { exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Sign in' })).toBeVisible();
   });
 
