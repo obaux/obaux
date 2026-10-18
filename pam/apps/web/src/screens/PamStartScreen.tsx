@@ -28,7 +28,7 @@ import { NotIn } from '../app/NotIn';
  * The Pam team only, and only while the switch is on.
  */
 export function PamStartScreen() {
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   const router = useRouter();
   const params = useSearchParams();
   const profileId = params.get('profile');
@@ -161,6 +161,9 @@ export function PamStartScreen() {
           </ThreadIntro>
         }
         onSend={(body) => send(body)}
+        // Pam's first words are words only: nothing to attach before there is a conversation (Nico, 4850ced6).
+        placeholder={tPlain('pam.start.placeholder')}
+        attachments="none"
         sending={sending}
         speechLanguage={speechLanguageFor(locale)}
       />

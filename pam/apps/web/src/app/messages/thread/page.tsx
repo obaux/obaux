@@ -354,6 +354,8 @@ function ThreadScreen() {
           pam={pamAsker}
           // The Pam team's saved replies (D-605): a pick fills the box, and only Send sends it.
           teamTools={state.isPam && state.teamView ? (c) => <PamSavedReplies onPick={c.setDraft} /> : undefined}
+          // The team replies as Pam, with photos only, as the person writes to Pam (D-605; Nico, 4850ced6).
+          {...(state.isPam && state.teamView ? { placeholder: tPlain('pam.thread.placeholder'), attachments: 'photo' as const } : {})}
           blocked={blocked}
           speechLanguage={speechLanguage}
         />

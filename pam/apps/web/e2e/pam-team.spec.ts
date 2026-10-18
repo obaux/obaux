@@ -92,7 +92,17 @@ test.describe("Message Pam, the team's side (card a100)", () => {
     expect(server.posts).toHaveLength(0);
   });
 
-  test("the team's ⋯ is its own: Close, then Reopen, and Files; no Report, no Block", async ({ page }) => {
+  test("the team replies as Pam, with photos only: no document button", async ({ page }) => {
+    await team(page);
+    await page.goto(`/messages/thread/?id=${PAM_C}&from=pam`);
+    await settled(page);
+    await expect(page.getByRole('textbox')).toHaveAccessibleName('Reply as Pam');
+    await expect(page.getByRole('button', { name: 'Add a photo' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Add a document' })).toHaveCount(0);
+  });
+
+  // Iris W5 (pass 1, on 647dd0d3): the team's ⋯ opened the ordinary Options, with Report and Block. Settled: neither, on a Pam conversation.
+  test("the team's ⋯ is its own: Close, then Reopen, and Files; no Report, no Block (W5)", async ({ page }) => {
     const server = await team(page);
     await page.goto(`/messages/thread/?id=${PAM_C}&from=pam`);
     await settled(page);
@@ -120,6 +130,10 @@ test.describe("Message Pam, the team's side (card a100)", () => {
     await page.goto(`/pam/start/?profile=${ASKER}&name=Aaliyah`);
     await settled(page);
     await expect(page.getByText('Aaliyah sees this as from Pam.')).toBeVisible();
+    // Words only before there is a conversation.
+    await expect(page.getByRole('textbox')).toHaveAccessibleName('Write as Pam');
+    await expect(page.getByRole('button', { name: 'Add a photo' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Add a document' })).toHaveCount(0);
     await page.getByRole('textbox').fill('Hi Aaliyah, your city is fixed.');
     await page.getByRole('button', { name: /send/i }).click();
     await expect(page).toHaveURL(new RegExp(`/messages/thread/\\?id=${PAM_C}&from=pam`));
