@@ -5,7 +5,7 @@
 ## What changed
 
 - `apps/web/src/lib/malfunction.tsx` (new): `MalfunctionProvider` and `useMalfunction().show(action, error, control)` / `clear()`; `settleWithin` (15 s) and `codeFromError` (offline, SQLSTATE, HTTP status, timeout, unknown). One fixed bottom `CompactNotice`, `role="alert"`, above the tab bar, safe area and keyboard; scrolls the failed control clear; leaves on the next tap or key, a good retry, or a pathname change; no timer.
-- `apps/web/src/lib/reportAppError.ts`: a stand-in with Nico's signature `reportAppError({ action, code })`. It does nothing until his client lib lands (his `claude/messages-app-errors` @ `f71a4665` has `packages/config/src/appErrors.ts` but not the client yet); then this file is replaced by his.
+- `apps/web/src/lib/reportAppError.ts` is Nico's real file (his `claude/messages-app-errors` @ `4096aba2` merged; my stand-in is dropped). `AppErrorAction` comes from `@pam/config`; the Text alerts switch returns early for `connect`, which is not on his list.
 - Provider wired in `providers.tsx` and Storybook's `preview.tsx`.
 - `AlertsView.tsx`: a switch moves only after its save (`onChange` + `isLoading`; Astryx's `changeAction` moves first, so it is not used), no answer in 15 s is a failure, a late success re-reads on mount, focus and visibility, and the inline failure notice is gone. `SettingsRow` loses its `below` slot (unused).
 - Story: Components › Feedback › Malfunction alert (English, Spanish, Arabic).
@@ -31,7 +31,6 @@ D-617 (Will's D-616 job, 18 October 21:14). Astryx `Switch.changeAction` is opti
 - The save functions return only a boolean, so the log gets offline, timeout or unknown for Text alerts; real codes need `useReminderConsent.ts` (Nico) to return the error.
 - Other failed-action rows in `docs/design/2026-10-18-something-went-wrong-audit.md` are not converted.
 - Seven-language 48px check against Lena's cap; BigButton `tPlain` (D-435).
-- Swap the stub for Nico's `reportAppError` when it lands.
 
 ## Needs a human
 

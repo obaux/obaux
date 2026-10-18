@@ -5,7 +5,8 @@ import { usePathname } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { CompactNotice } from '@pam/ui';
 import { useI18n } from './i18n';
-import { reportAppError, type AppErrorAction } from './reportAppError';
+import type { AppErrorAction } from '@pam/config';
+import { reportAppError } from './reportAppError';
 
 /**
  * When Pam fails (D-616, Will, 18 October: "Let's use the smaller alert banner. Overlaid below at bottom of page. Let's

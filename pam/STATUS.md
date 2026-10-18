@@ -1368,6 +1368,10 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · the error log, my part (18 October 2026)
+
+Built, not live (`app_errors_live` off, migration `20261018211942` not applied, Edge Function not redeployed): D-616. `report_app_error` takes an action key from a closed list and a code, nothing else; super admins read it only through `app_errors_grouped(p_days)`; the team gets one bell row per action per hour. `lib/reportAppError.ts` is the app's reporter (never throws, waits offline, ten at most) and `dispatch-sms` reports its own failures. Proven by DB test 85 (with mutations), `reportAppError.test.ts` and `dispatch-sms-reports-errors.test.ts`. Waiting on: Sage's names for the action keys, Lena's Privacy line signed by Will, call sites in Dot's and Ava's screens.
+
 ## Messages & notifications · Message Pam, slice 2: the person's side (18 October 2026)
 
 Built, not live (switch off): Pam's row and conversation in Messages, the welcome and out-of-hours reply from keys, the fixed address `/messages/pam/` (Sign in and back; switch off lands on Messages), Help's "Write to Pam", a limited account writing to Pam, and in every conversation a per-message state (Sending… / Not sent with Try again / Sent) where a failed send is kept and Try again sends once (D-609). Migration `20261018080342` makes `pam_inbox()` list only conversations somebody wrote in (live since 18 October, 16:15, as `20261018161516`). Proof: `message-pam.spec.ts`, `messages.spec.ts`, DB tests 80 to 83, Storybook `States/Message Pam`. Photos (slice 3, same branch): a bar under "Sending…" while a photo uploads, and a photo that did not go stays "Not sent" with Try again, in every conversation, to Pam included (no new string; the upload is the same request over XMLHttpRequest for its progress).
@@ -1688,7 +1692,7 @@ only the alert texts Will signed: no "introduced to your program", no "your acco
 
 ## Design system & Storybook · When Pam fails, D-616 (18 October)
 
-One small alert fixed at the bottom (`useMalfunction().show`, Lena's `notice.malfunction`), no timer, never over the failed control; a switch moves only after its save, no answer in 15 s is a failure, a late save is read back. Done for Text alerts; the other instant-save controls are named in Patterns and left to their owners. Logging is a stand-in until Nico's `reportAppError` lands. Branch `claude/pam-design-malfunction` (D-617); waits on Mira (b76).
+One small alert fixed at the bottom (`useMalfunction().show`, Lena's `notice.malfunction`), no timer, never over the failed control; a switch moves only after its save, no answer in 15 s is a failure, a late save is read back. Done for Text alerts; the other instant-save controls are named in Patterns and left to their owners. Logging is Nico's `reportAppError` (merged). Branch `claude/pam-design-malfunction` (D-617); waits on Mira (b76).
 
 ## Design system & Storybook · Text alerts: Iris's B3, B6 and the lead state (18 October)
 

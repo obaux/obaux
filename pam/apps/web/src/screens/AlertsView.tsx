@@ -166,7 +166,7 @@ function AlertsList() {
    * answers late is read back, so the screen shows what the database now says.
    */
   const change = async (kind: Kind, on: boolean, control: Element | null) => {
-    if (!LIVE.has(kind) || !userId || stopped || pending.has(kind)) return;
+    if (kind === 'connect' || !LIVE.has(kind) || !userId || stopped || pending.has(kind)) return;
     // The agree screen is the only opt-in (D-615): with no yes on file, a switch records nothing and turns nothing on.
     // It opens the agree screen for this role, which brings the person back here with this switch on, or off after "Not now".
     if (on && !consent) {
