@@ -193,7 +193,7 @@ for (const size of SIZES) {
   }
 }
 
-// A screen too short for seven rows (a phone on its side): the sheet keeps to the screen and scrolls, every row reachable.
+// A screen too short for seven rows (a phone on its side): what holds the list keeps to the screen and scrolls, every row reachable.
 test.describe('320×320', () => {
   test.use({ viewport: { width: 320, height: 320 } });
 
@@ -204,16 +204,21 @@ test.describe('320×320', () => {
     await page.getByRole('combobox', { name: en['onboarding.language.title'] }).click();
     const m = await measure(page, 'listbox', 'option');
     expect(m.list, 'a list was found').not.toBeNull();
-    const sheet = await page.getByRole('dialog', { name: en['onboarding.language.title'] }).boundingBox();
-    expect(sheet, 'the sheet was found').not.toBeNull();
-    expect(sheet!.y, 'the sheet starts on the screen').toBeGreaterThanOrEqual(0);
-    expect(sheet!.y + sheet!.height, 'the sheet ends on the screen').toBeLessThanOrEqual(m.screen.height + 1);
+    // What the list sits in: the sheet (a dialog) or, in a menu, its popover.
+    const holder = await page.evaluate(() => {
+      const rows = [...document.querySelectorAll<HTMLElement>('[role="option"]')].filter((row) => row.getBoundingClientRect().height > 0);
+      const box = rows[0]?.closest<HTMLElement>('dialog, [popover]')?.getBoundingClientRect();
+      return box ? { top: box.top, bottom: box.bottom } : null;
+    });
+    expect(holder, 'the list sits in a sheet or a popover').not.toBeNull();
+    expect(holder!.top, 'it starts on the screen').toBeGreaterThanOrEqual(-0.5);
+    expect(holder!.bottom, 'it ends on the screen').toBeLessThanOrEqual(m.screen.height + 0.5);
     expect(await unreachable(page, 'listbox', 'option'), 'languages that cannot be scrolled to').toEqual([]);
   });
 });
 
-// What happens on a pick and on Escape: the sheet closes either way, and focus goes back to the field it opened from.
-test.describe('Sign up: the sheet closes', () => {
+// What happens on a pick and on Escape: the list closes either way, and focus goes back to the field it opened from.
+test.describe('Sign up: the list closes', () => {
   test.use({ viewport: { width: 320, height: 568 } });
 
   test('Escape closes it and focus goes back to the field; picking a language closes it and switches the page', async ({ page }) => {
@@ -221,17 +226,17 @@ test.describe('Sign up: the sheet closes', () => {
     await page.goto('/join/');
     await settled(page);
     const field = page.getByRole('combobox', { name: en['onboarding.language.title'] });
-    const sheet = page.getByRole('dialog', { name: en['onboarding.language.title'] });
+    const list = page.getByRole('listbox');
 
     await field.click();
-    await expect(sheet).toBeVisible();
+    await expect(list).toBeVisible();
     await page.keyboard.press('Escape');
-    await expect(sheet).toBeHidden();
+    await expect(list).toBeHidden();
     await expect(field).toBeFocused();
 
     await field.click();
     await page.getByRole('option', { name: 'Español' }).click();
-    await expect(sheet).toBeHidden();
+    await expect(list).toBeHidden();
     await expect(page.getByRole('combobox', { name: es['onboarding.language.title'] })).toBeVisible();
   });
 });
