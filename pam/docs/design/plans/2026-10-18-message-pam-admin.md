@@ -14,11 +14,13 @@ end, agreed with him at 02:48.
 Anyone in the app can message Pam, and it goes to the super admin's inbox. The super admin can message programs and
 members. It is support, inside the app.
 
-## The one thing to decide first: this reverses D-171 for members
+## The one thing to decide first: this reverses D-171 and D-262 for members
 
 - **D-171** (Will, September): "a super admin cannot send messages to a member, a case manager, or a program."
-- **D-262** (migration 0072) already opened super admin ↔ case manager and program lead.
+- **D-262** (migration 0072) opened super admin ↔ case manager and program lead, and wrote down the rest: "**Never a
+  member** — a member's messages stay between them, their case manager and their programs."
 - **Super admin ↔ member is still closed.** `can_message` refuses it, and DB test 10 proves it.
+- **Members read that promise at onboarding.** The transparency screen can't be skipped (Iris, research §4 risk 1).
 
 Will's ask opens it, but in a narrower way than D-171 feared. D-171 was worried about the person with the broadest view
 starting private conversations as themselves. Here it is **Pam**, the service, writing: one named sender, visible to
@@ -32,8 +34,23 @@ What stays true:
 What Pam's own conversations add to what the super admin may see is Nico's proposed `ADMIN_CAN_SEE` entry
 (`messages_written_to_pam`, his §2), for Will to approve.
 
-Will should say this in his own words on the card. It then becomes a new decision that supersedes D-171 for members.
-Lena's lane tells members before it ships.
+Will should say this in his own words on the card. It then becomes a new decision that supersedes D-171 and D-262's
+"never a member". Lena's lane tells members before it ships.
+
+**There are two versions on the card** (Mira, 03:03):
+
+- **A. Pam replies only.** The person writes first and Pam replies, with no Pam-first messages to members. This is
+  Iris's smallest safe version (`docs/research/2026-10-18-message-pam.md` §4, `claude/research-message-pam` @ 90eb554a).
+  Her reasons: a message arriving unasked can read like a check-in from supervision; nothing measures how this audience
+  takes an organisation writing first; and Code for America found a "message about messaging" has to come first.
+  - What it changes: this is still a change, since Pam reads what members send. But a member only ever talks to Pam
+    after choosing to.
+  - Pam-first to staff stays as D-262 has it, and can move under the Pam name (Q2).
+- **B. Pam may also write first to a member**, as Will's ask reads.
+
+  The plan below is drawn so that A is B with one path switched off: §6's message button for a *member*.
+  **Recommendation: A for v1, then B once Will signs it and members have been told.** Every other part of this file
+  holds either way.
 
 ## 1. Where the inbox lives
 
@@ -49,11 +66,13 @@ today: Programs to check, Reported places, Waiting cities. Staff requests come a
   - Open question Q2: whether D-262's staff conversations should move into Pam's inbox later. Staff already see that
     sender as "Pam team" (D-395).
 
-**`/pam/messages/`, the list.** It reads from `pam_inbox()` (Nico §2): one row per conversation, newest activity first,
-in three groups:
+**`/pam/messages/`, the list.** It reads from `pam_inbox()` (Nico §2): one row per conversation, in three groups:
 
-1. **"Waiting for Pam"**: the person wrote last, so the conversation is waiting for a reply.
-2. **"Answered"**: open, and Pam wrote last.
+1. **"Waiting for Pam"**: the person wrote last, so the conversation is waiting for a reply. **Longest waiting first**,
+   and each row says how long: "Waiting 3 hours", "Waiting 2 days". The time comes from the person's oldest message
+   since Pam last replied. Iris: unanswered first, with how long each has waited. For this audience, silence is what
+   loses people.
+2. **"Answered"**: open, and Pam wrote last. Newest first.
 3. **"Closed"**: folded under a row that opens it. `pam_set_thread_status` closes a conversation. A closed one
    reopens on its own when the person writes again (Nico).
 
@@ -62,6 +81,24 @@ has the words.
 
 **Opening a row** opens the conversation (Nico's thread view). Inside it, the super admin can close or reopen it. The
 action sits in the header's menu, not as a button beside the composer, so it is never pressed by mistake.
+
+**Saved replies in the super admin's composer** (Iris §2 and §4). A small "Saved replies" button above the composer
+offers a few fixed answers to send or edit. The super admin sees it; the person never does.
+
+- "Pam can't give advice about parole, probation or a legal case", followed by the free legal help list (Iris names
+  Philadelphia Lawyers for Social Equity, Community Legal Services' record clearing, and the City's Office of Reentry
+  Partnerships).
+- "Please ask your guide" or "Please ask the program", for the wrong door.
+- For a case manager writing *about* a member: Pam can't act on a member without the member; talk to them in your own
+  conversation. That is Iris's risk 6: it keeps a member's situation out of a channel they can't see.
+
+The words are Sage's, and the legal one is read by a lawyer before it ships (Iris). It is a short list in the code, in
+seven languages, not something the super admin edits in the app.
+
+**How long replies take** (Iris: measure two to four weeks before promising a time). At the foot of the list is one
+quiet line: "Last 30 days: first reply in {median} on average". It is worked out from the timestamps `pam_inbox()`
+already has, or from one more column (Q to Nico). The person never sees it. It is there so Will knows what can be
+promised before anything is.
 
 ## 2. What each conversation row shows about who wrote
 
@@ -150,6 +187,9 @@ emailed (Nico: bell only, `texts_live` stays off).
 
 ## 6. Starting a conversation as Pam
 
+**Under version A** (Pam replies only), the message button to a *member* is not drawn. Pam can still start a
+conversation with a case manager or program lead, which D-262 already allows, and with a program.
+
 From where the super admin already finds people, so no new search screen. Every path calls `pam_start_conversation`
 (Nico §2). Each person has one Pam conversation ever, so "start" opens the existing one if there is one, with the
 composer ready.
@@ -158,6 +198,7 @@ composer ready.
   - Each real row gets the message button on its end, as the case manager's Home has (D-227). Today real rows have no
     link at all.
   - The label is "Message {first name} as Pam".
+  - Under version A, a member's row has no message button.
   - The Demo view switch stays where it is. The message button sits beside it, and both stay 48px.
 - **A program: the program's page from Programs to check** (`/programs/review/?id=`), "Message this program".
   - Programs have no shared conversation. One message fans out to each recipient's own Pam conversation (Nico §2).
@@ -179,19 +220,26 @@ nothing more.
 - **DB tests:** Nico's §2 and §5. For this file's paths, two are worth naming:
   - `pam_inbox()` returns nothing to anyone who isn't the super admin;
   - its columns are exactly the ones listed in §2 above.
-- **Decisions, when Will picks:** reversing D-171 for members, as Pam only; the inbox's shape and the Home row; the
-  sender rule.
+- **Decisions, when Will picks:** A or B (and, for B, reversing D-171 and D-262's "never a member" as Pam only); the
+  inbox's shape and the Home row; the sender rule; the saved replies' words.
+- **Iris's other privacy points** (Copy and Delete include the Pam conversation, a stated retention period, a lawyer's
+  reading of "What Pam keeps") are Nico's and Lena's, in his plan and her words. This file adds nothing to them.
 
 ## Open questions for Will (card)
 
-- **Q1.** Is reversing D-171 for members, as Pam only, what you mean?
+- **Q1.** Version A (the person writes first, Pam replies) or B (Pam may also write first to a member)? B reverses
+  D-171 and D-262's "never a member". Recommended: A for v1.
 - **Q2.** Should the staff conversations you already have (D-262, where staff see "Pam team") move into Pam's inbox, or
   stay on your Messages tab?
 - **Q3.** First name only in the inbox (as everywhere else), or last name too? Last name would be a new read under
   D-588.
 - **Q4.** Messaging a live program needs a way to find one. Is reaching its lead from Everyone enough for now, or do
   you want a Programs list?
-- **Q5.** Is "Pam" with Pam's mark the sender look you want for members?
+- **Q5.** Is "Pam" with Pam's mark the sender look you want for members? (Iris's question 5 asks the same; she gives
+  the reader's first name as the warmer, more personal option.)
+- **Q6.** Who covers when you're away? Iris puts silence third among the risks, and says a second reader or an away
+  notice is needed before launch. With no second reader, the smallest step is an "Away until {date}" switch on the
+  inbox. It changes Nico's automatic first reply to say when someone will read it. Which do you want?
 
 Nico's own questions are in his §6, including who a program's message reaches and what's off in v1.
 
@@ -221,6 +269,12 @@ Agreed with Nico at 02:48.
 - `pam_inbox()` returns the asker's region.
 - Every Pam function and policy goes through `is_pam_team()`, which today returns `is_super_admin()`.
 
-Nothing else in his functions needs to change.
+**Asked of Nico after Iris's research (03:10):**
+1. `pam_inbox()` gives, per conversation, when the person's oldest unanswered message was sent ("waiting since"). For
+   the "Last 30 days" line, it gives each conversation's first-reply time, or a small `pam_reply_times(days)`.
+2. If Will picks Iris's "Read by Pam" receipt for the person, it needs the Pam read marker this plan dropped. It would
+   be set when the super admin opens the conversation. That is Nico's side (the person's thread view). The count on
+   Home still uses "waiting for a reply", not the read marker.
+3. If Will picks the "Away until {date}" switch (Q6), Nico's automatic first reply reads it.
 
 Dot draws it after both plans exist.
