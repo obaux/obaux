@@ -9,11 +9,12 @@
   #stage { position: fixed; inset: 0; display: grid; place-items: center; }
   canvas { display: block; }
   #panel {
-    position: fixed; top: 12px; right: 12px; width: 220px; max-height: calc(100% - 24px); overflow: auto;
+    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); width: 300px; max-height: 70%; overflow: auto;
     padding: 12px; border-radius: 10px; background: rgba(20,18,20,.82); color: #eee;
     backdrop-filter: blur(8px); transition: opacity .2s;
   }
-  #panel.hidden { opacity: 0; pointer-events: none; }
+  #panel.hidden { opacity: 0; pointer-events: none; transform: translate(-50%, 16px); }
+  #panel { transition: opacity .2s, transform .25s; }
   #panel h2 { margin: 0 0 8px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #aaa; }
   .row { display: flex; align-items: center; justify-content: space-between; margin: 5px 0; }
   .row input[type=color] { width: 36px; height: 22px; padding: 0; border: 0; background: none; cursor: pointer; }
@@ -21,7 +22,7 @@
   button { background: #333; color: #eee; border: 0; border-radius: 6px; padding: 5px 9px; cursor: pointer; margin: 6px 6px 0 0; }
   button:hover { background: #444; }
   #toggle {
-    position: fixed; top: 12px; right: 12px; z-index: 5; margin: 0; padding: 8px 14px; font-size: 13px;
+    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 5; margin: 0; padding: 8px 14px; font-size: 13px;
     background: rgba(20,18,20,.72); backdrop-filter: blur(8px); touch-action: manipulation;
   }
   #toggle.open { opacity: 0; pointer-events: none; }
@@ -30,8 +31,9 @@
   #panel .close { float: right; margin: -4px 0 0; padding: 4px 10px; }
   .row input[type=color] { width: 44px; height: 28px; }
   @media (max-width: 640px) {
-    #panel { left: 0; right: 0; top: auto; bottom: 0; width: auto; max-height: 62%; border-radius: 14px 14px 0 0; padding: 14px 16px 22px; }
+    #panel { left: 0; right: 0; bottom: 0; transform: none; width: auto; max-height: 62%; border-radius: 14px 14px 0 0; padding: 14px 16px 22px; }
     #panel.hidden { transform: translateY(100%); }
+    #toggle { bottom: 20px; }
     #panel { transition: opacity .2s, transform .25s; }
     .row input[type=range] { width: 55%; }
     #hint { display: none; }
