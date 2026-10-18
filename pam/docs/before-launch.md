@@ -506,6 +506,7 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   forwarding, a test and Will's go, D-450). Six translations each by Claude, with no native reader: promises, so the same
   native readers as below. The English says "rules" where the app says "policy"; the translations follow the app's word.
 
+- [ ] **A native reader for Pam's own voice (Message Pam, 18 October 2026).** The welcome (`pam.welcome`, `.noName`), the out-of-hours reply (`pam.away`, `pam.away.crisis`) and the hours line (`pam.hours`, `.days.range`, `.days.every`, `.zone.eastern`) are Pam speaking to a member, in six translations by Claude with no native reader. Check that Pam sounds like one person in each language (tú, você, 您, вы), that the hours line reads as a sentence once `Intl` has filled in the days and times ("de lunes a viernes, de 9:00 a 17:00 (hora del Este)"; pt-BR "horário do leste dos EUA"; ru "восточное время США"; ar "التوقيت الشرقي"), and that the crisis line (988) matches how each language says it in `terms.s.emergencies.p2`.
 - [ ] **A native reader for the calendar link screen (D-538, 11 October 2026).** The 27 `calendar.*` strings are six translations by
   Claude with no native reader. Two things a reader must check against the real apps, in their own language, because the apps can
   rename them: **`calendar.others`** names buttons in Google Calendar ("Other calendars" › "From URL") and Outlook ("Add calendar" ›
