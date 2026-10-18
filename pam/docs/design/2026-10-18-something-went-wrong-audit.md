@@ -7,9 +7,9 @@ Owners are by `docs/lanes.md`. Owners convert their own files in the next batch;
 
 `grep` finds 78 lines with `something_went_wrong` in 40 files under `apps/web/src` (stories and tests apart). About a
 third of them are the second half of a pair (the `notice=` prop and the `NOTICES[...]` title lookup for the same
-card), so the screens below are the real count: **23 rows of failed actions and 18 rows of pages that cannot load** (a row
-is a screen; two rows name two files), plus the join result codes and the component gallery. `ReportedSection` and
-`BookForMemberView` were classified from their conditions without opening the screen: the owners should confirm.
+card), so the screens below are the real count: **26 rows of failed actions and 19 rows of pages that cannot load** (a row
+is a screen; two rows name two files), plus the join result codes and the component gallery. `ReportedSection` was classified from its condition without opening the screen: its owner should confirm. Piper checked her files
+against this list (21:26) and her corrections are folded in.
 
 ## Failed action (the small alert, at the bottom)
 
@@ -28,8 +28,11 @@ is a screen; two rows name two files), plus the join result codes and the compon
 | What you sent | `screens/WhatYouSentView.tsx` | Piper | withdrawing a request |
 | Policies (program) | `screens/PoliciesView.tsx` (lines 127, 249) | Piper | uploading or removing a policy |
 | Book a trip | `screens/NewTripView.tsx` (line 607) | Piper | booking a visit |
-| Book for a member | `screens/BookForMemberView.tsx` (line 194) | Piper | the list could not be read (borderline: a list, not an action) |
-| Calendar link (`/calendar/`) | `screens/CalendarLinkView.tsx` (line 70, the `failed` half) | Piper | making a link, the details switch |
+| Calendar link (`/calendar/`) | `screens/CalendarLinkView.tsx` (line 70, the `failed` half) | Piper | making a link, a new link, disconnecting (the details switch is gone on Piper's plan C, 0e3b6169; she resolves whichever lands second) |
+| A place, cancel a visit | `app/place/page.tsx` (`cancelFailed`, a Banner with `place.visit.cancel.failed`) | Piper | cancelling a visit (added by Piper, 21:26) |
+| "I'm here" and "I went" | `screens/ImHereCard.tsx` (line 65, a Banner with `join.failed.title`) | Piper | the check-in save (added by Piper) |
+| Program lead's check-in circle | `screens/ScheduleView.tsx` (lines 333-389, a Tooltip on a failed save) | Piper | a control: it moves only after its save, like a switch (added by Piper) |
+| The saved heart, Explore row | `screens/ExploreScreen.tsx` (line 264) and the heart itself | Piper | a save or unsave (added by Piper) |
 | Reported places (review) | `app/places/ReportedPlaces.tsx` (line 148) | Piper | a review decision |
 | Review a program | `screens/ProgramReviewScreen.tsx` (line 254) | Piper | approve, ask for changes |
 | Sign in | `app/signin/SignInScreen.tsx` (line 331) | Ava | sending or checking a code |
@@ -60,6 +63,7 @@ is a screen; two rows name two files), plus the join result codes and the compon
 | Saved | `screens/SavedView.tsx` (line 156) | Piper |
 | Reported places | `app/places/ReportedPlaces.tsx` (line 139), `screens/ReportedPlacesScreen.tsx` (line 72) | Piper |
 | Programs to check | `screens/ProgramsToCheckScreen.tsx` | Piper |
+| Book for a member (the list of members could not be read: `bookable.hasFailed`) | `screens/BookForMemberView.tsx` (line 194) | Piper (moved here from "failed action" by Piper, 21:26) |
 
 ## Neither (not a drawn alert)
 
@@ -72,5 +76,6 @@ A switch moves only once the save has succeeded (D-616). Every `Switch` in the a
 edited by Dot except Text alerts.
 - Text alerts, one per kind: `screens/AlertsView.tsx` (Dot; first).
 - Everyone's demo-view switch: `app/directory/page.tsx` (line 264, `toggleDemo`): **Ava**. It is disabled while the write is in flight but its value comes from the person's row, so it moves on the refetch, not on the tap: check that it stays put on a failure.
-- Calendar link, "Show details": `screens/CalendarLinkView.tsx` (line 125, `setShowDetails`): **Piper**.
+- Calendar link, "Show details": `screens/CalendarLinkView.tsx` (line 125, `setShowDetails`): **Piper**. The switch is gone on her plan C (0e3b6169); if plan C lands first there is no switch to convert.
+- The program lead's check-in circle (`ScheduleView.tsx` 333-389) is a control that saves: it moves only after its save, like a switch (**Piper**).
 Not switches but they save on a tap (looked at, not fixed): the star on a person (`StarToggle`, `PeopleHomeView.tsx`, Piper), a saved place's heart (`useSavedPlaces`, Piper), the language choice (Lena), the role switcher (Ava). Checkboxes in `ServiceEditView.tsx` are form fields saved with the form, not instant.
