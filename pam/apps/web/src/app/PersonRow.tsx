@@ -86,7 +86,7 @@ export function PersonRow({ firstName, href, chip, meta, programBadge, trailing,
           <VStack gap={0.5} xstyle={styles.compactText}>
             <DataHeading level={3} xstyle={styles.compactName}>
               {href ? (
-                <a href={href} {...stylex.props(styles.link)}>
+                <a href={href} data-pam-stretch="" {...stylex.props(styles.link)}>
                   {firstName ?? '—'}
                 </a>
               ) : (
@@ -118,7 +118,7 @@ export function PersonRow({ firstName, href, chip, meta, programBadge, trailing,
             <Avatar size="lg" name={firstName ?? '?'} />
             <DataHeading level={3} xstyle={styles.name}>
               {href ? (
-                <a href={href} {...stylex.props(styles.link)}>
+                <a href={href} data-pam-stretch="" {...stylex.props(styles.link)}>
                   {firstName ?? '—'}
                 </a>
               ) : (

@@ -75,4 +75,58 @@ test.describe('the press layer', () => {
     expect(await scaleOf(page, '.astryx-clickable-card')).toBe(1);
     await page.mouse.up();
   });
+
+  // Part 2 (Iris's re-test): the kinds that did not press. `:active` is held with the mouse, as above.
+  const PLACE = { id: 'p1', name: 'Santore Library', lookup_name: 'Santore Library', category: 'education', subcategory: null, address: '932 S 7th St, Philadelphia, PA', phone: null, place_id: null, lat: 39.9371, lon: -75.15526, meters: 1919.3, has_hours: false };
+  const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
+
+  async function explore(page: Page) {
+    await asMember(page);
+    await page.route('**/rest/v1/rpc/services_near*', (route) => route.fulfill(json([PLACE])));
+    await page.route('**/rest/v1/rpc/search_areas*', (route) => route.fulfill(json([])));
+    await page.goto('/');
+  }
+
+  test('Explore\'s program card presses in as a whole, by its stretched link', async ({ page }) => {
+    await explore(page);
+    const card = '.astryx-card:has(a[data-pam-stretch])';
+    await page.locator(card).first().waitFor();
+    await page.locator(card).first().scrollIntoViewIfNeeded();
+    expect(await scaleOf(page, card)).toBe(1);
+    await hold(page, card);
+    await expect.poll(() => scaleOf(page, card)).toBeCloseTo(0.97, 2);
+    expect(await page.locator(card).first().evaluate((el) => getComputedStyle(el).backgroundImage)).toContain('linear-gradient');
+    await page.mouse.move(0, 0);
+    await page.mouse.up();
+    await expect.poll(() => scaleOf(page, card)).toBe(1);
+  });
+
+  test('a service choice presses in', async ({ page }) => {
+    await asMember(page);
+    await page.goto('/place/?id=dummy-place-learning');
+    const card = '.astryx-selectable-card';
+    await page.locator(card).first().waitFor();
+    await page.locator(card).first().scrollIntoViewIfNeeded();
+    expect(await scaleOf(page, card)).toBe(1);
+    await hold(page, card);
+    await expect.poll(() => scaleOf(page, card)).toBeCloseTo(0.97, 2);
+    await page.mouse.move(0, 0);
+    await page.mouse.up();
+    await expect.poll(() => scaleOf(page, card)).toBe(1);
+  });
+
+  test('a tab in the bar shades while held', async ({ page }) => {
+    await asMember(page);
+    await page.goto('/');
+    const tab = 'a.astryx-tab';
+    await page.locator(tab).first().waitFor();
+    const shade = () => page.evaluate((sel) => getComputedStyle(document.querySelectorAll(sel)[1]!).backgroundColor, tab);
+    const before = await shade();
+    const box = (await page.locator(tab).nth(1).boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await expect.poll(shade).not.toBe(before);
+    await page.mouse.move(0, 0);
+    await page.mouse.up();
+  });
 });
