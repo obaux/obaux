@@ -128,7 +128,7 @@ export function PamInboxScreen() {
       {list.map((row) => {
         const waited = row.waitingSince ? waitedFor(row.waitingSince) : null;
         const preview = row.preview ?? '';
-        const line = row.lastFrom === 'team' ? t('pam.inbox.you', { line: preview }) : preview;
+        const line = row.lastFrom === 'team' ? t('messages.preview.you', { text: preview }) : preview;
         return (
           <ListItem
             key={row.conversationId}
@@ -177,7 +177,7 @@ export function PamInboxScreen() {
     );
   }
 
-  // The median, so one long wait does not move the line (Mira): "usually".
+  // The median (Mira: one long wait should not move the line), said as what it is: half came within (Sage, b947f366).
   const reply = replyTimes ? replyDuration(replyTimes.medianSeconds) : null;
   const nothingOpen = groups.waiting.length === 0 && groups.answered.length === 0;
 
@@ -211,7 +211,9 @@ export function PamInboxScreen() {
           ]}
         />
       ) : null}
-      {reply ? <Text xstyle={styles.stat}>{t(`pam.inbox.replyTime.${reply.unit}`, { count: reply.count })}</Text> : null}
+      <Text xstyle={styles.stat}>
+        {reply ? t(`pam.inbox.replyTime.${reply.unit}`, { count: reply.count }) : t('pam.inbox.replyTime.none')}
+      </Text>
     </Page>
   );
 }

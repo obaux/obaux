@@ -142,7 +142,7 @@ test.describe('Messages to Pam (card a100)', () => {
     await expect(page.getByText('Kofi')).toHaveCount(0);
     const closedRow = page.getByRole('link', { name: /Closed conversations/ });
     await expect(page.getByRole('listitem').filter({ has: closedRow })).toContainText('1');
-    await expect(page.getByText('Last 30 days: you usually reply within 3 hours.')).toBeVisible();
+    await expect(page.getByText('Last 30 days: half of Pam’s first replies came within 3 hours.')).toBeVisible();
 
     await closedRow.click();
     await expect(page.getByRole('heading', { name: 'Closed conversations', level: 1 })).toBeVisible();
@@ -160,11 +160,12 @@ test.describe('Messages to Pam (card a100)', () => {
     for (const word of ['Reeves', '2155550100', 'Camden']) await expect(page.getByRole('main')).not.toContainText(word);
   });
 
-  test('nobody waiting says so in one line, with no reply-time line yet', async ({ page }) => {
+  test('nobody waiting says so in one line, and the reply-time line says there is nothing to measure yet', async ({ page }) => {
     await signedIn(page, { inbox: [], median: null });
     await page.goto('/pam/messages/');
     await expect(page.getByText('Nobody is waiting for Pam.')).toBeVisible();
-    await expect(page.getByText(/usually reply/)).toHaveCount(0);
+    await expect(page.getByText('Last 30 days: no replies yet.')).toBeVisible();
+    await expect(page.getByText(/first replies came within/)).toHaveCount(0);
     await expect(page.getByRole('link', { name: /Closed conversations/ })).toHaveCount(0);
   });
 
