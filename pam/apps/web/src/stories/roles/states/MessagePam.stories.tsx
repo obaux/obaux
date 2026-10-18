@@ -326,9 +326,7 @@ function PamComposer({ photo, placeholder, draft = null }: { readonly photo: boo
         const field = c.querySelector<HTMLElement>('[contenteditable], [role="textbox"]');
         if (field && field.textContent !== draft) field.textContent = draft;
         for (const el of c.querySelectorAll<HTMLElement>('div')) {
-          // The placeholder is the one empty-looking leaf div that is aria-hidden: hide it by what it is, not by its words (Lena: the
-          // words are the app's own in five languages, and only the English one matched).
-          if (el.children.length === 0 && el.getAttribute('aria-hidden') === 'true') el.style.display = 'none';
+          if (el.children.length === 0 && el.textContent === text) el.style.display = 'none';
         }
       }
     };
