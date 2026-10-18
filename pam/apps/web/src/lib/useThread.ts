@@ -82,6 +82,10 @@ export type ThreadState =
       kind: ThreadKind;
       /** A person's conversation with Pam (D-605): the other side is Pam, with no profile behind it. */
       isPam: boolean;
+      /** The Pam team reading a person's Pam conversation (D-605): not a member; every message not from the person is Pam's. */
+      teamView: boolean;
+      /** In a team view, the person who wrote to Pam. */
+      askerId: string | null;
       messages: readonly ThreadMessage[];
     }
   | { status: 'not_found' }
@@ -135,7 +139,13 @@ interface OutboxItem {
   readonly photoUrl: string | null;
 }
 
-const toMessage = (row: MessageRow, me: string, links: Record<string, string>, photoUrl?: string | null): ThreadMessage => ({
+const toMessage = (
+  row: MessageRow,
+  me: string,
+  links: Record<string, string>,
+  photoUrl?: string | null,
+  askerId: string | null = null,
+): ThreadMessage => ({
   id: row.id,
   senderId: row.sender_id,
   body: row.body,
@@ -145,7 +155,8 @@ const toMessage = (row: MessageRow, me: string, links: Record<string, string>, p
   photoUrl: photoUrl !== undefined ? photoUrl : (links[photoPathOf(row) ?? ''] ?? null),
   file: fileOf(row),
   createdAt: row.created_at,
-  mine: row.sender_id !== null && row.sender_id === me,
+  // Read by the Pam team, everything that is not the person's is Pam's (including the system's); otherwise mine is what I wrote.
+  mine: askerId !== null ? row.sender_id !== askerId : row.sender_id !== null && row.sender_id === me,
 });
 
 export function useThread(conversationId: string | null): {
@@ -216,10 +227,26 @@ export function useThread(conversationId: string | null): {
 
         // RLS answers "am I a member" and "does this conversation exist" the
         // same way: zero rows. A genuine member always sees at least their own row.
-        const mine = memberRows.find((row) => row.profile_id === me);
+        let mine = memberRows.find((row) => row.profile_id === me);
+        let teamPartner: { askerId: string; name: string | null; role: Role | null; programName: string | null } | null = null;
         if (!mine) {
-          setLoaded({ status: 'not_found' });
-          return;
+          // Not a member. The Pam team may read a person's Pam conversation (20261018072101): the one member it sees is the
+          // person, and `pam_inbox()` says who. Anyone else sees no rows at all and lands on not_found below.
+          const only = memberRows.length === 1 ? memberRows[0] : undefined;
+          if (only && one(only.conversations)?.kind === 'support') {
+            const { data: inbox } = await supabase.rpc('pam_inbox');
+            const row = ((inbox ?? []) as { conversation_id: string; asker_id: string; first_name: string | null; role: Role; program_name: string | null }[]).find(
+              (r) => r.conversation_id === conversationId,
+            );
+            if (row) {
+              teamPartner = { askerId: row.asker_id, name: row.first_name, role: row.role, programName: row.program_name };
+              mine = only;
+            }
+          }
+          if (!teamPartner) {
+            setLoaded({ status: 'not_found' });
+            return;
+          }
         }
 
         const partner =
@@ -231,7 +258,7 @@ export function useThread(conversationId: string | null): {
               program_name: string | null;
             }[]
           ).find((row) => row.conversation_id === conversationId) ?? null;
-        const conv = one(mine.conversations);
+        const conv = one(mine?.conversations ?? null);
 
         const read = (columns: string) =>
           supabase
@@ -256,22 +283,26 @@ export function useThread(conversationId: string | null): {
         setLoaded({
           status: 'ready',
           meId: me,
-          otherName: partner?.first_name ?? null,
-          otherRole: partner?.role ?? null,
-          otherProgramName: partner?.program_name ?? null,
+          otherName: teamPartner ? teamPartner.name : (partner?.first_name ?? null),
+          otherRole: teamPartner ? teamPartner.role : (partner?.role ?? null),
+          otherProgramName: teamPartner ? teamPartner.programName : (partner?.program_name ?? null),
           kind: conv?.kind ?? 'direct',
           // A support conversation's other side is Pam: a partner row with no profile (20261018072339).
           isPam: conv?.kind === 'support',
-          messages: read200.map((row) => toMessage(row, me, links)),
+          teamView: teamPartner !== null,
+          askerId: teamPartner?.askerId ?? null,
+          messages: read200.map((row) => toMessage(row, me, links, undefined, teamPartner?.askerId ?? null)),
         });
 
         // Fire-and-forget: this is housekeeping for the bell and the list's
         // "unread" flag on the *next* visit, not something this render waits on.
-        void supabase
-          .from('conversation_members')
-          .update({ last_read_at: new Date().toISOString() })
-          .eq('conversation_id', conversationId)
-          .eq('profile_id', me);
+        if (!teamPartner) {
+          void supabase
+            .from('conversation_members')
+            .update({ last_read_at: new Date().toISOString() })
+            .eq('conversation_id', conversationId)
+            .eq('profile_id', me);
+        }
       } catch {
         if (!cancelled) setLoaded({ status: 'error', offline: !navigator.onLine });
       }
@@ -326,7 +357,7 @@ export function useThread(conversationId: string | null): {
         // A link starts its preview now, so Stuff shared has it ready (D-407).
         if (wantsPreview(row.body)) void requestLinkPreviews([row.id]);
         // What was just picked is shown from the phone; the stored copy is what the other person's link reads.
-        const message = toMessage(row, meId, {}, shrunk ? URL.createObjectURL(shrunk) : null);
+        const message = toMessage(row, meId, {}, shrunk ? URL.createObjectURL(shrunk) : null, loaded.askerId);
         setLoaded((prev) => (prev.status === 'ready' ? { ...prev, messages: [...prev.messages, message] } : prev));
         setOutbox((prev) => prev.filter((o) => o.id !== item.id));
         return true;
@@ -335,7 +366,8 @@ export function useThread(conversationId: string | null): {
         if (stored?.kind === 'file') void removeUnsentFile(stored.path);
         // A refusal and a dropped connection look alike from here; only one
         // of them is the account's doing, and it deserves its own words.
-        if (await readAccountLimited()) {
+        // (Not in a Pam conversation: a limited account can write to Pam, so a failed send there is only ever not sent.)
+        if (!loaded.isPam && (await readAccountLimited())) {
           setLimited(true);
           setOutbox((prev) => prev.filter((o) => o.id !== item.id));
         } else {
@@ -398,7 +430,7 @@ export function useThread(conversationId: string | null): {
             (item.attachment ? row.attachment_kind === item.attachment.kind : row.attachment_kind === null),
         );
         if (found) {
-          const message = toMessage(found, loaded.meId, {}, item.photoUrl);
+          const message = toMessage(found, loaded.meId, {}, item.photoUrl, loaded.askerId);
           setLoaded((prev) =>
             prev.status === 'ready' && !prev.messages.some((m) => m.id === message.id)
               ? { ...prev, messages: [...prev.messages, message] }

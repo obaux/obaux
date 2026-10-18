@@ -10,7 +10,7 @@ import { SubPage } from '@pam/ui/SubPage';
 import { MenuList } from '@pam/ui/MenuList';
 import { useI18n } from '@/lib/i18n';
 import { HELP_SAFETY_URL } from '@/lib/helpDesk';
-import { HelpDeskRow, useHelpDeskItem } from '@/screens/HelpDeskRow';
+import { HelpDeskRow, useHelpDeskItem, useWriteToPamItem } from '@/screens/HelpDeskRow';
 
 /**
  * Get help, as a list of the kinds of help (D-213, from the reference Will
@@ -39,6 +39,7 @@ const styles = stylex.create({
 export function HelpView({ backHref = '/', backLabel }: { readonly backHref?: string; readonly backLabel?: string }) {
   const { t } = useI18n();
   const helpDesk = useHelpDeskItem();
+  const writeToPam = useWriteToPamItem();
   return (
     <SubPage title={t('help.title')} backHref={backHref} backLabel={backLabel ?? t('nav.back.home')}>
       <Text type="supporting" xstyle={styles.intro}>
@@ -51,6 +52,7 @@ export function HelpView({ backHref = '/', backLabel }: { readonly backHref?: st
           { id: 'topics', label: t('help.menu.topics'), href: '/help/topics/', icon: <HelpIcon {...ICON} /> },
           { id: 'safety', label: t('help.menu.safety'), href: '/help/safety/', icon: <ShieldIcon {...ICON} /> },
           { id: 'place', label: t('help.menu.place'), href: '/help/report-place/', icon: <FlagIcon {...ICON} /> },
+          ...(writeToPam ? [writeToPam] : []),
         ]}
       />
     </SubPage>

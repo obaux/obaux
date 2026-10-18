@@ -182,6 +182,13 @@ export interface ThreadViewProps {
   readonly blocked?: 'mine' | 'theirs' | null;
   /** BCP-47 tag for dictation, e.g. "en-US" or "es-US". */
   readonly speechLanguage: string;
+  /**
+   * A person's conversation with Pam (D-605). The composer says "Write to Pam", takes a photo and no document (the microphone
+   * stays), and there is no limit notice: a limited account can write to Pam.
+   */
+  readonly pam?: boolean;
+  /** The Pam team's tools for a Pam conversation (saved replies), above the composer; Ava's. Only given to the Pam team. */
+  readonly teamTools?: ReactNode;
 }
 
 /**
@@ -582,6 +589,8 @@ export function ThreadView({
   limited = false,
   blocked = null,
   speechLanguage,
+  pam = false,
+  teamTools,
 }: ThreadViewProps) {
   const { t, tPlain, locale } = useI18n();
   const inputRef = useRef<ChatComposerInputHandle>(null);
@@ -758,7 +767,8 @@ export function ThreadView({
       setPicked({ kind: 'photo', file: shrunk, preview: URL.createObjectURL(shrunk) });
       return;
     }
-    if (!messageFileType(file)) {
+    // Pam takes a photo (screenshots) and no document (D-605).
+    if (pam || !messageFileType(file)) {
       refuse('wrongType');
       return;
     }
@@ -828,7 +838,7 @@ export function ThreadView({
       value={draft}
       onChange={setDraft}
       onSubmit={(value) => void submit(value)}
-      placeholder={t('messages.thread.placeholder')}
+      placeholder={pam ? t('messages.pam.placeholder') : t('messages.thread.placeholder')}
       isDisabled={sending}
       elevation="none"
       xstyle={[styles.composer, dropping && styles.dropping]}
@@ -907,7 +917,7 @@ export function ThreadView({
               <Banner
                 status="warning"
                 title={t(`messages.thread.attach.${attachProblem}.title`)}
-                description={t(`messages.thread.attach.${attachProblem}.hint`)}
+                description={t(pam && attachProblem === 'wrongType' ? 'messages.thread.attach.wrongType.pam.hint' : `messages.thread.attach.${attachProblem}.hint`)}
                 endContent={
                   <IconButton
                     label={t('messages.thread.attach.close')}
@@ -932,8 +942,8 @@ export function ThreadView({
         <ChatComposerInput
           ref={inputBox}
           handleRef={inputRef}
-          label={t('messages.thread.placeholder')}
-          placeholder={t('messages.thread.placeholder')}
+          label={pam ? t('messages.pam.placeholder') : t('messages.thread.placeholder')}
+          placeholder={pam ? t('messages.pam.placeholder') : t('messages.thread.placeholder')}
           hasHistory={false}
           maxRows={8}
           onFiles={(files) => void take(files)}
@@ -981,28 +991,32 @@ export function ThreadView({
             }}
             {...stylex.props(styles.fileInput)}
           />
-          <IconButton
-            label={t('messages.thread.file.add')}
-            icon={<Icon icon={DocumentIcon} size="md" color="secondary" />}
-            variant="ghost"
-            size="md"
-            isDisabled={sending}
-            onClick={() => docPicker.current?.click()}
-            xstyle={styles.square}
-          />
-          <input
-            ref={docPicker}
-            type="file"
-            accept={MESSAGE_FILE_ACCEPT}
-            tabIndex={-1}
-            aria-hidden
-            onChange={(event) => {
-              const files = [...(event.target.files ?? [])];
-              event.target.value = '';
-              void take(files);
-            }}
-            {...stylex.props(styles.fileInput)}
-          />
+          {pam ? null : (
+            <>
+              <IconButton
+                label={t('messages.thread.file.add')}
+                icon={<Icon icon={DocumentIcon} size="md" color="secondary" />}
+                variant="ghost"
+                size="md"
+                isDisabled={sending}
+                onClick={() => docPicker.current?.click()}
+                xstyle={styles.square}
+              />
+              <input
+                ref={docPicker}
+                type="file"
+                accept={MESSAGE_FILE_ACCEPT}
+                tabIndex={-1}
+                aria-hidden
+                onChange={(event) => {
+                  const files = [...(event.target.files ?? [])];
+                  event.target.value = '';
+                  void take(files);
+                }}
+                {...stylex.props(styles.fileInput)}
+              />
+            </>
+          )}
         </>
       }
       sendButton={
@@ -1021,7 +1035,7 @@ export function ThreadView({
   return (
     <>
     <ChatLayout
-      composer={composer}
+      composer={teamTools ? <VStack>{teamTools}{composer}</VStack> : composer}
       density="compact"
       scrollButton={<ScrollToBottom />}
       xstyle={styles.layout}
