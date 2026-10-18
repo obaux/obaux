@@ -33,7 +33,8 @@ import { SetupArt, type SetupArtKind } from './SetupArt.js';
 export interface SetupCardProps {
   readonly kind: SetupArtKind;
   readonly title: string;
-  readonly body: string;
+  /** Left out when the title says it (D-608: screens do not explain). */
+  readonly body?: string;
   /** Where the card goes — Add a program, Profile, the calendar preview. */
   readonly href: string;
   /** Not ready yet: a placeholder while loading, or a shimmer while it is being worked on. */
@@ -105,9 +106,11 @@ export function SetupCard({ kind, title, body, href, loading }: SetupCardProps) 
               {title}
             </a>
           </Heading>
-          <Text type="supporting" xstyle={styles.body}>
-            {body}
-          </Text>
+          {body ? (
+            <Text type="supporting" xstyle={styles.body}>
+              {body}
+            </Text>
+          ) : null}
         </VStack>
         <HStack aria-hidden xstyle={styles.chevron}>
           <Icon icon="chevronRight" size="md" />

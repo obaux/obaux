@@ -19,7 +19,7 @@ function LocalisedNotice({ title, body, contactLabel, retry, userFacingNote, ...
     <Notice
       {...rest}
       title={tr(title)}
-      body={tr(body)}
+      {...(body ? { body: tr(body) } : {})}
       {...(contactLabel ? { contactLabel: tr(contactLabel) } : {})}
       userFacingNote={userFacingNote}
       {...(retry ? { retry: { label: tr(retry.label), onPress: retry.onPress } } : {})}

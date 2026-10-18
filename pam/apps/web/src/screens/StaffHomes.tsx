@@ -292,7 +292,6 @@ function setupCards(setup: ProgramSetup, t: (key: string) => string): Card[] {
             id: 'photo',
             kind: 'photo' as const,
             title: t('home.setup.photo.title'),
-            body: t('home.setup.photo.body'),
             href: '/profile/',
           },
         ]),
@@ -304,7 +303,6 @@ const CALENDAR_CARD = (t: (key: string) => string): Card => ({
   id: 'calendar',
   kind: 'calendar',
   title: t('home.setup.calendar.title'),
-  body: t('home.setup.calendar.body'),
   href: '/home/calendar/',
 });
 

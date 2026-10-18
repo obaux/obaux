@@ -102,6 +102,14 @@ test.describe('the staff Home', () => {
     await expect(page.getByRole('heading', { name: 'A link for a member', level: 1 })).toBeVisible();
   });
 
+  test('the set-up cards are their titles: the photo card does not sell, and the program card has no explaining line (D-608)', async ({ page }) => {
+    await signedInAs(page, 'provider', { fresh: true });
+    await page.goto('/');
+    await settled(page);
+    await expect(page.getByRole('link', { name: 'Add your photo' })).toBeVisible();
+    await expect(page.getByText('A friendly face helps people feel welcome before they walk in.')).toHaveCount(0);
+  });
+
   test('a new program lead, with no program yet, has no strip of people above Add your program (W4)', async ({ page }) => {
     await signedInAs(page, 'provider', { fresh: true });
     await page.goto('/');

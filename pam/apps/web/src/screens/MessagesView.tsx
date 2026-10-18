@@ -49,7 +49,8 @@ export interface MessageRow {
 export interface MessagesViewProps {
   readonly rows: readonly MessageRow[];
   /** The empty state's line — what a member, or staff, should expect. */
-  readonly emptyBody: string;
+  /** Left out when the title says it (D-608). */
+  readonly emptyBody?: string | undefined;
   /** The bell and Help. */
   readonly headerActions?: ReactNode;
   /**

@@ -113,10 +113,6 @@ export function PoliciesScreen() {
         ) : undefined
       }
     >
-      <Text type="supporting" xstyle={styles.intro}>
-        {t('policies.intro')}
-      </Text>
-
       {/* New ones first, at the top (Will); a full card with a PDF (D-348). */}
       <PolicyUploadCard
         title={t('policies.upload.label')}
