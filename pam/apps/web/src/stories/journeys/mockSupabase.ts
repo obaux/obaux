@@ -113,6 +113,28 @@ export interface MockOptions {
   readonly pamOff?: boolean;
   /** The Pam team's inbox is empty. */
   readonly pamInboxEmpty?: boolean;
+  /**
+   * The person's own Pam conversation (D-605): only Pam's welcome; after a message sent outside Pam's hours, with the automatic
+   * reply; or a message that did not go ("Not sent", Try again).
+   */
+  readonly pamThread?: 'welcome' | 'away' | 'notSent';
+}
+
+const PAM_CONVO_ID = 'c0000000-0000-4000-8000-0000000000a1';
+
+/** The rows of a person's Pam conversation for a story (D-605). */
+function pamThreadMessages(state: 'welcome' | 'away' | 'notSent') {
+  const row = (id: string, sender: string | null, systemKey: string | null, systemVars: unknown, body: string, ago: number) => ({
+    id, conversation_id: PAM_CONVO_ID, sender_id: sender, system_key: systemKey, system_vars: systemVars, body,
+    attachment_url: null, attachment_kind: null, created_at: new Date(Date.now() - ago).toISOString(),
+  });
+  const welcome = row('pw', null, 'pam.welcome', null, '', 7_200_000);
+  if (state !== 'away') return [welcome];
+  return [
+    welcome,
+    row('pu', ME_ID, null, null, 'Is anyone there tonight?', 600_000),
+    row('pa', null, 'pam.away', { opensAt: new Date(Date.now() + 36_000_000).toISOString() }, '', 599_000),
+  ];
 }
 
 /** A real place of the catalogue, to plan a trip to in a story (the examples' ids are not real). */
@@ -737,6 +759,9 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/served_cities', () => ({ body: [{ city: 'Philadelphia' }] })),
     on('/rest/v1/conversation_members', (url, method) => {
       if (method === 'PATCH') return { body: [] };
+      if (options.pamThread && url.includes(`conversation_id=eq.${PAM_CONVO_ID}`)) {
+        return { body: [{ profile_id: ME_ID, conversations: { kind: 'support' } }] };
+      }
       if (url.includes('conversation_id=eq.')) {
         return {
           body: [
@@ -763,7 +788,11 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/message_program', () => ({ body: CONVO_ID })),
     // Counting a screen open (a76): a story never writes, and does not count either.
     on('/rpc/count_screen_open', () => ({ body: null })),
-    on('/rpc/conversation_partners', () => ({ body: [partnerFor(role)] })),
+    on('/rpc/conversation_partners', () => ({
+      body: options.pamThread
+        ? [{ conversation_id: PAM_CONVO_ID, profile_id: null, first_name: null, role: null, program_name: null }]
+        : [partnerFor(role)],
+    })),
     on('/rpc/conversation_block_state', () => ({
       body: [{ i_blocked: options.blocked === 'mine', blocked_me: options.blocked === 'theirs' }],
     })),
@@ -771,6 +800,10 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/block_in_conversation', () => ({ body: null })),
     on('/rpc/unblock_in_conversation', () => ({ body: null })),
     on('/rest/v1/messages', (_url, method) => {
+      if (options.pamThread) {
+        if (method === 'POST') return options.pamThread === 'notSent' ? { status: 500, body: {} } : { body: { id: 'new', sender_id: ME_ID, body: 'Sent from Storybook', created_at: new Date().toISOString() } };
+        return { body: pamThreadMessages(options.pamThread) };
+      }
       if (method !== 'POST') return { body: threadFor(role) };
       // What `messages_insert_sender` answers a limited account (0031).
       if (options.limited) {

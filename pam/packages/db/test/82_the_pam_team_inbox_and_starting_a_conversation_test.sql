@@ -141,7 +141,17 @@ select test.check('Ivy answers: she is waiting, and the preview is the first lin
 insert into public.messages (conversation_id, sender_id, body) values ((select v from t82 where k = 'ivy'), :'root', 'Great');
 select test.check('the team answers: nobody is waiting',
   (select count(*) from public.pam_inbox() where asker_id = :'ivy' and last_from = 'team' and waiting_since is null), 1);
-select test.check('a conversation with only Pam''s welcome (Wes''s, made here) is not in the inbox: nobody has written',
+-- Wes opens his Pam conversation the way the app does and writes nothing: it holds only Pam's welcome.
+select test.as_user(:'wes');
+insert into t82 select 'wes', public.open_pam_conversation();
+select test.as_user(:'root');
+select test.check('control: Wes has a Pam conversation (one thread, his)',
+  (select count(*) from public.pam_threads where asker_id = :'wes' and conversation_id = (select v from t82 where k = 'wes')), 1);
+select test.check('control: and it holds exactly one message, Pam''s welcome, which no person wrote',
+  (select count(*) from public.messages where conversation_id = (select v from t82 where k = 'wes')), 1);
+select test.check('control: ...with the key pam.welcome and no sender',
+  (select count(*) from public.messages where conversation_id = (select v from t82 where k = 'wes') and system_key = 'pam.welcome' and sender_id is null), 1);
+select test.check('a conversation with only Pam''s welcome (Wes''s) is not in the inbox: nobody has written',
   (select count(*) from public.pam_inbox() where asker_id = :'wes'), 0);
 select public.pam_set_thread_status((select v from t82 where k = 'ivy'), 'closed');
 select test.check_text('close: the inbox says closed',
@@ -162,6 +172,13 @@ select test.check('the same text goes to the program''s one active lead (the lim
   public.pam_start_program_conversation(:'svc_a', 'Hello from Pam')::bigint, 1);
 select test.check('...in the lead''s own Pam conversation',
   (select count(*) from public.pam_inbox() where asker_id = :'lead_a' and preview = 'Hello from Pam'), 1);
+reset role;
+select test.check('control: Program A''s organisation has two providers on Pam, one of them limited, and another organisation has its own lead',
+  (select count(*) from public.profiles where role = 'provider' and org_id = :'org_a')
+  + (select count(*) from public.profiles where id = :'lead_b' and access_status = 'limited')
+  + (select count(*) from public.profiles where id = :'lead_c' and org_id = :'org_c' and access_status = 'active'), 4);
+set role authenticated;
+select test.as_user(:'root');
 select test.check('...and nobody else''s',
   (select count(*) from public.pam_inbox() where asker_id in (:'lead_b', :'lead_c')), 0);
 select test.check('pam_program_has_lead says yes for a program with an active lead, no for one without, and no for a place with no organisation',

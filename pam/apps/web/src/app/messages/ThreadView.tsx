@@ -27,6 +27,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
+import { ProgressBar } from '@astryxdesign/core/ProgressBar';
 import { Thumbnail } from '@astryxdesign/core/Thumbnail';
 import { DocumentIcon, Notice, PhotoIcon } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
@@ -147,6 +148,8 @@ export interface ThreadViewMessage {
    * Try again under it), `sent` once stored. Absent is `sent`: a conversation read from the database, and the examples.
    */
   readonly status?: 'sent' | 'sending' | 'failed';
+  /** How much of its photo has gone (0 to 1) while it is uploading, or absent. */
+  readonly progress?: number | null;
 }
 
 export interface ThreadViewProps {
@@ -296,6 +299,7 @@ const styles = stylex.create({
   },
   // "Sending…", "Not sent" and "Sent" under a bubble, quiet; the Try again beside "Not sent" is a full 48px target.
   statusLine: { alignItems: 'center', minHeight: '24px' },
+  progress: { width: '160px', maxWidth: '100%' },
   statusText: { fontSize: '13px', lineHeight: 1.4 },
   retry: { minHeight: '48px', minWidth: '48px' },
   // A photo in a bubble (D-394): a 240px square, cropped to fill, that opens
@@ -687,11 +691,19 @@ export function ThreadView({
     const status = message.status ?? 'sent';
     if (status === 'sending') {
       return (
-        <HStack xstyle={styles.statusLine} role="status">
+        <VStack gap={1} xstyle={styles.statusLine} role="status">
           <Text type="supporting" xstyle={styles.statusText}>
             {t('messages.thread.sending')}
           </Text>
-        </HStack>
+          {typeof message.progress === 'number' ? (
+            <ProgressBar
+              label={tPlain('messages.thread.sending')}
+              isLabelHidden
+              value={Math.round(message.progress * 100)}
+              xstyle={styles.progress}
+            />
+          ) : null}
+        </VStack>
       );
     }
     if (status === 'failed') {
