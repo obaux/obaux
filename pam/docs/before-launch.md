@@ -115,6 +115,19 @@ STATUS row too.
   database, as for the site's `VISIT_REMINDERS_LIVE`, D-458), do these together, then say so to the merge desk:
   1. Flip `VISIT_REMINDERS_LIVE` in `apps/site/src/content/flags.ts` **and** `VISIT_REMINDERS_LIVE_IN_APP` in
      `apps/web/src/lib/visitRemindersLive.ts` (it also takes the "Coming soon" badge off the trip-reminder row on the agree screens and Text alerts). The test fails if only one is flipped.
+  1b. **Text alerts' member switch "A reminder before your trip"** (Nico, 18 October; found when the badge was tied to this flag).
+     That kind has no column of its own (there is no `alert_visit`), and `AlertsView` (Dot's) draws its switch as off whatever the
+     account says. Before the flag is flipped, the switch must read and write the member's yes to texts (as the saved-place switch
+     does, `setReminderConsent`), or it stays a dead toggle next to a promise that is now true. Dot builds it when the day is set.
+  1c. **Rows already waiting when texts go on** (Nico, 18 October; live read at 20:37: `appointment_24h` has 3 cancelled and 1 still
+     `scheduled` with its `send_at` already past). `claim_outbound_messages` holds them while `texts_live` is off and decides on the
+     first claim after it is on (restated last in 20261011042645, built in 20261010130754, D-475): a reminder for a visit that has
+     already started is cancelled (`the visit has already started`), and a time-bound text more than 12 hours late is cancelled
+     (`it was more than 12 hours late`, an hour past the member's quiet window if that is longer). DB test 38 proves both with
+     `texts_live` on (a 24-hour reminder 13 hours late is cancelled, one 11 hours late is sent). **What it does NOT do:** a reminder
+     that is, say, 5 hours past due for a visit still to come IS sent, because it is still useful. So on the day, look at the past-due
+     `scheduled` rows first (`select id, send_at, appointment_id from outbound_messages where status = 'scheduled' and send_at < now()`)
+     and cancel by hand any that the visit has since made pointless, before the first claim.
   2. Put these back in `en.json` (English first; Will reads it, because it is a promise), then the other six.
      The six as they were before D-474 are in git: `git show 717ed79:pam/packages/config/src/locales/<locale>.json`
      (that is `main` just before this change). Take the key's value from there, or write it again and
