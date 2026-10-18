@@ -37,6 +37,8 @@ export const NO_PLURAL_VARIANTS = new Set([
   'pam.inbox.replyTime.minutes.one',
   'pam.inbox.replyTime.hours.one',
   'pam.inbox.replyTime.days.one',
+  // And "{count} time" on the super admin's Problems list (Ava, D-616): English picks the singular itself.
+  'problems.times.one',
 ]);
 export const COUNT_KEYS = Object.keys(EN).filter((k) => EN[k]!.includes('{count}') && !NO_PLURAL_VARIANTS.has(k));
 

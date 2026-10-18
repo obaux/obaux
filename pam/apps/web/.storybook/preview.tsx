@@ -15,6 +15,7 @@ import { pseudoBundle } from '@pam/config/pseudo';
 import { pamTheme } from '@pam/ui/theme';
 import { I18nProvider, useI18n } from '../src/lib/i18n';
 import { AlertBannerProvider } from '../src/lib/alertBanner';
+import { MalfunctionProvider } from '../src/lib/malfunction';
 
 // The same stylesheets, in the same order, as src/app/layout.tsx.
 import '../src/app/layers.css';
@@ -83,7 +84,9 @@ const withPam: Decorator = (Story, context) => {
           <LocaleBridge locale={locale} />
           <RowTaps />
           <AlertBannerProvider>
-            <Story />
+            <MalfunctionProvider>
+              <Story />
+            </MalfunctionProvider>
           </AlertBannerProvider>
         </I18nProvider>
       </MotionProvider>

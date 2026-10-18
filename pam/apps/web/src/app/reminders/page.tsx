@@ -116,7 +116,7 @@ function RemindersForm() {
     if (session.status !== 'signed-in') return;
     setBusy(true);
     setFailed(false);
-    const saved = await setReminderConsent(session.session.userId, value);
+    const saved = (await setReminderConsent(session.session.userId, value)).ok;
 
     if (!saved) {
       setBusy(false);

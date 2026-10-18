@@ -142,6 +142,14 @@ export const WaitingCitiesEmpty: Story = {
   name: 'Cities people are waiting for — nobody yet',
   render: () => <>{REDESIGN_ROUTES['/cities/waiting/']!.render()}</>,
 };
+/** Problems (D-616): what broke in the app this week, newest first; no person, no free text. */
+export const Problems: Story = screen('super-admin', 'Problems', '/problems/', { from: 'notifications' });
+/** ...and nothing broke: one line. */
+export const ProblemsEmpty: Story = {
+  ...asRole('super-admin', '/problems/', {}, { noProblems: true }),
+  name: 'Problems — nothing this week',
+  render: () => <>{REDESIGN_ROUTES['/problems/']!.render()}</>,
+};
 export const ProgramToCheckNew: Story = screen('super-admin', 'A new program to check (waiting four days)', '/programs/review/item/', { id: 'check-1' });
 export const ProgramToCheckChange: Story = screen('super-admin', 'A change to a live program', '/programs/review/item/', { id: 'check-2' });
 export const ProgramToCheckWithdrawn: Story = screen('super-admin', 'A request the leader deleted to start over', '/programs/review/item/', { id: 'check-3' });

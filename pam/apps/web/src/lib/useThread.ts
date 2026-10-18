@@ -14,6 +14,7 @@ import {
   type OutgoingAttachment,
 } from './messageFile';
 import { readAccountLimited } from './accountLimited';
+import { codeFromError, reportAppError } from './reportAppError';
 
 /**
  * One conversation: who is in it, and what has been said.
@@ -474,6 +475,9 @@ export function useThread(conversationId: string | null): {
           setOutbox((prev) => prev.filter((o) => o.id !== item.id));
         } else {
           setOutbox((prev) => prev.map((o) => (o.id === item.id ? { ...o, status: 'failed' } : o)));
+          // The team hears of a send that did not go (D-616): which kind and what code, never the message or the words.
+          const uploading = /^(upload failed|could not read the photo)$/.test(String((caught as { message?: unknown } | null)?.message ?? ''));
+          reportAppError({ action: uploading ? 'messages.photo' : 'messages.send', code: codeFromError(caught) });
         }
         return false;
       }
@@ -542,8 +546,9 @@ export function useThread(conversationId: string | null): {
           return true;
         }
         return await attempt(item);
-      } catch {
+      } catch (caught) {
         setOutbox((prev) => prev.map((o) => (o.id === id ? { ...o, status: 'failed' } : o)));
+        reportAppError({ action: 'messages.retry', code: codeFromError(caught) });
         return false;
       } finally {
         sendingNow.current.delete(id);

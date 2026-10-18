@@ -1695,6 +1695,30 @@
   Text alerts can be tapped while texts are off. D-616 is b76: Dot's alert and switch rule, Nico's app_errors (off
   until Will signs Lena's Privacy line), Ava's Problems list, Sage's notice.malfunction and notify.app_error, Lena's
   six languages and pins, Iris's test plan.
+- **Batch b76 (18 October, 22:30 to 23:30).** D-616, as Will asked at 21:14. Dot's 72d85ce7 (D-617, on Nico's
+  ec8085eb): when something Pam does fails, one small alert at the bottom of the screen (useMalfunction,
+  CompactNotice, read out as an alert, no timer, gone at the next tap, a good retry or leaving), never over the failed
+  control; a switch moves only after its save succeeds, shows that it is saving, counts no answer in 15 seconds as a
+  failure and reads a late save back; the card under the row is gone. Patterns has the rule (When Pam fails), and
+  Dot's audit (b448c01a) lists 26 failed actions and 19 pages that cannot load, with owners, for b77. Sage signed the
+  words: notice.malfunction "That didn't go through. It's not your fault, so try again." (834facaa), the bell line and
+  the 23 action names (1d0d2cd5, 34f9444d, 689f92a6, f12e6544), the Problems words, the Privacy line's edit and the
+  site's alts (78b4f078). Lena's six languages for all of it, with the pins and a test that every action has a name
+  (0b7f3ffd, 14bc9d23), her Privacy read (f1b84bac), and "Buscar personas" for the Spanish search placeholder
+  (865928fa). Nico's error log: app_errors, nine columns and no free text, written only by report_app_error with a
+  closed code shape and the 23 keys in @pam/config, the route cut to a pattern, read only by a super admin through
+  app_errors_grouped, ten a minute per account and one shared count signed out (no network address at all), swept
+  after 30 days, one bell row per action per hour; off (app_errors_live) until Will signs the Privacy line (card
+  a104). The app's reporter never throws and keeps at most ten reports in memory while offline; Messages' send, photo,
+  retry, block, unblock and report use it (b85c289e), and dispatch-sms reports its status code. Ava's Problems list
+  for super admins, from the bell and the Pam team tools, and the bell names the action (18919c74). Iris's b75 re-test
+  (39cc6833) and her D-616 test plan (eb694a5e). Wren's site: Texts from Pam and Messages in Pam say what the app says
+  today (205c304f, dated 18 October). Will had pictures before it shipped (22:12, 22:17). The desk's full run found
+  two things the READYs had not run, both fixed in 07d72f08 (the lesson below), and the migration kept a stale comment
+  (bef297c3); Lena's 5bf287ba took the same stale words out of her Privacy read and before-launch. The migration is
+  not live: its constraint change waits for Will's yes at the connector, so the app ships first. Without
+  report_app_error a report gets an answer and is dropped, and the Problems list says it cannot load; dispatch-sms is
+  redeployed once the migration is live. b75's entry gives 21:56 as its end; its push was at 21:55:18.
 
 ## What was wrong, and what missed it
 
@@ -2043,6 +2067,14 @@
   it by comparing each merged file with its owner's tip, and fixed it in 92327adf; no other file one branch owns
   differs from that branch's tip. Lesson: after assembling a batch, compare every file one branch owns with that
   branch's tip, and read any file two branches changed by hand. A put-back is a change like any other.
+- **Two READYs went over the budget together, and neither had run it (b76, 22:36 to 22:43).** Dot put the malfunction
+  alert in Providers, which every route loads. Nico's reporter, which it imports, imported the Supabase client at the
+  top of the file, so the whole client moved into the root layout: 676.6 kB against the 600 kB budget (b75 was 592.3).
+  Dot's new switch guard also broke Nico's older pin, which matched the line exactly. Each READY had run web unit
+  tests and the e2e; neither had run the budget or the config tests, and the desk's full run found both. Fixed in
+  07d72f08: the client loads inside send(), the way Providers already loads LocaleSync, and the pin reads the new line
+  (it still fails with the live check taken out). Lesson: a READY that changes anything Providers imports runs the
+  budget, and a READY that changes a line another lane pins runs that lane's tests. Dot and Nico told at 22:45.
 
 ## Decisions
 
@@ -2324,9 +2356,21 @@
 | Batch b75 db tree (92327adf: Nico's 20261018185235 and test 84, db tests 22 and 23 on made-up 555 numbers; local Postgres 16) | Suite 1836 ok, "All database checks passed" |
 | 20261018185235 live (21:05, as 20261018210554) | Read back: one queue_saved_place_closed(uuid, text) returning integer, its body the file's (md5 9f6577bc), security definer, search_path public, extensions, no execute for anon or authenticated; saved_place_closed rows waiting: 0 before and after; texts_live off |
 | Batch b75, full run (92327adf: e1a2cbec + Sage 38a23293, de0f701f, 1a6bfd90, 2da9f7ef, 455cf870; Lena 2bc91ea4, dc22398b, cc6e9c9f, 022f8eb7, a32b53ee, e8c22aa8, 26168781, 6a4eb410, c543dcae, 959a0df1, 37b2f8ce, 32f90fe2, 05d04a72, 8e85d5c8; Nico d272c53b, 525d5103, 59504caa, 13989ef3, f648db12, c2f9d615, eb4fbf3d; Ava 9b6d87b5, e5b6c391, a476758d, 928fee6f; Dot b631a543, c6179f45, 7f9d6a77; Iris 7afc9719, ada1aca0; merge fixes c31ebaad, 593c87a9, 92327adf): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | All green: config 1456 passed (1 skipped, 1 todo), copy in step; ui 130; ui build; site 124; site tsc; build:e2e; tsc; web unit 214; budget 7.7 kB to spare; e2e 2561 passed, 22 skipped, 0 failed, no retries (33.8 m); storybook built, no bundle names the live project; site build; site a11y 125 scans, 0 problems. Language fit on the Storybook build (en, ar, 760): the Explore clamps did not come back; two findings not yet in fit-known.json, the Spanish search placeholder 2 px over its pill on the case manager's Home story in both runs, in no file b75 touched (sent to Lena) |
+| b75 main CI (4d39ccca, pushed 21:55:18) | Types/unit/build (22:06), Migrations and RLS, Publish Storybook, Accessibility (22:39): all four green; Vercel web and pam-site success (21:59) |
+| Batch b76 db tree (5e1bcccd: Nico's 20261018211942 and test 85; local Postgres 16) | Suite 1893 ok, "All database checks passed". Mutations: the switch ignored fails test 85 ("off: a signed-out report is not taken"); select granted to anon and authenticated fails test 85 ("anon cannot read the table"); the deny-all policy made allow-all on its own passes, because the table has no grants (the outer layer holds). The comment fix bef297c3 came after |
+| 20261018211942 live | Not applied. list_migrations before: last 20261018210554. apply_migration timed out at 60 s at 22:38 and 22:40; after each, no app_errors table, functions or cron jobs, notifications_kind_known unchanged (six kinds), no running query, no waiting lock. The migration drops and re-adds notifications_kind_known, which the connector holds for Will's confirmation (as with P4 on 10 October). Not worked around: it waits for Will in the session (card a104). dispatch-sms is not redeployed until it is live |
+| Batch b76, full run (5e1bcccd: 4d39ccca + Nico ec8085eb (with f71a4665, 4096aba2, 362c0d27, b85c289e); Lena 14bc9d23, 0b7f3ffd, 865928fa, f1b84bac; Ava 18919c74; Dot 72d85ce7, b448c01a; Sage 834facaa, 1d0d2cd5, 34f9444d, 689f92a6, f12e6544, 78b4f078; Iris 39cc6833, eb694a5e; Wren 205c304f with the posts:date dates): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | config 1 failed of 1496 (alert-texts-live.test.ts:46, the pin on the old switch guard); budget over by 76.6 kB (676.6 kB; the lesson below); the rest green: copy in step; ui 130; ui build; site 124; site tsc; build:e2e; tsc; web unit 224; e2e 2603 passed, 22 skipped, 0 failed, no retries (34.5 m); storybook built, no bundle names the live project; site build; site a11y 125 scans, 0 problems |
+| Batch b76, after the fixes (e8616909: 5e1bcccd + bef297c3, 07d72f08 and Lena 5bf287ba) | build:e2e; budget 6.1 kB to spare (593.9 kB); tsc; web unit 224; config 1491 passed (4 skipped, 1 todo); e2e on the specs that report errors (messages, problems, alerts, message-pam on narrow-320, dark-320 and iphone-se) 483 passed, 21 skipped, 0 failed (7.7 m); language fit on the Storybook (en, ar, 760): 5 Arabic findings, all already in fit-known.json, none new |
 
 ## Left undone
 
+- **As of b76 (18 October, 23:30):** D-616 is in: one small alert at the bottom when Pam fails, and switches that move
+  only after their save. The error log, its bell and the Problems list are built and stay off until Will signs a104;
+  migration 20261018211942 waits for his yes in the session, then dispatch-sms is redeployed. Next (b77): the lanes
+  move their failed actions to the alert from Dot's audit (Piper, Ava, Nico), Ava's C1 and C3, Nico's R3 and C2,
+  Lena's clipped-title audit check, and Iris runs the D-616 plan on main. Then the refile and the switch batch.
+  With Will: a104 and the migration; A30; whether the number ending 5265 is his own; the connect text; a102, a86, the
+  website's photo line; a97/a98, a91, a93, a84, a88.
 - **As of b75 (18 October, 21:56):** One name for texts: "Text alerts", and "Get text alerts" on both agree screens,
   each in its original layout. The saved-place text has its link (live). Message Pam is whole on both sides and stays
   behind its switch (off); Iris re-tests on main. Next: Wren's site renames and agree-screen pictures for the refile;

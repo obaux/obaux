@@ -422,7 +422,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
     }
     if (!userId) return;
     setBusy(true);
-    const saved = await setReminderConsent(userId, wants);
+    const saved = (await setReminderConsent(userId, wants)).ok;
     const finished = saved ? await finishSetup(userId, true) : false;
     setBusy(false);
     if (!saved || !finished) {
