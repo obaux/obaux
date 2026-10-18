@@ -322,7 +322,7 @@
   "messages.thread.send": "Enviar",
   "messages.thread.sending": "Enviando…",
   "messages.thread.sent": "Enviado",
-  "messages.thread.rateLimited": "That's a lot at once. Wait a moment, then send it again.",
+  "messages.thread.rateLimited": "É muita coisa de uma vez. Espere um instante e envie de novo.",
   "messages.thread.notSent": "Não enviado",
   "messages.thread.tryAgain": "Tentar de novo",
   "messages.thread.notSent.label": "Não enviado. Tentar de novo.",
