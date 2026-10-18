@@ -16,11 +16,11 @@ None new; addendum to D-602.
 
 ## Verified
 
-`e2e/press-layer.spec.ts` gained Explore's program card, a service choice and a tab; each fails on main on its assertion (scale 1, not 0.97; no shade) and passes with the rule. `:active` is forced with a held mouse button, as in part 1. Case manager member cards and Finish setting up cards share the one stretched-card rule and the same marked anchors; I did not add a screen-level case for them. Pictures and clip in `docs/design/review/2026-10-18-press-2/`.
+`e2e/press-layer.spec.ts` gained Explore's program card, a service choice and a tab; each fails on main on its assertion (scale 1, not 0.97; no shade) and passes with the rule. `:active` is forced with a held mouse button, as in part 1. Mira's second round added the two staff screens: a case manager's member card (Home) and a program lead's Finish setting up card (Home, no program yet); both fail on main on scale 1 not 0.97 and pass with the rule on all three projects (27 passed). Pictures and clip in `docs/design/review/2026-10-18-press-2/`.
 
 ## Left undone
 
-The primary button under reduced motion: I could not reproduce the missing shade. On main a held primary button already shows Astryx's pressed overlay (a 22% black gradient) with motion reduced, so I added no rule. If Iris saw none, it was a disabled button or a different screen; I need which.
+The primary button under reduced motion: the big "Plan a trip" inside the Press wrapper already shades. Measured with reduced motion and a held mouse button on the button (`:active` true): background-image goes from none to linear-gradient(rgba(0,0,0,0.22), rgba(0,0,0,0.22)); the wrapper's transform stays none. So Astryx's own overlay shows through the wrapper and no rule was added.
 
 ## Needs a human
 

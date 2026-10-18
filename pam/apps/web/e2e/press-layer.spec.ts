@@ -129,4 +129,48 @@ test.describe('the press layer', () => {
     await page.mouse.move(0, 0);
     await page.mouse.up();
   });
+
+  // The two staff screens whose cards are stretched links: tonight's lesson is that a press test samples the screens people tap.
+  async function staff(page: Page, role: 'admin' | 'provider') {
+    await asMember(page, role);
+    await page.route('**/rest/v1/rpc/**', (route) => route.fulfill(json([])));
+    await page.route('**/rest/v1/services*', (route) => route.fulfill(json([])));
+    await page.route('**/rest/v1/program_services*', (route) => route.fulfill(json([])));
+    await page.route('**/rest/v1/program_submissions*', (route) => route.fulfill(json([])));
+    await page.route('**/rest/v1/enrollments*', (route) => route.fulfill(json([])));
+    await page.route('**/rest/v1/access_controls*', (route) => route.fulfill(json([])));
+  }
+
+  async function pressesAsAWhole(page: Page, card: string) {
+    await page.locator(card).first().waitFor();
+    await page.locator(card).first().scrollIntoViewIfNeeded();
+    expect(await scaleOf(page, card)).toBe(1);
+    await hold(page, card);
+    await expect.poll(() => scaleOf(page, card)).toBeCloseTo(0.97, 2);
+    await page.mouse.move(0, 0);
+    await page.mouse.up();
+    await expect.poll(() => scaleOf(page, card)).toBe(1);
+  }
+
+  test('a case manager\'s member card presses in as a whole', async ({ page }) => {
+    await staff(page, 'admin');
+    await page.route('**/rest/v1/profiles*', (route) =>
+      route.request().url().includes('role=eq.member')
+        ? route.fulfill(json([{ id: 'm1', first_name: 'Marcus', access_status: 'active', last_active_at: null }]))
+        : route.fallback(),
+    );
+    await page.goto('/');
+    await pressesAsAWhole(page, '.astryx-card:has(a[data-pam-stretch][href*="person"])');
+  });
+
+  test('a program lead\'s Finish setting up card presses in as a whole', async ({ page }) => {
+    await staff(page, 'provider');
+    // A real lead with no program yet (examples would give them one, and no cards to finish).
+    await page.addInitScript(() => window.sessionStorage.removeItem('pam.examples'));
+    await page.route('**/rest/v1/profiles*', (route) =>
+      route.fulfill(json({ id: 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b', org_id: '22222222-0000-0000-0000-0000000000aa', role: 'provider', first_name: 'Lou', region_id: null, regions: null, access_status: 'active', onboarded_at: '2026-09-14T00:00:00Z' })),
+    );
+    await page.goto('/');
+    await pressesAsAWhole(page, '.astryx-card:has(a[data-pam-stretch])');
+  });
 });
