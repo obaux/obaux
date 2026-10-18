@@ -341,7 +341,7 @@
   "messages.thread.send": "إرسال",
   "messages.thread.sending": "يتم الإرسال…",
   "messages.thread.sent": "تم الإرسال",
-  "messages.thread.rateLimited": "That is a lot of messages in a short time. Wait a little, then send it again.",
+  "messages.thread.rateLimited": "That's a lot at once. Wait a moment, then send it again.",
   "messages.thread.notSent": "لم يُرسل",
   "messages.thread.tryAgain": "حاول مرة أخرى",
   "messages.thread.notSent.label": "لم يُرسل. حاول مرة أخرى.",
