@@ -1596,6 +1596,22 @@
   order on thread 2729f940, with a86, a97/a98, a93, a91 and a84 held unless he says yes. Card a102 (the lines that
   leave the screens for Privacy, D-608) went up at 16:10. Will at 16:00: a permission prompt should show in the
   Control Room (v28, below).
+- **Batch b72 (18 October, 16:23 to 17:30).** Will's two asks from this afternoon, and the first of the fewer words.
+  Dot's d0359060 (D-610, Will 14:55): a member's Explore shows the bell only while something is new, so Search
+  programs takes the full width; staff Home's Search members is a plain field that filters the list, with no dropdown
+  (Explore's own dropdown goes with a86, on Will's yes). D-608 (Will 15:19): Sage's shorter English (b50e386a) and
+  Lena's six languages (630f9868), 34 values; Nico's Text alerts (D-611: names, "Kinds of texts", a Coming soon badge,
+  no intro) with Lena's words (dd03b8f5, a37039b1); Nico's cuts on Connections, block and unblock, and Reported
+  messages (29e5f13d, with the program conversation's note put back: it is line 5 on card a102); Ava's cuts on Join,
+  Invite and Account (529b21f0). With them: Message Pam slice 3 (photos show their progress and keep a photo that did
+  not go, in every conversation) and teamTools/setDraft for Ava's saved replies, both behind the switch (off); Lena's
+  report-reach pin (2175d0de). Merge desk: the bundles and ledger met Nico's English copies of the same Text alerts
+  keys; merged key by key, Lena's translations taken on the 20 keys both changed, and every row of the merged ledger
+  equals main's or one of Lena's tips. Held for b73: Lena and Nico's slice 5 (209722d3, with Nico's hours fix),
+  Piper's D-608 cuts (7cbe17e6, once the messages.empty cut comes out and book.new.note goes). The full run failed 12
+  cases: four specs in Piper's, Ava's and Nico's files still pinned sentences Sage's shorter English had changed;
+  fixed in the batch (0fe32067), each check pinning the signed sentence whole, and the owners told. The Control Room's
+  "Right now" and team rows were five days old; rewritten at 16:47.
 
 ## What was wrong, and what missed it
 
@@ -1889,6 +1905,21 @@
   never opened, so there was nothing to keep out. Nico's fix opens it and puts a control beside each zero (3a046434);
   with the line removed the check now fails, and nothing else does. Lesson: a check that expects nothing needs a
   control that shows something was there to miss; and a migration does not go live until its mutation has failed.
+- **A line moved onto Will's card while two lanes were cutting it (b72, 16:19).** Card a102 went up at 16:10 with
+  messages.program.note on it (line 5, a line Will signed before). Nico had the D-608 audit from 15:58 and cut it at
+  16:18; his READY and my hold crossed. Piper's READY cut a line in Nico's file that the switch-on batch owns. Both
+  were caught at the merge desk and nothing shipped wrong. Lesson: when a line moves onto a card for Will, tell every
+  lane whose audit rows include it, in the same minute, with the words "leave it on screen".
+- **The page Will reads went stale while the cards stayed current (16:47).** The Control Room's cards and chat replies
+  were up to the minute, but its "Right now" panel still showed 13 October and each teammate's "Doing now" was from 11
+  to 13 October. Lesson: write "Right now" and the team rows with each batch, the same as STATUS.
+- **Words changed, and no screen was run (b72, 17:24).** Sage's shorter English (b50e386a) and Lena's six languages on
+  it (630f9868) were proven by the config tests, which check the bundles, not the screens. Four specs in three other
+  lanes pinned the old sentences, and only the batch's full run found them, as 12 failures. One more check, which
+  expected an old sentence to be gone (consent.spec, texts stopped), now passes without testing anything. Lesson: a
+  READY that changes words runs the full e2e; before assembling, the merge desk searches every spec and test for each
+  changed value's old sentences (every run of four words from the old value): the ones that would fail and the ones
+  expecting it gone.
 
 ## Decisions
 
@@ -2149,9 +2180,23 @@
 | pam_inbox live (list_migrations before: 080342 not there) | Applied 16:15 as 20261018161516. Read back: body md5 3a54da7e3fbedbf4bf29c25478b8f853, the same as the file; security definer; search_path public, extensions; execute for authenticated and service_role only (no anon); no arguments |
 | b71 new specs on main's build (16962fc4, build:e2e; b71's message-pam.spec and messages.spec, narrow-320, retries 0) | 19 failed, 91 passed. Failed: 16 of the 17 message-pam cases (Pam's row, the thread, the after-hours reply, a limited account, Not sent and Try again, Help's Write to Pam, /messages/pam/ three ways, the seven languages) and the three new failed-send cases in messages.spec (no "Not sent"). The one that passes is the switch-off control ("nothing of Pam is shown"), as it should. The seven language cases first failed on a missing key, so they ran again with b71's bundles against main's build and failed on their first screen check (no Pam heading). DB suite on b70fb74f's own tree: all passed, 1826 ok |
 | Batch b71, full run (767309c2: b70 + Nico c535f8a8, merge fix): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1443 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 200 / 8.7 kB spare / 2312 passed, 19 skipped, 0 failed, 0 flaky / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
+| b71 main CI (184fc004, pushed 16:40:47) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (Accessibility 17:18); Vercel web and pam-site success |
+| b72 new specs on b71's build (767309c2 out/, the same app as main 184fc004; b72's ten changed specs and bundles, narrow-320, retries 0) | 15 failed, 168 passed, 6 skipped; every failure on its assertion (toHaveCount 10, toBeVisible 3, toBe 1, toBeGreaterThan 1): Ava's account, invite and join; Nico's two alerts cases, blocking, the photo progress case and Connections; Dot's explore-bell (2), explore-bell-shift (2), case-manager-pass (2) and messages' "no one to message". One new case passes on b71: message-pam's "a photo to Pam ... Not sent until Try again", because keeping and retrying a photo came with slice 2; it is a guard, and slice 3's progress is proven by the messages case |
+| b72 ledger (merge desk, key by key) | Against main: 30 rows added, 48 removed, 222 changed across six languages; every row equals main's or Lena's at a37039b1 or 630f9868 (0 otherwise); copy:status in step |
+| Batch b72, full run (bfb1a0d9: b71 + Nico 29e5f13d, Lena a37039b1, 2175d0de and 630f9868, Dot d0359060, Ava 529b21f0): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1447 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 200 / 9.3 kB spare / 2324 passed, 19 skipped, 12 failed, 0 flaky (four specs on three projects pinned the old words; fixed in 0fe32067, next row) / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
+| b72 spec fix (0fe32067, merge desk): add-my-program, program-book-example, staff-request-approve, messages, on the three projects | 306 passed. Each check now pins the signed sentence whole (anchored), so the old sentence cannot pass it |
 
 ## Left undone
 
+- **As of b72 (18 October, 17:30):** Will's bell and Search members fixes and the first D-608 cuts are on main;
+  Message Pam (person's side, photos) is on main behind the switch (off). b73: Lena and Nico's slice 5 (209722d3 plus
+  Nico's hours fix), Piper's D-608 cuts and book.new.note, Lena's retire commit (programs.new.done.body,
+  home.caseload.search.none, points.intro, programs.review.text.body). Then Message Pam's last fixes: Nico's live
+  refresh (S1, a timer that fetches what is new while the screen is open) and W1, W2, W4, P1 to P3 and the
+  profile_roles migration; Ava's team side in one READY (S2 to S4 with Dot's three, W5, W6, P4 to P7, T1 to T6, Lena's
+  959a0df1); Iris re-tests on main; then the switch batch and release 0.53.0 on Will's go. Dot: a86 brought up to
+  main. Wren: the Text reminders picture from main. With Will: a102, a86 (the Explore dropdown goes with it), the
+  website's photo line; a97/a98, a91, a93, a84, a88.
 - **As of b71 (18 October, 16:40):** Message Pam: the database side, the files sweep and the person's side are on
   main, all behind the switch (off); pam_inbox's rule is live (20261018161516). b72 is assembled and runs next: Dot's
   Explore bell and Search members (d0359060, D-610), Nico's Text alerts, slice 3 and D-608 rows (to 29e5f13d), Sage
