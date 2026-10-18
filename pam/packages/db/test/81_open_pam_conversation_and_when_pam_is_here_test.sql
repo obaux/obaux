@@ -73,8 +73,13 @@ set role authenticated;
 select test.as_user(:'rosa');
 select test.check_text('switch off: no conversation and no id',
   coalesce(public.open_pam_conversation()::text, 'none'), 'none');
-select test.check('...and nothing is made',
-  (select count(*) from public.pam_threads), 0);
+reset role;
+select test.check('...and nothing is made (counted as the database, not as Rosa)',
+  (select count(*) from public.pam_threads where asker_id = :'rosa')
+  + (select count(*) from public.conversation_members m join public.conversations c on c.id = m.conversation_id
+       where m.profile_id = :'rosa' and c.kind = 'support'), 0);
+set role authenticated;
+select test.as_user(:'rosa');
 select test.check_text('pam_status says it is off',
   (select live::text from public.pam_status()), 'false');
 select set_config('request.jwt.claim.sub', '', false);
