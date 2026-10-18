@@ -159,6 +159,15 @@ test.describe('Message Pam, the person\'s side', () => {
     expect(uploads).toBe(2);
   });
 
+  test('a screen reader hears Pam\'s messages as Pam, never "This person" (Iris W1)', async ({ page }) => {
+    await world(page, { away: true });
+    await page.goto(`/messages/thread/?id=${PAM_C}`);
+    await settled(page);
+    const log = page.getByRole('log');
+    await expect(log).toContainText(/Pam, /);
+    await expect(log).not.toContainText('This person');
+  });
+
   test('too many messages too fast: no "Not sent" and no Try again, the words go back in the box and a calm line says to wait (Iris W4)', async ({ page }) => {
     const server = await world(page, { rateLimited: true });
     await page.goto(`/messages/thread/?id=${PAM_C}`);

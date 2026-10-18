@@ -318,7 +318,7 @@ function ThreadScreen() {
         <ThreadViewLazy
           messages={shown}
           translations={translations}
-          otherName={state.otherName}
+          otherName={pamAsker ? t('pam.name') : state.otherName}
           otherPhotoUrl={examplePhoto}
           intro={
             <ThreadIntro
