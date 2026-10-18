@@ -385,7 +385,7 @@
   "nav.back.places": "Volver a Lugares",
   "nav.back.saved": "Volver a Guardados",
   "nav.help": "Ayuda",
-  "notice.account_limited.body": "No puedes enviar mensajes por ahora. Tu guía lo desactivó en tu cuenta. Todavía puedes leer tus mensajes. Contacta a Pam y te ayudaremos a comunicarte con tu guía.",
+  "notice.account_limited.body": "No puedes enviar mensajes por ahora, excepto a Pam. Escribe a Pam y te ayudaremos a comunicarte con tu guía.",
   "notice.account_limited.title": "Algunas cosas están apagadas",
   "notice.account_suspended.body": "No puedes entrar ahora. Tu guía puede activarla otra vez. Contacta a Pam y te ayudamos a comunicarte con esa persona.",
   "notice.account_suspended.title": "Tu cuenta está en pausa",

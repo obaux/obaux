@@ -122,10 +122,10 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
 
   /**
    * A limited account (0007's `is_active_account()`): it can read, including its
-   * messages, but cannot send a message or start a conversation, or connect with
-   * a new person. The words say that (D-427) — they used to say "messages are off",
-   * which was untrue of reading — and name who to call, as `terms.s.limits.p3`
-   * promises ("Pam tells you it is off and who to ask").
+   * messages, and write to Pam (Will, 18 October, a100), but cannot send another
+   * message or start another conversation, or connect with a new person. The words
+   * say that (D-427; Sage's A29 sign-off b658ac15) and name who to call, as
+   * `terms.s.limits.p3` promises ("Pam tells you it is off and who to ask").
    */
   account_limited: define({
     key: 'account_limited',
@@ -133,10 +133,8 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
     status: 'warning',
     title: 'Some things are turned off',
     body:
-      'You cannot send messages right now. ' +
-      'Your guide turned this off for your account. ' +
-      'You can still read your messages. ' +
-      'Contact Pam and we will help you reach your guide.',
+      'You cannot send messages right now, except to Pam. ' +
+      'Write to Pam and we will help you reach your guide.',
     offersSupport: true,
     audience: 'member',
   }),

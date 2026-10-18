@@ -636,10 +636,10 @@ test.describe('a conversation', () => {
     await expect(page.getByRole('button', { name: /send/i })).toHaveCount(0);
     // ...and Pam says so, with a way to reach a person.
     await expect(page.getByRole('alert').getByText('Some things are turned off')).toBeVisible();
-    // It begins with what is off, says why, then points to Pam (Will, 9 October).
+    // It begins with what is off and what is not (Pam), then points to Pam (Will, 9 and 18 October; Sage's A29 sign-off b658ac15).
     const notice = page.getByRole('alert');
-    await expect(notice.getByText(/^You cannot send messages right now\./)).toBeVisible();
-    await expect(notice.getByText(/Your guide turned this off for your account\./)).toBeVisible();
+    await expect(notice.getByText(/^You cannot send messages right now, except to Pam\./)).toBeVisible();
+    await expect(notice.getByText(/Write to Pam and we will help you reach your guide\./)).toBeVisible();
     await expect(notice.getByText(/your plan/i)).toHaveCount(0);
     const call = notice.getByRole('link', { name: /Contact Pam/ });
     await expect(call).toHaveAttribute('href', '/help/');

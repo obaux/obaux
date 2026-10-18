@@ -385,7 +385,7 @@
   "nav.back.places": "Back to Places",
   "nav.back.saved": "Back to Saved",
   "nav.help": "Help",
-  "notice.account_limited.body": "You cannot send messages right now. Your guide turned this off for your account. You can still read your messages. Contact Pam and we will help you reach your guide.",
+  "notice.account_limited.body": "You cannot send messages right now, except to Pam. Write to Pam and we will help you reach your guide.",
   "notice.account_limited.title": "Some things are turned off",
   "notice.account_suspended.body": "You cannot sign in right now. Your guide can turn it back on. Contact Pam and we will help you reach them.",
   "notice.account_suspended.title": "Your account is paused",
