@@ -42,12 +42,12 @@ describe('promises of a text or a reminder (D-474)', () => {
     expect(BUNDLES.en['flag.done.body']).not.toMatch(/\bis told\b|\bwill be told\b|\bwe will (tell|text)\b/i);
   });
 
-  it('the Text reminders screen still says what is and is not sent today', () => {
-    // The honest line each of the two opt-in screens carries (D-453); the lists above it say "would".
-    // Texts are held until Will says go (texts_live, D-481), so the saved-place note is not sent either (A28 check).
-    expect(BUNDLES.en['reminders.today.staff']).toMatch(/does not send any/i);
+  it('the Text reminders screen marks what is not sent yet with the badge word, not a sentence (D-608)', () => {
+    // The two lists (member, staff) carry "Coming soon" on every row whose text is not sent (`textKindsFor`, which `lib/textKinds.test.ts`
+    // pins). Texts are held until Will says go (texts_live, D-481). The lines that said it in a sentence are retired, so nothing says
+    // "Pam does not send any of these yet" on the screen any more.
+    expect(BUNDLES.en['common.comingSoon']).toBe('Coming soon');
     if (!VISIT_REMINDERS_LIVE_IN_APP) {
-      expect(BUNDLES.en['reminders.today.member']).toMatch(/does not send any/i);
       expect(BUNDLES.en['profile.promo.reminders.body']).not.toMatch(/\bwe can text you\b/i);
     }
   });

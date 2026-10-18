@@ -78,11 +78,26 @@ test.describe('agreeing to reminders', () => {
     // planned", must fail here: this list is what the carrier reads as the opt-in.
     await expect(page.getByText('A reminder before each visit, with the address.', { exact: true })).toBeVisible();
     await expect(page.getByText(/a visit you planned/i)).toHaveCount(0);
-    // No promise about how often: only what really goes out today (10 October 2026, D-453).
-    await expect(page.getByText(/Pam does not send any of these yet/i)).toBeVisible();
+    // No sentence about what is not sent yet: a "Coming soon" badge under each row whose text is not (D-608). Texts are held, so both.
+    await expect(page.getByText(/Pam does not send any of these yet/i)).toHaveCount(0);
+    await expect(page.getByText('Coming soon', { exact: true })).toHaveCount(2);
+    await expect(page.getByText('Kinds of texts', { exact: true })).toBeVisible();
+    await expect(page.getByText(/Pam can text you the reminders/)).toHaveCount(0);
     await expect(page.getByText(/few messages a week/i)).toHaveCount(0);
     await expect(page.getByText(/Reply STOP/)).toBeVisible();
     await expect(page.getByText(/rates may apply/i)).toBeVisible();
+  });
+
+  test('the one line about sender, frequency, STOP, HELP and rates is on screen without scrolling at 320 x 568 (D-608)', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 568 });
+    await page.goto('/reminders/');
+    await settled(page);
+    const how = page.getByText(en['reminders.how'], { exact: true });
+    await expect(how).toBeVisible();
+    const box = (await how.boundingBox())!;
+    expect(box.y + box.height).toBeLessThanOrEqual(568);
+    // The rows come before it, each with its badge under the name.
+    await expect(page.getByText('Kinds of texts', { exact: true })).toBeVisible();
   });
 
   test('signed out, it still explains the choice and points at sign-in', async ({ page }) => {
