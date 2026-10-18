@@ -26,15 +26,18 @@ const styles = stylex.create({
   label: { fontSize: '17px', lineHeight: 1.35 },
 });
 
-export function TextKindsList({ who }: { readonly who: TextKindsFor }) {
+export function TextKindsList({ who, bare = false }: { readonly who: TextKindsFor; readonly bare?: boolean }) {
   const { t } = useI18n();
   const textsLive = useTextsLive();
   const rows = textKindsFor(who, textsLive);
   return (
     <VStack gap={1}>
-      <Text type="supporting" xstyle={styles.label}>
-        {t('reminders.what')}
-      </Text>
+      {/* On a screen that keeps its card (the agree screens, a103: "keep the original layouts") the card carries the heading itself. */}
+      {bare ? null : (
+        <Text type="supporting" xstyle={styles.label}>
+          {t('reminders.what')}
+        </Text>
+      )}
       <SettingsList>
         {rows.map((row) => (
           <SettingsRow key={row.key} label={t(row.key)} badge={row.live ? undefined : t('common.comingSoon')} control={null} />

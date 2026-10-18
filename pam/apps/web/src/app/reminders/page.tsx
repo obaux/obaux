@@ -153,14 +153,18 @@ function RemindersForm() {
           </VStack>
         </Card>
       ) : null}
-      {/* The list of kinds, then the one line about them above the buttons (D-608): no introduction, no "today" line. */}
+      {/* The card the kinds always sat in (Will, a103: "keep the original layouts"): its heading, the kinds with their badges, and the one
+          line about them, all inside it and above the buttons. No introduction and no "today" line (D-608). */}
       {stopped ? null : (
-        <>
-          <TextKindsList who={role === 'provider' ? 'provider' : isStaff ? 'admin' : 'member'} />
-          <Text type="supporting" xstyle={styles.small}>
-            {t('reminders.how')}
-          </Text>
-        </>
+        <Card padding={6} xstyle={styles.card}>
+          <VStack gap={2}>
+            <Text xstyle={styles.heading}>{t('reminders.what')}</Text>
+            <TextKindsList who={role === 'provider' ? 'provider' : isStaff ? 'admin' : 'member'} bare />
+            <Text type="supporting" xstyle={styles.small}>
+              {t('reminders.how')}
+            </Text>
+          </VStack>
+        </Card>
       )}
 
       {!stopped && (done || already === true) ? (
