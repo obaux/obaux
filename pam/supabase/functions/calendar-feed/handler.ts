@@ -3,8 +3,8 @@
 // GET /functions/v1/calendar-feed/<token>.ics, public (deploy with JWT verification OFF): the
 // address is the key. Two kinds of token. A LEGACY one is 43 characters of base64url (256 bits); the
 // database holds only its SHA-256, so this hashes what it was given and asks `calendar_feed_read`,
-// which only the service role may call. A LINK (D-604) is 65: the member's id, then an HMAC of it
-// and the link's version under a key only the database holds, so this hands the whole token to
+// which only the service role may call. A LINK (D-604) is 65: a random lookup id Pam made for
+// the link (never the member's id), then an HMAC of it and the link's version under a key only the database holds, so this hands the whole token to
 // `calendar_feed_read_link`, which checks it and answers. Everything that decides what is in the
 // file is in ics.ts and the function.
 //
@@ -12,6 +12,11 @@
 //   1. A wrong, malformed or turned-off address gets the same bare 404, so nothing tells them apart.
 //   2. Nothing is recorded about the request: no token, no caller, no read time. Errors log a
 //      status, never a value.
+//      What the request log holds (privacy line what-we-keep.p12, pinned in calendar-link-line.test.ts) is
+//      the link, the time and the calendar company's IP address, and nothing else. For a link the
+//      "link" is the token: lookup id and MAC. Nothing in this function writes member_id, calendar,
+//      language or a place; a legacy link's log is unchanged. If a log line ever gains a field,
+//      tell Lena before it ships: p12 says exactly those three things.
 //   3. No CORS: a calendar app is not a web page, and no page should read it.
 
 import { buildCalendar, type Feed } from './ics.ts';
