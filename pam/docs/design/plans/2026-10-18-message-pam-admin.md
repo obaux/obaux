@@ -3,7 +3,7 @@
 **Date:** 2026-10-18 · **Lane:** Accounts & invites (Ava) · **Status:** plan for Will's card. Nothing is built before he
 picks.
 
-**Companion:** Nico's `docs/design/plans/2026-10-18-message-pam.md` (`claude/messages-plan-message-pam` @ 00daebd0).
+**Companion:** Nico's `docs/design/plans/2026-10-18-message-pam.md` (`claude/messages-plan-message-pam` @ 0c024637).
 It owns the model: the conversations, RLS, migrations, the functions, the bell, what is off in v1, and the
 `ADMIN_CAN_SEE` entry. This file doesn't repeat any of that; it links to Nico's sections. It covers what the super admin
 sees and does, and what the person on the other end sees as the sender. The split is in **Seams with Nico** at the
@@ -69,8 +69,8 @@ today: Programs to check, Reported places, Waiting cities. Staff requests come a
 **`/pam/messages/`, the list.** It reads from `pam_inbox()` (Nico §2): one row per conversation, in three groups:
 
 1. **"Waiting for Pam"**: the person wrote last, so the conversation is waiting for a reply. **Longest waiting first**,
-   and each row says how long: "Waiting 3 hours", "Waiting 2 days". The time comes from the person's oldest message
-   since Pam last replied. Iris: unanswered first, with how long each has waited. For this audience, silence is what
+   and each row says how long: "Waiting 3 hours", "Waiting 2 days". The time is `pam_inbox()`'s `waiting_since` (Nico), worked out from
+   message times, so nothing new is stored. Iris: unanswered first, with how long each has waited. For this audience, silence is what
    loses people.
 2. **"Answered"**: open, and Pam wrote last. Newest first.
 3. **"Closed"**: folded under a row that opens it. `pam_set_thread_status` closes a conversation. A closed one
@@ -96,8 +96,7 @@ The words are Sage's, and the legal one is read by a lawyer before it ships (Iri
 seven languages, not something the super admin edits in the app.
 
 **How long replies take** (Iris: measure two to four weeks before promising a time). At the foot of the list is one
-quiet line: "Last 30 days: first reply in {median} on average". It is worked out from the timestamps `pam_inbox()`
-already has, or from one more column (Q to Nico). The person never sees it. It is there so Will knows what can be
+quiet line: "Last 30 days: first reply in {median} on average". It comes from Nico's `pam_reply_times(days)`, which is Pam team only and returns a duration and counts, never text. The person never sees it. It is there so Will knows what can be
 promised before anything is.
 
 ## 2. What each conversation row shows about who wrote
@@ -239,7 +238,9 @@ nothing more.
   the reader's first name as the warmer, more personal option.)
 - **Q6.** Who covers when you're away? Iris puts silence third among the risks, and says a second reader or an away
   notice is needed before launch. With no second reader, the smallest step is an "Away until {date}" switch on the
-  inbox. It changes Nico's automatic first reply to say when someone will read it. Which do you want?
+  inbox. The person's conversation then shows a status line, "Pam is away until {date}" (Nico: `pam_status.away_until`).
+  It is not an automatic message, because that would be a message nobody wrote, with no real author, ringing the
+  person's bell. Which do you want?
 
 Nico's own questions are in his §6, including who a program's message reaches and what's off in v1.
 
@@ -269,12 +270,11 @@ Agreed with Nico at 02:48.
 - `pam_inbox()` returns the asker's region.
 - Every Pam function and policy goes through `is_pam_team()`, which today returns `is_super_admin()`.
 
-**Asked of Nico after Iris's research (03:10):**
-1. `pam_inbox()` gives, per conversation, when the person's oldest unanswered message was sent ("waiting since"). For
-   the "Last 30 days" line, it gives each conversation's first-reply time, or a small `pam_reply_times(days)`.
-2. If Will picks Iris's "Read by Pam" receipt for the person, it needs the Pam read marker this plan dropped. It would
-   be set when the super admin opens the conversation. That is Nico's side (the person's thread view). The count on
-   Home still uses "waiting for a reply", not the read marker.
-3. If Will picks the "Away until {date}" switch (Q6), Nico's automatic first reply reads it.
+**Asked of Nico after Iris's research (03:10), and done (03:15, his 0c024637):**
+1. `pam_inbox()` returns `waiting_since`, and `pam_reply_times(days)` gives the median first reply.
+2. If Will picks "Read by Pam": `pam_threads.last_team_read_at`, set by `pam_mark_read`. The words must say a person
+   opened it. The Home count stays on waiting-for-reply.
+3. If Will picks the away switch (Q6): a status line, not an automatic reply (`pam_status.away_until`).
+4. Under version A, `pam_start_conversation` for members isn't built.
 
 Dot draws it after both plans exist.
