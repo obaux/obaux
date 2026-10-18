@@ -158,7 +158,7 @@ function ThreadScreen() {
     if (state.status !== 'ready') return NO_MESSAGES;
     return state.messages.map((m) => {
       if (m.systemKey === null) return m;
-      const text = pamSystemText(m.systemKey, { t, tPlain, locale, firstName: state.teamView ? null : firstName, hours });
+      const text = pamSystemText(m.systemKey, { t, tPlain, locale, firstName: state.teamView ? null : firstName, hours }, m.systemVars);
       return { ...m, body: text };
     });
   }, [state, t, tPlain, locale, firstName, hours]);
