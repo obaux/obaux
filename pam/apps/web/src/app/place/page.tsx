@@ -421,7 +421,7 @@ function PlaceScreen() {
   const address = service?.address ?? place!.address;
   // The booked visit (D-273, D-281): "Your next visit", the day large, the
   // time under it, and a way to move it.
-  const visitDay = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long', month: 'long', day: 'numeric' });
+  const visitDay = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long', month: 'short', day: 'numeric' });
   const visitTime = new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' });
   const visitWhen = visit ? visitDay.format(new Date(visit.startsAt)) : null;
   const visitHour = visit ? visitTime.format(new Date(visit.startsAt)) : '';

@@ -114,41 +114,21 @@ for (const locale of ['en', 'ar']) {
   });
 }
 
-/** A member who already has a calendar link (Sage's words, Dot's drawing): the corner button says where the visits go and opens the Calendar screen. */
-const ME = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
-const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
-async function withLink(page: Page, calendar: string) {
-  await page.addInitScript((userId: string) => {
-    const session = {
-      access_token: 't', refresh_token: 'r', token_type: 'bearer', expires_in: 3600,
-      expires_at: Math.floor(Date.now() / 1000) + 3600,
-      user: { id: userId, aud: 'authenticated', role: 'authenticated' },
-    };
-    for (const ref of ['stub', 'shobqzuhicoiymtumiaz']) window.localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(session));
-  }, ME);
-  await page.route('**/auth/v1/user*', (route) => route.fulfill(json({ id: ME })));
-  await page.route('**/rest/v1/profiles*', (route) =>
-    route.fulfill(json({ id: ME, role: 'member', first_name: 'Marcus', region_id: null, regions: null, access_status: 'active', onboarded_at: '2026-09-14T00:00:00Z' })),
-  );
-  await page.route('**/rest/v1/notifications*', (route) => route.fulfill(json([])));
-  await page.route('**/rest/v1/rpc/calendar_link_state*', (route) =>
-    route.fulfill(json([{ is_on: true, is_legacy: false, calendar, linked_on: '2026-10-12', token: 'A'.repeat(22) + 'b'.repeat(43) }])),
-  );
-}
+/** The green card abbreviates the month (Will, 18 October): "Monday, Oct 19". Arabic months have no short form and must still read. */
+test('the booked card says the month short in English', async ({ page }) => {
+  await booked(page);
+  await expect(page.getByText(/^(Mon|Tues|Wednes|Thurs|Fri)day, (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{1,2}$/)).toBeVisible();
+  await expect(page.getByText(/^\w+day, (January|February|March|April|June|July|August|September|October|November|December) \d/)).toHaveCount(0);
+});
 
-for (const [calendar, words] of [['apple', 'Apple Calendar'], ['google', 'Google Calendar'], ['other', 'your calendar']] as const) {
-  test(`with a ${calendar} link, the corner button says "Goes to ${words}", is 48px, opens Calendar, and the fine print is gone`, async ({ page }) => {
-    await withLink(page, calendar);
-    await booked(page);
-    const sync = page.getByRole('link', { name: `Goes to ${words} through your calendar link. Opens Calendar.` });
-    await expect(sync).toBeVisible();
-    // The visible words start the accessible name (label in name).
-    await expect(sync).toContainText(`Goes to ${words}`);
-    const box = (await sync.boundingBox())!;
-    expect(box.height).toBeGreaterThanOrEqual(47.5);
-    await expect(page.getByRole('button', { name: 'Add to calendar' })).toHaveCount(0);
-    await expect(page.getByText('Sync all future trip details?')).toHaveCount(0);
-    await sync.click();
-    await expect(page).toHaveURL(/\/calendar\/$/);
-  });
-}
+test('the booked card still reads in Arabic, where months have no short form', async ({ page }) => {
+  await page.addInitScript(() => window.localStorage.setItem('pam.locale', 'ar'));
+  await page.goto('/trips/new/?place=dummy-place-learning&name=Example%20Learning%20Center&category=education');
+  await settled(page);
+  await page.getByRole('button', { name: /^(الاثنين|الثلاثاء|الأربعاء|الخميس|الجمعة)/ }).first().click();
+  await page.getByRole('button', { name: /AM|PM|[٠-٩0-9]+[:٫][٠-٩0-9]+/ }).first().click();
+  await page.getByRole('button', { name: /^التالي/ }).click();
+  await page.getByRole('button', { name: /^إضافة هذه الزيارة/ }).click();
+  const day = page.getByText(/^(الاثنين|الثلاثاء|الأربعاء|الخميس|الجمعة)[،,] .*[٠-٩0-9]/);
+  await expect(day.first()).toBeVisible();
+});

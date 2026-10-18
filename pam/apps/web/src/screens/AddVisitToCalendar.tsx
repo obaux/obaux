@@ -11,8 +11,6 @@ import { Button } from '@pam/ui/Button';
 import { MenuList } from '@pam/ui/MenuList';
 import { PamSheet } from '@pam/ui/PamSheet';
 import { useI18n } from '@/lib/i18n';
-import { useCalendarLink } from '@/lib/useCalendarLink';
-import { useSession } from '@/lib/useSession';
 import { buildVisitFile, googleEventUrl, type FeedVisit } from '../../../../supabase/functions/calendar-feed/ics';
 
 /**
@@ -34,8 +32,6 @@ const styles = stylex.create({
     color: colorVars['--color-text-green'],
     borderRadius: '24px',
   },
-  // Synced: no fill, the card's own green showing through; the words stay green and 16px bold, still 48px to tap (Dot's story).
-  synced: { flexShrink: 0, minHeight: '48px', paddingInline: '4px', fontSize: '16px', fontWeight: 700, color: colorVars['--color-text-green'] },
   fine: { alignSelf: 'center', minHeight: '48px', paddingInline: '12px', fontSize: '15px', fontWeight: 600, color: colorVars['--color-text-secondary'] },
   sheet: { width: '100%', paddingInline: '20px', paddingBlockEnd: '28px' },
   hint: { fontSize: '15px', lineHeight: 1.5 },
@@ -90,31 +86,6 @@ const ownRowFor = (placeName: string, label: string): boolean => placeName.lengt
 export function AddVisitToCalendar({ card, visit }: { readonly card: (slot: CalendarSlot) => ReactNode; readonly visit: VisitToAdd }) {
   const { t, tPlain } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
-  // A member who already has a calendar link: Pam cannot see a save, so "Add to calendar" never changes after adding one visit, but with a
-  // link the corner button says where the visits go and opens the Calendar screen (Mira, Sage's words, Dot's drawing).
-  const { state: session } = useSession();
-  const { state: link } = useCalendarLink(session.status === 'signed-in');
-  if (link.status === 'on') {
-    const calendar = link.calendar && link.calendar !== 'other' ? t(`calendar.kind.${link.calendar}`) : t('calendar.kind.other.inline');
-    const calendarPlain = link.calendar && link.calendar !== 'other' ? tPlain(`calendar.kind.${link.calendar}`) : tPlain('calendar.kind.other.inline');
-    return (
-      <VStack gap={1}>
-        {card({
-          action: (
-            <Button
-              label={t('trips.addToCalendar.linked', { calendar })}
-              aria-label={tPlain('trips.addToCalendar.linked.label', { calendar: calendarPlain })}
-              variant="ghost"
-              href="/calendar/"
-              icon={<SyncIcon width={22} height={22} aria-hidden />}
-              xstyle={styles.synced}
-            />
-          ),
-          actionOwnRow: true,
-        })}
-      </VStack>
-    );
-  }
   return (
     <VStack gap={1}>
       {card({
