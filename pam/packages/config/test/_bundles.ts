@@ -32,6 +32,8 @@ export const NO_PLURAL_VARIANTS = new Set([
   'pam.inbox.waiting.minutes.one',
   'pam.inbox.waiting.hours.one',
   'pam.inbox.waiting.days.one',
+  // And "Sent to 1 lead." (the team's start-a-message note): English picks the singular itself.
+  'pam.inbox.sent.one',
   'pam.inbox.replyTime.minutes.one',
   'pam.inbox.replyTime.hours.one',
   'pam.inbox.replyTime.days.one',

@@ -506,6 +506,7 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   forwarding, a test and Will's go, D-450). Six translations each by Claude, with no native reader: promises, so the same
   native readers as below. The English says "rules" where the app says "policy"; the translations follow the app's word.
 
+- [ ] **A native reader for Arabic counts of two (Message Pam pass 1, P8, 18 October 2026).** Arabic has a dual, and 32 keys carry it (`*.two`). Four are lengths of time and now write the dual without the digit, as CLDR's relative-time patterns do ("منذ يومين", "منذ ساعتين", "منذ دقيقتين", "بعد يومين": `pam.inbox.waiting.*.two`, `when.countdown.days.two`). The other 28 keep the digit before a dual noun ("{count} نقطتان", "{count} شخصان", "{count} رسالتان جديدتان"): a reader should say whether Arabic wants "2 نقطتان" or just "نقطتان", and `copy.test.ts` (`AR_DUAL_WITHOUT_DIGIT`) is where a key moves from one list to the other.
 - [ ] **A native reader for the calendar link screen (D-538, 11 October 2026).** The 27 `calendar.*` strings are six translations by
   Claude with no native reader. Two things a reader must check against the real apps, in their own language, because the apps can
   rename them: **`calendar.others`** names buttons in Google Calendar ("Other calendars" › "From URL") and Outlook ("Add calendar" ›

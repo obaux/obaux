@@ -42,10 +42,24 @@ describe('locale bundles', () => {
     expect(findDignityViolations(bundle)).toEqual([]);
   });
 
-  it.each(Object.entries(bundles))('%s keeps placeholders matched with English', (_l, bundle) => {
+  // Arabic writes the dual of a length of time without the digit, as CLDR's relative-time patterns do: "منذ يومين" (two days ago), not
+  // "منذ 2 يومين" (Iris, Message Pam pass 1, P8). Four keys; the other dual forms ("{count} نقطتان", "{count} شخصان") keep the digit until a
+  // native reader says otherwise (docs/before-launch.md). The dual of these four must carry no {count} at all.
+  const AR_DUAL_WITHOUT_DIGIT = new Set([
+    'pam.inbox.waiting.minutes.two',
+    'pam.inbox.waiting.hours.two',
+    'pam.inbox.waiting.days.two',
+    'when.countdown.days.two',
+  ]);
+
+  it.each(Object.entries(bundles))('%s keeps placeholders matched with English', (locale, bundle) => {
     for (const [key, value] of Object.entries(bundle)) {
       const source = en[baseKey(key)];
       expect(source, `"${key}" has no English source`).toBeDefined();
+      if (locale === 'ar' && AR_DUAL_WITHOUT_DIGIT.has(key)) {
+        expect(placeholders(value), `"${key}" is a length of time in the dual: no digit`).toEqual([]);
+        continue;
+      }
       expect(placeholders(value), `placeholders drifted on "${key}"`).toEqual(placeholders(source!));
     }
   });
