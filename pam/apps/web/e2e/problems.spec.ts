@@ -79,6 +79,27 @@ test.describe('Problems (D-616)', () => {
     await expect(page.getByRole('link', { name: 'Back to Notifications' })).toHaveAttribute('href', '/notifications/');
   });
 
+  test("the bell's row says what broke by its name, not its key, and opens the list", async ({ page }) => {
+    await signedIn(page);
+    const row = (id: string, action: string, count: number) => ({
+      id, kind: 'app_error', subject_type: null, subject_id: null, body_key: 'notify.app_error',
+      body_vars: { action, count }, created_at: new Date().toISOString(), read_at: null,
+    });
+    // As the database writes it: the count is a number (report_app_error), so one failure reads in the singular.
+    await page.route('**/rest/v1/notifications*', (route) =>
+      route.fulfill(json([row('n1', 'messages.send', 3), row('n2', 'messages.photo', 1), row('n3', 'not.a.real.key', 2)])),
+    );
+    await page.goto('/notifications/');
+    await settled(page);
+    await expect(page.getByText("Sending a message didn't go through 3 times in the last hour.")).toBeVisible();
+    await expect(page.getByText("Sending a photo didn't go through in the last hour.")).toBeVisible();
+    await expect(page.getByText('messages.send')).toHaveCount(0);
+    // A key with no name yet still says something true.
+    await expect(page.getByText("not.a.real.key didn't go through 2 times in the last hour.")).toBeVisible();
+    await page.getByRole('link', { name: /Sending a message/ }).click();
+    await expect(page).toHaveURL(/\/problems\/\?from=notifications/);
+  });
+
   test("a row beside the team's other tools opens it", async ({ page }) => {
     await signedIn(page);
     await page.goto('/requests/');
