@@ -37,7 +37,9 @@ const WORDS = {
     countdown: 'In 2 days',
     change: 'Change appointment',
     addToCalendar: 'Add to calendar',
-    syncing: 'Syncing to Apple Calendar', // stand-in; Sage signs the words
+    // Sage's words (ledger a7f6b7f8): "Goes to {calendar}"; "Calendar link" if it wraps at 320.
+    syncing: 'Goes to Apple Calendar',
+    syncingName: 'Goes to Apple Calendar through your calendar link. Opens Calendar.',
     sync: 'Sync all future trip details?',
     sheetTitle: 'Add to calendar',
     done: 'Done',
@@ -75,7 +77,8 @@ const WORDS = {
     countdown: 'بعد يومين',
     change: 'غيّر الموعد',
     addToCalendar: 'أضف إلى التقويم',
-    syncing: 'تتم المزامنة مع تقويم Apple', // stand-in
+    syncing: 'تتم المزامنة مع تقويم Apple', // stand-in until Lena translates Sage's words
+    syncingName: 'تتم المزامنة مع تقويم Apple عبر رابط التقويم. يفتح التقويم.', // stand-in
     sync: 'مزامنة تفاصيل كل رحلاتك القادمة؟',
     sheetTitle: 'أضف إلى التقويم',
     done: 'تم',
@@ -149,7 +152,7 @@ function BookedScreen({ synced = false }: { readonly synced?: boolean }) {
           actionOwnRow={synced}
           action={
             synced ? (
-              <Button label={w.syncing} variant="ghost" href="/calendar/" icon={<SyncIcon width={22} height={22} aria-hidden />} xstyle={styles.synced} />
+              <Button label={w.syncing} aria-label={w.syncingName} variant="ghost" href="/calendar/" icon={<SyncIcon width={22} height={22} aria-hidden />} xstyle={styles.synced} />
             ) : (
               <Button label={w.addToCalendar} variant="secondary" icon={<CalendarAddIcon width={22} height={22} aria-hidden />} xstyle={styles.calendar} />
             )
