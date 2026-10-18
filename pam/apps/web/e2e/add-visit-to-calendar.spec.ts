@@ -138,7 +138,9 @@ test('the drawer ends with "Add all your future visits" and its hint, opening th
   expect(names.map((text) => text.replace(/Set up a calendar link once\.$/, '').trim())).toEqual(['Apple Calendar', 'Google Calendar', 'Outlook', SYNC]);
   await expect(sheet.getByText('Set up a calendar link once.')).toBeVisible();
   const row = sheet.getByRole('link', { name: new RegExp(SYNC) });
-  expect((await row.boundingBox())!.height).toBeGreaterThanOrEqual(47.5);
+  // The whole row is the tap (b60's row taps): measure the row, not the words' link inside it.
+  const whole = row.locator('xpath=ancestor-or-self::*[contains(@class, "astryx-item")][1]');
+  expect((await whole.boundingBox())!.height).toBeGreaterThanOrEqual(47.5);
   await row.click();
   await expect(page).toHaveURL(/\/calendar\/$/);
 });
