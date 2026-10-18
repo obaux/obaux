@@ -95,7 +95,10 @@ STATUS row too.
      which comes first. Nico also updates `docs/sms-campaign-samples.md` and Will pastes Sage's HELP auto-reply into
      Twilio ("Get help at joinpam.org/support or write to hello@joinpam.org. Reply STOP to stop.").
   2. **"Reply HELP to reach a person"** (`reminders.how`, `alerts.how`, the screens the carrier reviewed) now promises more
-     than the new HELP reply gives (an address). Sage to word it; it touches the registration.
+     than the new HELP reply gives (an address). Sage to word it; it touches the registration. **18 October (D-608):** `alerts.how`
+     is done ("Reply STOP to stop, or HELP for help"; the consent paragraph in `docs/sms-campaign-samples.md` follows it).
+     `reminders.how` is done too (the /reminders/ screen the registration shows, and the join step): the screenshot Will attaches
+     must be of the new screen, and the consent paragraph in `docs/sms-campaign-samples.md` already follows it.
   3. **Ava's in-app copy and delete** (a fresh sign-in code to the account's phone). The day it ships,
      `privacy.copy.body` and `privacy.delete.body` change from "Contact Pam and ask…" to the in-app steps, and
      the Privacy › Copy / Delete pages lose their Contact Pam button (Lena carries the words).
