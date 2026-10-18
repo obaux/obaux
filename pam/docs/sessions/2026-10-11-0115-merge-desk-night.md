@@ -1494,6 +1494,64 @@
   says why and what to try, in seven languages (Nico e3b04c4f, Lena dbe32f83: Sage's ten lines, a test that fails
   when a kind has no words, five stories). Iris's re-test of b64 (5c4d74d9, docs): press part 2 and the Sunday
   schedule pass; Trips' map pins show no press (polish, for Dot).
+- **Message Pam, continued (03:01 to 03:21).** Ava's inbox plan is now cc375f7f (Q1: A or B, Ava recommends A; the
+  waiting list oldest first, with "Waiting since"; saved replies; reply times kept for a median; a "Read by Pam"
+  marker only if Will picks it; Q6's away switch is a status line in the person's conversation, not an automatic
+  reply, which would be a message nobody wrote ringing the person's bell). Nico's plan took Ava's three asks
+  (0c024637); nothing is open between them. Sage drafted option C's words (7b280684: a notice that the Pam team
+  can now start a conversation, and a Profile switch, "Pam can write to me first"), in line with Lena's. Lena's drafts
+  (7a11a3cc: the Privacy, What others can see and Terms lines, L1 to L5, none signed) recommend a separate
+  PAM_TEAM_CAN_READ list, so the guide's list never widens and the two cannot be confused. The desk took it (03:21):
+  ADMIN_CAN_SEE stays as it is, and Nico's plan (6347e200) puts messages_written_to_pam in the new list beside it, a
+  separate line on the member's transparency screen, and a contract test that fails if the entry ever reaches
+  ADMIN_CAN_SEE; the photo option would add two more entries to the new list. Widening either list still needs Will,
+  and members are told first (D-413). Dot's drawings are final (e7769915: A, B and C, a text-only composer with the
+  microphone, Pam's name at the top, "Write to Pam" under Help's answers). Lena's lines are at c4aa8150 with Sage's
+  edit to L1 (d849470f); before card a100 goes up, Lena and Sage close four gaps (L4 to match L1, the notices for A
+  and C, the Terms' own limited-account sentence, L2 under A).
+- **Card a98 (03:20).** Picture 3 is now the drawer with Will's 03:11 cut: under "Add all your future visits", only
+  "Set up a calendar link once." (Dot 36abc895). Dot noted that a visit added on this phone still says "Added" if
+  it later moves, while the copy in the calendar keeps the old time (the signed line 2 says the copy does not
+  change). Piper's build answers it (97cbce51): the note holds the visit's start time, so a moved visit shows "Add to
+  calendar" again, with Sage's "This visit changed after you added it. Add it again." (That line moves inside the
+  card; see below.)
+- **Batch b66 (18 October, 03:17 to 03:53).** S1 (Lena cd71d729, from Iris's run-through): Sign up's language list
+  opens as Astryx's own bottom sheet, with all seven languages on any phone, and the Sign in globe's list is no longer
+  cut at 300px (a list of languages only may be nine 48px rows tall, or the screen less 32px); no `!important` (Lena's
+  notes corrected to the rule, 0bdd646b). Iris's b63 follow-ups (Piper 2cec036c): with the Trips sheet fully up, the
+  map it covers is out of Tab and the screen reader's reach (P3); the lead stories' example people open a card (P4,
+  stories only). No new words, no new field, no migration.
+- **Card a100, Message Pam (03:59).** One card for Will with Dot's pictures (e7769915: what every version has, Will's
+  inbox, A, B, C, and 911 and 988 above the box on the smallest phone) and three choices: who can write first (A: the
+  member always does; B: Pam can start with anyone, what Will asked for; C: B with a switch in Profile, the desk's
+  pick), whether a limited account can still write to Pam (the desk says yes), and text only or screenshots too
+  (text only). The desk decided the rest and listed it so Will can change it: no automatic reply, an away line not a
+  message, no "Read by Pam", no promised hours yet, "Pam" as the sender, first names in the inbox, one conversation
+  per person kept while they use Pam, no translation until it is on for all messages, a message to a program goes to
+  each lead. Lines to sign: Lena's L1 to L5 (0d368702), with L4 matching L1 and three notices, A's pointing to Help
+  (Sage e8164a44). A helper merged the six plans' questions and found the gaps first (letters that did not match, L4,
+  the A and C notices, the Terms' own sentence); Lena and Sage closed them before the card went up. Nothing is built
+  until Will answers.
+- **Plan C, continued (03:51 to 04:25).** Piper's corner fix (e252d92e): the place page's button had gone to its own
+  row because a rule counted the place's name, which that card does not show; it is now measured, and in the corner
+  at 390 and 320. The underlined "Cancel this visit" in one picture was the pointer left over it when the shot was
+  taken (d607d46b, retaken). The moved-visit line is inside the card, under the countdown: Sage's "Your calendar has
+  the old time." (2e05e77a; a screen reader also hears "This visit changed after you added it."), drawn by Dot
+  (06c2e2b0) and on card a98 as picture 4, then built (Piper 0e3b6169, READY 05:05: full e2e 2312 passed, 19
+  skipped, 0 failed; the placement spec fails on 22896318's build, the line's bottom 507.97 below the card's 484.97;
+  built pictures 9 to 11 on a98). Dot found why drawers.spec failed under load: the
+  sheet was still rising 8px when the spec measured it, and `open()` now waits for it to settle (650bd404; 520 of 520
+  after, 518 of 520 before). Lena's words for all of it are at a8f5188d.
+- **Batch b67 (18 October, 04:50 to 05:30).** S1 polish (Lena 272c3c4e, from Iris's b66 re-test): on a 320×320
+  window the Sign in globe's menu keeps to the room under the globe and scrolls, and Sign up's sheet is the one box
+  that scrolls; at 568 and 844 nothing moves. Iris's re-test of b65 and b66 (18b9ee37, docs): W4, S1, P3 and P4 pass,
+  and Iris's b63 Tab-stop note is withdrawn (it was focus wrapping to the page).
+- **Batch b68 (18 October, 06:03 to 06:39).** Dot's settle wait for the whole e2e suite (5c169fa9):
+  `arrived()` waits until no arrival animation is left on an element, inside it or on any ancestor, fonts are loaded
+  and its box holds for three frames; `settled()` now calls it for the page, so every spec that goes through it waits
+  for the 8px rise to end. Only arrivals are waited for (finite, under a second), so a spec that times a longer
+  animation (messages.spec's sliding file name) is left alone. profile-skeleton.spec measures the card where it ends.
+  And the nightly flow map from main c13ddaca (14d1ce65): Cities people are waiting for on the Super admin page.
 
 ## What was wrong, and what missed it
 
@@ -1750,6 +1808,19 @@
 - **A CI watcher that stopped before CI did (b64, 02:38).** The watcher ran with the 30-minute background limit and
   was stopped while Accessibility was still running; nothing said so until its notice. Restarted with an hour, and
   b65 waited for the green. Lesson: give a CI watcher the full hour.
+- **A test that failed on main only because its function was missing (02:58).** Piper's first P4 test imported
+  programMemberCardFor, which main does not have, so on main it failed on the import, not on what the stories show.
+  Rewritten (2cec036c) to call the journey mock's program_member_card, it fails on main's mock and fixtures on its
+  assertion. Lesson: a missing name is not a failing behaviour; old code includes old fixtures.
+- **A READY that did not match its drawing (plan C, 03:51).** Piper's READY passed every check, but its built
+  pictures, asked for after it, put the place page's button on its own row rather than the corner Will approved, and
+  a new line under the card where Will had asked for nothing. The specs check behaviour, not placement. Lesson: a
+  READY for a drawn screen comes with built pictures, and the desk compares them with the drawing before taking it.
+- **The same 8px, a second time (b67's full run, 05:29).** profile-skeleton.spec.ts:84 failed once on narrow-320 and
+  passed on its retry: the real card's top was 175.09 against the skeleton's 167.09, exactly the 8px Astryx's enter
+  rise moves, while the heights matched. Same class as drawers.spec: a box read while it is still rising. b67 does
+  not touch Profile; the evidence is copied aside, and Dot (D-520) gives it the settle wait and looks for a shared
+  helper and other specs that read a box as a screen appears. Lesson: once a cause is found, look for it elsewhere.
 
 ## Decisions
 
@@ -1984,9 +2055,41 @@
 | Iris's re-test of b64 (5c4d74d9) | Press part 2 PASS (Explore's, the case manager's and the lead's cards, service choices: 97% and a shade, light and dark, 390 and 320; the tab bar shades; reduced motion shade only); the example schedule PASS (six pinned days, 18 October to 1 November) |
 | W4 proof: messages.spec's "speaking a message that cannot start" from dbe32f83 on main's build (c67be570), --retries=0 | 33 failed (11 tests × 3), each on toBeVisible of the line's words; 3 passed ("a browser with no speech recognition has no mic to tap", already true on main) |
 | Batch b65, full run (dd85a115: W4 a2f5f480, Iris 5c4d74d9): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1403 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 192 / 10.0 kB spare / 2198 passed, 19 skipped, 0 failed / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
+| b65 main CI (61046033, pushed 03:15:37) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (03:51); Vercel web and pam-site success (03:19, 03:21) |
+| S1 proof: language-list-fits.spec from cd71d729 on main's build (61046033), --retries=0 | 39 of 42 failed, each on the spec's own check (36 on rows the list hides, 3 on the list ending off the screen); 3 passed (Escape and a pick, which main does too) |
+| P3 proof: trips-covered-pins.spec from 2cec036c on main's build (61046033), --retries=0 | 3 of 3 failed on toHaveCount (the covered map's region counted 1, not 0) |
+| P4 proof: example-people.test from 2cec036c against main's mock and fixtures (vitest) | failed on its assertion, "Marcus: expected null not to be null"; the stranger case passed on both |
+| Batch b66, full run (2cdc72e6: S1 622c780a, Piper 2cdc72e6; then Lena's docs-only 0bdd646b): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1403 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 194 / 10.0 kB spare / 2249 passed, 19 skipped, 0 failed / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
+| b66 main CI (6defda30, pushed 03:55:00) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (04:35); Vercel web and pam-site success (03:58, 04:00) |
+| S1 polish proof: language-list-fits.spec from 272c3c4e on main's build (6defda30), -g "too short", --retries=0 | 6 of 6 new cases failed on their checks (3 "the boxes that scroll round the list": expected 1, got 2, ["listbox", "div"]; 3 "it ends on the screen": 364, not <= 320.5); 3 passed (Sign up's stays-on-screen case, true on main) |
+| Batch b67, full run (77d9e8a2: Lena 8933b153, Iris 77d9e8a2): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1403 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 194 / 10.0 kB spare / 2254 passed, 19 skipped, 0 failed, 1 flaky (profile-skeleton.spec:84 on narrow-320, the 8px rise; to Dot) / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
+| b67 main CI (c13ddaca, pushed 05:31:11) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (06:12); Vercel pam-site and web success (05:33, 05:36) |
+| Settle wait proof, Dot's run (not the desk's): profile-skeleton.spec with every animation slowed tenfold (CDP Animation.setPlaybackRate 0.1), narrow-320, --repeat-each=5 | Before 9 of 20 failed, each on toBeCloseTo at line 99, "Received difference: 8"; after 20 of 20 passed. The 37 other specs that read a box, slowed the same way: 449 passed, 2 failed (messages.spec's two tests that time an animation, which a slowed clock breaks by design) |
+| Batch b68, full run (afcc16de: Dot e4a02333, flow map afcc16de): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1403 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 194 / 10.0 kB spare / 2255 passed, 19 skipped, 0 failed, 0 flaky / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
 
 ## Left undone
 
+- **As of b68 (18 October, 06:39):** Plan C is READY (Piper 0e3b6169, Lena a8f5188d) and waits on Will's
+  "yes a97" and the iPhone try; its drawers.spec can use `arrived()` once both are on main. Message Pam: card a100
+  waits on Will's three answers and signature. Dot: Trips' map pins press (polish). With Will: a100, "yes a97", the
+  iPhone try; a86, a91, a93, a84, a88.
+- **As of b67 (18 October, 05:30):** Plan C is READY (Piper 0e3b6169, Lena a8f5188d) and waits on Will's "yes a97" and
+  the iPhone try; then the desk proves its specs on main, and its batch applies 20261018003713, checks the Vault key
+  and redeploys calendar-feed, with the ship day in p6. Message Pam: card a100 waits on Will's three answers and
+  signature; after it, Nico (the "never a member" comment), Wren (Messages in Pam, and three posts if limited accounts
+  can write) and Ava (Sage's saved reply for legal questions). Dot: profile-skeleton.spec's settle wait, then Trips'
+  map pins press (polish). With Will: a100,
+  "yes a97", the iPhone try; a86, a91, a93, a84, a88.
+- **As of b66 (18 October, 03:53):** Plan C is built (Piper 97cbce51; Lena's words, lines and pins 4434a659) but not
+  ready: its built pictures put the place page's button on its own row, not in the corner, and the moved-visit line
+  under the card. Piper moves the button back to the corner (own row only when the header can't hold it); Dot draws
+  where the line goes inside the card, and Sage may shorten it; then Piper re-shoots for card a98. Dot also finds why
+  drawers.spec fails under load (two tests in Piper's full run, a97's spec). Then Will's "yes a97" and the iPhone
+  try, and the desk proves it on main; the batch applies 20261018003713, checks the Vault key and redeploys
+  calendar-feed, with the ship day in p6. Message Pam: card a100 for Will (pictures from Dot e7769915, lines from
+  Lena c4aa8150 and Sage d849470f, once Lena and Sage close the four gaps). Dot: Trips' map pins press (polish).
+  Iris: re-test b65's W4 and b66's S1, P3 and P4. With Will: "yes a97", the iPhone try, a100; a86, a91, a93, a84,
+  a88.
 - **As of b65 (18 October, 03:14):** b66 takes Piper's two b63 follow-ups (2cec036c, its stories test proven by the
   desk) and Lena's S1 (Sign up's language list as Astryx's bottom sheet) when its READY comes in. Piper: plan C's
   READY after its full run, with Will's 03:11 hint. Dot: the drawer with the short hint, then Message Pam's version
