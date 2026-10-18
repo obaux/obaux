@@ -121,6 +121,24 @@ export const DATA_COLLECTED: readonly CollectedData[] = [
     },
   },
   {
+    id: 'pam-conversation',
+    what:
+      'What a person writes to Pam, what Pam writes back (its welcome message and its after-hours reply too), and the photos (screenshots) ' +
+      'they send there, in the one Pam conversation each person has (`conversations.kind = \'support\'`, D-605). The Pam team ' +
+      '(`is_pam_team()`) reads it and a guide and a program cannot. Not PDF or Word files, not link previews. It goes with the account. ' +
+      'The conversation is `what-we-keep.p17`; a photo in it is the photo of `what-we-keep.p3` and `how-long.p1`, which Will wanted said ' +
+      'in no more words than that (a101, 18 October).',
+    covers: {
+      keys: ['privacy.s.what-we-keep.p17', 'privacy.s.what-we-keep.p3', 'privacy.s.how-long.p1'],
+      says: [
+        'we keep what you both write',
+        'Only the Pam team reads this conversation',
+        'we delete the whole conversation',
+        'messages, photos and documents',
+      ],
+    },
+  },
+  {
     id: 'signature',
     what: 'A name typed and a signature drawn to sign a program\'s rules.',
     covers: { keys: ['privacy.s.what-we-keep.p8'], says: ['signature'] },
@@ -198,7 +216,7 @@ export const INPUT_FILES: readonly InputFile[] = [
   { file: 'apps/web/src/screens/ExploreScreen.tsx', fields: 1, collects: ['address-typed'] },
   { file: 'apps/web/src/app/places/AreaPicker.tsx', fields: 2, collects: ['address-typed', 'location-near'] },
   { file: 'apps/web/src/lib/imHere.ts', fields: 2, collects: ['location-here'] },
-  { file: 'apps/web/src/app/messages/ThreadView.tsx', fields: 5, collects: ['messages'] },
+  { file: 'apps/web/src/app/messages/ThreadView.tsx', fields: 5, collects: ['messages', 'pam-conversation'] },
   { file: 'apps/web/src/screens/MemberPoliciesView.tsx', fields: 2, collects: ['signature'] },
   { file: 'apps/web/src/screens/NewTripView.tsx', fields: 1, collects: ['visit-note'] },
   { file: 'apps/web/src/screens/SupportReplyScreen.tsx', fields: 1, collects: ['help-desk-reply'] },

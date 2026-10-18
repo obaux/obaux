@@ -304,6 +304,9 @@ export const TRANSPARENCY_SCREEN: {
   readonly programHeadingKey: string;
   readonly programHeading: string;
   readonly program: readonly TransparencyLine[];
+  readonly pamHeadingKey: string;
+  readonly pamHeading: string;
+  readonly pam: readonly TransparencyLine[];
   readonly cannotSeeHeadingKey: string;
   readonly cannotSeeHeading: string;
   readonly cannotSee: readonly TransparencyLine[];
@@ -398,6 +401,21 @@ export const TRANSPARENCY_SCREEN: {
     },
   ],
 
+  pamHeadingKey: 'transparency.pam.heading',
+  pamHeading: 'The Pam team can see:',
+  /**
+   * What the Pam team reads (D-605, card a101, Will 18 October): a card of its own, never in the guide's list above, which would tell the
+   * member their guide reads it. One line, because there is one thing: a person's conversation with Pam, both ways. The screen splits a line
+   * of two sentences at the full stop into a lead and a grey line. Said on the Privacy page in `what-we-keep.p17`, and nowhere in the
+   * conversation itself ("Keep the UI clean", Will). `PAM_TEAM_CAN_READ` is the list behind it.
+   */
+  pam: [
+    {
+      key: 'transparency.pam.messages',
+      en: 'What you and Pam write to each other. Your guide and your programs cannot see it.',
+    },
+  ],
+
   cannotSeeHeadingKey: 'transparency.cannotSee.heading',
   cannotSeeHeading: 'Your guide cannot see:',
   cannotSee: [
@@ -424,6 +442,8 @@ export const TRANSPARENCY_I18N_KEYS: readonly string[] = [
   ...TRANSPARENCY_SCREEN.canSee.map((l) => l.key),
   TRANSPARENCY_SCREEN.programHeadingKey,
   ...TRANSPARENCY_SCREEN.program.map((l) => l.key),
+  TRANSPARENCY_SCREEN.pamHeadingKey,
+  ...TRANSPARENCY_SCREEN.pam.map((l) => l.key),
   TRANSPARENCY_SCREEN.cannotSeeHeadingKey,
   ...TRANSPARENCY_SCREEN.cannotSee.map((l) => l.key),
   TRANSPARENCY_SCREEN.footerKey,
@@ -436,6 +456,7 @@ export const TRANSPARENCY_I18N_KEYS: readonly string[] = [
   'transparency.summary.cannot',
   'transparency.summary.reported',
   'transparency.summary.program',
+  'transparency.summary.pam',
   ...['plans', 'progress', 'people'].map((g) => `transparency.group.${g}`),
   'copy.page',
   'copy.done',
