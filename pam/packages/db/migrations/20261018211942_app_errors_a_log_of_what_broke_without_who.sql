@@ -3,28 +3,32 @@
 -- App errors: a log of what broke, without who (D-616; Will, 18 October 2026, 21:14: "if something breaks, please create an error log so
 -- the team can be notified and fix the issue").
 --
--- WHAT IT HOLDS. One row per failure the app reports: when, the screen's route (`area`), a stable key for what was being done
--- (`action`, e.g. alerts.switch.closed), the code it failed with (an HTTP status, a Postgres code, or 'offline'), a short `detail`
--- (200 characters at most, never what a person typed), the app build, the platform, the role the person was acting as (read here from
--- their sign-in, not taken from the app), and the language. NO account id, no phone, no message text, no place name: there is no column
--- to put one in, and the route, key and code are held to a narrow alphabet by the table itself.
+-- WHAT IT HOLDS. One row per failure the app reports: when, the screen's route as a PATTERN (`area`, /person/[id]/, never an id or a
+-- query), a stable key for what was being done (`action`, e.g. alerts.switch.closed), the code it failed with (an HTTP status, a
+-- Postgres SQLSTATE, or offline / timeout / unknown), the app build, the platform, the role the person was acting as (read here from
+-- their sign-in, not taken from the app), and the language. NO free text at all (Lena's Privacy read, Mira 21:23): an error's own
+-- message carries the value that broke it ("Key (phone)=(...) already exists"), so there is no detail column and the function takes none.
+-- NO account id, no phone, no message text, no place name: there is no column to put one in, and the route, key and code are held to
+-- a narrow shape by the table itself.
 --
--- WHO MAY WRITE. Only `report_app_error()`, a security definer function callable signed in or signed out (a failure to sign in is a
--- failure too), by Edge Functions through the service role, never by a table write. Nobody but the database reads the table:
--- RLS is on and forced, with no policies and no grants for anon or authenticated.
+-- WHO MAY WRITE AND READ. Only `report_app_error()`, a security definer function callable signed in or signed out (a failure to sign in
+-- is a failure too), and by Edge Functions through the service role, never by a table write. Only a super admin may SELECT: RLS is on
+-- and forced, anon has no grant, authenticated has SELECT through a policy that asks `is_super_admin()`, and nobody has a write grant.
 --
 -- WHAT KEEPS IT SMALL AND HARMLESS.
 --   * A switch, `app_errors_live`, starts 'off': with it off the function writes nothing (Lena reads it for Privacy first, and if
 --     Privacy needs a line Will signs it before the switch is turned on).
 --   * A rate limit: 10 reports a minute per caller (the account, else a one-way hash of the network address, kept an hour at most),
 --     and 200 a minute overall, so a loop in a screen or a person with a script cannot flood it.
---   * The values are cleaned on the way in: the route loses its query, the key and code are cut to their alphabet, and the detail loses
---     long digit runs and anything that looks like an email address.
---   * Thirty days, then a nightly sweep removes the row.
+--   * The values are checked on the way in. The code must be an HTTP status, a SQLSTATE or offline/timeout/unknown, else it is stored
+--     as 'unknown'; the route loses its query and any id; the action must have the shape of a stable key (lowercase words and dots), and a
+--     report whose action does not is REFUSED and writes nothing. The closed list of actions is in the app's code (packages/config).
+--   * Thirty days, then a nightly sweep removes the row. The number is held in one function, `app_errors_keep_days()`.
 --
 -- TELLING THE TEAM. The first time an action fails in an hour, every super admin gets one bell notification for that action
 -- (`app_error`, body_key notify.app_error, {action, count: 1}); each further failure of the same action in that hour raises its
--- count, and does not make another notification.
+-- count, and does not make another notification. It holds nothing the log row does not. The bell is in the app, for super admins only:
+-- no email, chat or outside service (that would be a new host and a new Privacy sentence).
 
 alter table public.notifications drop constraint if exists notifications_kind_known;
 alter table public.notifications add constraint notifications_kind_known check (
@@ -38,13 +42,12 @@ alter table public.notifications add constraint notifications_kind_known check (
 create table public.app_errors (
   id         uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
-  -- A route such as /alerts/ or /messages/thread/, never an address with an id or a query.
+  -- A route PATTERN such as /alerts/ or /person/[id]/, never an address with an id or a query.
   area       text not null check (area ~ '^/[A-Za-z0-9/_\[\]-]{0,98}$'),
-  -- A stable key for what was being done: alerts.switch.closed, messages.send.
-  action     text not null check (action ~ '^[a-z0-9][a-z0-9._-]{0,79}$'),
-  -- An HTTP status, a Postgres code, or 'offline'.
-  code       text not null check (code ~ '^[A-Za-z0-9_.-]{1,30}$'),
-  detail     text check (char_length(detail) <= 200),
+  -- A stable key for what was being done: alerts.switch.closed, messages.send (a closed list in the app's code).
+  action     text not null check (action ~ '^[a-z][a-z0-9-]{0,29}(\.[a-z0-9][a-z0-9-]{0,29}){1,3}$' and char_length(action) <= 60),
+  -- An HTTP status, a Postgres SQLSTATE, or offline / timeout / unknown.
+  code       text not null check (code ~ '^[0-9]{3}$' or code ~ '^[0-9A-Z]{5}$' or code in ('offline', 'timeout', 'unknown')),
   build      text check (build ~ '^[A-Za-z0-9._+-]{1,40}$'),
   platform   text not null default 'unknown' check (platform in ('web', 'ios', 'android', 'server', 'unknown')),
   role       text not null check (role in ('member', 'admin', 'provider', 'super_admin', 'signed-out', 'service')),
@@ -57,12 +60,13 @@ create index app_errors_action_idx on public.app_errors (action, created_at desc
 alter table public.app_errors enable row level security;
 alter table public.app_errors force row level security;
 revoke all on public.app_errors from anon, authenticated;
--- A table with RLS and no policy is flagged as an oversight (test 03); this one is on purpose: nobody reads it or writes it but the function.
-create policy app_errors_nobody on public.app_errors for all to anon, authenticated using (false) with check (false);
+-- Only a super admin reads it; nobody writes it but the function (no write grant, no write policy).
+grant select on public.app_errors to authenticated;
+create policy app_errors_super_admin_reads on public.app_errors for select to authenticated using (public.is_super_admin());
 
 comment on table public.app_errors is
-  'What broke in the app, without who (D-616): a route, a key for the action, a code, a short detail, build, platform, role, language. '
-  'No account, phone, message text or place. Written only by report_app_error(); kept 30 days.';
+  'What broke in the app, without who (D-616): a route pattern, a key for the action, a code, build, platform, role, language. '
+  'No free text, no account, phone, message text or place. Written only by report_app_error(); read only by a super admin; kept 30 days.';
 
 -- Counts per caller per minute, so the limit holds. The caller is the account, or a one-way hash of the network address.
 create table public.app_error_limits (
@@ -86,7 +90,6 @@ create or replace function public.report_app_error(
   p_area     text,
   p_action   text,
   p_code     text,
-  p_detail   text default null,
   p_build    text default null,
   p_platform text default null,
   p_locale   text default null
@@ -105,7 +108,6 @@ declare
   v_area    text;
   v_action  text;
   v_code    text;
-  v_detail  text;
   v_build   text;
   v_platform text;
   v_locale  text;
@@ -143,26 +145,28 @@ begin
     return false;
   end if;
 
-  -- Cleaned on the way in; a bad value is made harmless, never an error (a report must not break the screen that sent it).
+  -- Checked on the way in. A report must not break the screen that sent it, so nothing here raises: a bad route or code is made harmless, and
+  -- a report whose action is not a stable key is simply not taken (the closed list of keys is in the app's code).
+  v_action := coalesce(p_action, '');
+  if v_action !~ '^[a-z][a-z0-9-]{0,29}(\.[a-z0-9][a-z0-9-]{0,29}){1,3}$' or char_length(v_action) > 60 then
+    return false;
+  end if;
+  -- The route as a pattern: no query, no fragment, and any id made a placeholder (uuids and long digit runs).
   v_area := split_part(split_part(coalesce(p_area, ''), '?', 1), '#', 1);
+  v_area := regexp_replace(v_area, '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}', '[id]', 'g');
+  v_area := regexp_replace(v_area, '[0-9]{4,}', '[id]', 'g');
   if v_area !~ '^/[A-Za-z0-9/_\[\]-]{0,98}$' then v_area := '/unknown'; end if;
-  v_action := lower(regexp_replace(coalesce(p_action, ''), '[^A-Za-z0-9._-]', '', 'g'));
-  v_action := left(v_action, 80);
-  if v_action !~ '^[a-z0-9][a-z0-9._-]{0,79}$' then v_action := 'unknown'; end if;
-  v_code := left(regexp_replace(coalesce(p_code, ''), '[^A-Za-z0-9_.-]', '', 'g'), 30);
-  if v_code = '' then v_code := 'unknown'; end if;
-  v_detail := nullif(btrim(coalesce(p_detail, '')), '');
-  if v_detail is not null then
-    v_detail := regexp_replace(v_detail, '[^[:space:]]+@[^[:space:]]+', '[email]', 'g');
-    v_detail := regexp_replace(v_detail, '[0-9]{6,}', '#', 'g');
-    v_detail := left(v_detail, 200);
+  -- The code from a closed shape; anything else (an error's own words, for one) is just "unknown".
+  v_code := coalesce(p_code, '');
+  if not (v_code ~ '^[0-9]{3}$' or v_code ~ '^[0-9A-Z]{5}$' or v_code in ('offline', 'timeout', 'unknown')) then
+    v_code := 'unknown';
   end if;
   v_build := case when p_build ~ '^[A-Za-z0-9._+-]{1,40}$' then p_build else null end;
   v_platform := case when p_platform in ('web', 'ios', 'android', 'server') then p_platform else 'unknown' end;
   v_locale := case when p_locale in ('en', 'es', 'pt-BR', 'zh-CN', 'zh-HK', 'ru', 'ar') then p_locale else null end;
 
-  insert into public.app_errors (area, action, code, detail, build, platform, role, locale)
-  values (v_area, v_action, v_code, v_detail, v_build, v_platform, v_role, v_locale);
+  insert into public.app_errors (area, action, code, build, platform, role, locale)
+  values (v_area, v_action, v_code, v_build, v_platform, v_role, v_locale);
 
   -- Tell the team: one bell row per action per hour, with its count going up.
   v_subject := md5('app_error:' || v_action)::uuid;
@@ -184,8 +188,16 @@ begin
 end;
 $$;
 
-revoke all on function public.report_app_error(text, text, text, text, text, text, text) from public;
-grant execute on function public.report_app_error(text, text, text, text, text, text, text) to anon, authenticated, service_role;
+revoke all on function public.report_app_error(text, text, text, text, text, text) from public;
+grant execute on function public.report_app_error(text, text, text, text, text, text) to anon, authenticated, service_role;
+
+-- How long a row is kept: the one place the number lives (Privacy says it; the sweep and the test read it here).
+create or replace function public.app_errors_keep_days()
+returns integer
+language sql
+immutable
+set search_path = public, extensions
+as $$ select 30 $$;
 
 -- Thirty days, then gone; the per-minute counters an hour.
 create or replace function public.sweep_app_errors()
@@ -197,10 +209,10 @@ as $$
 declare
   n integer;
 begin
-  delete from public.app_errors where created_at < now() - interval '30 days';
+  delete from public.app_errors where created_at < now() - make_interval(days => public.app_errors_keep_days());
   get diagnostics n = row_count;
   delete from public.app_error_limits where minute < now() - interval '1 hour';
-  delete from public.notifications where kind = 'app_error' and created_at < now() - interval '30 days';
+  delete from public.notifications where kind = 'app_error' and created_at < now() - make_interval(days => public.app_errors_keep_days());
   return n;
 end;
 $$;
