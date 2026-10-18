@@ -1,5 +1,7 @@
 'use client';
 
+import { codeFromError } from './reportAppError';
+
 /**
  * Whether somebody has agreed to be texted reminders.
  *
@@ -78,19 +80,30 @@ export async function getReminderConsent(memberId: string): Promise<boolean | nu
 }
 
 /**
- * Records the answer. Returns false when it could not be saved — and always
- * false for a yes after a STOP: that is never written, here or by the database.
+ * What a save of the text settings answers (D-616): `{ ok: true }`, or `{ ok: false, code }` where `code` has already been through
+ * `appErrorCode` (an HTTP status, a SQLSTATE, `offline`, `timeout` or `unknown`) so the screen can hand it straight to
+ * `reportAppError`. `stopped: true` marks the one refusal that is not a failure: a yes after a STOP is never written, and is not
+ * to be reported as a problem.
  */
-export async function setReminderConsent(memberId: string, enabled: boolean): Promise<boolean> {
+export type SaveResult = { readonly ok: true } | { readonly ok: false; readonly code: string; readonly stopped?: true };
+
+const SAVED: SaveResult = { ok: true };
+const REFUSED_AFTER_STOP: SaveResult = { ok: false, code: 'unknown', stopped: true };
+
+/**
+ * Records the answer. `ok: false` when it could not be saved — and always
+ * for a yes after a STOP: that is never written, here or by the database.
+ */
+export async function setReminderConsent(memberId: string, enabled: boolean): Promise<SaveResult> {
   try {
-    if (enabled && (await getTextStatus(memberId)).stopped) return false;
+    if (enabled && (await getTextStatus(memberId)).stopped) return REFUSED_AFTER_STOP;
     const { createClient } = await import('./supabase');
     const { error } = await createClient()
       .from('notification_preferences')
       .upsert({ member_id: memberId, sms_enabled: enabled }, { onConflict: 'member_id' });
-    return !error;
-  } catch {
-    return false;
+    return error ? { ok: false, code: codeFromError(error) } : SAVED;
+  } catch (caught) {
+    return { ok: false, code: codeFromError(caught) };
   }
 }
 
@@ -99,7 +112,7 @@ export async function setReminderConsent(memberId: string, enabled: boolean): Pr
  * only turns that switch off: it never withdraws the yes (Lena, 18 October, D-615: a switch is only on once the person has agreed on
  * the consent screen, and no text goes without a switch on, so a staff member who turns the last one off has not left a way to be
  * texted, and does not have to agree again to turn one back on; a STOP still ends everything). `alertsAreAllTheyGetTexts` is kept for
- * callers and no longer changes anything. Always false for a yes after a STOP; the database holds the same line.
+ * callers and no longer changes anything. Always refused for a yes after a STOP (`stopped`); the database holds the same line.
  */
 export async function setTextAlert(
   memberId: string,
@@ -107,17 +120,17 @@ export async function setTextAlert(
   on: boolean,
   current: AlertFlags,
   alertsAreAllTheyGetTexts: boolean,
-): Promise<boolean> {
+): Promise<SaveResult> {
   try {
-    if (on && (await getTextStatus(memberId)).stopped) return false;
+    if (on && (await getTextStatus(memberId)).stopped) return REFUSED_AFTER_STOP;
     const { createClient } = await import('./supabase');
     void current;
     void alertsAreAllTheyGetTexts;
     const row: Record<string, unknown> = { member_id: memberId, [ALERT_COLUMN[kind]]: on };
     if (on) row.sms_enabled = true;
     const { error } = await createClient().from('notification_preferences').upsert(row, { onConflict: 'member_id' });
-    return !error;
-  } catch {
-    return false;
+    return error ? { ok: false, code: codeFromError(error) } : SAVED;
+  } catch (caught) {
+    return { ok: false, code: codeFromError(caught) };
   }
 }

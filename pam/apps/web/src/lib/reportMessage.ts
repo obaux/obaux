@@ -1,5 +1,7 @@
 'use client';
 
+import { codeFromError, reportAppError } from './reportAppError';
+
 /**
  * Says a message is not safe (D-177).
  *
@@ -19,8 +21,10 @@ export async function reportMessage(messageId: string, reason: string): Promise<
       p_message_id: messageId,
       p_reason: reason,
     });
+    if (error) reportAppError({ action: 'messages.report', code: codeFromError(error) });
     return !error;
-  } catch {
+  } catch (caught) {
+    reportAppError({ action: 'messages.report', code: codeFromError(caught) });
     return false;
   }
 }

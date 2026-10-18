@@ -165,7 +165,7 @@ function AlertsList() {
       const before = alerts;
       setAlerts({ ...alerts, [key]: on });
       if (on) setConsent(true);
-      const ok = await setTextAlert(userId, key, on, before, who !== 'member');
+      const ok = (await setTextAlert(userId, key, on, before, who !== 'member')).ok;
       setFailedKind(ok ? null : kind);
       setSaved(ok);
       if (!ok) {
@@ -177,7 +177,7 @@ function AlertsList() {
       return;
     }
     setConsent(on);
-    const ok = await setReminderConsent(userId, on);
+    const ok = (await setReminderConsent(userId, on)).ok;
     setFailedKind(ok ? null : kind);
     setSaved(ok);
     if (!ok) setConsent(!on);

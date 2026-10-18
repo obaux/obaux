@@ -1,0 +1,149 @@
+import { appErrorCode, isAppErrorAction } from '@pam/config';
+import { createClient } from './supabase';
+
+/**
+ * Tells the team that something a person did did not work (D-616; Will: "if something breaks, create an error log so the team can
+ * be notified and fix the issue"). A screen that shows a failed-action alert also calls this, with two things and nothing else:
+ *
+ *   - `action`: a key from the closed list in `@pam/config` (`messages.send`, `alerts.switch.closed`, ...). Anything off the list is
+ *     dropped here, and again by the database.
+ *   - `code`: what the failure was, as a number or a short code: an HTTP status, a Postgres SQLSTATE, `offline`, `timeout` or
+ *     `unknown`. NEVER an error's message: it carries the value that broke it (a phone number, a name). `appErrorCode` keeps only
+ *     the closed shapes and turns everything else into `unknown`, so a caller that passes `error.message` by mistake sends `unknown`.
+ *
+ * What goes with it is only where and on what: the screen's path (the database cuts it to a pattern), the build, the platform
+ * and the language. Never who: the database reads the person's role from their sign-in and the log keeps no account.
+ *
+ * It never throws and never makes the caller wait. With the switch off (`app_errors_live`) the database takes nothing and
+ * answers `false`; the app does not read the switch first, so a failure costs one quiet call, not two. A report that cannot go
+ * because the phone is offline waits in memory (ten at most, the oldest dropped first) and goes when the network is back. It is
+ * not written to the phone's storage: a report lost with the app closed is a smaller harm than a new thing kept on the device.
+ */
+export interface AppErrorReport {
+  readonly action: string;
+  readonly code?: string | number | null;
+}
+
+interface Wire {
+  readonly p_area: string;
+  readonly p_action: string;
+  readonly p_code: string;
+  readonly p_build: string | null;
+  readonly p_platform: string;
+  readonly p_locale: string | null;
+}
+
+/** What the reporter needs from its surroundings; the tests give it fakes. */
+export interface ReporterDeps {
+  /** Resolves true when the database was reached (even if it declined), false when the network failed. */
+  readonly send: (wire: Wire) => Promise<boolean>;
+  readonly online: () => boolean;
+  /** Calls `fn` once, the next time the network comes back. */
+  readonly whenOnline: (fn: () => void) => void;
+  readonly describe: () => Pick<Wire, 'p_area' | 'p_build' | 'p_platform' | 'p_locale'>;
+}
+
+export const APP_ERROR_QUEUE_MAX = 10;
+
+export function createReporter(deps: ReporterDeps): (report: AppErrorReport) => void {
+  const queue: Wire[] = [];
+  let flushing = false;
+  let waiting = false;
+
+  async function flush(): Promise<void> {
+    if (flushing) return;
+    flushing = true;
+    try {
+      while (queue.length > 0) {
+        if (!deps.online()) {
+          if (!waiting) {
+            waiting = true;
+            deps.whenOnline(() => {
+              waiting = false;
+              void flush();
+            });
+          }
+          return;
+        }
+        const next = queue[0]!;
+        let reached = false;
+        try {
+          reached = await deps.send(next);
+        } catch {
+          reached = false;
+        }
+        if (!reached) {
+          // The network failed under us: keep it, and try again when the network says it is back.
+          if (!waiting) {
+            waiting = true;
+            deps.whenOnline(() => {
+              waiting = false;
+              void flush();
+            });
+          }
+          return;
+        }
+        queue.shift();
+      }
+    } finally {
+      flushing = false;
+    }
+  }
+
+  return (report) => {
+    try {
+      if (!isAppErrorAction(report.action)) return;
+      const code = appErrorCode(report.code);
+      queue.push({ ...deps.describe(), p_action: report.action, p_code: code });
+      while (queue.length > APP_ERROR_QUEUE_MAX) queue.shift();
+      void flush();
+    } catch {
+      /* a report must never break the screen that sent it */
+    }
+  };
+}
+
+/**
+ * The code for a caught failure: `offline` when the phone has no network, `timeout` for an abort, else the error's own status or
+ * SQLSTATE if it has one of the closed shapes (anything else becomes `unknown` when it is reported). Never its message.
+ */
+export function codeFromError(caught: unknown, online: boolean = typeof navigator === 'undefined' || navigator.onLine !== false): string {
+  if (!online) return 'offline';
+  const error = caught as { name?: unknown; code?: unknown; status?: unknown } | null | undefined;
+  if (error?.name === 'AbortError') return 'timeout';
+  const code = typeof error?.code === 'string' || typeof error?.code === 'number' ? error.code : error?.status;
+  return appErrorCode(typeof code === 'string' || typeof code === 'number' ? code : null);
+}
+
+function platform(): string {
+  const cap = (globalThis as { Capacitor?: { getPlatform?: () => string } }).Capacitor;
+  const p = cap?.getPlatform?.();
+  return p === 'ios' || p === 'android' ? p : 'web';
+}
+
+export const reportAppError = createReporter({
+  send: async (wire) => {
+    const { error } = await createClient().rpc('report_app_error', wire);
+    // A refusal from the database (switch off, rate limit, bad value) is an answer, not a network failure.
+    // A PostgREST answer carries a code; a network failure does not.
+    return !error || Boolean((error as { code?: string }).code);
+  },
+  online: () => typeof navigator === 'undefined' || navigator.onLine !== false,
+  whenOnline: (fn) => {
+    if (typeof window !== 'undefined') window.addEventListener('online', fn, { once: true });
+  },
+  describe: () => {
+    let locale: string | null = null;
+    try {
+      locale = typeof document !== 'undefined' ? document.documentElement.lang || null : null;
+    } catch {
+      locale = null;
+    }
+    return {
+      p_area: typeof location !== 'undefined' ? location.pathname : '/',
+      p_build: process.env['NEXT_PUBLIC_PAM_BUILD'] ?? null,
+      p_platform: platform(),
+      p_locale: locale,
+    };
+  },
+});
