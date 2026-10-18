@@ -6,17 +6,16 @@
 
 A plan, no code: `docs/design/plans/2026-10-18-message-pam-admin.md`. It covers the super admin's side of "Message Pam"
 (Will, 02:39, via Mira). It goes with Nico's `docs/design/plans/2026-10-18-message-pam.md`
-(`claude/messages-plan-message-pam` @ bfeead66).
+(`claude/messages-plan-message-pam` @ 00daebd0).
 
 - The inbox is the first row of the super admin's Home: a plain count of the conversations waiting for a reply
   (D-586). It opens `/pam/messages/`, grouped into waiting, answered and closed.
-- Rows show only what `pam_inbox()` returns: first name, role, a lead's program, and region if Nico adds it. Region
-  is already on Everyone.
+- Rows show only what `pam_inbox()` returns: first name, role, region (already on Everyone) and a lead's program.
 - The person sees "Pam", never a staff name. Nothing is texted or emailed.
 - New conversations start from Everyone's real rows and from a program's page. The program fan-out is a stub until
   Will picks.
-- Who is the super admin: `is_super_admin()` alone today. For support staff later, the recommendation is a separate
-  `is_pam_team()` for the Pam functions only, with Will's sign-off.
+- Who is the super admin: `is_pam_team()`, which today is exactly `is_super_admin()`. Support staff later widen only
+  that, with Will's sign-off.
 
 ## What was wrong, and what missed it
 
@@ -40,7 +39,7 @@ A plan, no code: `docs/design/plans/2026-10-18-message-pam-admin.md`. It covers 
 
 ## Left undone
 
-- Region in `pam_inbox()`: asked of Nico, 02:55.
+- Nothing from this plan: Nico added region to `pam_inbox()` and `is_pam_team()` (his 00daebd0, 02:58).
 
 ## Needs a human
 

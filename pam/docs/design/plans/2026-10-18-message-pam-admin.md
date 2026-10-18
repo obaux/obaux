@@ -3,7 +3,7 @@
 **Date:** 2026-10-18 · **Lane:** Accounts & invites (Ava) · **Status:** plan for Will's card. Nothing is built before he
 picks.
 
-**Companion:** Nico's `docs/design/plans/2026-10-18-message-pam.md` (`claude/messages-plan-message-pam` @ bfeead66).
+**Companion:** Nico's `docs/design/plans/2026-10-18-message-pam.md` (`claude/messages-plan-message-pam` @ 00daebd0).
 It owns the model: the conversations, RLS, migrations, the functions, the bell, what is off in v1, and the
 `ADMIN_CAN_SEE` entry. This file doesn't repeat any of that; it links to Nico's sections. It covers what the super admin
 sees and does, and what the person on the other end sees as the sender. The split is in **Seams with Nico** at the
@@ -65,18 +65,17 @@ action sits in the header's menu, not as a button beside the composer, so it is 
 
 ## 2. What each conversation row shows about who wrote
 
-Only what `pam_inbox()` returns (Nico §2): first name, role, the program name for a lead, the time and first line of the
-latest message, who wrote last, and the status. Nothing else. There is no last name, phone, email or city.
+Only what `pam_inbox()` returns (Nico §2): first name, role, region, the program name for a lead, the time and first
+line of the latest message, who wrote last, and the status. Nothing else. There is no last name, phone, email or city.
 
 | Who wrote | Name line | Line under it |
 | --- | --- | --- |
-| Member | First name | "Member · {region}"* |
-| Case manager | First name | "Case manager · {region}"* |
+| Member | First name | "Member · {region}" |
+| Case manager | First name | "Case manager · {region}" |
 | Program lead | First name | "Program lead at {program}" (D-395's line) |
 
-\* **Region is one column to ask Nico for.** Everyone (`directory_people`) already shows the super admin each person's
-region, so adding it isn't a widening, and two members both called "Marcus" need something to tell them apart. If Will
-or Nico would rather not, the line is just "Member" and "Case manager".
+**Region** is in `pam_inbox()` at Ava's ask (Nico, 02:58). Everyone (`directory_people`) already shows the super admin
+each person's region, so it isn't a widening. It is what tells two members both called "Marcus" apart.
 
 Then, on the right, the time of the latest message. A row waiting for Pam has a bold name. Under the name is the latest
 message's first line, cut to one line (`isDescriptionOneLine`, D-306), prefixed "You: " when Pam wrote last.
@@ -106,18 +105,19 @@ row has no number.
 ## 4. Who is "the super admin" for this, now and later
 
 **Today:** `is_super_admin()` (`profiles.role = 'super_admin'`, migration 0033). In live data that is Will's account
-only; Robin in the example data is fictional. Every Pam function and policy uses `is_super_admin()` alone (Nico).
+only; Robin in the example data is fictional.
+
+Every Pam function and policy calls `is_pam_team()` (Nico §2, 02:58), never `is_super_admin()` directly. Today
+`is_pam_team()` returns exactly `is_super_admin()`.
 
 **If Pam adds support staff later**, two things need Will's sign-off, because each adds people who can read what members
 write to Pam:
 
 1. **Who.** A support role, or a flag on a profile.
-2. **What they get.** The recommendation is a separate `is_pam_team()`. Today it would be `is_super_admin()` and nothing
-   more. Only the Pam functions (`pam_inbox`, `pam_set_thread_status`, `pam_start_conversation`, the program fan-out)
-   would switch to it.
-   - Widening `is_super_admin()` itself would also hand support staff approvals, reported places, programs to check,
-     waiting cities, Everyone's demo switch and staff requests.
-   - With `is_pam_team()`, support staff get the inbox, starting Pam conversations (§6) and the bell, and nothing else.
+2. **What they get.** Widen `is_pam_team()`, not `is_super_admin()`.
+   - Widening `is_super_admin()` would also hand support staff approvals, reported places, programs to check, waiting
+     cities, Everyone's demo switch and staff requests.
+   - Widening `is_pam_team()` gives them the inbox, starting Pam conversations (§6) and the bell, and nothing else.
    - That day comes with a DB test: a support account reaches Pam conversations and nothing else `is_super_admin()`
      guards.
 
@@ -217,6 +217,10 @@ Agreed with Nico at 02:48.
 - the "Pam" sender rule;
 - where the super admin starts a conversation.
 
-**Asked of Nico:** `pam_inbox()` adds the asker's region (§2). Nothing else in his function's return needs to change.
+**Asked of Nico and done (02:58):**
+- `pam_inbox()` returns the asker's region.
+- Every Pam function and policy goes through `is_pam_team()`, which today returns `is_super_admin()`.
+
+Nothing else in his functions needs to change.
 
 Dot draws it after both plans exist.
