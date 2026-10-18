@@ -172,11 +172,22 @@ select test.check('...and the other four are not',
   (select count(*) from t85 where not ok), 4);
 select test.check('...and the log holds only the ten',
   (select count(*) from public.app_errors where action like 'loop.%'), 10);
-select set_config('request.headers', '{"x-forwarded-for":"203.0.113.77"}', false);
 select set_config('request.jwt.claim.sub', '', false);
+delete from public.app_error_limits;
 set role anon;
-select test.check('another caller (another network address) is not held up by the first',
-  (select case when public.report_app_error('/signin/', 'signin.code', '500') then 1 else 0 end), 1);
+create temp table t85o (n int, ok boolean);
+insert into t85o select g, public.report_app_error('/signin/', 'signin.code', '500') from generate_series(1, 35) g;
+reset role;
+select test.check('everyone signed out shares thirty a minute: the first thirty are taken, the other five are not',
+  (select count(*) from t85o where ok) * 10 + (select count(*) from t85o where not ok), 305);
+select test.check('no counter key is per person or per network address',
+  (select count(*) from public.app_error_limits where bucket !~ '^(u:[0-9a-f-]{36}|s:service|s:signed-out)$'), 0);
+select test.check('...and none starts with n:',
+  (select count(*) from public.app_error_limits where bucket like 'n:%'), 0);
+set role authenticated;
+select test.as_user(:'marcus');
+select test.check('a signed-in account is not held up by the signed-out cap',
+  (select case when public.report_app_error('/alerts/', 'signin.code', '500') then 1 else 0 end), 1);
 reset role;
 
 \echo ''
@@ -205,6 +216,7 @@ select test.check('an hour later the same action is news again: a new row, count
 
 \echo ''
 \echo '--- An Edge Function reports too, as the service ---'
+select set_config('request.jwt.claim.sub', '', false);
 select set_config('request.jwt.claim.role', 'service_role', false);
 select test.check('the service role is taken, and its role is "service"',
   (select case when public.report_app_error('/', 'function.invite-emails', '502', 'b75', 'server') then 1 else 0 end), 1);

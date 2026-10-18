@@ -19,8 +19,8 @@
 -- WHAT KEEPS IT SMALL AND HARMLESS.
 --   * A switch, `app_errors_live`, starts 'off': with it off the function writes nothing (Lena reads it for Privacy first, and if
 --     Privacy needs a line Will signs it before the switch is turned on).
---   * A rate limit: 10 reports a minute per caller (the account, else a one-way hash of the network address, kept five minutes at most),
---     and 200 a minute overall, so a loop in a screen or a person with a script cannot flood it.
+--   * A rate limit: 10 reports a minute per signed-in account (counter kept five minutes at most), 30 a minute shared by
+--     everyone signed out (no key per person or network address at all), and 200 a minute overall, so a loop in a screen or a person with a script cannot flood it.
 --   * The values are checked on the way in. The code must be an HTTP status, a SQLSTATE or offline/timeout/unknown, else it is stored
 --     as 'unknown'; the route loses its query and any id; the action must have the shape of a stable key (lowercase words and dots), and a
 --     report whose action does not is REFUSED and writes nothing. The closed list of actions is in the app's code (packages/config).
@@ -131,16 +131,17 @@ begin
 
   -- The counters only matter for the minute they count: anything older than five minutes is dropped on each report (and again by the nightly sweep).
   delete from public.app_error_limits where minute < now() - interval '5 minutes';
-  -- The rate limit: ten a minute for one caller, two hundred overall.
+  -- The rate limit: ten a minute for one signed-in account, thirty a minute shared by everyone signed out (no key per person or per
+  -- network address: an address is personal data, and a hash of one can be reversed), sixty for the service, two hundred overall.
   v_bucket := case
     when v_uid is not null then 'u:' || v_uid::text
     when v_role = 'service' then 's:service'
-    else 'n:' || md5('pam-app-errors' || coalesce(nullif((nullif(current_setting('request.headers', true), '')::json) ->> 'x-forwarded-for', ''), 'unknown'))
+    else 's:signed-out'
   end;
   insert into public.app_error_limits (bucket, minute, n) values (v_bucket, date_trunc('minute', now()), 1)
   on conflict (bucket, minute) do update set n = public.app_error_limits.n + 1
   returning n into v_n;
-  v_cap := (case when v_role = 'service' then 60 else 10 end);
+  v_cap := (case when v_role = 'service' then 60 when v_role = 'signed-out' then 30 else 10 end);
   if v_n > v_cap then
     return false;
   end if;
