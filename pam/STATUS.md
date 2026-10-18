@@ -1320,6 +1320,10 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · message files are swept each night (18 October 2026)
+
+Built, not deployed: `sweep-message-files` removes, once a night, every photo, document and link picture that no message points at or whose conversation is gone, in all three message buckets (D-607). Covers every conversation, not only Pam's. The merge desk deploys the function and applies `20261018074530`. Test: `sweep-message-files.test.ts`.
+
 ## Messages & notifications · speaking a message says why it did not start (18 October 2026)
 
 Built, not live: in a conversation, every failure to start the microphone (refused, no microphone, no connection, a language it cannot hear, an unexpected code, a start that throws or never answers) puts one warning banner above the box, and "Listening" shows as soon as it starts. A browser with no speech recognition keeps the mic hidden (D-603; Mira's call). Ten English lines signed by Sage (a2703793), translated by Lena (f4d7e260). Proof: twelve cases in `messages.spec.ts` that fail on main 62ba50e4, `dictationProblem.test.ts`, `dictation-problems.test.ts`. No migration. Will to try it on his phone once live.
