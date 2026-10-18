@@ -2,9 +2,8 @@
 
 **Written by:** Lena (Languages & legal), 18 October 2026, for Mira, Nico and then Will. **Asked:** Will, 18 October, 21:14, relayed by Mira at 21:15:
 "if something breaks, please create an error log so the team can be notified and fix the issue", with a small alert at the bottom of the screen for failed actions.
-**Status:** a read of the design as Mira described it. Nico's migration (`public.app_errors`) is not on any pushed branch yet, so nothing below has been checked
-against code. Where a claim in the draft line depends on code, section 3 says what the code has to do and the test that holds it.
-**Nothing is signed, built, translated or switched on.**
+**Status:** first written from Mira's description (21:15); **checked against Nico's migration, `claude/messages-app-errors` @ `1f142e4a` (21:35), at 21:45** (section 3 now says what each requirement turned out to be). The pins that hold the line to the migration are on `claude/lena-app-errors-pins`.
+**Nothing is signed, translated or switched on.**
 
 ## The short version
 
@@ -17,9 +16,9 @@ against code. Where a claim in the draft line depends on code, section 3 says wh
    with role + language + time in a small pilot it is not safe to claim after that either.
 3. **It ships with the switch, not before.** While `app_errors_live` is off nothing is kept, and a line that says Pam keeps something it does not
    is as wrong as the reverse. Will signs the line before the switch turns on (A29); the line goes live the same day (`legal:date privacy`).
-4. **The honest weak point is the "short detail".** A database or API error often carries the value that broke it (`Key (phone)=(+1215…) already
-   exists`, a failing constraint with the row's values, a URL with an id). The promise "no name, phone number, account, message or place" is only true
-   if the detail is built from a closed list or scrubbed on the server, never copied from the error. Section 3 asks for that, and for the test.
+4. **The weak point was the "short detail".** A database or API error often carries the value that broke it (`Key (phone)=(+1215…) already
+   exists`, a failing constraint with the row's values, a URL with an id). Nico's migration has no detail column at all, and takes none; section 3a
+   checks each of the nine requirements against it.
 5. **No new outside company.** If the notes go only into Pam's own database (Mira's description), `third-party-hosts.test.ts` is untouched, and so is
    the Privacy sentence about other companies (`sharing.p3`). Emailing the team about errors later, or sending them to a service such as Sentry,
    would add a host: the guard fails until that host is listed and Privacy names the company.
@@ -45,7 +44,9 @@ So: a line, in "What we keep", next to the other records of use.
 
 Key for now: `privacy.s.what-we-keep.p17` (renumber when it lands; the Google card and a84's lines are also waiting for numbers).
 
-> If something goes wrong, Pam sends us a short note so we can fix it: when, which screen and action, the kind of error, the version of Pam, your kind of phone, whether you are a member, a case manager or a program, and your language. It has no name, phone number, account, message or place in it. Only the Pam team reads these notes, and we delete them after 30 days.
+> If something goes wrong, Pam sends us a short note so we can fix it: when, which screen and action, the kind of error, the version of Pam, the kind of phone or browser, whether you are a member, a case manager or a program (or not signed in), and your language. It has no name, phone number, account, message or place in it. Only the Pam team reads these notes, and we delete them after 30 days.
+
+(Changed after reading the migration: "kind of phone or browser" is `platform`, which is only web, iOS, Android, server or unknown; "or not signed in" because a failure to sign in is reported too, with the role `signed-out`.)
 
 Why each clause is there, and what makes it true:
 
@@ -58,7 +59,27 @@ Why each clause is there, and what makes it true:
 | "Only the Pam team reads these notes" | Row-level security lets only super admins select; no member, case manager or program lead can, through a table or a function. A database test holds it. |
 | "we delete them after 30 days" | A scheduled job deletes rows older than 30 days, and a test reads the job. |
 
-## 3. What the code has to do, so the line stays true (for Nico; I will pin each once the migration is pushed)
+## 3a. Checked against `1f142e4a` (Nico, 21:35)
+
+| # | Requirement | In the migration |
+|---|---|---|
+| 1 | The detail is never an error's own message | **Met.** There is no detail column and the function takes none. The code must be an HTTP status, a SQLSTATE or `offline`/`timeout`/`unknown`; anything else is stored as `unknown`. The app's closed list (`APP_ERROR_ACTIONS`) and `appErrorCode` match the database's shape, and test 85 offers an error whose message holds a phone, an email, a first name and a street and finds none of it. |
+| 2 | The route is a pattern | **Met.** The query and fragment are cut, a uuid or a run of four or more digits becomes `[id]`, anything outside `/[A-Za-z0-9/_[]-]` becomes `/unknown`. Pam's app has **no dynamic path segment** (it is a static export: ids travel in the query, `/person/?id=…`), so a real pathname never holds an id; the database's cut is a second guard. |
+| 3 | The action is from a closed list | **Met.** Closed list in the app; the database refuses a key that is not lowercase words and dots. |
+| 4 | Size limits and a rate limit | **Met.** Length limits on every field (the table's own checks); ten reports a minute per caller (the account, or a hash of the network address), two hundred overall. |
+| 5 | Only super admins read | **Met.** Forced row security, a deny-all policy, no grants; the one read is `app_errors_grouped()`, which refuses everyone but a super admin, and returns counts by route, action and code. Test 85 refuses anon, member, case manager, program lead, and even a super admin on the table directly. |
+| 6 | Thirty days is enforced | **Met.** `app_errors_keep_days()` is 30; `sweep_app_errors()` deletes older rows; `pg_cron` schedules it nightly at 04:20, and **`pg_cron` 1.6.4 is installed on the live project** (checked 21:44; the migration skips the schedule silently where it is not, so this was worth asking). The bell rows go at the same age. |
+| 7 | The bell holds nothing the log does not | **Met.** `body_vars` is `{action, count}`. |
+| 8 | No new host | **Met** in this branch (a database function; no http, no edge function). The app's client is not on the branch yet; when it lands, `third-party-hosts.test.ts` runs on it. |
+| 9 | Off means off | **Met.** The switch is read first; off returns before the counter or the row is touched. Test 85 shows an empty log, no counter and no bell row while it is off. |
+
+### Three things I noticed that do not change the line
+
+- **The rate-limit counters hold an account id for longer than "five minutes".** `app_error_limits` has rows like `u:<account id>`, minute, count. A report deletes counters older than five minutes; if nobody reports, the nightly sweep deletes those older than an hour. So a counter can sit until the next report or 04:20, up to about a day. It is no new fact: the request log (p11) already holds which account called and when for a week. If it should be tighter, run the counter delete on its own schedule every few minutes. (Nico's message said "5 minutes at most"; "up to the next report or the nightly sweep" is exact.)
+- **The signed-out counter key is an md5 of the network address with a constant salt.** An IPv4 address is only 4 billion values, so anyone who could read the counter table could invert it. Nobody can read it, and the address is in the request log for a week anyway, so I do not count it as a leak. A keyed hash (HMAC with a secret) would be the tidy version, later.
+- **The 200-a-minute cap is shared.** A script posting from many addresses could use it up and hide real reports behind its own for the minute. That is a robustness question for Nico, not Privacy.
+
+## 3. What the code had to do (the list I sent to Nico at 21:15; section 3a is the answer)
 
 1. **The detail is never an error's own message.** Not `error.message`, not PostgREST's `details` or `hint`, not a URL. Take the error `code`
    (a Postgres five-character code, `PAM_RATE_LIMITED`, an HTTP status) and, if a detail helps, map it to a phrase from a closed list in the app; or
