@@ -83,15 +83,18 @@ export function linkEventLines(visit: FeedVisit, now: Date): string[] {
 /** The calendar's name in the member's own calendar list: neutral, not "Pam" (D-604; Sage's word to confirm). */
 export const LINK_CALENDAR_NAME = 'Visits';
 
-/** The calendar's name in the member's saved language (read when the feed is fetched; nothing new is stored). English stands in until Lena translates. */
+/**
+ * The calendar's name in the member's saved language (read when the feed is fetched; nothing new is stored). Sage signed "Visits"
+ * (ledger 9190aac3); the six translations say it the way each language's own lines say a visit (`calendar.warn`, `trips.title`).
+ */
 export const LINK_CALENDAR_NAMES: Readonly<Record<string, string>> = {
   en: 'Visits',
-  es: 'Visits',
-  'pt-BR': 'Visits',
-  ru: 'Visits',
-  ar: 'Visits',
-  'zh-CN': 'Visits',
-  'zh-HK': 'Visits',
+  es: 'Visitas',
+  'pt-BR': 'Visitas',
+  ru: 'Визиты',
+  ar: 'الزيارات',
+  'zh-CN': '预约',
+  'zh-HK': '到訪',
 };
 
 /** One visit as a calendar file, made on the phone for Apple Calendar or Outlook to open (D-604): the same event as the feed's. */
