@@ -258,8 +258,8 @@ const useWords = () => {
     // The line the app draws under a message that did not send; "Your message is still here" has no key, so it is not drawn.
     stillHere: t('messages.thread.notSent.label'),
     composerPlaceholder: t('messages.pam.placeholder'),
-    helpRow: t('help.writeToPam'),
-    rowLine: t('help.writeToPam'),
+    helpRow: t('help.desk.label'),
+    rowLine: t('help.desk.label'),
   };
 };
 type W = ReturnType<typeof useWords>;
