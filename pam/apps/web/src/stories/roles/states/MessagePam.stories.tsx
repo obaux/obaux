@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import * as stylex from '@stylexjs/stylex';
 import { Avatar } from '@astryxdesign/core/Avatar';
@@ -57,8 +58,17 @@ const WORDS = {
     replyAs: 'Reply as Pam', // stand-in
     writeAs: 'Write as Pam', // stand-in
     helpRow: 'Write to Pam',
-    helpHint: 'A person on the Pam team reads it.',
+    helpHint: '',
     rowLine: 'Write to Pam',
+    // Option B, clean (Will, 18 October): a welcome from day one, an automatic reply out of hours, a thread like any other. Sage's words to come.
+    welcome: "Hi, welcome to Pam. Ask us anything about the app, a place or a visit. We'll answer here.",
+    outHours: "Thanks for your message. We're away right now and will answer on Monday from 9 AM. If you're in crisis, call or text 988.",
+    notSent: 'Not sent',
+    tryAgain: 'Try again',
+    sendingLabel: 'Sending…',
+    sentLabel: 'Sent',
+    stillHere: 'Not sent. Your message is still here.',
+    welcomeLine: "Hi, welcome to Pam. Ask us anything about…",
     started: 'Pam started this conversation.',
     // Option C (Sage, ledger 7b280684).
     cTitle: 'The Pam team can now start a conversation with you, as Pam.',
@@ -141,8 +151,16 @@ const WORDS = {
     replyAs: 'رُدّ باسم Pam',
     writeAs: 'اكتب باسم Pam',
     helpRow: 'اكتب إلى Pam',
-    helpHint: 'يقرؤها شخص من فريق Pam.',
+    helpHint: '',
     rowLine: 'اكتب إلى Pam',
+    welcome: 'أهلًا بك في Pam. اسألنا عن التطبيق أو مكان أو زيارة. سنجيب هنا.',
+    outHours: 'شكرًا لرسالتك. نحن بعيدون الآن وسنرد يوم الاثنين من التاسعة صباحًا. إن كنت في أزمة فاتصل أو أرسل رسالة إلى 988.',
+    notSent: 'لم تُرسل',
+    tryAgain: 'حاول مرة أخرى',
+    sendingLabel: 'جارٍ الإرسال…',
+    sentLabel: 'أُرسلت',
+    stillHere: 'لم تُرسل. رسالتك ما زالت هنا.',
+    welcomeLine: 'أهلًا بك في Pam. اسألنا عن…',
     started: 'بدأ Pam هذه المحادثة.',
     cTitle: 'يمكن لفريق Pam الآن أن يبدأ محادثة معك، باسم Pam.',
     cBody: 'ستراها في الرسائل، ولا يقرؤها إلا فريق Pam. يمكنك إيقاف ذلك من ملفي.',
@@ -239,33 +257,17 @@ const styles = stylex.create({
   stat: { fontSize: '15px', color: colorVars['--color-text-secondary'] },
   switchWords: { flexGrow: 1, flexShrink: 1, minWidth: 0 },
   switchLabel: { fontSize: '18px', fontWeight: 600 },
+  statusRow: { width: '100%', paddingInline: '4px' },
+  statusError: { fontSize: '15px', fontWeight: 600, color: colorVars['--color-text-red'] },
+  statusQuiet: { fontSize: '14px', color: colorVars['--color-text-secondary'] },
+  statusRetry: { minHeight: '48px', fontSize: '15px', fontWeight: 700, color: colorVars['--color-text-red'] },
+  overlay: { position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'oklch(0 0 0 / 42%)', borderRadius: '12px' },
   full: { width: '100%', paddingInline: '12px' },
   bar: { paddingInline: '4px' },
 });
 
 const NOW = new Date();
 const minutesAgo = (m: number) => new Date(NOW.getTime() - m * 60_000).toISOString();
-
-/** The fixed card at the top of every Pam thread: what it is, who reads, 911 and 988 early, what Pam can't do, who sees it. */
-function PamCard() {
-  const w = useWords();
-  return (
-    <Card padding={4} xstyle={styles.card}>
-      <VStack gap={3}>
-        <Heading level={2} xstyle={styles.cardTitle}>
-          {w.cardTitle}
-        </Heading>
-        <Text xstyle={styles.cardText}>{w.p1}</Text>
-        {/* The line that must be readable without scrolling at 320 x 568 (Mira, 03:00): second, and in bold. */}
-        <Text data-pam-danger="" xstyle={styles.cardStrong}>
-          {w.p2}
-        </Text>
-        <Text xstyle={styles.cardText}>{w.p3}</Text>
-        <Text xstyle={styles.cardText}>{w.p4}</Text>
-      </VStack>
-    </Card>
-  );
-}
 
 /** A line of small print drawn just above the composer (the build gives ThreadView a slot; Nico's). */
 function Above({ lines }: { readonly lines: readonly string[] }) {
@@ -298,7 +300,7 @@ function Above({ lines }: { readonly lines: readonly string[] }) {
  * the photo button only in the version Will can choose (Iris allows screenshots); the microphone stays. ThreadView's composer is not
  * built for any of this yet, so the drawing rewrites it after it mounts: the build gives ThreadView these as props (Nico's).
  */
-function PamComposer({ photo, placeholder }: { readonly photo: boolean; readonly placeholder?: string }) {
+function PamComposer({ photo, placeholder, draft = null }: { readonly photo: boolean; readonly placeholder?: string; readonly draft?: string | null }) {
   const w = useWords();
   const text = placeholder ?? w.composerPlaceholder;
   useEffect(() => {
@@ -314,19 +316,122 @@ function PamComposer({ photo, placeholder }: { readonly photo: boolean; readonly
       for (const el of c.querySelectorAll<HTMLElement>('div')) {
         if (el.children.length === 0 && /^(Write a message|اكتب رسالة)/.test(el.textContent ?? '')) el.textContent = text;
       }
+      // A failed text keeps its words in the box (drawing only: the build keeps the draft in state).
+      if (draft) {
+        const field = c.querySelector<HTMLElement>('[contenteditable], [role="textbox"]');
+        if (field && field.textContent !== draft) field.textContent = draft;
+        for (const el of c.querySelectorAll<HTMLElement>('div')) {
+          if (el.children.length === 0 && el.textContent === text) el.style.display = 'none';
+        }
+      }
     };
     apply();
     const observer = new MutationObserver(apply);
     observer.observe(document.body, { childList: true, subtree: true, characterData: true });
     return () => observer.disconnect();
-  }, [photo, text]);
+  }, [photo, text, draft]);
   return null;
 }
 
-type Msg = { readonly id: string; readonly body: string; readonly createdAt: string; readonly mine: boolean };
+
+/**
+ * What a message in flight looks like (Will, 18 October: "this has to work better than anything else in the app"). The words and the
+ * ways are one set for a text and a photo: in flight, "Sending…" under the bubble (a photo has a ring of progress over it, with a
+ * cross to stop it); once it is there, a quiet "Sent" under the last message only; and when it fails, the message STAYS in the
+ * thread with a red outline and "Not sent" and a 48px "Try again" under it, so nothing is lost and one tap sends it again. The
+ * thread's own bubbles do not know these states yet (ThreadView's messages carry no status), so the drawing adds them to the last
+ * bubble after it mounts; the build gives each message a `status`.
+ */
+type Status = 'text-failed' | 'photo-sending' | 'photo-sent' | 'photo-failed';
+
+function StatusRow({ status }: { readonly status: Status }) {
+  const w = useWords();
+  const failed = status === 'text-failed' || status === 'photo-failed';
+  return (
+    <HStack gap={1} align="center" justify="end" xstyle={styles.statusRow}>
+      {failed ? (
+        <>
+          <Text xstyle={styles.statusError}>{w.notSent}</Text>
+          <Button label={w.tryAgain} variant="ghost" xstyle={styles.statusRetry} />
+        </>
+      ) : status === 'photo-sending' ? (
+        <Text xstyle={styles.statusQuiet}>{w.sendingLabel}</Text>
+      ) : (
+        <Text xstyle={styles.statusQuiet}>{w.sentLabel}</Text>
+      )}
+    </HStack>
+  );
+}
+
+function PhotoOverlay({ status }: { readonly status: 'photo-sending' | 'photo-failed' }) {
+  const failed = status === 'photo-failed';
+  const [box, setBox] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
+  useEffect(() => {
+    const place = () => {
+      const img = document.querySelector<HTMLElement>('article.astryx-chat-message:last-of-type .astryx-chat-message-bubble img');
+      if (img) setBox({ left: img.offsetLeft, top: img.offsetTop, width: img.offsetWidth, height: img.offsetHeight });
+    };
+    place();
+    const id = window.setInterval(place, 400);
+    return () => window.clearInterval(id);
+  }, []);
+  return (
+    <div {...stylex.props(styles.overlay)} style={box ? { ...box, inset: 'auto' } : undefined}>
+      <svg width="48" height="48" viewBox="0 0 48 48" aria-hidden>
+        <circle cx="24" cy="24" r="19" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="4" />
+        {failed ? (
+          <path d="M24 14v13M24 33v1" stroke="#fff" strokeWidth="4" strokeLinecap="round" fill="none" />
+        ) : (
+          <>
+            <circle cx="24" cy="24" r="19" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeDasharray="74 120" transform="rotate(-90 24 24)" />
+            <path d="M17 17l14 14M31 17L17 31" stroke="#fff" strokeWidth="3" strokeLinecap="round" fill="none" />
+          </>
+        )}
+      </svg>
+    </div>
+  );
+}
+
+function Decorate({ status }: { readonly status: Status }) {
+  const [hosts, setHosts] = useState<{ row: HTMLElement; bubble: HTMLElement } | null>(null);
+  useEffect(() => {
+    const find = () => {
+      const articles = document.querySelectorAll<HTMLElement>('article.astryx-chat-message');
+      const last = articles[articles.length - 1];
+      const bubble = last?.querySelector<HTMLElement>('.astryx-chat-message-bubble');
+      if (!last || !bubble) return;
+      let row = last.nextElementSibling instanceof HTMLElement && last.nextElementSibling.hasAttribute('data-pam-status') ? last.nextElementSibling : null;
+      if (!row) {
+        row = document.createElement('div');
+        row.setAttribute('data-pam-status', '');
+        // The status sits on its own line under the last message, after it in the list, on the side the bubble is on.
+        row.style.display = 'flex';
+        row.style.justifyContent = 'flex-end';
+        row.style.paddingInline = '12px';
+        last.after(row);
+      }
+      bubble.style.position = 'relative';
+      if (status === 'text-failed' || status === 'photo-failed') bubble.style.outline = '2px solid light-dark(#a11d1d, #ff8a8a)';
+      setHosts((prev) => (prev && prev.row === row && prev.bubble === bubble ? prev : { row: row!, bubble }));
+    };
+    find();
+    const observer = new MutationObserver(find);
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [status]);
+  if (!hosts) return null;
+  return (
+    <>
+      {createPortal(<StatusRow status={status} />, hosts.row)}
+      {status === 'photo-sending' || status === 'photo-failed' ? createPortal(<PhotoOverlay status={status} />, hosts.bubble) : null}
+    </>
+  );
+}
+
+type Msg = { readonly id: string; readonly body: string | null; readonly photoUrl?: string; readonly createdAt: string; readonly mine: boolean };
 
 /** A Pam thread as the person sees it: Pam's mark, the card at the top, the messages, the composer. */
-function PersonThread({ messages, intro, photo = false }: { readonly messages: readonly Msg[]; readonly intro?: ReactNode; readonly photo?: boolean }) {
+function PersonThread({ messages, status = null, draft = null }: { readonly messages: readonly Msg[]; readonly status?: Status | null; readonly draft?: string | null }) {
   const w = useWords();
   const { locale } = useI18n();
   return (
@@ -339,55 +444,17 @@ function PersonThread({ messages, intro, photo = false }: { readonly messages: r
         messages={messages}
         otherName={w.pam}
         otherPhotoUrl={PAM_MARK}
-        intro={
-          <VStack gap={3} xstyle={styles.full}>
-            {/* The same intro every conversation has (D-526): Pam's mark and "Pam"; once it scrolls away the bar carries the name. */}
-            <ThreadIntro name={w.pam} photoUrl={PAM_MARK} context={null} />
-            <PamCard />
-            {intro}
-          </VStack>
-        }
+        // The same intro every conversation has (D-526), Pam's mark centred over "Pam"; once it scrolls away the bar carries the name.
+        // Nothing else: no card, no strip, no list of terms (Will, 18 October).
+        intro={<ThreadIntro name={w.pam} photoUrl={PAM_MARK} context={null} />}
         onSend={async () => true}
         sending={false}
         sendFailed={false}
         speechLanguage={locale === 'ar' ? 'ar' : 'en-US'}
       />
-      <PamComposer photo={photo} />
+      <PamComposer photo draft={draft} />
+      {status ? <Decorate status={status} /> : null}
     </ThreadFrame>
-  );
-}
-
-/** The first view: nothing written yet, the card and the composer. */
-function ThreadEmpty({ photo = false }: { readonly photo?: boolean }) {
-  return <PersonThread messages={[]} photo={photo} />;
-}
-
-/** After the first message: the automatic reply, then a person's answer. */
-function ThreadAfter() {
-  const w = useWords();
-  return (
-    <PersonThread
-      messages={[
-        { id: 'm1', body: w.mine1, createdAt: minutesAgo(190), mine: true },
-        { id: 'm2', body: `${w.autoLabel}\n${w.auto}`, createdAt: minutesAgo(189), mine: false },
-        { id: 'm3', body: w.pam1, createdAt: minutesAgo(40), mine: false },
-      ]}
-    />
-  );
-}
-
-/** Version B only: Pam wrote first, and says so. */
-function ThreadPamStarted() {
-  const w = useWords();
-  return (
-    <PersonThread
-      messages={[{ id: 'm1', body: w.pamStart, createdAt: minutesAgo(30), mine: false }]}
-      intro={
-        <Text type="supporting" xstyle={styles.cardText}>
-          {w.started}
-        </Text>
-      }
-    />
   );
 }
 
@@ -400,7 +467,7 @@ function HelpWrite({ first = false }: { readonly first?: boolean }) {
     { id: 'safety', label: w.safety, href: '/help/safety/', icon: <ShieldIcon {...icon} /> },
     { id: 'place', label: w.place, href: '/help/report-place/', icon: <PlacesIcon {...icon} /> },
   ];
-  const write = { id: 'write', label: w.helpRow, description: w.helpHint, href: '/messages/thread/?pam=1', icon: <MessagesIcon {...icon} /> };
+  const write = { id: 'write', label: w.helpRow, href: '/messages/thread/?pam=1', icon: <MessagesIcon {...icon} /> };
   return (
     <Page gap={4}>
       <LargeTitleHeader title={w.help} actions={<HeaderActions />} />
@@ -423,22 +490,23 @@ function HelpWrite({ first = false }: { readonly first?: boolean }) {
 const rowFor = (w: W, kind: 'fresh' | 'wrote'): MessageRow => ({
   id: 'pam',
   name: w.pam,
-  context: kind === 'fresh' ? w.rowLine : null,
-  preview: kind === 'fresh' ? w.rowLine : w.pamRowLine,
-  when: kind === 'fresh' ? null : w.when1,
-  unread: kind === 'wrote',
+  // From day one the row carries the welcome's first line, unread (Will, 18 October); later, the last thing said.
+  context: null,
+  preview: kind === 'fresh' ? w.welcomeLine : w.pamRowLine,
+  when: w.when1,
+  unread: true,
   href: '/messages/thread/?pam=1',
   photoUrl: PAM_MARK,
 });
 
-function MemberMessages({ kind }: { readonly kind: 'none' | 'fresh' | 'wrote' | 'wrote-others' }) {
+function MemberMessages({ kind }: { readonly kind: 'none' | 'fresh' | 'fresh-others' | 'wrote' | 'wrote-others' }) {
   const w = useWords();
   const others: MessageRow[] = [
     { id: 'cm', name: w.caseManager, context: w.cmContext, preview: w.cmLine, when: w.when2, unread: false, href: '/messages/thread/?id=cm' },
     { id: 'prog', name: w.program, context: w.programContext, preview: w.programLine, when: w.when2, unread: false, href: '/messages/thread/?id=prog' },
   ];
   const rows: MessageRow[] =
-    kind === 'none' ? [] : kind === 'fresh' ? [rowFor(w, 'fresh')] : kind === 'wrote' ? [rowFor(w, 'wrote')] : [rowFor(w, 'wrote'), ...others];
+    kind === 'none' ? [] : kind === 'fresh' ? [rowFor(w, 'fresh')] : kind === 'fresh-others' ? [rowFor(w, 'fresh'), ...others] : kind === 'wrote' ? [rowFor(w, 'wrote')] : [rowFor(w, 'wrote'), ...others];
   return <MessagesView rows={rows} emptyBody={w.emptyBody} headerActions={<HeaderActions />} />;
 }
 
@@ -552,7 +620,7 @@ function AdminThread({ kind }: { readonly kind: 'answering' | 'new-member' | 'ne
         sendFailed={false}
         speechLanguage={locale === 'ar' ? 'ar' : 'en-US'}
       />
-      <PamComposer photo={false} placeholder={kind === 'answering' ? w.replyAs : w.writeAs} />
+      <PamComposer photo placeholder={kind === 'answering' ? w.replyAs : w.writeAs} />
       <Above lines={[kind === 'answering' ? w.sees : kind === 'new-member' ? w.seesNew : w.seesProgram]} />
     </ThreadFrame>
   );
@@ -605,57 +673,57 @@ function ProgramPage() {
   );
 }
 
-/** Option C (B plus a way to turn it off), the one-time notice: the app's own alert banner at the top of the page, dismissible. */
-function NoticeC() {
-  const w = useWords();
-  return (
-    <>
-      <AlertBannerHost banner={{ status: 'info', title: w.cTitle, description: w.cBody }} onDismiss={() => {}} />
-      <MemberMessages kind="fresh" />
-    </>
-  );
-}
-
-/** Option C, the Profile switch: off means Pam only answers. */
-function ProfileSwitch() {
-  const w = useWords();
-  const icon = { width: 26, height: 26, 'aria-hidden': true } as const;
-  const [on, setOn] = useState(true);
-  return (
-    <Page gap={4}>
-      <LargeTitleHeader title={w.profile} actions={<HeaderActions />} />
-      <Text xstyle={styles.group}>{w.pMessages}</Text>
-      <Card padding={4}>
-        <HStack gap={3} align="center" wrap="nowrap">
-          <VStack gap={1} xstyle={styles.switchWords}>
-            <Text xstyle={styles.switchLabel}>{w.cSwitch}</Text>
-            <Text type="supporting" xstyle={styles.ctx}>
-              {w.cHint}
-            </Text>
-          </VStack>
-          <Switch label={w.cSwitch} isLabelHidden value={on} changeAction={setOn} />
-        </HStack>
-      </Card>
-      <MenuList
-        label={w.profile}
-        items={[
-          { id: 'language', label: w.pLanguage, href: '/language/', icon: <GlobeIcon {...icon} /> },
-          { id: 'alerts', label: w.pAlerts, href: '/alerts/', icon: <MessagesIcon {...icon} /> },
-          { id: 'calendar', label: w.pCalendar, href: '/calendar/', icon: <PlacesIcon {...icon} /> },
-        ]}
-      />
-    </Page>
-  );
-}
-
 const member = (path: string) => asRedesign('member', path);
 const admin = (path: string) => asRedesign('super-admin', path);
 
-// Both versions
-/** The first view of a Pam thread: the card (who reads, 911 and 988, what Pam can't do, who sees it) and the composer. */
-export const X1_ThreadEmpty: Story = { ...member('/messages/thread/'), render: () => <ThreadEmpty /> };
-/** After the first message: the automatic reply (labelled), then a person's answer, all from Pam. */
-export const X2_ThreadAfterFirstMessage: Story = { ...member('/messages/thread/'), render: () => <ThreadAfter /> };
+
+const NOW2 = (m: number) => new Date(Date.now() - m * 60_000).toISOString();
+const PHOTO = '/onboarding/hero-city.webp';
+
+/** Pam's welcome is the first message, there from day one: the thread is never empty. */
+function pamThread(kind: 'welcome' | 'out-of-hours' | 'text-failed' | 'draft-kept' | 'photo-sending' | 'photo-sent' | 'photo-failed') {
+  return function PamThreadStory() {
+    const w = useWords();
+    const welcome: Msg = { id: 'w', body: w.welcome, createdAt: NOW2(300), mine: false };
+    const mine: Msg = { id: 'm', body: w.mine1, createdAt: NOW2(20), mine: true };
+    const photo: Msg = { id: 'p', body: null, photoUrl: PHOTO, createdAt: NOW2(2), mine: true };
+    if (kind === 'welcome') return <PersonThread messages={[welcome]} />;
+    if (kind === 'out-of-hours') return <PersonThread messages={[welcome, mine, { id: 'a', body: w.outHours, createdAt: NOW2(19), mine: false }]} />;
+    if (kind === 'text-failed') return <PersonThread messages={[welcome, mine]} status="text-failed" />;
+    if (kind === 'draft-kept') return <PersonThread messages={[welcome]} draft={w.mine1} />;
+    return <PersonThread messages={[welcome, photo]} status={kind} />;
+  };
+}
+const ThreadWelcome = pamThread('welcome');
+const ThreadOutOfHours = pamThread('out-of-hours');
+const ThreadTextFailed = pamThread('text-failed');
+const ThreadDraftKept = pamThread('draft-kept');
+const ThreadPhotoSending = pamThread('photo-sending');
+const ThreadPhotoSent = pamThread('photo-sent');
+const ThreadPhotoFailed = pamThread('photo-failed');
+
+// The member's side, clean (Will's answer on a100: B; "messaging Pam should feel like messaging anyone else")
+/** P1: Pam's welcome is the first message from day one; the header is the mark centred over "Pam"; the composer has the microphone, the photo button and Send. */
+export const P1_ThreadWelcome: Story = { ...member('/messages/thread/'), render: () => <ThreadWelcome /> };
+/** P2: written to outside business hours: their message, then Pam's automatic reply saying when Pam is back, with one 988 line. Not labelled: it reads like any reply. */
+export const P2_ThreadOutOfHours: Story = { ...member('/messages/thread/'), render: () => <ThreadOutOfHours /> };
+/** P3: a text that did not send stays in the thread, outlined, with "Not sent" and Try again under it (a 48px target). Nothing is lost. */
+export const P3_TextFailed: Story = { ...member('/messages/thread/'), render: () => <ThreadTextFailed /> };
+/** P3b: the other way to keep a draft: the words stay in the box and the line above says so (shown for comparison). */
+export const P3b_TextFailedDraftInBox: Story = { ...member('/messages/thread/'), render: () => <><ThreadDraftKept /><Above lines={[WORDS.en.stillHere]} /></> };
+/** P4: a photo on its way: dimmed, a ring of progress with a cross to stop it, "Sending…" under it. */
+export const P4_PhotoSending: Story = { ...member('/messages/thread/'), render: () => <ThreadPhotoSending /> };
+/** P5: the photo is there: the picture as sent, and a quiet "Sent" under the last message. */
+export const P5_PhotoSent: Story = { ...member('/messages/thread/'), render: () => <ThreadPhotoSent /> };
+/** P6: a photo that did not send stays, dimmed with an alert mark, "Not sent" and Try again under it. */
+export const P6_PhotoFailed: Story = { ...member('/messages/thread/'), render: () => <ThreadPhotoFailed /> };
+/** P7: Messages from day one: Pam's row with the welcome's first line, unread, alone; and with others. */
+export const P7_MessagesDayOne: Story = { ...member('/messages/'), render: () => <MemberMessages kind="fresh" /> };
+export const P7b_MessagesDayOneWithOthers: Story = { ...member('/messages/'), render: () => <MemberMessages kind="fresh-others" /> };
+/** P8: Help: the answers first, then "Write to Pam" with no hint. (X3 is the same screen.) */
+export const P8_HelpWriteToPam: Story = { ...member('/help/'), render: () => <HelpWrite /> };
+
+// The super admin's side (unchanged, plus photos in the composer)
 /** Help: the answers first, "Write to Pam" last, with its hint. */
 export const X3_HelpWriteToPam: Story = { ...member('/help/'), render: () => <HelpWrite /> };
 /** The super admin's Home: Messages to Pam is the first row, with a plain count of the conversations waiting. */
@@ -666,25 +734,9 @@ export const X5_AdminInbox: Story = { ...admin('/pam/messages/'), render: () => 
 export const X6_AdminThread: Story = { ...admin('/messages/thread/'), render: () => <AdminThread kind="answering" /> };
 
 // Version A (Iris's smallest v1)
-/** A: a member with nobody else has no Pam row, and the Messages tab says what it always did. */
-export const A1_MessagesBeforeWriting: Story = { ...member('/messages/'), render: () => <MemberMessages kind="none" /> };
-/** A: once the person has written, Pam is a row, with the answer unread. */
-export const A2_MessagesAfterWriting: Story = { ...member('/messages/'), render: () => <MemberMessages kind="wrote" /> };
-/** A: the super admin can only answer, so Everyone has no message button on any row (Mira, 03:16; Ava's A kept staff rows' button). */
-export const A3_AdminEveryone: Story = { ...admin('/directory/'), render: () => <Everyone version="A" /> };
 
-/** A: Help with "Write to Pam" as the first row, as Mira's 03:16 note read; X3 has it under the answers, as Iris's research puts it. */
-export const A4_HelpWriteFirst: Story = { ...member('/help/'), render: () => <HelpWrite first /> };
-/** The composer with the photo button too, for the version Will can choose (Iris allows screenshots). */
-export const X7_ThreadWithPhoto: Story = { ...member('/messages/thread/'), render: () => <ThreadEmpty photo /> };
 
 // Version B (Nico's plan)
-/** B: Pam is in everyone's Messages from the start, "Write to Pam" until the first message. */
-export const B1_MessagesPamRow: Story = { ...member('/messages/'), render: () => <MemberMessages kind="fresh" /> };
-/** B: and with others in the list once they have a conversation. */
-export const B1b_MessagesWithOthers: Story = { ...member('/messages/'), render: () => <MemberMessages kind="wrote-others" /> };
-/** B: a thread Pam started says so. */
-export const B2_PamStarted: Story = { ...member('/messages/thread/'), render: () => <ThreadPamStarted /> };
 /** B: Everyone has a message button on every row. */
 export const B3_AdminEveryone: Story = { ...admin('/directory/'), render: () => <Everyone version="B" /> };
 /** B: "Message this program" on a program's page. */
@@ -695,25 +747,19 @@ export const B5_AdminStartsMember: Story = { ...admin('/messages/thread/'), rend
 export const B6_AdminStartsProgram: Story = { ...admin('/messages/thread/'), render: () => <AdminThread kind="new-program" /> };
 
 // Option C (Sage, ledger 7b280684)
-/** C1: the one-time notice, where the app already puts one: a dismissible banner across the top of the page. */
-export const C1_OneTimeNotice: Story = { ...member('/messages/'), render: () => <NoticeC /> };
-/** C2: Profile's switch. On by default; off, Pam only answers. */
-export const C2_ProfileSwitch: Story = { ...member('/profile/'), render: () => <ProfileSwitch /> };
 
 const arabic = { globals: { locale: 'ar' } } as const;
-export const X1_ThreadEmpty_Arabic: Story = { ...X1_ThreadEmpty, ...arabic };
-export const X2_ThreadAfterFirstMessage_Arabic: Story = { ...X2_ThreadAfterFirstMessage, ...arabic };
+export const P1_ThreadWelcome_Arabic: Story = { ...P1_ThreadWelcome, ...arabic };
+export const P2_ThreadOutOfHours_Arabic: Story = { ...P2_ThreadOutOfHours, ...arabic };
+export const P3_TextFailed_Arabic: Story = { ...P3_TextFailed, ...arabic };
+export const P3b_TextFailedDraftInBox_Arabic: Story = { ...P3b_TextFailedDraftInBox, ...arabic };
+export const P4_PhotoSending_Arabic: Story = { ...P4_PhotoSending, ...arabic };
+export const P5_PhotoSent_Arabic: Story = { ...P5_PhotoSent, ...arabic };
+export const P6_PhotoFailed_Arabic: Story = { ...P6_PhotoFailed, ...arabic };
+export const P7_MessagesDayOne_Arabic: Story = { ...P7_MessagesDayOne, ...arabic };
+export const P8_HelpWriteToPam_Arabic: Story = { ...P8_HelpWriteToPam, ...arabic };
 export const X3_HelpWriteToPam_Arabic: Story = { ...X3_HelpWriteToPam, ...arabic };
 export const X4_AdminHome_Arabic: Story = { ...X4_AdminHome, ...arabic };
 export const X5_AdminInbox_Arabic: Story = { ...X5_AdminInbox, ...arabic };
-export const A4_HelpWriteFirst_Arabic: Story = { ...A4_HelpWriteFirst, ...arabic };
-export const X7_ThreadWithPhoto_Arabic: Story = { ...X7_ThreadWithPhoto, ...arabic };
 export const X6_AdminThread_Arabic: Story = { ...X6_AdminThread, ...arabic };
-export const A1_MessagesBeforeWriting_Arabic: Story = { ...A1_MessagesBeforeWriting, ...arabic };
-export const A3_AdminEveryone_Arabic: Story = { ...A3_AdminEveryone, ...arabic };
-export const A2_MessagesAfterWriting_Arabic: Story = { ...A2_MessagesAfterWriting, ...arabic };
-export const B1_MessagesPamRow_Arabic: Story = { ...B1_MessagesPamRow, ...arabic };
-export const B2_PamStarted_Arabic: Story = { ...B2_PamStarted, ...arabic };
-export const C1_OneTimeNotice_Arabic: Story = { ...C1_OneTimeNotice, ...arabic };
-export const C2_ProfileSwitch_Arabic: Story = { ...C2_ProfileSwitch, ...arabic };
 export const B3_AdminEveryone_Arabic: Story = { ...B3_AdminEveryone, ...arabic };
