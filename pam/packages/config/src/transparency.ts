@@ -157,6 +157,10 @@ export type AdminVisibleField = (typeof ADMIN_CAN_SEE)[number];
 
 /** Explicitly NOT visible. Kept as data so tests can assert the negative. */
 export const ADMIN_CANNOT_SEE = [
+  /**
+   * True of the guide (a case manager) and of every conversation but one. The exception is a person's Pam conversation, which the Pam
+   * team reads: that is `PAM_TEAM_CAN_READ` below, a list of its own so this one is never widened by it (D-605).
+   */
   'message_bodies',
   /** D-394: photos in a conversation, outside a report — no admin policy on the bucket, as on `messages`. */
   'message_photos',
@@ -244,6 +248,27 @@ export const ADMIN_CANNOT_SEE = [
    */
   'member_location',
 ] as const;
+
+/**
+ * What the Pam team reads, and nothing else: a list of its own, apart from `ADMIN_CAN_SEE` (Lena recommended it and the merge desk took
+ * it, 18 October 2026), so the guide's list can never be widened by it and the two cannot be confused. `is_pam_team()` in the database is the
+ * only door to anything below, and today it is exactly `is_super_admin()`. Widening this list needs Will, and members are told first (D-413).
+ *
+ * The first and only entry came from Will's answers on card a100 (D-605, 18 October 2026): messaging Pam is a conversation in everyone's
+ * Messages that the Pam team reads, and Pam writes back. It is not behind a policy that exists yet: the policies arrive with migration 4 of
+ * the Message Pam build, and until the switch (`app_settings.pam_messaging_live`) is on, nothing is created for the team to read.
+ */
+export const PAM_TEAM_CAN_READ = [
+  /**
+   * The messages and photos a person writes in their one Pam conversation (`conversations.kind = 'support'`), and Pam's replies there. Read
+   * by `is_pam_team()` and nobody else: not a case manager, not a program, not another member. It reaches no other conversation, and a
+   * person's other conversations stay between them and the other person (`ADMIN_CANNOT_SEE.message_bodies`). Said to the person on the
+   * Privacy page, never inside the conversation (Will, 18 October: "Save it for the legal pages. Keep the UI clean.").
+   */
+  'messages_written_to_pam',
+] as const;
+
+export type PamTeamReadableField = (typeof PAM_TEAM_CAN_READ)[number];
 
 export type AdminHiddenField = (typeof ADMIN_CANNOT_SEE)[number];
 

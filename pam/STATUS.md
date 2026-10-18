@@ -1320,6 +1320,10 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · Message Pam, slice 0 and the first migrations (18 October 2026)
+
+Built, not live: Will's card a100 (D-605) makes messaging Pam the app's main channel, behind a switch that is off (`app_settings.pam_messaging_live`). This slice: `PAM_TEAM_CAN_READ` (the Pam team's own list; `ADMIN_CAN_SEE` untouched, D-606), a `support` conversation kind, a message that may have no author and says what it is by a key (a person cannot write one), and the switch and hours settings. Four migrations (`20261018071550` to `20261018071643`, the nullable sender alone in its file), test 79. Nothing creates a Pam conversation yet. The plan: `docs/design/plans/2026-10-18-message-pam-slices.md`.
+
 ## Messages & notifications · speaking a message says why it did not start (18 October 2026)
 
 Built, not live: in a conversation, every failure to start the microphone (refused, no microphone, no connection, a language it cannot hear, an unexpected code, a start that throws or never answers) puts one warning banner above the box, and "Listening" shows as soon as it starts. A browser with no speech recognition keeps the mic hidden (D-603; Mira's call). Ten English lines signed by Sage (a2703793), translated by Lena (f4d7e260). Proof: twelve cases in `messages.spec.ts` that fail on main 62ba50e4, `dictationProblem.test.ts`, `dictation-problems.test.ts`. No migration. Will to try it on his phone once live.
