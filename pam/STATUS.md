@@ -1642,6 +1642,10 @@ connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merge
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
 
+## Design system & Storybook · card audit (18 October)
+
+A list, not fixes: ten screens where a Card wraps one list or form, one borderline, four in the code but not pictured (`docs/design/review/2026-10-18-card-audit/`). Branch `claude/pam-design-card-audit`; the merge desk routes each to its owner after Will has seen it.
+
 ## Design system & Storybook · Explore bell and staff search (18 October)
 
 A member's Explore draws the bell only while something is unread; the staff Home's member search is a plain field (D-610). Branch `claude/pam-design-explore-bell`; waits on Mira. a86 (`claude/pam-design-search-bar-look`) takes it by merge next.
