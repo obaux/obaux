@@ -635,7 +635,7 @@
   "reminders.skip": "暂时不用",
   "reminders.stopped.title": "短信已关闭",
   "reminders.stopped.body": "您回复了 STOP，所以 Pam 不会再给您发短信。应用里的任何操作都无法重新开启短信。",
-  "reminders.title": "短信通知",
+  "reminders.title": "接收短信通知",
   "reminders.today.member": "Pam目前还不会发送其中任何一条。它们即将推出。",
   "reminders.today.staff": "Pam目前还不会发送其中任何一条。它们即将推出。",
   "reminders.what": "短信类型",

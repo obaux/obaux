@@ -635,7 +635,7 @@
   "reminders.skip": "暫時不用",
   "reminders.stopped.title": "短訊已關閉",
   "reminders.stopped.body": "您回覆了 STOP，所以 Pam 不會再傳短訊給您。應用程式內沒有任何操作可以重新開啟短訊。",
-  "reminders.title": "短訊通知",
+  "reminders.title": "接收短訊通知",
   "reminders.today.member": "Pam目前尚未發送其中任何一項。它們即將推出。",
   "reminders.today.staff": "Pam目前尚未發送其中任何一項。它們即將推出。",
   "reminders.what": "短訊類型",
