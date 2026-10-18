@@ -69,6 +69,8 @@ uniform vec3 uBlobB;      // lower body: yellow-green
 uniform vec3 uBlobC;      // lower body: green-teal
 uniform vec3 uBlobD;      // lower body: blue-grey
 uniform vec3 uBase;       // lower body base wash
+uniform vec3 uHighlight;  // glassy edge shine
+uniform float uGlass;     // 0 = flat, 1 = full refraction / shine
 
 const float CX    = 0.5;
 const float R     = 0.21;   // arch radius
@@ -81,6 +83,12 @@ float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.545
 float capsule(vec2 p, float r) {
   float y = clamp(p.y, BOT_Y, TOP_Y);
   return length(vec2(p.x - CX, p.y - y)) - r;
+}
+
+vec3 bands(float d, vec3 edge) {
+  vec3 c = mix(uYellow, uPink, smoothstep(0.03, 0.22, d));
+  c = mix(c, uYellow, smoothstep(0.36, 0.66, d));
+  return mix(c, edge, smoothstep(0.68, 0.98, d));
 }
 
 vec3 blob(vec3 acc, inout float wsum, vec2 p, vec2 c, float r, vec3 col) {
@@ -97,6 +105,7 @@ void main() {
   // ---- arch: slight breathing ------------------------------------
   float r = R + 0.004 * sin(t * 0.8) * uMotion;
   float sdf = capsule(p, r);
+  vec2 nrm = normalize(vec2(p.x - CX, p.y - clamp(p.y, BOT_Y, TOP_Y)) + 1e-5);   // outward edge normal
 
   // ---- banded pattern radiating from the spine --------------------
   float yTop = min(p.y, TOP_Y);
@@ -108,11 +117,11 @@ void main() {
   float pr = length(p - uPointer);
   d += 0.05 * uPress * sin(pr * 20.0 - t * 3.0) * exp(-pr * 3.5);
 
-  vec3 pat = uYellow;
-  pat = mix(pat, uPink,   smoothstep(0.03, 0.22, d));
-  pat = mix(pat, uYellow, smoothstep(0.36, 0.66, d));
+  // glass lens: bands bunch toward the rim, and R/G/B split slightly there
+  d = pow(clamp(d, 0.0, 1.2), 1.0 - 0.25 * uGlass);
+  float ca = 0.035 * uGlass * smoothstep(0.45, 1.0, d);
   vec3 edge = mix(uTan, uTop, smoothstep(0.45, 0.78, p.y));
-  pat = mix(pat, edge,    smoothstep(0.68, 0.98, d));
+  vec3 pat = vec3(bands(d * (1.0 - ca), edge).r, bands(d, edge).g, bands(d * (1.0 + ca), edge).b);
 
   // ---- lower body: soft drifting colour blobs ---------------------
   float ws = 0.12;
@@ -131,9 +140,12 @@ void main() {
   float mask = 1.0 - smoothstep(-soft, soft, sdf);
 
   // ---- backdrop ---------------------------------------------------
-  float dx = abs(p.x - CX);
-  float up = smoothstep(0.66, 0.12, p.y + 0.10 * dx);        // glow strength, grows downward
-  vec3 glow = mix(uGlowRed, uGlowOrange, smoothstep(0.34, 0.04, p.y));
+  // refraction: the glow bends around the glass, with standing ripples off the edge
+  vec2 pw = p - nrm * 0.035 * uGlass * exp(-max(sdf, 0.0) * 12.0);
+  float rip = sin(sdf * 62.0 + sin(p.y * 7.0 + t * 0.4) * 1.6 - t * 1.6) * exp(-max(sdf, 0.0) * 7.0) * step(0.0, sdf);
+  float dx = abs(pw.x - CX);
+  float up = smoothstep(0.66, 0.12, pw.y + 0.10 * dx);
+  vec3 glow = mix(uGlowRed, uGlowOrange, smoothstep(0.34, 0.04, pw.y));
   vec3 bg = mix(uBg, glow, up);
   // vignette in the lower corners
   bg *= 1.0 - 0.3 * smoothstep(0.40, 0.75, length(p - vec2(0.5, 0.25)));
@@ -142,9 +154,17 @@ void main() {
   float rimY = smoothstep(0.30, 0.42, p.y) * smoothstep(0.62, 0.50, p.y);
   float rim = exp(-max(sdf, 0.0) * 14.0) * rimY;
   bg = mix(bg, uEdgeGlow, rim * 0.85);
+  bg += uGlowRed * 0.04 * uGlass * rip * (0.4 + up);
   bg = max(bg, uBg);
 
   vec3 col = mix(bg, bodyCol, mask);
+
+  // specular rim on the lit (upper-left) side, faint inner shade opposite
+  float inside = max(-sdf, 0.0) * step(0.0, -sdf);
+  float lit = pow(max(dot(nrm, normalize(vec2(-0.55, 0.8))), 0.0), 2.5);
+  float zone = smoothstep(0.38, 0.70, p.y);
+  col += uHighlight * exp(-inside * 110.0) * step(0.0, -sdf) * lit * zone * 0.8 * uGlass;
+  col *= 1.0 - 0.18 * uGlass * exp(-inside * 45.0) * step(0.0, -sdf) * (1.0 - lit) * zone;
 
   // dither to hide banding in the big gradients
   col += (hash(gl_FragCoord.xy + fract(uTime)) - 0.5) / 255.0;
@@ -171,11 +191,12 @@ const PALETTE = {
   uBlobC:      '#86cfa0',
   uBlobD:      '#a9b9c9',
   uBase:       '#dcc0b4',
+  uHighlight:  '#ffffff',
 };
 const LABELS = {
   uBg: 'Background', uGlowRed: 'Glow · red', uGlowOrange: 'Glow · orange', uEdgeGlow: 'Rim glow',
   uTop: 'Cap green', uYellow: 'Bands yellow', uPink: 'Ring pink', uTan: 'Edge tan',
-  uBlobA: 'Body · pink', uBlobB: 'Body · yellow', uBlobC: 'Body · green', uBlobD: 'Body · blue', uBase: 'Body base',
+  uBlobA: 'Body · pink', uBlobB: 'Body · yellow', uBlobC: 'Body · green', uBlobD: 'Body · blue', uBase: 'Body base', uHighlight: 'Edge shine',
 };
 
 // ---------------------------------------------------------------- GL
@@ -197,9 +218,10 @@ gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false,
 const U = n => gl.getUniformLocation(prog, n);
 
 const hex2rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
-const state = { speed: 1, motion: 1, playing: true, time: 0, px: .5, py: .5, tx: .5, ty: .5, press: 0, tpress: 0 };
+const state = { speed: 1, motion: 1, playing: true, time: 0, px: .5, py: .5, tx: .5, ty: .5, press: 0, tpress: 0, glass: 0.7 };
 const params = new URLSearchParams(location.search);
 if (params.has('t'))      { state.time = +params.get('t'); }
+if (params.has('glass'))  { state.glass = +params.get('glass'); }
 if (params.has('motion')) { state.motion = +params.get('motion'); }
 
 function resize() {
@@ -214,6 +236,7 @@ function draw() {
   gl.uniform2f(U('uRes'), canvas.width, canvas.height);
   gl.uniform1f(U('uTime'), state.time);
   gl.uniform1f(U('uMotion'), state.motion);
+  gl.uniform1f(U('uGlass'), state.glass);
   gl.uniform2f(U('uPointer'), state.px, state.py);
   gl.uniform1f(U('uPress'), state.press);
   for (const k in PALETTE) gl.uniform3fv(U(k), hex2rgb(PALETTE[k]));
@@ -252,9 +275,11 @@ for (const k in PALETTE) {
 }
 panel.insertAdjacentHTML('beforeend', `<h2 style="margin-top:12px">Motion</h2>
   <div class="row"><span>Amount</span><input id="motion" type="range" min="0" max="2" step=".05" value="${state.motion}"></div>
+  <div class="row"><span>Glass</span><input id="glass" type="range" min="0" max="1.5" step=".05" value="${state.glass}"></div>
   <div class="row"><span>Speed</span><input id="speed" type="range" min="0" max="3" step=".05" value="${state.speed}"></div>
   <button id="pause">Pause</button><button id="png">Save PNG</button>`);
 panel.querySelector('#motion').oninput = e => state.motion = +e.target.value;
+panel.querySelector('#glass').oninput  = e => state.glass  = +e.target.value;
 panel.querySelector('#speed').oninput  = e => state.speed  = +e.target.value;
 const pauseBtn = panel.querySelector('#pause');
 const togglePlay = () => { state.playing = !state.playing; pauseBtn.textContent = state.playing ? 'Pause' : 'Play'; };
@@ -279,6 +304,7 @@ window.art = {
   setColors(map) { for (const k in map) if (k in PALETTE) { PALETTE[k] = map[k]; if (inputs[k]) inputs[k].value = map[k]; } },
   setSpeed(v)  { state.speed = v; },
   setMotion(v) { state.motion = v; },
+  setGlass(v)  { state.glass = v; },
   play()  { state.playing = true; },
   pause() { state.playing = false; },
 };
