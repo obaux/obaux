@@ -321,7 +321,6 @@
   "pam.hours.days.every": "Every day",
   "pam.hours.zone.eastern": "Eastern",
   "messages.pam.placeholder": "Write to Pam",
-  "help.writeToPam": "Write to Pam",
   "messages.thread.someone": "This person",
   "messages.title": "Messages",
   "messages.preview.you": "You: {text}",

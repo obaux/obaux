@@ -355,7 +355,6 @@
   "pam.hours.days.every": "كل يوم",
   "pam.hours.zone.eastern": "التوقيت الشرقي",
   "messages.pam.placeholder": "اكتب إلى Pam",
-  "help.writeToPam": "اكتب إلى Pam",
   "messages.thread.someone": "هذا الشخص",
   "messages.title": "الرسائل",
   "messages.preview.you": "أنت: {text}",

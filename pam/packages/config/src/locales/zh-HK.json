@@ -335,7 +335,6 @@
   "pam.hours.days.every": "每日",
   "pam.hours.zone.eastern": "美國東部時間",
   "messages.pam.placeholder": "傳訊息給 Pam",
-  "help.writeToPam": "傳訊息給 Pam",
   "messages.thread.someone": "這個人",
   "messages.title": "訊息",
   "messages.preview.you": "您：{text}",

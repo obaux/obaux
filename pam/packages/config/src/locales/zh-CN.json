@@ -335,7 +335,6 @@
   "pam.hours.days.every": "每天",
   "pam.hours.zone.eastern": "美国东部时间",
   "messages.pam.placeholder": "给 Pam 发消息",
-  "help.writeToPam": "给 Pam 发消息",
   "messages.thread.someone": "这个人",
   "messages.title": "消息",
   "messages.preview.you": "您：{text}",
