@@ -102,6 +102,9 @@ export function createReporter(deps: ReporterDeps): (report: AppErrorReport) => 
   };
 }
 
+/** What an action answers when the screen draws the failure itself (`useMalfunction().show`): the code is already a closed shape. */
+export type ActionResult = { readonly ok: true } | { readonly ok: false; readonly code: string };
+
 /**
  * The code for a caught failure: `offline` when the phone has no network, `timeout` for an abort, else the error's own status or
  * SQLSTATE if it has one of the closed shapes (anything else becomes `unknown` when it is reported). Never its message.

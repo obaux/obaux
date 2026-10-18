@@ -500,4 +500,22 @@ test.describe('The reminders screen with a yes already on file (Iris C2)', () =>
     await expect(page.getByRole('button', { name: 'Agree to receive texts' })).toBeVisible();
     await expect(page.getByText('Saved.', { exact: true })).toHaveCount(0);
   });
+
+  test('a save that fails shows the small alert, not a card, and tells the error log (D-616)', async ({ page }) => {
+    const reports: Record<string, unknown>[] = [];
+    await page.route('**/rest/v1/rpc/report_app_error', (route) => {
+      reports.push(route.request().postDataJSON() as Record<string, unknown>);
+      return route.fulfill(json(false));
+    });
+    await signedInAs(page, 'member', null, 'on');
+    await page.route(PREFS, (route) => (route.request().method() === 'GET' ? route.fulfill(json(null)) : route.fulfill({ status: 500, contentType: 'application/json', body: '{}' })));
+    await page.goto('/reminders/');
+    await settled(page);
+    await page.getByRole('button', { name: 'Agree to receive texts' }).click();
+    await expect(page.getByRole('alert').filter({ hasText: "That didn't go through" })).toBeVisible();
+    await expect(page.getByText('Something went wrong')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Agree to receive texts' })).toBeEnabled();
+    await expect.poll(() => reports.length).toBe(1);
+    expect(reports[0]).toMatchObject({ p_action: 'reminders.agree' });
+  });
 });

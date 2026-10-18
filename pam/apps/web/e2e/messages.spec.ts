@@ -986,6 +986,41 @@ test.describe('a conversation', () => {
     expect(calls).toEqual(['block', 'unblock']);
   });
 
+  test('a block or a report that fails shows the small alert at the bottom, stays on the screen, and tells the error log (D-616)', async ({ page }) => {
+    const reports: Record<string, unknown>[] = [];
+    await page.route('**/rest/v1/rpc/report_app_error', (route) => {
+      reports.push(route.request().postDataJSON() as Record<string, unknown>);
+      return route.fulfill(json(false));
+    });
+    await signedInAs(page, 'member');
+    await withOneConversation(page);
+    await page.route('**/rest/v1/rpc/conversation_block_state*', (route) => route.fulfill(json([{ i_blocked: false, blocked_me: false }])));
+    await page.route('**/rest/v1/rpc/block_in_conversation*', (route) => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));
+    await page.route(REPORT, (route) => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));
+    await page.goto(`/messages/thread/options/?id=${CONVO}`);
+    await settled(page);
+
+    await page.getByRole('button', { name: 'Block this person' }).click();
+    await page.getByRole('button', { name: 'Block', exact: true }).click();
+    const alert = page.getByRole('alert').filter({ hasText: "That didn't go through" });
+    await expect(alert).toBeVisible();
+    // No card in the page, and the person is still where they can try again.
+    await expect(page.getByText('Something went wrong')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'Block this person?' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Block', exact: true })).toBeEnabled();
+    await expect.poll(() => reports.length).toBe(1);
+    expect(reports[0]).toMatchObject({ p_action: 'messages.block' });
+
+    await page.goto(`/messages/thread/report/?id=${CONVO}`);
+    await settled(page);
+    await page.getByRole('button', { name: 'Send report' }).click();
+    await expect(page.getByRole('alert').filter({ hasText: "That didn't go through" })).toBeVisible();
+    await expect(page.getByText('Something went wrong')).toHaveCount(0);
+    await expect.poll(() => reports.length).toBe(2);
+    expect(reports[1]).toMatchObject({ p_action: 'messages.report' });
+    expect(JSON.stringify(reports)).not.toMatch(/Is the class still|reason/i);
+  });
+
   test('in a blocked conversation the composer gives way to a notice, and the messages stay', async ({ page }) => {
     for (const [who, state, title] of [
       ['I blocked them', { i_blocked: true, blocked_me: false }, 'You blocked this person'],
