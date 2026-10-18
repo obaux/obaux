@@ -82,3 +82,20 @@ $$;
 grant usage on schema storage to anon, authenticated, service_role;
 grant select, insert, update, delete on storage.objects to authenticated;
 grant select on storage.buckets to anon, authenticated;
+
+
+-- A stand-in for Supabase Vault (the real one is an extension this throwaway database does not have): a secrets table, the view that
+-- decrypts them (here, plain), and the function that makes one. Nobody but the database's owner can use it, as on the real project.
+create schema if not exists vault;
+create table if not exists vault.secrets (
+  id          uuid primary key default gen_random_uuid(),
+  name        text unique,
+  description text not null default '',
+  secret      text not null
+);
+create or replace view vault.decrypted_secrets as select id, name, description, secret as decrypted_secret from vault.secrets;
+create or replace function vault.create_secret(new_secret text, new_name text default null, new_description text default '', new_key_id uuid default null)
+returns uuid
+language sql
+as $$ insert into vault.secrets (name, description, secret) values (new_name, new_description, new_secret) returning id; $$;
+revoke all on schema vault from public, anon, authenticated, service_role;
