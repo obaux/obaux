@@ -82,10 +82,12 @@ For **each** row, offline and with a 15-second wait that then fails:
   replaced. There's no stale alert on the next screen.
 - **A5. Success is silent.** A save that succeeds after a 5 s wait moves the switch and shows no
   alert.
-- **A6. Slow, then success.** The switch has been called failed at 15 s, but the database then saves
-  it at 45 s. The switch doesn't then say off while the database says on. I record what's on screen at
-  16, 30 and 46 s, and whether a reload agrees. If they disagree, that's a finding: the person was
-  told it didn't go through when it did.
+- **A6. A late success shows the truth (a requirement, the desk at 21:32).** A save held for 45 s
+  that then succeeds: at 16 s the switch is back in its old place with the alert. When the answer
+  comes, the screen re-reads the saved value and the switch ends up **on**, matching the database.
+  The alert stays until the next tap. I check the screen at 14, 16, 30 and 46 s, check that a reload
+  agrees, and check that the re-read makes no second write. The same goes for a late failure (a 500
+  at 45 s): the switch stays off and nothing new is announced.
 - **A7. Mistakes stay inline.** A wrong sign-in code, and a field to correct (D-509), show their own
   line by the field and no bottom alert. Nothing is logged for them, since they aren't Pam's
   failures.
@@ -154,8 +156,8 @@ migration and, where it doesn't need PostGIS, run its functions in a throwaway P
   does, and nothing from the person who met the error.
 - **D8. No new host.** In the browser the only request a failure makes is to Pam's own database. My
   route log shows no other host asked.
-- **D9. Off means off.** With `app_errors_live` off, a failure makes no call to the writer. The alert
-  still shows to the person; the desk to confirm.
+- **D9. Off means off.** With `app_errors_live` off, a failure makes no call to the writer, and the
+  person still sees the alert (the desk, 21:32).
 - **D10. No account in the row:** no `profile_id`, no hash of one, and no device id. The request
   itself is authenticated, and that log is the platform's, kept a week, as Lena's read says.
 - **D11. Offline.** A failure while offline is logged once when back online, or not at all by design.
