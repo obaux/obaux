@@ -91,6 +91,15 @@ test.describe('a real account has no examples', () => {
 });
 
 test.describe('examples stay where they are asked for', () => {
+  test('Connections with people on it has no introduction line (D-608): the list says it', async ({ page }) => {
+    await page.addInitScript(() => sessionStorage.setItem('pam.examples', '1'));
+    await signedIn(page);
+    await page.goto('/connections/');
+    await settled(page);
+    await expect(page.getByText('Teresa').first()).toBeVisible();
+    await expect(page.getByText('The people on your side. Message them any time.')).toHaveCount(0);
+  });
+
   test('a demo (a tab that asked for examples) still sees the example badge and cast', async ({ page }) => {
     await page.addInitScript(() => sessionStorage.setItem('pam.examples', '1'));
     await signedIn(page);

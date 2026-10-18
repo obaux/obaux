@@ -190,8 +190,12 @@ export interface ThreadViewProps {
    * stays), and there is no limit notice: a limited account can write to Pam.
    */
   readonly pam?: boolean;
-  /** The Pam team's tools for a Pam conversation (saved replies), above the composer; Ava's. Only given to the Pam team. */
-  readonly teamTools?: ReactNode;
+  /**
+   * The Pam team's tools for a Pam conversation (saved replies), above the composer; Ava's. Only given to the Pam team.
+   * Called with `setDraft`, which replaces what is in the box and puts the cursor at its end: a saved reply fills the box and is
+   * never sent by itself.
+   */
+  readonly teamTools?: (composer: { readonly setDraft: (text: string) => void }) => ReactNode;
 }
 
 /**
@@ -669,6 +673,21 @@ export function ThreadView({
   // Only then: someone editing the middle of a long message by hand is
   // never pulled away from where they are.
   const inputBox = useRef<HTMLDivElement>(null);
+  // Fills the box with words that were not typed (a saved reply), focuses it and leaves the cursor at the end.
+  const fillDraft = (text: string) => {
+    setDraft(text);
+    requestAnimationFrame(() => {
+      const editable = inputBox.current?.querySelector<HTMLElement>('[contenteditable]');
+      if (!editable) return;
+      editable.focus();
+      const range = document.createRange();
+      range.selectNodeContents(editable);
+      range.collapse(false);
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+    });
+  };
   useEffect(() => {
     if (!dictation.isListening) return;
     const editable = inputBox.current?.querySelector<HTMLElement>('[contenteditable]');
@@ -1047,7 +1066,7 @@ export function ThreadView({
   return (
     <>
     <ChatLayout
-      composer={teamTools ? <VStack>{teamTools}{composer}</VStack> : composer}
+      composer={teamTools ? <VStack>{teamTools({ setDraft: fillDraft })}{composer}</VStack> : composer}
       density="compact"
       scrollButton={<ScrollToBottom />}
       xstyle={styles.layout}
