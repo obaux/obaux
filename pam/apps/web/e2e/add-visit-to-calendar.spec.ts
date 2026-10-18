@@ -87,3 +87,29 @@ test('under the card, "Sync all future trip details?" opens the Calendar screen,
   await sync.click();
   await expect(page).toHaveURL(/\/calendar\/$/);
 });
+
+/** The longest example place name, at 320 wide, in the language with the longest words and in the one that reads right to left. */
+const LONGEST = 'Example Reentry Employment and Housing Resource Center of North Philadelphia';
+for (const locale of ['en', 'ar']) {
+  test(`${locale}: the longest place name and the Add to calendar button both fit the card, and do not overlap`, async ({ page }) => {
+    await page.addInitScript((code) => localStorage.setItem('pam.locale', code), locale);
+    await page.goto(`/trips/new/?place=dummy-place-reentry&name=${encodeURIComponent(LONGEST)}&category=employment`);
+    await settled(page);
+    await page.getByRole('button', { name: /^(Mon|Tue|Wed|Thu|Fri|الاثنين|الثلاثاء|الأربعاء|الخميس|الجمعة)/ }).first().click();
+    await page.getByRole('button', { name: /AM|PM|[٠-٩0-9]+[:٫][٠-٩0-9]+/ }).first().click();
+    await page.getByRole('button', { name: /^(Next|التالي)/ }).click();
+    await page.getByRole('button', { name: /^(Add this trip|إضافة هذه الزيارة)/ }).click();
+    const button = page.locator('button', { has: page.locator('svg') }).filter({ hasText: /Add to calendar|calendar|تقويم/i }).first();
+    await expect(button).toBeVisible();
+    const card = (await page.getByText(LONGEST, { exact: false }).first().boundingBox())!;
+    const b = (await button.boundingBox())!;
+    const viewport = page.viewportSize()!;
+    expect(b.x).toBeGreaterThanOrEqual(0);
+    expect(b.x + b.width).toBeLessThanOrEqual(viewport.width);
+    expect(b.height).toBeGreaterThanOrEqual(47.5);
+    // Not on top of the title: one is wholly above the other, or they do not share a column.
+    const apart = b.y >= card.y + card.height - 1 || card.y >= b.y + b.height - 1 || b.x >= card.x + card.width - 1 || card.x >= b.x + b.width - 1;
+    expect(apart).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+  });
+}

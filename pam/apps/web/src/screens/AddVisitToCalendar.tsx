@@ -3,7 +3,6 @@
 import { useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
-import { IconButton } from '@astryxdesign/core/IconButton';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
@@ -22,26 +21,16 @@ import { buildVisitFile, googleEventUrl, type FeedVisit } from '../../../../supa
  * Under the card, fine print: "Sync all future trip details?" opens the Calendar screen, for every visit at once.
  */
 const styles = stylex.create({
-  wrap: { position: 'relative', width: '100%' },
-  // The button sits in the green card's top corner: a 36px circle in a 48px target.
-  button: {
-    position: 'absolute',
-    insetBlockStart: '10px',
-    insetInlineEnd: '10px',
-    zIndex: 2,
-    width: '48px',
-    height: '48px',
-    backgroundColor: 'transparent',
-    boxShadow: 'none',
-  },
-  circle: {
-    width: '36px',
-    height: '36px',
-    minWidth: '36px',
+  // "Add to calendar" is a real button in the green card's header (Will, a98; Dot's story): the card's white, the green icon and words, 48px.
+  calendar: {
     flexShrink: 0,
-    borderRadius: '50%',
+    minHeight: '48px',
+    paddingInline: '14px',
+    fontSize: '16px',
+    fontWeight: 700,
     backgroundColor: colorVars['--color-background-card'],
-    color: colorVars['--color-icon-green'],
+    color: colorVars['--color-text-green'],
+    borderRadius: '24px',
   },
   fine: { alignSelf: 'center', minHeight: '48px', paddingInline: '12px', fontSize: '15px', fontWeight: 600, color: colorVars['--color-text-secondary'] },
   sheet: { width: '100%', paddingInline: '20px', paddingBlockEnd: '28px' },
@@ -85,25 +74,32 @@ function timeZone(): string | undefined {
   }
 }
 
-export function AddVisitToCalendar({ card, visit }: { readonly card: ReactNode; readonly visit: VisitToAdd }) {
+/** What the card is given: the button for VisitCard's `action`, and whether the header cannot hold the title and it (`actionOwnRow`). */
+export interface CalendarSlot {
+  readonly action: ReactNode;
+  readonly actionOwnRow: boolean;
+}
+
+/** A long place name, or a long label, leaves the button no room beside the title at 320 wide: it takes a row of its own. */
+const ownRowFor = (placeName: string, label: string): boolean => placeName.length + label.length > 30;
+
+export function AddVisitToCalendar({ card, visit }: { readonly card: (slot: CalendarSlot) => ReactNode; readonly visit: VisitToAdd }) {
   const { t, tPlain } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
   return (
     <VStack gap={1}>
-      <div {...stylex.props(styles.wrap)}>
-        {card}
-        <IconButton
-          label={tPlain('trips.addToCalendar')}
-          variant="ghost"
-          onClick={() => setIsOpen(true)}
-          icon={
-            <HStack align="center" justify="center" xstyle={styles.circle}>
-              <CalendarAddIcon width={20} height={20} aria-hidden />
-            </HStack>
-          }
-          xstyle={styles.button}
-        />
-      </div>
+      {card({
+        action: (
+          <Button
+            label={tPlain('trips.addToCalendar')}
+            variant="secondary"
+            icon={<CalendarAddIcon width={22} height={22} aria-hidden />}
+            onClick={() => setIsOpen(true)}
+            xstyle={styles.calendar}
+          />
+        ),
+        actionOwnRow: ownRowFor(visit.placeName, tPlain('trips.addToCalendar')),
+      })}
       <Button label={t('trips.syncAll')} variant="ghost" icon={<SyncIcon width={18} height={18} aria-hidden />} href="/calendar/" xstyle={styles.fine} />
       <PamSheet isOpen={isOpen} onOpenChange={setIsOpen} label={tPlain('trips.addToCalendar')} kind="act" actionLabel={t('trips.confirm.close')}>
         <VStack gap={2} xstyle={styles.sheet}>

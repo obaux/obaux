@@ -389,8 +389,10 @@ export function NewTripView({
         */}
         <AddVisitToCalendar
           visit={{ id: confirmed.id, placeName: place.name, address: place.address ?? null, startsAt: confirmed.at }}
-          card={
+          card={({ action, actionOwnRow }) => (
           <VisitCard
+            action={action}
+            actionOwnRow={actionOwnRow}
             eyebrow={place.name}
             day={dayLong.format(confirmed.at)}
             time={timeFmt.format(confirmed.at)}
@@ -405,7 +407,7 @@ export function NewTripView({
               change: confirmed.id,
             }).toString()}`}
           />
-          }
+          )}
         />
         {hasLead ? (
           forMember ? null : <Banner status="info" title={t('trips.booked.hasLead', { place: place.name })} />
