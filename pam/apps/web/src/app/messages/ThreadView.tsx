@@ -331,7 +331,8 @@ const styles = stylex.create({
   progress: { width: '160px', maxWidth: '100%' },
   // The number in the out-of-hours reply is a call (Iris P1): vertical padding on an inline link lengthens what a thumb can hit, not the line.
   // Padding on the sides is cancelled by the same margin, so the space round the number stays a word space and the hit area is 48px wide.
-  callLink: { paddingBlock: '14px', paddingInline: '12px', marginInline: '-12px', fontWeight: 600 },
+  // The tap area is padding that its own negative margin takes back, so the line it sits in keeps the other lines' height (Iris R3).
+  callLink: { paddingBlock: '14px', paddingInline: '12px', marginBlock: '-14px', marginInline: '-12px', fontWeight: 600 },
   statusText: { fontSize: '13px', lineHeight: 1.4 },
   retry: { minHeight: '48px', minWidth: '48px' },
   // A photo in a bubble (D-394): a 240px square, cropped to fill, that opens

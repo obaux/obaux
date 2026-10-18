@@ -206,7 +206,8 @@ function RemindersForm() {
               and nothing here can be pre-selected, because there is nothing to
               select.
             */}
-          <BigButton label={t('reminders.agree')} onPress={() => void answer(true)} isDisabled={busy} />
+          {/* A yes already on file is not asked for again (Iris C2): the line above says it is saved, and the way out is below. */}
+          {already === true ? null : <BigButton label={t('reminders.agree')} onPress={() => void answer(true)} isDisabled={busy} />}
           {/* Saying no is one tap, and it is recorded like any other answer. */}
           <TextLink label={t('reminders.skip')} onClick={() => void answer(false)} isDisabled={busy} />
         </>

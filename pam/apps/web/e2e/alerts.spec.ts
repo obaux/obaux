@@ -400,3 +400,23 @@ test.describe('Text alerts', () => {
     await expect(page.getByText('Coming soon').first()).toBeVisible();
   });
 });
+
+test.describe('The reminders screen with a yes already on file (Iris C2)', () => {
+  const YES = { sms_enabled: true, sms_stopped_at: null, alert_message: false, alert_booked: false, alert_changed: false, alert_trip: false };
+
+  test('says it is saved and does not ask again', async ({ page }) => {
+    await signedInAs(page, 'member', YES, 'on');
+    await page.goto('/reminders/');
+    await settled(page);
+    await expect(page.getByText('Saved.', { exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Agree to receive texts' })).toHaveCount(0);
+  });
+
+  test('still asks when nothing is on file', async ({ page }) => {
+    await signedInAs(page, 'member', null, 'on');
+    await page.goto('/reminders/');
+    await settled(page);
+    await expect(page.getByRole('button', { name: 'Agree to receive texts' })).toBeVisible();
+    await expect(page.getByText('Saved.', { exact: true })).toHaveCount(0);
+  });
+});
