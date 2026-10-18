@@ -18,12 +18,17 @@ export interface MemberTrip {
   readonly startsAt: string;
   /** The program marked them as there. Only these are "Programs attended in the past": a missed or not-yet-marked visit is not one (W5). */
   readonly attended: boolean;
+  /** The program marked them as not there, or nobody did (a day after it ended). */
+  readonly missed: boolean;
+  /** A program lead booked it for them (D-595): the place is that program. */
+  readonly bookedByProgram: boolean;
 }
 
 interface Row {
   readonly id: string;
   readonly starts_at: string;
   readonly status: string | null;
+  readonly booked_by_org?: string | null;
   readonly service_id: string | null;
   readonly services: { readonly name: string | null; readonly category: string | null } | { readonly name: string | null; readonly category: string | null }[] | null;
 }
@@ -32,7 +37,7 @@ export function tripsFromRows(rows: readonly Row[]): MemberTrip[] {
   return rows.flatMap((row) => {
     const service = Array.isArray(row.services) ? row.services[0] : row.services;
     if (!row.service_id || !service?.name) return [];
-    return [{ id: row.id, placeId: row.service_id, placeName: service.name, category: (service.category ?? 'other') as Category, startsAt: row.starts_at, attended: row.status === 'attended' }];
+    return [{ id: row.id, placeId: row.service_id, placeName: service.name, category: (service.category ?? 'other') as Category, startsAt: row.starts_at, attended: row.status === 'attended', missed: row.status === 'missed', bookedByProgram: Boolean(row.booked_by_org) }];
   });
 }
 
@@ -49,7 +54,7 @@ export function useMemberTrips(memberId: string | null, enabled: boolean): reado
         const { createClient } = await import('./supabase');
         const { data, error } = await createClient()
           .from('appointments')
-          .select('id,starts_at,status,service_id,services(name,category)')
+          .select('id,starts_at,status,booked_by_org,service_id,services(name,category)')
           .eq('member_id', memberId)
           .neq('status', 'cancelled')
           .order('starts_at', { ascending: true });

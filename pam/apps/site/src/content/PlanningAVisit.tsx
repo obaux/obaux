@@ -75,7 +75,7 @@ export function PlanningAVisit() {
       <Section title="Past visits">
         <P>
           When a visit’s time has gone, it moves down to “Past visits” on Trips, with the most recent first.
-          “Past visits” lists the visits you planned.
+          “Past visits” lists the visits you planned and the ones a program booked for you.
         </P>
         <ShotCard shots={[{ name: 'planning-a-visit/past-visits.png', alt: "The Trips screen, scrolled down. Under the visits coming up there is a heading, “Past visits”, and under it one earlier visit, to Riverside Job Center on Wednesday, October 7 at 10:00 AM.", caption: "Trips, with a past visit." }]} />
       </Section>

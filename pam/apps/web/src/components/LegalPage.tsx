@@ -18,6 +18,7 @@ import {
   Page,
   PeopleIcon,
   PhoneIcon,
+  MailIcon,
   PlacesIcon,
   SettingsIcon,
   ShareIcon,
@@ -91,7 +92,8 @@ const styles = stylex.create({
     borderStyle: 'solid',
     borderColor: colorVars['--color-border'],
     boxShadow: '0 1px 4px light-dark(oklch(0 0 0 / 7%), oklch(0 0 0 / 35%))',
-    '::before': { content: "''", position: 'absolute', insetBlock: '-4px', insetInline: '-2px' },
+    // -6px: it is measured from the padding box, inside the border (1px, 2px on the pill you are on), so the 40px pill gets 4px above and below: 48px (-4px gave 46).
+    '::before': { content: "''", position: 'absolute', insetBlock: '-6px', insetInline: '-2px' },
   },
   // The reading position, drawn as a heavier outline and weight rather than a
   // colour change: a colour alone would be the only signal (§12).
@@ -131,7 +133,7 @@ const SECTION_ICONS: Record<string, ReactNode> = {
   sharing: <ShareIcon />,
   'how-long': <ClockIcon />,
   'your-choices': <SettingsIcon />,
-  contact: <PhoneIcon />,
+  contact: <MailIcon />,
   'what-pam-is': <InfoIcon />,
   emergencies: <PhoneIcon />,
   'your-account': <MeIcon />,

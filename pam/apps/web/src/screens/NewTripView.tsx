@@ -21,7 +21,7 @@ import { SubPage } from '@pam/ui/SubPage';
 import { SuccessScreen } from '@pam/ui/SuccessScreen';
 import { useI18n } from '@/lib/i18n';
 import { readAddedTrips, withMoves } from '@/lib/addedTrips';
-import { asksForSavedTrips, bookTrip, isSavedPlace, moveSavedOrLocalTrip } from '@/lib/savedTrips';
+import { asksForSavedTrips, bookTrip, isSavedPlace, moveSavedOrLocalTrip, type BookRefusal } from '@/lib/savedTrips';
 import { useTrips } from '@/lib/useTrips';
 import { useSession } from '@/lib/useSession';
 import { examplesOn } from '@/lib/examples';
@@ -237,6 +237,8 @@ export function NewTripView({
   // The trip is being saved, or could not be (D-454): say so rather than show it booked.
   const [isSaving, setIsSaving] = useState(false);
   const [failed, setFailed] = useState(false);
+  // The database said no, and why (a program booking for a member, D-595): a true message, not "try again".
+  const [refusal, setRefusal] = useState<BookRefusal | null>(null);
   // The service picked on the place's page (D-313), carried in the link.
   const offered = place ? forPlace(place.id) : [];
   const serviceId = initialService ?? bookedTrip?.trip.serviceId ?? null;
@@ -270,6 +272,8 @@ export function NewTripView({
   const [movedTo, setMovedTo] = useState<Date | null>(null);
   // Booked for a member (D-316): the moment, then the program's Home.
   const [bookedAt, setBookedAt] = useState<Date | null>(null);
+  // Saved for the member (D-595), not kept in this tab: the confirmation says "Booked", not "Example".
+  const [bookedForReal, setBookedForReal] = useState(false);
   // The member's own booking, confirmed (D-333): the booked screen.
   const [confirmed, setConfirmed] = useState<{ readonly id: string; readonly at: Date } | null>(
     bookedTrip ? { id: bookedTrip.trip.id, at: new Date(bookedTrip.trip.startsAt) } : null,
@@ -346,15 +350,12 @@ export function NewTripView({
 
   if (bookedAt && place && forMember) {
     const vars = { place: place.name, day: dayLong.format(bookedAt), time: timeFmt.format(bookedAt) };
-    // An example, and it says so (Lena's promise sweep, 10 October): a booking
-    // for a member is kept in this tab only. Nothing is saved with the program
-    // and nobody is texted, so the screen claims neither. The "booked" and
-    // "texted" words (trips.booked.title / .texted / .sms) come back when a
-    // booking for a member is saved for real and texts are live.
+    // Saved for the member (D-595): booked, on their Trips, and the bell tells them (no text). An
+    // example, and it says so (Lena's promise sweep, 10 October), when it is only kept in this tab.
     return (
       <SuccessScreen
-        title={t('trips.booked.example.title', { name: forMember.name })}
-        body={t('trips.booked.example.body', vars)}
+        title={bookedForReal ? t('trips.booked.title', { name: forMember.name }) : t('trips.booked.example.title', { name: forMember.name })}
+        body={bookedForReal ? t('trips.booked.body', vars) : t('trips.booked.example.body', vars)}
         action={<Button label={t('trips.moved.home')} variant="secondary" href="/" xstyle={styles.home} />}
         // A place with no program lead on Pam is not told either way (D-498).
         {...(hasLead ? {} : { note: t('trips.booked.noLead', { place: place.name }) })}
@@ -522,6 +523,7 @@ export function NewTripView({
             onPress={async () => {
               if (isSaving) return;
               setFailed(false);
+              setRefusal(null);
               if (changing) {
                 const when = at(day, time);
                 setIsSaving(true);
@@ -553,10 +555,15 @@ export function NewTripView({
                 setFailed(true);
                 return;
               }
+              if ('refused' in trip) {
+                setRefusal(trip.refused);
+                return;
+              }
               const id = trip.id;
               if (forMember) {
                 // The program's moment (D-316), then its Home — not the
                 // member's Trips, which is theirs.
+                setBookedForReal(trip.bookedByProgram === true);
                 setBookedAt(at(day, time));
                 return;
               }
@@ -587,6 +594,13 @@ export function NewTripView({
         )
       }
     >
+      {refusal ? (
+        <Banner
+          status="warning"
+          title={t('join.failed.title')}
+          description={t(`trips.new.refused.${refusal}`, { name: forMember?.name ?? '', place: place?.name ?? '' })}
+        />
+      ) : null}
       {failed ? (
         // Not saved (D-454): nothing is shown as booked, and what was picked stays.
         <Notice
@@ -708,7 +722,7 @@ export function NewTripView({
           )}
           {/* True only for an example place or a program booking: a trip to a real
               place is saved (D-454), and saying otherwise would be a lie. */}
-          {asksForSavedTrips(session) !== null && isSavedPlace(place.id) && !forMember ? null : (
+          {forMember && isSavedPlace(forMember.id) && isSavedPlace(place.id) && session.status === 'signed-in' && !session.session.isDemo ? null : asksForSavedTrips(session) !== null && isSavedPlace(place.id) && !forMember ? null : (
             <Text type="supporting" xstyle={styles.note}>
               {t('trips.new.example')}
             </Text>

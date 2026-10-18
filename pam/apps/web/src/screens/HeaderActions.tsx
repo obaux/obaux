@@ -13,6 +13,7 @@ export function HeaderActions({
   enabled = true,
   hasHelp = true,
   isBellHidden = false,
+  bellOnlyWhenNew = false,
 }: {
   readonly role?: Role | null;
   readonly enabled?: boolean;
@@ -20,10 +21,18 @@ export function HeaderActions({
   readonly hasHelp?: boolean;
   /** A search bar is open on this screen and takes the bell's room (a86). */
   readonly isBellHidden?: boolean;
+  /** A member's Explore: the bell is there only while something is unread, and the search bar has the row otherwise. */
+  readonly bellOnlyWhenNew?: boolean;
 }) {
   return (
     <>
-      <HeaderBell enabled={enabled} role={role} appearance="round" isHidden={isBellHidden} />
+      <HeaderBell
+        enabled={enabled}
+        role={role}
+        appearance="round"
+        isHidden={isBellHidden}
+        hideWhenNothingNew={bellOnlyWhenNew}
+      />
       {hasHelp ? <HelpButton /> : null}
     </>
   );

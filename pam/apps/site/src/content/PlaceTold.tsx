@@ -17,13 +17,13 @@ export function PlaceTold() {
 
       <Section title="Places that see your visit">
         <P>
-          When a program is on Pam, the people who run it see the visits planned there: your first name, the day and
-          time, the service you picked, and whether you were marked as there. They do not see your last name or the rest of your profile.
+          When a program is on Pam, the people who run it see the visits planned there and the ones they book for you: your first
+          name, the day and time, the service, and whether you were marked as there. They do not see your last name or the rest of your profile.
         </P>
         <P>
           If nobody marks you as there, the visit shows to them as missed a day after it ends. You can mark it
           yourself: tap “I’m here” when you get there, or “I went” up to 3 hours after the visit ends. This works only
-          for a visit you planned at least 2 hours before it starts, and “I went” works 3 times in any 7 days. If you
+          for a visit made at least 2 hours before it starts, and “I went” works 3 times in any 7 days. If you
           went and it says missed, tell the program. They can fix it for 14 days after the visit.
         </P>
         <P>If you cancel the visit, they stop seeing it.</P>

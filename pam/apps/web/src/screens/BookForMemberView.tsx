@@ -14,12 +14,13 @@ import { DUMMY_APPOINTMENTS } from '@pam/config/dummy-appointments';
 import { dummyConversationsFor } from '@pam/config/dummy-conversations';
 import { DUMMY_MEMBERS } from '@pam/config/dummy-people';
 import { DUMMY_PLACES_BY_ID } from '@pam/config/dummy-places';
-import { PlusIcon } from '@pam/ui';
+import { Notice, PlusIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPage } from '@pam/ui/SubPage';
 import { readAddedTrips, TRIPS_CHANGED, withMoves } from '@/lib/addedTrips';
 import { examplesOn } from '@/lib/examples';
 import { useI18n } from '@/lib/i18n';
+import { useBookableMembers } from '@/lib/useBookableMembers';
 import { useConversations } from '@/lib/useConversations';
 import { useProgramSetup } from '@/lib/programSetup';
 import { useSession } from '@/lib/useSession';
@@ -30,8 +31,8 @@ import { intlLocale } from '@pam/config';
 /**
  * Book a visit for a member (D-316, D-322; Will, 6 October): the first thing
  * under a program lead's +. "They should be able to book on behalf of a user
- * who's messaged them" — so the list is the people in the program's
- * conversations, and each row says what a lead needs before tapping: are
+ * who's messaged them" — so the list is the people the program may book for (those who wrote to it, signed up with it or planned a
+ * visit there, and nobody blocked, D-595), and each row says what a lead needs before tapping: are
  * they already booked (their next visit here) or not, when they last wrote,
  * and the last thing they said, on one line. A row opens New trip with this
  * program as the place and that person as who it is for.
@@ -62,8 +63,8 @@ const styles = stylex.create({
   words: { minWidth: 0 },
 });
 
-/** One person who has written to the program, from an example or a real conversation. */
-interface Person {
+/** One person a program may book for, from an example, a real conversation or the bookable list. */
+export interface Person {
   readonly id: string;
   readonly firstName: string;
   readonly lastMessageAt: string | null;
@@ -97,7 +98,7 @@ function useNextVisitHere(programId: string | null): Readonly<Record<string, str
   return next;
 }
 
-export function BookForMemberView() {
+export function BookForMemberView({ people: shown }: { readonly people?: readonly Person[] } = {}) {
   const { t, locale } = useI18n();
   // The lead's own program (D-509); the example one only in a demo or Storybook, with its example people.
   const { state: session } = useSession();
@@ -113,33 +114,42 @@ export function BookForMemberView() {
       ? DUMMY_PLACES_BY_ID[EXAMPLE_PROGRAM_ID]
       : undefined;
   const nextHere = useNextVisitHere(programId);
-  // Who wrote to the program (S1, Iris's program lead pass): a real lead's own conversations with members,
-  // first name and last message only (D-541 part 2, D-542); the example people only in a demo or Storybook.
+  // Who may be booked for (D-595): the database's own list, which is those who wrote to the program, signed up with it or planned a visit
+  // there, and leaves out anybody blocked either way. It is the whole list (Iris, b58): a conversation partner who is not in it would be
+  // refused, so the conversations below only add what each person last said, never a person.
+  const bookable = useBookableMembers(!examples && session.status === 'signed-in');
+  // What a real member last said (S1, Iris's program lead pass): first name and last message only (D-541 part 2, D-542).
   const { state: conversations } = useConversations(!examples && session.status === 'signed-in');
-  const people: readonly Person[] = examples
-    ? dummyConversationsFor('provider').flatMap((c) => {
-        const member = DUMMY_MEMBERS.find((m) => m.id === c.otherId);
-        return member
-          ? [{ id: member.id, firstName: member.firstName, lastMessageAt: c.lastMessageAt ?? null, preview: c.preview ?? null }]
-          : [];
-      })
-    : conversations.status === 'ready' && programId !== null
-      ? // One conversation per pair is the rule, but a repeat would collide on the list key: the first (newest) wins.
-        conversations.conversations
-          .filter((c, i, all) => c.otherProfileId === null || all.findIndex((o) => o.otherProfileId === c.otherProfileId) === i)
-          .flatMap((c) =>
-          c.otherRole === 'member' && c.otherProfileId
-            ? [
-                {
-                  id: c.otherProfileId,
-                  firstName: c.otherName ?? '',
-                  lastMessageAt: c.lastMessageAt,
-                  preview: c.lastMessageBody ? { body: c.lastMessageBody, mine: c.lastMessageMine } : null,
-                },
-              ]
-            : [],
-        )
-      : [];
+  const people: readonly Person[] =
+    shown ??
+    (examples
+      ? dummyConversationsFor('provider').flatMap((c) => {
+          const member = DUMMY_MEMBERS.find((m) => m.id === c.otherId);
+          return member
+            ? [{ id: member.id, firstName: member.firstName, lastMessageAt: c.lastMessageAt ?? null, preview: c.preview ?? null }]
+            : [];
+        })
+      : programId === null
+        ? []
+        : // Those who wrote come first, newest first, with what they said; the others follow by name (the database's order).
+          bookable.members
+            .map((m): Person => {
+              const talk = conversations.status === 'ready' ? conversations.conversations.find((c) => c.otherProfileId === m.id) : undefined;
+              return {
+                id: m.id,
+                firstName: m.firstName,
+                lastMessageAt: talk?.lastMessageAt ?? null,
+                preview: talk?.lastMessageBody ? { body: talk.lastMessageBody, mine: talk.lastMessageMine } : null,
+              };
+            })
+            .map((person, index) => ({ person, index }))
+            .sort((a, b) => {
+              if (a.person.lastMessageAt && b.person.lastMessageAt) return b.person.lastMessageAt.localeCompare(a.person.lastMessageAt);
+              if (a.person.lastMessageAt) return -1;
+              if (b.person.lastMessageAt) return 1;
+              return a.index - b.index;
+            })
+            .map(({ person }) => person));
 
   const when = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
   const clock = new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' });
@@ -179,7 +189,10 @@ export function BookForMemberView() {
       <Heading level={2} xstyle={styles.heading}>
         {t('book.people')}
       </Heading>
-      {people.length === 0 && !examples && (conversations.status === 'loading' || setup.isLoading) ? null : people.length === 0 ? (
+      {people.length === 0 && !shown && !examples && (bookable.isLoading || conversations.status === 'loading' || setup.isLoading) ? null : bookable.hasFailed && !examples && !shown ? (
+        // The list could not be read: that is not "nobody", and saying so would be false.
+        <Notice notice="something_went_wrong" title={t('notice.something_went_wrong.title')} body={t('notice.something_went_wrong.body')} contactLabel={t('help.contact.action')} />
+      ) : people.length === 0 ? (
         <Text type="supporting" xstyle={styles.empty}>
           {t('book.empty')}
         </Text>

@@ -18,7 +18,9 @@ import {
   PeopleIcon,
   ShieldIcon,
   StarIcon,
+  TripsIcon,
 } from '@pam/ui';
+import { intlLocale } from '@pam/config';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { emptyState } from '@pam/ui/emptyState';
 import { isFreshAccount } from '@/lib/programSetup';
@@ -74,7 +76,16 @@ function describe(
   bodyKey: string,
   bodyVars: Record<string, string>,
   t: (key: string, vars?: Record<string, string>) => string,
+  locale = 'en',
 ) {
+  // A program booked a visit for the member (D-595): the time is written here, in their language, not stored as words.
+  if (bodyKey === 'notify.visit_booked_for_you' && typeof bodyVars['startsAt'] === 'string') {
+    const at = new Date(bodyVars['startsAt']);
+    const when = Number.isNaN(at.getTime())
+      ? ''
+      : new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(at);
+    return t(bodyKey, { place: bodyVars['place'] ?? '', when });
+  }
   if (bodyKey === 'notify.service_flagged' && typeof bodyVars['reason'] === 'string') {
     return t(bodyKey, { ...bodyVars, reason: t(`flag.reason.${bodyVars['reason']}`) });
   }
@@ -93,6 +104,7 @@ function describe(
 function hrefFor(kind: string, subjectId: string | null): string | undefined {
   if (kind === 'message_reported') return '/messages/?show=reported';
   if (kind === 'message_received' && subjectId) return `/messages/thread/?id=${encodeURIComponent(subjectId)}`;
+  if (kind === 'visit_booked_for_you') return '/trips/';
   if (kind === 'service_flagged') return '/places/reported/?from=notifications';
   if (kind === 'staff_request_pending') return '/requests/';
   return undefined;
@@ -110,6 +122,7 @@ const KIND_ICONS: Record<string, ReactNode> = {
   message_reported: <ShieldIcon />,
   message_received: <MessagesIcon />,
   staff_request_pending: <PeopleIcon />,
+  visit_booked_for_you: <TripsIcon />,
   'demo.newInterest': <PeopleIcon />,
   'demo.pointsEarned': <StarIcon />,
   'demo.savedPlaceUpdated': <BookmarkIcon />,
@@ -201,7 +214,7 @@ export default function NotificationsPage() {
           <NotificationList
             items={state.items.map((item) => ({
               id: item.id,
-              text: describe(item.bodyKey, item.bodyVars, t),
+              text: describe(item.bodyKey, item.bodyVars, t, locale),
               ...kindOf(item.kind, t),
               when: whenHappened(item.createdAt, locale, t),
               isNew: !item.isRead,
@@ -216,7 +229,7 @@ export default function NotificationsPage() {
             <NotificationList
               items={dummyItems.map((item) => ({
                 id: item.id,
-                text: describe(item.bodyKey, item.bodyVars, t),
+                text: describe(item.bodyKey, item.bodyVars, t, locale),
                 ...kindOf(item.bodyKey.replace('notify.', ''), t),
                 when: whenHappened(item.createdAt, locale, t),
                 isNew: item.isNew,

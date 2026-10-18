@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { useState } from 'react';
-import { Text } from '@astryxdesign/core/Text';
 import type { SelectorOptionType } from '@astryxdesign/core/Selector';
 import { Dropdown } from '@pam/ui/Dropdown';
 
@@ -20,30 +19,9 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const NOTE = '__note';
-
 function Cities({ isOpen = false, options }: { readonly isOpen?: boolean; readonly options: SelectorOptionType[] }) {
   const [value, setValue] = useState('Philadelphia');
-  return (
-    <Dropdown
-      label="City you live in"
-      options={options}
-      isDefaultOpen={isOpen}
-      value={value}
-      onChange={(next: string) => {
-        if (next !== NOTE) setValue(next);
-      }}
-      renderOption={(option) =>
-        option.value === NOTE ? (
-          <Text type="supporting" size="sm" justify="center">
-            {option.label}
-          </Text>
-        ) : (
-          option.label
-        )
-      }
-    />
-  );
+  return <Dropdown label="City you live in" options={options} isDefaultOpen={isOpen} value={value} onChange={setValue} />;
 }
 
 const CITIES: SelectorOptionType[] = [
@@ -53,13 +31,8 @@ const CITIES: SelectorOptionType[] = [
 
 export const Default: Story = { args: { label: '', options: [] }, render: () => <Cities options={CITIES} /> };
 
-/** Open, as on sign-up: the cities Pam is in, with the small print at the foot. */
-export const OpenWithNote: Story = {
-  args: { label: '', options: [] },
-  render: () => (
-    <Cities
-      isOpen
-      options={[...CITIES, { type: 'divider' }, { value: NOTE, label: 'Pam is only in these cities for now.', disabled: true }]}
-    />
-  ),
-};
+/**
+ * Open, as on sign-up: the cities Pam is in, and nothing else. "Pam is only in these cities for now." is a line under the
+ * field on the sign-up screen, not a row in the list (Ava, b62), so a row that looks like a choice but does nothing is gone.
+ */
+export const Open: Story = { args: { label: '', options: [] }, render: () => <Cities isOpen options={CITIES} /> };

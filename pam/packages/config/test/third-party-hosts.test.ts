@@ -102,21 +102,21 @@ const HOSTS: Record<string, HostEntry> = {
   'accounts.google.com': {
     kind: 'server',
     why: 'Google sign-in for the calendar sync: the member is sent there to allow it (google-calendar, D-539)',
-    privacy: { key: 'privacy.s.sharing.p9', names: /Google/ },
+    privacy: { key: 'privacy.s.sharing.p10', names: /Google/ },
     pending: 'the Google sync card (merged with GOOGLE_SYNC_LIVE)',
     arriving: 'D-539',
   },
   'oauth2.googleapis.com': {
     kind: 'server',
     why: 'the sealed key to the “Pam visits” calendar: exchange, refresh and revoke (google-calendar, D-539)',
-    privacy: { key: 'privacy.s.sharing.p9', names: /Google/ },
+    privacy: { key: 'privacy.s.sharing.p10', names: /Google/ },
     pending: 'the Google sync card (merged with GOOGLE_SYNC_LIVE)',
     arriving: 'D-539',
   },
   'www.googleapis.com': {
     kind: 'server',
     why: 'the “Pam visits” calendar and its events: the visits (google-calendar, D-539)',
-    privacy: { key: 'privacy.s.sharing.p9', names: /Google/ },
+    privacy: { key: 'privacy.s.sharing.p10', names: /Google/ },
     pending: 'the Google sync card (merged with GOOGLE_SYNC_LIVE)',
     arriving: 'D-539',
   },
@@ -162,6 +162,7 @@ interface FunctionEntry {
 const FUNCTIONS: Record<string, FunctionEntry> = {
   'dispatch-sms': { reaches: ['api.twilio.com'], why: 'sends the texts' },
   'sms-inbound': { reaches: [], why: 'Twilio calls it with a reply; it asks only Pam’s own database' },
+  'sweep-message-files': { reaches: [], why: 'each night removes message photos, documents and link pictures no conversation uses; asks only Pam’s own database and storage (D-607)' },
   'sweep-staff-photos': { reaches: [], why: 'each night removes staff photos no account uses; asks only Pam’s own database and storage (D-587)' },
   'send-invite-emails': { reaches: ['api.resend.com'], why: 'sends the invite email' },
   'help-request': { reaches: ['api.resend.com'], why: 'forwards a help request by email, behind a switch' },

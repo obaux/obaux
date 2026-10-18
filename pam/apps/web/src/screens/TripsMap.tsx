@@ -111,19 +111,19 @@ const styles = stylex.create({
   pinWhen: { fontSize: '12px', textAlign: 'center', whiteSpace: 'nowrap' },
 });
 
-export function TripsMap({ pins }: { readonly pins: readonly TripPin[] }) {
+export function TripsMap({ pins, sheetTop = null }: { readonly pins: readonly TripPin[]; readonly sheetTop?: number | null }) {
   // If Google will not draw — the key refused, the script blocked, no
   // connection — the drawn preview takes over rather than a blank map.
   const [failed, setFailed] = useState(false);
   return KEY && !failed ? (
     <GoogleTripsMap pins={pins} onFail={() => setFailed(true)} />
   ) : (
-    <PreviewTripsMap pins={pins} />
+    <PreviewTripsMap pins={pins} sheetTop={sheetTop} />
   );
 }
 
 /** The drawn stand-in: pins placed by coordinate within the upper map area. */
-function PreviewTripsMap({ pins: all }: { readonly pins: readonly TripPin[] }) {
+function PreviewTripsMap({ pins: all, sheetTop }: { readonly pins: readonly TripPin[]; readonly sheetTop: number | null }) {
   const { t } = useI18n();
   // One pin per place, labelled with its soonest visit (the list is in date
   // order): two trips to the same place drew one label over the other (D-225).
@@ -167,8 +167,16 @@ function PreviewTripsMap({ pins: all }: { readonly pins: readonly TripPin[] }) {
     else placed.push({ at, members: [pin] });
   }
 
+  // With the sheet all the way up the whole drawn map is under it, the "Map preview" note too: a finger lands on the sheet, so Tab and a screen
+  // reader leave the map alone, and no focus ring is drawn across the Trips title from a control the sheet hides (Iris, P3 polish).
+  const isMapCovered = sheetTop !== null && sheetTop <= NOTE_BOTTOM;
   return (
-    <VStack xstyle={[styles.map, styles.preview]} role="region" aria-label={t('trips.map.label')}>
+    <VStack
+      xstyle={[styles.map, styles.preview]}
+      role="region"
+      aria-label={t('trips.map.label')}
+      {...(isMapCovered ? { 'aria-hidden': true, inert: true } : {})}
+    >
       {/* Said only when there is something drawn: with no trips this is just a quiet ground. */}
       {pins.length > 0 ? (
         <Text type="supporting" xstyle={styles.previewLabel}>
@@ -179,11 +187,15 @@ function PreviewTripsMap({ pins: all }: { readonly pins: readonly TripPin[] }) {
         const first = members[0]!;
         const pin: TripPin =
           members.length > 1 ? { ...first, name: t('trips.map.many', { count: members.length }) } : first;
+        // A pin the sheet covers whole is not reachable by a finger (the tap lands on the sheet's card), so it is not reachable by a
+        // screen reader or the Tab key either (Iris, P3). One the sheet covers only in part keeps its link: what shows can be tapped.
+        const isCovered = sheetTop !== null && at.top - PIN_BLOCK >= sheetTop;
         return (
           <a
             key={pin.id}
             href={pin.href}
             aria-label={`${pin.name}, ${pin.when}`}
+            {...(isCovered ? { 'aria-hidden': true, tabIndex: -1 } : {})}
             {...stylex.props(styles.pin, styles.pinAt(at.left, at.top))}
           >
             <VStack xstyle={styles.pinTile} aria-hidden>

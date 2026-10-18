@@ -18,6 +18,7 @@ import {
   useChatStreamScroll,
   type ChatComposerInputHandle,
 } from '@astryxdesign/core/Chat';
+import { Button } from '@astryxdesign/core/Button';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { Banner } from '@astryxdesign/core/Banner';
 import { Avatar } from '@astryxdesign/core/Avatar';
@@ -26,6 +27,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
+import { ProgressBar } from '@astryxdesign/core/ProgressBar';
 import { Thumbnail } from '@astryxdesign/core/Thumbnail';
 import { DocumentIcon, Notice, PhotoIcon } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
@@ -40,6 +42,7 @@ import {
   type MessageFile,
   type OutgoingAttachment,
 } from '@/lib/messageFile';
+import { DICTATION_START_MS, dictationProblemFor, type DictationProblem } from '@/lib/dictationProblem';
 import { MESSAGE_PHOTO_ACCEPT, photoType, shrinkPhoto } from '@/lib/messagePhoto';
 import { FileSummary, GoogleLinkCard, MessageFileCard } from './MessageFileCard';
 import { PhotoViewer } from './PhotoViewer';
@@ -72,7 +75,8 @@ import { LimitedNotice } from './LimitedNotice';
  * few words). The
  * mic (`ChatDictationButton`) hides itself when the browser has no speech
  * recognition, which is the same §1 rule `VoiceInput` follows — a dead
- * button is worse than no button.
+ * button is worse than no button. When the browser has it but it cannot
+ * start, the conversation says why (W4, D-603).
  *
  * The send button's icon is `<Icon icon="arrowUp" size="md" />`, not
  * `ChatSendButton`'s own default (Will's screenshot, 21 September: the
@@ -139,6 +143,13 @@ export interface ThreadViewMessage {
   readonly fileUrl?: string | null;
   readonly createdAt: string;
   readonly mine: boolean;
+  /**
+   * Where my message is (D-605): `sending` while it goes, `failed` if it did not (it stays here, outlined, with "Not sent" and a
+   * Try again under it), `sent` once stored. Absent is `sent`: a conversation read from the database, and the examples.
+   */
+  readonly status?: 'sent' | 'sending' | 'failed';
+  /** How much of its photo has gone (0 to 1) while it is uploading, or absent. */
+  readonly progress?: number | null;
 }
 
 export interface ThreadViewProps {
@@ -158,7 +169,8 @@ export interface ThreadViewProps {
   /** Sends the words, a photo or a document, or words with one; true once it has gone. */
   readonly onSend: (body: string, attachment: OutgoingAttachment | null) => Promise<boolean>;
   readonly sending: boolean;
-  readonly sendFailed: boolean;
+  /** Sends a message that did not go once more (D-605). Its id is the message's. */
+  readonly onRetry?: (id: string) => void;
   /**
    * A limited account (0031) can read but not send. The composer gives way to
    * the notice that says what is off and who to call (terms.s.limits.p3,
@@ -173,6 +185,17 @@ export interface ThreadViewProps {
   readonly blocked?: 'mine' | 'theirs' | null;
   /** BCP-47 tag for dictation, e.g. "en-US" or "es-US". */
   readonly speechLanguage: string;
+  /**
+   * A person's conversation with Pam (D-605). The composer says "Write to Pam", takes a photo and no document (the microphone
+   * stays), and there is no limit notice: a limited account can write to Pam.
+   */
+  readonly pam?: boolean;
+  /**
+   * The Pam team's tools for a Pam conversation (saved replies), above the composer; Ava's. Only given to the Pam team.
+   * Called with `setDraft`, which replaces what is in the box and puts the cursor at its end: a saved reply fills the box and is
+   * never sent by itself.
+   */
+  readonly teamTools?: (composer: { readonly setDraft: (text: string) => void }) => ReactNode;
 }
 
 /**
@@ -272,6 +295,17 @@ const styles = stylex.create({
   // times without becoming a second scroll box.
   reveal: { width: '100%', overflowX: 'clip', touchAction: 'pan-y' },
   notice: { paddingInline: spacingVars['--spacing-3'] },
+  // A message that did not go stays where it was written, outlined, so nothing is lost (D-605).
+  failedBubble: {
+    borderWidth: '2px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border-red'],
+  },
+  // "Sending…", "Not sent" and "Sent" under a bubble, quiet; the Try again beside "Not sent" is a full 48px target.
+  statusLine: { alignItems: 'center', minHeight: '24px' },
+  progress: { width: '160px', maxWidth: '100%' },
+  statusText: { fontSize: '13px', lineHeight: 1.4 },
+  retry: { minHeight: '48px', minWidth: '48px' },
   // A photo in a bubble (D-394): a 240px square, cropped to fill, that opens
   // full size when tapped. A photo or a document sits in an even 8px rim of
   // the bubble's colour — the same above it as beside it (Will, 9 October,
@@ -559,15 +593,75 @@ export function ThreadView({
   intro = null,
   onSend,
   sending,
-  sendFailed,
+  onRetry,
   limited = false,
   blocked = null,
   speechLanguage,
+  pam = false,
+  teamTools,
 }: ThreadViewProps) {
   const { t, tPlain, locale } = useI18n();
   const inputRef = useRef<ChatComposerInputHandle>(null);
   const [draft, setDraft] = useState('');
-  const dictation = useChatDictation({ inputRef, lang: speechLanguage });
+  // Speaking a message says why it did not start (W4, D-603). Astryx's mic
+  // reports nothing on its own: a refused microphone, no connection or a
+  // browser with no recogniser all looked like a button that did nothing. So
+  // the errors the browser sends, a start that never answers, and the tap on a
+  // browser with no recogniser each put one line above the box, and a start
+  // clears it. `tries` counts them so a second failure shakes the line again.
+  const [dictationProblem, setDictationProblem] = useState<DictationProblem | null>(null);
+  const [dictationTries, setDictationTries] = useState(0);
+  const attempt = useRef({ started: false, reported: false });
+  const startTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clearStartTimer = () => {
+    if (startTimer.current) clearTimeout(startTimer.current);
+    startTimer.current = null;
+  };
+  const dictationFailed = (kind: DictationProblem) => {
+    clearStartTimer();
+    attempt.current.reported = true;
+    setDictationProblem(kind);
+    setDictationTries((n) => n + 1);
+  };
+  const speech = useChatDictation({
+    inputRef,
+    lang: speechLanguage,
+    onStart: () => {
+      clearStartTimer();
+      attempt.current.started = true;
+      setDictationProblem(null);
+    },
+    onError: (event) => {
+      const kind = dictationProblemFor(event.error);
+      if (kind) dictationFailed(kind);
+    },
+    onEnd: () => {
+      clearStartTimer();
+      // Ended without ever starting and without saying why.
+      if (!attempt.current.started && !attempt.current.reported) dictationFailed('failed');
+    },
+  });
+  useEffect(() => clearStartTimer, []);
+  const dictation = {
+    ...speech,
+    toggle: () => {
+      if (speech.isListening) {
+        speech.stop();
+        return;
+      }
+      attempt.current = { started: false, reported: false };
+      setDictationProblem(null);
+      clearStartTimer();
+      startTimer.current = setTimeout(() => {
+        if (!attempt.current.started && !attempt.current.reported) dictationFailed('failed');
+      }, DICTATION_START_MS);
+      try {
+        speech.start();
+      } catch {
+        dictationFailed('failed');
+      }
+    },
+  };
 
   // While the mic is on, the words follow you (Will, 8 October, D-397). The
   // box grows to 8 lines, then scrolls inside itself; a typed word keeps
@@ -579,6 +673,21 @@ export function ThreadView({
   // Only then: someone editing the middle of a long message by hand is
   // never pulled away from where they are.
   const inputBox = useRef<HTMLDivElement>(null);
+  // Fills the box with words that were not typed (a saved reply), focuses it and leaves the cursor at the end.
+  const fillDraft = (text: string) => {
+    setDraft(text);
+    requestAnimationFrame(() => {
+      const editable = inputBox.current?.querySelector<HTMLElement>('[contenteditable]');
+      if (!editable) return;
+      editable.focus();
+      const range = document.createRange();
+      range.selectNodeContents(editable);
+      range.collapse(false);
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+    });
+  };
   useEffect(() => {
     if (!dictation.isListening) return;
     const editable = inputBox.current?.querySelector<HTMLElement>('[contenteditable]');
@@ -593,6 +702,54 @@ export function ThreadView({
   }, [dictation.isListening]);
 
   const name = otherName ?? t('messages.thread.someone');
+
+  // Under my message: "Sending…" while it goes; "Not sent" and a 48px "Try again" if it did not (D-605); a quiet "Sent" under the last
+  // message only. The same words and the same ways for a text and a photo, in every conversation.
+  const statusOf = (message: ThreadViewMessage, isLast: boolean): ReactNode => {
+    if (!message.mine) return undefined;
+    const status = message.status ?? 'sent';
+    if (status === 'sending') {
+      return (
+        <VStack gap={1} xstyle={styles.statusLine} role="status">
+          <Text type="supporting" xstyle={styles.statusText}>
+            {t('messages.thread.sending')}
+          </Text>
+          {typeof message.progress === 'number' ? (
+            <ProgressBar
+              label={tPlain('messages.thread.sending')}
+              isLabelHidden
+              value={Math.round(message.progress * 100)}
+              xstyle={styles.progress}
+            />
+          ) : null}
+        </VStack>
+      );
+    }
+    if (status === 'failed') {
+      return (
+        <HStack gap={2} xstyle={styles.statusLine} data-message-status="failed">
+          <Text type="supporting" xstyle={styles.statusText}>
+            {t('messages.thread.notSent')}
+          </Text>
+          <Button
+            label={t('messages.thread.tryAgain')}
+            aria-label={tPlain('messages.thread.notSent.label')}
+            variant="secondary"
+            size="md"
+            onClick={() => onRetry?.(message.id)}
+            xstyle={styles.retry}
+          />
+        </HStack>
+      );
+    }
+    return isLast ? (
+      <HStack xstyle={styles.statusLine}>
+        <Text type="supporting" xstyle={styles.statusText}>
+          {t('messages.thread.sent')}
+        </Text>
+      </HStack>
+    ) : undefined;
+  };
   // What is picked to send — a photo (D-394) or a document (D-399), one at a
   // time — shown above where you type until it goes.
   const picker = useRef<HTMLInputElement>(null);
@@ -641,7 +798,8 @@ export function ThreadView({
       setPicked({ kind: 'photo', file: shrunk, preview: URL.createObjectURL(shrunk) });
       return;
     }
-    if (!messageFileType(file)) {
+    // Pam takes a photo (screenshots) and no document (D-605).
+    if (pam || !messageFileType(file)) {
       refuse('wrongType');
       return;
     }
@@ -655,15 +813,17 @@ export function ThreadView({
 
   const submit = async (value: string) => {
     if (sending || (value.trim() === '' && !picked)) return;
-    const ok = await onSend(
-      value,
-      picked ? (picked.kind === 'photo' ? { kind: 'photo', file: picked.file, isReady: true } : { kind: 'file', file: picked.file }) : null,
-    );
-    if (ok) {
-      setDraft('');
-      clearPicked();
-      setAttachProblem(null);
-    }
+    const attachment: OutgoingAttachment | null = picked
+      ? picked.kind === 'photo'
+        ? { kind: 'photo', file: picked.file, isReady: true }
+        : { kind: 'file', file: picked.file }
+      : null;
+    // The message is in the conversation the moment it is sent, "Sending…"; if it does not go it stays there as "Not sent" with
+    // its words and its picture, and Try again sends it (D-605). So the box is empty at once and nothing is lost.
+    setDraft('');
+    clearPicked();
+    setAttachProblem(null);
+    await onSend(value, attachment);
   };
 
   // A drop anywhere on the conversation (D-399): files are taken as above; a
@@ -709,7 +869,7 @@ export function ThreadView({
       value={draft}
       onChange={setDraft}
       onSubmit={(value) => void submit(value)}
-      placeholder={t('messages.thread.placeholder')}
+      placeholder={pam ? t('messages.pam.placeholder') : t('messages.thread.placeholder')}
       isDisabled={sending}
       elevation="none"
       xstyle={[styles.composer, dropping && styles.dropping]}
@@ -719,6 +879,28 @@ export function ThreadView({
             <Text type="supporting" xstyle={styles.attachNote}>
               {t('messages.thread.attach.drop')}
             </Text>
+          </ChatComposerDrawer>
+        ) : dictationProblem ? (
+          // Why speaking did not start (W4, D-603): the same banner, and the
+          // same shake, as a file Pam cannot take, below.
+          <ChatComposerDrawer>
+            <VStack key={dictationTries} data-dictation-problem={dictationProblem} xstyle={styles.refusal}>
+              <Banner
+                status="warning"
+                title={t(`messages.thread.dictate.problem.${dictationProblem}.title`)}
+                description={t(`messages.thread.dictate.problem.${dictationProblem}.hint`)}
+                endContent={
+                  <IconButton
+                    label={t('messages.thread.attach.close')}
+                    icon={<Icon icon="close" size="md" />}
+                    variant="ghost"
+                    size="md"
+                    onClick={() => setDictationProblem(null)}
+                    xstyle={styles.square}
+                  />
+                }
+              />
+            </VStack>
           </ChatComposerDrawer>
         ) : picked?.kind === 'photo' ? (
           <ChatComposerDrawer>
@@ -766,7 +948,7 @@ export function ThreadView({
               <Banner
                 status="warning"
                 title={t(`messages.thread.attach.${attachProblem}.title`)}
-                description={t(`messages.thread.attach.${attachProblem}.hint`)}
+                description={t(pam && attachProblem === 'wrongType' ? 'messages.thread.attach.wrongType.pam.hint' : `messages.thread.attach.${attachProblem}.hint`)}
                 endContent={
                   <IconButton
                     label={t('messages.thread.attach.close')}
@@ -780,14 +962,19 @@ export function ThreadView({
               />
             </VStack>
           </ChatComposerDrawer>
+        ) : dictation.isListening ? (
+          // Listening, said in words as well as by the bars on the mic (W4).
+          <ChatComposerDrawer>
+            <Banner status="info" title={t('voice.listening')} />
+          </ChatComposerDrawer>
         ) : undefined
       }
       input={
         <ChatComposerInput
           ref={inputBox}
           handleRef={inputRef}
-          label={t('messages.thread.placeholder')}
-          placeholder={t('messages.thread.placeholder')}
+          label={pam ? t('messages.pam.placeholder') : t('messages.thread.placeholder')}
+          placeholder={pam ? t('messages.pam.placeholder') : t('messages.thread.placeholder')}
           hasHistory={false}
           maxRows={8}
           onFiles={(files) => void take(files)}
@@ -835,28 +1022,32 @@ export function ThreadView({
             }}
             {...stylex.props(styles.fileInput)}
           />
-          <IconButton
-            label={t('messages.thread.file.add')}
-            icon={<Icon icon={DocumentIcon} size="md" color="secondary" />}
-            variant="ghost"
-            size="md"
-            isDisabled={sending}
-            onClick={() => docPicker.current?.click()}
-            xstyle={styles.square}
-          />
-          <input
-            ref={docPicker}
-            type="file"
-            accept={MESSAGE_FILE_ACCEPT}
-            tabIndex={-1}
-            aria-hidden
-            onChange={(event) => {
-              const files = [...(event.target.files ?? [])];
-              event.target.value = '';
-              void take(files);
-            }}
-            {...stylex.props(styles.fileInput)}
-          />
+          {pam ? null : (
+            <>
+              <IconButton
+                label={t('messages.thread.file.add')}
+                icon={<Icon icon={DocumentIcon} size="md" color="secondary" />}
+                variant="ghost"
+                size="md"
+                isDisabled={sending}
+                onClick={() => docPicker.current?.click()}
+                xstyle={styles.square}
+              />
+              <input
+                ref={docPicker}
+                type="file"
+                accept={MESSAGE_FILE_ACCEPT}
+                tabIndex={-1}
+                aria-hidden
+                onChange={(event) => {
+                  const files = [...(event.target.files ?? [])];
+                  event.target.value = '';
+                  void take(files);
+                }}
+                {...stylex.props(styles.fileInput)}
+              />
+            </>
+          )}
         </>
       }
       sendButton={
@@ -875,7 +1066,7 @@ export function ThreadView({
   return (
     <>
     <ChatLayout
-      composer={composer}
+      composer={teamTools ? <VStack>{teamTools({ setDraft: fillDraft })}{composer}</VStack> : composer}
       density="compact"
       scrollButton={<ScrollToBottom />}
       xstyle={styles.layout}
@@ -942,7 +1133,9 @@ export function ThreadView({
                       styles.bubble,
                       message.mine && styles.mine,
                       (message.photoUrl != null || message.file != null) && styles.rim,
+                      message.status === 'failed' && styles.failedBubble,
                     ]}
+                    metadata={statusOf(message, i === messages.length - 1)}
                   >
                     {message.photoUrl ? (
                       <VStack gap={3}>
@@ -985,16 +1178,6 @@ export function ThreadView({
         </ChatMessageList>
       </RevealTimes>
 
-      {sendFailed && !limited && !blocked ? (
-        <VStack xstyle={styles.notice}>
-          <Notice
-            notice="something_went_wrong"
-            title={t('messages.thread.failed.title')}
-            body={t('messages.thread.failed.body')}
-            contactLabel={t('help.contact.action')}
-          />
-        </VStack>
-      ) : null}
     </VStack>
     </ChatLayout>
     <PhotoViewer media={viewing} onClose={() => setViewing(null)} />

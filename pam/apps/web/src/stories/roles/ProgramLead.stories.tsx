@@ -3,6 +3,7 @@ import { screen, screenWithControls } from './screen';
 import { asRole } from '../journeys/journey';
 import { REDESIGN_ROUTES } from '../prototype/routes';
 import { withSetup } from '../journeys/journey';
+import { BookForMemberView } from '../../screens/BookForMemberView';
 
 /**
  * A program lead's app, screen by screen (D-217, D-218). Their bar is Home
@@ -37,6 +38,7 @@ const soon = (days: number, hour: number) => {
   d.setHours(hour, 0, 0, 0);
   return d.toISOString();
 };
+/** The names are the pretend database's own people for these ids (dummy-m1 Jordan, dummy-m2 Keisha, dummy-m3 Miguel), so a row opens the person it names (Iris, P4). */
 const bookedFor = (n: number, name: string, days: number, hour: number) => ({
   id: `added-story-${n}`,
   placeId: 'dummy-place-learning',
@@ -90,7 +92,7 @@ export const WhatYouSent: Story = withSetup(screen('provider', 'What you sent', 
 });
 export const HomeFolded: Story = withSetup(screen('provider', 'Home — first bookings, photo still to add', '/'), {
   done: ['program'],
-  booked: [bookedFor(1, 'Marcus', 1, 10), bookedFor(2, 'Tanya', 2, 13), bookedFor(3, 'Luis', 3, 11)],
+  booked: [bookedFor(1, 'Jordan', 1, 10), bookedFor(2, 'Keisha', 2, 13), bookedFor(3, 'Miguel', 3, 11)],
 });
 export const NotificationsNone: Story = withSetup(screen('provider', 'Notifications — none yet', '/notifications/'), {});
 export const MessagesNone: Story = withSetup(screen('provider', 'Messages — none yet', '/messages/'), {});
@@ -108,6 +110,15 @@ export const Member: Story = screen('provider', 'A member', '/person/', { id: 'd
 export const MemberPolicies: Story = screen('provider', 'A member — policies signed', '/person/policies/', { id: 'dummy-m2' });
 export const Invite: Story = screen('provider', 'Invite someone', '/invite/');
 export const BookForMember: Story = screen('provider', 'Book a visit for a member', '/program/book/');
+/**
+ * Nobody to pick yet (D-595): nobody has written to the program, signed up with it or planned a visit there. The sentence says all
+ * three, and the list is not a blank. Drawn here so the language fit audit measures it.
+ */
+export const BookForMemberNobody: Story = {
+  ...asRole('provider', '/program/book/'),
+  name: 'Book a visit for a member — nobody to pick',
+  render: () => <BookForMemberView people={[]} />,
+};
 export const AddPerson: Story = screen('provider', 'Add a person', '/program/book/new/');
 export const AllPrograms: Story = screen('provider', 'All programs', '/programs/');
 export const AddProgram: Story = screen('provider', 'Add a program', '/programs/new/');

@@ -55,6 +55,8 @@ export interface Trip {
   readonly startsAt: string;
   /** What the program marked after the visit (D-526). */
   readonly attendance?: 'attended' | 'missed';
+  /** A program lead booked it for the member, who had written to it (D-595). */
+  readonly bookedByProgram?: boolean;
   readonly withName?: string | null;
   readonly withPhotoUrl?: string | null;
   /** The service the visit is for (D-313): its policies are the ones to sign. */
@@ -127,6 +129,8 @@ const PIN_ART = { width: 20, height: 20, 'aria-hidden': true } as const;
 
 export function TripsView({ trips, headerActions, justAdded = null }: TripsViewProps) {
   const { t, tPlain, locale } = useI18n();
+  // Where the sheet's top edge is, so the map can take the pins it covers out of a screen reader's reach (Iris, P3).
+  const [sheetTop, setSheetTop] = useState<number | null>(null);
   // Coming up stays on the map and in the count; a visit whose time has gone
   // moves down to Past visits, most recent first, with no policies to sign.
   const nowAt = new Date().toISOString();
@@ -175,7 +179,14 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
             : null
         }
         // After the visit, what the program marked (D-526): a mark is theirs to make; no mark says so, and costs nothing.
-        mark={isPast && trip.attendance ? t(trip.attendance === 'attended' ? 'schedule.checkedIn' : 'trips.notMarked') : null}
+        mark={
+          isPast && trip.attendance
+            ? t(trip.attendance === 'attended' ? 'schedule.checkedIn' : 'trips.notMarked')
+            : // A program booked it for them (D-595): said on the card, as on the Explore one, until the visit is past.
+              !isPast && trip.bookedByProgram
+              ? t('trips.bookedForYou')
+              : null
+        }
         label={
           trip.withName
             ? tPlain('trips.card.label', { place: trip.placeName, when: when(trip.startsAt), name: trip.withName })
@@ -197,6 +208,7 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
     // What a tapped next-trip card grows into (D-269): Trips has no `Page`.
     <VStack data-pam-morph-target="" xstyle={styles.screen}>
       <TripsMap
+        sheetTop={sheetTop}
         pins={shown.map((trip) => ({
           id: trip.id,
           name: trip.placeName,
@@ -220,6 +232,7 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
       */}
       {justAdded ? <Confetti /> : null}
       <MapDrawer
+        onTopChange={setSheetTop}
         initialStop={justAdded ? 'full' : 'half'}
         bottomOffset={TAB_BAR}
         topOffset={84}
@@ -313,6 +326,7 @@ export function TripsScreen({ headerActions }: { readonly headerActions?: ReactN
     startsAt: trip.startsAt,
     serviceId: trip.serviceId ?? null,
     ...(trip.attendance ? { attendance: trip.attendance } : {}),
+    ...(trip.bookedByProgram ? { bookedByProgram: true } : {}),
   }));
   // The example set (a demo or Storybook only, D-509): `exampleTrips` is empty for a real account,
   // and changes whenever a trip is cancelled, so this reads again then.

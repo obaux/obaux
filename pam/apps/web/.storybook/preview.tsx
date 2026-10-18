@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import type { Decorator, Preview } from '@storybook/nextjs';
 import { Theme } from '@astryxdesign/core/theme';
 import { MotionProvider } from '@pam/ui';
+import { useRowTaps } from '@pam/ui/tapRows';
 import { LANGUAGE_TAGS, isSupportedLocale, type Locale, type TextBundle } from '@pam/config';
 import en from '@pam/config/locales/en.json';
 import es from '@pam/config/locales/es.json';
@@ -63,6 +64,12 @@ function LocaleBridge({ locale }: { readonly locale: Locale }) {
  * signed-in account, and Storybook has none): the PAM theme, motion, i18n and
  * the alert banner.
  */
+/** The app shell's row taps, for a story (the same hook `Providers` runs). */
+function RowTaps() {
+  useRowTaps();
+  return null;
+}
+
 const withPam: Decorator = (Story, context) => {
   const mode = context.globals['theme'] === 'dark' ? 'dark' : 'light';
   const chosen = String(context.globals['locale'] ?? '');
@@ -74,6 +81,7 @@ const withPam: Decorator = (Story, context) => {
         <I18nProvider key={pseudo ? 'pseudo' : 'real'} bundles={pseudo ? BUNDLES_PSEUDO : BUNDLES} initialLocale={locale}>
           <SchemeBridge mode={mode} />
           <LocaleBridge locale={locale} />
+          <RowTaps />
           <AlertBannerProvider>
             <Story />
           </AlertBannerProvider>

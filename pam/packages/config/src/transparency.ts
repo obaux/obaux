@@ -57,6 +57,18 @@ export const ADMIN_CAN_SEE = [
    */
   'visits_planned_at_their_own_program',
   /**
+   * D-595 (a94; Will, 17 October, card a94, 15:21: "signed on all"): a program can book a visit for a member who wrote to it, signed up
+   * with it or planned a visit there (`book_visit_for_member`), and a case manager (the member's guide) sees, beside every such visit,
+   * that a program booked it and WHICH program: "Booked by {program}" (`person.trip.bookedBy`; `BOOKED_BY_SHOWN_ON` is 'every', Will's
+   * answer to the open question). It is an organisation, never a person: `appointments.booked_by_org` is read through
+   * `appointments_select_admin`, and which lead did it is in `audit_log`, which only the Pam team reads. A program lead reads no
+   * appointment row at all (test 65), so this fact is the guide's alone. Said to the member before it ships, in four places that
+   * `program-booking-line.test.ts` holds together: the Privacy page (`privacy.s.who-can-see.p1`), the guide's list
+   * (`transparency.canSee.bookedBy`), the staff's own list (`join.privacy.admin.2`) and this entry. The member sees "Booked for you" on
+   * the card and can cancel the visit (`cancel_trip` cancels any of their own scheduled visits, whoever booked it).
+   */
+  'which_visits_a_program_booked_for_them',
+  /**
    * D-541 (Will, 11 October, 20:22 and 20:24: "members must be able to message a program before booking" and
    * "communicate what programs can see, even before the person books"): a member can write to a program from its
    * page at any time, with no sign-up and no visit.
@@ -145,6 +157,10 @@ export type AdminVisibleField = (typeof ADMIN_CAN_SEE)[number];
 
 /** Explicitly NOT visible. Kept as data so tests can assert the negative. */
 export const ADMIN_CANNOT_SEE = [
+  /**
+   * True of the guide (a case manager) and of every conversation but one. The exception is a person's Pam conversation, which the Pam
+   * team reads: that is `PAM_TEAM_CAN_READ` below, a list of its own so this one is never widened by it (D-605).
+   */
   'message_bodies',
   /** D-394: photos in a conversation, outside a report — no admin policy on the bucket, as on `messages`. */
   'message_photos',
@@ -233,6 +249,27 @@ export const ADMIN_CANNOT_SEE = [
   'member_location',
 ] as const;
 
+/**
+ * What the Pam team reads, and nothing else: a list of its own, apart from `ADMIN_CAN_SEE` (Lena recommended it and the merge desk took
+ * it, 18 October 2026), so the guide's list can never be widened by it and the two cannot be confused. `is_pam_team()` in the database is the
+ * only door to anything below, and today it is exactly `is_super_admin()`. Widening this list needs Will, and members are told first (D-413).
+ *
+ * The first and only entry came from Will's answers on card a100 (D-605, 18 October 2026): messaging Pam is a conversation in everyone's
+ * Messages that the Pam team reads, and Pam writes back. It is not behind a policy that exists yet: the policies arrive with migration 4 of
+ * the Message Pam build, and until the switch (`app_settings.pam_messaging_live`) is on, nothing is created for the team to read.
+ */
+export const PAM_TEAM_CAN_READ = [
+  /**
+   * The messages and photos a person writes in their one Pam conversation (`conversations.kind = 'support'`), and Pam's replies there. Read
+   * by `is_pam_team()` and nobody else: not a case manager, not a program, not another member. It reaches no other conversation, and a
+   * person's other conversations stay between them and the other person (`ADMIN_CANNOT_SEE.message_bodies`). Said to the person on the
+   * Privacy page, never inside the conversation (Will, 18 October: "Save it for the legal pages. Keep the UI clean.").
+   */
+  'messages_written_to_pam',
+] as const;
+
+export type PamTeamReadableField = (typeof PAM_TEAM_CAN_READ)[number];
+
 export type AdminHiddenField = (typeof ADMIN_CANNOT_SEE)[number];
 
 export function isAdminVisible(field: string): field is AdminVisibleField {
@@ -290,6 +327,8 @@ export const TRANSPARENCY_SCREEN: {
       key: 'transparency.canSee.appointments',
       en: 'Your visits, and if you went or missed one. A program sees the visits you plan there too.',
     },
+    // D-595 (a94, Will 17 October): the guide sees which of the visits a program booked. Said once here; the Privacy page says it in `who-can-see.p1`.
+    { key: 'transparency.canSee.bookedBy', en: 'Which of your visits a program booked for you.' },
     // D-413 — badges named, not left to "level": a case manager already reads them.
     { key: 'transparency.canSee.points', en: 'Your points, your level and your badges' },
     // The case manager sees this. A program does NOT yet: D-242 (Will, 3 October) said it should, but the
@@ -355,7 +394,7 @@ export const TRANSPARENCY_SCREEN: {
     },
     {
       key: 'transparency.program.visits',
-      en: 'The visits you plan there: the day and time, the service you picked, and whether you were marked as there.',
+      en: 'The visits you plan there, and the ones it books for you: the day and time, the service, and whether you were marked as there.',
     },
   ],
 
@@ -417,7 +456,12 @@ export const TRANSPARENCY_GROUPS: readonly {
 }[] = [
   {
     titleKey: 'transparency.group.plans',
-    keys: ['transparency.canSee.goals', 'transparency.canSee.enrollments', 'transparency.canSee.appointments'],
+    keys: [
+      'transparency.canSee.goals',
+      'transparency.canSee.enrollments',
+      'transparency.canSee.appointments',
+      'transparency.canSee.bookedBy',
+    ],
   },
   {
     titleKey: 'transparency.group.progress',

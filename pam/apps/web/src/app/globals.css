@@ -379,8 +379,67 @@
   .astryx-selector-option-row {
     min-height: var(--pam-touch-target-min);
   }
+
+  /*
+   * The items of a drop-down menu (a place's More options, Home's +, What you sent's More, the role and language menus) were 34px, with
+   * "Delete and start over" sitting directly above Help (Iris, W2, 17 October): each is a tap, so each meets the 48px floor like
+   * every other control and the dropdown options above.
+   */
+  .astryx-dropdown-menu-item {
+    min-height: var(--pam-touch-target-min);
+  }
   .astryx-selector-option-row[data-selected] > span:last-child .astryx-icon svg {
     stroke-width: 2.5;
+  }
+
+  /*
+   * A list of languages shows all of them (S1, Iris's interaction run-through, 17 October 2026). Astryx stops a menu and a
+   * dropdown's list at 300px, which is six rows of 48px and a bit: on the way in Russian was cut in half and Arabic was
+   * under the edge, with nothing to say there was more, and the person who needs Arabic may read nothing else on the
+   * screen. These lists are found by their rows (`TaggedWords` marks the ones that start with the English tag), so the
+   * City list and every other menu keep the cap. The new cap is nine rows of the touch target (seven languages and room for
+   * two more), and the viewport still limits it, less a gap above and below.
+   * Two selectors because the cap is in two places: the globe's menu and the popover round it (which decides where the
+   * menu opens). The list in Sign up's sheet (`LanguageField`) has Astryx's 300px, which is lifted below.
+   */
+  .astryx-dropdown-menu:has([data-pam-tagged]),
+  [popover]:has(.astryx-dropdown-menu [data-pam-tagged]) {
+    max-block-size: min(calc(9 * var(--pam-touch-target-min)), calc(100vh - 2 * var(--spacing-4)));
+    max-block-size: min(calc(9 * var(--pam-touch-target-min)), calc(100dvh - 2 * var(--spacing-4)));
+  }
+
+  /*
+   * The list inside Sign up's sheet has no cap of its own: the sheet round it scrolls when the window is short, and a list with a
+   * cap as well scrolled inside it, two boxes for one list that had to be scrolled together (320×320: the sheet's content area and
+   * the list). The sheet is the one box. A window with room for the seven rows is as it was.
+   */
+  [role='listbox']:has([data-pam-tagged]) {
+    max-block-size: none;
+  }
+
+  /*
+   * The globe's menu opens under the globe, in the room the page leaves under it, and the cap above is the window less
+   * two gaps, not that room: on a 320×320 window the room is 248px and the cap 288px, so the menu ran 40px past the
+   * window and Arabic could be got to only by scrolling the page and the menu together (Iris, 18 October). Percentages
+   * on the popover are of the area it is anchored into (the room under the globe, or over it when it flips), so the
+   * popover is also capped at that area less its 4px margins; the surface and the menu inside it are columns that may
+   * shrink, so the menu keeps to the popover and scrolls. A window with room for the whole menu is as it was.
+   */
+  [popover]:has(.astryx-dropdown-menu [data-pam-tagged]) {
+    max-block-size: min(calc(9 * var(--pam-touch-target-min)), calc(100vh - 2 * var(--spacing-4)), calc(100% - 2 * var(--spacing-1)));
+    max-block-size: min(calc(9 * var(--pam-touch-target-min)), calc(100dvh - 2 * var(--spacing-4)), calc(100% - 2 * var(--spacing-1)));
+  }
+  [popover]:has(.astryx-dropdown-menu [data-pam-tagged]):popover-open {
+    display: flex;
+    flex-direction: column;
+  }
+  [popover]:has(.astryx-dropdown-menu [data-pam-tagged]) > .astryx-popover-surface {
+    display: flex;
+    flex-direction: column;
+    min-block-size: 0;
+  }
+  .astryx-dropdown-menu:has([data-pam-tagged]) {
+    min-block-size: 0;
   }
 
   /* The closed box's chevron (D-372): larger and bolder, tucked 20px in
@@ -635,3 +694,106 @@
 :root { overflow-wrap: break-word; }
 :root:not([lang='en']) { hyphens: auto; }
 :root:lang(zh-CN), :root:lang(zh-HK) { line-break: strict; }
+
+/*
+ * The press layer (Will, 17 October 2026, card a99: "a more sophisticated interaction layer across the app for tapable items, where it
+ * feels like someone is tapping or pressing in. Right now those items are feeling very flat"). Three things, all on `:active`, which iOS
+ * Safari applies because the app keeps one touchstart listener (packages/ui/src/tapRows.ts):
+ *
+ *   - a ROW or a SEGMENT of a switch darkens while held: a quick 7% shade (10% white in the dark), in at 60ms, released over 200ms;
+ *   - a CARD or TILE and a BUTTON press in: scale(0.97) with the same shade on a card, in at 90ms, a soft release over 220ms;
+ *   - reduced motion keeps the shade and drops the scale: no transform, no transition.
+ *
+ * `Press` (packages/ui/src/motion.tsx) already scales a primary button's wrapper to 0.97; it is marked `data-pam-press`, and what is
+ * inside it is left to it so a primary button does not press to 0.94.
+ */
+@layer pam {
+  :root {
+    --pam-press-shade: light-dark(oklch(0 0 0 / 7%), oklch(1 0 0 / 10%));
+    --pam-press-scale: 0.97;
+    --pam-press-in: 90ms;
+    --pam-press-out: 220ms;
+    --pam-press-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* A row: darken while held. */
+  .astryx-item {
+    transition: background-color var(--pam-press-out) var(--pam-press-ease);
+  }
+  .astryx-item:active {
+    background-color: var(--pam-press-shade);
+    transition-duration: 60ms;
+  }
+
+  /* A segment of a switch (Day | Week | Month, Conversations | Reported): shade while held, no scale. */
+  .astryx-segmented-control-item {
+    transition: background-image var(--pam-press-out) var(--pam-press-ease);
+  }
+  .astryx-segmented-control-item:active {
+    background-image: linear-gradient(var(--pam-press-shade), var(--pam-press-shade));
+    transition-duration: 60ms;
+  }
+
+  /* A card or tile that opens something, and a button: press in. */
+  .astryx-clickable-card,
+  .astryx-button {
+    transition-property: transform, background-color, border-color, opacity, background-image;
+    transition-duration: var(--pam-press-out), 125ms, 125ms, 125ms, 125ms;
+    transition-timing-function: var(--pam-press-ease);
+  }
+  .astryx-clickable-card:active {
+    transform: scale(var(--pam-press-scale));
+    background-image: linear-gradient(var(--pam-press-shade), var(--pam-press-shade));
+    transition-duration: var(--pam-press-in), 125ms, 125ms, 125ms, 125ms;
+  }
+  .astryx-button:active:not(:disabled, [aria-disabled='true']):not([data-pam-press] *) {
+    transform: scale(var(--pam-press-scale));
+    transition-duration: var(--pam-press-in), 125ms, 125ms, 125ms, 125ms;
+  }
+
+  /*
+   * A card whose heading is a stretched link (`data-pam-stretch`: Explore's program cards, the case manager's member cards and
+   * program list, the program lead's "Finish setting up" cards) is an `astryx-card`, not a clickable card. Pressing the link
+   * (its ::after covers the card) presses the whole card. Only marked cards: an ordinary link inside a card does not.
+   */
+  /* A service choice. */
+  .astryx-card,
+  .astryx-selectable-card {
+    transition-property: transform, background-color, border-color, background-image;
+    transition-duration: var(--pam-press-out), 125ms, 125ms, 125ms;
+    transition-timing-function: var(--pam-press-ease);
+  }
+  .astryx-card:has(a[data-pam-stretch]:active),
+  .astryx-selectable-card:active {
+    transform: scale(var(--pam-press-scale));
+    background-image: linear-gradient(var(--pam-press-shade), var(--pam-press-shade));
+    transition-duration: var(--pam-press-in), 125ms, 125ms, 125ms;
+  }
+
+  /* A tab in the bar: shade while held, as a row. */
+  .astryx-tab {
+    transition: background-color var(--pam-press-out) var(--pam-press-ease);
+  }
+  .astryx-tab:active {
+    background-color: var(--pam-press-shade);
+    transition-duration: 60ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .astryx-item,
+    .astryx-segmented-control-item,
+    .astryx-clickable-card,
+    .astryx-card,
+    .astryx-selectable-card,
+    .astryx-tab,
+    .astryx-button {
+      transition: none;
+    }
+    .astryx-clickable-card:active,
+    .astryx-card:has(a[data-pam-stretch]:active),
+    .astryx-selectable-card:active,
+    .astryx-button:active:not(:disabled, [aria-disabled='true']):not([data-pam-press] *) {
+      transform: none;
+    }
+  }
+}

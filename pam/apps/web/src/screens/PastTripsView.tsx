@@ -8,6 +8,7 @@ import { SubPageHeader } from '@pam/ui/SubPage';
 import { TripCard } from '@pam/ui/TripCard';
 import { dummyTripsFor } from '@pam/config/dummy-trips';
 import { DUMMY_EVERYONE } from '@pam/config/dummy-people';
+import { showsBookedBy } from '@/lib/bookedByLine';
 import { useMemberTrips } from '@/lib/useMemberTrips';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
@@ -64,6 +65,7 @@ export function PastTripsView({ personId, name }: { readonly personId: string; r
               href={`/place/?id=${encodeURIComponent(trip.placeId)}`}
               art={<CategoryPicture category={trip.category} />}
               label={`${trip.placeName}, ${when(trip.startsAt)}`}
+              mark={'bookedByProgram' in trip && showsBookedBy(trip) ? t('person.trip.bookedBy', { program: trip.placeName }) : null}
             />
           ))}
         </VStack>

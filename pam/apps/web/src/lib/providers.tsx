@@ -4,6 +4,7 @@ import { useEffect, useState, type ComponentType, type ReactNode } from 'react';
 import { Theme } from '@astryxdesign/core/theme';
 import { pamTheme } from '@pam/ui/theme';
 import { ContactHrefProvider, MotionProvider } from '@pam/ui';
+import { useRowTaps } from '@pam/ui/tapRows';
 import { I18nProvider } from './i18n';
 import { AlertBannerProvider } from './alertBanner';
 import { ClientNav } from './ClientNav';
@@ -26,6 +27,8 @@ import { ClientNav } from './ClientNav';
  * (§3.1 "Me"), and it sets this `mode` prop.
  */
 export function Providers({ children }: { children: ReactNode }) {
+  // A row opens from anywhere on it, and iOS applies :active (packages/ui/src/tapRows.ts).
+  useRowTaps();
   /*
    * `LocaleSync` calls `useSession`, and `Providers` wraps every route,
    * including several — `/help`, `/privacy`, `/terms` — that never called

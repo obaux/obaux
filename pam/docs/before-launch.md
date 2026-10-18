@@ -95,7 +95,10 @@ STATUS row too.
      which comes first. Nico also updates `docs/sms-campaign-samples.md` and Will pastes Sage's HELP auto-reply into
      Twilio ("Get help at joinpam.org/support or write to hello@joinpam.org. Reply STOP to stop.").
   2. **"Reply HELP to reach a person"** (`reminders.how`, `alerts.how`, the screens the carrier reviewed) now promises more
-     than the new HELP reply gives (an address). Sage to word it; it touches the registration.
+     than the new HELP reply gives (an address). Sage to word it; it touches the registration. **18 October (D-608):** `alerts.how`
+     is done ("Reply STOP to stop, or HELP for help"; the consent paragraph in `docs/sms-campaign-samples.md` follows it).
+     `reminders.how` is done too (the /reminders/ screen the registration shows, and the join step): the screenshot Will attaches
+     must be of the new screen, and the consent paragraph in `docs/sms-campaign-samples.md` already follows it.
   3. **Ava's in-app copy and delete** (a fresh sign-in code to the account's phone). The day it ships,
      `privacy.copy.body` and `privacy.delete.body` change from "Contact Pam and ask…" to the in-app steps, and
      the Privacy › Copy / Delete pages lose their Contact Pam button (Lena carries the words).
@@ -257,6 +260,11 @@ STATUS row too.
   **The opt-in description Will files with the carrier must match `reminders.intro` and its list once those ship**
   (paste the answer under "How do end-users consent…" in `docs/sms-campaign-samples.md` only after it says the same).
   No booking text goes to members (the bell only), so there is no `reminders.what.4`.
+  **Also the moment `texts_live` goes on (Sage, 67fea9ad, 18 October):** the website's Messages in Pam post
+  (`apps/site/src/content/MessagesInPam.tsx`, the paragraph on how you hear about a message) says "Pam does not send a
+  text for a message, so open Pam to read it". A person who opted in to message texts then gets the "message waiting"
+  text (D-478; Pam's replies too, D-606), so that sentence turns false at the same moment. Sage words the replacement
+  and Wren ships it in the batch that turns texts on.
 
 - [x] **Merge and deploy 0068 and 0069** — done 8 October as 0075/0076 (D-388) (readiness fixes and blocking, on
   branch `claude/hopeful-thompson-07nj7n`, not yet on this one). 0068 is what
@@ -498,6 +506,7 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   forwarding, a test and Will's go, D-450). Six translations each by Claude, with no native reader: promises, so the same
   native readers as below. The English says "rules" where the app says "policy"; the translations follow the app's word.
 
+- [ ] **A native reader for the shortened lines that say what Pam does (D-608, 18 October 2026).** The six translations of the 34 values Sage shortened are by Claude with no native reader. Seven say what Pam does or will do, so they are promises and go to a reader first: `addProgram.ask.sent.body` and `programs.new.done.body` ("Sent. We'll text you when it's checked.", the second used by no screen), `addProgram.ask.waiting.body`, `requests.done.body` ("We texted them that they are in."), `invite.who.note` ("Only this number can use the link."), `invite.link.body` ("Works until {date}, for one person.") and `program.pending.body` ("Waiting for Pam. Members see the old one until then."). Check that "text" is the word a person uses for a text message in each language (es *texto* in the staff lines, *mensaje* elsewhere; pt-BR *mensagem*; zh-CN 短信, zh-HK 短訊; ru *сообщение*/*SMS*; ar *رسالة*), and that `schedule.checkin.undo.body` says "not marked as there" in the words `trips.notMarked` uses (zh *未标记为已到场*, not *签到*). Spanish staff screens are in *usted*.
 - [ ] **A native reader for the calendar link screen (D-538, 11 October 2026).** The 27 `calendar.*` strings are six translations by
   Claude with no native reader. Two things a reader must check against the real apps, in their own language, because the apps can
   rename them: **`calendar.others`** names buttons in Google Calendar ("Other calendars" › "From URL") and Outlook ("Add calendar" ›
@@ -531,6 +540,20 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   (1) **The case manager's search pill** (`home.caseload.search.placeholder` and `.label`, D-600): the words must fit 128px, so they are short: es "Buscar miembros" / "Buscar miembros por nombre"; pt-BR "Buscar membros" / "Buscar membros pelo nome"; zh-CN 搜索成员 / 搜索成员（按姓名）; zh-HK 搜尋會員 / 搜尋會員（按姓名）; ru «Поиск людей» / «Поиск людей по имени»; ar "ابحث في الأعضاء" / "ابحث في الأعضاء بالاسم". The label has to begin with the pill's words (voice control says them, WCAG 2.5.3). Check: does each read naturally, spoken aloud as the label; is Russian «людей» (people) acceptable where the rest of the app says «участники» for members (the pill has no room for «участников»); do 成员 and 會員 match the word the app uses for members.
   (2) **The short version's second sentence** (`transparency.summary.program`): "It sees more once you sign up, sign its rules or plan a visit there." Check that each language's word for "rules"/"policies" is the one its Privacy page uses (`sharing.p2`), and that the sentence says a program sees more, not that it must.
   (3) **The case manager's visit line** (`caseload.visit.*`, Ava's a93, ships with her branch): "Marked as there" and "Not marked as there" say what the *program* marked, not whether the member went. es "Presencia marcada / sin marcar", pt-BR "Presença registrada / não registrada", zh 标记为已到场 / 未标记为已到场 (zh-HK 標記為已到場 / 未標記為已到場), ru «Присутствие отмечено / не отмечено», ar "تم تسجيل الحضور / لم يسجل الحضور". Check that none of them reads as "the member was absent".
+
+- [ ] **A native reader for what Will signed on card a94 (17 October; Lena).** Six translations each, written by Claude, none read by a native speaker; the Privacy lines are promises.
+  (1) **Privacy** (usted, você, 您, вы): `privacy.s.sharing.p9` ("If you have written to a program, signed up with it or planned a visit there, it can book a visit for you. It shows in your Trips with the program's name, and you can cancel it.") and the clause in `privacy.s.who-can-see.p1` ("…your visits and which ones a program booked for you…"). Check that each names the same three ways in as `book.intro` and `book.empty`, and that "Trips" is the word on the app's own tab (es/pt-BR "Visitas", zh-CN 预约, zh-HK 到訪, ru «Визиты», ar «الزيارات»). In zh-CN 预约 is both the verb and the tab: does "该项目就可以为您预约。预约会连同项目名称显示在“预约”中" read clearly?
+  (2) **The member's screens** (tú in Spanish): `trips.bookedForYou` "Booked for you" (es "Reservada para ti": is the feminine right under a card titled with a place?), `transparency.canSee.bookedBy`, `transparency.program.visits`, and `reminders.intro` / `reminders.what.1` (the opt-in the carrier reads: "reminders and notes listed below"; check "notes" is the word each language uses on the list).
+  (3) **The guide's side:** `person.trip.bookedBy` ("Booked by {program}"; es/pt-BR "Reservada por") and `join.privacy.admin.2` ("…which ones a program booked and if they went or missed one…").
+
+- [ ] **A native reader for the seven Book a visit refusals (17 October; Lena; Sage's ledger `33175aed`).** Six translations each, written by Claude, none read by a native speaker. A program lead reads them under "We could not save that" when the database refuses a booking, so the register is staff (usted, você, 您, вы).
+  (1) **`trips.new.refused.member`** ("Pam cannot book a visit for {name} right now."): it must give **no reason** in any language, and a lead must not be able to read a block, an account or a link into it. es "Pam no puede reservar una visita para {name} en este momento."; pt-BR "A Pam não pode reservar uma visita para {name} no momento."; zh-CN Pam暂时无法为{name}预约。; zh-HK Pam暫時無法為{name}預約到訪。; ru «Pam сейчас не может записать на визит: {name}.» ({name} stays in the nominative, so no name is declined; does the colon read as natural, or should it be «записать на визит {name}»?); ar "لا يستطيع Pam حجز زيارة لـ {name} حاليا."
+  (2) **`.limit`** ("No more visits can be booked today, for this member or for your program."): it names both and does not say which was hit; check "or" (es *o*, pt-BR *ou*, ru *или*, zh 或) reads as "either limit", not "neither". **`.already`** ("around that time"): es "cerca de esa hora", pt-BR "por volta desse horário", ru «примерно на это время», ar "في وقت قريب من هذا الوقت". **`.far`** ("about six months ahead"; "an earlier day" = nearer): es "un día más cercano", pt-BR "um dia mais próximo", ru «более ранний день», ar "يوما أقرب".
+  (3) **`.place` and `.service`**: the place name inside the line is a Latin-script name in ru (in «») and ar (check the line still reads cleanly with a long name; the fit audit sees it wrap and not clip).
+- [ ] **A native reader for the ten dictation-banner lines (18 October; Lena; Sage's ledger `a2703793`, D-603).** Six translations each, written by Claude, none read by a native speaker. A person who taps the microphone in a conversation and it does not start reads one of these in Pam's warning banner (member register: tú, você, 您, вы).
+  (1) **"Pam can't use the microphone" / "Pam can't find a microphone"** and their hints (`messages.thread.dictate.problem.blocked.*`, `.noMic.*`): is "allow the microphone for Pam in your browser's settings" said the way the phone's own settings say it? es "ajustes de tu navegador", pt-BR "configurações do seu navegador", zh "浏览器设置 / 瀏覽器設定", ru «в настройках браузера», ar «في إعدادات متصفحك» (with «اسمح لـ Pam»).
+  (2) **"Speaking needs an internet connection" / "This browser can't listen in your language"** (`.offline.*`, `.language.*`): the second is not literal ("listen in a language" is not how they say it): zh "此浏览器听不懂您的语言", ru «Этот браузер не понимает речь на вашем языке», ar «لا يستطيع هذا المتصفح فهم الكلام بلغتك». Do they read as the browser's limit, not the person's fault?
+  (3) **"The microphone didn't start"** (`.failed.*`): es "El micrófono no empezó a funcionar", pt-BR "O microfone não começou a funcionar", zh "麦克风没有启动", ru «Микрофон не включился», ar «لم يبدأ الميكروفون بالعمل».
 
 - [ ] **Hear the language tags with a screen reader (10 October, D-455).** Every list
   of languages now starts each name with an English tag (EN, ES, PT-BR, ZH-CN, ZH-HK,
