@@ -330,7 +330,8 @@ const styles = stylex.create({
   statusLine: { alignItems: 'center', minHeight: '24px' },
   progress: { width: '160px', maxWidth: '100%' },
   // The number in the out-of-hours reply is a call (Iris P1): vertical padding on an inline link lengthens what a thumb can hit, not the line.
-  callLink: { paddingBlock: '14px', paddingInline: '6px', fontWeight: 600 },
+  // Padding on the sides is cancelled by the same margin, so the space round the number stays a word space and the hit area is 48px wide.
+  callLink: { paddingBlock: '14px', paddingInline: '12px', marginInline: '-12px', fontWeight: 600 },
   statusText: { fontSize: '13px', lineHeight: 1.4 },
   retry: { minHeight: '48px', minWidth: '48px' },
   // A photo in a bubble (D-394): a 240px square, cropped to fill, that opens
@@ -742,7 +743,41 @@ export function ThreadView({
     const lead = behind === '' || /\s$/.test(behind) ? '' : ' ';
     if (!document.execCommand('insertText', false, lead + text)) {
       setDraft((now) => (now === '' || /\s$/.test(now) ? now + text : `${now} ${text}`));
+      return;
     }
+    // The box is drawn again from its words once the change reaches state, and the browser puts its cursor back at the very start
+    // (Ava, T2). So where the cursor stands now, counted in letters, is put back after that, on the next frame and the one after.
+    const after = window.getSelection();
+    if (!after || after.rangeCount === 0) return;
+    const upTo = document.createRange();
+    upTo.setStart(editable, 0);
+    upTo.setEnd(after.getRangeAt(0).endContainer, after.getRangeAt(0).endOffset);
+    const letters = upTo.toString().length;
+    const restore = () => {
+      const box = inputBox.current?.querySelector<HTMLElement>('[contenteditable]');
+      if (!box) return;
+      const walker = document.createTreeWalker(box, NodeFilter.SHOW_TEXT);
+      let left = letters;
+      let node = walker.nextNode();
+      while (node && left > (node.textContent?.length ?? 0)) {
+        left -= node.textContent?.length ?? 0;
+        node = walker.nextNode();
+      }
+      const place = document.createRange();
+      if (node) place.setStart(node, left);
+      else {
+        place.selectNodeContents(box);
+        place.collapse(false);
+      }
+      place.collapse(true);
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(place);
+    };
+    requestAnimationFrame(() => {
+      restore();
+      requestAnimationFrame(restore);
+    });
   };
   // Fills the box with words that were not typed (a saved reply), focuses it and leaves the cursor at the end.
   const fillDraft = (text: string) => {
