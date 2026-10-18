@@ -144,8 +144,18 @@ export function PamStartScreen() {
     return true;
   };
 
-  // Refused for good (Pam is off, or this person is one Pam does not write to): a calm line, no Try again in it (T3).
-  const calm = first?.status === 'failed' && (first.why === 'PAM_OFF' || first.why === 'NOT_ALLOWED');
+  // Refused for good (Pam is off, or this person is one Pam does not write to): one calm line in place of the conversation, as
+  // for a program with no lead. Nothing here can go, so no composer and no Try again (Iris T3).
+  if (first?.status === 'failed' && (first.why === 'PAM_OFF' || first.why === 'NOT_ALLOWED')) {
+    return (
+      <Page gap={4}>
+        <SubPageHeader title={name} {...back} />
+        <Text type="supporting" role="status">
+          {t(first.why === 'PAM_OFF' ? 'pam.inbox.off' : 'pam.start.notAllowed')}
+        </Text>
+      </Page>
+    );
+  }
 
   return (
     <ThreadFrame>
@@ -165,18 +175,8 @@ export function PamStartScreen() {
               </Text>
             ) : null}
             {first?.status === 'failed' ? (
-              calm ? (
-                <Text type="supporting" role="status">
-                  {t(first.why === 'PAM_OFF' ? 'pam.inbox.off' : 'pam.start.notAllowed')}
-                </Text>
-              ) : (
-                // The same error card as other screens (T6); Try again is on the message itself.
-                <Notice
-                  notice="something_went_wrong"
-                  title={t('notice.something_went_wrong.title')}
-                  body={t('pam.start.failed')}
-                />
-              )
+              // The same error card as other screens (T6); Try again is on the message itself.
+              <Notice notice="something_went_wrong" title={t('notice.something_went_wrong.title')} body={t('pam.start.failed')} />
             ) : null}
           </ThreadIntro>
         }

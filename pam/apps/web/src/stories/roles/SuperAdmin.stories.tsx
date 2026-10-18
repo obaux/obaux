@@ -102,6 +102,34 @@ export const PamStartProgram: Story = screen('super-admin', 'Pam writes first �
   service: 'dummy-place-learning',
   name: 'Second Chance Workforce Training',
 });
+/**
+ * Pam writing first, when it does not go (Iris T1, T3, T6): the words stay as "Not sent" with Try again under an error card, or,
+ * refused by name, one calm line in place of the conversation. The story types and sends, so the 320 audit and the pictures see the state.
+ */
+const sendFirst: Story['play'] = async ({ canvas, userEvent }) => {
+  const box = await canvas.findByRole('textbox');
+  await userEvent.click(box);
+  await userEvent.keyboard('Hi, your city is fixed.');
+  // Send in the story's language: the button's name is the word for Send.
+  const send = new RegExp(`^(${[en, es, ptBR, zhCN, zhHK, ru, ar].map((b) => (b as Record<string, string>)['messages.thread.send']).join('|')})$`);
+  await userEvent.click(await canvas.findByRole('button', { name: send }));
+};
+const startFails = (
+  name: string,
+  query: Record<string, string>,
+  pamStartFails: 'error' | 'NOT_ALLOWED' | 'PAM_OFF',
+): Story => ({
+  ...asRole('super-admin', '/pam/start/', query, { pamStartFails }),
+  name,
+  render: () => <>{REDESIGN_ROUTES['/pam/start/']!.render()}</>,
+  play: sendFirst,
+});
+const PERSON = { profile: 'a0000000-0000-4000-8000-0000000000c1', name: 'Aaliyah' };
+const PROGRAM = { service: 'dummy-place-learning', name: 'Second Chance Workforce Training' };
+export const PamStartPersonFailed: Story = startFails('Pam writes first — to a person, not sent', PERSON, 'error');
+export const PamStartPersonNotAllowed: Story = startFails('Pam writes first — to the Pam team, refused', PERSON, 'NOT_ALLOWED');
+export const PamStartPersonOff: Story = startFails('Pam writes first — Message Pam is off', PERSON, 'PAM_OFF');
+export const PamStartProgramFailed: Story = startFails('Pam writes first — to a program, not sent', PROGRAM, 'error');
 // When Pam is here: the days and times, and the out-of-hours reply as people will get it.
 /** The team's ⋯ in a person's Pam conversation: Close (or Reopen) and what was shared; no Report, no Block (D-605). */
 export const PamThreadOptions: Story = screen('super-admin', "A Pam conversation's options", '/pam/thread/options/', {

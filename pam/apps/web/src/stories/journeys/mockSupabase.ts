@@ -118,9 +118,17 @@ export interface MockOptions {
    * reply; or a message that did not go ("Not sent", Try again).
    */
   readonly pamThread?: 'welcome' | 'away' | 'notSent';
+  /** Pam writing first fails (Iris T1, T3): on the network, or refused by name. Unset: it goes. */
+  readonly pamStartFails?: 'error' | 'NOT_ALLOWED' | 'PAM_OFF';
 }
 
 const PAM_CONVO_ID = 'c0000000-0000-4000-8000-0000000000a1';
+
+/** How the database answers Pam writing first, when a story asks it to fail (Iris T1, T3). */
+function startAnswer(fails: MockOptions['pamStartFails']): { status: number; body: unknown } | null {
+  if (!fails) return null;
+  return fails === 'error' ? { status: 500, body: {} } : { status: 400, body: { code: 'P0001', message: fails } };
+}
 
 /** The rows of a person's Pam conversation for a story (D-605). */
 function pamThreadMessages(state: 'welcome' | 'away' | 'notSent') {
@@ -468,9 +476,9 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
       ],
     })),
     on('/rpc/pam_set_thread_status', () => ({ body: null })),
-    on('/rpc/pam_start_conversation', () => ({ body: 'c0000000-0000-4000-8000-0000000000b9' })),
+    on('/rpc/pam_start_conversation', () => startAnswer(options.pamStartFails) ?? { body: 'c0000000-0000-4000-8000-0000000000b9' }),
     on('/rpc/pam_program_has_lead', () => ({ body: true })),
-    on('/rpc/pam_start_program_conversation', () => ({ body: 2 })),
+    on('/rpc/pam_start_program_conversation', () => startAnswer(options.pamStartFails) ?? { body: 2 }),
     on('/rpc/pam_set_hours', () => ({ body: null })),
     on('/rpc/review_program_submission', (_url, _method, body) => {
       const args = (body ?? {}) as { p_id: string };
