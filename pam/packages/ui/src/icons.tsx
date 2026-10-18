@@ -189,6 +189,19 @@ export function CalendarAddIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/** A calendar with a tick: this visit is in the calendar ("Added to calendar"). */
+export function CalendarCheckIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} data-icon="calendar-check" {...props}>
+      <rect x="3.5" y="5" width="17" height="15" rx="2.5" />
+      <path d="M3.5 10h17" />
+      <path d="M8 3v4" />
+      <path d="M16 3v4" />
+      <path d="M9.2 15.2l2.1 2.1 3.7-3.9" />
+    </svg>
+  );
+}
+
 /** One arrow round a circle: do it again, afresh ("Get a new link"). */
 export function RefreshIcon(props: SVGProps<SVGSVGElement>) {
   return (

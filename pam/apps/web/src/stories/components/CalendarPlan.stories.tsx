@@ -6,12 +6,11 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BigButton, CalendarAddIcon, CheckIcon, CrossIcon, RefreshIcon, SyncIcon, TripsIcon } from '@pam/ui';
-import { Button } from '@pam/ui/Button';
+import { BigButton, CheckIcon, CrossIcon, RefreshIcon, SyncIcon, TripsIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { PamSheet } from '@pam/ui/PamSheet';
 import { SubPage } from '@pam/ui/SubPage';
-import { VisitCard } from '@pam/ui/VisitCard';
+import { CalendarVisitCard } from '../support/CalendarAction';
 import { useI18n } from '@/lib/i18n';
 
 /**
@@ -41,6 +40,7 @@ const WORDS = {
     syncing: 'Goes to Apple Calendar',
     syncingName: 'Goes to Apple Calendar through your calendar link. Opens Calendar.',
     sync: 'Sync all future trip details?',
+    syncTrips: 'Sync all future trips', // stand-in; Sage signs it
     sheetTitle: 'Add to calendar',
     done: 'Done',
     apple: 'Apple Calendar',
@@ -80,6 +80,7 @@ const WORDS = {
     syncing: 'تتم المزامنة مع تقويم Apple', // stand-in until Lena translates Sage's words
     syncingName: 'تتم المزامنة مع تقويم Apple عبر رابط التقويم. يفتح التقويم.', // stand-in
     sync: 'مزامنة تفاصيل كل رحلاتك القادمة؟',
+    syncTrips: 'مزامنة كل رحلاتك القادمة', // stand-in
     sheetTitle: 'أضف إلى التقويم',
     done: 'تم',
     apple: 'تقويم Apple',
@@ -115,51 +116,17 @@ const styles = stylex.create({
   body: { fontSize: '17px', lineHeight: 1.5 },
   small: { fontSize: '15px', lineHeight: 1.5 },
   heading: { fontSize: '20px', lineHeight: 1.3, fontWeight: 700 },
-  // "Add to calendar" is a real button in the green card's top corner (Will, a98): the card's white, the green icon and words, 48px.
-  calendar: {
-    flexShrink: 0,
-    minHeight: '48px',
-    paddingInline: '14px',
-    fontSize: '16px',
-    fontWeight: 700,
-    backgroundColor: colorVars['--color-background-card'],
-    color: colorVars['--color-text-green'],
-    borderRadius: '24px',
-  },
-  // Synced: no fill, the card's own green showing through; the words stay green and 16px bold, still 48px to tap.
-  synced: { flexShrink: 0, minHeight: '48px', paddingInline: '4px', fontSize: '16px', fontWeight: 700, color: colorVars['--color-text-green'] },
-  // 48px high (the global button floor), so the whole line is the tap, not only its words.
-  fine: { alignSelf: 'center', minHeight: '48px', paddingInline: '12px', fontSize: '15px', fontWeight: 600, color: colorVars['--color-text-secondary'] },
   tick: { width: '28px', height: '28px', borderRadius: '50%', backgroundColor: colorVars['--color-background-green'], color: colorVars['--color-icon-green'], flexShrink: 0 },
   on: { fontSize: '17px', fontWeight: 700, color: colorVars['--color-text-accent'] },
   sheet: { width: '100%', paddingInline: '20px', paddingBlockEnd: '28px' },
 });
 
-/** `synced`: the member has a calendar link, so the corner button is quieter (no white fill, the sync icon, "Syncing to …") and opens the Calendar screen. */
-function BookedScreen({ synced = false }: { readonly synced?: boolean }) {
+/** `added`: the visit is in the calendar (a link, or added on this phone): the same corner, "Added to calendar", no fill, opens Calendar. */
+function BookedScreen({ added = false }: { readonly added?: boolean }) {
   const w = useWords();
   return (
     <SubPage title={w.booked} backHref="/trips/" backLabel={w.close} backIcon="close">
-      <VStack gap={1}>
-        <VisitCard
-          eyebrow={w.eyebrow}
-          day={w.day}
-          time={w.time}
-          countdown={w.countdown}
-          changeLabel={w.change}
-          changeHref="/trips/"
-          // The words are long, so the synced button takes its own row under the title (actionOwnRow) rather than squeezing it.
-          actionOwnRow={synced}
-          action={
-            synced ? (
-              <Button label={w.syncing} aria-label={w.syncingName} variant="ghost" href="/calendar/" icon={<SyncIcon width={22} height={22} aria-hidden />} xstyle={styles.synced} />
-            ) : (
-              <Button label={w.addToCalendar} variant="secondary" icon={<CalendarAddIcon width={22} height={22} aria-hidden />} xstyle={styles.calendar} />
-            )
-          }
-        />
-        {synced ? null : <Button label={w.sync} variant="ghost" icon={<SyncIcon width={18} height={18} aria-hidden />} href="/calendar/" xstyle={styles.fine} />}
-      </VStack>
+      <CalendarVisitCard added={added} />
     </SubPage>
   );
 }
@@ -182,6 +149,8 @@ function AddSheet() {
               { id: 'apple', label: w.apple, icon: <TripsIcon width={26} height={26} />, onSelect: () => {} },
               { id: 'google', label: w.google, icon: <TripsIcon width={26} height={26} />, onSelect: () => {} },
               { id: 'outlook', label: w.outlook, icon: <TripsIcon width={26} height={26} />, onSelect: () => {} },
+              // Sync moves in here from under the card (Will, 18 October). Stand-in words until Sage's.
+              { id: 'sync', label: w.syncTrips, icon: <SyncIcon width={26} height={26} aria-hidden />, href: '/calendar/' },
             ]}
           />
         </VStack>
@@ -266,8 +235,8 @@ function CalendarScreen({ which }: { readonly which: 'none' | 'apple' | 'google'
 /** The booked screen: a calendar icon in the green card; under it, fine print and a sync icon. */
 export const C_Booked: Story = { render: () => <BookedScreen /> };
 /** What the icon opens: pick a calendar and the visit is on the phone. */
-/** The corner button once a calendar is linked: quieter, "Syncing to …", opens the Calendar screen. */
-export const C_Booked_Synced: Story = { render: () => <BookedScreen synced /> };
+/** The corner button once the visit is added: "Added to calendar", no fill, opens the Calendar screen. */
+export const C_Booked_Added: Story = { render: () => <BookedScreen added /> };
 export const C_Sheet: Story = { render: () => <AddSheet /> };
 /** Profile › Calendar, nothing linked. */
 export const C_CalendarNone: Story = { render: () => <CalendarScreen which="none" /> };
@@ -278,7 +247,7 @@ export const C_CalendarGoogle: Story = { render: () => <CalendarScreen which="go
 
 const arabic = { globals: { locale: 'ar' } } as const;
 export const C_Booked_Arabic: Story = { ...C_Booked, ...arabic };
-export const C_Booked_Synced_Arabic: Story = { ...C_Booked_Synced, ...arabic };
+export const C_Booked_Added_Arabic: Story = { ...C_Booked_Added, ...arabic };
 export const C_Sheet_Arabic: Story = { ...C_Sheet, ...arabic };
 export const C_CalendarNone_Arabic: Story = { ...C_CalendarNone, ...arabic };
 export const C_CalendarApple_Arabic: Story = { ...C_CalendarApple, ...arabic };
