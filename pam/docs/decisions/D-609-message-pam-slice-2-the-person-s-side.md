@@ -14,6 +14,12 @@
 - **A fixed address, `/messages/pam/`** (Mira, 18 October): signed in, it asks `open_pam_conversation()` and opens the thread; signed out, Sign in and back (`/signin/?next=/messages/pam/`, added to the allow-list for every role but the super admin); switch off, or a super admin: Messages. Help's last row "Write to Pam" and Contact Pam use it.
 - **`pam_inbox()` lists only conversations somebody wrote in** (migration `20261018080342`, Ava's point): a welcome alone is not a conversation the team has to answer, and the client is not sent a row per account.
 
+## Slice 3: photos in every conversation
+
+- **A photo shows its progress.** While it uploads, "Sending…" has a bar under it (Astryx `ProgressBar`, named by the same words); no new string. The upload is the same request the storage client makes (same address, the person's own sign-in, `x-upsert: false`), sent over `XMLHttpRequest`, the only way a browser reports upload progress. The database decides exactly as before (0079).
+- **A photo that did not go stays in the conversation**, outlined, with "Not sent" and Try again, the picture kept. Try again uploads once; a first upload that had landed but whose answer was lost is found by the same look as a text (sender, time, then kind) and not sent twice.
+- To Pam it is the same, a photo only (a screenshot): documents are still refused with "Send a photo."
+
 ## What this changes
 
 D-511 (Contact Pam / Help as the way to reach Pam by email form) stays for a signed-out visitor; signed in, both go to the conversation. The old per-conversation "connection dropped" notice (D-427's neighbours) is replaced by the per-message state.

@@ -1179,6 +1179,53 @@ test.describe('photos and documents, picked or pasted (D-408)', () => {
     expect(inserted).toMatchObject({ conversation_id: CONVO, attachment_kind: 'photo' });
   });
 
+  test('a photo shows its progress while it goes, and when it did not go it stays "Not sent" with the picture and Try again sends it once (D-609)', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    let uploads = 0;
+    let release: () => void = () => {};
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    await page.route('**/storage/v1/object/message-photos/**', async (route) => {
+      uploads += 1;
+      if (uploads === 1) {
+        await gate;
+        return route.fulfill({ status: 500, contentType: 'application/json', body: '{}' });
+      }
+      return route.fulfill(json({ Key: 'message-photos/x.jpg' }));
+    });
+    let inserts = 0;
+    await page.route(MESSAGES, (route) => {
+      if (route.request().method() === 'POST') {
+        inserts += 1;
+        const row = route.request().postDataJSON() as Record<string, unknown>;
+        return route.fulfill(json({ id: 'new-photo', sender_id: ME, body: null, attachment_url: row.attachment_url, attachment_kind: 'photo', created_at: new Date().toISOString() }));
+      }
+      return route.fulfill(json([]));
+    });
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await paste(page, { name: 'image.png', type: 'image/png', base64: PNG });
+    await page.getByRole('button', { name: /send/i }).click();
+    // On its way: "Sending…" and a bar, the picture already in the conversation.
+    await expect(page.getByRole('progressbar', { name: 'Sending…' })).toBeVisible();
+    await expect(page.getByText('Sending…', { exact: true }).first()).toBeVisible();
+    release();
+
+    await expect(page.getByText('Not sent', { exact: true })).toBeVisible();
+    await expect(page.getByRole('progressbar')).toHaveCount(0);
+    await expect(page.getByRole('img', { name: 'A photo you sent' })).toBeVisible();
+    expect(inserts).toBe(0);
+
+    await page.getByRole('button', { name: 'Not sent. Try again.' }).click();
+    await expect(page.getByText('Not sent', { exact: true })).toHaveCount(0);
+    await expect(page.getByRole('img', { name: 'A photo you sent' })).toHaveCount(1);
+    await expect.poll(() => inserts).toBe(1);
+    await expect(page.getByText('Sent', { exact: true })).toBeVisible();
+    expect(inserts).toBe(1);
+    expect(uploads).toBe(2);
+  });
+
   test('a pasted PDF or Word file is a document, the same as from the button; pasted words are still words', async ({ page }) => {
     await signedInAs(page, 'admin');
     await withOneConversation(page);

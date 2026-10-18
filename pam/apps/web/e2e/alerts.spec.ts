@@ -55,6 +55,28 @@ async function signedInAs(page: import('@playwright/test').Page, role: 'provider
   return writes;
 }
 
+test.describe('Text alerts say little (D-608, Will 18 October: "we don\'t need an introduction paragraph")', () => {
+  test('a label over the list, rows that are their names, and "Coming soon" as the switch\'s description', async ({ page }) => {
+    await signedInAs(page, 'member', null, 'off');
+    await page.goto('/alerts/');
+    await settled(page);
+    await expect(page.getByText('Kinds of texts', { exact: true })).toBeVisible();
+    // No introduction, no second line under a row, no sentence about what Pam does not send yet.
+    await expect(page.getByText('Choose what Pam texts you about')).toHaveCount(0);
+    await expect(page.getByText('So you do not go to the wrong door.')).toHaveCount(0);
+    await expect(page.getByText('Only that a message is waiting')).toHaveCount(0);
+    await expect(page.getByText('Pam does not send this text yet')).toHaveCount(0);
+    // The badge is the switch's description: a screen reader hears "{row}, switch, off, Coming soon".
+    const toggle = page.getByRole('switch', { name: 'Someone messages you' });
+    await expect(toggle).toHaveAccessibleDescription('Coming soon');
+    await expect(page.getByText('Pam sends one text each time something you turned on happens. Reply STOP to stop, or HELP for help. Text and data rates may apply.')).toBeVisible();
+    // A link to what a text says and never says, named for a screen reader as "Privacy: Text messages".
+    const privacy = page.getByRole('link', { name: 'Privacy: Text messages' });
+    await expect(privacy).toHaveText('Privacy');
+    await expect(privacy).toHaveAttribute('href', '/privacy/#texts');
+  });
+});
+
 test.describe('Text alerts, held until the day (D-478)', () => {
   test.skip(ALERT_TEXTS_LIVE, 'the alerts are live: the held-state checks do not apply');
 
@@ -67,7 +89,7 @@ test.describe('Text alerts, held until the day (D-478)', () => {
       await expect(toggle).not.toBeChecked();
       await expect(toggle).toBeDisabled();
     }
-    await expect(page.getByText('Coming soon. Pam does not send this text yet.')).toHaveCount(3);
+    await expect(page.getByText('Coming soon', { exact: true })).toHaveCount(3);
     expect(writes).toHaveLength(0);
   });
 
@@ -87,7 +109,7 @@ test.describe('The closed-place text follows the server\'s texts_live switch (D-
     await page.goto('/alerts/');
     await settled(page);
     await expect(page.getByRole('switch', { name: 'A saved place closes or moves' })).toBeDisabled();
-    await expect(page.getByText('Coming soon. Pam does not send this text yet.').first()).toBeVisible();
+    await expect(page.getByText('Coming soon').first()).toBeVisible();
     expect(writes).toHaveLength(0);
   });
 
@@ -173,6 +195,6 @@ test.describe('Text alerts', () => {
     await page.goto('/alerts/');
     await settled(page);
     await expect(page.getByRole('switch', { name: 'Someone wants to connect' })).toBeDisabled();
-    await expect(page.getByText('Coming soon. Pam does not send this text yet.').first()).toBeVisible();
+    await expect(page.getByText('Coming soon').first()).toBeVisible();
   });
 });
