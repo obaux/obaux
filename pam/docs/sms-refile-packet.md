@@ -12,7 +12,7 @@ page is right (three of its statements were wrong against the screens: see §10)
 | Not ready | Effect |
 |---|---|
 | The two agree screens (Nico's `TextKindsList`, Ava's `JoinScreen` swap; Sage `1c09f1de`, `2a600d73`) | §3 describes them as signed. **It is true only once they are built.** Compare it with Wren's screenshots word for word before pasting. |
-| `saved_place_closed` is queued **without its link** (`queue_saved_place_closed`, migration 0037, writes `{reason_key}` only; the template needs `link`), so the dispatcher refuses it every time | Sample 8 is registered but cannot send until a migration adds the link. It must not be one of the texts Will tests on his phone. Told to Mira and Nico. |
+| `saved_place_closed` is queued **without its link** (`queue_saved_place_closed`, migration 0037, writes `{reason_key}` only; the template needs `link`), so the dispatcher refuses it every time | **Fixed by Nico** on `claude/messages-pam-s0-s1a` @ `d272c53b` (migration 20261018185235, a DB test and a dispatcher test; link = `{app_url}/`; Mira takes it in b75). Until it is on main and deployed, sample 8 cannot send and is not one of the texts Will tests on his phone. |
 | `support_reply` and `reply_no_read` have no `reviewedBy`; the START reply below is a proposal | Will's to sign (A29). The dispatcher will not send an unsigned template. |
 | `texts_live` is `off`; `ALERT_TEXTS_LIVE` (app) and `VISIT_REMINDERS_LIVE`, `PLACE_TEXTS_LIVE` (website) are `false` | Only the **account texts** leave Pam today (sign-in code, the decision on a staff request). Everything else is queued and held. |
 
@@ -80,7 +80,7 @@ Every English text is one segment: with real values the longest is the help answ
    `Pam: Someone on your list planned a visit. Open Pam to see it: {link}`
 7. A staff request was approved, `staff_request_approved` (Will 17 Sep; account text, sends today)
    `Pam: Your request was approved. Open Pam to get started: {link}`
-8. A saved place closed or moved, `saved_place_closed` (Will 13 Sep; **cannot send yet, §0**)
+8. A saved place closed or moved, `saved_place_closed` (Will 13 Sep; **sends only once Nico's fix `d272c53b` is deployed, §0**)
    `Pam: A place you saved is {reason}. Find others in Pam: {link}`
    `{reason}` is one of four fixed phrases: "closed, so there is no need to go", "at a new address now", "not taking
    new people, so there is no need to go", "listed wrong here".
@@ -117,7 +117,7 @@ replies. Its Twilio webhook and Will's STOP/START test are in `docs/sms-setup.md
 | Field | Answer | Why |
 |---|---|---|
 | Embedded links | **Yes** | *Rejected before for undeclared links.* Samples 2–8 carry `{link}`. |
-| Link domains | `app.joinpam.org` (`/trips/` in the reminder, `/messages/` in a message alert, `/` in the others, `/programs/new/` for a new program lead's approval); and the bare text `joinpam.org/support` in sample 9 (and in `access_limited_notice`, which nothing sends) | `app_url` is `https://app.joinpam.org` (migration 20261010190831). |
+| Link domains | `app.joinpam.org` (`/trips/` in the reminder, `/messages/` in a message alert, `/` in the others and in the saved-place text, `/programs/new/` for a new program lead's approval); and the bare text `joinpam.org/support` in sample 9 (and in `access_limited_notice`, which nothing sends) | `app_url` is `https://app.joinpam.org` (migration 20261010190831). |
 | Public URL shortener | none in Pam's own links. **Will: check the Messaging Service's link-shortening setting.** If Twilio shortens links, name its short domain in the notes. | |
 | Embedded phone numbers | **No** | No text carries Pam's number (A28); `hello@joinpam.org` is an email address. |
 | Age-gated content | No | |
@@ -142,10 +142,10 @@ number, and for the time-bound ones not more than 12 hours late.
 | `staff_request_approved` | **Yes** (account text) | approving a staff request (20261010192105) | the requester | `{app_url}` or `{app_url}/programs/new/` | Will 17 Sep |
 | `staff_request_denied` | **Yes** (account text) | denying one (0055, phone-only row) | the requester | `joinpam.org/support` (text) | Will 17 Sep; A28 wording, card a59 |
 | `appointment_24h` | held (`texts_live`) | a saved trip (20261010130831) | the member, if agreed | `{app_url}/trips/` | Will 13 Sep |
-| `message_waiting` | held | `queue_text_alert` (20261010134429) | the others in the thread who switched it on | `{app_url}/messages/` | Will 10 Oct |
+| `message_waiting` | held | `queue_message_text_alert` (20261010134429) | the others in the thread who switched it on (a Pam reply to someone who opted in queues the same text; Pam's welcome and out-of-hours reply have no sender and queue none) | `{app_url}/messages/` | Will 10 Oct |
 | `visit_booked`, `booking_changed` | held | same | the program's lead who switched it on | `{app_url}/` | Will 10 Oct |
 | `trip_planned` | held | same | the member's case manager who switched it on | `{app_url}/` | Will 10 Oct |
-| `saved_place_closed` | held, **and cannot send (§0)** | `queue_saved_place_closed` (0037) | people who saved the place | none queued (needs one) | Will 13 Sep |
+| `saved_place_closed` | held, **and not yet able to send (§0)** | `queue_saved_place_closed` (0037; the link added by `d272c53b`) | people who saved the place | `{app_url}/` once `d272c53b` is deployed | Will 13 Sep |
 | `support_reply` | held; **unsigned** | `send_support_text` (super admin) | a number typed into the help form | none; ends with the STOP suffix | **not signed** (card a61) |
 | `reply_no_read` | no | nothing sends it (`sms-inbound` never answers in words) | would be: anyone who texts Pam back | none (`hello@joinpam.org`) | **not signed** |
 | `appointment_2h`, `appointment_morning_of`, `attendance_check`, `attendance_missed_followup`, `facilitation_member`, `facilitation_provider`, `access_limited_notice`, `invite_member`, `invite_provider`, `connection_request` | **No**: a template and a signature, but nothing queues them | none | none | various | Will 13 Sep |
