@@ -352,8 +352,6 @@
   "messages.report.cancel": "不用了",
   "messages.report.done.title": "謝謝您。Pam會查看。",
   "messages.report.done.body": "Pam和您的引導人現在可以看到這一則訊息，以及它附帶的相片或文件（如果有的話）。對話中的其他任何內容都不會被看到。",
-  "messages.report.failed.title": "未能傳送",
-  "messages.report.failed.body": "您的網絡連線中斷了，或這則訊息已被舉報過。請再試一次，或聯絡Pam。",
   "messages.start.member.title": "傳訊息給您的個案經理或計劃",
   "messages.thread.from": "{name}，{time}",
   "messages.thread.lead": "計劃負責人",

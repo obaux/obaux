@@ -352,8 +352,6 @@
   "messages.report.cancel": "Deixar para lá",
   "messages.report.done.title": "Obrigado. Pam vai analisar.",
   "messages.report.done.body": "Pam e seu guia agora podem ver esta mensagem, e a foto ou o documento dela, se houver. Nada mais da conversa.",
-  "messages.report.failed.title": "Isso não foi enviado",
-  "messages.report.failed.body": "Sua conexão caiu ou esta mensagem já foi denunciada. Tente de novo ou entre em contato com Pam.",
   "messages.start.member.title": "Escreva para o seu gestor de casos ou programa",
   "messages.thread.from": "{name}, {time}",
   "messages.thread.lead": "Líder de programa",

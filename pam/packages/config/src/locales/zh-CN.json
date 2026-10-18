@@ -352,8 +352,6 @@
   "messages.report.cancel": "算了",
   "messages.report.done.title": "谢谢您。Pam会查看。",
   "messages.report.done.body": "Pam和您的引导人现在可以看到这一条消息，如果有照片或文档，也可以看到。聊天里的其他内容都看不到。",
-  "messages.report.failed.title": "没有发送成功",
-  "messages.report.failed.body": "您的网络断开了，或者这条消息已经被举报过了。请再试一次，或联系Pam。",
   "messages.start.member.title": "给您的个案管理员或项目发消息",
   "messages.thread.from": "{name}，{time}",
   "messages.thread.lead": "项目负责人",

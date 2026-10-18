@@ -372,8 +372,6 @@
   "messages.report.cancel": "لا بأس",
   "messages.report.done.title": "شكرا لك. سينظر Pam في الأمر.",
   "messages.report.done.body": "يستطيع Pam ومرشدك الآن رؤية هذه الرسالة وحدها، ورؤية صورتها أو مستندها إن كان لها. لا شيء آخر من المحادثة.",
-  "messages.report.failed.title": "لم يتم الإرسال",
-  "messages.report.failed.body": "انقطع اتصالك بالإنترنت، أو تم الإبلاغ عن هذه الرسالة بالفعل. حاول مرة أخرى، أو تواصل مع Pam.",
   "messages.start.member.title": "راسل مدير حالتك أو برنامجك",
   "messages.thread.from": "{name}، {time}",
   "messages.thread.lead": "مسؤول البرنامج",

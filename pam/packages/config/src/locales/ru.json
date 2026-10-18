@@ -364,8 +364,6 @@
   "messages.report.cancel": "Не нужно",
   "messages.report.done.title": "Спасибо. Pam это посмотрит.",
   "messages.report.done.body": "Pam и ваш куратор теперь видят это одно сообщение и его фото или документ, если они есть. Больше ничего из чата.",
-  "messages.report.failed.title": "Не отправилось",
-  "messages.report.failed.body": "Пропало подключение, или на это сообщение уже пожаловались. Попробуйте ещё раз или свяжитесь с Pam.",
   "messages.start.member.title": "Напишите своему кейс-менеджеру или программе",
   "messages.thread.from": "{name}, {time}",
   "messages.thread.lead": "Руководитель программы",

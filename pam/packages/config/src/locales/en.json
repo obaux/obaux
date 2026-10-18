@@ -338,8 +338,6 @@
   "messages.report.cancel": "Never mind",
   "messages.report.done.title": "Thank you. Pam will look at it.",
   "messages.report.done.body": "Pam and your guide can now see this one message, and its photo or document if it has one. Nothing else from the chat.",
-  "messages.report.failed.title": "That did not send",
-  "messages.report.failed.body": "Your connection dropped, or this message was already reported. Try again, or contact Pam.",
   "messages.start.member.title": "Message your case manager or program",
   "messages.thread.from": "{name}, {time}",
   "messages.thread.lead": "Program lead",
