@@ -50,3 +50,15 @@ describe('parsePamHours', () => {
     expect(parsePamHours({ tz: 'America/Denver' })).toEqual({ ...DEFAULT_PAM_HOURS, tz: 'America/Denver' });
   });
 });
+
+describe('a whole hour reads as a time in every language (Lena)', () => {
+  const words = (key: string, vars?: Record<string, string>) => (key === 'pam.hours' ? `${vars?.open}|${vars?.close}` : key);
+  it.each([
+    ['en', '9 AM|5 PM'],
+    ['es', '9:00|17:00'],
+    ['pt-BR', '9:00|17:00'],
+    ['ru', '9:00|17:00'],
+  ])('%s: a bare number is never the whole time', (locale, expected) => {
+    expect(pamHoursLine(DEFAULT_PAM_HOURS, locale, words)).toBe(expected);
+  });
+});
