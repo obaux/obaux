@@ -1318,7 +1318,7 @@
   "glossary.trip.definition": "Una visita es el plan de un miembro para ir a un programa: el lugar, el día y la hora. Aparece en su mapa de Visitas, y el programa también la ve.",
   "glossary.whatIs": "¿Qué es un {term}?",
   "alerts.trip": "Alguien planea una visita",
-  "alerts.visit": "Antes de tu visita",
+  "alerts.visit": "Un recordatorio antes de tu visita",
   "alerts.closed": "Un lugar guardado cierra o se muda",
   "alerts.connect": "Alguien quiere conectar",
   "program.quick.phone": "Número de contacto",

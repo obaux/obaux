@@ -1318,7 +1318,7 @@
   "glossary.trip.definition": "预约是成员计划前往某个项目的一次到访：地点、日期和时间。它会显示在对方的“预约”地图上，项目方也能看到。",
   "glossary.whatIs": "什么是{term}？",
   "alerts.trip": "有人安排预约",
-  "alerts.visit": "预约之前",
+  "alerts.visit": "预约之前的提醒",
   "alerts.closed": "收藏的地点关闭或搬迁",
   "alerts.connect": "有人想与您取得联系",
   "program.quick.phone": "联系电话",
