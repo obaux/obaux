@@ -1659,6 +1659,10 @@ only the alert texts Will signed: no "introduced to your program", no "your acco
 
 The error sits under the row that failed; the row's name works the switch; the screen follows the database's yes. Branch `claude/pam-design-alerts-b3-b6` off b74; waits on Mira (b75).
 
+## Design system & Storybook · radio circle on a wrapped label (18 October)
+
+A radio's circle sits level with the first line of its label (global style, `flag.spec` check). Branch `claude/pam-design-radio-first-line` off b74; waits on Mira (b75).
+
 ## Design system & Storybook · settings list, Text alerts (18 October)
 
 `SettingsList` is the pattern for a list of switches: no card, thin lines, badge under the name (D-615; Foundations › Patterns). Text alerts uses it, without the STOP line or the Privacy link. Branch `claude/pam-design-settings-list`; waits on Sage's `alerts.kinds` words and Will's look at the pictures.
