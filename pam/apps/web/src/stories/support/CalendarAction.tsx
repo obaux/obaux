@@ -1,4 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
+import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { CalendarAddIcon, CalendarCheckIcon } from '@pam/ui';
 import { Button } from '@pam/ui/Button';
@@ -12,8 +13,8 @@ import { useI18n } from '@/lib/i18n';
  */
 // The day is the weekday long and the month short, from Intl in each language (Will, 18 October): en "Thursday, Oct 22", es "jueves, 22 oct"; Arabic has no short month, so it stays whole.
 const WORDS = {
-  en: { add: 'Add to calendar', added: 'Added to calendar', addedName: 'Added to calendar. Opens Calendar settings.', eyebrow: 'Your next visit', day: 'Thursday, Oct 22', time: '10:00 AM', countdown: 'In 2 days', change: 'Change appointment' },
-  ar: { add: 'أضف إلى التقويم', added: 'أُضيف إلى التقويم', addedName: 'أُضيف إلى التقويم. يفتح إعدادات التقويم.', eyebrow: 'زيارتك القادمة', day: 'الخميس، 22 أكتوبر', time: '10:00 ص', countdown: 'بعد يومين', change: 'غيّر الموعد' },
+  en: { add: 'Add to calendar', added: 'Added to calendar', addedName: 'Added to calendar. Opens Calendar settings.', eyebrow: 'Your next visit', day: 'Thursday, Oct 22', time: '10:00 AM', countdown: 'In 2 days', movedLead: 'This visit changed after you added it. ', moved: 'Your calendar has the old time.', change: 'Change appointment' },
+  ar: { add: 'أضف إلى التقويم', added: 'أُضيف إلى التقويم', addedName: 'أُضيف إلى التقويم. يفتح إعدادات التقويم.', eyebrow: 'زيارتك القادمة', day: 'الخميس، 22 أكتوبر', time: '10:00 ص', countdown: 'بعد يومين', movedLead: 'تغيّرت هذه الزيارة بعد أن أضفتها. ', moved: 'تقويمك فيه الوقت القديم.', change: 'غيّر الموعد' },
 };
 export const useCalendarWords = () => (useI18n().locale === 'ar' ? WORDS.ar : WORDS.en);
 
@@ -42,7 +43,7 @@ export function CalendarAction({ added = false }: { readonly added?: boolean }) 
 }
 
 /** The green card as the place page and the booked screen both draw it. */
-export function CalendarVisitCard({ added = false, ownRow = false }: { readonly added?: boolean; readonly ownRow?: boolean }) {
+export function CalendarVisitCard({ added = false, moved = false, ownRow = false }: { readonly added?: boolean; readonly moved?: boolean; readonly ownRow?: boolean }) {
   const w = useCalendarWords();
   return (
     <VisitCard
@@ -53,7 +54,9 @@ export function CalendarVisitCard({ added = false, ownRow = false }: { readonly 
       changeLabel={w.change}
       changeHref="/trips/"
       actionOwnRow={ownRow}
-      action={<CalendarAction added={added} />}
+      // A visit added on this phone that then moved: the button is back to "Add to calendar", and the card says why, inside it.
+      note={moved ? <><VisuallyHidden>{w.movedLead}</VisuallyHidden>{w.moved}</> : null}
+      action={<CalendarAction added={added && !moved} />}
     />
   );
 }
