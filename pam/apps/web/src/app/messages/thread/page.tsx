@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Text } from '@astryxdesign/core/Text';
 import { Loading, Notice, Page } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { DEFAULT_PAM_HOURS, NOTICES, speechLanguageFor } from '@pam/config';
@@ -336,6 +337,12 @@ function ThreadScreen() {
               {/* A member's visit with this program, under the name (D-276). */}
               {trueRole === 'member' && state.otherRole === 'provider' ? (
                 <ThreadVisit programName={state.otherProgramName ?? null} threadId={conversationId ?? ''} />
+              ) : null}
+              {/* What the program sees, said where a member writes (D-541): a first name and these words. Kept: Will signed this line (a102 waits on him). */}
+              {trueRole === 'member' && state.otherRole === 'provider' ? (
+                <Text type="supporting" dir="auto">
+                  {t('messages.program.note')}
+                </Text>
               ) : null}
             </ThreadIntro>
           }

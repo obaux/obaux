@@ -162,6 +162,7 @@ interface FunctionEntry {
 const FUNCTIONS: Record<string, FunctionEntry> = {
   'dispatch-sms': { reaches: ['api.twilio.com'], why: 'sends the texts' },
   'sms-inbound': { reaches: [], why: 'Twilio calls it with a reply; it asks only Pam’s own database' },
+  'sweep-message-files': { reaches: [], why: 'each night removes message photos, documents and link pictures no conversation uses; asks only Pam’s own database and storage (D-607)' },
   'sweep-staff-photos': { reaches: [], why: 'each night removes staff photos no account uses; asks only Pam’s own database and storage (D-587)' },
   'send-invite-emails': { reaches: ['api.resend.com'], why: 'sends the invite email' },
   'help-request': { reaches: ['api.resend.com'], why: 'forwards a help request by email, behind a switch' },
