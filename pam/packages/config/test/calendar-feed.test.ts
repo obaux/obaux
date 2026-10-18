@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { handle, tokenOf, type Deps } from '../../../supabase/functions/calendar-feed/handler.ts';
-import { buildCalendar, escapeText, fold, type Feed } from '../../../supabase/functions/calendar-feed/ics.ts';
+import { buildCalendar, buildVisitFile, escapeText, fold, googleEventUrl, type Feed } from '../../../supabase/functions/calendar-feed/ics.ts';
 
 /**
  * A member's Pam visits as a calendar file at a secret address (D-538): discreet unless the member
@@ -161,5 +161,113 @@ describe('the function', () => {
     await handle(get(`${TOKEN}.ics`), world(DISCREET).deps);
     expect(log).not.toHaveBeenCalled();
     log.mockRestore();
+  });
+});
+
+/**
+ * A link (D-604, a98 plan C): the member's versioned address, and the one-visit add made on the phone from the same module. Every event
+ * is the place's name alone, its address and the time. The list of lines below is the promise: an event has exactly these and nothing else.
+ */
+const LINK_TOKEN = 'A'.repeat(22) + 'b'.repeat(43); // 65 characters: the member, then the HMAC
+const LINKED: Feed = { kind: 'link', visits: [{ ...VISIT, name: 'Fresh Start Kitchen', address: '1234 Market St, Philadelphia' }] };
+
+describe('a link: the place, the address and the time', () => {
+  const text = buildCalendar(LINKED, NOW);
+  it('has exactly these lines in an event, and no link, no description, no "Pam visit"', () => {
+    expect(lines(text)).toEqual([
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Pam//Visits//EN',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'X-WR-CALNAME:Visits',
+      'REFRESH-INTERVAL;VALUE=DURATION:PT12H',
+      'X-PUBLISHED-TTL:PT12H',
+      'BEGIN:VEVENT',
+      'UID:aaaaaaaa-0000-0000-0000-000000000001@joinpam.org',
+      'DTSTAMP:20261012T150000Z',
+      'DTSTART:20261014T140000Z',
+      'DTEND:20261014T153000Z',
+      'SUMMARY:Fresh Start Kitchen',
+      'LOCATION:1234 Market St\\, Philadelphia',
+      'TRANSP:OPAQUE',
+      'END:VEVENT',
+      'END:VCALENDAR',
+      '',
+    ]);
+    expect(text).not.toMatch(/URL|DESCRIPTION|COMMENT|ATTENDEE|ORGANIZER|Pam visit|joinpam\.org\/|app\.joinpam|points|attend|trips|4c0f6b64/i);
+  });
+  it('names nothing about Pam where a person can read it: not the title, the place, the calendar or a link', () => {
+    for (const line of lines(text)) {
+      if (/^(SUMMARY|LOCATION|X-WR-CALNAME|DESCRIPTION):/.test(line)) expect(line).not.toMatch(/pam/i);
+    }
+  });
+  it('titles an event by its address when a place has no name, and never by Pam', () => {
+    const noName = buildCalendar({ kind: 'link', visits: [{ ...VISIT, name: null, address: '9 Elm St' }] }, NOW);
+    expect(lines(noName)).toContain('SUMMARY:9 Elm St');
+    expect(buildCalendar({ kind: 'link', visits: [{ ...VISIT, name: null, address: null }] }, NOW)).not.toMatch(/Pam visit/);
+  });
+  it('gives a visit with no end an hour, and leaves out one whose start is not a time', () => {
+    const open = buildCalendar({ kind: 'link', visits: [{ ...LINKED.visits[0]!, ends_at: null }] }, NOW);
+    expect(open).toContain('DTEND:20261014T150000Z');
+    expect(buildCalendar({ kind: 'link', visits: [{ ...LINKED.visits[0]!, starts_at: 'soon' }] }, NOW)).not.toContain('VEVENT');
+  });
+});
+
+describe('a one-visit add is made from the same event, on the phone', () => {
+  const visit = LINKED.visits[0]!;
+  it('is the same event as the feed makes, in a calendar file of its own', () => {
+    const file = lines(buildVisitFile(visit, NOW));
+    const feed = lines(buildCalendar(LINKED, NOW));
+    const event = (all: string[]) => all.slice(all.indexOf('BEGIN:VEVENT'), all.indexOf('END:VEVENT') + 1);
+    expect(event(file)).toEqual(event(feed));
+    expect(file.slice(0, 5)).toEqual(['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Pam//Visits//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH']);
+    expect(file.filter((l) => l.startsWith('BEGIN:VEVENT'))).toHaveLength(1);
+    expect(file).not.toContain('X-WR-CALNAME:Visits');
+  });
+  it('makes nothing from a start that is not a time', () => {
+    expect(buildVisitFile({ ...visit, starts_at: 'soon' }, NOW)).toBe('');
+  });
+  it('makes a Google link with the place as the title, the address, the time and the time zone, and nothing else', () => {
+    const url = new URL(googleEventUrl(visit, 'America/New_York'));
+    expect(`${url.origin}${url.pathname}`).toBe('https://calendar.google.com/calendar/render');
+    expect([...url.searchParams.keys()].sort()).toEqual(['action', 'ctz', 'dates', 'location', 'text']);
+    expect(url.searchParams.get('action')).toBe('TEMPLATE');
+    expect(url.searchParams.get('text')).toBe('Fresh Start Kitchen');
+    expect(url.searchParams.get('location')).toBe('1234 Market St, Philadelphia');
+    expect(url.searchParams.get('dates')).toBe('20261014T140000Z/20261014T153000Z');
+    expect(url.searchParams.get('ctz')).toBe('America/New_York');
+    expect(googleEventUrl(visit)).not.toContain('ctz');
+  });
+});
+
+describe('the function, for a link', () => {
+  it('finds a 65-character token as well as a 43-character one', () => {
+    expect(tokenOf(`https://x/functions/v1/calendar-feed/${LINK_TOKEN}.ics`)).toBe(LINK_TOKEN);
+    expect(tokenOf(`https://x/functions/v1/calendar-feed/${LINK_TOKEN}x.ics`)).toBeNull();
+    expect(tokenOf(`https://x/functions/v1/calendar-feed/${'a'.repeat(50)}.ics`)).toBeNull();
+  });
+  it('hands a link\'s whole token to calendar_feed_read_link (which checks it), and answers with the place', async () => {
+    const { deps, asked } = world(LINKED);
+    const response = await handle(get(`${LINK_TOKEN}.ics`), deps);
+    expect(response.status).toBe(200);
+    const body = await response.text();
+    expect(body).toContain('SUMMARY:Fresh Start Kitchen');
+    expect(body).not.toMatch(/Pam visit|URL:/);
+    expect(asked).toHaveLength(1);
+    expect(asked[0]!.url).toBe('https://stub.supabase.co/rest/v1/rpc/calendar_feed_read_link');
+    expect(JSON.parse(asked[0]!.body)).toEqual({ p_token: LINK_TOKEN });
+  });
+  it('answers a link the database does not know with the same bare 404 as any other bad address', async () => {
+    const unknown = world(null);
+    const r = await handle(get(`${LINK_TOKEN}.ics`), unknown.deps);
+    expect(r.status).toBe(404);
+    expect(await r.text()).toBe('Not found');
+  });
+  it('still answers a legacy 43-character address as it did: the hash, and the old shape', async () => {
+    const { deps, asked } = world(DISCREET);
+    const response = await handle(get(`${TOKEN}.ics`), deps);
+    expect(await response.text()).toContain('SUMMARY:Pam visit');
+    expect(asked[0]!.url).toBe('https://stub.supabase.co/rest/v1/rpc/calendar_feed_read');
   });
 });
