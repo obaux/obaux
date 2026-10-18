@@ -72,8 +72,8 @@ class OrbHero {
 
   // Timeline, seconds (read off the reference recording).
   static T = {
-    heroGrow: 1.15,                                // hero growth ends; the spring-back to rest starts
-    latticeStart: 1.15, latticeStagger: 0.22,
+    heroGrow: 0.65,                                // hero growth ends; the spring-back to rest starts
+    latticeStart: 0.65, latticeStagger: 0.22,
     settle: 0.7,                                   // a circle is "landed" this long after it starts
     idleFade: 1.2,                                 // float / breathing ease in over this long after landing
     exitDur: 0.6, exitStagger: 0.35,
@@ -345,7 +345,7 @@ class OrbHero {
     if (this.frozen) { t = this.frozen.t; exitT = this.frozen.exitT ?? -1; }
     if (this.reduceMotion && !this.frozen) t = 10;   // jump to the finished layout
     const still = this.reduceMotion;                  // no float, no touch response
-    const live = !this.frozen && !still && o.interactive && t > 1.9;
+    const live = !this.frozen && !still && o.interactive && t > 1.4;
     const clock = still ? 0 : now / 1000;
     const dt = Math.min(0.033, Math.max(0, (now - (this.lastNow ?? now)) / 1000)); this.lastNow = now;
     let tap = this.pointer.tap; this.pointer.tap = false;
