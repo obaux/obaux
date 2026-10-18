@@ -1,4 +1,5 @@
 import type { Page } from '@playwright/test';
+import { arrivedPage } from './arrived';
 
 /**
  * Wait for the page a member actually reads.
@@ -17,4 +18,6 @@ import type { Page } from '@playwright/test';
 export async function settled(page: Page): Promise<void> {
   await page.waitForLoadState('networkidle');
   await page.evaluate(() => document.fonts.ready);
+  // ...and after the screen has finished rising (8px, D-269): a box read mid-rise is 8px lower than anyone sees it (arrived.ts).
+  await arrivedPage(page);
 }
