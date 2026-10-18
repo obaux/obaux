@@ -1790,5 +1790,12 @@
   "trips.bookedForYou": "Запись для вас",
   "person.trip.bookedBy": "Запись от {program}",
   "notify.visit_booked_for_you": "{place}: вас записали на визит. Когда: {when}",
-  "notify.kind.visit_booked_for_you": "Для вас записан визит"
+  "notify.kind.visit_booked_for_you": "Для вас записан визит",
+  "trips.new.refused.member": "Pam сейчас не может записать на визит: {name}.",
+  "trips.new.refused.already": "{name}: сюда уже запланирован визит примерно на это время. Выберите другое время.",
+  "trips.new.refused.limit": "Больше визитов на сегодня записать нельзя — для этого участника или для вашей программы. Попробуйте завтра.",
+  "trips.new.refused.past": "Это время уже прошло. Выберите более позднее время.",
+  "trips.new.refused.far": "Визит можно записать максимум примерно на шесть месяцев вперёд. Выберите более ранний день.",
+  "trips.new.refused.place": "Сейчас вы не можете записать на визит в «{place}».",
+  "trips.new.refused.service": "Сейчас вы не можете записать на эту услугу. Выберите другую."
 }

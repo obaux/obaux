@@ -21,6 +21,10 @@ async function leadWith(page: import('@playwright/test').Page, people: boolean, 
   await page.route('**/rest/v1/profiles*', (route) =>
     route.fulfill(json({ id: 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b', org_id: ORG, role: 'provider', first_name: 'Lou', region_id: null, regions: null, access_status: 'active', onboarded_at: '2026-09-14T00:00:00Z' })),
   );
+  // The list is the database's own (D-595): those who wrote, signed up or planned a visit, and nobody blocked either way.
+  await page.route('**/rest/v1/rpc/my_program_bookable_members*', (route) =>
+    route.fulfill(json(people ? [{ member_id: JORDAN, first_name: 'Jordan' }] : [])),
+  );
   await page.route('**/rest/v1/program_services*', (route) => route.fulfill(json([])));
   await page.route('**/rest/v1/program_submissions*', (route) => route.fulfill(json([])));
   await page.route('**/rest/v1/services*', (route) =>
@@ -113,4 +117,33 @@ test('a member who signed up or planned a visit there is listed too, once, even 
   await expect(page.getByRole('link', { name: /Jordan/ })).toHaveCount(1);
   await page.getByRole('link', { name: /Wanda/ }).click();
   await expect(page).toHaveURL(new RegExp(`for=${WANDA}`));
+});
+
+test('a member who wrote but is blocked either way is not listed, and so cannot be picked and refused (Iris, b58)', async ({ page }) => {
+  await leadWith(page, true);
+  const DEE = '7c1f8c1e-1c7e-4a5c-9d6e-0f3a2b4c5d71';
+  // Dee wrote to the program (she is in a conversation) but is blocked, so the database's own list leaves her out.
+  await page.route('**/rest/v1/rpc/conversation_partners*', (route) =>
+    route.fulfill(
+      json([
+        { conversation_id: CONVO, profile_id: JORDAN, first_name: 'Jordan', role: 'member', program_name: null },
+        { conversation_id: CONVO_STAFF, profile_id: DEE, first_name: 'Dee', role: 'member', program_name: null },
+      ]),
+    ),
+  );
+  await page.goto('/program/book/');
+  await settled(page);
+  await expect(page.getByRole('link', { name: /Jordan/ })).toBeVisible();
+  await expect(page.getByText('Dee')).toHaveCount(0);
+});
+
+test('a list the database could not give is not "nobody": it says something went wrong', async ({ page }) => {
+  await leadWith(page, true);
+  await page.route('**/rest/v1/rpc/my_program_bookable_members*', (route) =>
+    route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ message: 'boom' }) }),
+  );
+  await page.goto('/program/book/');
+  await settled(page);
+  await expect(page.getByText('Something went wrong')).toBeVisible();
+  await expect(page.getByText(/Nobody has written to your program/)).toHaveCount(0);
 });

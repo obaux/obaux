@@ -21,7 +21,7 @@ import { SubPage } from '@pam/ui/SubPage';
 import { SuccessScreen } from '@pam/ui/SuccessScreen';
 import { useI18n } from '@/lib/i18n';
 import { readAddedTrips, withMoves } from '@/lib/addedTrips';
-import { asksForSavedTrips, bookTrip, isSavedPlace, moveSavedOrLocalTrip } from '@/lib/savedTrips';
+import { asksForSavedTrips, bookTrip, isSavedPlace, moveSavedOrLocalTrip, type BookRefusal } from '@/lib/savedTrips';
 import { useTrips } from '@/lib/useTrips';
 import { useSession } from '@/lib/useSession';
 import { examplesOn } from '@/lib/examples';
@@ -237,6 +237,8 @@ export function NewTripView({
   // The trip is being saved, or could not be (D-454): say so rather than show it booked.
   const [isSaving, setIsSaving] = useState(false);
   const [failed, setFailed] = useState(false);
+  // The database said no, and why (a program booking for a member, D-595): a true message, not "try again".
+  const [refusal, setRefusal] = useState<BookRefusal | null>(null);
   // The service picked on the place's page (D-313), carried in the link.
   const offered = place ? forPlace(place.id) : [];
   const serviceId = initialService ?? bookedTrip?.trip.serviceId ?? null;
@@ -521,6 +523,7 @@ export function NewTripView({
             onPress={async () => {
               if (isSaving) return;
               setFailed(false);
+              setRefusal(null);
               if (changing) {
                 const when = at(day, time);
                 setIsSaving(true);
@@ -550,6 +553,10 @@ export function NewTripView({
               setIsSaving(false);
               if (!trip) {
                 setFailed(true);
+                return;
+              }
+              if ('refused' in trip) {
+                setRefusal(trip.refused);
                 return;
               }
               const id = trip.id;
@@ -587,6 +594,13 @@ export function NewTripView({
         )
       }
     >
+      {refusal ? (
+        <Banner
+          status="warning"
+          title={t('join.failed.title')}
+          description={t(`trips.new.refused.${refusal}`, { name: forMember?.name ?? '', place: place?.name ?? '' })}
+        />
+      ) : null}
       {failed ? (
         // Not saved (D-454): nothing is shown as booked, and what was picked stays.
         <Notice
