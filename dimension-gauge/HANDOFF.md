@@ -19,6 +19,8 @@ A flat "liquid fill" circle that shows one life dimension's amount (0–100) on 
 |---|---|
 | `value` (also `el.value = n`) | 0–100, clamped. Changing it tweens the level (~900 ms, ease-out). First paint always fills up from empty. |
 | `label` | Accessible name. Set it. |
+| `max-fill` | Highest level the circle can reach. Default **92**, so a gauge never fills to the top (there is always room to grow). `max-fill="100"` allows a full circle. `aria-valuenow` still reports the real value. |
+| `energy` | Wave liveliness 0.4–1.6, default 1. Used for the weak (0.6) / steady (1) / strong (1.35) examples. |
 | `static` | Disables wave motion. Also applied automatically under `prefers-reduced-motion`. |
 
 CSS custom properties (set on the element or an ancestor): `--dg-size` (default 120px), `--dg-color` (#4561de), `--dg-track` (empty circle, translucent white), `--dg-icon` (#fff). Optional `--dg-wave` overrides the pale back wave.

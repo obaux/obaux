@@ -8,6 +8,9 @@
  * Attributes
  *   value       0–100. Changing it animates the level to the new value.
  *   label       Accessible name (e.g. "Housing"). Required for screen readers.
+ *   max-fill    Highest level the circle can reach, 0–100. Default 92, so there is always
+ *               a little room left at the top. Use max-fill="100" to allow a full circle.
+ *   energy      Wave liveliness, 0.4–1.6. Default 1. Low = slow, shallow swell; high = brisk, taller waves.
  *   static      Boolean. No wave motion (also automatic under prefers-reduced-motion).
  *
  * Theming (CSS custom properties, set on the element or any ancestor)
@@ -44,7 +47,7 @@ svg.disc{display:block;width:100%;height:100%}
 `;
 
 class DimensionGauge extends HTMLElement {
-  static observedAttributes = ['value', 'label', 'static'];
+  static observedAttributes = ['value', 'label', 'static', 'max-fill', 'energy'];
 
   constructor() {
     super();
@@ -81,7 +84,7 @@ class DimensionGauge extends HTMLElement {
 
   attributeChangedCallback(name) {
     if (!this.isConnected) return;
-    if (name === 'value') {
+    if (name === 'value' || name === 'max-fill') {
       this._from = this._shown; this._to = this._value(); this._t0 = performance.now();
       this._sync(); this._kick();
     } else { this._sync(); this._kick(); }
@@ -90,11 +93,13 @@ class DimensionGauge extends HTMLElement {
   get value() { return this._value(); }
   set value(v) { this.setAttribute('value', String(v)); }
 
-  _value() { return clamp(parseFloat(this.getAttribute('value')) || 0, 0, 100); }
+  _ceiling() { const m = parseFloat(this.getAttribute('max-fill')); return clamp(Number.isNaN(m) ? 92 : m, 0, 100); }
+  _energy() { const e = parseFloat(this.getAttribute('energy')); return clamp(Number.isNaN(e) ? 1 : e, 0.4, 1.6); }
+  _value() { return Math.min(this._ceiling(), clamp(parseFloat(this.getAttribute('value')) || 0, 0, 100)); }
   _still() { return this.hasAttribute('static') || REDUCED(); }
 
   _sync() {
-    const v = Math.round(this._value());
+    const v = Math.round(clamp(parseFloat(this.getAttribute('value')) || 0, 0, 100));
     this.setAttribute('aria-valuenow', String(v));
     this.setAttribute('aria-valuetext', `${v}%`);
     const label = this.getAttribute('label');
@@ -107,7 +112,7 @@ class DimensionGauge extends HTMLElement {
     this._raf = 0;
     const dt = this._last ? Math.min(0.05, (now - this._last) / 1000) : 0;
     this._last = now;
-    if (!this._still()) this._t += dt;
+    if (!this._still()) this._t += dt * this._energy();
 
     const D = 900;                                   // level tween, ms
     const p = clamp((now - this._t0) / D, 0, 1);
@@ -127,7 +132,7 @@ class DimensionGauge extends HTMLElement {
   _wave(v, w) {
     // Waves flatten near 0 and 100 so the circle reads as truly empty / truly full.
     const edge = Math.min(1, v / 6, (100 - v) / 6);
-    const amp = w.amp * clamp(edge, 0, 1);
+    const amp = w.amp * clamp(edge, 0, 1) * (0.55 + 0.45 * this._energy());
     const level = 100 - v;                            // y of the surface (0 = top)
     const y0 = v >= 99.5 ? -w.amp - 1 : level - w.lift * clamp(edge, 0, 1);
     let d = `M-2 102 L-2 ${y0.toFixed(2)}`;
