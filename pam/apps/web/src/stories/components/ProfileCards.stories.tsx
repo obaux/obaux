@@ -58,19 +58,25 @@ export const FeatureTiles: Story = {
 
 /** A single PromoCard offer. */
 export const Promo: Story = {
-  render: () => (
-    <PromoCard
-      title="Get text reminders"
-      badge="Coming soon"
-      href="/reminders/"
-      art={<SetupArt kind="alerts" size={72} />}
-    />
-  ),
+  render: function Render() {
+    // The app's own words, read from the bundle (the offer's name changed once already: B4).
+    const tr = useStoryText();
+    return (
+      <PromoCard
+        title={tr('profile.promo.reminders.title')}
+        badge={tr('common.comingSoon')}
+        href="/reminders/"
+        art={<SetupArt kind="alerts" size={72} />}
+      />
+    );
+  },
 };
 
 /** The full Profile stack, as the screen lays it out. */
 export const FullProfile: Story = {
-  render: (args) => (
+  render: function Render(args) {
+    const tr = useStoryText();
+    return (
     <VStack gap={4}>
       <ProfileSummary {...args} />
       <FeatureTileRow>
@@ -78,11 +84,12 @@ export const FullProfile: Story = {
         <FeatureTile label="Connections" href="/connections/" art={<ConnectionsArt size={88} />} />
       </FeatureTileRow>
       <PromoCard
-        title="Get text reminders"
-        badge="Coming soon"
+        title={tr('profile.promo.reminders.title')}
+        badge={tr('common.comingSoon')}
         href="/reminders/"
         art={<BellIcon width={36} height={36} aria-hidden />}
       />
     </VStack>
-  ),
+    );
+  },
 };

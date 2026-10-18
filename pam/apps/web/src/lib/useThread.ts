@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Role } from '@pam/config';
 import { requestLinkPreviews, wantsPreview } from './linkPreview';
 import { useLiveTick } from './useLiveTick';
+import { PAM_MARK } from './pam';
 import { loadPhotos, removeUnsentPhoto, shrinkPhoto, uploadMessagePhoto } from './messagePhoto';
 import {
   displayFileName,
@@ -67,6 +68,8 @@ export interface ThreadMessage {
   readonly progress: number | null;
   /** The message's document (D-399), not yet downloaded, or null. */
   readonly file: MessageFile | null;
+  /** Who wrote it when that is Pam herself for a message written by no person, as the Pam team reads it; else absent. */
+  readonly author?: { readonly name: string; readonly photoUrl: string };
   readonly createdAt: string;
   readonly mine: boolean;
 }
@@ -163,6 +166,9 @@ const toMessage = (
   photoUrl: photoUrl !== undefined ? photoUrl : (links[photoPathOf(row) ?? ''] ?? null),
   progress: null,
   file: fileOf(row),
+  // The team reading a Pam conversation sees the welcome and the out-of-hours reply as Pam's, with her mark and name, never as the person's
+  // (Iris R1: the avatar showed the person's initial and a screen reader said their name).
+  ...(askerId !== null && row.sender_id === null ? { author: { name: 'Pam', photoUrl: PAM_MARK } } : {}),
   createdAt: row.created_at,
   // Read by the Pam team, everything that is not the person's is Pam's (including the system's); otherwise mine is what I wrote.
   // A message written by no person (Pam's welcome, the out-of-hours reply) is Pam's, never "mine" for the team reading it either.

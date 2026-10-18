@@ -32,7 +32,7 @@ async function signedInAs(page: Page, role: 'admin' | 'provider', options: { fre
     },
     [ME, options.fresh ?? false] as [string, boolean],
   );
-  await page.route('**/auth/v1/user*', (route) => route.fulfill(json({ id: ME, phone: '12673095265' })));
+  await page.route('**/auth/v1/user*', (route) => route.fulfill(json({ id: ME, phone: '12155550191' })));
   await page.route('**/rest/v1/notifications*', (route) => route.fulfill(json([])));
   await page.route('**/rest/v1/access_controls*', (route) => route.fulfill(json([])));
   await page.route('**/rest/v1/rpc/member_points*', (route) => route.fulfill(json(250)));

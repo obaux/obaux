@@ -30,6 +30,10 @@ export interface SettingsRowProps {
   readonly badgeId?: string | undefined;
   /** The switch. */
   readonly control: ReactNode;
+  /** The id of the control, so a tap on the name works it too: the name is its label, one control and not two tap targets. */
+  readonly labelFor?: string | undefined;
+  /** Under the whole row, full width: where something about this row says so (an error), in front of the person's eyes. */
+  readonly below?: ReactNode;
 }
 
 const styles = stylex.create({
@@ -39,15 +43,18 @@ const styles = stylex.create({
   control: { flexShrink: 0 },
   // The (i) keeps its 48px target but is not allowed to make the name's line taller: the line is the name's own height
   // and the button overflows it evenly, so every row has the same name-to-badge gap and switch position with or without one.
+  below: { paddingBlockEnd: '16px' },
   adornment: { height: '23px', flexShrink: 0, overflow: 'visible' },
 });
 
-export function SettingsRow({ label, adornment, badge, badgeId, control }: SettingsRowProps) {
-  return (
+export function SettingsRow({ label, adornment, badge, badgeId, control, labelFor, below }: SettingsRowProps) {
+  const row = (
     <HStack gap={3} align="center" wrap="nowrap" xstyle={styles.row}>
       <VStack gap={1} xstyle={styles.words}>
         <HStack gap={0} align="center" wrap="nowrap">
-          <Text xstyle={styles.label}>{label}</Text>
+          <Text {...(labelFor ? { as: 'label' as const, htmlFor: labelFor } : {})} xstyle={styles.label}>
+            {label}
+          </Text>
           {adornment ? (
             <HStack align="center" xstyle={styles.adornment}>
               {adornment}
@@ -64,6 +71,13 @@ export function SettingsRow({ label, adornment, badge, badgeId, control }: Setti
         {control}
       </HStack>
     </HStack>
+  );
+  if (!below) return row;
+  return (
+    <VStack gap={0}>
+      {row}
+      <VStack xstyle={styles.below}>{below}</VStack>
+    </VStack>
   );
 }
 

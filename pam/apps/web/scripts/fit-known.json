@@ -882,5 +882,13 @@
   {
     "key": "es|cut|member-created-states-program-booked-a-visit--on-trips|12:00",
     "reason": "At 320×568 the Trips drawer scrolls and fades out at its foot, and the second trip card sits half under the tab bar, so the detector sees whichever of its words land on that edge partly hidden (partial=true, 0 in, 0 out); since b55 the time is its own no-wrap text node (\"13:00\", \"12:00\"), so it is the time that is reported in Spanish. It is reached by scrolling and nothing is lost. Same class as the Trips entries above; found by the a94 audit on c780d42b (the new story Program booked a visit › On Trips is the second card there)."
+  },
+  {
+    "key": "ar|ellipsis|super-admin-screens--messages-to-pam|You are all set. Thank you for the report.",
+    "reason": "A row in Messages to Pam keeps what was said to one line and trims it with an ellipsis; that is the design, in English too (the English row is \"You: …\" in one text node and is trimmed the same way, so it is listed with the English defects). In Arabic the row is two text nodes, the label \"أنت:\" and then the words, so the detector reports the words alone under a different text and calls it new. The words are what the person wrote, in English in the story, and are not a translation. Found by the 320 audit of claude/lena-pam-team-words @ 959a0df1 (18 October); none of the 30 keys in that commit is on this row."
+  },
+  {
+    "key": "ar|ellipsis|super-admin-screens--messages-to-pam-closed|Glad that worked out.",
+    "reason": "A row in Messages to Pam keeps what was said to one line and trims it with an ellipsis; that is the design, in English too (the English row is \"You: …\" in one text node and is trimmed the same way, so it is listed with the English defects). In Arabic the row is two text nodes, the label \"أنت:\" and then the words, so the detector reports the words alone under a different text and calls it new. The words are what the person wrote, in English in the story, and are not a translation. Found by the 320 audit of claude/lena-pam-team-words @ 959a0df1 (18 October); none of the 30 keys in that commit is on this row."
   }
 ]

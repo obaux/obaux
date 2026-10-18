@@ -39,10 +39,10 @@ $$;
 grant execute on function test.check_raises_like(text, text, text) to authenticated, anon, service_role;
 
 reset role;
-insert into auth.users (id, phone) values (:'newlead', '12675559601');
+insert into auth.users (id, phone) values (:'newlead', '12155550192');
 -- A program lead whose account Pam approved: a provider, with no org yet.
 insert into public.profiles (id, role, first_name, region_id, phone, access_status) values
-  (:'newlead', 'provider', 'Nell', :'region_north', '+12675559601', 'active');
+  (:'newlead', 'provider', 'Nell', :'region_north', '+12155550192', 'active');
 
 -- ===========================================================================
 \echo ''

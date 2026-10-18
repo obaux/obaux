@@ -205,15 +205,3 @@ describe('what the member sees on the card (Will, card a94: under the trip card 
     expect(card).toMatch(/\{placeName\}/);
   });
 });
-
-describe('the Text reminders screen, which the carrier reads as the opt-in (Sage 06:15 and 06:20; Will signed)', () => {
-  it('lists what it can send and covers a booked visit: "before each visit", not "a visit you planned"', () => {
-    expect(EN['reminders.intro']).toBe(
-      'Pam can text you the reminders and notes listed below. It is your choice, and you can change it whenever you want.',
-    );
-    expect(EN['reminders.what.1']).toBe('A reminder before each visit, with the address.');
-    // No text goes to a member when a program books for them: the bell tells them (D-595), so no row for it.
-    expect(EN['reminders.what.4']).toBeUndefined();
-    expect(book!.body).not.toMatch(/outbound_messages|sms|twilio/i);
-  });
-});

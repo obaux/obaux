@@ -27,6 +27,16 @@ export const NO_PLURAL_VARIANTS = new Set([
   // English picks this one itself for a count of 1 ("{count} policy"); it keeps {count} so that Portuguese (which
   // uses "one" for 0 as well as 1) and Russian (21, 31...) can write the number instead of a fixed "1" (D-582).
   'program.policies.rowBody.one',
+  // The same for the Pam inbox's waiting times and reply times (Ava, S1): English writes "1 minute" itself, and the other languages
+  // carry the category as `.one` of the plural family, so the key is the family's own form and not a family of its own.
+  'pam.inbox.waiting.minutes.one',
+  'pam.inbox.waiting.hours.one',
+  'pam.inbox.waiting.days.one',
+  // And "Sent to 1 lead." (the team's start-a-message note): English picks the singular itself.
+  'pam.inbox.sent.one',
+  'pam.inbox.replyTime.minutes.one',
+  'pam.inbox.replyTime.hours.one',
+  'pam.inbox.replyTime.days.one',
 ]);
 export const COUNT_KEYS = Object.keys(EN).filter((k) => EN[k]!.includes('{count}') && !NO_PLURAL_VARIANTS.has(k));
 
