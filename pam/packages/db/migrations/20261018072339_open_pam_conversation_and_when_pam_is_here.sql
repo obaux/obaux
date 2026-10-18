@@ -122,6 +122,40 @@ grant execute on function public.pam_status() to authenticated;
 
 -- ---------------------------------------------------------------------------
 
+-- The one place a Pam conversation is made (not callable by a client): the conversation with the person as its only member, its
+-- thread row, and Pam's welcome. Idempotent; two at once make one. Used by `open_pam_conversation()` below and by the Pam team
+-- starting a conversation (a later migration).
+create or replace function public.pam_ensure_conversation(p_profile uuid)
+returns uuid
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+declare
+  v_id uuid;
+begin
+  select t.conversation_id into v_id from public.pam_threads t where t.asker_id = p_profile;
+  if v_id is not null then
+    return v_id;
+  end if;
+
+  begin
+    insert into public.conversations (kind) values ('support') returning id into v_id;
+    insert into public.conversation_members (conversation_id, profile_id) values (v_id, p_profile);
+    insert into public.pam_threads (conversation_id, asker_id) values (v_id, p_profile);
+    -- Pam's welcome: written by no person; the app draws it in the reader's language (D-605).
+    insert into public.messages (conversation_id, sender_id, body, system_key)
+    values (v_id, null, '', 'pam.welcome');
+  exception when unique_violation then
+    -- Two at once: the other one made it.
+    select t.conversation_id into v_id from public.pam_threads t where t.asker_id = p_profile;
+  end;
+  return v_id;
+end;
+$$;
+
+revoke all on function public.pam_ensure_conversation(uuid) from public, anon, authenticated;
+
 create or replace function public.open_pam_conversation()
 returns uuid
 language plpgsql
@@ -130,7 +164,6 @@ set search_path = public, extensions
 as $$
 declare
   v_me uuid := auth.uid();
-  v_id uuid;
 begin
   if v_me is null then
     return null;
@@ -145,24 +178,7 @@ begin
   if not exists (select 1 from public.profiles where id = v_me) then
     return null;
   end if;
-
-  select t.conversation_id into v_id from public.pam_threads t where t.asker_id = v_me;
-  if v_id is not null then
-    return v_id;
-  end if;
-
-  begin
-    insert into public.conversations (kind) values ('support') returning id into v_id;
-    insert into public.conversation_members (conversation_id, profile_id) values (v_id, v_me);
-    insert into public.pam_threads (conversation_id, asker_id) values (v_id, v_me);
-    -- Pam's welcome: written by no person; the app draws it in the reader's language (D-605).
-    insert into public.messages (conversation_id, sender_id, body, system_key)
-    values (v_id, null, '', 'pam.welcome');
-  exception when unique_violation then
-    -- Two calls at once: the other one made it.
-    select t.conversation_id into v_id from public.pam_threads t where t.asker_id = v_me;
-  end;
-  return v_id;
+  return public.pam_ensure_conversation(v_me);
 end;
 $$;
 
