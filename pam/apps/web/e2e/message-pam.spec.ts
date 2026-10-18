@@ -186,7 +186,7 @@ test.describe('Message Pam, the person\'s side', () => {
     await settled(page);
     await page.getByRole('textbox').fill('One more thing');
     await page.getByRole('button', { name: /send/i }).click();
-    await expect(page.getByText("That's a lot at once. Try again later.", { exact: true })).toBeVisible();
+    await expect(page.getByText("That's a lot at once. Wait a moment, then send it again.", { exact: true })).toBeVisible();
     await expect(page.getByText('Not sent', { exact: true })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Not sent. Try again.' })).toHaveCount(0);
     await expect(page.getByRole('textbox')).toHaveText('One more thing');
