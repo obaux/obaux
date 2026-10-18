@@ -18,7 +18,6 @@ const SAGE: Record<string, string> = {
   'pam.hours.zone.eastern': 'Eastern',
   'messages.pam.placeholder': 'Write to Pam',
   'messages.thread.attach.wrongType.pam.hint': 'Send a photo.',
-  'help.writeToPam': 'Write to Pam',
   'messages.thread.sent': 'Sent',
   'messages.thread.notSent': 'Not sent',
   'messages.thread.tryAgain': 'Try again',

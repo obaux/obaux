@@ -15,6 +15,8 @@
 
 - Will, directly, after the pictures: "Move coming soon to the bottom of list." What is on comes first, badged rows below, each in their own order (a stable sort in `AlertsView`); Patterns' fifth rule; a spec (the live row is above every badge; fails on main, where the saved-place row is last). alerts.spec 48 pass.
 
+- Mira's 18:22 fix: the (i) row on the case manager's screen drew its name line taller (the 48px button grew it: name-to-badge about 79px against 54 at 2x, and the switch not level). `SettingsRow` now boxes the adornment at the name's own line height; the button keeps its 48px target and overflows it evenly. Spec: name-to-badge gap and switch place equal with and without the (i); fails without the fix (12.5px off), passes with it. alerts.spec 51 pass. Admin pictures re-shot from the build.
+
 ## What was wrong, and what missed it
 
 A card around a one-list screen, a badge beside a name that needs the room, and instructions repeated after consent: the first drawing followed the old card habit and nothing named it a pattern until Will did.

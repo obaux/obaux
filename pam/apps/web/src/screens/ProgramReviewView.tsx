@@ -118,11 +118,10 @@ export function ProgramReviewView({ isCelebrating = false, ...given }: ProgramRe
   const waitRows = [
     ...(hasPhoto
       ? []
-      : [{ id: 'photo', label: t('programs.review.photo'), description: t('programs.review.photo.body'), href: '/profile/', icon: <MeIcon {...ICON} /> }]),
+      : [{ id: 'photo', label: t('programs.review.photo'), href: '/profile/', icon: <MeIcon {...ICON} /> }]),
     {
       id: 'policies',
       label: t('programs.review.policies'),
-      description: t('programs.review.policies.body'),
       href: '/program/policies/',
       icon: <LegalIcon {...ICON} />,
     },
@@ -132,10 +131,10 @@ export function ProgramReviewView({ isCelebrating = false, ...given }: ProgramRe
     { id: 'sent', label: t('programs.review.seeSent'), href: '/program/sent/', icon: <PlacesIcon {...ICON} /> },
     // Another program of theirs is live: a way to it from here (D-318).
     ...(setup.programCount > 1
-      ? [{ id: 'switch', label: t('program.switch.row'), description: t('program.switch.row.body'), href: '/program/switch/', icon: <PlacesIcon {...ICON} /> }]
+      ? [{ id: 'switch', label: t('program.switch.row'), href: '/program/switch/', icon: <PlacesIcon {...ICON} /> }]
       : []),
     ...(status === 'late'
-      ? [{ id: 'ask', label: t('programs.review.ask'), description: t('programs.review.ask.body'), href: '/help/', icon: <HelpIcon {...ICON} /> }]
+      ? [{ id: 'ask', label: t('programs.review.ask'), href: '/help/', icon: <HelpIcon {...ICON} /> }]
       : []),
   ];
 
@@ -176,7 +175,7 @@ export function ProgramReviewView({ isCelebrating = false, ...given }: ProgramRe
               </VStack>
               <VStack gap={0} xstyle={[styles.step, isLast && styles.lastStep]}>
                 <Text xstyle={[styles.stepLabel, isLast && styles.later]}>{label}</Text>
-                {i === 1 ? <Text xstyle={styles.note}>{t(`programs.review.step.note.${status}`)}</Text> : null}
+                {i === 1 && status !== 'review' ? <Text xstyle={styles.note}>{t(`programs.review.step.note.${status}`)}</Text> : null}
               </VStack>
             </HStack>
           );

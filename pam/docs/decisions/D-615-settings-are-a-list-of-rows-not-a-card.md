@@ -1,10 +1,12 @@
-# D-615 — Settings are a list of rows, not a card
+# D-615 — A list of settings is rows, not a card
 
 **Date:** 2026-10-18 · **Branch:** `claude/pam-design-settings-list`
 
 Will, 18 October, 17:51 (Control Room), on the Text alerts screen: the line above the list says when to receive a text; "Remove the card; it isn't needed. Each kind is its own item on the page, separated by lines"; "Move the badge below the row's name, so it fits longer text, especially in other languages"; remove the instructions (people already saw them when they first agreed to texts); remove the Privacy link (it is in Profile › Legal). "Please learn from this so the team can improve their design skills."
 
-**Decided.** `SettingsList` and `SettingsRow` (`@pam/ui/SettingsList`) are the standard for any list of settings: no card, rows divided by a thin line, the name, the `StatusBadge` under it, the switch at the end; logical directions only, so it mirrors in Arabic, and the name wraps at 320. Text alerts uses it. The rules are written in Storybook, Foundations › Patterns: no card around a single list; badges under the name, not beside it; no instructions repeated after first consent; no legal links on task screens; a label over a list says what the list is.
+**Scope, narrowed (Will, 18 October, 19:22: "No that's not what I meant. Keep the original layouts.").** His 17:51 notes were about Text alerts only. This decision is for lists of settings (Text alerts; the agree screens keep their original layout, card included, and only share its row names); it is NOT a rule that a card may never wrap a single list or form. "Something is wrong here" keeps its card (the change was taken out), and nothing in the card audit (`docs/design/review/2026-10-18-card-audit/`) changes unless Will asks for a screen. The other rules (badge under the name, say it once, no legal links on a settings or task screen, Coming soon at the bottom) stand.
+
+**Decided.** `SettingsList` and `SettingsRow` (`@pam/ui/SettingsList`) are the standard for any list of settings: no card, rows divided by a thin line, the name, the `StatusBadge` under it, the switch at the end; logical directions only, so it mirrors in Arabic, and the name wraps at 320. Text alerts uses it. The rules are written in Storybook, Foundations › Patterns: a list of settings has no card; badges under the name, not beside it; no instructions repeated after first consent; no legal links on task screens; a label over a list says what the list is.
 
 **Coming soon goes to the bottom (Will, 18 October, after seeing the pictures).** What is on comes first; badged rows follow, each group in its own order. It is the pattern's fifth rule, and `AlertsView` does it with a stable sort on what is live.
 
@@ -16,4 +18,4 @@ Will, 18 October, 17:51 (Control Room), on the Text alerts screen: the line abov
 
 **Not proven by a spec: staff.** Staff kinds are not live yet, so no e2e can switch one. The code is the same path (`/reminders/` has its own staff branch) and `Case manager/Created/States/Text alerts: agree first` draws the staff agree screens; a staff routing spec goes in the day `ALERT_TEXTS_LIVE` is flipped.
 
-**Known cost.** A case manager or program lead who turns their last switch off withdraws the yes (as before), so the next switch-on sends them to the agree screen again. That is the rule, applied; it can be softened by not withdrawing on the last switch-off, which is a consent decision for Lena, not a design one.
+**Turning the last switch off keeps the yes (Nico, 21b053e9).** So the routing above only meets people who never agreed, chose "Not now", or have a withdrawn yes; only a STOP ends everything. The held test in `alerts.spec` expects `{alert_booked: false}` and no `sms_enabled`, and stays skipped while texts are held.

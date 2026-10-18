@@ -132,10 +132,13 @@ test.describe('Message Pam, the person\'s side', () => {
     await page.getByRole('textbox').fill('I lost my paperwork');
     await page.getByRole('button', { name: /send/i }).click();
     await expect(page.getByText('Not sent', { exact: true })).toBeVisible();
+    // "Not sent" goes the moment Try again is tapped (it is "Sending…" again), before the retry is answered: wait for the retry itself.
+    const retried = page.waitForResponse((r) => r.url().includes('/rest/v1/messages') && r.request().method() === 'POST');
     await page.getByRole('button', { name: 'Not sent. Try again.' }).click();
+    await retried;
+    await expect.poll(() => server.sent().map((m) => m.body)).toEqual(['I lost my paperwork']);
     await expect(page.getByText('Not sent', { exact: true })).toHaveCount(0);
     await expect(page.getByText('I lost my paperwork')).toHaveCount(1);
-    expect(server.sent().map((m) => m.body)).toEqual(['I lost my paperwork']);
   });
 
   test('a photo to Pam goes with its progress, and one that did not go stays "Not sent" until Try again (slice 3)', async ({ page }) => {
@@ -183,12 +186,35 @@ test.describe('Message Pam, the person\'s side', () => {
     await settled(page);
     await page.getByRole('textbox').fill('One more thing');
     await page.getByRole('button', { name: /send/i }).click();
-    await expect(page.getByText('That is a lot of messages in a short time. Wait a little, then send it again.')).toBeVisible();
+    await expect(page.getByText("That's a lot at once. Wait a moment, then send it again.", { exact: true })).toBeVisible();
     await expect(page.getByText('Not sent', { exact: true })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Not sent. Try again.' })).toHaveCount(0);
     await expect(page.getByRole('textbox')).toHaveText('One more thing');
     expect(server.sent()).toHaveLength(0);
   });
+
+  for (const locale of LOCALES) {
+    test(`in ${locale}: the limit's calm line is whole and inside the screen, the words stay in the box, nothing scrolls sideways (Iris W4)`, async ({ page }) => {
+      await world(page, { locale, rateLimited: true });
+      const words = bundle(locale);
+      await page.goto(`/messages/thread/?id=${PAM_C}`);
+      await settled(page);
+      await page.getByRole('textbox').fill('One more thing');
+      // The send button's name is the language's own: it is the composer's one primary button.
+      await page.locator('.astryx-chat-composer button[data-variant="primary"]').click();
+      // The signed line in this language, read from the bundle and not typed.
+      const line = page.getByText(words['messages.thread.rateLimited']!, { exact: true });
+      await expect(line).toBeVisible();
+      const box = (await line.boundingBox())!;
+      const width = page.viewportSize()!.width;
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(width);
+      // Whole: nothing cut by the box it sits in.
+      expect(await line.evaluate((el) => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
+      await expect(page.getByRole('textbox')).toHaveText('One more thing');
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    });
+  }
 
   test('with the switch on, Help\'s Contact Pam and Your safety\'s Talk to someone now open the conversation, not the website (Iris W2)', async ({ page }) => {
     await world(page);

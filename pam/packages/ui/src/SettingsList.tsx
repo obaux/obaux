@@ -37,6 +37,9 @@ const styles = stylex.create({
   words: { flexGrow: 1, minWidth: 0 },
   label: { fontSize: '17px', lineHeight: 1.35, fontWeight: 600 },
   control: { flexShrink: 0 },
+  // The (i) keeps its 48px target but is not allowed to make the name's line taller: the line is the name's own height
+  // and the button overflows it evenly, so every row has the same name-to-badge gap and switch position with or without one.
+  adornment: { height: '23px', flexShrink: 0, overflow: 'visible' },
 });
 
 export function SettingsRow({ label, adornment, badge, badgeId, control }: SettingsRowProps) {
@@ -45,7 +48,11 @@ export function SettingsRow({ label, adornment, badge, badgeId, control }: Setti
       <VStack gap={1} xstyle={styles.words}>
         <HStack gap={0} align="center" wrap="nowrap">
           <Text xstyle={styles.label}>{label}</Text>
-          {adornment}
+          {adornment ? (
+            <HStack align="center" xstyle={styles.adornment}>
+              {adornment}
+            </HStack>
+          ) : null}
         </HStack>
         {badge ? (
           <span id={badgeId}>

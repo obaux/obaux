@@ -74,7 +74,7 @@ test.describe('Text alerts say little (D-608, Will 18 October: "we don\'t need a
     await expect(toggle).toHaveAccessibleDescription('Coming soon');
   });
 
-  // Sage signs the words and Lena puts them in key alerts.kinds; this stays red until they are there, and says why.
+  // Sage signed the line (f0279243) and alerts.kinds carries it; this pins the whole sentence so a reworded value shows up here.
   test('the line over the list is the one Will asked for', async ({ page }) => {
     await signedInAs(page, 'member', null, 'off');
     await page.goto('/alerts/');
@@ -121,6 +121,27 @@ test.describe('Text alerts say little (D-608, Will 18 October: "we don\'t need a
     // And every badged row sits below every row without one.
     const badges = await page.locator('.astryx-badge').evaluateAll((els) => els.map((el) => el.getBoundingClientRect().y));
     expect(Math.min(...badges)).toBeGreaterThan(liveY);
+  });
+
+  test('an (i) beside a name does not make its line taller: every row has the same name-to-badge gap and switch place', async ({ page }) => {
+    // A case manager's second row, "Someone plans a trip", carries the glossary's (i), a 48px target.
+    await signedInAs(page, 'admin', null, 'off');
+    await page.goto('/alerts/');
+    await settled(page);
+    const measure = async (name: string) => {
+      const toggle = page.getByRole('switch', { name });
+      // The nearest ancestor holding both this switch and a badge is this row (a row has one of each).
+      const row = toggle.locator('xpath=ancestor::*[.//*[contains(@class,"astryx-badge")]][1]');
+      const label = row.getByText(name, { exact: true }).first();
+      const badge = row.locator('.astryx-badge').first();
+      const [l, b, w, r] = await Promise.all([label.boundingBox(), badge.boundingBox(), toggle.boundingBox(), row.boundingBox()]);
+      return { gap: b!.y - l!.y, switchFromTop: w!.y + w!.height / 2 - r!.y };
+    };
+    const plain = await measure('Someone messages you');
+    const withInfo = await measure('Someone plans a trip');
+    expect(Math.abs(withInfo.gap - plain.gap)).toBeLessThanOrEqual(1);
+    // The rows are the same height, so the switch is level with the name in both.
+    expect(Math.abs(withInfo.switchFromTop - plain.switchFromTop)).toBeLessThanOrEqual(1);
   });
 
   test('the badge sits under the name, not beside it', async ({ page }) => {
@@ -268,7 +289,7 @@ test.describe('Text alerts', () => {
     expect(results.violations).toEqual([]);
   });
 
-  test('turning the last one off withdraws the yes to texts, for a program', async ({ page }) => {
+  test('turning the last one off keeps the yes to texts, for a program (Nico 21b053e9: only STOP ends it)', async ({ page }) => {
     const writes = await signedInAs(page, 'provider', { sms_enabled: true, sms_stopped_at: null, alert_booked: true, alert_message: false, alert_changed: false, alert_trip: false });
     await page.goto('/alerts/');
     await settled(page);
@@ -277,7 +298,9 @@ test.describe('Text alerts', () => {
     await booked.click();
     await expect(booked).not.toBeChecked();
     await expect.poll(() => writes.length).toBe(1);
-    expect(writes[0]).toMatchObject({ alert_booked: false, sms_enabled: false });
+    expect(writes[0]).toMatchObject({ alert_booked: false });
+    // The yes is not withdrawn by the last switch going off: only a STOP ends it.
+    expect(writes[0]).not.toHaveProperty('sms_enabled');
   });
 
   test('turning one off while another is on leaves the yes alone', async ({ page }) => {
