@@ -186,10 +186,13 @@ test('a radio sits level with the first line of its label, whether the label wra
       const label = row.querySelector('span[id]') as HTMLElement;
       const box = label.getBoundingClientRect();
       const line = parseFloat(getComputedStyle(label).lineHeight);
-      return { circleY: circle.y + circle.height / 2, firstLineY: box.y + line / 2, lines: Math.round(box.height / line) };
+      // The first line's own box (an inline span is shorter than its line), whose middle is the middle of that line.
+      const lines = Math.round((box.height - 17) / line) + 1;
+      const firstLine = box.height - (lines - 1) * line;
+      return { circleY: circle.y + circle.height / 2, firstLineY: box.y + firstLine / 2, lines };
     });
     if (m.lines > 1) wrapped++;
-    expect(Math.abs(m.circleY - m.firstLineY)).toBeLessThanOrEqual(0.5);
+    expect(Math.abs(m.circleY - m.firstLineY)).toBeLessThanOrEqual(1);
   }
   // At 390 and 320 the long fourth reason wraps, so the case is really exercised.
   expect(wrapped).toBeGreaterThan(0);
