@@ -3,7 +3,6 @@
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
-import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { ConnectionsIcon } from '@pam/ui';
 import { emptyState } from '@pam/ui/emptyState';
@@ -49,7 +48,6 @@ export interface ConnectionsViewProps {
 }
 
 const styles = stylex.create({
-  intro: { fontSize: '18px', lineHeight: 1.5 },
 });
 
 export function connectionSubtitle(person: Connection, t: (key: string) => string): string {
@@ -80,9 +78,6 @@ export function ConnectionsView({ connections }: ConnectionsViewProps) {
         </Card>
       ) : (
         <>
-          <Text type="supporting" xstyle={styles.intro}>
-            {t('connections.intro')}
-          </Text>
           <VStack gap={4}>
             {connections.map((person) => {
               const subtitle = connectionSubtitle(person, t);
