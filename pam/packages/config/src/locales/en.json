@@ -1293,7 +1293,7 @@
   "alerts.changed": "Someone changes a booking",
   "alerts.message": "Someone messages you",
   "alerts.saved": "Saved.",
-  "alerts.kinds": "Kinds of texts",
+  "alerts.kinds": "Please choose when you'd like to get a text.",
   "alerts.comingSoon": "Coming soon",
   "profile.promo.alerts.body.providerList": "Coming soon: texts about bookings, changes and messages.",
   "alerts.how": "Pam sends one text each time something you turned on happens. Reply STOP to stop, or HELP for help. Text and data rates may apply.",

@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useId, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useId, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
 import { Switch } from '@astryxdesign/core/Switch';
@@ -92,7 +92,7 @@ const styles = stylex.create({
   words: { flexGrow: 1, minWidth: 0 },
 });
 
-export function AlertsView() {
+function AlertsList() {
   const { t } = useI18n();
   const soonId = useId();
   const textsLive = useTextsLive();
@@ -103,6 +103,7 @@ export function AlertsView() {
   const who = role === 'provider' ? 'provider' : role === 'admin' ? 'admin' : 'member';
   const KINDS = KINDS_FOR[who];
   const router = useRouter();
+  const query = useSearchParams();
   /** The account's one yes/no for texts (`notification_preferences`), which every sent kind shares. */
   const [consent, setConsent] = useState(false);
   /** The account's answer has come: until it has, no switch can be tapped (a tap would be routed on a guess). */
@@ -135,7 +136,7 @@ export function AlertsView() {
   // Back from the agree screen with "Agree to receive texts": the switch they tapped is turned on, once.
   useEffect(() => {
     if (!loaded || !consent || stopped) return;
-    const kind = new URLSearchParams(window.location.search).get('on');
+    const kind = query.get('on');
     if (!kind) return;
     router.replace('/alerts/');
     const asked = KINDS.find((k) => k === kind);
@@ -239,5 +240,17 @@ export function AlertsView() {
         />
       ) : null}
     </SubPage>
+  );
+}
+
+/** `useSearchParams` needs a Suspense boundary in an exported app; the fallback is the real header, so the way back is always there. */
+export function AlertsView() {
+  const { t } = useI18n();
+  return (
+    <Suspense
+      fallback={<SubPage title={t('alerts.title')} backHref="/profile/" backLabel={t('nav.back.profile')} actions={<HelpButton />}>{null}</SubPage>}
+    >
+      <AlertsList />
+    </Suspense>
   );
 }

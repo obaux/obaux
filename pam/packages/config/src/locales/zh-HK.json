@@ -1293,7 +1293,7 @@
   "alerts.changed": "有人更改預約",
   "alerts.message": "有人傳訊息給您",
   "alerts.saved": "已儲存。",
-  "alerts.kinds": "短訊類型",
+  "alerts.kinds": "請選擇您希望何時收到短訊。",
   "alerts.comingSoon": "即將推出",
   "profile.promo.alerts.body.providerList": "即將推出：有關預約、更改和訊息的短訊。",
   "alerts.how": "每當您開啟的事項發生，Pam 會發送一則短訊。回覆STOP可停止接收短訊，回覆HELP可獲得協助。可能會收取短訊和數據費用。",

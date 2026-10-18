@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Card } from '@astryxdesign/core/Card';
@@ -55,9 +55,10 @@ const styles = stylex.create({
   box: { width: '100%', minHeight: '48px', textAlign: 'start' },
 });
 
-export default function RemindersPage() {
+function RemindersForm() {
   const { t } = useI18n();
   const router = useRouter();
+  const query = useSearchParams();
   const { state: session } = useSession();
 
   /**
@@ -124,9 +125,8 @@ export default function RemindersPage() {
     setDone(true);
     // Sent here from a switch on Text alerts (D-615): back there, with that switch on after "Agree", off after "Not now".
     // Only that one place and only a known kind, so the address cannot be made to send anyone elsewhere.
-    const asked = new URLSearchParams(window.location.search);
-    if (asked.get('next') === 'alerts') {
-      const kind = asked.get('kind');
+    if (query.get('next') === 'alerts') {
+      const kind = query.get('kind');
       router.replace(value && kind && /^[a-z]+$/.test(kind) ? `/alerts/?on=${kind}` : '/alerts/');
       return;
     }
@@ -233,5 +233,24 @@ export default function RemindersPage() {
         </>
       )}
     </Page>
+  );
+}
+
+/**
+ * `useSearchParams` needs a Suspense boundary in an exported app (as on Flag), and the fallback is the real header:
+ * the way back never depends on a chunk arriving.
+ */
+export default function RemindersPage() {
+  const { t } = useI18n();
+  return (
+    <Suspense
+      fallback={
+        <Page>
+          <SubPageHeader title={t('reminders.title')} backHref="/profile/" backLabel={t('nav.back.profile')} />
+        </Page>
+      }
+    >
+      <RemindersForm />
+    </Suspense>
   );
 }
