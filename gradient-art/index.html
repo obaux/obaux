@@ -428,7 +428,8 @@ function trackerTrail(b) {
     if (i) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
   }
   const sqf = 1 - 0.07 * state.sq;
-  const R = state.style === 'sphere' ? (0.19 + 0.11 * b.v) * sqf : 0.30 * sqf * 0.88;
+  // sphere: its own outline. bloom: the edge of the colour layer, which scales with the breath (the green ball stays put)
+  const R = state.style === 'sphere' ? (0.19 + 0.11 * b.v) * sqf : 0.30 * sqf * 0.85 * (0.42 + 0.58 * b.v);
   const total = PATTERNS[state.pattern].phases.reduce((a, p) => a + p[1], 0);
   const f0 = (state.clock % total) / total;
   for (let j = 0; j < TRAIL; j++) {
