@@ -26,7 +26,10 @@ function sources(dir: string): string[] {
   });
 }
 
-/** Columns the app filters a GET on, each holding an id, a state, a role, or a setting's name. */
+/**
+ * Columns the app filters a GET on, each holding an id, a state, a role, or a setting's name. The list goes by column name, so
+ * the value filtered on must be a time the app computed or an id the app holds, never text a person typed.
+ */
 const ALLOWED = new Set([
   'id',
   'service_id',
