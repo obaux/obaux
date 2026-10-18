@@ -1521,6 +1521,31 @@
   notes corrected to the rule, 0bdd646b). Iris's b63 follow-ups (Piper 2cec036c): with the Trips sheet fully up, the
   map it covers is out of Tab and the screen reader's reach (P3); the lead stories' example people open a card (P4,
   stories only). No new words, no new field, no migration.
+- **Card a100, Message Pam (03:59).** One card for Will with Dot's pictures (e7769915: what every version has, Will's
+  inbox, A, B, C, and 911 and 988 above the box on the smallest phone) and three choices: who can write first (A: the
+  member always does; B: Pam can start with anyone, what Will asked for; C: B with a switch in Profile, the desk's
+  pick), whether a limited account can still write to Pam (the desk says yes), and text only or screenshots too
+  (text only). The desk decided the rest and listed it so Will can change it: no automatic reply, an away line not a
+  message, no "Read by Pam", no promised hours yet, "Pam" as the sender, first names in the inbox, one conversation
+  per person kept while they use Pam, no translation until it is on for all messages, a message to a program goes to
+  each lead. Lines to sign: Lena's L1 to L5 (0d368702), with L4 matching L1 and three notices, A's pointing to Help
+  (Sage e8164a44). A helper merged the six plans' questions and found the gaps first (letters that did not match, L4,
+  the A and C notices, the Terms' own sentence); Lena and Sage closed them before the card went up. Nothing is built
+  until Will answers.
+- **Plan C, continued (03:51 to 04:25).** Piper's corner fix (e252d92e): the place page's button had gone to its own
+  row because a rule counted the place's name, which that card does not show; it is now measured, and in the corner
+  at 390 and 320. The underlined "Cancel this visit" in one picture was the pointer left over it when the shot was
+  taken (d607d46b, retaken). The moved-visit line is inside the card, under the countdown: Sage's "Your calendar has
+  the old time." (2e05e77a; a screen reader also hears "This visit changed after you added it."), drawn by Dot
+  (06c2e2b0) and on card a98 as picture 4, then built (Piper 0e3b6169, READY 05:05: full e2e 2312 passed, 19
+  skipped, 0 failed; the placement spec fails on 22896318's build, the line's bottom 507.97 below the card's 484.97;
+  built pictures 9 to 11 on a98). Dot found why drawers.spec failed under load: the
+  sheet was still rising 8px when the spec measured it, and `open()` now waits for it to settle (650bd404; 520 of 520
+  after, 518 of 520 before). Lena's words for all of it are at a8f5188d.
+- **Batch b67 (18 October, 04:50 to 05:30).** S1 polish (Lena 272c3c4e, from Iris's b66 re-test): on a 320×320
+  window the Sign in globe's menu keeps to the room under the globe and scrolls, and Sign up's sheet is the one box
+  that scrolls; at 568 and 844 nothing moves. Iris's re-test of b65 and b66 (18b9ee37, docs): W4, S1, P3 and P4 pass,
+  and Iris's b63 Tab-stop note is withdrawn (it was focus wrapping to the page).
 
 ## What was wrong, and what missed it
 
@@ -1785,6 +1810,11 @@
   pictures, asked for after it, put the place page's button on its own row rather than the corner Will approved, and
   a new line under the card where Will had asked for nothing. The specs check behaviour, not placement. Lesson: a
   READY for a drawn screen comes with built pictures, and the desk compares them with the drawing before taking it.
+- **The same 8px, a second time (b67's full run, 05:29).** profile-skeleton.spec.ts:84 failed once on narrow-320 and
+  passed on its retry: the real card's top was 175.09 against the skeleton's 167.09, exactly the 8px Astryx's enter
+  rise moves, while the heights matched. Same class as drawers.spec: a box read while it is still rising. b67 does
+  not touch Profile; the evidence is copied aside, and Dot (D-520) gives it the settle wait and looks for a shared
+  helper and other specs that read a box as a screen appears. Lesson: once a cause is found, look for it elsewhere.
 
 ## Decisions
 
@@ -2024,9 +2054,19 @@
 | P3 proof: trips-covered-pins.spec from 2cec036c on main's build (61046033), --retries=0 | 3 of 3 failed on toHaveCount (the covered map's region counted 1, not 0) |
 | P4 proof: example-people.test from 2cec036c against main's mock and fixtures (vitest) | failed on its assertion, "Marcus: expected null not to be null"; the stranger case passed on both |
 | Batch b66, full run (2cdc72e6: S1 622c780a, Piper 2cdc72e6; then Lena's docs-only 0bdd646b): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1403 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 194 / 10.0 kB spare / 2249 passed, 19 skipped, 0 failed / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
+| b66 main CI (6defda30, pushed 03:55:00) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (04:35); Vercel web and pam-site success (03:58, 04:00) |
+| S1 polish proof: language-list-fits.spec from 272c3c4e on main's build (6defda30), -g "too short", --retries=0 | 6 of 6 new cases failed on their checks (3 "the boxes that scroll round the list": expected 1, got 2, ["listbox", "div"]; 3 "it ends on the screen": 364, not <= 320.5); 3 passed (Sign up's stays-on-screen case, true on main) |
+| Batch b67, full run (77d9e8a2: Lena 8933b153, Iris 77d9e8a2): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1403 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 194 / 10.0 kB spare / 2254 passed, 19 skipped, 0 failed, 1 flaky (profile-skeleton.spec:84 on narrow-320, the 8px rise; to Dot) / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
 
 ## Left undone
 
+- **As of b67 (18 October, 05:30):** Plan C is READY (Piper 0e3b6169, Lena a8f5188d) and waits on Will's "yes a97" and
+  the iPhone try; then the desk proves its specs on main, and its batch applies 20261018003713, checks the Vault key
+  and redeploys calendar-feed, with the ship day in p6. Message Pam: card a100 waits on Will's three answers and
+  signature; after it, Nico (the "never a member" comment), Wren (Messages in Pam, and three posts if limited accounts
+  can write) and Ava (Sage's saved reply for legal questions). Dot: profile-skeleton.spec's settle wait, then Trips'
+  map pins press (polish). With Will: a100,
+  "yes a97", the iPhone try; a86, a91, a93, a84, a88.
 - **As of b66 (18 October, 03:53):** Plan C is built (Piper 97cbce51; Lena's words, lines and pins 4434a659) but not
   ready: its built pictures put the place page's button on its own row, not in the corner, and the moved-visit line
   under the card. Piper moves the button back to the corner (own row only when the header can't hold it); Dot draws
