@@ -15,6 +15,8 @@ import { Button } from '@pam/ui/Button';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPage } from '@pam/ui/SubPage';
+import { Switch } from '@astryxdesign/core/Switch';
+import { AlertBannerHost } from '@/lib/AlertBannerHost';
 import { useI18n } from '@/lib/i18n';
 import { MessagesView, type MessageRow } from '../../../screens/MessagesView';
 import { ThreadView } from '../../../app/messages/ThreadView';
@@ -52,10 +54,22 @@ const WORDS = {
     auto: "We got your message. A person on the Pam team will read it and answer here. We don't watch messages as they come in. In danger? Call 911. In crisis? Call or text 988.",
     autoLabel: 'Automatic reply',
     composerPlaceholder: 'Write to Pam',
+    replyAs: 'Reply as Pam', // stand-in
+    writeAs: 'Write as Pam', // stand-in
     helpRow: 'Write to Pam',
     helpHint: 'A person on the Pam team reads it.',
     rowLine: 'Write to Pam',
     started: 'Pam started this conversation.',
+    // Option C (Sage, ledger 7b280684).
+    cTitle: 'The Pam team can now start a conversation with you, as Pam.',
+    cBody: "You'll see it in Messages, and only the Pam team can read it. You can turn this off in Profile.",
+    cSwitch: 'Pam can write to me first',
+    cHint: "Off: Pam answers when you write, and doesn't start a conversation.",
+    profile: 'Profile',
+    pLanguage: 'Language',
+    pAlerts: 'Text alerts',
+    pCalendar: 'Calendar',
+    pMessages: 'Messages from Pam',
     // Stand-in words.
     mine1: "I can't get my code to come through to my phone.",
     pam1: 'Thanks, Marcus. We have sent a new code. Tell us if it still does not arrive.',
@@ -124,10 +138,21 @@ const WORDS = {
     auto: 'وصلتنا رسالتك. سيقرأها شخص من فريق Pam ويرد هنا. لا نراقب الرسائل لحظة وصولها. في خطر؟ اتصل بـ 911. في أزمة؟ اتصل أو أرسل رسالة إلى 988.',
     autoLabel: 'رد تلقائي',
     composerPlaceholder: 'اكتب إلى Pam',
+    replyAs: 'رُدّ باسم Pam',
+    writeAs: 'اكتب باسم Pam',
     helpRow: 'اكتب إلى Pam',
     helpHint: 'يقرؤها شخص من فريق Pam.',
     rowLine: 'اكتب إلى Pam',
     started: 'بدأ Pam هذه المحادثة.',
+    cTitle: 'يمكن لفريق Pam الآن أن يبدأ محادثة معك، باسم Pam.',
+    cBody: 'ستراها في الرسائل، ولا يقرؤها إلا فريق Pam. يمكنك إيقاف ذلك من ملفي.',
+    cSwitch: 'يمكن لـ Pam أن يكتب لي أولًا',
+    cHint: 'إيقاف: يرد Pam عندما تكتب، ولا يبدأ محادثة.',
+    profile: 'ملفي',
+    pLanguage: 'اللغة',
+    pAlerts: 'تنبيهات نصية',
+    pCalendar: 'التقويم',
+    pMessages: 'رسائل من Pam',
     mine1: 'لا يصلني رمز الدخول على هاتفي.',
     pam1: 'شكرًا يا ماركوس. أرسلنا رمزًا جديدًا. أخبرنا إن لم يصل.',
     pamStart: 'مرحبًا عالية. نتأكد أن الجميع يستطيع الدخول. هل يعمل التطبيق معك؟',
@@ -191,9 +216,9 @@ type W = ReturnType<typeof useWords>;
 
 const styles = stylex.create({
   card: { width: '100%', backgroundColor: colorVars['--color-background-muted'], borderColor: 'transparent' },
-  cardTitle: { fontSize: '20px', lineHeight: 1.3, fontWeight: 700 },
-  cardText: { fontSize: '16px', lineHeight: 1.45 },
-  cardStrong: { fontSize: '16px', lineHeight: 1.45, fontWeight: 700 },
+  cardTitle: { fontSize: '19px', lineHeight: 1.25, fontWeight: 700 },
+  cardText: { fontSize: '15px', lineHeight: 1.4 },
+  cardStrong: { fontSize: '15px', lineHeight: 1.4, fontWeight: 700 },
   note: {
     position: 'fixed',
     insetInline: 0,
@@ -212,6 +237,8 @@ const styles = stylex.create({
   when: { fontSize: '14px' },
   group: { fontSize: '15px', fontWeight: 700, letterSpacing: '0.02em', color: colorVars['--color-text-secondary'] },
   stat: { fontSize: '15px', color: colorVars['--color-text-secondary'] },
+  switchWords: { flexGrow: 1, flexShrink: 1, minWidth: 0 },
+  switchLabel: { fontSize: '18px', fontWeight: 600 },
   full: { width: '100%', paddingInline: '12px' },
   bar: { paddingInline: '4px' },
 });
@@ -271,8 +298,9 @@ function Above({ lines }: { readonly lines: readonly string[] }) {
  * the photo button only in the version Will can choose (Iris allows screenshots); the microphone stays. ThreadView's composer is not
  * built for any of this yet, so the drawing rewrites it after it mounts: the build gives ThreadView these as props (Nico's).
  */
-function PamComposer({ photo }: { readonly photo: boolean }) {
+function PamComposer({ photo, placeholder }: { readonly photo: boolean; readonly placeholder?: string }) {
   const w = useWords();
+  const text = placeholder ?? w.composerPlaceholder;
   useEffect(() => {
     const apply = () => {
       const c = document.querySelector('.astryx-chat-composer');
@@ -284,14 +312,14 @@ function PamComposer({ photo }: { readonly photo: boolean }) {
         buttons[2]!.style.display = 'none';
       }
       for (const el of c.querySelectorAll<HTMLElement>('div')) {
-        if (el.children.length === 0 && /^(Write a message|اكتب رسالة)/.test(el.textContent ?? '')) el.textContent = w.composerPlaceholder;
+        if (el.children.length === 0 && /^(Write a message|اكتب رسالة)/.test(el.textContent ?? '')) el.textContent = text;
       }
     };
     apply();
     const observer = new MutationObserver(apply);
     observer.observe(document.body, { childList: true, subtree: true, characterData: true });
     return () => observer.disconnect();
-  }, [photo, w.composerPlaceholder]);
+  }, [photo, text]);
   return null;
 }
 
@@ -313,6 +341,8 @@ function PersonThread({ messages, intro, photo = false }: { readonly messages: r
         otherPhotoUrl={PAM_MARK}
         intro={
           <VStack gap={3} xstyle={styles.full}>
+            {/* The same intro every conversation has (D-526): Pam's mark and "Pam"; once it scrolls away the bar carries the name. */}
+            <ThreadIntro name={w.pam} photoUrl={PAM_MARK} context={null} />
             <PamCard />
             {intro}
           </VStack>
@@ -522,6 +552,7 @@ function AdminThread({ kind }: { readonly kind: 'answering' | 'new-member' | 'ne
         sendFailed={false}
         speechLanguage={locale === 'ar' ? 'ar' : 'en-US'}
       />
+      <PamComposer photo={false} placeholder={kind === 'answering' ? w.replyAs : w.writeAs} />
       <Above lines={[kind === 'answering' ? w.sees : kind === 'new-member' ? w.seesNew : w.seesProgram]} />
     </ThreadFrame>
   );
@@ -574,6 +605,49 @@ function ProgramPage() {
   );
 }
 
+/** Option C (B plus a way to turn it off), the one-time notice: the app's own alert banner at the top of the page, dismissible. */
+function NoticeC() {
+  const w = useWords();
+  return (
+    <>
+      <AlertBannerHost banner={{ status: 'info', title: w.cTitle, description: w.cBody }} onDismiss={() => {}} />
+      <MemberMessages kind="fresh" />
+    </>
+  );
+}
+
+/** Option C, the Profile switch: off means Pam only answers. */
+function ProfileSwitch() {
+  const w = useWords();
+  const icon = { width: 26, height: 26, 'aria-hidden': true } as const;
+  const [on, setOn] = useState(true);
+  return (
+    <Page gap={4}>
+      <LargeTitleHeader title={w.profile} actions={<HeaderActions />} />
+      <Text xstyle={styles.group}>{w.pMessages}</Text>
+      <Card padding={4}>
+        <HStack gap={3} align="center" wrap="nowrap">
+          <VStack gap={1} xstyle={styles.switchWords}>
+            <Text xstyle={styles.switchLabel}>{w.cSwitch}</Text>
+            <Text type="supporting" xstyle={styles.ctx}>
+              {w.cHint}
+            </Text>
+          </VStack>
+          <Switch label={w.cSwitch} isLabelHidden value={on} changeAction={setOn} />
+        </HStack>
+      </Card>
+      <MenuList
+        label={w.profile}
+        items={[
+          { id: 'language', label: w.pLanguage, href: '/language/', icon: <GlobeIcon {...icon} /> },
+          { id: 'alerts', label: w.pAlerts, href: '/alerts/', icon: <MessagesIcon {...icon} /> },
+          { id: 'calendar', label: w.pCalendar, href: '/calendar/', icon: <PlacesIcon {...icon} /> },
+        ]}
+      />
+    </Page>
+  );
+}
+
 const member = (path: string) => asRedesign('member', path);
 const admin = (path: string) => asRedesign('super-admin', path);
 
@@ -620,6 +694,12 @@ export const B5_AdminStartsMember: Story = { ...admin('/messages/thread/'), rend
 /** B: a new message to a program: it says who it reaches. */
 export const B6_AdminStartsProgram: Story = { ...admin('/messages/thread/'), render: () => <AdminThread kind="new-program" /> };
 
+// Option C (Sage, ledger 7b280684)
+/** C1: the one-time notice, where the app already puts one: a dismissible banner across the top of the page. */
+export const C1_OneTimeNotice: Story = { ...member('/messages/'), render: () => <NoticeC /> };
+/** C2: Profile's switch. On by default; off, Pam only answers. */
+export const C2_ProfileSwitch: Story = { ...member('/profile/'), render: () => <ProfileSwitch /> };
+
 const arabic = { globals: { locale: 'ar' } } as const;
 export const X1_ThreadEmpty_Arabic: Story = { ...X1_ThreadEmpty, ...arabic };
 export const X2_ThreadAfterFirstMessage_Arabic: Story = { ...X2_ThreadAfterFirstMessage, ...arabic };
@@ -632,4 +712,6 @@ export const X6_AdminThread_Arabic: Story = { ...X6_AdminThread, ...arabic };
 export const A2_MessagesAfterWriting_Arabic: Story = { ...A2_MessagesAfterWriting, ...arabic };
 export const B1_MessagesPamRow_Arabic: Story = { ...B1_MessagesPamRow, ...arabic };
 export const B2_PamStarted_Arabic: Story = { ...B2_PamStarted, ...arabic };
+export const C1_OneTimeNotice_Arabic: Story = { ...C1_OneTimeNotice, ...arabic };
+export const C2_ProfileSwitch_Arabic: Story = { ...C2_ProfileSwitch, ...arabic };
 export const B3_AdminEveryone_Arabic: Story = { ...B3_AdminEveryone, ...arabic };
