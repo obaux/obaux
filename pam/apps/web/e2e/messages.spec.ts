@@ -817,8 +817,7 @@ test.describe('a conversation', () => {
     // Asked first: nothing is called by tapping the row.
     await page.getByRole('button', { name: 'Block this person' }).click();
     await expect(page.getByRole('heading', { name: 'Block this person?' })).toBeVisible();
-    await expect(page.getByText(/They will see that messages are blocked/)).toBeVisible();
-    await expect(page.getByText(/unblock them any time from this menu/)).toBeVisible();
+    await expect(page.getByText(/^Neither of you can send messages here\. You can unblock them later\.$/)).toBeVisible();
     expect(calls).toEqual([]);
     // "Not now" goes back to the menu and still calls nothing.
     await page.getByRole('button', { name: 'Not now' }).click();
