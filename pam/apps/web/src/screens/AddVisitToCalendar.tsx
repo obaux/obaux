@@ -95,8 +95,8 @@ export function AddVisitToCalendar({ card, visit }: { readonly card: (slot: Cale
   const { state: session } = useSession();
   const { state: link } = useCalendarLink(session.status === 'signed-in');
   if (link.status === 'on') {
-    const calendar = link.calendar ? t(`calendar.kind.${link.calendar}`) : t('calendar.kind.other.inline');
-    const calendarPlain = link.calendar ? tPlain(`calendar.kind.${link.calendar}`) : tPlain('calendar.kind.other.inline');
+    const calendar = link.calendar && link.calendar !== 'other' ? t(`calendar.kind.${link.calendar}`) : t('calendar.kind.other.inline');
+    const calendarPlain = link.calendar && link.calendar !== 'other' ? tPlain(`calendar.kind.${link.calendar}`) : tPlain('calendar.kind.other.inline');
     return (
       <VStack gap={1}>
         {card({
