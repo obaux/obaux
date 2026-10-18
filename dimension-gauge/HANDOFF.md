@@ -7,6 +7,7 @@ A flat "liquid fill" circle that shows one life dimension's amount (0–100) on 
 
 ## Files
 - `dimension-gauge.js` — the whole component. A framework-free custom element, `<dimension-gauge>`. No dependencies, no build step. Shadow DOM, so app CSS can't break it.
+- `likert.js` / `likert.test.mjs` — Likert scoring and bucketing (see below).
 - `demo.html` — six sample gauges with placeholder icons and a randomize button. Serve the folder over HTTP (ES module import) and open it.
 
 ## API
@@ -26,6 +27,17 @@ A flat "liquid fill" circle that shows one life dimension's amount (0–100) on 
 CSS custom properties (set on the element or an ancestor): `--dg-size` (default 120px), `--dg-color` (#4561de), `--dg-track` (empty circle, translucent white), `--dg-icon` (#fff). Optional `--dg-wave` overrides the pale back wave.
 
 Slot content: any inline `<svg slot="icon">` using `currentColor`. It is sized to 34% of the circle. Use the app's own icon set. The `label` attribute is announced to screen readers only; nothing visible is drawn.
+
+## Likert -> bucket -> gauge
+`likert.js` (pure functions, tested by `likert.test.mjs`, run with `node likert.test.mjs`):
+1. Each dimension is several Likert items. Unanswered or out-of-range items are ignored. Items listed in `reverse` are flipped (`min + max - answer`).
+2. Mean of the answers, rescaled to a 0–100 score: `(mean - min) / (max - min) * 100`, rounded. No answers gives `score: null`.
+3. Bucket from the score: **weak** < 40, **steady** 40–69, **strong** >= 70 (on a 1–5 scale that is mean < 2.6 / 2.6–3.7 / >= 3.8).
+4. `gaugeProps()` returns `{ value: score, energy }` with energy 0.6 / 1 / 1.35 for weak / steady / strong. The gauge fill height is the real score (capped at 92); the bucket only changes how the water moves.
+
+Assumptions to confirm (marked `TODO(product)` in the code): the scale is 1–5, the cut points are 40 and 70, and every dimension's items are weighted equally. The survey's actual scale, item count per dimension, reverse-coded items and whether dimensions share the same cut points were not provided.
+
+Alternative if buckets should drive the fill too: map weak / steady / strong to fixed levels (e.g. 24 / 56 / 84) instead of the exact score.
 
 ## Behaviour details worth knowing
 - Waves flatten near 0 and 100 so the circle reads truly empty / truly full.
