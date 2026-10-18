@@ -425,6 +425,7 @@
   "notice.service_not_available.body": "It may come back. Contact Pam and we can help you find another place.",
   "notice.service_not_available.title": "This place is not on Pam right now",
   "notice.something_went_wrong.body": "This is not your fault. Try again. If it keeps happening, contact Pam.",
+  "notice.malfunction": "That didn't go through. It's not your fault, so try again.",
   "notice.something_went_wrong.title": "Something went wrong",
   "notify.demo.newInterest": "{count} people are interested in {program}",
   "notify.demo.pointsEarned": "You earned {points} points for {reason}",

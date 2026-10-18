@@ -428,6 +428,7 @@
   "notice.service_not_available.body": "它可能会回来。请联系Pam，我们帮您找另一个地方。",
   "notice.service_not_available.title": "这个地点目前不在Pam上",
   "notice.something_went_wrong.body": "这不是您的错。请再试一次。如果一直这样，请联系Pam。",
+  "notice.malfunction": "没有成功。这不是您的错，请再试一次。",
   "notice.something_went_wrong.title": "出了点问题",
   "notify.demo.newInterest": "{count}人对{program}有兴趣",
   "notify.demo.pointsEarned": "您获得了{points}积分，原因：{reason}",

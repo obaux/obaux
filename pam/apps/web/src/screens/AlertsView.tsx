@@ -1,17 +1,17 @@
 'use client';
 
-import { Suspense, useEffect, useId, useState } from 'react';
+import { Suspense, useCallback, useEffect, useId, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
 import { Switch } from '@astryxdesign/core/Switch';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { Notice } from '@pam/ui';
 import { SettingsList, SettingsRow } from '@pam/ui/SettingsList';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
+import { settleWithin, useMalfunction } from '@/lib/malfunction';
 import { ALERT_TEXTS_LIVE } from '@/lib/alertTextsLive';
 import { useTextsLive } from '@/lib/useTextsLive';
 import { setReminderConsent, setTextAlert, type AlertFlags, type AlertKind } from '@/lib/useReminderConsent';
@@ -115,28 +115,38 @@ function AlertsList() {
   const [saved, setSaved] = useState(false);
   /** The input id Astryx gave each switch, so the row's name can be its label. */
   const [switchIds, setSwitchIds] = useState<Partial<Record<Kind, string>>>({});
-  /** The row whose write failed: its error is drawn under it, where the finger was, not at the foot of the page. */
-  const [failedKind, setFailedKind] = useState<Kind | null>(null);
+  /** The switches whose save has not answered yet: each stays where it was, and says it is working (D-616). */
+  const [pending, setPending] = useState<ReadonlySet<Kind>>(() => new Set());
+  const malfunction = useMalfunction();
   /** They replied STOP (D-453): the switches are off and cannot be turned on from here. */
   const [stopped, setStopped] = useState(false);
 
-  // What the account says: yes, no, nobody asked, or a STOP.
-  useEffect(() => {
+  /** What the account says: yes, no, nobody asked, or a STOP. Read on arrival, on coming back to the screen, and after a late answer. */
+  const reread = useCallback(async () => {
     if (!userId) return;
-    let cancelled = false;
-    void (async () => {
-      const { getTextStatus } = await import('@/lib/useReminderConsent');
-      const status = await getTextStatus(userId);
-      if (cancelled) return;
-      setStopped(status.stopped);
-      setConsent(status.consent === true);
-      setAlerts(status.alerts);
-      setLoaded(true);
-    })();
-    return () => {
-      cancelled = true;
-    };
+    const { getTextStatus } = await import('@/lib/useReminderConsent');
+    const status = await getTextStatus(userId);
+    setStopped(status.stopped);
+    setConsent(status.consent === true);
+    setAlerts(status.alerts);
+    setLoaded(true);
   }, [userId]);
+
+  useEffect(() => {
+    void reread();
+  }, [reread]);
+  // The truth is the database's: a save that answered late may have gone through, so coming back to the screen reads it again (Iris's A6).
+  useEffect(() => {
+    const again = () => {
+      if (document.visibilityState === 'visible') void reread();
+    };
+    window.addEventListener('focus', again);
+    document.addEventListener('visibilitychange', again);
+    return () => {
+      window.removeEventListener('focus', again);
+      document.removeEventListener('visibilitychange', again);
+    };
+  }, [reread]);
 
   // Back from the agree screen with "Agree to receive texts": the switch they tapped is turned on, once.
   useEffect(() => {
@@ -145,13 +155,18 @@ function AlertsList() {
     if (!kind) return;
     router.replace('/alerts/');
     const asked = KINDS.find((k) => k === kind);
-    if (asked && LIVE.has(asked) && !isOn(asked)) void change(asked, true);
+    if (asked && LIVE.has(asked) && !isOn(asked)) void change(asked, true, null);
     // Once, on arrival with the answer in.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loaded, consent, stopped]);
 
-  const change = async (kind: Kind, on: boolean) => {
-    if (!LIVE.has(kind) || !userId || stopped) return;
+  /**
+   * A switch moves only once its save has succeeded (D-616). While it saves it stays where it was and says it is working; if the save
+   * fails, or has not answered in 15 s, it stays where it was and the bottom alert says so, and the failure is logged. A save that
+   * answers late is read back, so the screen shows what the database now says.
+   */
+  const change = async (kind: Kind, on: boolean, control: Element | null) => {
+    if (kind === 'connect' || !LIVE.has(kind) || !userId || stopped || pending.has(kind)) return;
     // The agree screen is the only opt-in (D-615): with no yes on file, a switch records nothing and turns nothing on.
     // It opens the agree screen for this role, which brings the person back here with this switch on, or off after "Not now".
     if (on && !consent) {
@@ -159,28 +174,38 @@ function AlertsList() {
       return;
     }
     setSaved(false);
-    setFailedKind(null);
-    if (ALERT_KINDS.has(kind)) {
-      const key = kind as AlertKind;
-      const before = alerts;
-      setAlerts({ ...alerts, [key]: on });
-      if (on) setConsent(true);
-      const ok = (await setTextAlert(userId, key, on, before, who !== 'member')).ok;
-      setFailedKind(ok ? null : kind);
-      setSaved(ok);
-      if (!ok) {
-        setAlerts(before);
-        setConsent(consent);
+    setPending((previous) => new Set(previous).add(kind));
+    const save = ALERT_KINDS.has(kind)
+      ? setTextAlert(userId, kind as AlertKind, on, alerts, who !== 'member')
+      : setReminderConsent(userId, on);
+    const settled = await settleWithin(save);
+    setPending((previous) => {
+      const next = new Set(previous);
+      next.delete(kind);
+      return next;
+    });
+    if (settled.status === 'ok' && settled.value.ok) {
+      if (ALERT_KINDS.has(kind)) {
+        setAlerts((previous) => ({ ...previous, [kind as AlertKind]: on }));
+        if (on) setConsent(true);
+        // The last alert going off keeps the yes to texts: only a STOP ends it (Nico, 21b053e9), so the screen's own yes is left as
+        // it was and follows the database; turning one back on in this visit does not open the agree screen.
+      } else {
+        setConsent(on);
       }
-      // The last alert going off keeps the yes to texts: only a STOP ends it (Nico, 21b053e9), so the screen's own yes is left as it
-      // was and follows the database; turning one back on in this visit does not open the agree screen.
+      setSaved(true);
+      malfunction.clear();
       return;
     }
-    setConsent(on);
-    const ok = (await setReminderConsent(userId, on)).ok;
-    setFailedKind(ok ? null : kind);
-    setSaved(ok);
-    if (!ok) setConsent(!on);
+    // A yes refused because of a STOP is not a failure: nothing is shown or logged, and the screen reads the STOP back.
+    if (settled.status === 'ok' && !settled.value.ok && settled.value.stopped) {
+      void reread();
+      return;
+    }
+    // Nothing moved. Only a code leaves this screen for the log (D-616, Nico): the save's own, or 'timeout'.
+    const code = settled.status === 'ok' ? (settled.value.ok ? 'unknown' : settled.value.code) : settled.status === 'timeout' ? 'timeout' : 'unknown';
+    malfunction.show(`alerts.switch.${kind}`, { code }, control);
+    if (settled.status === 'timeout') void settled.late.then(() => reread());
   };
 
   /** A switch shows on only while the account says yes to texts and it has not been stopped. */
@@ -213,16 +238,6 @@ function AlertsList() {
               badge={live ? undefined : t('common.comingSoon')}
               badgeId={badgeId}
               labelFor={live ? switchIds[kind] : undefined}
-              below={
-                failedKind === kind ? (
-                  <Notice
-                    notice="something_went_wrong"
-                    title={t('notice.something_went_wrong.title')}
-                    body={t('notice.something_went_wrong.body')}
-                    contactLabel={t('help.contact.action')}
-                  />
-                ) : null
-              }
               control={
                 <Switch
                   ref={(input) => {
@@ -236,7 +251,9 @@ function AlertsList() {
                   label={t(`alerts.${kind}`)}
                   isLabelHidden
                   value={live && isOn(kind)}
-                  changeAction={(on) => change(kind, on)}
+                  isLoading={pending.has(kind)}
+                  // `onChange`, not `changeAction`: Astryx's changeAction moves the switch at once and puts it back on a failure; ours moves after the save (D-616).
+                  onChange={(on, event) => void change(kind, on, event.target)}
                   isDisabled={!userId || !loaded || !live || stopped}
                 />
               }
@@ -244,7 +261,7 @@ function AlertsList() {
           );
         })}
       </SettingsList>
-      {saved && !failedKind ? (
+      {saved ? (
         <Text type="supporting" xstyle={styles.small}>
           {t('alerts.saved')}
         </Text>

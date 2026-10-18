@@ -448,6 +448,7 @@
   "notice.service_not_available.body": "ربما يعود. تواصل مع Pam ويمكننا مساعدتك في العثور على مكان آخر.",
   "notice.service_not_available.title": "هذا المكان غير متوفر في Pam حاليا",
   "notice.something_went_wrong.body": "هذا ليس خطأك. حاول مرة أخرى. وإذا استمرت المشكلة، فتواصل مع Pam.",
+  "notice.malfunction": "لم تتم العملية. هذا ليس خطأك، لذا حاول مرة أخرى.",
   "notice.something_went_wrong.title": "حدث خطأ ما",
   "notify.demo.newInterest": "{count} شخص مهتمون ببرنامج {program}",
   "notify.demo.newInterest.zero": "{count} أشخاص مهتمون ببرنامج {program}",

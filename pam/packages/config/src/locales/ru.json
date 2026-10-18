@@ -440,6 +440,7 @@
   "notice.service_not_available.body": "Возможно, оно вернётся. Свяжитесь с Pam, и мы поможем найти другое место.",
   "notice.service_not_available.title": "Этого места сейчас нет в Pam",
   "notice.something_went_wrong.body": "Это не ваша вина. Попробуйте ещё раз. Если это повторяется, свяжитесь с Pam.",
+  "notice.malfunction": "Не получилось. Это не ваша вина, попробуйте ещё раз.",
   "notice.something_went_wrong.title": "Что-то пошло не так",
   "notify.demo.newInterest": "{count} человека интересуются программой «{program}»",
   "notify.demo.newInterest.one": "{count} человек интересуется программой «{program}»",
