@@ -24,7 +24,10 @@ function world(opts: {
   pageCap?: number;
   secret?: string | null;
   failRead?: string;
+  /** Called after each page of a table is read: a row added or taken away while the sweep is reading. */
+  between?: (table: string, page: number, values: string[]) => void;
 }) {
+  const reads: Record<string, number> = {};
   const removed: { bucket: string; path: string }[] = [];
   const calls: string[] = [];
   const table = (name: string, column: string, values: string[]) => ({ name, column, values });
@@ -39,10 +42,24 @@ function world(opts: {
     const t = tables.find((x) => url.pathname === `/rest/v1/${x.name}`);
     if (t) {
       if (opts.failRead === t.name) return new Response('down', { status: 500 });
-      const offset = Number(url.searchParams.get('offset'));
       const limit = Math.min(Number(url.searchParams.get('limit')), opts.pageCap ?? Infinity);
-      const rows = t.values.slice(offset, offset + limit).map((v) => ({ [t.column]: v }));
-      return new Response(JSON.stringify(rows), { headers: { 'content-range': `${offset}-${offset + rows.length - 1}/${t.values.length}` } });
+      const sorted = [...t.values].sort();
+      // (A table may be filtered on its column too, as `not.is.null`, so every value of it is looked at.)
+      const gt = url.searchParams.getAll(t.column).find((v) => v.startsWith('gt.'));
+      let rows: string[];
+      if (gt) {
+        // The way the handler pages: after the last value it read.
+        rows = sorted.filter((v) => v > gt.slice(3)).slice(0, limit);
+      } else {
+        // The way an offset-paging version would: the nth page of whatever is there now.
+        rows = sorted.slice(Number(url.searchParams.get('offset') ?? 0), Number(url.searchParams.get('offset') ?? 0) + limit);
+      }
+      reads[t.name] = (reads[t.name] ?? 0) + 1;
+      opts.between?.(t.name, reads[t.name]!, t.values);
+      // A real server says how many rows there are in all; an offset-paging reader needs it to know when to stop.
+      return new Response(JSON.stringify(rows.map((v) => ({ [t.column]: v }))), {
+        headers: { 'content-range': `0-${Math.max(rows.length - 1, 0)}/${t.values.length}` },
+      });
     }
     const list = url.pathname.match(/^\/storage\/v1\/object\/list\/(.+)$/);
     if (list) {
@@ -130,6 +147,36 @@ describe('the sweep (D-607)', () => {
       messageAttachments: conversations.map((c) => `${c}/a.jpg`),
       pageCap: 3,
       buckets: { 'message-photos': Object.fromEntries(conversations.map((c) => [c, [{ name: 'a.jpg', created_at: OLD }]])) },
+    });
+    await w.call();
+    expect(w.removed).toEqual([]);
+  });
+
+  it('reads every conversation even when one is taken away between two pages, so no live folder is emptied (keyset paging)', async () => {
+    const conversations = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7'];
+    const w = world({
+      conversations,
+      messageAttachments: ['c4/in-use.jpg'],
+      pageCap: 3,
+      buckets: { 'message-photos': { c4: [{ name: 'in-use.jpg', created_at: OLD }] } },
+      // After the first page of conversations, c1 is erased: with offset paging every later row moves up one and c4 is never read.
+      between: (table, page, values) => {
+        if (table === 'conversations' && page === 1) values.splice(values.indexOf('c1'), 1);
+      },
+    });
+    await w.call();
+    expect(w.removed).toEqual([]);
+  });
+
+  it('reads every attachment even when a message is added before the page between two reads', async () => {
+    const w = world({
+      conversations: ['live'],
+      messageAttachments: ['live/a.jpg', 'live/b.jpg', 'live/c.jpg', 'live/d.jpg', 'live/e.jpg'],
+      pageCap: 2,
+      buckets: { 'message-photos': { live: ['a', 'b', 'c', 'd', 'e'].map((n) => ({ name: `${n}.jpg`, created_at: OLD })) } },
+      between: (table, page, values) => {
+        if (table === 'messages' && page === 1) values.push('live/0-new.jpg');
+      },
     });
     await w.call();
     expect(w.removed).toEqual([]);

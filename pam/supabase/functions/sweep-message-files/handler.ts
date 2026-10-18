@@ -80,23 +80,23 @@ export async function handle(request: Request, deps: Deps): Promise<Response> {
   if (!base || !key) return reply(503, { error: 'not set up: no service key' });
   const auth = { apikey: key, Authorization: `Bearer ${key}` };
 
-  // One column of one table, every row, page by page. The server may cap a page below what is asked, so the total it reports is
-  // what says when to stop; a failure, a missing total or a page that stops short is `null`, and the sweep stops.
+  // One column of one table, every row, page by KEY (the next page is the values after the last one read), not by offset: if a row is
+  // added or taken away while the sweep reads, an offset shifts and one row is never read, and a row never read is a file in use
+  // treated as unpointed or a live folder treated as gone. It goes on until a page comes back EMPTY (the server may cap a page below
+  // what is asked, so a short page does not mean the end). A failed read is `null`, and the sweep stops with nothing removed.
   const column = async (path: string, name: string, extra = ''): Promise<string[] | null> => {
     const out: string[] = [];
-    for (let offset = 0, total = Infinity; offset < total; ) {
-      const res = await deps.fetch(`${base}/rest/v1/${path}?select=${name}${extra}&order=${name}&limit=${PAGE}&offset=${offset}`, {
-        headers: { ...auth, Prefer: 'count=exact' },
-      });
+    let last: string | null = null;
+    for (;;) {
+      const after = last === null ? '' : `&${name}=gt.${encodeURIComponent(last)}`;
+      const res = await deps.fetch(`${base}/rest/v1/${path}?select=${name}${extra}${after}&order=${name}&limit=${PAGE}`, { headers: auth });
       if (!res.ok) return null;
-      total = Number(res.headers.get('content-range')?.split('/')[1]);
-      if (!Number.isFinite(total)) return null;
       const rows = (await res.json()) as Record<string, string>[];
-      if (rows.length === 0 && offset < total) return null;
+      if (!Array.isArray(rows)) return null;
+      if (rows.length === 0) return out;
       for (const row of rows) out.push(String(row[name]));
-      offset += rows.length;
+      last = String(rows[rows.length - 1]![name]);
     }
-    return out;
   };
 
   const list = async (bucket: string, prefix: string) => {
