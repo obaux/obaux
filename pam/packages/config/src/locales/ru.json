@@ -668,7 +668,7 @@
   "reminders.skip": "Не сейчас",
   "reminders.stopped.title": "Сообщения отключены",
   "reminders.stopped.body": "Вы ответили STOP, поэтому Pam не отправляет вам сообщения. Ничто в приложении не может включить их снова.",
-  "reminders.title": "Включите SMS-уведомления",
+  "reminders.title": "Получать SMS",
   "reminders.today.member": "Pam пока не отправляет ничего из этого. Это появится позже.",
   "reminders.today.staff": "Pam пока не отправляет ничего из этого. Это появится позже.",
   "reminders.what": "Виды SMS",
