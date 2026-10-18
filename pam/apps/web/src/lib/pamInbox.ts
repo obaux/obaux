@@ -29,7 +29,14 @@ export function waitedFor(since: string, now: Date = new Date()): { readonly uni
   return { unit: 'days', count: Math.floor(hours / 24) };
 }
 
-/** The reply-time line's duration (a median in seconds), in the same units as the waiting line. */
+/**
+ * The reply-time line's duration (a median in seconds). Rounded **up**: the line says half the first replies came
+ * "within" it (Sage), so 90 minutes is "within 2 hours", never "within 1 hour".
+ */
 export function replyDuration(seconds: number): { readonly unit: 'minutes' | 'hours' | 'days'; readonly count: number } {
-  return waitedFor(new Date(0).toISOString(), new Date(Math.max(60, seconds) * 1000));
+  const minutes = Math.max(1, Math.ceil(seconds / 60));
+  if (minutes < 60) return { unit: 'minutes', count: minutes };
+  const hours = Math.ceil(minutes / 60);
+  if (hours < 24) return { unit: 'hours', count: hours };
+  return { unit: 'days', count: Math.ceil(hours / 24) };
 }

@@ -928,6 +928,15 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Accounts & invites · Messages to Pam, the Pam team's inbox (18 October) — S1 READY, behind Nico's switch (card a100)
+
+`claude/pam-message-pam-admin` (stacked on Nico's `claude/messages-pam-s0-s1a`). The super admin's Home has a first row,
+"Messages to Pam", with a plain count of conversations waiting (D-586). `/pam/messages/` lists who is waiting for Pam,
+longest first, with how long, then Answered, with Closed folded under a row. A row shows first name, role and region (or
+a lead's program) only. A line gives the median first reply, rounded up. Built on Nico's `lib/pam.ts`. Words: Sage
+b947f366 and Lena a2fc2638. Next: S2 (close and reopen, saved replies), S3 (starting as Pam), S4 (hours). Plan:
+`docs/design/plans/2026-10-18-message-pam-admin-build.md`.
+
 ## Accounts & invites · Sign up's city note is a line, not a row (17 October) — in b62 (run-through P5)
 
 `claude/pam-join-city-note`. "Pam is only in these cities for now." is small print under the city field, not a disabled

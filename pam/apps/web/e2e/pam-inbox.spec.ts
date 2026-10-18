@@ -142,7 +142,8 @@ test.describe('Messages to Pam (card a100)', () => {
     await expect(page.getByText('Kofi')).toHaveCount(0);
     const closedRow = page.getByRole('link', { name: /Closed conversations/ });
     await expect(page.getByRole('listitem').filter({ has: closedRow })).toContainText('1');
-    await expect(page.getByText('Last 30 days: half of Pam’s first replies came within 3 hours.')).toBeVisible();
+    // The median is 3 hours 10 minutes: "within" rounds up, never down to a time half of them missed.
+    await expect(page.getByText('Last 30 days: half of Pam’s first replies came within 4 hours.')).toBeVisible();
 
     await closedRow.click();
     await expect(page.getByRole('heading', { name: 'Closed conversations', level: 1 })).toBeVisible();

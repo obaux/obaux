@@ -60,8 +60,12 @@ describe('waitedFor', () => {
 });
 
 describe('replyDuration', () => {
-  it('words a median in seconds the same way', () => {
-    expect(replyDuration(2 * 3600 + 120)).toEqual({ unit: 'hours', count: 2 });
+  it('rounds up, because the line says "within"', () => {
+    expect(replyDuration(5400)).toEqual({ unit: 'hours', count: 2 });
+    expect(replyDuration(3600)).toEqual({ unit: 'hours', count: 1 });
+    expect(replyDuration(3601)).toEqual({ unit: 'hours', count: 2 });
     expect(replyDuration(30)).toEqual({ unit: 'minutes', count: 1 });
+    expect(replyDuration(59 * 60 + 1)).toEqual({ unit: 'hours', count: 1 });
+    expect(replyDuration(25 * 3600)).toEqual({ unit: 'days', count: 2 });
   });
 });
