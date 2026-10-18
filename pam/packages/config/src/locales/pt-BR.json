@@ -1281,7 +1281,7 @@
   "alerts.changed": "Alguém muda uma reserva",
   "alerts.message": "Alguém escreve para você",
   "alerts.saved": "Salvo.",
-  "alerts.kinds": "Tipos de mensagens",
+  "alerts.kinds": "Escolha quando você quer receber uma mensagem de texto.",
   "alerts.comingSoon": "Em breve",
   "alerts.how": "Pam envia uma mensagem de texto cada vez que acontece algo que você ligou. Responda STOP para parar de receber mensagens, ou HELP para pedir ajuda. Podem ser cobradas tarifas de mensagens e de dados.",
   "alerts.privacy": "Privacidade",

@@ -1,0 +1,34 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Patterns" />
+
+# Patterns
+
+Rules that came from looking at a real screen. Each says what to do, and where it came from. A pattern with a
+component has a story under Components.
+
+## A list of settings (D-615)
+
+Will, 18 October, on Text alerts: *"Remove the card; it isn't needed. Each kind is its own item on the page, separated
+by lines."* and *"Move the badge below the row's name, so it fits longer text, especially in other languages."*
+Then: *"Please learn from this so the team can improve their design skills."*
+
+1. **No card around a single list.** A card holds a thing of its own: a person, an offer, a place. A list of
+   settings on a screen of its own is the page. Rows go straight on it, each under a thin line (`SettingsList`,
+   `SettingsRow` in `@pam/ui`).
+2. **A badge goes under the name, not beside it.** Beside it, the badge takes room from the name and a long name in
+   Spanish or Russian is cut or squeezed. Under it, the name has the whole width (D-612, `StatusBadge`).
+3. **No instructions repeated after first consent.** STOP, HELP and rates are said once, where somebody agrees to
+   texts (Sage's rule, in `docs/voice.md` and Foundations › Writing). The agree screen is the only opt-in: a switch on
+   a settings screen never records a first yes. With no yes on file it opens the agree screen for the person's own
+   role and comes back with that switch on after "Agree", off after "Not now". After a STOP the switches stay off
+   and cannot be turned on from the screen.
+4. **No legal links on task screens, with no exception.** Privacy and Terms are in Profile › Legal; a link to them
+   where someone is choosing something distracts from the choice (the agree screens carry none either: carriers
+   do not require it). Sage's wording of this is in `docs/voice.md` and Foundations › Writing.
+5. **Not-yet rows go to the bottom.** What is on comes first; rows with a "Coming soon" badge sit below them, in their
+   own order. The list opens on what a person can use, and what is not ready never pushes it down (Will, 18 October).
+6. **A label over a list says what the list is**, in one line (D-608), never how Pam works.
+
+The row is laid out in logical directions only, so it mirrors in Arabic. It is checked at 320px with the longest
+language, where the name wraps and the row grows.
