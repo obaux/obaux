@@ -27,6 +27,7 @@ export const APP_ERROR_ACTIONS = [
   'alerts.agree',
   'reminders.agree',
   'reminders.decline',
+  'function.dispatch-sms',
 ] as const;
 
 export type AppErrorAction = (typeof APP_ERROR_ACTIONS)[number];

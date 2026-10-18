@@ -341,5 +341,5 @@ Before you send words to Will:
 - [ ] Right tone for the moment: on the website and in welcomes, the headline lane (short beats, "your", a turn at the end); plainest in errors and privacy.
 - [ ] Does anything sound like watching people? Write it as guiding them.
 - [ ] Touches a promise (privacy, terms, transparency, notices)? Lena reads the meaning.
-- [ ] Changing a sentence that's already on a screen? List its key in the hand-off, and search the specs (`apps/web/e2e`, `*.test.ts`) for any phrase of the old words, not just its opening. On 18 October four specs still checked shortened D-608 lines and b72's full run failed on them.
+- [ ] Changing a sentence that's already on a screen? List its key in the hand-off, and search the specs (`apps/web/e2e`, `*.test.ts`) for any phrase of the old words, not just its opening. On 18 October four specs still checked shortened D-608 lines and b72's full run failed on them. Name each spec you find to the lane that owns it; don't edit it yourself (one owner per file).
 - [ ] Signed in `docs/signed-english.md` (Sage). A text, an email, Privacy or Terms, or a new promise? It goes to Will on a card (A29).

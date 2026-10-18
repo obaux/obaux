@@ -122,6 +122,15 @@ describe('rendering a reviewed message', () => {
     expect(en).not.toMatch(/\{place\}/);
   });
 
+  it('renders the saved-place text from exactly what the database queues, and refuses the shape it used to queue (migration 20261018185235)', () => {
+    // `queue_saved_place_closed` queues {reason_key, link}: the dispatcher builds `reason` from the key and has no default for `link`.
+    const queued = { reason_key: 'closed', link: 'https://app.joinpam.org/' };
+    const body = render(REVIEWED, 'saved_place_closed', 'en', queued);
+    expect(body).toContain('Find others in Pam: https://app.joinpam.org/');
+    // Before the fix it queued {reason_key} alone, and every such row failed here.
+    expect(() => render(REVIEWED, 'saved_place_closed', 'en', { reason_key: 'closed' })).toThrow(/missing variable "link"/);
+  });
+
   it('refuses a reason key it does not recognise rather than sending a gap', () => {
     expect(() =>
       render(REVIEWED, 'saved_place_closed', 'en', { reason_key: 'burned_down', link: 'https://pam.to/a' }),
@@ -259,7 +268,7 @@ describe('the dispatcher and the config package say the same words', () => {
       adminFirstName: 'Cassandra',
       time: '10:00 AM',
       address: '18200 Northwest Martin Luther King Junior Memorial Boulevard',
-      supportPhone: '+12673095265',
+      supportPhone: '+12155550191',
       reply: 'We can help.',
     };
   };
