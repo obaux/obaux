@@ -398,6 +398,31 @@
     max-block-size: min(calc(9 * var(--pam-touch-target-min)), calc(100dvh - 2 * var(--spacing-4)));
   }
 
+  /*
+   * The globe's menu opens under the globe, in the room the page leaves under it, and the cap above is the window less
+   * two gaps, not that room: on a 320×320 window the room is 248px and the cap 288px, so the menu ran 40px past the
+   * window and Arabic could be got to only by scrolling the page and the menu together (Iris, 18 October). Percentages
+   * on the popover are of the area it is anchored into (the room under the globe, or over it when it flips), so the
+   * popover is also capped at that area less its 4px margins; the surface and the menu inside it are columns that may
+   * shrink, so the menu keeps to the popover and scrolls. A window with room for the whole menu is as it was.
+   */
+  [popover]:has(.astryx-dropdown-menu [data-pam-tagged]) {
+    max-block-size: min(calc(9 * var(--pam-touch-target-min)), calc(100vh - 2 * var(--spacing-4)), calc(100% - 2 * var(--spacing-1)));
+    max-block-size: min(calc(9 * var(--pam-touch-target-min)), calc(100dvh - 2 * var(--spacing-4)), calc(100% - 2 * var(--spacing-1)));
+  }
+  [popover]:has(.astryx-dropdown-menu [data-pam-tagged]):popover-open {
+    display: flex;
+    flex-direction: column;
+  }
+  [popover]:has(.astryx-dropdown-menu [data-pam-tagged]) > .astryx-popover-surface {
+    display: flex;
+    flex-direction: column;
+    min-block-size: 0;
+  }
+  .astryx-dropdown-menu:has([data-pam-tagged]) {
+    min-block-size: 0;
+  }
+
   /* The closed box's chevron (D-372): larger and bolder, tucked 20px in
      from the right edge (Dropdown sets the padding) rather than 15px. */
   .astryx-selector:has(> [data-pam-dropdown]) .astryx-icon,

@@ -120,7 +120,11 @@ async function unreachable(page: Page, listRole: 'menu' | 'listbox', rowRole: 'm
       if (!list) return ['no list'];
       const lost: string[] = [];
       for (const row of rows) {
-        row.scrollIntoView({ block: 'nearest' });
+        // The list alone is scrolled, not the page: a row that is reached only by scrolling the page and the list together is not reached.
+        const before = row.getBoundingClientRect();
+        const box = list.getBoundingClientRect();
+        if (before.bottom > box.bottom) list.scrollTop += before.bottom - box.bottom;
+        else if (before.top < box.top) list.scrollTop -= box.top - before.top;
         const b = row.getBoundingClientRect();
         const l = list.getBoundingClientRect();
         if (b.top < l.top - 0.5 || b.bottom > l.bottom + 0.5 || b.top < -0.5 || b.bottom > window.innerHeight + 0.5) lost.push((row.textContent ?? '').trim());
@@ -139,6 +143,15 @@ async function placeField(field: Locator, top: number): Promise<void> {
 }
 
 const SIGN_UP = 'Sign up: "Choose a language"';
+
+/** What holds the rows: the sheet (a dialog) or, in a menu, its popover. */
+async function holderOf(page: Page, rowRole: 'menuitemradio' | 'option'): Promise<{ top: number; bottom: number } | null> {
+  return page.evaluate((rowRole) => {
+    const rows = [...document.querySelectorAll<HTMLElement>(`[role="${rowRole}"]`)].filter((row) => row.getBoundingClientRect().height > 0);
+    const box = rows[0]?.closest<HTMLElement>('dialog, [popover]')?.getBoundingClientRect();
+    return box ? { top: box.top, bottom: box.bottom } : null;
+  }, rowRole);
+}
 
 for (const size of SIZES) {
   for (const locale of ['en', 'ar'] as const) {
@@ -204,16 +217,26 @@ test.describe('320×320', () => {
     await page.getByRole('combobox', { name: en['onboarding.language.title'] }).click();
     const m = await measure(page, 'listbox', 'option');
     expect(m.list, 'a list was found').not.toBeNull();
-    // What the list sits in: the sheet (a dialog) or, in a menu, its popover.
-    const holder = await page.evaluate(() => {
-      const rows = [...document.querySelectorAll<HTMLElement>('[role="option"]')].filter((row) => row.getBoundingClientRect().height > 0);
-      const box = rows[0]?.closest<HTMLElement>('dialog, [popover]')?.getBoundingClientRect();
-      return box ? { top: box.top, bottom: box.bottom } : null;
-    });
+    const holder = await holderOf(page, 'option');
     expect(holder, 'the list sits in a sheet or a popover').not.toBeNull();
     expect(holder!.top, 'it starts on the screen').toBeGreaterThanOrEqual(-0.5);
     expect(holder!.bottom, 'it ends on the screen').toBeLessThanOrEqual(m.screen.height + 0.5);
     expect(await unreachable(page, 'listbox', 'option'), 'languages that cannot be scrolled to').toEqual([]);
+  });
+
+  // The globe's menu opens under the globe, so on this screen it has 248px of room and the cap alone (288px) ran it 40px past the bottom:
+  // Arabic was reached only by scrolling the page and the menu together (Iris, 18 October). The popover keeps to the room it has.
+  test("Sign in: the globe's menu on a screen too short for the whole list stays on the screen, and every language can be scrolled to", async ({ page }) => {
+    await page.goto('/signin/');
+    await settled(page);
+    await page.getByRole('button', { name: en['language.title'] }).first().click();
+    const m = await measure(page, 'menu', 'menuitemradio');
+    expect(m.list, 'a menu was found').not.toBeNull();
+    const holder = await holderOf(page, 'menuitemradio');
+    expect(holder, 'the menu sits in a popover').not.toBeNull();
+    expect(holder!.top, 'it starts on the screen').toBeGreaterThanOrEqual(-0.5);
+    expect(holder!.bottom, 'it ends on the screen').toBeLessThanOrEqual(m.screen.height + 0.5);
+    expect(await unreachable(page, 'menu', 'menuitemradio'), 'languages that cannot be scrolled to').toEqual([]);
   });
 });
 
