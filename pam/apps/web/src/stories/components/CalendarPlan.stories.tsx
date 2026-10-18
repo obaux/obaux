@@ -3,7 +3,6 @@ import { useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
 import { HStack } from '@astryxdesign/core/HStack';
-import { IconButton } from '@astryxdesign/core/IconButton';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
@@ -111,26 +110,16 @@ const styles = stylex.create({
   body: { fontSize: '17px', lineHeight: 1.5 },
   small: { fontSize: '15px', lineHeight: 1.5 },
   heading: { fontSize: '20px', lineHeight: 1.3, fontWeight: 700 },
-  cardWrap: { position: 'relative', width: '100%' },
-  // The calendar button sits in the green card's top corner, a 36px circle in a 48px target (as the drawers' button does).
+  // "Add to calendar" is a real button in the green card's top corner (Will, a98): the card's white, the green icon and words, 48px.
   calendar: {
-    position: 'absolute',
-    insetBlockStart: '10px',
-    insetInlineEnd: '10px',
-    zIndex: 2,
-    width: '48px',
-    height: '48px',
-    backgroundColor: 'transparent',
-    boxShadow: 'none',
-  },
-  calendarCircle: {
-    width: '36px',
-    height: '36px',
-    minWidth: '36px',
     flexShrink: 0,
-    borderRadius: '50%',
+    minHeight: '48px',
+    paddingInline: '14px',
+    fontSize: '16px',
+    fontWeight: 700,
     backgroundColor: colorVars['--color-background-card'],
-    color: colorVars['--color-icon-green'],
+    color: colorVars['--color-text-green'],
+    borderRadius: '24px',
   },
   // 48px high (the global button floor), so the whole line is the tap, not only its words.
   fine: { alignSelf: 'center', minHeight: '48px', paddingInline: '12px', fontSize: '15px', fontWeight: 600, color: colorVars['--color-text-secondary'] },
@@ -144,19 +133,15 @@ function BookedScreen() {
   return (
     <SubPage title={w.booked} backHref="/trips/" backLabel={w.close} backIcon="close">
       <VStack gap={1}>
-        <div {...stylex.props(styles.cardWrap)}>
-          <VisitCard eyebrow={w.eyebrow} day={w.day} time={w.time} countdown={w.countdown} changeLabel={w.change} changeHref="/trips/" />
-          <IconButton
-            label={w.addToCalendar}
-            variant="ghost"
-            icon={
-              <HStack align="center" justify="center" xstyle={styles.calendarCircle}>
-                <CalendarAddIcon width={20} height={20} aria-hidden />
-              </HStack>
-            }
-            xstyle={styles.calendar}
-          />
-        </div>
+        <VisitCard
+          eyebrow={w.eyebrow}
+          day={w.day}
+          time={w.time}
+          countdown={w.countdown}
+          changeLabel={w.change}
+          changeHref="/trips/"
+          action={<Button label={w.addToCalendar} variant="secondary" icon={<CalendarAddIcon width={22} height={22} aria-hidden />} xstyle={styles.calendar} />}
+        />
         <Button label={w.sync} variant="ghost" icon={<SyncIcon width={18} height={18} aria-hidden />} href="/calendar/" xstyle={styles.fine} />
       </VStack>
     </SubPage>

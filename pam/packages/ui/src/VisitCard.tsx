@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Button } from './Button.js';
 import { Card } from '@astryxdesign/core/Card';
@@ -39,6 +40,11 @@ export interface VisitCardProps {
   /** "Change appointment" — left out for a visit that has already happened. */
   readonly changeLabel?: string;
   readonly changeHref?: string | null;
+  /**
+   * A button for the card's header corner (plan C, a98: "Add to calendar"). When given it takes the place of the round calendar mark
+   * at the top left, so the card does not carry two calendar icons (Will, 18 October).
+   */
+  readonly action?: ReactNode;
 }
 
 const styles = stylex.create({
@@ -58,6 +64,7 @@ const styles = stylex.create({
   // The program's name in the body colour, not green (Will, D-343), so it
   // reads as a name rather than another green label.
   eyebrow: { fontSize: '16px', lineHeight: 1.3, fontWeight: 700, color: colorVars['--color-text-primary'] },
+  eyebrowGrow: { flexGrow: 1, flexShrink: 1, minWidth: 0 },
   day: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700, color: colorVars['--color-text-primary'] },
   time: { fontSize: '20px', lineHeight: 1.3, fontWeight: 600, color: colorVars['--color-text-green'] },
   // Metadata, so it reads quieter than the day and time (Will, D-341): plain
@@ -88,17 +95,20 @@ const styles = stylex.create({
   },
 });
 
-export function VisitCard({ eyebrow, day, time, service = null, countdown = null, changeLabel, changeHref = null }: VisitCardProps) {
+export function VisitCard({ eyebrow, day, time, service = null, countdown = null, changeLabel, changeHref = null, action = null }: VisitCardProps) {
   return (
     <Card padding={5} xstyle={styles.card}>
       {/* Room between each line (Will, 7 October, D-339: "so things aren't
           squished together"). */}
       <VStack gap={5}>
-        <HStack gap={3} align="center" wrap="nowrap">
-          <HStack align="center" justify="center" xstyle={styles.mark}>
-            <Icon icon="calendar" size="md" />
-          </HStack>
-          <Text xstyle={styles.eyebrow}>{eyebrow}</Text>
+        <HStack gap={3} align="center" justify="between" wrap="nowrap">
+          {action ? null : (
+            <HStack align="center" justify="center" xstyle={styles.mark}>
+              <Icon icon="calendar" size="md" />
+            </HStack>
+          )}
+          <Text xstyle={[styles.eyebrow, action ? styles.eyebrowGrow : null]}>{eyebrow}</Text>
+          {action}
         </HStack>
         <VStack gap={2}>
           <Text xstyle={styles.day}>{day}</Text>
