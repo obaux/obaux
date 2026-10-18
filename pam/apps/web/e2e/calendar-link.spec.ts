@@ -105,17 +105,17 @@ test('Manage: Get a new link asks first and keeps the calendar; Disconnect asks 
   await page.goto('/calendar/');
   await settled(page);
   await expect(page.getByText('Manage', { exact: true })).toBeVisible();
-  await expect(page.getByText('Get a new link', { exact: true })).toBeVisible();
-  await expect(page.getByText('Disconnect Google Calendar', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Get a new link/ }).first()).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Disconnect Google Calendar/ }).first()).toBeVisible();
   // A new link.
-  await page.getByText('Get a new link', { exact: true }).click();
+  await page.getByRole('button', { name: /^Get a new link/ }).first().click();
   expect(world.issued).toHaveLength(0);
   await page.getByRole('dialog').getByRole('button', { name: 'Get a new link' }).click();
   await expect.poll(() => world.issued.length).toBe(1);
   expect(world.issued[0]).toMatchObject({ p_calendar: null });
   await expect(page.getByText('Google Calendar', { exact: true }).first()).toBeVisible();
   // Disconnect.
-  await page.getByText('Disconnect Google Calendar', { exact: true }).click();
+  await page.getByRole('button', { name: /^Disconnect Google Calendar/ }).first().click();
   expect(world.off).toBe(0);
   await expect(page.getByRole('dialog')).toContainText('Disconnect Google Calendar?');
   await page.getByRole('dialog').getByRole('button', { name: 'Disconnect' }).click();
