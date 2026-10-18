@@ -717,6 +717,32 @@ test.describe('a conversation', () => {
     return { posts: () => posts };
   };
 
+  test('a reply that comes in while the conversation is open shows without leaving it, and is not shown twice (Iris S1)', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await withOneConversation(page);
+    await page.clock.install();
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+    await expect(page.getByText('Is the class still on Tuesday?')).toBeVisible();
+    await expect(page.getByText('Yes, see you there.')).toHaveCount(0);
+
+    const theirs = { id: MSG_THEIRS, conversation_id: CONVO, sender_id: OTHER, body: 'Is the class still on Tuesday?', created_at: new Date().toISOString() };
+    const reply = { id: 'late-reply', conversation_id: CONVO, sender_id: OTHER, body: 'Yes, see you there.', created_at: new Date(Date.now() + 1000).toISOString() };
+    let asked = 0;
+    await page.route(MESSAGES, (route) => {
+      if (route.request().method() !== 'GET') return route.continue();
+      asked += 1;
+      return route.fulfill(json([theirs, reply]));
+    });
+    await page.clock.runFor(9000);
+    await expect(page.getByText('Yes, see you there.')).toBeVisible();
+    // The next look brings the same two rows again: nothing is shown twice.
+    await page.clock.runFor(9000);
+    await expect.poll(() => asked).toBeGreaterThanOrEqual(2);
+    await expect(page.getByText('Yes, see you there.')).toHaveCount(1);
+    await expect(page.getByText('Is the class still on Tuesday?')).toHaveCount(1);
+  });
+
   test('a send that fails stays in the conversation as "Not sent", with its words, and a 48px Try again', async ({ page }) => {
     await signedInAs(page, 'member');
     await withOneConversation(page);

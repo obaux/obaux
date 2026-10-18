@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Role } from '@pam/config';
 import { requestLinkPreviews, wantsPreview } from './linkPreview';
+import { useLiveTick } from './useLiveTick';
 import { loadPhotos, removeUnsentPhoto, shrinkPhoto, uploadMessagePhoto } from './messagePhoto';
 import {
   displayFileName,
@@ -323,6 +324,60 @@ export function useThread(conversationId: string | null): {
       cancelled = true;
     };
   }, [conversationId, nonce]);
+
+  // What came in while it is open (Iris S1): ask for anything newer than the last message, every few seconds while the app is in front,
+  // and at once when it comes back or the network does. By conversation and time only, never by words. Merged by id, so a message
+  // that was just sent here, or that this very ask already brought, is never shown twice; nothing flashes back to loading.
+  const tick = useLiveTick(loaded.status === 'ready', 8_000);
+  const loadedNow = useRef(loaded);
+  loadedNow.current = loaded;
+  useEffect(() => {
+    const here = loadedNow.current;
+    if (tick === 0 || !conversationId || here.status !== 'ready') return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const { createClient } = await import('./supabase');
+        const supabase = createClient();
+        const last = here.messages[here.messages.length - 1]?.createdAt;
+        const ask = (columns: string) => {
+          let query = supabase.from('messages').select(columns).eq('conversation_id', conversationId);
+          if (last) query = query.gte('created_at', last);
+          return query.order('created_at', { ascending: true }).limit(200);
+        };
+        let { data, error } = await ask(MESSAGE_COLUMNS_WITH_SYSTEM);
+        if (error) ({ data, error } = await ask(MESSAGE_COLUMNS));
+        if (error || cancelled) return;
+        const rows = (data ?? []) as unknown as MessageRow[];
+        const now = loadedNow.current;
+        if (now.status !== 'ready') return;
+        const known = new Set(now.messages.map((m) => m.id));
+        const fresh = rows.filter((row) => !known.has(row.id));
+        if (fresh.length === 0) return;
+        const links = await loadPhotos(fresh.map(photoPathOf).filter((p): p is string => p !== null));
+        if (cancelled) return;
+        const added = fresh.map((row) => toMessage(row, now.meId, links, undefined, now.askerId));
+        setLoaded((prev) =>
+          prev.status === 'ready'
+            ? { ...prev, messages: [...prev.messages, ...added.filter((m) => !prev.messages.some((x) => x.id === m.id))] }
+            : prev,
+        );
+        // Read as it arrives, as when the conversation was opened (the Pam team's reading is not a member's).
+        if (!now.teamView && added.some((m) => !m.mine)) {
+          void supabase
+            .from('conversation_members')
+            .update({ last_read_at: new Date().toISOString() })
+            .eq('conversation_id', conversationId)
+            .eq('profile_id', now.meId);
+        }
+      } catch {
+        // A missed ask is caught up by the next one.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [tick, conversationId]);
 
   /** One try at storing a message. True once it is in; false (and kept, or dropped when the account is limited) if not. */
   const attempt = useCallback(

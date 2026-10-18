@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useLiveTick } from './useLiveTick';
 import type { Role } from '@pam/config';
 
 /**
@@ -110,6 +111,8 @@ export function useConversations(enabled: boolean): {
   const [state, setState] = useState<ConversationsState>({ status: 'loading' });
   const [nonce, setNonce] = useState(0);
   const refresh = useCallback(() => setNonce((n) => n + 1), []);
+  // Looks again every 20 seconds while the app is in front, and when it comes back (Iris S1): a reply that came in shows without a visit.
+  const tick = useLiveTick(enabled, 20_000);
 
   useEffect(() => {
     if (!enabled) return;
@@ -134,7 +137,7 @@ export function useConversations(enabled: boolean): {
 
         if (cancelled) return;
         if (error) {
-          setState({ status: 'error', offline: !navigator.onLine });
+          setState((prev) => (prev.status === 'ready' ? prev : { status: 'error', offline: !navigator.onLine }));
           return;
         }
 
@@ -154,7 +157,7 @@ export function useConversations(enabled: boolean): {
 
         if (cancelled) return;
         if (partnersError || latestError) {
-          setState({ status: 'error', offline: !navigator.onLine });
+          setState((prev) => (prev.status === 'ready' ? prev : { status: 'error', offline: !navigator.onLine }));
           return;
         }
 
@@ -214,16 +217,17 @@ export function useConversations(enabled: boolean): {
 
         setState({ status: 'ready', conversations });
       } catch {
-        if (!cancelled) setState({ status: 'error', offline: !navigator.onLine });
+        if (!cancelled) setState((prev) => (prev.status === 'ready' ? prev : { status: 'error', offline: !navigator.onLine }));
       }
     };
 
-    setState({ status: 'loading' });
+    // Quietly when there is already a list on screen: no flash back to loading.
+    setState((prev) => (prev.status === 'ready' ? prev : { status: 'loading' }));
     void load();
     return () => {
       cancelled = true;
     };
-  }, [enabled, nonce]);
+  }, [enabled, nonce, tick]);
 
   return { state, refresh };
 }
