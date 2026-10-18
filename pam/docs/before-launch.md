@@ -99,6 +99,10 @@ STATUS row too.
      is done ("Reply STOP to stop, or HELP for help"; the consent paragraph in `docs/sms-campaign-samples.md` follows it).
      `reminders.how` is done too (the /reminders/ screen the registration shows, and the join step): the screenshot Will attaches
      must be of the new screen, and the consent paragraph in `docs/sms-campaign-samples.md` already follows it.
+     **Update, 18 October (D-615):** `alerts.how` is retired, because Text alerts no longer explains anything; the agree screen
+     (`/reminders/`, and the join step once Ava's swap lands) is the only place the STOP / HELP / rates line is shown, as
+     `reminders.how`. The consent paragraph to paste is now `docs/sms-refile-packet.md` §3, not `docs/sms-campaign-samples.md`.
+     This item stays open for Will for the HELP reply itself (it gives an address, not a person) and the START reply (§5 of the packet).
   3. **Ava's in-app copy and delete** (a fresh sign-in code to the account's phone). The day it ships,
      `privacy.copy.body` and `privacy.delete.body` change from "Contact Pam and ask…" to the in-app steps, and
      the Privacy › Copy / Delete pages lose their Contact Pam button (Lena carries the words).
@@ -260,6 +264,11 @@ STATUS row too.
   **The opt-in description Will files with the carrier must match `reminders.intro` and its list once those ship**
   (paste the answer under "How do end-users consent…" in `docs/sms-campaign-samples.md` only after it says the same).
   No booking text goes to members (the bell only), so there is no `reminders.what.4`.
+  **Update, 18 October (D-608, D-615): this is replaced.** The agree screens have no intro: `reminders.intro` and the
+  bullet list `reminders.what.1` to `.3` are retired (once Ava's join-step swap lands; the join step still draws them
+  today). The screen shows "Kinds of texts" and one row per kind in Text alerts' own names ("A reminder before your trip",
+  "A saved place closes or moves", and the staff ones), a "Coming soon" badge on any not yet live, and `reminders.how`.
+  The opt-in description Will files must match **that**: `docs/sms-refile-packet.md` §3.
   **Also the moment `texts_live` goes on (Sage, 67fea9ad, 18 October):** the website's Messages in Pam post
   (`apps/site/src/content/MessagesInPam.tsx`, the paragraph on how you hear about a message) says "Pam does not send a
   text for a message, so open Pam to read it". A person who opted in to message texts then gets the "message waiting"
