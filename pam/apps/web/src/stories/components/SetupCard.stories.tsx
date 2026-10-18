@@ -1,6 +1,14 @@
+import type { ComponentProps } from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { VStack } from '@astryxdesign/core/VStack';
 import { SetupCard } from '@pam/ui/SetupCard';
+import { useStoryText } from '../support/useStoryText';
+
+/** Its words are the app's own, read from the bundle (args are keys), so they follow the Language toolbar and cannot drift. */
+function Localised(props: ComponentProps<typeof SetupCard>) {
+  const tr = useStoryText();
+  return <SetupCard {...props} title={tr(props.title)} body={tr(props.body)} />;
+}
 
 /**
  * One thing to set up, on a program lead's Home (D-352): the place card's
@@ -12,10 +20,11 @@ const meta = {
   title: 'Components/Cards/SetupCard',
   tags: ['autodocs'],
   component: SetupCard,
+  render: (args) => <Localised {...args} />,
   args: {
     kind: 'program',
-    title: 'Add your program',
-    body: 'Say what you offer and where. Pam checks it before members see it.',
+    title: 'home.setup.program.title',
+    body: 'home.setup.program.body',
     href: '/programs/new/',
   },
 } satisfies Meta<typeof SetupCard>;
@@ -27,16 +36,16 @@ export const Program: Story = {};
 export const Photo: Story = {
   args: {
     kind: 'photo',
-    title: 'Add your photo',
-    body: 'A friendly face helps people feel welcome before they walk in.',
+    title: 'home.setup.photo.title',
+    body: 'home.setup.photo.body',
     href: '/profile/',
   },
 };
 export const Calendar: Story = {
   args: {
     kind: 'calendar',
-    title: 'See who is coming in',
-    body: 'When members plan a trip to your program, you will see them here and check them in.',
+    title: 'home.setup.calendar.title',
+    body: 'home.setup.calendar.body',
     href: '/home/calendar/',
   },
 };
@@ -48,8 +57,8 @@ export const Calendar: Story = {
 export const Processing: Story = {
   args: {
     kind: 'review',
-    title: 'Your program is in review',
-    body: 'Pam checks it in 1–2 days. See where it is.',
+    title: 'home.setup.review.title.review',
+    body: 'home.setup.review.body.review',
     href: '/program/',
     loading: 'processing',
   },
@@ -62,9 +71,9 @@ export const Loading: Story = { args: { loading: 'skeleton' } };
 export const AllThree: Story = {
   render: () => (
     <VStack gap={3}>
-      <SetupCard {...Program.args!} {...meta.args} />
-      <SetupCard {...meta.args} {...Photo.args!} />
-      <SetupCard {...meta.args} {...Calendar.args!} />
+      <Localised {...Program.args!} {...meta.args} />
+      <Localised {...meta.args} {...Photo.args!} />
+      <Localised {...meta.args} {...Calendar.args!} />
     </VStack>
   ),
 };

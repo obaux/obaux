@@ -4,6 +4,7 @@ import { BellIcon, StarIcon } from '@pam/ui';
 import { BadgeArt, ConnectionsArt } from '@pam/ui/BadgeArt';
 import { FeatureTile, FeatureTileRow, ProfileSummary, PromoCard } from '@pam/ui/ProfileCards';
 import { SetupArt } from '@pam/ui/SetupArt';
+import { useStoryText } from '../support/useStoryText';
 
 /** The Profile screen's cards: who you are with up to three numbers, two feature tiles side by side, and a single offer. Use ProfileSummary at the top of a profile. */
 const meta = {
