@@ -38,6 +38,11 @@ export interface MapDrawerProps {
   /** Pixels kept free above it at full height — the search bar. */
   readonly topOffset?: number;
   readonly initialStop?: DrawerStop;
+  /**
+   * Told where the drawer's top edge is, in pixels from the top of the screen, whenever it rests at a stop or the screen changes (not
+   * while a finger drags it). What the drawer covers is under it: the screen behind can take those things out of a screen reader's reach.
+   */
+  readonly onTopChange?: (top: number) => void;
 }
 
 // Just the title and its count (Will, 5 October, D-289): no card may show.
@@ -125,6 +130,7 @@ export function MapDrawer({
   bottomOffset = 0,
   topOffset = 80,
   initialStop = 'half',
+  onTopChange,
 }: MapDrawerProps) {
   const [viewport, setViewport] = useState(700);
   useEffect(() => {
@@ -144,6 +150,11 @@ export function MapDrawer({
   };
 
   const [stop, setStop] = useState<DrawerStop>(initialStop);
+  const restingTop = viewport - bottomOffset - heights[stop];
+  useEffect(() => {
+    onTopChange?.(restingTop);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restingTop]);
   const [dragHeight, setDragHeight] = useState<number | null>(null);
   const drag = useRef<{ y: number; h: number; moved: boolean } | null>(null);
   /** A drag ends in a click with a mouse; set while one is going so that click is not read as a tap (D-494). */
