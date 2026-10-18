@@ -1,0 +1,28 @@
+diff --git a/pam/apps/site/src/content/MessagesInPam.tsx b/pam/apps/site/src/content/MessagesInPam.tsx
+index 4e9baa62..e2b728e7 100644
+--- a/pam/apps/site/src/content/MessagesInPam.tsx
++++ b/pam/apps/site/src/content/MessagesInPam.tsx
+@@ -91,9 +91,7 @@ export function MessagesInPam() {
+         shots={[{ name: 'messages-in-pam/blocked.png', alt: "A conversation after the other person blocked it. The box for writing a message is gone. In its place: “You can’t send messages here. This person has blocked messages in this conversation. You can still read it. Questions? Contact Pam.” and a link, “Contact Pam”.", caption: "What the other person sees." }]}
+         />
+         <P>
+-          Pam asks first. It says: “Neither of you will be able to send messages in this conversation or start
+-          a new one. What has already been said stays here, and you can still report it. They will see that
+-          messages are blocked. You can unblock them any time from this menu.”
++          Pam asks first. It says: “Neither of you can send messages here. You can unblock them later.”
+         </P>
+         <P>
+           The other person is told. Where the box for writing a message was, they see “You can’t send messages
+diff --git a/pam/apps/site/src/content/TextsFromPam.tsx b/pam/apps/site/src/content/TextsFromPam.tsx
+index ff3589fa..ba0d669d 100644
+--- a/pam/apps/site/src/content/TextsFromPam.tsx
++++ b/pam/apps/site/src/content/TextsFromPam.tsx
+@@ -90,7 +90,7 @@ export function TextsFromPam() {
+             'For a sign-in code, wait for the “Send it again” timer to finish, then ask for a new code. Use the newest one.',
+             'Still no text? Contact Pam.',
+           ]}
+-          shots={[{ name: 'texts-from-pam/reminders.png', alt: "The “Text reminders” screen in Pam. A list headed “What we would send”, then a line that says today Pam sends only a note when a place you saved closes or moves, then two buttons: “Agree to receive texts” and “Not now”.", caption: "The “Text reminders” screen." }, { name: 'texts-from-pam/texts-off.png', alt: "The “Text reminders” screen after someone replied STOP. It says “Texts are off” and that Pam does not text you, and that nothing in the app can turn texts back on.", caption: "After you reply STOP, the screen says “Texts are off”." }]}
++          shots={[{ name: 'texts-from-pam/reminders.png', alt: "The “Text reminders” screen in Pam. A list headed “Kinds of texts”, then a line that says today Pam sends only a note when a place you saved closes or moves, then two buttons: “Agree to receive texts” and “Not now”.", caption: "The “Text reminders” screen." }, { name: 'texts-from-pam/texts-off.png', alt: "The “Text reminders” screen after someone replied STOP. It says “Texts are off” and that Pam does not text you, and that nothing in the app can turn texts back on.", caption: "After you reply STOP, the screen says “Texts are off”." }]}
+         />
+       </Section>
+     </Body>
