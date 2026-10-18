@@ -804,6 +804,39 @@ test.describe('a conversation', () => {
     await expect(tab).toHaveAccessibleName(/New messages/);
   });
 
+  test('a send that gets no answer becomes Not sent with Try again after a while, and Try again makes no second copy (Iris P2)', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await withOneConversation(page);
+    await page.clock.install();
+    let posts = 0;
+    let landed: Record<string, unknown> | null = null;
+    await page.route(MESSAGES, async (route) => {
+      const request = route.request();
+      if (request.method() === 'POST') {
+        posts += 1;
+        // The first one reaches the database and the answer never comes back; the second is never needed.
+        landed = { id: 'landed-1', conversation_id: CONVO, sender_id: ME, body: 'See you Thursday.', created_at: new Date().toISOString() };
+        if (posts === 1) return new Promise(() => {});
+        return route.fulfill(json(landed));
+      }
+      const theirs = { id: MSG_THEIRS, conversation_id: CONVO, sender_id: OTHER, body: 'Is the class still on Tuesday?', created_at: new Date(Date.now() - 60_000).toISOString() };
+      // Asked by sender, the probe finds what landed.
+      if (request.url().includes(`sender_id=eq.${ME}`)) return route.fulfill(json(posts >= 1 ? [landed] : []));
+      return route.fulfill(json([theirs]));
+    });
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+    await page.getByRole('textbox').fill('See you Thursday.');
+    await page.getByRole('button', { name: /send/i }).click();
+    await expect(page.getByText('Sending…', { exact: true }).first()).toBeVisible();
+    await page.clock.runFor(31_000);
+    await expect(page.getByText('Not sent', { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Not sent. Try again.' }).click();
+    await expect(page.getByText('Not sent', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('See you Thursday.')).toHaveCount(1);
+    expect(posts).toBe(1);
+  });
+
   test('a send that fails stays in the conversation as "Not sent", with its words, and a 48px Try again', async ({ page }) => {
     await signedInAs(page, 'member');
     await withOneConversation(page);

@@ -168,6 +168,15 @@ test.describe('Message Pam, the person\'s side', () => {
     await expect(log).not.toContainText('This person');
   });
 
+  test('the 988 in the out-of-hours reply is a call: one tap, named for what it does (Iris P1)', async ({ page }) => {
+    await world(page, { away: true });
+    await page.goto(`/messages/thread/?id=${PAM_C}`);
+    await settled(page);
+    const call = page.getByRole('link', { name: 'Call or text 988' });
+    await expect(call).toHaveAttribute('href', 'tel:988');
+    await expect(call).toHaveText('988');
+  });
+
   test('too many messages too fast: no "Not sent" and no Try again, the words go back in the box and a calm line says to wait (Iris W4)', async ({ page }) => {
     const server = await world(page, { rateLimited: true });
     await page.goto(`/messages/thread/?id=${PAM_C}`);

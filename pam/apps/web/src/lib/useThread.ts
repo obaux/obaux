@@ -119,6 +119,9 @@ const MESSAGE_COLUMNS =
 // conversation has had since 0005 still read it.
 const MESSAGE_COLUMNS_BEFORE_0080 = 'id, sender_id, body, attachment_url, attachment_kind, created_at';
 
+/** How long a message may go unanswered before it is "Not sent" (Iris P2). */
+const SEND_DEADLINE_MS = 30_000;
+
 const photoPathOf = (row: MessageRow) => (row.attachment_kind === 'photo' ? row.attachment_url : null);
 
 const fileOf = (row: MessageRow): MessageFile | null =>
@@ -162,7 +165,8 @@ const toMessage = (
   file: fileOf(row),
   createdAt: row.created_at,
   // Read by the Pam team, everything that is not the person's is Pam's (including the system's); otherwise mine is what I wrote.
-  mine: askerId !== null ? row.sender_id !== askerId : row.sender_id !== null && row.sender_id === me,
+  // A message written by no person (Pam's welcome, the out-of-hours reply) is Pam's, never "mine" for the team reading it either.
+  mine: askerId !== null ? row.sender_id !== null && row.sender_id !== askerId : row.sender_id !== null && row.sender_id === me,
 });
 
 export function useThread(conversationId: string | null): {
@@ -418,6 +422,10 @@ export function useThread(conversationId: string | null): {
         }
         const { createClient } = await import('./supabase');
         const supabase = createClient();
+        // No answer is not "Sending…" for ever (Iris P2): after 30 seconds it is given up on and shows "Not sent" with Try again. The
+        // request may still have reached the database, which is what Try again's look before sending is for.
+        const giveUp = new AbortController();
+        const deadline = setTimeout(() => giveUp.abort(), SEND_DEADLINE_MS);
         const { data, error } = await supabase
           .from('messages')
           .insert({
@@ -428,7 +436,9 @@ export function useThread(conversationId: string | null): {
             ...(named ? { attachment_name: named.name, attachment_bytes: named.bytes } : {}),
           })
           .select(MESSAGE_COLUMNS)
+          .abortSignal(giveUp.signal)
           .single();
+        clearTimeout(deadline);
         if (error || !data) throw error ?? new Error('insert failed');
         stored = null;
 
