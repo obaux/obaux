@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ComponentProps } from 'react';
+import { useEffect, useRef, useState, type ComponentProps } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
 import { Heading } from '@astryxdesign/core/Heading';
@@ -19,8 +19,8 @@ import { setPamThreadStatus, usePamInbox } from '@/lib/pam';
 /**
  * The Pam team's tools in a Pam conversation (card a100, D-605; Dot's x6). Only the team sees them; the person never does.
  *
- * - **Saved replies:** a button under the person's name opens a short list. Picking one puts its words in the composer, and
- *   nothing is sent until Send. The words are fixed (Sage's, in seven languages), never edited in the app, and carry no
+ * - **Saved replies:** a button above the composer opens a short list. Picking one puts its words in the composer where the
+ *   cursor was, after what was already typed (Iris T2), and nothing is sent until Send. The words are fixed (Sage's, in seven languages), never edited in the app, and carry no
  *   justice words (Sage, fb410c60). The legal reply waits for a lawyer-read list of free legal help, so it is not offered.
  * - **Close and Reopen:** in the conversation's ⋯ screen, never beside the composer. Closing is undone by Reopen, or by
  *   the person writing again, so it asks nothing first.
@@ -36,12 +36,35 @@ const styles = stylex.create({
 export function PamSavedReplies({ onPick }: { readonly onPick: (text: string) => void }) {
   const { t, tPlain } = useI18n();
   const [open, setOpen] = useState(false);
+  const bar = useRef<HTMLDivElement>(null);
+  // When the sheet closes, focus goes back to the message box, not to this button (Iris T2): the box is beside it in the composer.
+  const box = useRef<HTMLElement | null>(null);
+  // The reply goes in once the sheet has closed and handed focus back, so the cursor it leaves after the words stays there.
+  const picked = useRef<string | null>(null);
+  useEffect(() => {
+    if (open || picked.current === null) return;
+    const text = picked.current;
+    picked.current = null;
+    const frame = requestAnimationFrame(() => onPick(text));
+    return () => cancelAnimationFrame(frame);
+  }, [open, onPick]);
+  const openSheet = () => {
+    box.current = bar.current?.parentElement?.querySelector<HTMLElement>('[contenteditable="true"]') ?? null;
+    setOpen(true);
+  };
   return (
     <>
-      <HStack gap={2} xstyle={styles.bar}>
-        <Button label={t('pam.saved.title')} variant="secondary" onClick={() => setOpen(true)} />
+      <HStack ref={bar} gap={2} xstyle={styles.bar}>
+        <Button label={t('pam.saved.title')} variant="secondary" onClick={openSheet} />
       </HStack>
-      <BottomSheet isOpen={open} onOpenChange={setOpen} label={tPlain('pam.saved.title')} height="hug" xstyle={sheet.panel}>
+      <BottomSheet
+        isOpen={open}
+        onOpenChange={setOpen}
+        label={tPlain('pam.saved.title')}
+        height="hug"
+        finalFocusRef={box}
+        xstyle={sheet.panel}
+      >
         {open ? (
           <VStack gap={2} xstyle={styles.sheet}>
             <Heading level={2} xstyle={styles.title}>
@@ -56,7 +79,7 @@ export function PamSavedReplies({ onPick }: { readonly onPick: (text: string) =>
                 icon: <MessagesIcon width={26} height={26} aria-hidden />,
                 onSelect: () => {
                   // What is sent is plain text: no invisible isolates in someone's message (D-435).
-                  onPick(tPlain(key));
+                  picked.current = tPlain(key);
                   setOpen(false);
                 },
               }))}

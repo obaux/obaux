@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { useSearchParams } from 'next/navigation';
 import { Avatar } from '@astryxdesign/core/Avatar';
@@ -19,7 +19,8 @@ import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { whenHappened } from '@/lib/when';
-import { usePamInbox, usePamStatus, type PamInboxRow } from '@/lib/pam';
+import { usePamInbox, usePamStatus, type PamInboxRow, type PamInboxState } from '@/lib/pam';
+import { useLiveTick } from '@/lib/useLiveTick';
 import { inboxGroups, waitedFor } from '@/lib/pamInbox';
 import { NotIn } from '../app/NotIn';
 
@@ -58,7 +59,18 @@ export function PamInboxScreen() {
   const pam = usePamStatus(isSuperAdmin);
   const live = pam.status === 'ready';
   const [refresh, setRefresh] = useState(0);
-  const state = usePamInbox(isSuperAdmin && live, refresh);
+  // Looks again every 20 seconds while the screen is in front (Nico's ticker, D-614), so a new message shows without a reload.
+  const { tick, settle } = useLiveTick(isSuperAdmin && live, 20_000);
+  const fresh = usePamInbox(isSuperAdmin && live, refresh + tick);
+  // A background look that fails says nothing while a list is on screen: the last list stays (only Try again, pressed, shows an
+  // error over it).
+  const lastReady = useRef<PamInboxState | null>(null);
+  useEffect(() => {
+    if (fresh.status === 'loading') return;
+    settle(fresh.status === 'ready');
+    if (fresh.status === 'ready') lastReady.current = fresh;
+  }, [fresh, settle]);
+  const state = fresh.status === 'error' && lastReady.current ? lastReady.current : fresh;
 
   const params = useSearchParams();
   const showClosed = params.get('show') === 'closed';

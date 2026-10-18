@@ -60,7 +60,11 @@ async function team(page: Page, { status = 'open', hasLead = true, existing = fa
       return route.fulfill(json({}));
     }
     return route.fulfill(
-      json([{ id: 'q', conversation_id: PAM_C, sender_id: ASKER, system_key: null, system_vars: null, body: 'How do I change my city?', attachment_url: null, attachment_kind: null, created_at: new Date().toISOString() }]),
+      json([
+        // Pam's welcome, from no person (system_key), then the person's question.
+        { id: 'w', conversation_id: PAM_C, sender_id: null, system_key: 'pam.welcome', system_vars: null, body: '', attachment_url: null, attachment_kind: null, created_at: new Date(Date.now() - 60_000).toISOString() },
+        { id: 'q', conversation_id: PAM_C, sender_id: ASKER, system_key: null, system_vars: null, body: 'How do I change my city?', attachment_url: null, attachment_kind: null, created_at: new Date().toISOString() },
+      ]),
     );
   });
   const rpc = (fn: string, answer: () => unknown) =>
@@ -104,6 +108,32 @@ test.describe("Message Pam, the team's side (card a100)", () => {
     await expect(sheet).toHaveCount(0);
     await expect(page.getByRole('textbox')).toHaveText('Your guide is the best person for this. You can write to them in Messages.');
     expect(server.posts).toHaveLength(0);
+  });
+
+  // Iris T2 (pass 2): a saved reply replaced what was typed, and focus did not come back to the box.
+  test('a saved reply goes in after what was already typed, and the box has focus again', async ({ page }) => {
+    const server = await team(page);
+    await page.goto(`/messages/thread/?id=${PAM_C}&from=pam`);
+    await settled(page);
+    const box = page.getByRole('textbox');
+    await box.click();
+    await page.keyboard.type('Hi Aaliyah,');
+    await page.getByRole('button', { name: 'Saved replies' }).click();
+    await page.getByRole('dialog', { name: 'Saved replies' }).getByText('Your guide is the best person for this.', { exact: false }).click();
+    await expect(box).toHaveText('Hi Aaliyah, Your guide is the best person for this. You can write to them in Messages.');
+    await expect(box).toBeFocused();
+    expect(server.posts).toHaveLength(0);
+  });
+
+  // Iris W6 (pass 1): Pam's welcome showed as the team's own message, "You", in the green bubble on the right.
+  test("Pam's welcome reads as Pam's, on the person's side, never as the team's own", async ({ page }) => {
+    await team(page);
+    await page.goto(`/messages/thread/?id=${PAM_C}&from=pam`);
+    await settled(page);
+    const welcome = page.getByRole('article').filter({ hasText: 'If you need help with anything, reply here.' });
+    await expect(welcome).toHaveCount(1);
+    await expect(welcome).toHaveAccessibleName(/^Pam, /);
+    await expect(page.getByRole('article', { name: /^You, / })).toHaveCount(0);
   });
 
   test("the team replies as Pam, with photos only: no document button", async ({ page }) => {

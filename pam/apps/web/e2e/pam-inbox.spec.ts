@@ -194,6 +194,29 @@ test.describe('Messages to Pam (card a100)', () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
   });
 
+  test('looks again every 20 seconds: a new message shows without a reload, and a failed look keeps the list', async ({ page }) => {
+    await page.clock.install();
+    let calls = 0;
+    await signedIn(page);
+    await page.route('**/rest/v1/rpc/pam_inbox*', (route) => {
+      calls += 1;
+      if (calls === 1) return route.fulfill(json(INBOX.slice(0, 1)));
+      if (calls === 2) return route.fulfill({ status: 500, contentType: 'application/json', body: '{}' });
+      return route.fulfill(json(INBOX.slice(0, 2)));
+    });
+    await page.goto('/pam/messages/');
+    const waiting = page.getByRole('list', { name: 'Waiting for Pam' });
+    await expect(waiting.getByRole('listitem')).toHaveCount(1);
+    // A look that fails says nothing: the list stays, with no error over it.
+    await page.clock.fastForward(21_000);
+    await expect.poll(() => calls).toBe(2);
+    await expect(waiting.getByRole('listitem')).toHaveCount(1);
+    await expect(page.getByRole('button', { name: 'Try again' })).toHaveCount(0);
+    // After a failure the next look waits longer; then the new conversation is there.
+    await page.clock.fastForward(61_000);
+    await expect(waiting.getByRole('listitem')).toHaveCount(2);
+  });
+
   for (const role of ['member', 'admin'] as const) {
     test(`a ${role === 'admin' ? 'case manager' : 'member'} is refused, and the inbox is never asked`, async ({ page }) => {
       const asked = await signedIn(page, { role });

@@ -162,7 +162,8 @@ function ThreadScreen() {
     return state.messages.map((m) => {
       if (m.systemKey === null) return m;
       const text = pamSystemText(m.systemKey, { t, tPlain, locale, firstName: state.teamView ? null : firstName, hours });
-      return { ...m, body: text };
+      // The team reads Pam's automatic messages as Pam's, on the person's side, never as its own "You" (Iris W6, Nico 09db914f).
+      return state.teamView ? { ...m, body: text, author: { name: tPlain('pam.name'), photoUrl: PAM_MARK } } : { ...m, body: text };
     });
   }, [state, t, tPlain, locale, firstName, hours]);
 
@@ -356,7 +357,7 @@ function ThreadScreen() {
           tooFast={tooFast}
           pam={pamAsker}
           // The Pam team's saved replies (D-605): a pick fills the box, and only Send sends it.
-          teamTools={state.isPam && state.teamView ? (c) => <PamSavedReplies onPick={c.setDraft} /> : undefined}
+          teamTools={state.isPam && state.teamView ? (c) => <PamSavedReplies onPick={c.insertDraft} /> : undefined}
           // The team replies as Pam, with photos only, as the person writes to Pam (D-605; Nico, 4850ced6).
           {...(state.isPam && state.teamView ? { placeholder: tPlain('pam.thread.placeholder'), attachments: 'photo' as const } : {})}
           blocked={blocked}
