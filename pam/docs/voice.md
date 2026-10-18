@@ -173,12 +173,17 @@ information that the transparency screen doesn't say, and nothing that sounds li
 ### Screens don't explain (D-608, Will, 18 October 2026)
 The rule above every pattern below. Will: "they explain too many things in the app that should just be explained
 inside privacy or legal pages."
-- **No intro paragraph under a title.** A short label over a list is fine when it says what the list is ("Kinds of texts").
+- **No intro paragraph under a title.** A short line over a list is fine when it says what to do with the list (Will's, on Text alerts: "Please choose when you'd like to get a text.").
 - **What Pam does, doesn't do or never does goes in Privacy or Terms**, never on the screen ("Only that…, never who",
   "Pam does not…"). Send it to Lena; Will signs it.
 - **Not on yet? A "Coming soon" badge**, never a sentence.
 - **A row is its name.** A second line only when someone needs it to choose. A promise is never that reason.
-- Still on screens: errors, carrier consent lines (STOP, HELP, rates) where texts are turned on, and a step's
+- **Say it once, at the first agreement (Will, 18 October 17:51).** Instructions people saw when they first agreed
+  (STOP, HELP, rates) are not repeated on later settings screens. The first consent screen keeps them; Text alerts
+  doesn't.
+- **No legal links on task screens (Will, 17:51).** Privacy and Terms live in Profile › Legal. A task screen doesn't
+  link to them, and neither does a consent screen.
+- Still on screens: errors, the carrier lines (STOP, HELP, rates) at the first agreement to texts, and a step's
   instruction mid-task.
 
 ### Buttons
