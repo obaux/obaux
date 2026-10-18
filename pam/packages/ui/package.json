@@ -42,6 +42,7 @@
     "./BringFriend": "./src/BringFriend.tsx",
     "./sheet": "./src/sheet.ts",
     "./tapRows": "./src/tapRows.ts",
+    "./PamSheet": "./src/PamSheet.tsx",
     "./share": "./src/share.ts",
     "./PolicyUploadCard": "./src/PolicyUploadCard.tsx",
     "./StaffBadge": "./src/StaffBadge.tsx",

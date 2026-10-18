@@ -175,6 +175,42 @@ export function PhoneIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/** A calendar with a plus: put this visit in a calendar. */
+export function CalendarAddIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} data-icon="calendar-add" {...props}>
+      <rect x="3.5" y="5" width="17" height="15" rx="2.5" />
+      <path d="M3.5 10h17" />
+      <path d="M8 3v4" />
+      <path d="M16 3v4" />
+      <path d="M12 12.8v4.4" />
+      <path d="M9.8 15h4.4" />
+    </svg>
+  );
+}
+
+/** One arrow round a circle: do it again, afresh ("Get a new link"). */
+export function RefreshIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} data-icon="refresh" {...props}>
+      <path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3" />
+      <path d="M19.5 4v4.5H15" />
+    </svg>
+  );
+}
+
+/** Two arrows chasing round a circle. Keep something up to date by itself: "Sync all future trip details?". */
+export function SyncIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} data-icon="sync" {...props}>
+      <path d="M20 11.5A8 8 0 0 0 5.3 7.6" />
+      <path d="M5 3.5v4.4h4.4" />
+      <path d="M4 12.5a8 8 0 0 0 14.7 3.9" />
+      <path d="M19 20.5v-4.4h-4.4" />
+    </svg>
+  );
+}
+
 /** An envelope. Write to us: an email line (the phone is for lines that dial). */
 export function MailIcon(props: SVGProps<SVGSVGElement>) {
   return (

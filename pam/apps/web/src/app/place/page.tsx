@@ -693,6 +693,7 @@ function PlaceScreen() {
           hours: t('place.hours'),
           today: t('place.hours.today'),
           hoursOnGoogle: t('place.hoursOnGoogle'),
+          done: t('action.done'),
           about: service?.description ? t('place.aboutService') : t('place.about'),
           // Services at more than one address (Will, D-313): the card says
           // which — the program's "Main address", or the picked "Service

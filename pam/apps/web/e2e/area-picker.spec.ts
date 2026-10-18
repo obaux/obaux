@@ -152,16 +152,16 @@ test.describe('choosing an area', () => {
     await expect(page.getByRole('button', { name: 'Near your location' })).toBeVisible();
   });
 
-  test('Cancel closes the drawer and changes nothing', async ({ page }) => {
+  test('Done closes the drawer and changes nothing', async ({ page }) => {
     await stub(page);
     await page.goto('/');
     await page.getByRole('button', { name: 'Change the area' }).click();
-    await page.getByRole('button', { name: 'Cancel' }).click();
+    await page.getByRole('button', { name: 'Done' }).click();
     await expect(page.getByRole('textbox', { name: 'ZIP code' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Near City Hall' })).toBeVisible();
   });
 
-  test('closing without picking leaves the area as it was (Cancel, Escape)', async ({ page }) => {
+  test('closing without picking leaves the area as it was (Done, Escape)', async ({ page }) => {
     await stub(page);
     await page.goto('/');
     await page.getByRole('button', { name: 'Change the area' }).click();
