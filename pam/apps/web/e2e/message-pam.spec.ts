@@ -181,17 +181,32 @@ test.describe('Message Pam, the person\'s side', () => {
     expect(server.sent()).toHaveLength(0);
   });
 
-  test('Help ends with Write to Pam, which opens the conversation; Contact Pam goes there too', async ({ page }) => {
+  test('with the switch on, Help\'s Contact Pam and Your safety\'s Talk to someone now open the conversation, not the website (Iris W2)', async ({ page }) => {
     await world(page);
     await page.goto('/help/');
     await settled(page);
-    const rows = page.getByRole('link');
-    const write = page.getByRole('link', { name: 'Write to Pam' });
-    await expect(write).toBeVisible();
-    await expect(rows.last()).toBeDefined();
-    await write.click();
+    const contact = page.getByRole('link', { name: /Contact Pam/ });
+    await expect(contact).toHaveAttribute('href', '/messages/pam/');
+    await expect(contact).not.toHaveAttribute('target', '_blank');
+    await contact.click();
     await expect(page).toHaveURL(new RegExp(`/messages/thread/\\?id=${PAM_C}`));
     await expect(page.getByRole('textbox')).toHaveAccessibleName('Write to Pam');
+
+    await page.goto('/help/safety/');
+    await settled(page);
+    const talk = page.getByRole('link', { name: /Talk to someone now/ });
+    await expect(talk).toHaveAttribute('href', '/messages/pam/');
+    await expect(talk).not.toHaveAttribute('target', '_blank');
+  });
+
+  test('with the switch off, both still open the website', async ({ page }) => {
+    await world(page, { live: false });
+    await page.goto('/help/');
+    await settled(page);
+    await expect(page.getByRole('link', { name: /Contact Pam/ })).toHaveAttribute('href', /\/support\/$/);
+    await page.goto('/help/safety/');
+    await settled(page);
+    await expect(page.getByRole('link', { name: /Talk to someone now/ })).toHaveAttribute('href', /\/support\/your-safety\/$/);
   });
 
   test('/messages/pam/ opens the conversation', async ({ page }) => {
@@ -213,11 +228,11 @@ test.describe('Message Pam, the person\'s side', () => {
     await expect(page).toHaveURL(/\/signin\/\?next=(%2F|\/)messages(%2F|\/)pam(%2F|\/)/);
   });
 
-  test('with the switch off nothing of Pam is shown: no row, no Write to Pam, the tab hides with nobody to message', async ({ page }) => {
+  test('with the switch off nothing of Pam is shown: no Pam row in Help, the tab hides with nobody to message', async ({ page }) => {
     await world(page, { live: false });
     await page.goto('/help/');
     await settled(page);
-    await expect(page.getByRole('link', { name: 'Write to Pam' })).toHaveCount(0);
+    await expect(page.locator('a[href="/messages/pam/"]')).toHaveCount(0);
     await page.goto('/messages/thread/?pam=1');
     await settled(page);
     await expect(page.getByRole('heading', { name: 'Pam', level: 1 })).toHaveCount(0);

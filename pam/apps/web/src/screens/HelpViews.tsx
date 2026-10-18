@@ -5,7 +5,7 @@ import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { BigButton, FlagIcon, GlobeIcon, HelpIcon, PhoneIcon, ShieldIcon } from '@pam/ui';
+import { BigButton, FlagIcon, GlobeIcon, HelpIcon, MessagesIcon, PhoneIcon, ShieldIcon } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
 import { MenuList } from '@pam/ui/MenuList';
 import { useI18n } from '@/lib/i18n';
@@ -39,7 +39,6 @@ const styles = stylex.create({
 export function HelpView({ backHref = '/', backLabel }: { readonly backHref?: string; readonly backLabel?: string }) {
   const { t } = useI18n();
   const helpDesk = useHelpDeskItem();
-  const writeToPam = useWriteToPamItem();
   return (
     <SubPage title={t('help.title')} backHref={backHref} backLabel={backLabel ?? t('nav.back.home')}>
       <Text type="supporting" xstyle={styles.intro}>
@@ -52,7 +51,6 @@ export function HelpView({ backHref = '/', backLabel }: { readonly backHref?: st
           { id: 'topics', label: t('help.menu.topics'), href: '/help/topics/', icon: <HelpIcon {...ICON} /> },
           { id: 'safety', label: t('help.menu.safety'), href: '/help/safety/', icon: <ShieldIcon {...ICON} /> },
           { id: 'place', label: t('help.menu.place'), href: '/help/report-place/', icon: <FlagIcon {...ICON} /> },
-          ...(writeToPam ? [writeToPam] : []),
         ]}
       />
     </SubPage>
@@ -102,6 +100,7 @@ export function HelpTopicsView() {
  */
 export function HelpSafetyView() {
   const { t } = useI18n();
+  const toPam = useWriteToPamItem();
   return (
     <SubPage title={t('help.safety.title')} backHref="/help/" backLabel={t('nav.back.help')}>
       <Card padding={6}>
@@ -141,14 +140,23 @@ export function HelpSafetyView() {
               href: '/messages/',
               icon: <FlagIcon {...ICON} />,
             },
-            {
-              id: 'desk',
-              label: t('help.safety.talk.heading'),
-              description: t('help.safety.talk.body'),
-              href: HELP_SAFETY_URL,
-              isExternal: true,
-              icon: <GlobeIcon {...ICON} />,
-            },
+            // Signed in with messaging Pam on (D-605, Iris W2): the person's conversation with Pam, in the app; otherwise the website.
+            toPam
+              ? {
+                  id: 'desk',
+                  label: t('help.safety.talk.heading'),
+                  description: t('help.safety.talk.body'),
+                  href: toPam.href,
+                  icon: <MessagesIcon {...ICON} />,
+                }
+              : {
+                  id: 'desk',
+                  label: t('help.safety.talk.heading'),
+                  description: t('help.safety.talk.body'),
+                  href: HELP_SAFETY_URL,
+                  isExternal: true,
+                  icon: <GlobeIcon {...ICON} />,
+                },
           ]}
         />
       </VStack>
