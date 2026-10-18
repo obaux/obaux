@@ -271,10 +271,10 @@ test.describe('signing up', () => {
     await page.getByRole('button', { name: 'I understand' }).click();
     // The texts step says what Text reminders says (D-608, a103): its title, the kinds of texts by their short names, the
     // same Agree button and Not now; no introduction paragraph.
-    await expect(page.getByRole('heading', { name: 'Text reminders', level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Get text alerts', level: 1 })).toBeVisible();
     await expect(page.getByText('3 of 3', { exact: true })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Kinds of texts', level: 2 })).toBeVisible();
-    await expect(page.getByText('Before your trip', { exact: true })).toBeVisible();
+    await expect(page.getByText('A reminder before your trip', { exact: true })).toBeVisible();
     await expect(page.getByText('A saved place closes or moves', { exact: true })).toBeVisible();
     // Neither text is sent yet here (texts_live is off in the stub), so each says so.
     await expect(page.getByText('Coming soon', { exact: true })).toHaveCount(2);
