@@ -16,8 +16,11 @@ Site tsc 0, tests 124 pass, build 0, a11y 0 (125 scans, 0 problems), usability 0
 ## Revised (07:57)
 Sage's two Getting help from Pam lines (ledger 67fea9ad) are folded in: "Pam has no phone line. If you can’t use the app, writing to us here is how you reach a person." and "Pam’s answer comes in the app." (replacing "…not by text", which would be false once texts_live is on). The same checks pass again on the revised tree (tsc 0, tests 124, build 0, a11y 0, usability 0, scrollspy 0).
 
+## Revised (14:50)
+"Open Pam" (`OPEN_PAM_URL`) is now the app's `/messages/pam/` (Nico, 6b449896): signed in it opens the person's Pam conversation, signed out it goes through Sign in and comes back, with the switch off it lands on Messages. Checks again clean (tsc 0, tests 124, build 0, a11y 0 with 125 scans, usability 0, scrollspy 0).
+
 ## Left undone
 - The dates are 2026-10-18; if the app ships on another day, run `pnpm --filter @pam/site posts:date <slug>=<day>` for the five slugs.
-- "Open Pam" should point to Pam's conversation when the app has a route for it.
+- Whether "You can add a photo, like a screenshot of what you see." stays in Getting help from Pam: Mira asked Will (his Privacy sign-off did not mention photos). Left in for now.
 - When message texts go on (texts_live), Messages in Pam's "Pam does not send a text for a message" has to change (Sage).
 - No hours or reply time anywhere (Will has not signed any). Screenshots of the new screens wait for the app.

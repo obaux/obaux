@@ -296,15 +296,15 @@ index d541cc64..f0f1cf65 100644
      'In danger right now?': 'In danger',
      'A message feels unsafe': 'Unsafe message',
 diff --git a/pam/apps/site/src/lib/links.ts b/pam/apps/site/src/lib/links.ts
-index 1731703f..803db985 100644
+index 1731703f..f3aabc94 100644
 --- a/pam/apps/site/src/lib/links.ts
 +++ b/pam/apps/site/src/lib/links.ts
 @@ -11,6 +11,8 @@ export const APP_URL = (
  export const SIGN_IN_URL = `${APP_URL}/signin/`;
  /** Sign in, then straight to Add my program (the app keeps `next` to one listed screen, used once, never for a program lead: S1). */
  export const ADD_PROGRAM_URL = `${APP_URL}/signin/?next=/profile/add-program/`;
-+/** Where "Open Pam" on Still stuck? goes: the app, where Messages has the conversation named Pam and Help has "Write to Pam" (a100). Change to the exact screen once the app has a route for it. */
-+export const OPEN_PAM_URL = `${APP_URL}/`;
++/** Where "Open Pam" on Still stuck? goes (a100; Nico's route, 6b449896): signed in, it opens the person's Pam conversation; signed out, it goes through Sign in and comes back; with the switch off, it lands on Messages. */
++export const OPEN_PAM_URL = `${APP_URL}/messages/pam/`;
  export const PRIVACY_URL = `${APP_URL}/privacy/`;
  export const TERMS_URL = `${APP_URL}/terms/`;
  
