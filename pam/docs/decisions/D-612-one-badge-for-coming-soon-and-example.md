@@ -11,4 +11,4 @@ D-608 (Will, 18 October, 15:19): "Instead of having 'coming soon' and explaining
 
 **Why not Astryx's `Token` or `StatusDot`.** Astryx's own guidance says "Badge = counts only", and PAM already draws labels in `Badge` (role chip, audience, category); Will and the merge desk said badge. If a later session wants the Astryx-pure answer, `StatusBadge` is the one place to change.
 
-**Left for others.** The six other languages for `common.comingSoon` and `common.example` (Lena); the pictures' Arabic words are stand-ins. Unused keys, not deleted: `profile.promo.reminders.body`, `profile.promo.alerts.body.adminList`, `profile.promo.alerts.body.providerList`, `example.people.note`, `notify.example.note`, `home.calendar.preview.note`. Text alerts (Nico) adopts `StatusBadge` in place of its `alerts.comingSoon` sentence.
+**Left for others.** Unused keys, not deleted: `profile.promo.reminders.body`, `profile.promo.alerts.body.adminList`, `profile.promo.alerts.body.providerList`, `example.people.note`, `notify.example.note`, `home.calendar.preview.note`. Text alerts (Nico) adopts `StatusBadge` in place of its `alerts.comingSoon` sentence.
