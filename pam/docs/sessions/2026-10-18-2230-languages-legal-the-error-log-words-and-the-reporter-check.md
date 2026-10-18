@@ -17,3 +17,6 @@
 - **The bell shows the raw key.** `notifications/page.tsx` `describe()` passes `bodyVars` as they are, and the database puts the action *key* in them (`{action: 'messages.send', count: 1}`). It needs a case like the others: `t(bodyKey, { ...bodyVars, action: <plain name> })`, with the key as the fallback until it has a name.
 - The line lists the roles "a member, a case manager, a program or not signed in"; the log also holds `super_admin` and `service` (Sage's note: "the Pam team" covers them). Not a gap, but Will may prefer "or on the Pam team" in the list.
 - Native readers: the six `…text alert` names (all languages) and the Russian «Изменение SMS-уведомления о…» phrases.
+
+## Later the same night
+- Piper's nine action names (Sage ec7c8426, 23:40) on `claude/lena-d616-names-places`, off main 9aac8b6f: English as signed, six languages. The two check-in names quote the button words from `checkin.here` / `checkin.went` in each language. `app-error-action-names.test.ts` goes red on this branch alone until Piper's keys are on `APP_ERROR_ACTIONS`; with them (put in by hand, not committed) the config suite is 70 files / 1,491 passed.
