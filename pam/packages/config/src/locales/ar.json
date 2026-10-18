@@ -1389,6 +1389,8 @@
   "alerts.comingSoon": "قريبا",
   "profile.promo.alerts.body.providerList": "قريبا: تنبيهات نصية عن الحجوزات والتغييرات والرسائل.",
   "alerts.how": "رسالة نصية واحدة في كل مرة، وفقط لما تم تفعيله. رد بكلمة STOP لإيقاف الرسائل، أو بكلمة HELP للحصول على مساعدة. قد تنطبق رسوم الرسائل والبيانات.",
+  "alerts.privacy": "الخصوصية",
+  "alerts.privacy.label": "الخصوصية: الرسائل النصية",
   "invite.expired.title": "انتهت صلاحية هذا الرابط",
   "invite.expired.used.title": "تم استخدام هذا الرابط من قبل",
   "invite.expired.missing.title": "لم نعثر على هذا الرابط",

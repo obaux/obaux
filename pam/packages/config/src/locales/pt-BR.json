@@ -1289,6 +1289,8 @@
   "alerts.comingSoon": "Em breve",
   "profile.promo.alerts.body.providerList": "Em breve: avisos por texto sobre reservas, mudanças e mensagens.",
   "alerts.how": "Uma mensagem de texto de cada vez, só para o que estiver ligado. Responda STOP para parar de receber mensagens, ou HELP para pedir ajuda. Podem ser cobradas tarifas de mensagens e de dados.",
+  "alerts.privacy": "Privacidade",
+  "alerts.privacy.label": "Privacidade: Mensagens de texto",
   "invite.expired.title": "Este link venceu",
   "invite.expired.used.title": "Este link já foi usado",
   "invite.expired.missing.title": "Não encontramos esse link",
