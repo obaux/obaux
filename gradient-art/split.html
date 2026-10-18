@@ -74,6 +74,7 @@ uniform float uSoft;      // 0 = crisp, 1 = very blurred bloom
 uniform float uReachMin;  // how far each half reaches toward the centre on a full exhale (fraction of half the screen width)
 uniform float uReachMax;  // ... and on a full inhale
 uniform float uFadeMin;   // strength of the halves on a full exhale (1 = no dimming)
+uniform float uStars;     // night sky amount: 0 = none, 1 = default
 
 uniform vec3 uBg;         // sky: top
 uniform vec3 uGlowRed;    // sky: upper glow
@@ -86,6 +87,53 @@ float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.545
 float sstep(float a, float b, float x) {          // quintic ease
   float t = clamp((x - a) / (b - a), 0.0, 1.0);
   return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
+}
+
+// two layers of twinkling stars; q is in screen-height units
+vec3 starField(vec2 q) {
+  vec3 acc = vec3(0.0);
+  for (int L = 0; L < 2; L++) {
+    float fl = float(L);
+    float scale = mix(42.0, 19.0, fl);                 // cells per screen height
+    float dens  = mix(0.28, 0.14, fl);                 // share of cells holding a star
+    float size  = mix(0.075, 0.10, fl);
+    vec2 g = (q + 7.3 * fl) * scale;
+    vec2 id = floor(g), f = fract(g) - 0.5;
+    float h = hash(id + 11.0 * fl);
+    if (h < dens) {
+      vec2 off = (vec2(hash(id + 1.7 + fl), hash(id + 5.3 + fl)) - 0.5) * 0.6;
+      float d = length(f - off);
+      float tw = 0.5 + 0.5 * sin(uTime * (1.2 + 3.0 * hash(id + 9.1)) + 6.2832 * hash(id + 3.3));   // each star twinkles at its own pace
+      float s = exp(-d * d / (size * size)) + 0.18 * exp(-d * d / (size * size * 9.0));
+      vec3 tint = mix(vec3(1.0, 0.93, 0.82), vec3(0.78, 0.88, 1.0), hash(id + 4.4));
+      acc += tint * s * (0.25 + 0.75 * tw * tw) * (0.55 + 0.45 * hash(id + 6.6));
+    }
+  }
+  return acc;
+}
+
+// an occasional streak across the upper sky: two independent tracks, each firing on its own schedule
+vec3 shootingStars(vec2 q, float W) {
+  vec3 acc = vec3(0.0);
+  for (int i = 0; i < 2; i++) {
+    float fi = float(i);
+    float period = mix(7.3, 11.9, fi);
+    float tt = uTime + fi * 3.1;
+    float n = floor(tt / period);
+    float ph = tt - n * period;
+    if (hash(vec2(n, fi + 2.0)) > 0.35 && ph < 0.9) {  // about two in three slots fire; each streak lasts 0.9 s
+      float u = ph / 0.9;
+      vec2 start = vec2((hash(vec2(n, fi + 7.1)) - 0.5) * 1.8 * W, mix(0.05, 0.42, hash(vec2(n, fi + 9.9))));
+      vec2 dir = normalize(vec2(hash(vec2(n, fi + 4.2)) > 0.5 ? -1.0 : 1.0, -0.45));
+      vec2 head = start + dir * u * 0.55;
+      vec2 v = q - head;
+      float along = clamp(dot(v, -dir), 0.0, 0.16);
+      float d = length(v + dir * along);
+      float life = sin(3.14159 * u);
+      acc += vec3(1.0, 0.97, 0.9) * life * (exp(-d * d / 0.0000030) * pow(1.0 - along / 0.16, 2.0) * 1.2 + 0.8 * exp(-dot(v, v) / 0.0004));
+    }
+  }
+  return acc;
 }
 
 void main() {
@@ -113,6 +161,11 @@ void main() {
 
   // soft orange halo past the curved edges
   sky = mix(sky, uTop * 0.55, 0.18 * (0.5 + 0.5 * b) * fade * exp(-max(en - 1.0, 0.0) * 3.0) * smoothstep(0.85, 1.1, en));
+
+  // night sky: only where the sky has gone dark, so the orange glow below stays clean
+  float luma = dot(sky, vec3(0.299, 0.587, 0.114));
+  float dark = 1.0 - smoothstep(0.07, 0.20, luma);
+  sky += (starField(q) + shootingStars(q, W)) * dark * uStars;
 
   vec3 col = mix(sky, c, body);
 
@@ -184,7 +237,7 @@ const U = n => gl.getUniformLocation(prog, n);
 
 const hex2rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
 const state = {
-  motion: 0.45, soft: 0.65, reachMin: 0.52, reachMax: 0.88, fadeMin: 0.5,   // look (reach = fraction of half the screen width)
+  motion: 0.45, soft: 0.65, reachMin: 0.52, reachMax: 0.88, fadeMin: 0.5, stars: 1,   // look (reach = fraction of half the screen width)
   playing: true, time: 0, clock: 0, pattern: 'calm',       // clock = seconds of breathing
 };
 const params = new URLSearchParams(location.search);
@@ -217,6 +270,7 @@ function draw(b) {
   gl.uniform1f(U('uReachMin'), state.reachMin);
   gl.uniform1f(U('uReachMax'), state.reachMax);
   gl.uniform1f(U('uFadeMin'), state.fadeMin);
+  gl.uniform1f(U('uStars'), state.stars);
   for (const k in PALETTE) gl.uniform3fv(U(k), hex2rgb(PALETTE[k]));
   gl.drawArrays(gl.TRIANGLES, 0, 3);
 }
@@ -251,8 +305,9 @@ panel.insertAdjacentHTML('beforeend', `<h2 style="margin-top:12px">Shape</h2>
   ${slider('reachMin', 'Reach · exhale', 0.2, 0.8, 0.01, state.reachMin)}
   ${slider('soft', 'Blur', 0.1, 1, 0.05, state.soft)}
   ${slider('fadeMin', 'Exhale dimming', 0.2, 1, 0.05, state.fadeMin)}
+  ${slider('stars', 'Night sky', 0, 1.5, 0.05, state.stars)}
   ${slider('motion', 'Sway', 0, 2, 0.05, state.motion)}`);
-for (const k of ['reachMin', 'reachMax', 'soft', 'fadeMin', 'motion']) panel.querySelector('#' + k).oninput = e => { state[k] = +e.target.value; };
+for (const k of ['reachMin', 'reachMax', 'soft', 'fadeMin', 'stars', 'motion']) panel.querySelector('#' + k).oninput = e => { state[k] = +e.target.value; };
 const patternSel = panel.querySelector('#pattern');
 patternSel.value = state.pattern;
 patternSel.onchange = () => { state.pattern = patternSel.value; state.clock = 0; };
