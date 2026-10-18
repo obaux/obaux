@@ -10,8 +10,9 @@ import { useI18n } from '@/lib/i18n';
  * calendar" after (no fill, a calendar with a tick), both 48px, both the card's `action`. Added opens the Calendar screen. Drawings
  * only: the words are drafts (Sage signs them; the Arabic is a stand-in until Lena's).
  */
+// The day is the weekday long and the month short, from Intl in each language (Will, 18 October): en "Thursday, Oct 22", es "jueves, 22 oct"; Arabic has no short month, so it stays whole.
 const WORDS = {
-  en: { add: 'Add to calendar', added: 'Added to calendar', eyebrow: 'Your next visit', day: 'Thursday, October 22', time: '10:00 AM', countdown: 'In 2 days', change: 'Change appointment' },
+  en: { add: 'Add to calendar', added: 'Added to calendar', eyebrow: 'Your next visit', day: 'Thursday, Oct 22', time: '10:00 AM', countdown: 'In 2 days', change: 'Change appointment' },
   ar: { add: 'أضف إلى التقويم', added: 'أُضيف إلى التقويم', eyebrow: 'زيارتك القادمة', day: 'الخميس، 22 أكتوبر', time: '10:00 ص', countdown: 'بعد يومين', change: 'غيّر الموعد' },
 };
 export const useCalendarWords = () => (useI18n().locale === 'ar' ? WORDS.ar : WORDS.en);
