@@ -118,11 +118,40 @@ describe('Privacy on the calendar link and on one visit (D-538, D-604)', () => {
     expect(event.join('\n')).not.toMatch(/URL|DESCRIPTION|ATTENDEE|ORGANIZER|pam visit/i);
   });
 
-  it('is true of one visit: nothing is sent to Pam or stored, the file is made on the phone and Google is a tap', () => {
-    const code = stripComments(read('apps/web/src/screens/AddVisitToCalendar.tsx'));
-    expect(code, 'no request, no database, no storage').not.toMatch(/fetch\(|\.rpc\(|createClient|lib\/supabase|XMLHttpRequest|sendBeacon|localStorage|sessionStorage|indexedDB/i);
-    expect(code, 'the file is made here').toMatch(/URL\.createObjectURL\(new Blob\(/);
-    expect(code, 'Google is a link the person taps').toMatch(/googleEventUrl\(/);
+  it('is true of one visit: nothing is sent to Pam, and the only thing kept is a note on the phone, the visit id and its start time', () => {
+    const screen = stripComments(read('apps/web/src/screens/AddVisitToCalendar.tsx'));
+    expect(screen, 'no request, no database, no storage in the screen (it reads the member\'s own link row through the existing hook)').not.toMatch(
+      /fetch\(|\.rpc\(|createClient|lib\/supabase|XMLHttpRequest|sendBeacon|localStorage|sessionStorage|indexedDB/i,
+    );
+    expect(screen, 'the file is made here').toMatch(/URL\.createObjectURL\(new Blob\(/);
+    expect(screen, 'Google is a link the person taps').toMatch(/googleEventUrl\(/);
+    expect(screen, 'it keeps the note through the one helper').toMatch(/from '@\/lib\/visitAddedToCalendar'/);
+
+    // The helper is the only file that touches this storage, and what it stores is the visit's id (the key) and its start time (the value).
+    const helperPath = 'apps/web/src/lib/visitAddedToCalendar.ts';
+    const helper = stripComments(read(helperPath));
+    expect(helper, 'no request, no database, no other storage').not.toMatch(/fetch\(|\.rpc\(|createClient|supabase|XMLHttpRequest|sendBeacon|sessionStorage|indexedDB/i);
+    expect(helper).toMatch(/const PREFIX = 'pam\.calendarAdded:';/);
+    const writes = helper.match(/localStorage\.setItem\(.*\)(?=;)/g) ?? [];
+    expect(writes, 'one write').toHaveLength(1);
+    expect(writes[0], 'the key is the prefix and the visit id; the value is the start time and nothing else').toMatch(
+      /^localStorage\.setItem\(`\$\{PREFIX\}\$\{visitId\}`, startsAt\.toISOString\(\)\)$/,
+    );
+    expect(helper, 'no calendar kind, place or address is in what it keeps').not.toMatch(/apple|google|outlook|address|place/i);
+
+    // And no other file in the app writes that note.
+    const writers: string[] = [];
+    const walk = (dir: string) => {
+      for (const entry of readdirSync(join(ROOT, dir), { withFileTypes: true })) {
+        const rel = `${dir}/${entry.name}`;
+        if (/(^|\/)(stories|e2e|gallery|node_modules)(\/|$)|\.(test|spec|stories)\.tsx?$/.test(rel)) continue;
+        if (entry.isDirectory()) walk(rel);
+        else if (/\.tsx?$/.test(entry.name) && /calendarAdded/.test(readFileSync(join(ROOT, rel), 'utf8'))) writers.push(rel);
+      }
+    };
+    walk('apps/web/src');
+    walk('packages/ui/src');
+    expect(writers, 'the only file that names this storage').toEqual([helperPath]);
   });
 
   it('is true of an older link: it keeps saying only "Pam visit" and its time', () => {

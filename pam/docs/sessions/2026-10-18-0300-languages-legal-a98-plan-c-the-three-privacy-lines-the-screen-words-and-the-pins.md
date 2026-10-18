@@ -30,6 +30,11 @@
 - Storybook built at `e35a887d` (stub env): fit audit of the 33 calendar stories and the add-one-visit story in 7 languages at 320×760 and 320×568: **0 findings**. I looked at the pictures: Arabic linked, Russian disconnect question, Spanish add-one-visit sheet.
 - `tsc` clean in `@pam/web` at that commit.
 
+## Follow-up, 18 October ~03:45 UTC: Will changed the booked card
+
+- Will cut "Goes to {calendar}" (02:33): the corner button says **"Added to calendar"** once a visit is added, with a sync row in the drawer. Nothing I wrote for "Goes to" shipped (the keys were never on my branch). **Translated** from Sage's ledgers 4aef64a9, b875573a and c2ca2e94, with Piper's key names (`dd970847`, `45d1911c`, merged): `calendar.addOne.added` and `.added.label`, `.syncAll` ("Add all your future visits") and `.syncAll.hint` (cut by Will to "Set up a calendar link once."), and `.changed`. `trips.syncAll` is retired (six translations). The merge conflicted only at the tail of the six bundles and the ledger, where we both added keys; resolved key by key, not by hand.
+- **"Added" is remembered on the phone only** (Mira's question, answered: no new Privacy line). The pin in `calendar-link-line.test.ts` now says exactly what is true: `visitAddedToCalendar.ts` is the only file that names that storage, with one write whose key is `pam.calendarAdded:` plus the visit id and whose value is the visit's start time (`toISOString()`), no calendar, place or address, no request; `AddVisitToCalendar.tsx` has no storage and no request. Mutation-tested: a value that carries a calendar fails it, and a `fetch` in the screen fails it. The privacy-guard entry for the calendar link says the note exists and is never sent.
+
 ## Left undone
 
 - **Native readers** (`docs/before-launch.md`, new entry).

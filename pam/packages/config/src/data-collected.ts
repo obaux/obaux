@@ -173,9 +173,11 @@ export const DATA_COLLECTED: readonly CollectedData[] = [
       'Which calendar a member says they use (Apple, Google, Outlook or another), picked on Profile > Calendar, and the day they ' +
       'linked it, with the link\'s version number and a random id Pam makes (`calendar_links`: `calendar`, `linked_on`, `version`, ' +
       '`lookup_id`; a migration of 18 October 2026, D-604). Not the address itself: it is made from the id and the version with ' +
-      'a key only the database holds, and made again each time the member asks to see it. Nothing is kept for one visit added ' +
-      'from a booked card: the file is made on the phone and Google\'s page is a tap (`AddVisitToCalendar`, pinned in ' +
-      '`calendar-link-line.test.ts`).',
+      'a key only the database holds, and made again each time the member asks to see it. For one visit added ' +
+      'from a booked card, Pam keeps nothing and is sent nothing: the file is made on the phone and Google\'s page is a tap. The ' +
+      'only trace is a note on that phone alone (`pam.calendarAdded:<visit id>` = the visit\'s start time, so the card can say ' +
+      '"Added to calendar" and notice when the visit moves), never a calendar name, never sent (`AddVisitToCalendar`, ' +
+      '`visitAddedToCalendar.ts`, pinned in `calendar-link-line.test.ts`).',
     covers: {
       keys: ['privacy.s.what-we-keep.p12', 'privacy.s.sharing.p6', 'privacy.s.sharing.p10'],
       says: [
