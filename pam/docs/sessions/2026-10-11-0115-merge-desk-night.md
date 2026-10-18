@@ -1552,6 +1552,19 @@
   for the 8px rise to end. Only arrivals are waited for (finite, under a second), so a spec that times a longer
   animation (messages.spec's sliding file name) is left alone. profile-skeleton.spec measures the card where it ends.
   And the nightly flow map from main c13ddaca (14d1ce65): Cities people are waiting for on the Super admin page.
+- **Batch b69 (18 October, 07:19 to 08:01).** Message Pam, the first slice, behind a switch that is off.
+  Will answered card a100 at 07:04 (B; limited accounts write to Pam and Pam to them; screenshots; a clean thread
+  with Pam's welcome there from day one and an out-of-hours reply; Help reaches Pam in the app). Nico's slice 0
+  (7710d04f, D-605, D-606): `PAM_TEAM_CAN_READ`, the Pam team's own list, apart from `ADMIN_CAN_SEE`; a `support`
+  conversation kind; a message with no author that says what it is by a key, which no signed-in person can write;
+  `pam_messaging_live` ('off') and `pam_hours` (Monday to Friday, 9 to 5, New York, until Will says otherwise). The
+  four migrations went live before the push, in order, after list_migrations, at 07:21 to 07:22 as
+  20261018072100 to 20261018072122; the connector took the DROP NOT NULL. With it, docs only: Lena's lines for
+  Will to sign on card a101 (07fcf4fb; Sage signed them, fa8df003), Iris's test plan (ea946d09) and Sage's ledger to
+  07f41e39. The desk decided: no block or report on Pam's conversation; the staff conversations (D-262) stay on
+  Will's Messages tab; a Pam reply texts a person who opted in to message texts, as from anyone (behind texts_live);
+  no in-app notice, on the a94 precedent, so the Privacy page and "What others can see" go live with the switch or
+  before it, never after; no Away line in v1; the reply-time line is a median, worded "usually".
 
 ## What was wrong, and what missed it
 
@@ -1821,6 +1834,16 @@
   rise moves, while the heights matched. Same class as drawers.spec: a box read while it is still rising. b67 does
   not touch Profile; the evidence is copied aside, and Dot (D-520) gives it the settle wait and looks for a shared
   helper and other specs that read a box as a screen appears. Lesson: once a cause is found, look for it elsewhere.
+- **The watcher that stopped before the hour (b68 CI, 07:26).** watch-ci.sh looped 90 times at about 31 seconds,
+  47 minutes, and ended with an Accessibility run still in progress on main's SHA. That run was a branch pushed at
+  2bcb2e39, not main; main's own run (PAM CI 2044) had finished green at 07:17:58. Lesson: a watcher's loop is its
+  hour (now 120 rounds), and a check run on main's SHA is main's only if its workflow run's branch is main.
+- **A deletion promise that nothing keeps (message photos and files, found by Nico at 07:35).** Privacy how-long.p1
+  has said since 8 October that we delete your messages, photos and documents when you ask, but only staff-photos has
+  a Storage sweep (D-590); deleting a conversation or an account removes its rows, never its files, because only the
+  Storage API removes a file. Live, message-photos and message-files hold no file yet, so nothing is orphaned. A sweep
+  for both buckets goes ahead of Message Pam's slice 2. Lesson: a promise about files is kept by a sweep, not by a
+  cascade; check the Storage side of every deletion line.
 
 ## Decisions
 
@@ -2066,9 +2089,23 @@
 | b67 main CI (c13ddaca, pushed 05:31:11) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (06:12); Vercel pam-site and web success (05:33, 05:36) |
 | Settle wait proof, Dot's run (not the desk's): profile-skeleton.spec with every animation slowed tenfold (CDP Animation.setPlaybackRate 0.1), narrow-320, --repeat-each=5 | Before 9 of 20 failed, each on toBeCloseTo at line 99, "Received difference: 8"; after 20 of 20 passed. The 37 other specs that read a box, slowed the same way: 449 passed, 2 failed (messages.spec's two tests that time an animation, which a slowed clock breaks by design) |
 | Batch b68, full run (afcc16de: Dot e4a02333, flow map afcc16de): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1403 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 194 / 10.0 kB spare / 2255 passed, 19 skipped, 0 failed, 0 flaky / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
+| b68 main CI (2bcb2e39, pushed 06:39:59) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all green (PAM CI run 2044 finished 07:17:58; a second set of runs on the same SHA came from a branch pushed at 2bcb2e39); Vercel web and pam-site success |
+| Message Pam migrations live (list_migrations before; read back, counts only) | 20261018071550 → 20261018072100, 071552 → 072106 (DROP NOT NULL, accepted), 071553 → 072114, 071643 → 072122. conversation_kind = direct, mentor, support; messages.sender_id nullable; system_key text, system_vars jsonb; messages_author_or_key = CHECK ((sender_id IS NULL) = (system_key IS NOT NULL)); pam_messaging_live = off; pam_hours = Mon–Fri 09:00–17:00 America/New_York; authenticated INSERT columns on messages exclude system_key and system_vars, no UPDATE columns; 0 null-sender rows, 0 support conversations; security advisors: nothing new |
+| Slice 0 proofs (b69 tree) | pam-team-can-read.test with the entry also put in ADMIN_CAN_SEE: 1 failed, 2 passed, on "messages_written_to_pam is in ADMIN_CAN_SEE: expected true to be false". DB suite on b69 (local Postgres 16): all passed, 1690 ok. Without the four migrations: test 79 "FAIL a conversation can be of kind support" |
+| Message Pam slice 1 migrations live (Nico 6842b4b8; list_migrations before; read back, counts only) | 072101 → 20261018074212, 072339 → 074239, 072644 → 074311, 073011 → 074325, 073013 → 074339, 073016 → 074352. 23 functions, all definer with search_path, none executable by anon; pam_threads RLS on and forced; 10 Pam policies; triggers messages_pam_before, messages_pam_after, pam_threads_erased; queue_message_text_alert unchanged (same md5); report guard present; 0 threads, 0 support conversations, switch off; security advisors: anon definer 17 (unchanged), authenticated definer 96 → 107 (the new RPCs, each checks its caller) |
+| Slice 1 proofs (6842b4b8, local Postgres 16) | Full suite: all passed, 1816 ok. Four mutations, each failing on its own check: support scope removed from messages_select_pam_team → test 80 "the Pam team reads NOTHING in a direct conversation it is not in"; switch gate removed from open_pam_conversation → test 81 "switch off: no conversation and no id"; team check removed from pam_inbox → test 82 "a member cannot read the inbox"; report guard removed → test 83 "Kai cannot report what Pam wrote" |
+| Batch b69, full run (d4eed0de: Nico 7710d04f, Lena 07fcf4fb, Iris ea946d09, Sage 07f41e39): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1406 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 194 / 10.0 kB spare / 2255 passed, 19 skipped, 0 failed, 0 flaky / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
 
 ## Left undone
 
+- **As of b69 (18 October, 08:01):** Message Pam: card a101 (Lena's lines, Sage-signed) waits on Will's signature and
+  the hours, with Dot's pictures on it (a01bbf8c: the clean conversation in Sage's words, and "What others can see"
+  with Pam's card); the rest of the database side went live at 07:42 to 07:43 (six more migrations, 20261018074212 to
+  074352, proven by four mutations; the code, 6842b4b8, rides in b70); Nico builds the message-photos and
+  message-files sweep, then slice 2; Ava's plan (07e164b1) starts 4a on Nico's hooks; Wren holds the site (one post,
+  MessagesInPam's two lines, L3's three posts). For b70: Lena's retire sweep (fe3374f3), Dot a01bbf8c, Ava 07e164b1,
+  Nico 6842b4b8. Plan C waits on "yes a97" and the iPhone try. With Will: a101 and the hours, "yes a97", the iPhone
+  try; a86, a91, a93, a84, a88.
 - **As of b68 (18 October, 06:39):** Plan C is READY (Piper 0e3b6169, Lena a8f5188d) and waits on Will's
   "yes a97" and the iPhone try; its drawers.spec can use `arrived()` once both are on main. Message Pam: card a100
   waits on Will's three answers and signature. Dot: Trips' map pins press (polish). With Will: a100, "yes a97", the
