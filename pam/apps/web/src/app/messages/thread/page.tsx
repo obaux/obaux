@@ -134,7 +134,7 @@ function ThreadScreen() {
     };
   }, [wantsPam, signedIn, router]);
 
-  const { state, send, retry, sending, limited } = useThread(signedIn && realCanMessage && !exampleId ? conversationId : null);
+  const { state, send, retry, sending, limited, tooFast } = useThread(signedIn && realCanMessage && !exampleId ? conversationId : null);
 
   // Somebody blocked in this conversation (0076, D-463): the composer says so.
   const { state: blockState } = useBlockState(signedIn && realCanMessage && !exampleId && !(state.status === 'ready' && state.isPam) ? conversationId : null);
@@ -343,6 +343,7 @@ function ThreadScreen() {
           onRetry={(id) => void retry(id)}
           // A limited account can write to Pam (Will, 18 October), so nothing limits this conversation.
           limited={state.isPam ? false : limited || accountLimited}
+          tooFast={tooFast}
           pam={pamAsker}
           blocked={blocked}
           speechLanguage={speechLanguage}

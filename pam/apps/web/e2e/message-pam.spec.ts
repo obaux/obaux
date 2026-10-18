@@ -23,7 +23,7 @@ interface Row { id: string; conversation_id: string; sender_id: string | null; s
 
 async function world(
   page: Page,
-  opts: { live?: boolean; access?: 'active' | 'limited'; locale?: string; role?: 'member' | 'admin' | 'provider'; away?: boolean; failFirstPost?: boolean } = {},
+  opts: { live?: boolean; access?: 'active' | 'limited'; locale?: string; role?: 'member' | 'admin' | 'provider'; away?: boolean; failFirstPost?: boolean; rateLimited?: boolean } = {},
 ) {
   const live = opts.live ?? true;
   const messages: Row[] = live
@@ -63,6 +63,7 @@ async function world(
     const request = route.request();
     if (request.method() === 'POST') {
       posts += 1;
+      if (opts.rateLimited) return route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ code: 'P0001', message: 'PAM_RATE_LIMITED', details: null, hint: null }) });
       if (opts.failFirstPost && posts === 1) return route.fulfill({ status: 500, contentType: 'application/json', body: '{}' });
       const body = request.postDataJSON() as { body: string };
       const row: Row = { id: `m${posts}`, conversation_id: PAM_C, sender_id: ME, system_key: null, system_vars: null, body: body.body, attachment_url: null, attachment_kind: null, created_at: new Date().toISOString() };
@@ -156,6 +157,19 @@ test.describe('Message Pam, the person\'s side', () => {
     await expect.poll(() => server.sent().length).toBe(1);
     await expect(page.getByText('Not sent', { exact: true })).toHaveCount(0);
     expect(uploads).toBe(2);
+  });
+
+  test('too many messages too fast: no "Not sent" and no Try again, the words go back in the box and a calm line says to wait (Iris W4)', async ({ page }) => {
+    const server = await world(page, { rateLimited: true });
+    await page.goto(`/messages/thread/?id=${PAM_C}`);
+    await settled(page);
+    await page.getByRole('textbox').fill('One more thing');
+    await page.getByRole('button', { name: /send/i }).click();
+    await expect(page.getByText('That is a lot of messages in a short time. Wait a little, then send it again.')).toBeVisible();
+    await expect(page.getByText('Not sent', { exact: true })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Not sent. Try again.' })).toHaveCount(0);
+    await expect(page.getByRole('textbox')).toHaveText('One more thing');
+    expect(server.sent()).toHaveLength(0);
   });
 
   test('Help ends with Write to Pam, which opens the conversation; Contact Pam goes there too', async ({ page }) => {

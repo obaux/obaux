@@ -181,11 +181,15 @@ export function useThread(conversationId: string | null): {
    * (terms.s.limits.p3, D-427) instead of leaving a message marked as not sent.
    */
   limited: boolean;
+  /** The last send was refused for sending too many too fast; its words and attachment are given back. `n` counts them. */
+  tooFast: { readonly n: number; readonly body: string; readonly attachment: OutgoingAttachment | null } | null;
   refresh: () => void;
 } {
   const [loaded, setLoaded] = useState<ThreadState>({ status: 'loading' });
   const [outbox, setOutbox] = useState<readonly OutboxItem[]>([]);
   const [limited, setLimited] = useState(false);
+  /** The last send was refused for sending too many too fast (Pam's limit): its words and picture, given back to the box. */
+  const [tooFast, setTooFast] = useState<{ readonly n: number; readonly body: string; readonly attachment: OutgoingAttachment | null } | null>(null);
   const [nonce, setNonce] = useState(0);
   const refresh = useCallback(() => setNonce((n) => n + 1), []);
   const seq = useRef(0);
@@ -369,9 +373,16 @@ export function useThread(conversationId: string | null): {
         setLoaded((prev) => (prev.status === 'ready' ? { ...prev, messages: [...prev.messages, message] } : prev));
         setOutbox((prev) => prev.filter((o) => o.id !== item.id));
         return true;
-      } catch {
+      } catch (caught) {
         if (stored?.kind === 'photo') void removeUnsentPhoto(stored.path);
         if (stored?.kind === 'file') void removeUnsentFile(stored.path);
+        // Sending too many, too fast (Pam's limit): not a message that failed, so no "Not sent" and no Try again that would be
+        // refused again. It goes back to the box, and the screen says to wait a little.
+        if (String((caught as { message?: unknown } | null)?.message ?? '').includes('PAM_RATE_LIMITED')) {
+          setOutbox((prev) => prev.filter((o) => o.id !== item.id));
+          setTooFast((prev) => ({ n: (prev?.n ?? 0) + 1, body: item.body, attachment: item.attachment }));
+          return false;
+        }
         // A refusal and a dropped connection look alike from here; only one
         // of them is the account's doing, and it deserves its own words.
         // (Not in a Pam conversation: a limited account can write to Pam, so a failed send there is only ever not sent.)
@@ -480,5 +491,5 @@ export function useThread(conversationId: string | null): {
   }, [loaded, outbox]);
 
   const sending = outbox.some((o) => o.status === 'sending');
-  return { state, send, retry, sending, limited, refresh };
+  return { state, send, retry, sending, limited, tooFast, refresh };
 }

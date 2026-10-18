@@ -178,6 +178,11 @@ export interface ThreadViewProps {
    */
   readonly limited?: boolean;
   /**
+   * The last send was refused for sending too many too fast (Pam's limit): the words (and photo) go back in the box, and a calm line
+   * says to wait a little. There is no "Not sent" and no Try again for it, which would only be refused again.
+   */
+  readonly tooFast?: { readonly n: number; readonly body: string; readonly attachment: OutgoingAttachment | null } | null;
+  /**
    * Somebody blocked in this conversation (0076, D-463): `mine` when the reader did,
    * `theirs` when the other person did. Reading and reporting stay; the composer
    * gives way to a notice that says which.
@@ -603,6 +608,7 @@ export function ThreadView({
   sending,
   onRetry,
   limited = false,
+  tooFast = null,
   blocked = null,
   speechLanguage,
   pam = false,
@@ -788,6 +794,23 @@ export function ThreadView({
     });
   };
 
+  // Sent too many, too fast (Pam's limit): what was written goes back in the box, and a calm line says to wait a little.
+  const [rateLine, setRateLine] = useState(false);
+  const seenTooFast = useRef(0);
+  useEffect(() => {
+    if (!tooFast || tooFast.n === seenTooFast.current) return;
+    seenTooFast.current = tooFast.n;
+    setDraft((now) => (now.trim() === '' ? tooFast.body : now));
+    if (tooFast.attachment?.kind === 'photo') {
+      const photo = tooFast.attachment.file;
+      setPicked((prev) => prev ?? { kind: 'photo', file: photo, preview: URL.createObjectURL(photo) });
+    } else if (tooFast.attachment?.kind === 'file') {
+      const file = tooFast.attachment.file;
+      setPicked((prev) => prev ?? { kind: 'file', file });
+    }
+    setRateLine(true);
+  }, [tooFast]);
+
   // Any way a file arrives — a picker, a drop, a paste — comes through here:
   // a JPEG, a PNG or an iPhone photo is a photo, shrunk to a JPEG right away
   // so the person sees what will be sent (and learns now if it cannot be
@@ -835,6 +858,7 @@ export function ThreadView({
     setDraft('');
     clearPicked();
     setAttachProblem(null);
+    setRateLine(false);
     await onSend(value, attachment);
   };
 
@@ -1082,7 +1106,32 @@ export function ThreadView({
   return (
     <>
     <ChatLayout
-      composer={teamTools ? <VStack>{teamTools({ setDraft: fillDraft })}{composer}</VStack> : composer}
+      composer={
+        teamTools || rateLine ? (
+          <VStack>
+            {teamTools ? teamTools({ setDraft: fillDraft }) : null}
+            {rateLine ? (
+              <Banner
+                status="info"
+                title={t('messages.thread.rateLimited')}
+                endContent={
+                  <IconButton
+                    label={t('messages.thread.attach.close')}
+                    icon={<Icon icon="close" size="md" />}
+                    variant="ghost"
+                    size="md"
+                    onClick={() => setRateLine(false)}
+                    xstyle={styles.square}
+                  />
+                }
+              />
+            ) : null}
+            {composer}
+          </VStack>
+        ) : (
+          composer
+        )
+      }
       density="compact"
       scrollButton={<ScrollToBottom />}
       xstyle={styles.layout}
