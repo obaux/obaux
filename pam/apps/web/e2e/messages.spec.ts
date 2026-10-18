@@ -2231,3 +2231,131 @@ test.describe('a real account sees only its real things (Will, 11 October 2026)'
     await expect(page.getByRole('link', { name: /Teresa/ })).toBeVisible();
   });
 });
+
+test.describe('speaking a message that cannot start (W4, D-603)', () => {
+  // A stand-in for the browser's speech recogniser that can be told how to
+  // fail. `mode` is set on window by the test before the tap.
+  const fakeRecogniser = () => {
+    type Handler = ((event?: unknown) => void) | null;
+    class FakeRecognition {
+      lang = '';
+      continuous = true;
+      interimResults = true;
+      onstart: Handler = null;
+      onend: Handler = null;
+      onresult: Handler = null;
+      onerror: Handler = null;
+      onnomatch: Handler = null;
+      onspeechstart: Handler = null;
+      onspeechend: Handler = null;
+      start() {
+        const mode = (window as unknown as { __mode?: string }).__mode ?? 'works';
+        if (mode === 'throws') throw new Error('InvalidStateError');
+        if (mode === 'silent') return;
+        if (mode === 'ends') {
+          setTimeout(() => this.onend?.(), 0);
+          return;
+        }
+        if (mode === 'works') {
+          setTimeout(() => this.onstart?.(), 0);
+          return;
+        }
+        // Any other mode is the code the browser reports.
+        setTimeout(() => {
+          this.onerror?.({ error: mode });
+          this.onend?.();
+        }, 0);
+      }
+      stop() {
+        setTimeout(() => this.onend?.(), 0);
+      }
+      abort() {
+        this.onend?.();
+      }
+    }
+    const w = window as unknown as Record<string, unknown>;
+    w.SpeechRecognition = FakeRecognition;
+    w.webkitSpeechRecognition = FakeRecognition;
+  };
+
+  async function openThread(page: import('@playwright/test').Page) {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+  }
+  const setMode = (page: import('@playwright/test').Page, mode: string) =>
+    page.evaluate((m) => ((window as unknown as { __mode: string }).__mode = m), mode);
+  const mic = (page: import('@playwright/test').Page) => page.getByRole('button', { name: 'Speak your message' });
+
+  const refusals: Array<[string, string, string]> = [
+    ['the microphone is refused', 'not-allowed', "Pam can't use the microphone"],
+    ['the speech service is refused', 'service-not-allowed', "Pam can't use the microphone"],
+    ['there is no microphone', 'audio-capture', "Pam can't find a microphone"],
+    ['there is no connection', 'network', 'Speaking needs an internet connection'],
+    ['the language is not one it can hear', 'language-not-supported', "This browser can't listen in your language"],
+    ['the browser sends a code nobody expected', 'bad-grammar', "The microphone didn't start"],
+    ['it stops without ever starting or saying why', 'ends', "The microphone didn't start"],
+    ['it throws when asked to start', 'throws', "The microphone didn't start"],
+  ];
+  for (const [what, mode, line] of refusals) {
+    test(`when ${what}, the conversation says so`, async ({ page }) => {
+      await page.addInitScript(fakeRecogniser);
+      await openThread(page);
+      await setMode(page, mode);
+      await mic(page).click();
+      await expect(page.getByText(line, { exact: true })).toBeVisible();
+      await expect(page.getByText('Listening', { exact: true })).toHaveCount(0);
+    });
+  }
+
+  test('when the browser never answers, it says so after ten seconds', async ({ page }) => {
+    await page.addInitScript(fakeRecogniser);
+    await page.clock.install();
+    await openThread(page);
+    await setMode(page, 'silent');
+    await mic(page).click();
+    await page.clock.fastForward(9_000);
+    await expect(page.getByText("The microphone didn't start", { exact: true })).toHaveCount(0);
+    await page.clock.fastForward(2_000);
+    await expect(page.getByText("The microphone didn't start", { exact: true })).toBeVisible();
+  });
+
+  test('a browser with no speech recognition has no mic to tap (a dead button is worse than none)', async ({ page }) => {
+    await page.addInitScript(() => {
+      const w = window as unknown as Record<string, unknown>;
+      Object.defineProperty(w, 'SpeechRecognition', { value: undefined, configurable: true });
+      Object.defineProperty(w, 'webkitSpeechRecognition', { value: undefined, configurable: true });
+    });
+    await openThread(page);
+    await expect(page.getByRole('button', { name: 'Add a photo' })).toBeVisible();
+    await expect(mic(page)).toHaveCount(0);
+  });
+
+  test('"Listening" shows as soon as it starts, and a start clears an earlier failure', async ({ page }) => {
+    await page.addInitScript(fakeRecogniser);
+    await openThread(page);
+    await setMode(page, 'network');
+    await mic(page).click();
+    await expect(page.getByText('Speaking needs an internet connection', { exact: true })).toBeVisible();
+
+    await setMode(page, 'works');
+    await mic(page).click();
+    await expect(page.getByText('Listening', { exact: true })).toBeVisible();
+    await expect(page.getByText('Speaking needs an internet connection', { exact: true })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Stop listening' })).toBeVisible();
+
+    await page.getByRole('button', { name: 'Stop listening' }).click();
+    await expect(page.getByText('Listening', { exact: true })).toHaveCount(0);
+  });
+
+  test('the line can be closed, and it is announced', async ({ page }) => {
+    await page.addInitScript(fakeRecogniser);
+    await openThread(page);
+    await setMode(page, 'not-allowed');
+    await mic(page).click();
+    await expect(page.getByRole('alert').filter({ hasText: "Pam can't use the microphone" })).toBeVisible();
+    await page.getByRole('button', { name: 'Close this message' }).click();
+    await expect(page.getByText("Pam can't use the microphone", { exact: true })).toHaveCount(0);
+  });
+});
