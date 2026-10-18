@@ -347,7 +347,6 @@
   "pam.hours.days.every": "каждый день",
   "pam.hours.zone.eastern": "восточное время США",
   "messages.pam.placeholder": "Написать Pam",
-  "help.writeToPam": "Написать Pam",
   "messages.thread.someone": "Этот человек",
   "messages.title": "Сообщения",
   "messages.preview.you": "Вы: {text}",
