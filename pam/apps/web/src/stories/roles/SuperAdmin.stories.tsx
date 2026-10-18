@@ -85,6 +85,14 @@ export const RequestReview: Story = screen('super-admin', 'A request to review',
 export const ProgramsToCheck: Story = screen('super-admin', 'Programs to check', '/programs/review/');
 /** Cities people are waiting for (D-593, card a96): counts only, biggest first. */
 export const WaitingCities: Story = screen('super-admin', 'Cities people are waiting for', '/cities/waiting/', { from: 'home' });
+// Messages to Pam (card a100, Dot's x5): waiting longest first with how long, answered, closed folded at the foot.
+export const MessagesToPam: Story = screen('super-admin', 'Messages to Pam', '/pam/messages/', { from: 'home' });
+export const MessagesToPamClosed: Story = screen('super-admin', 'Messages to Pam — closed conversations', '/pam/messages/', { show: 'closed' });
+export const MessagesToPamEmpty: Story = {
+  ...asRole('super-admin', '/pam/messages/', { from: 'home' }, { pamInboxEmpty: true }),
+  name: 'Messages to Pam — nobody waiting',
+  render: () => <>{REDESIGN_ROUTES['/pam/messages/']!.render()}</>,
+};
 /** ...and nobody waiting yet: the empty state's two lines, for the fit audit (Lena). */
 export const WaitingCitiesEmpty: Story = {
   ...asRole('super-admin', '/cities/waiting/', { from: 'home' }, { noWaitingCities: true }),

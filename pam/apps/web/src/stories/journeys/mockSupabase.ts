@@ -109,6 +109,8 @@ export interface MockOptions {
   readonly staffReview?: 'pair' | 'city' | 'decided' | 'other' | 'addedToExisting';
   /** Nobody waiting for a city yet (D-593): the list's empty state. */
   readonly noWaitingCities?: boolean;
+  /** Messages to Pam (card a100): the switch on, and nobody waiting. */
+  readonly pamInboxEmpty?: boolean;
 }
 
 /** A real place of the catalogue, to plan a trip to in a story (the examples' ids are not real). */
@@ -414,6 +416,31 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
         { place: 'Upper Darby Township, Delaware County', people: 2 },
         { place: 'Norristown', people: 1 },
       ],
+    })),
+    // Messages to Pam (card a100): the switch on in Storybook, and the inbox Dot drew (x5): three waiting, longest first,
+    // one answered, and closed ones folded at the foot. Program lead's line is long for the fit audit.
+    on('/rpc/pam_status', () => ({
+      body: [{ live: true, hours_tz: 'America/New_York', hours_days: [1, 2, 3, 4, 5], hours_open: '09:00', hours_close: '17:00', open_now: true, next_open: null }],
+    })),
+    on('/rpc/pam_inbox', () => {
+      const ago = (minutes: number) => new Date(Date.now() - minutes * 60_000).toISOString();
+      const row = (id: string, first_name: string, role: string, extra: Record<string, unknown>) => ({
+        conversation_id: id, first_name, role, region: 'Philadelphia', program_name: null, last_from_team: false,
+        waiting_since: null, status: 'open', ...extra,
+      });
+      return {
+        body: options.pamInboxEmpty ? [] : [
+          row('pam-c1', 'Marcus', 'member', { waiting_since: ago(2 * 24 * 60), last_message_at: ago(2 * 24 * 60), last_line: "I can't get my code to come through to my phone." }),
+          row('pam-c2', 'Aaliyah', 'member', { waiting_since: ago(3 * 60), last_message_at: ago(3 * 60), last_line: 'How do I change my city?' }),
+          row('pam-c3', 'Lou', 'provider', { region: null, program_name: 'Fresh Start Kitchen', waiting_since: ago(20), last_message_at: ago(20), last_line: 'Our program page has the wrong hours for Saturdays.' }),
+          row('pam-c4', 'Dana', 'admin', { last_from_team: true, last_message_at: ago(5 * 24 * 60), last_line: 'We have fixed your city.' }),
+          row('pam-c5', 'Renee', 'member', { status: 'closed', last_from_team: true, last_message_at: ago(9 * 24 * 60), last_line: 'Glad it works now.' }),
+          row('pam-c6', 'Tomas', 'member', { status: 'closed', last_from_team: true, last_message_at: ago(12 * 24 * 60), last_line: 'You are all set.' }),
+        ],
+      };
+    }),
+    on('/rpc/pam_reply_times', () => ({
+      body: [{ median_seconds: options.pamInboxEmpty ? null : 3 * 3600 + 600, mean_seconds: options.pamInboxEmpty ? null : 5 * 3600, conversations: options.pamInboxEmpty ? 0 : 14 }],
     })),
     on('/rpc/review_program_submission', (_url, _method, body) => {
       const args = (body ?? {}) as { p_id: string };
