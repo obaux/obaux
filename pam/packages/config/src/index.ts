@@ -22,6 +22,7 @@ export * from './phone.js';
  * had 0.2 kB of headroom and this cost 0.6 (16 September).
  */
 export * from './legal.js';
+export * from './pamHours.js';
 export * from './glossary.js';
 
 export * from './i18n.js';

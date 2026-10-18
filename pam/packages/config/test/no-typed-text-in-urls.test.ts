@@ -26,12 +26,18 @@ function sources(dir: string): string[] {
   });
 }
 
-/** Columns the app filters a GET on, each holding an id, a state, a role, or a setting's name. */
+/**
+ * Columns the app filters a GET on, each holding an id, a state, a role, or a setting's name. The list goes by column name, so
+ * the value filtered on must be a time the app computed or an id the app holds, never text a person typed.
+ */
 const ALLOWED = new Set([
   'id',
   'service_id',
   'profile_id',
   'conversation_id',
+  // Who wrote a message and when: an id and a time, never words. A failed send looks for its own earlier try by these (D-605).
+  'sender_id',
+  'created_at',
   'member_id',
   'subject_id',
   'user_id',

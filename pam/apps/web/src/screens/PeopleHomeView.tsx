@@ -1,8 +1,7 @@
 'use client';
 
-import { useMemo, useState, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
-import { Avatar } from '@astryxdesign/core/Avatar';
 import { Button } from '@pam/ui/Button';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { Heading } from '@astryxdesign/core/Heading';
@@ -14,8 +13,7 @@ import { MessagesIcon, NoResultsIcon, OfflineIcon, Page, StarIcon } from '@pam/u
 import { emptyState } from '@pam/ui/emptyState';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { PersonRowSkeletonList } from '@pam/ui/Skeletons';
-import { SearchPill, type SearchPillItem } from '@pam/ui/SearchPill';
-import type { SearchSource } from '@astryxdesign/core/Typeahead';
+import { SearchField } from '@pam/ui/SearchPill';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { PersonRow } from '../app/PersonRow';
@@ -32,9 +30,11 @@ import { StatusBadge } from '@pam/ui/StatusBadge';
  * serves both — what differs is whose list, and the words — so a case
  * manager and a program admin learn the same screen.
  *
- * The search filters this list as you type and drops down the matching
- * names; picking one opens that person. Nothing leaves the phone for it —
- * the list is already here.
+ * The search filters this list as you type, right where the list is: no
+ * dropdown of names over the page (Will, 18 October: "no need for that many
+ * dropdowns. It obstructs the view of the rest of the page"). Tapping a row
+ * opens that person. Nothing leaves the phone for it — the list is already
+ * here.
  */
 export interface HomePerson {
   readonly id: string;
@@ -55,7 +55,7 @@ export interface PeopleHomeViewProps {
   readonly title: string;
   /** "12 people on your list" — said once the list is in. */
   readonly countLabel: (count: number) => string;
-  readonly search: { readonly label: string; readonly placeholder: string; readonly none: string };
+  readonly search: { readonly label: string; readonly placeholder: string };
   readonly state: PeopleState;
   /** What to say when there is nobody at all, with a way forward. */
   readonly empty: ReactNode;
@@ -67,7 +67,6 @@ export interface PeopleHomeViewProps {
   readonly footer?: ReactNode;
   readonly actions?: ReactNode;
   readonly onRetry: () => void;
-  readonly onPick: (person: HomePerson) => void;
   /**
    * A message button on each row (D-227, Will, 2 October), in the star's
    * place — the star moved to the person's own page. Tapping anywhere else on
@@ -79,10 +78,6 @@ export interface PeopleHomeViewProps {
   };
   /** Floats above the bottom bar — "Invite someone" (D-218). */
   readonly floating?: ReactNode;
-}
-
-interface PersonSuggestion extends SearchPillItem {
-  readonly auxiliaryData: HomePerson;
 }
 
 const styles = stylex.create({
@@ -128,47 +123,24 @@ export function PeopleHomeView({
   footer,
   actions,
   onRetry,
-  onPick,
   message,
   floating,
 }: PeopleHomeViewProps) {
   const { t } = useI18n();
   const [query, setQuery] = useState('');
-  const [clearSignal, setClearSignal] = useState(0);
   const people = state.status === 'ready' ? state.people : [];
   const shown = people.filter((person) => matches(person, query));
-
-  const searchSource = useMemo<SearchSource<PersonSuggestion>>(
-    () => ({
-      search: (text) =>
-        people
-          .filter((person) => matches(person, text))
-          .map((person) => ({
-            id: person.id,
-            label: person.firstName ?? '—',
-            ...(person.meta[0] ? { description: person.meta[0] } : {}),
-            auxiliaryData: person,
-          })),
-      bootstrap: () => [],
-    }),
-    [people],
-  );
 
   return (
     <>
       <Page gap={4}>
         <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.top}>
           <VStack xstyle={styles.search}>
-            <SearchPill<PersonSuggestion>
+            <SearchField
               label={search.label}
               placeholder={search.placeholder}
-              searchSource={searchSource}
-              onPick={(item) => onPick(item.auxiliaryData)}
-              onQuery={setQuery}
-              emptyText={search.none}
-              clearLabel={t('explore.search.clear')}
-              itemIcon={(item) => <Avatar size="sm" name={item.label} tooltip={false} alt="" />}
-              clearSignal={clearSignal}
+              value={query}
+              onChange={setQuery}
             />
           </VStack>
           {actions}
@@ -217,7 +189,7 @@ export function PeopleHomeView({
               <Button
                 label={t('explore.search.clear')}
                 variant="primary"
-                onClick={() => setClearSignal((n) => n + 1)}
+                onClick={() => setQuery('')}
               />
             }
           />

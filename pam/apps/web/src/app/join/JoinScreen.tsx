@@ -99,8 +99,6 @@ const STEP: Record<Phase, number> = {
 const PROVIDER_EXPECT: readonly SetupArtKind[] = ['calendar', 'message', 'policy', 'private', 'alerts'];
 
 const styles = stylex.create({
-  // Small print under the city list (D-369): a line on the page, not a row in the list (Iris's run-through, P5).
-  cityNote: { fontSize: '13px', lineHeight: 1.4 },
   quietIntro: { fontSize: '16px', lineHeight: 1.5 },
   // The bell in the brand green, its middle on the first line's middle.
   bell: { flexShrink: 0, paddingBlockStart: '3px', color: colorVars['--color-icon-accent'] },
@@ -607,24 +605,19 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 xstyle={styles.field}
               />
               {/* A list, not a box to type in (Will, 7 October, D-369): Pam is
-                  only in the cities an admin has set up, so the list is those,
-                  with a line of small print under it that says so: on the page,
-                  not a row in the list that looks tappable and isn't (Iris's
-                  run-through, P5). If the list cannot be fetched, the box comes
-                  back — somebody offline can still say where they live. */}
+                  only in the cities an admin has set up, so the list is those. No
+                  line says so (D-608): the list shows it, and a city that is not
+                  on it leads to the waiting screen. If the list cannot be fetched,
+                  the box comes back — somebody offline can still say where they
+                  live. */}
               {cities.length > 0 ? (
-                <VStack gap={1}>
-                  <Dropdown
-                    label={t(cityLabel)}
-                    width="100%"
-                    value={city}
-                    options={cities.map((name) => ({ value: name, label: name }))}
-                    onChange={setCity}
-                  />
-                  <Text type="supporting" xstyle={styles.cityNote}>
-                    {t('join.details.city.note')}
-                  </Text>
-                </VStack>
+                <Dropdown
+                  label={t(cityLabel)}
+                  width="100%"
+                  value={city}
+                  options={cities.map((name) => ({ value: name, label: name }))}
+                  onChange={setCity}
+                />
               ) : (
                 <TextField
                   id={cityId}
