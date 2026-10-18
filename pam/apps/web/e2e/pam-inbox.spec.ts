@@ -44,9 +44,10 @@ interface Setup {
   readonly live?: boolean;
   readonly inbox?: unknown[];
   readonly locale?: string;
+  readonly failFirst?: boolean;
 }
 
-async function signedIn(page: Page, { role = 'super_admin', live = true, inbox = INBOX, locale }: Setup = {}) {
+async function signedIn(page: Page, { role = 'super_admin', live = true, inbox = INBOX, locale, failFirst = false }: Setup = {}) {
   const asked: string[] = [];
   await page.addInitScript(([userId, code]) => {
     const session = {
@@ -77,6 +78,7 @@ async function signedIn(page: Page, { role = 'super_admin', live = true, inbox =
   );
   await page.route('**/rest/v1/rpc/pam_inbox*', (route) => {
     asked.push('pam_inbox');
+    if (failFirst && asked.length === 1) return route.fulfill({ status: 500, contentType: 'application/json', body: '{}' });
     return route.fulfill(json(inbox));
   });
   return asked;
@@ -109,6 +111,18 @@ test.describe('Messages to Pam (card a100)', () => {
     await expect(page.getByText('Marcus')).toHaveCount(0);
     await expect(page.getByText('Waiting for Pam')).toHaveCount(0);
     expect(asked).toHaveLength(0);
+    // The Pam team is told the switch is off, not that its account does not open this (Iris P4).
+    await expect(page.getByText('Message Pam is off.')).toBeVisible();
+    await expect(page.getByText(/does not open this/)).toHaveCount(0);
+  });
+
+  test('when the inbox cannot be read, Try again reads it again (Iris P5)', async ({ page }) => {
+    const asked = await signedIn(page, { failFirst: true });
+    await page.goto('/pam/messages/');
+    await expect(page.getByText('Marcus')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Try again' }).click();
+    await expect(page.getByRole('list', { name: 'Waiting for Pam' }).getByText('Marcus')).toBeVisible();
+    expect(asked).toHaveLength(2);
   });
 
   test('waiting longest first with how long, then answered, then closed folded at the foot', async ({ page }) => {

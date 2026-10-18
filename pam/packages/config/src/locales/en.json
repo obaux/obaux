@@ -1762,6 +1762,7 @@
   "pam.program.noLead": "Nobody runs this program in Pam right now, so it can't get messages.",
   "pam.inbox.sent": "Sent to {count} leads.",
   "pam.inbox.sent.one": "Sent to {count} lead.",
+  "pam.inbox.off": "Message Pam is off.",
   "pam.hours.title": "Pam's hours",
   "pam.hours.row": "Pam's hours",
   "pam.hours.days": "Days",

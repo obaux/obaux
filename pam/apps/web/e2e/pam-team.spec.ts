@@ -83,6 +83,8 @@ test.describe("Message Pam, the team's side (card a100)", () => {
     await page.goto(`/messages/thread/?id=${PAM_C}&from=pam`);
     await settled(page);
     await expect(page.getByRole('heading', { name: 'Aaliyah', level: 1 })).toBeVisible();
+    // Opened from Messages to Pam, Back goes there, not to Messages (Iris P6).
+    await expect(page.getByRole('link', { name: 'Back to Messages to Pam' }).or(page.getByRole('link', { name: 'Messages to Pam' }))).toHaveAttribute('href', '/pam/messages/');
     await page.getByRole('button', { name: 'Saved replies' }).click();
     const sheet = page.getByRole('dialog', { name: 'Saved replies' });
     await expect(sheet.getByRole('button')).toHaveCount(3);

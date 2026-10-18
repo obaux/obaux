@@ -78,8 +78,10 @@ function ThreadScreen() {
   // Opened from a program's page (D-313): Back returns there, so a member
   // can ask a question and go straight back to booking.
   const fromPlaceId = params.get('from') === 'place' ? params.get('place') : null;
-  const backHref = fromPlaceId ? `/place/?id=${encodeURIComponent(fromPlaceId)}` : '/messages/';
-  const backLabel = fromPlaceId ? t('nav.back.program') : t('nav.back.messages');
+  // Opened from Messages to Pam (the Pam team, D-613): Back returns to that inbox (Iris P6).
+  const fromPam = params.get('from') === 'pam';
+  const backHref = fromPlaceId ? `/place/?id=${encodeURIComponent(fromPlaceId)}` : fromPam ? '/pam/messages/' : '/messages/';
+  const backLabel = fromPlaceId ? t('nav.back.program') : fromPam ? t('pam.inbox.title') : t('nav.back.messages');
   // An example conversation opens only where examples are allowed (Storybook, a demo account).
   const examplesOn = useExamplesOn();
   const exampleId = isDummyId(conversationId);

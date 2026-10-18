@@ -1,13 +1,17 @@
 'use client';
 
+import { useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { useSearchParams } from 'next/navigation';
 import { Avatar } from '@astryxdesign/core/Avatar';
+import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { List, ListItem } from '@astryxdesign/core/List';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { ClockIcon, Loading, MessagesIcon, Notice, Page } from '@pam/ui';
+import { ClockIcon, Loading, MessagesIcon, Notice, OfflineIcon, Page } from '@pam/ui';
+import { Button } from '@pam/ui/Button';
+import { emptyState } from '@pam/ui/emptyState';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { NOTICES, splitIsolated } from '@pam/config';
@@ -53,7 +57,8 @@ export function PamInboxScreen() {
   // Nico's hooks (`lib/pam.ts`): the switch first, and nothing else is asked while it is off.
   const pam = usePamStatus(isSuperAdmin);
   const live = pam.status === 'ready';
-  const state = usePamInbox(isSuperAdmin && live);
+  const [refresh, setRefresh] = useState(0);
+  const state = usePamInbox(isSuperAdmin && live, refresh);
 
   const params = useSearchParams();
   const showClosed = params.get('show') === 'closed';
@@ -84,7 +89,16 @@ export function PamInboxScreen() {
       </Page>
     );
   }
-  if (!isSuperAdmin || pam.status === 'off') {
+  // The Pam team with the switch off: one line, not an access error (Iris P4). Nothing makes a Pam conversation while it is off.
+  if (isSuperAdmin && pam.status === 'off') {
+    return (
+      <Page gap={4}>
+        {header}
+        <Text type="supporting">{t('pam.inbox.off')}</Text>
+      </Page>
+    );
+  }
+  if (!isSuperAdmin) {
     return (
       <Page gap={4}>
         {header}
@@ -110,7 +124,14 @@ export function PamInboxScreen() {
     return (
       <Page gap={4}>
         {header}
-        <Notice notice={notice} title={t(NOTICES[notice].titleKey)} body={t(NOTICES[notice].bodyKey)} contactLabel={t('help.contact.action')} />
+        {/* Try again, as other lists have (Iris P5); Help is a tap away elsewhere, so no second way to call. */}
+        <EmptyState
+          headingLevel={2}
+          icon={<OfflineIcon {...stylex.props(emptyState.icon)} aria-hidden />}
+          title={t(NOTICES[notice].titleKey)}
+          description={t(NOTICES[notice].bodyKey)}
+          actions={<Button label={t('explore.error.retry')} variant="primary" onClick={() => setRefresh((n) => n + 1)} />}
+        />
       </Page>
     );
   }
