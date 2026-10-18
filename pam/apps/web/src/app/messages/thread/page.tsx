@@ -23,6 +23,7 @@ import { threadLineFor } from '@/lib/threadLine';
 import { messageProgram } from '@/lib/openConversation';
 import { openPamConversation, PAM_MARK, usePamStatus } from '@/lib/pam';
 import { pamSystemText } from '@/lib/pamMessages';
+import { PamSavedReplies } from '../../../screens/PamTeamTools';
 
 /**
  * One conversation — read what has been said, and send the next thing.
@@ -77,8 +78,10 @@ function ThreadScreen() {
   // Opened from a program's page (D-313): Back returns there, so a member
   // can ask a question and go straight back to booking.
   const fromPlaceId = params.get('from') === 'place' ? params.get('place') : null;
-  const backHref = fromPlaceId ? `/place/?id=${encodeURIComponent(fromPlaceId)}` : '/messages/';
-  const backLabel = fromPlaceId ? t('nav.back.program') : t('nav.back.messages');
+  // Opened from Messages to Pam (the Pam team, D-613): Back returns to that inbox (Iris P6).
+  const fromPam = params.get('from') === 'pam';
+  const backHref = fromPlaceId ? `/place/?id=${encodeURIComponent(fromPlaceId)}` : fromPam ? '/pam/messages/' : '/messages/';
+  const backLabel = fromPlaceId ? t('nav.back.program') : fromPam ? t('pam.inbox.title') : t('nav.back.messages');
   // An example conversation opens only where examples are allowed (Storybook, a demo account).
   const examplesOn = useExamplesOn();
   const exampleId = isDummyId(conversationId);
@@ -312,7 +315,14 @@ function ThreadScreen() {
             backHref={backHref}
             backLabel={backLabel}
             // Pam's conversation has no ⋯ for the person: no report, no block (D-605). The Pam team's has its own (Close, Reopen).
-            {...(pamAsker ? {} : { menuHref: `/messages/thread/options/?id=${encodeURIComponent(conversationId ?? '')}` })}
+            {...(pamAsker
+              ? {}
+              : {
+                  menuHref:
+                    state.isPam && state.teamView
+                      ? `/pam/thread/options/?id=${encodeURIComponent(conversationId ?? '')}`
+                      : `/messages/thread/options/?id=${encodeURIComponent(conversationId ?? '')}`,
+                })}
           />
         </ThreadTop>
         <ThreadViewLazy
@@ -345,6 +355,10 @@ function ThreadScreen() {
           limited={state.isPam ? false : limited || accountLimited}
           tooFast={tooFast}
           pam={pamAsker}
+          // The Pam team's saved replies (D-605): a pick fills the box, and only Send sends it.
+          teamTools={state.isPam && state.teamView ? (c) => <PamSavedReplies onPick={c.insertDraft} /> : undefined}
+          // The team replies as Pam, with photos only, as the person writes to Pam (D-605; Nico, 4850ced6).
+          {...(state.isPam && state.teamView ? { placeholder: tPlain('pam.thread.placeholder'), attachments: 'photo' as const } : {})}
           blocked={blocked}
           speechLanguage={speechLanguage}
         />
