@@ -59,8 +59,8 @@ describe('distanceLabel', () => {
     expect(render(3 * 0.6, 'ru')).toBe('1,8 мили');
   });
 
-  it('says it the way Arabic counts: a dual for two, a plural for 3 to 10, a singular after', () => {
-    expect(render(2, 'ar')).toBe('2 ميلان');
+  it('says it the way Arabic counts: a dual for two (alone: the dual says two), a plural for 3 to 10, a singular after', () => {
+    expect(render(2, 'ar')).toBe('ميلان');
     expect(render(3, 'ar')).toBe('3 أميال');
     expect(render(5, 'ar')).toBe('5 أميال');
     expect(render(11, 'ar')).toBe('11 ميلا');

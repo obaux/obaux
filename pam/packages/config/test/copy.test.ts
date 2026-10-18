@@ -42,14 +42,28 @@ describe('locale bundles', () => {
     expect(findDignityViolations(bundle)).toEqual([]);
   });
 
-  // Arabic writes the dual of a length of time without the digit, as CLDR's relative-time patterns do: "منذ يومين" (two days ago), not
-  // "منذ 2 يومين" (Iris, Message Pam pass 1, P8). Four keys; the other dual forms ("{count} نقطتان", "{count} شخصان") keep the digit until a
-  // native reader says otherwise (docs/before-launch.md). The dual of these four must carry no {count} at all.
+  // Arabic says two with the dual alone: "منذ يومين" (two days ago), "نقطتان" (two points), not "2 يومين" or "{count} نقطتان" (Iris, Message Pam pass 1 P8 and
+  // the b73 re-test R4; CLDR's `two` patterns carry no number). These eighteen carry no {count}; every other placeholder stays. The label-then-number
+  // strings ("المهتمون: {count}") keep the digit, because there it is a value and not a count before a noun.
   const AR_DUAL_WITHOUT_DIGIT = new Set([
     'pam.inbox.waiting.minutes.two',
     'pam.inbox.waiting.hours.two',
     'pam.inbox.waiting.days.two',
     'when.countdown.days.two',
+    'admin.points.two',
+    'directory.count.two',
+    'notify.demo.newInterest.two',
+    'person.message.unread.two',
+    'places.miles.two',
+    'points.subtitle.two',
+    'points.summary.two',
+    'places.reported.count.two',
+    'home.caseload.count.two',
+    'home.interested.count.two',
+    'program.policies.rowBody.two',
+    'trips.added.policies.title.two',
+    'trips.map.many.two',
+    'pam.inbox.sent.two',
   ]);
 
   it.each(Object.entries(bundles))('%s keeps placeholders matched with English', (locale, bundle) => {
@@ -57,7 +71,9 @@ describe('locale bundles', () => {
       const source = en[baseKey(key)];
       expect(source, `"${key}" has no English source`).toBeDefined();
       if (locale === 'ar' && AR_DUAL_WITHOUT_DIGIT.has(key)) {
-        expect(placeholders(value), `"${key}" is a length of time in the dual: no digit`).toEqual([]);
+        expect(placeholders(value), `"${key}" is a dual: no digit, every other placeholder kept`).toEqual(
+          placeholders(source!).filter((name) => name !== 'count'),
+        );
         continue;
       }
       expect(placeholders(value), `placeholders drifted on "${key}"`).toEqual(placeholders(source!));

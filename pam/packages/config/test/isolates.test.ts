@@ -69,7 +69,7 @@ describe('splitIsolated', () => {
     ]);
     expect(splitIsolated(fillAr('messages.thread.from', { name: 'Marcus Johnson', time: '3:45 PM' }))).toEqual([
       { text: 'Marcus Johnson', isValue: true },
-      { text: ', ', isValue: false },
+      { text: '، ', isValue: false }, // Arabic's own comma (Iris R5)
       { text: '3:45 PM', isValue: true },
     ]);
   });
@@ -123,7 +123,7 @@ describe('an Arabic sentence with a left-to-right value in it', () => {
 
   it('wraps each value separately when a sentence has two', () => {
     const out = fillAr('messages.thread.from', { name: 'Marcus Johnson', time: '3:45 PM' });
-    expect(out).toBe(`${FSI}Marcus Johnson${PDI}, ${FSI}3:45 PM${PDI}`);
+    expect(out).toBe(`${FSI}Marcus Johnson${PDI}، ${FSI}3:45 PM${PDI}`);
   });
 
   it('leaves a number alone: it has no direction of its own to disagree with the sentence', () => {
