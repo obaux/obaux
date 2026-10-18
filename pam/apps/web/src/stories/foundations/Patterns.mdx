@@ -13,9 +13,14 @@ Will, 18 October, on Text alerts: *"Remove the card; it isn't needed. Each kind 
 by lines."* and *"Move the badge below the row's name, so it fits longer text, especially in other languages."*
 Then: *"Please learn from this so the team can improve their design skills."*
 
-1. **No card around a single list.** A card holds a thing of its own: a person, an offer, a place. A list of
-   settings on a screen of its own is the page. Rows go straight on it, each under a thin line (`SettingsList`,
-   `SettingsRow` in `@pam/ui`).
+**Scope (Will, 18 October, 19:22: "No that's not what I meant. Keep the original layouts.").** These notes were about
+Text alerts and a list of settings like it. Other screens keep the layouts they have: a card around a form or a list
+elsewhere (Something is wrong here, the reminders list, the program pages) stays as it is unless Will asks for
+that screen. Nothing in the card audit changes.
+
+1. **A list of settings has no card.** A card holds a thing of its own: a person, an offer, a place. A list of
+   switches on a screen of its own is the page: rows go straight on it, each under a thin line (`SettingsList`,
+   `SettingsRow` in `@pam/ui`). This is for lists of settings; it is not a rule for every screen.
 2. **A badge goes under the name, not beside it.** Beside it, the badge takes room from the name and a long name in
    Spanish or Russian is cut or squeezed. Under it, the name has the whole width (D-612, `StatusBadge`).
 3. **No instructions repeated after first consent.** STOP, HELP and rates are said once, where somebody agrees to
@@ -23,7 +28,7 @@ Then: *"Please learn from this so the team can improve their design skills."*
    a settings screen never records a first yes. With no yes on file it opens the agree screen for the person's own
    role and comes back with that switch on after "Agree", off after "Not now". After a STOP the switches stay off
    and cannot be turned on from the screen.
-4. **No legal links on task screens, with no exception.** Privacy and Terms are in Profile › Legal; a link to them
+4. **No legal links on a settings or task screen, with no exception.** Privacy and Terms are in Profile › Legal; a link to them
    where someone is choosing something distracts from the choice (the agree screens carry none either: carriers
    do not require it). Sage's wording of this is in `docs/voice.md` and Foundations › Writing.
 5. **Not-yet rows go to the bottom.** What is on comes first; rows with a "Coming soon" badge sit below them, in their

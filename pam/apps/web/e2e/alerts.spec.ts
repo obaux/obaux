@@ -74,7 +74,7 @@ test.describe('Text alerts say little (D-608, Will 18 October: "we don\'t need a
     await expect(toggle).toHaveAccessibleDescription('Coming soon');
   });
 
-  // Sage signs the words and Lena puts them in key alerts.kinds; this stays red until they are there, and says why.
+  // Sage signed the line (f0279243) and alerts.kinds carries it; this pins the whole sentence so a reworded value shows up here.
   test('the line over the list is the one Will asked for', async ({ page }) => {
     await signedInAs(page, 'member', null, 'off');
     await page.goto('/alerts/');
