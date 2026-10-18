@@ -1,7 +1,5 @@
 'use client';
 
-import * as stylex from '@stylexjs/stylex';
-import { Text } from '@astryxdesign/core/Text';
 import { MeIcon, PlacesIcon, ShieldIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPage } from '@pam/ui/SubPage';
@@ -23,9 +21,6 @@ import { HelpButton } from './HelpButton';
  */
 const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
 
-const styles = stylex.create({
-  intro: { fontSize: '18px', lineHeight: 1.5 },
-});
 
 export function InviteView() {
   const { t } = useI18n();
@@ -34,9 +29,7 @@ export function InviteView() {
 
   return (
     <SubPage title={t('profile.menu.invite')} backHref="/" backLabel={t('nav.back.home')} actions={<HelpButton />}>
-      <Text type="supporting" xstyle={styles.intro}>
-        {t('invite.intro')}
-      </Text>
+      {/* No intro line (D-608): the three kinds below say what an invite is. */}
       <MenuList
         label={t('profile.menu.invite')}
         items={[

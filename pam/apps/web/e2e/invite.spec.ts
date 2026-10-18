@@ -79,6 +79,9 @@ test.describe('inviting somebody, on a page of its own (D-444)', () => {
     });
 
     await page.goto('/invite/');
+    await expect(page.getByRole('link', { name: /^Invite a program/ })).toBeVisible();
+    // No intro line (D-608): the three kinds say what an invite is.
+    await expect(page.getByText('Each invite is a link for one person.', { exact: false })).toHaveCount(0);
     // A list of rows that are links — no form here, nothing swapped in place.
     await page.getByRole('link', { name: /^Invite a program/ }).click();
     await expect(page).toHaveURL(/\/invite\/new\/\?role=provider/);
