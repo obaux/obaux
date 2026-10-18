@@ -101,7 +101,7 @@ export function SetupCard({ kind, title, body, href, loading }: SetupCardProps) 
         </HStack>
         <VStack gap={0.5} xstyle={styles.words}>
           <Heading level={3} xstyle={styles.title}>
-            <a href={href} {...stylex.props(styles.link)}>
+            <a href={href} data-pam-stretch="" {...stylex.props(styles.link)}>
               {title}
             </a>
           </Heading>

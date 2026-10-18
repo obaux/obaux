@@ -211,7 +211,7 @@ export function PlaceCard({
           <VStack gap={0.5} xstyle={styles.words}>
             <HStack gap={2} align="start" justify="between" wrap="nowrap">
               <Heading level={3} xstyle={styles.name}>
-                <a href={href} {...stylex.props(styles.link)}>
+                <a href={href} data-pam-stretch="" {...stylex.props(styles.link)}>
                   {name}
                 </a>
               </Heading>
