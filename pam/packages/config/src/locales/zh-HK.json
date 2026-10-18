@@ -1331,7 +1331,7 @@
   "glossary.trip.definition": "到訪是指會員安排前往某項計劃的一次行程：包括地點、日期和時間。它會顯示在他們的到訪地圖上，計劃也會看到。",
   "glossary.whatIs": "什麼是「{term}」？",
   "alerts.trip": "有人安排到訪",
-  "alerts.visit": "到訪之前",
+  "alerts.visit": "到訪之前的提醒",
   "alerts.closed": "收藏的地點關閉或搬遷",
   "alerts.connect": "有人想與您聯繫",
   "profile.promo.alerts.body.adminList": "即將推出：有關訊息和到訪的短訊。",
