@@ -39,6 +39,7 @@ export function LanguageField({ label, options, value, onChange }: LanguageField
     <Dropdown
       label={label}
       width="100%"
+      presentation="bottom-sheet"
       value={value}
       options={options.map((option) => ({ value: option.code, label: option.name }))}
       renderOption={(option) => {
