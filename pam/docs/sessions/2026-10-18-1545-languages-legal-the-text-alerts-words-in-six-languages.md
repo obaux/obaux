@@ -10,7 +10,7 @@ Lena, on `claude/lena-text-alerts-words`, off main `1551ed31`. Asked by Sage at 
 
 ## Checked against the carrier minimum
 
-Frequency, STOP, HELP and rates are on the line; the row labels are the list of what is sent; the "Coming soon" badge says which are live; nothing is pre-selected. Dropping "reach a person" is right: the HELP reply is an address (a59). Two things Sage decides: the sender's name (the removed intro was the only place the screen said "Pam"), and a link to Privacy and Terms (the campaign lists both URLs; the screen has none).
+Frequency, STOP, HELP and rates are on the line; the row labels are the list of what is sent; the "Coming soon" badge says which are live; nothing is pre-selected. Dropping "reach a person" is right: the HELP reply is an address (a59). The removed intro was the only place the screen said "Pam", so the line names the sender. I first suggested "Pam sends one text each time, only for what is on", then saw it reads as all of Pam's texting (the sign-in code and the account notices go without a switch) and has no referent on the consent screens (nothing is "on" yet); the signed lines say "something you turned on happens" and "something on this list happens". The screen had no link to Privacy; `alerts.privacy` is it.
 
 ## Found
 
@@ -20,7 +20,7 @@ Frequency, STOP, HELP and rates are on the line; the row labels are the list of 
 ## Left undone
 
 - `alerts.intro` and the seven `alerts.*.body` come out of the six languages and `en.json` in the same commit that the Text alerts screen stops rendering them. Removing them first shows raw key names on the live screen.
-- `reminders.how` waits for Sage's wording.
+- **The registration and the screens disagree about the member's list:** the registered paragraph names two texts for a member (a reminder before a visit; a note if a saved place closes or moves), `/reminders/` shows those two, and the join step shows three (`reminders.what.3`, "A note when someone wants to connect with you"). Nothing queues `connection_request`, so that third row promises a text Pam does not send. Sage and Mira have it.
 - This branch fails `alerts.spec.ts` until Nico's screen lands. It ships with it, not before.
 
 ## Needs a human
