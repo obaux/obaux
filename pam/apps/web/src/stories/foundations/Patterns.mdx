@@ -18,11 +18,14 @@ Then: *"Please learn from this so the team can improve their design skills."*
    `SettingsRow` in `@pam/ui`).
 2. **A badge goes under the name, not beside it.** Beside it, the badge takes room from the name and a long name in
    Spanish or Russian is cut or squeezed. Under it, the name has the whole width (D-612, `StatusBadge`).
-3. **No instructions repeated after first consent.** STOP, HELP and rates are said where somebody agrees to texts
-   (and a carrier needs them there). A settings screen that comes after does not say them again. If the screen can
-   be reached without the agreement, the first switch-on goes to the agreement; it does not carry the lines itself.
-4. **No legal links on a task screen.** Privacy and Terms are in Profile › Legal. A link to them on a screen where
-   someone is choosing something distracts from the choice.
+3. **No instructions repeated after first consent.** STOP, HELP and rates are said once, where somebody agrees to
+   texts (Sage's rule, in `docs/voice.md` and Foundations › Writing). The agree screen is the only opt-in: a switch on
+   a settings screen never records a first yes. With no yes on file it opens the agree screen for the person's own
+   role and comes back with that switch on after "Agree", off after "Not now". After a STOP the switches stay off
+   and cannot be turned on from the screen.
+4. **No legal links on task screens, with no exception.** Privacy and Terms are in Profile › Legal; a link to them
+   where someone is choosing something distracts from the choice (the agree screens carry none either: carriers
+   do not require it). Sage's wording of this is in `docs/voice.md` and Foundations › Writing.
 5. **A label over a list says what the list is**, in one line (D-608), never how Pam works.
 
 The row is laid out in logical directions only, so it mirrors in Arabic. It is checked at 320px with the longest

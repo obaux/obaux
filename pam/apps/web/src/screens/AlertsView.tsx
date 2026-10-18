@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useId, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
 import { Switch } from '@astryxdesign/core/Switch';
@@ -101,8 +102,11 @@ export function AlertsView() {
   const role = session.status === 'signed-in' ? session.session.role : null;
   const who = role === 'provider' ? 'provider' : role === 'admin' ? 'admin' : 'member';
   const KINDS = KINDS_FOR[who];
+  const router = useRouter();
   /** The account's one yes/no for texts (`notification_preferences`), which every sent kind shares. */
   const [consent, setConsent] = useState(false);
+  /** The account's answer has come: until it has, no switch can be tapped (a tap would be routed on a guess). */
+  const [loaded, setLoaded] = useState(false);
   /** The four alert switches, each its own yes (D-478). */
   const [alerts, setAlerts] = useState<AlertFlags>({ message: false, booked: false, changed: false, trip: false });
   const [saved, setSaved] = useState(false);
@@ -121,14 +125,33 @@ export function AlertsView() {
       setStopped(status.stopped);
       setConsent(status.consent === true);
       setAlerts(status.alerts);
+      setLoaded(true);
     })();
     return () => {
       cancelled = true;
     };
   }, [userId]);
 
+  // Back from the agree screen with "Agree to receive texts": the switch they tapped is turned on, once.
+  useEffect(() => {
+    if (!loaded || !consent || stopped) return;
+    const kind = new URLSearchParams(window.location.search).get('on');
+    if (!kind) return;
+    router.replace('/alerts/');
+    const asked = KINDS.find((k) => k === kind);
+    if (asked && LIVE.has(asked) && !isOn(asked)) void change(asked, true);
+    // Once, on arrival with the answer in.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loaded, consent, stopped]);
+
   const change = async (kind: Kind, on: boolean) => {
     if (!LIVE.has(kind) || !userId || stopped) return;
+    // The agree screen is the only opt-in (D-615): with no yes on file, a switch records nothing and turns nothing on.
+    // It opens the agree screen for this role, which brings the person back here with this switch on, or off after "Not now".
+    if (on && !consent) {
+      router.push(`/reminders/?next=alerts&kind=${kind}`);
+      return;
+    }
     setSaved(false);
     setFailed(false);
     if (ALERT_KINDS.has(kind)) {
@@ -195,7 +218,7 @@ export function AlertsView() {
                   isLabelHidden
                   value={live && isOn(kind)}
                   changeAction={(on) => change(kind, on)}
-                  isDisabled={!userId || !live || stopped}
+                  isDisabled={!userId || !loaded || !live || stopped}
                 />
               }
             />

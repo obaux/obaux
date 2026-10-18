@@ -46,10 +46,14 @@ async function signedInAs(page: import('@playwright/test').Page, role: 'provider
     ),
   );
   const writes: Record<string, unknown>[] = [];
+  let current: Record<string, unknown> | null = prefs;
   await page.route(PREFS, async (route) => {
     const request = route.request();
-    if (request.method() === 'GET') return route.fulfill(json(prefs));
-    writes.push(JSON.parse(request.postData() ?? '{}'));
+    if (request.method() === 'GET') return route.fulfill(json(current));
+    const body = JSON.parse(request.postData() ?? '{}');
+    writes.push(body);
+    // What was written is what the next read says, as the database would.
+    current = { sms_stopped_at: null, alert_message: false, alert_booked: false, alert_changed: false, alert_trip: false, ...(current ?? {}), ...body };
     return route.fulfill({ status: 201, body: '' });
   });
   return writes;
@@ -75,7 +79,7 @@ test.describe('Text alerts say little (D-608, Will 18 October: "we don\'t need a
     await signedInAs(page, 'member', null, 'off');
     await page.goto('/alerts/');
     await settled(page);
-    await expect(page.getByText(/^Please select when you.d like to receive a text notification\.$/)).toBeVisible();
+    await expect(page.getByText(/^Please choose when you.d like to get a text\.$/)).toBeVisible();
   });
 
   async function openAlerts(page: import('@playwright/test').Page) {
@@ -115,6 +119,69 @@ test.describe('Text alerts say little (D-608, Will 18 October: "we don\'t need a
     expect(b.y).toBeGreaterThanOrEqual(n.y + n.height - 1);
     // Starts where the name starts.
     expect(Math.abs(b.x - n.x)).toBeLessThan(2);
+  });
+});
+
+test.describe('The agree screen is the only opt-in (D-615, Lena, 18 October)', () => {
+  const CLOSED = 'A saved place closes or moves';
+
+  test('no yes on file: the switch records nothing and opens the agree screen; "Agree" brings the person back with it on', async ({ page }) => {
+    const writes = await signedInAs(page, 'member', null, 'on');
+    await page.goto('/alerts/');
+    await settled(page);
+    await page.getByRole('switch', { name: CLOSED }).click();
+    await expect(page).toHaveURL(/\/reminders\/\?next=alerts&kind=closed/);
+    expect(writes).toHaveLength(0);
+    await page.getByRole('button', { name: 'Agree to receive texts' }).click();
+    await expect(page).toHaveURL(/\/alerts\/$/);
+    await settled(page);
+    await expect(page.getByRole('switch', { name: CLOSED })).toBeChecked();
+    expect(writes[0]).toMatchObject({ member_id: ME, sms_enabled: true });
+  });
+
+  test('"Not now" brings the person back with the switch off', async ({ page }) => {
+    const writes = await signedInAs(page, 'member', null, 'on');
+    await page.goto('/alerts/');
+    await settled(page);
+    await page.getByRole('switch', { name: CLOSED }).click();
+    await expect(page).toHaveURL(/\/reminders\//);
+    await page.getByRole('button', { name: 'Not now' }).click();
+    await expect(page).toHaveURL(/\/alerts\/$/);
+    await settled(page);
+    await expect(page.getByRole('switch', { name: CLOSED })).not.toBeChecked();
+    expect(writes).toHaveLength(1);
+    expect(writes[0]).toMatchObject({ sms_enabled: false });
+  });
+
+  test('a yes that was withdrawn counts as no yes: the same route', async ({ page }) => {
+    const writes = await signedInAs(page, 'member', { sms_enabled: false, sms_stopped_at: null, alert_message: false, alert_booked: false, alert_changed: false, alert_trip: false }, 'on');
+    await page.goto('/alerts/');
+    await settled(page);
+    await page.getByRole('switch', { name: CLOSED }).click();
+    await expect(page).toHaveURL(/\/reminders\/\?next=alerts&kind=closed/);
+    expect(writes).toHaveLength(0);
+  });
+
+  test('a yes on file: the saved-place switch shows on, and turning it off withdraws the yes right here, as before', async ({ page }) => {
+    const writes = await signedInAs(page, 'member', { sms_enabled: true, sms_stopped_at: null, alert_message: false, alert_booked: false, alert_changed: false, alert_trip: false }, 'on');
+    await page.goto('/alerts/');
+    await settled(page);
+    const toggle = page.getByRole('switch', { name: CLOSED });
+    await expect(toggle).toBeChecked();
+    await toggle.click();
+    await expect(toggle).not.toBeChecked();
+    await expect(page).toHaveURL(/\/alerts\/$/);
+    await expect.poll(() => writes.length).toBe(1);
+    expect(writes[0]).toMatchObject({ sms_enabled: false });
+  });
+
+  test('after a STOP the switches stay off and cannot be turned on from here', async ({ page }) => {
+    const writes = await signedInAs(page, 'member', { sms_enabled: true, sms_stopped_at: '2026-10-08T15:00:00Z', alert_message: true, alert_booked: false, alert_changed: false, alert_trip: false }, 'on');
+    await page.goto('/alerts/');
+    await settled(page);
+    await expect(page.getByRole('switch', { name: CLOSED })).toBeDisabled();
+    await expect(page.getByRole('switch', { name: CLOSED })).not.toBeChecked();
+    expect(writes).toHaveLength(0);
   });
 });
 
@@ -165,8 +232,8 @@ test.describe('The closed-place text follows the server\'s texts_live switch (D-
 test.describe('Text alerts', () => {
   test.skip(!ALERT_TEXTS_LIVE, 'held until the day: ALERT_TEXTS_LIVE is false (apps/web/src/lib/alertTextsLive.ts)');
 
-  test('a program turns on "someone books a visit": that switch, and the yes to texts', async ({ page }) => {
-    const writes = await signedInAs(page, 'provider', null);
+  test('a program with the yes on file turns on "someone books a visit": that switch alone', async ({ page }) => {
+    const writes = await signedInAs(page, 'provider', { sms_enabled: true, sms_stopped_at: null, alert_booked: false, alert_message: false, alert_changed: false, alert_trip: false });
     await page.goto('/alerts/');
     await settled(page);
 
@@ -176,7 +243,7 @@ test.describe('Text alerts', () => {
     await booked.click();
     await expect(booked).toBeChecked();
     await expect.poll(() => writes.length).toBe(1);
-    expect(writes[0]).toMatchObject({ member_id: ME, alert_booked: true, sms_enabled: true });
+    expect(writes[0]).toMatchObject({ member_id: ME, alert_booked: true });
     // The other switches are untouched: each is its own yes.
     expect(writes[0]).not.toHaveProperty('alert_changed');
     await expect(page.getByRole('switch', { name: 'Someone changes a booking' })).not.toBeChecked();

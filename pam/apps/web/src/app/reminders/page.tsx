@@ -122,6 +122,14 @@ export default function RemindersPage() {
     }
 
     setDone(true);
+    // Sent here from a switch on Text alerts (D-615): back there, with that switch on after "Agree", off after "Not now".
+    // Only that one place and only a known kind, so the address cannot be made to send anyone elsewhere.
+    const asked = new URLSearchParams(window.location.search);
+    if (asked.get('next') === 'alerts') {
+      const kind = asked.get('kind');
+      router.replace(value && kind && /^[a-z]+$/.test(kind) ? `/alerts/?on=${kind}` : '/alerts/');
+      return;
+    }
     // Everyone lands on the first tab: Explore for a member, their home for staff (D-212).
     router.replace('/');
   };

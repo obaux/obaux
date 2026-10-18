@@ -28,6 +28,7 @@ const Row = ({ label, badge, on = false }: { label: string; badge?: string; on?:
 
 /** Some on, some not yet. */
 export const Default: Story = {
+  args: { children: null },
   render: () => (
     <VStack gap={2}>
       <Text type="supporting">Please select when you'd like to receive a text notification.</Text>
@@ -42,6 +43,7 @@ export const Default: Story = {
 
 /** A long name takes the whole width and wraps; the badge stays under it. */
 export const LongNames: Story = {
+  args: { children: null },
   render: () => (
     <SettingsList>
       <Row label="Alguien cambia una reserva de una visita a uno de sus programas" badge="Próximamente" />
