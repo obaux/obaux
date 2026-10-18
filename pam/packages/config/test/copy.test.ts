@@ -96,6 +96,9 @@ describe('every other language is actually translated', () => {
   MAY_MATCH_ENGLISH.add('trips.moved.body.self');
   // The same for a trip card's spoken name when nobody comes along: a place and a day, no word of its own (D-578; the comma is the language's).
   MAY_MATCH_ENGLISH.add('trips.card.label.alone');
+  // Two weekday names and a dash for Russian ("понедельник – пятница"): the weekday names come from Intl in the nominative, so "с … по …" would
+  // need two cases nothing here can supply, and a dash is how a Russian timetable writes the range. No word of its own to translate (pam.hours).
+  MAY_MATCH_ENGLISH.add('pam.hours.days.range');
 
   it.each(OTHER_LOCALES)('%s differs from English except where a name or a symbol should not change', (locale) => {
     const same = Object.keys(EN).filter((k) => BUNDLES[locale][k] === EN[k] && /[A-Za-z]{3}/.test(EN[k]!));

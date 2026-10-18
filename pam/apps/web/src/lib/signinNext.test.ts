@@ -7,7 +7,7 @@ describe('safeNext', () => {
     expect(safeNext('/profile/add-program/')).toBe('/profile/add-program/');
     expect(safeNext('/profile/add-program')).toBe('/profile/add-program/');
     expect(safeNext('/messages/pam')).toBe('/messages/pam/');
-    expect(NEXT_ALLOWED).toEqual(['/profile/add-program/', '/messages/pam/']);
+    expect(NEXT_ALLOWED).toEqual(['/profile/add-program/', '/messages/pam/', '/alerts/']);
   });
   it('refuses everything else: another screen, an outside address, a scheme, a double slash, a backslash, a query', () => {
     for (const bad of [
@@ -74,6 +74,16 @@ describe('the way back to Pam (D-605)', () => {
       expect(takeNext(role)).toBeNull();
     }
     rememberNext('/messages/pam/');
+    expect(takeNext('super_admin')).toBeNull();
+  });
+  it('Text alerts is a way back for the roles that have it, once (D-615)', () => {
+    expect(safeNext('/alerts')).toBe('/alerts/');
+    for (const role of ['member', 'admin', 'provider']) {
+      rememberNext('/alerts/');
+      expect(takeNext(role), role).toBe('/alerts/');
+      expect(takeNext(role)).toBeNull();
+    }
+    rememberNext('/alerts/');
     expect(takeNext('super_admin')).toBeNull();
   });
   it('does not widen Add my program, which stays for members', () => {
