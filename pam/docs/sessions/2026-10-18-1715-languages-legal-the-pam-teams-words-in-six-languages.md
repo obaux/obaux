@@ -14,6 +14,13 @@ Lena, on `claude/lena-pam-team-words`, on Ava's `claude/pam-message-pam-admin` @
 - `{zone}` in `pam.hours.times` is "hora del Este", "восточное время США" or a city name, so the zone sits in brackets in every language.
 - Config suite: 65 files, 1,451 tests pass, 1 skipped.
 
+## The 320 audit (Message Pam and the Pam stories, 760 and 568, seven languages, on `959a0df1`)
+
+Seven findings new in a language; none comes from the 30 keys.
+
+- **Five overlaps, one story** (`design-message-pam-plan--p-3-b-text-failed-draft-in-box`, es, pt-BR, zh-CN, zh-HK, ru): the app's own placeholder ("Escribe un mensaje") is painted over the draft that the story keeps in the box. Cause: the story's `PamComposer` (Nico) draws the kept draft by hand and hides the placeholder only when its text equals the story's English word, which fits English and Arabic; the five other languages carry the app's translation of `messages.thread.placeholder`, which was already there. The build does not do this (the placeholder goes when the draft is not empty). Not accepted in `fit-known.json`, because the drawing is wrong, not the design; the fix is one line in his file (hide the leaf `div` with `aria-hidden="true"` in the composer, which is exactly the placeholder in all seven languages, checked in the built story). Sent to Nico.
+- **Two Arabic ellipses** (`super-admin-screens--messages-to-pam`, `…-closed`): a row in Messages to Pam trims what was said to one line, in English as well. In Arabic the row is two text nodes (the label «أنت:» and then the words), so the detector reports the words under another text and calls them new. Accepted in `fit-known.json` with the reason.
+
 ## Left undone
 
-The 320 audit of the admin stories (below, if it ran), and a native reader for the Pam voice and the team's words.
+A native reader for the Pam voice and the team's words. The overlap story waits for Nico's one line.
