@@ -1565,6 +1565,18 @@
   Will's Messages tab; a Pam reply texts a person who opted in to message texts, as from anyone (behind texts_live);
   no in-app notice, on the a94 precedent, so the Privacy page and "What others can see" go live with the switch or
   before it, never after; no Away line in v1; the reply-time line is a median, worded "usually".
+- **Batch b70 (18 October, 08:02 to 15:53).** Message Pam's database side and the files sweep, on main. Nico's slice 1
+  (6842b4b8, D-605, D-606): who reads a Pam conversation, open_pam_conversation and the hours, the team's inbox and
+  starting a conversation, the bell, the person's limit and the after-hours reply, erasure and no report; its six
+  migrations went live at 07:42 to 07:43. The sweep (Nico 2a7a51d5, D-607): message photos, documents and link
+  pictures nobody uses are removed each night, for every conversation; the function was deployed at 15:50 and its
+  schedule applied as 20261018155025, and a run by hand found nothing to remove. With them: Lena's retire sweep
+  (fe3374f3, four unused strings), Dot's clean Message Pam drawing in Sage's words (a01bbf8c), Ava's plan for the
+  super admin's side (07e164b1, docs). Will signed card a101 at 14:44 (the Privacy lines approved, with no mention of
+  photos: screenshots are a feature, not a line); Lena's lines in seven languages are ready (1b0f47d4) and go live
+  with the switch. Will at 14:55: the bell on a member's Explore with nothing new, and the search dropdown over the
+  page (Dot; a86 already removes the dropdown); at 15:19: screens explain too much (D-608, Sage's rule; Text alerts
+  first, Nico builds). None of those is in b70. Nico's slice 2 (c535f8a8) came READY at 15:29 and goes in b71.
 
 ## What was wrong, and what missed it
 
@@ -1844,6 +1856,11 @@
   Storage API removes a file. Live, message-photos and message-files hold no file yet, so nothing is orphaned. A sweep
   for both buckets goes ahead of Message Pam's slice 2. Lesson: a promise about files is kept by a sweep, not by a
   cascade; check the Storage side of every deletion line.
+- **A rule that lived on a retired screen (Will, 14:55).** D-548 (13 October, 02:14) hid a member's bell on Explore
+  while its list was empty, by a prop on the old /places/ page. D-565 retired that page the same evening; the prop
+  went with it, the spec lost its empty-list case, and the new Explore never had either, so the bell came back with
+  nothing behind it. Lesson: retiring a screen moves its per-screen rules with its content or lists them as dropped,
+  and a spec rewritten for the new screen keeps every case the old one held.
 
 ## Decisions
 
@@ -2095,9 +2112,21 @@
 | Message Pam slice 1 migrations live (Nico 6842b4b8; list_migrations before; read back, counts only) | 072101 → 20261018074212, 072339 → 074239, 072644 → 074311, 073011 → 074325, 073013 → 074339, 073016 → 074352. 23 functions, all definer with search_path, none executable by anon; pam_threads RLS on and forced; 10 Pam policies; triggers messages_pam_before, messages_pam_after, pam_threads_erased; queue_message_text_alert unchanged (same md5); report guard present; 0 threads, 0 support conversations, switch off; security advisors: anon definer 17 (unchanged), authenticated definer 96 → 107 (the new RPCs, each checks its caller) |
 | Slice 1 proofs (6842b4b8, local Postgres 16) | Full suite: all passed, 1816 ok. Four mutations, each failing on its own check: support scope removed from messages_select_pam_team → test 80 "the Pam team reads NOTHING in a direct conversation it is not in"; switch gate removed from open_pam_conversation → test 81 "switch off: no conversation and no id"; team check removed from pam_inbox → test 82 "a member cannot read the inbox"; report guard removed → test 83 "Kai cannot report what Pam wrote" |
 | Batch b69, full run (d4eed0de: Nico 7710d04f, Lena 07fcf4fb, Iris ea946d09, Sage 07f41e39): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1406 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 194 / 10.0 kB spare / 2255 passed, 19 skipped, 0 failed, 0 flaky / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
+| b69 main CI (1551ed31, pushed 08:01:51) | Types/unit/build, Migrations and RLS, Publish Storybook, Accessibility: all four green (Accessibility 08:43); Vercel web and pam-site success |
+| Message files sweep live (D-607; list_migrations before) | Function sweep-message-files deployed 15:50 (version 1, JWT off; files read back the same as 2a7a51d5). Schedule 20261018074530 applied as 20261018155025: cron 'sweep-message-files' at 50 4 * * *, active, calling the function with the vault secret. Before: message-photos, message-files and link-previews 0 objects; 0 messages with an attachment; 0 link pictures. Run by hand at 15:50: 200 {folders 0, removed 0, failed 0}. Without the secret: 401 |
+| Batch b70, full run (1d7afe45: Nico 6842b4b8, Lena fe3374f3, Dot a01bbf8c, Ava 07e164b1): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | 1406 passed, 1 skipped / in step / 130 / 0 / 124 / 0 / 0 / 0 / 198 / 10.1 kB spare / 2255 passed, 19 skipped, 0 failed, 0 flaky / built; "no bundle names the live one" / 0 / 125 scans, 0 problems |
+| b70 with the sweep (c48f8810, + Nico 2a7a51d5): config / site test / site tsc / DB suite | 1419 passed, 1 skipped / 124 / 0 / all passed, 1816 ok (the schedule migration skips itself where there is no scheduler) |
 
 ## Left undone
 
+- **As of b70 (18 October, 15:53):** Message Pam: the database side and the files sweep are live and on main; the
+  switch is off. Slice 2, the person's side (Nico c535f8a8), is READY for b71 with its migration 20261018080342
+  (pam_inbox skips conversations nobody wrote in). Card a101 is signed; Lena's lines (1b0f47d4) ship in the batch that
+  turns the switch on, with Wren's three posts and site patch (5fccabca). Dot: the member's Explore bell only while
+  something is new, no dropdown on Search members, then a86 brought up to main. Sage: D-608 (9fcfd26f) and the audit
+  (1ad129b9); Nico builds Text alerts; Lena drafts the Privacy line for what a text alert never says. Plan C waits on
+  "yes a97" and the iPhone try. With Will: a86 (yes and its Privacy line), the website's photo line, "yes a97", the
+  iPhone try; a91, a93, a84, a88.
 - **As of b69 (18 October, 08:01):** Message Pam: card a101 (Lena's lines, Sage-signed) waits on Will's signature and
   the hours, with Dot's pictures on it (a01bbf8c: the clean conversation in Sage's words, and "What others can see"
   with Pam's card); the rest of the database side went live at 07:42 to 07:43 (six more migrations, 20261018074212 to
