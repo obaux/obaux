@@ -5,7 +5,10 @@ import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
 import { Switch } from '@astryxdesign/core/Switch';
-import { Dropdown, Loading, Notice, Page, PeopleIcon, ScrollReveal, ShieldIcon } from '@pam/ui';
+import { HStack } from '@astryxdesign/core/HStack';
+import { IconButton } from '@astryxdesign/core/IconButton';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { Dropdown, Loading, MessagesIcon, Notice, Page, PeopleIcon, ScrollReveal, ShieldIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { HelpButton } from '../../screens/HelpButton';
@@ -20,6 +23,9 @@ import { useSession } from '@/lib/useSession';
 import { useDirectory, setDemoView } from '@/lib/useDirectory';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useDemoView } from '@/lib/useDemoView';
+import { usePamStatus } from '@/lib/pam';
+import { navigate } from '@/lib/navigate';
+import { StatusBadge } from '@pam/ui/StatusBadge';
 
 /**
  * Everyone on Pam, for the person running it.
@@ -47,7 +53,8 @@ import { useDemoView } from '@/lib/useDemoView';
 const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
 
 const styles = stylex.create({
-  note: { fontSize: '15px', lineHeight: 1.5 },
+  // The case manager Home's message button (D-227): 48px, the accent colour.
+  message: { width: '48px', height: '48px', color: colorVars['--color-icon-accent'] },
 });
 
 /** "All", then one option per role, in the order somebody thinks of them. */
@@ -73,6 +80,8 @@ export default function DirectoryPage() {
   const isDemo = useDemoView(session);
   const [filter, setFilter] = useState<Filter>('all');
   const { state: directory, refresh: refreshDirectory } = useDirectory(isSuperAdmin, filter as Role | 'all');
+  // Pam can write first to anyone here (card a100, Will's B), once Message Pam is on. The real account only.
+  const pamLive = usePamStatus(isSuperAdmin && trueRole === 'super_admin').status === 'ready';
   // The filter is real: it asks the same question of the example set that it
   // asks the database, so switching it while the real directory is empty
   // still demonstrates what it does.
@@ -261,14 +270,35 @@ export default function DirectoryPage() {
                     when ? t('admin.lastActive', { when }) : t('admin.lastActive.never'),
                   ]}
                   trailing={
-                    <Switch
-                      // Each switch says whose it is, or a screen reader hears the same name on every row (Iris, super admin P5).
-                      label={tPlain('directory.demoView.for', { name: person.firstName ?? '' })}
-                      isLabelHidden
-                      value={person.isDemo}
-                      isDisabled={demoBusyId === person.id}
-                      onChange={(next) => void toggleDemo(person.id, next)}
-                    />
+                    <HStack gap={1} align="center" wrap="nowrap">
+                      {/* Not on the Pam team itself: Pam does not write to a super admin, and the database refuses it (Iris T3). */}
+                      {pamLive && person.role !== 'super_admin' ? (
+                        <IconButton
+                          // Opens their Pam conversation, or starts one (Dot's b3, b5).
+                          label={tPlain('pam.start.action', { name: person.firstName ?? '' })}
+                          variant="ghost"
+                          onClick={() =>
+                            navigate(
+                              `/pam/start/?${new URLSearchParams({ profile: person.id, name: person.firstName ?? '' }).toString()}`,
+                            )
+                          }
+                          icon={
+                            <HStack>
+                              <MessagesIcon width={24} height={24} aria-hidden />
+                            </HStack>
+                          }
+                          xstyle={styles.message}
+                        />
+                      ) : null}
+                      <Switch
+                        // Each switch says whose it is, or a screen reader hears the same name on every row (Iris, super admin P5).
+                        label={tPlain('directory.demoView.for', { name: person.firstName ?? '' })}
+                        isLabelHidden
+                        value={person.isDemo}
+                        isDisabled={demoBusyId === person.id}
+                        onChange={(next) => void toggleDemo(person.id, next)}
+                      />
+                    </HStack>
                   }
                 />
               </ScrollReveal>
@@ -307,9 +337,7 @@ export default function DirectoryPage() {
               </ScrollReveal>
             );
           })}
-          <Text type="supporting" xstyle={styles.note}>
-            {t('example.people.note')}
-          </Text>
+          <StatusBadge label={t('common.example')} />
         </VStack>
       ) : null}
     </Page>

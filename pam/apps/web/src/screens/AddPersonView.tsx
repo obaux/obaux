@@ -28,7 +28,6 @@ import { HelpButton } from './HelpButton';
 const styles = stylex.create({
   intro: { fontSize: '18px', lineHeight: 1.5 },
   field: { width: '100%' },
-  note: { fontSize: '15px', lineHeight: 1.5 },
 });
 
 const EXAMPLE_PROGRAM_ID = 'dummy-place-learning';
@@ -97,9 +96,6 @@ export function AddPersonView() {
           )
         }
       />
-      <Text type="supporting" xstyle={styles.note}>
-        {t('book.new.note')}
-      </Text>
     </SubPage>
   );
 }

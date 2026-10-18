@@ -14,6 +14,7 @@ import { settled } from './settled';
  */
 const ME = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
 const PAM_C = 'c0c0c0c0-0000-4000-8000-00000000a001';
+const ASKER = 'c0c0c0c0-0000-4000-8000-00000000a0ff';
 const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
 const LOCALES = ['en', 'es', 'pt-BR', 'zh-CN', 'zh-HK', 'ru', 'ar'] as const;
 const bundle = (locale: string): Record<string, string> =>
@@ -23,7 +24,7 @@ interface Row { id: string; conversation_id: string; sender_id: string | null; s
 
 async function world(
   page: Page,
-  opts: { live?: boolean; access?: 'active' | 'limited'; locale?: string; role?: 'member' | 'admin' | 'provider'; away?: boolean; failFirstPost?: boolean } = {},
+  opts: { live?: boolean; access?: 'active' | 'limited'; locale?: string; role?: 'member' | 'admin' | 'provider' | 'super_admin'; team?: boolean; away?: boolean; failFirstPost?: boolean; rateLimited?: boolean } = {},
 ) {
   const live = opts.live ?? true;
   const messages: Row[] = live
@@ -49,6 +50,9 @@ async function world(
   await page.route('**/rest/v1/rpc/pam_status*', (route) =>
     route.fulfill(json([{ live, hours_tz: 'America/New_York', hours_days: [1, 2, 3, 4, 5], hours_open: '09:00:00', hours_close: '17:00:00', open_now: true, next_open: null }])),
   );
+  await page.route('**/rest/v1/rpc/pam_inbox*', (route) =>
+    route.fulfill(json([{ conversation_id: PAM_C, asker_id: ASKER, first_name: 'Marcus', role: 'member', region_name: 'Philadelphia', program_name: null, status: 'open', last_message_at: null, last_from: 'asker', waiting_since: null, preview: null }])),
+  );
   await page.route('**/rest/v1/rpc/open_pam_conversation*', (route) => route.fulfill(json(live ? PAM_C : null)));
   await page.route('**/rest/v1/rpc/conversation_partners*', (route) =>
     route.fulfill(json(live ? [{ conversation_id: PAM_C, profile_id: null, first_name: null, role: null, program_name: null }] : [])),
@@ -56,13 +60,15 @@ async function world(
   await page.route('**/rest/v1/conversation_members*', (route) => {
     if (route.request().method() === 'PATCH') return route.fulfill(json([]));
     if (!live) return route.fulfill(json([]));
-    if (route.request().url().includes('conversation_id=eq.')) return route.fulfill(json([{ profile_id: ME, conversations: { kind: 'support' } }]));
+    // The team reading a person's conversation: the one member it sees is the person, not the reader.
+    if (route.request().url().includes('conversation_id=eq.')) return route.fulfill(json([{ profile_id: opts.team ? ASKER : ME, conversations: { kind: 'support' } }]));
     return route.fulfill(json([{ conversation_id: PAM_C, last_read_at: null }]));
   });
   await page.route('**/rest/v1/messages*', (route) => {
     const request = route.request();
     if (request.method() === 'POST') {
       posts += 1;
+      if (opts.rateLimited) return route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ code: 'P0001', message: 'PAM_RATE_LIMITED', details: null, hint: null }) });
       if (opts.failFirstPost && posts === 1) return route.fulfill({ status: 500, contentType: 'application/json', body: '{}' });
       const body = request.postDataJSON() as { body: string };
       const row: Row = { id: `m${posts}`, conversation_id: PAM_C, sender_id: ME, system_key: null, system_vars: null, body: body.body, attachment_url: null, attachment_kind: null, created_at: new Date().toISOString() };
@@ -131,10 +137,13 @@ test.describe('Message Pam, the person\'s side', () => {
     await page.getByRole('textbox').fill('I lost my paperwork');
     await page.getByRole('button', { name: /send/i }).click();
     await expect(page.getByText('Not sent', { exact: true })).toBeVisible();
+    // "Not sent" goes the moment Try again is tapped (it is "Sending…" again), before the retry is answered: wait for the retry itself.
+    const retried = page.waitForResponse((r) => r.url().includes('/rest/v1/messages') && r.request().method() === 'POST');
     await page.getByRole('button', { name: 'Not sent. Try again.' }).click();
+    await retried;
+    await expect.poll(() => server.sent().map((m) => m.body)).toEqual(['I lost my paperwork']);
     await expect(page.getByText('Not sent', { exact: true })).toHaveCount(0);
     await expect(page.getByText('I lost my paperwork')).toHaveCount(1);
-    expect(server.sent().map((m) => m.body)).toEqual(['I lost my paperwork']);
   });
 
   test('a photo to Pam goes with its progress, and one that did not go stays "Not sent" until Try again (slice 3)', async ({ page }) => {
@@ -158,17 +167,114 @@ test.describe('Message Pam, the person\'s side', () => {
     expect(uploads).toBe(2);
   });
 
-  test('Help ends with Write to Pam, which opens the conversation; Contact Pam goes there too', async ({ page }) => {
+  test('a screen reader hears Pam\'s messages as Pam, never "This person" (Iris W1)', async ({ page }) => {
+    await world(page, { away: true });
+    await page.goto(`/messages/thread/?id=${PAM_C}`);
+    await settled(page);
+    const log = page.getByRole('log');
+    await expect(log).toContainText(/Pam, /);
+    await expect(log).not.toContainText('This person');
+  });
+
+  test('the 988 in the out-of-hours reply is a call: one tap, named for what it does (Iris P1)', async ({ page }) => {
+    await world(page, { away: true });
+    await page.goto(`/messages/thread/?id=${PAM_C}`);
+    await settled(page);
+    const call = page.getByRole('link', { name: 'Call or text 988' });
+    await expect(call).toHaveAttribute('href', 'tel:988');
+    await expect(call).toHaveText('988');
+    // The tap area is padded, but the padding does not open a gap before the full stop that follows ("text 988 .", Iris R3): the next
+    // character starts where the number's own letters end.
+    const gap = await call.evaluate((el) => {
+      const after = el.nextSibling;
+      if (!after || after.nodeType !== Node.TEXT_NODE) return null;
+      const range = document.createRange();
+      range.setStart(after, 0);
+      range.setEnd(after, 1);
+      const numberRange = document.createRange();
+      numberRange.selectNodeContents(el);
+      return range.getBoundingClientRect().left - numberRange.getBoundingClientRect().right;
+    });
+    expect(gap).not.toBeNull();
+    expect(Math.abs(gap!)).toBeLessThan(2);
+    const box = (await call.boundingBox())!;
+    expect(box.height).toBeGreaterThanOrEqual(47.5);
+    expect(box.width).toBeGreaterThanOrEqual(47.5);
+  });
+
+  test('the team reads Pam\'s welcome and the out-of-hours reply as Pam, with her mark, never as the person (Iris R1)', async ({ page }) => {
+    // Marcus wrote one line between the two; the team is a super admin looking at his conversation.
+    await world(page, { role: 'super_admin', team: true, away: true });
+    await page.goto(`/messages/thread/?id=${PAM_C}`);
+    await settled(page);
+    const log = page.getByRole('log');
+    // The welcome and the reply are Pam's: named Pam to a screen reader, drawn with her mark. The person's own line keeps the person's name.
+    await expect(log).toContainText('Pam, ');
+    await expect(log).not.toContainText('Marcus, ');
+  });
+
+  test('too many messages too fast: no "Not sent" and no Try again, the words go back in the box and a calm line says to wait (Iris W4)', async ({ page }) => {
+    const server = await world(page, { rateLimited: true });
+    await page.goto(`/messages/thread/?id=${PAM_C}`);
+    await settled(page);
+    await page.getByRole('textbox').fill('One more thing');
+    await page.getByRole('button', { name: /send/i }).click();
+    await expect(page.getByText("That's a lot at once. Try again later.", { exact: true })).toBeVisible();
+    await expect(page.getByText('Not sent', { exact: true })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Not sent. Try again.' })).toHaveCount(0);
+    await expect(page.getByRole('textbox')).toHaveText('One more thing');
+    expect(server.sent()).toHaveLength(0);
+  });
+
+  for (const locale of LOCALES) {
+    test(`in ${locale}: the limit's calm line is whole and inside the screen, the words stay in the box, nothing scrolls sideways (Iris W4)`, async ({ page }) => {
+      await world(page, { locale, rateLimited: true });
+      const words = bundle(locale);
+      await page.goto(`/messages/thread/?id=${PAM_C}`);
+      await settled(page);
+      await page.getByRole('textbox').fill('One more thing');
+      // The send button's name is the language's own: it is the composer's one primary button.
+      await page.locator('.astryx-chat-composer button[data-variant="primary"]').click();
+      // The signed line in this language, read from the bundle and not typed.
+      const line = page.getByText(words['messages.thread.rateLimited']!, { exact: true });
+      await expect(line).toBeVisible();
+      const box = (await line.boundingBox())!;
+      const width = page.viewportSize()!.width;
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(width);
+      // Whole: nothing cut by the box it sits in.
+      expect(await line.evaluate((el) => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
+      await expect(page.getByRole('textbox')).toHaveText('One more thing');
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    });
+  }
+
+  test('with the switch on, Help\'s Contact Pam and Your safety\'s Talk to someone now open the conversation, not the website (Iris W2)', async ({ page }) => {
     await world(page);
     await page.goto('/help/');
     await settled(page);
-    const rows = page.getByRole('link');
-    const write = page.getByRole('link', { name: 'Write to Pam' });
-    await expect(write).toBeVisible();
-    await expect(rows.last()).toBeDefined();
-    await write.click();
+    const contact = page.getByRole('link', { name: /Contact Pam/ });
+    await expect(contact).toHaveAttribute('href', '/messages/pam/');
+    await expect(contact).not.toHaveAttribute('target', '_blank');
+    await contact.click();
     await expect(page).toHaveURL(new RegExp(`/messages/thread/\\?id=${PAM_C}`));
     await expect(page.getByRole('textbox')).toHaveAccessibleName('Write to Pam');
+
+    await page.goto('/help/safety/');
+    await settled(page);
+    const talk = page.getByRole('link', { name: /Talk to someone now/ });
+    await expect(talk).toHaveAttribute('href', '/messages/pam/');
+    await expect(talk).not.toHaveAttribute('target', '_blank');
+  });
+
+  test('with the switch off, both still open the website', async ({ page }) => {
+    await world(page, { live: false });
+    await page.goto('/help/');
+    await settled(page);
+    await expect(page.getByRole('link', { name: /Contact Pam/ })).toHaveAttribute('href', /\/support\/$/);
+    await page.goto('/help/safety/');
+    await settled(page);
+    await expect(page.getByRole('link', { name: /Talk to someone now/ })).toHaveAttribute('href', /\/support\/your-safety\/$/);
   });
 
   test('/messages/pam/ opens the conversation', async ({ page }) => {
@@ -190,11 +296,11 @@ test.describe('Message Pam, the person\'s side', () => {
     await expect(page).toHaveURL(/\/signin\/\?next=(%2F|\/)messages(%2F|\/)pam(%2F|\/)/);
   });
 
-  test('with the switch off nothing of Pam is shown: no row, no Write to Pam, the tab hides with nobody to message', async ({ page }) => {
+  test('with the switch off nothing of Pam is shown: no Pam row in Help, the tab hides with nobody to message', async ({ page }) => {
     await world(page, { live: false });
     await page.goto('/help/');
     await settled(page);
-    await expect(page.getByRole('link', { name: 'Write to Pam' })).toHaveCount(0);
+    await expect(page.locator('a[href="/messages/pam/"]')).toHaveCount(0);
     await page.goto('/messages/thread/?pam=1');
     await settled(page);
     await expect(page.getByRole('heading', { name: 'Pam', level: 1 })).toHaveCount(0);

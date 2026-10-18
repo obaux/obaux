@@ -1,4 +1,4 @@
-import { pamHoursLine, type PamHours } from '@pam/config';
+import { pamHoursLine, parsePamHours, type PamHours } from '@pam/config';
 
 /**
  * What a message written by no person says (D-605). The database holds a KEY (`messages.system_key`, 20261018071643) and what the
@@ -20,12 +20,13 @@ export interface PamWords {
 }
 
 /** The sentence for a system message, or null for a key this build does not know (it then shows nothing rather than a key). */
-export function pamSystemText(key: string, words: PamWords): string | null {
+export function pamSystemText(key: string, words: PamWords, vars?: Readonly<Record<string, unknown>> | null): string | null {
   switch (key) {
     case 'pam.welcome':
       return words.firstName ? words.t('pam.welcome', { name: words.firstName }) : words.t('pam.welcome.noName');
     case 'pam.away':
-      return `${words.t('pam.away', { hours: pamHoursLine(words.hours, words.locale, words.tPlain) })}\n\n${words.t('pam.away.crisis')}`;
+      // The hours in force when the reply was sent, when it carries them (20261018182004); today's for the replies sent before that.
+      return `${words.t('pam.away', { hours: pamHoursLine(vars?.hours ? parsePamHours(vars.hours) : words.hours, words.locale, words.tPlain) })}\n\n${words.t('pam.away.crisis')}`;
     default:
       return null;
   }

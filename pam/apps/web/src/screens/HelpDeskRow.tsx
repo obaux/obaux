@@ -18,6 +18,10 @@ const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
  */
 export function useHelpDeskItem(id = 'desk'): MenuItem {
   const { t } = useI18n();
+  const toPam = useWriteToPamItem();
+  // Signed in with messaging Pam on (D-605, Iris W2): "Contact Pam" opens the person's conversation with Pam, in the app, instead of
+  // the website. Off, signed out, or the Pam team: it is what it was.
+  if (toPam) return { id, label: t('help.desk.label'), href: toPam.href, icon: <MessagesIcon {...ICON} /> };
   return {
     id,
     label: t('help.desk.label'),
@@ -46,5 +50,6 @@ export function useWriteToPamItem(): MenuItem | null {
   const signedIn = session.status === 'signed-in' && session.session.role !== 'super_admin';
   const pam = usePamStatus(signedIn);
   if (!signedIn || pam.status !== 'ready') return null;
-  return { id: 'pam', label: t('help.writeToPam'), href: '/messages/pam/', icon: <MessagesIcon {...ICON} /> };
+  // Only the href is read (Contact Pam and Your safety's "talk to someone" both use it); the label is the help desk's own words.
+  return { id: 'pam', label: t('help.desk.label'), href: '/messages/pam/', icon: <MessagesIcon {...ICON} /> };
 }

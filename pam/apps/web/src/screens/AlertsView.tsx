@@ -1,14 +1,14 @@
 'use client';
 
-import { useEffect, useId, useState } from 'react';
+import { Suspense, useEffect, useId, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
-import { Badge } from '@astryxdesign/core/Badge';
-import { HStack } from '@astryxdesign/core/HStack';
 import { Switch } from '@astryxdesign/core/Switch';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { Notice, TextLink } from '@pam/ui';
+import { Notice } from '@pam/ui';
+import { SettingsList, SettingsRow } from '@pam/ui/SettingsList';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
@@ -28,9 +28,9 @@ import type { GlossaryTerm } from '@pam/config';
  *   - someone messages you — that one is waiting, never what it says.
  *
  * **Consent stays an act.** Every switch starts off — a carrier rejected
- * Pam's first campaign for an opt-in that arrived pre-selected (30925) — and
- * the STOP / HELP / rates line sits under them, as on the member's screen.
- * Turning any switch on records consent (`setReminderConsent(true)`); turning
+ * Pam's first campaign for an opt-in that arrived pre-selected (30925). The STOP /
+ * HELP / rates line is not repeated here (D-615): people saw it when they first agreed
+ * to texts, and no switch can turn on without that agreement. Turning any switch on records consent (`setReminderConsent(true)`); turning
  * the last one off withdraws it.
  *
  * **What is on is kept on the account (D-453, D-478).** Not on this phone: a
@@ -92,8 +92,8 @@ const styles = stylex.create({
   words: { flexGrow: 1, minWidth: 0 },
 });
 
-export function AlertsView() {
-  const { t, tPlain } = useI18n();
+function AlertsList() {
+  const { t } = useI18n();
   const soonId = useId();
   const textsLive = useTextsLive();
   const LIVE = textsLive ? LIVE_KINDS : NONE_LIVE;
@@ -102,12 +102,21 @@ export function AlertsView() {
   const role = session.status === 'signed-in' ? session.session.role : null;
   const who = role === 'provider' ? 'provider' : role === 'admin' ? 'admin' : 'member';
   const KINDS = KINDS_FOR[who];
+  // What is on comes first; "Coming soon" rows go to the bottom (Will, 18 October), in their own order (the sort is stable).
+  const ORDERED = [...KINDS].sort((a, b) => Number(!LIVE.has(a)) - Number(!LIVE.has(b)));
+  const router = useRouter();
+  const query = useSearchParams();
   /** The account's one yes/no for texts (`notification_preferences`), which every sent kind shares. */
   const [consent, setConsent] = useState(false);
+  /** The account's answer has come: until it has, no switch can be tapped (a tap would be routed on a guess). */
+  const [loaded, setLoaded] = useState(false);
   /** The four alert switches, each its own yes (D-478). */
   const [alerts, setAlerts] = useState<AlertFlags>({ message: false, booked: false, changed: false, trip: false });
   const [saved, setSaved] = useState(false);
-  const [failed, setFailed] = useState(false);
+  /** The input id Astryx gave each switch, so the row's name can be its label. */
+  const [switchIds, setSwitchIds] = useState<Partial<Record<Kind, string>>>({});
+  /** The row whose write failed: its error is drawn under it, where the finger was, not at the foot of the page. */
+  const [failedKind, setFailedKind] = useState<Kind | null>(null);
   /** They replied STOP (D-453): the switches are off and cannot be turned on from here. */
   const [stopped, setStopped] = useState(false);
 
@@ -122,35 +131,54 @@ export function AlertsView() {
       setStopped(status.stopped);
       setConsent(status.consent === true);
       setAlerts(status.alerts);
+      setLoaded(true);
     })();
     return () => {
       cancelled = true;
     };
   }, [userId]);
 
+  // Back from the agree screen with "Agree to receive texts": the switch they tapped is turned on, once.
+  useEffect(() => {
+    if (!loaded || !consent || stopped) return;
+    const kind = query.get('on');
+    if (!kind) return;
+    router.replace('/alerts/');
+    const asked = KINDS.find((k) => k === kind);
+    if (asked && LIVE.has(asked) && !isOn(asked)) void change(asked, true);
+    // Once, on arrival with the answer in.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loaded, consent, stopped]);
+
   const change = async (kind: Kind, on: boolean) => {
     if (!LIVE.has(kind) || !userId || stopped) return;
+    // The agree screen is the only opt-in (D-615): with no yes on file, a switch records nothing and turns nothing on.
+    // It opens the agree screen for this role, which brings the person back here with this switch on, or off after "Not now".
+    if (on && !consent) {
+      router.push(`/reminders/?next=alerts&kind=${kind}`);
+      return;
+    }
     setSaved(false);
-    setFailed(false);
+    setFailedKind(null);
     if (ALERT_KINDS.has(kind)) {
       const key = kind as AlertKind;
       const before = alerts;
       setAlerts({ ...alerts, [key]: on });
       if (on) setConsent(true);
       const ok = await setTextAlert(userId, key, on, before, who !== 'member');
-      setFailed(!ok);
+      setFailedKind(ok ? null : kind);
       setSaved(ok);
       if (!ok) {
         setAlerts(before);
         setConsent(consent);
-      } else if (!on && who !== 'member' && !Object.entries({ ...before, [key]: false }).some(([, v]) => v)) {
-        setConsent(false);
       }
+      // The last alert going off keeps the yes to texts: only a STOP ends it (Nico, 21b053e9), so the screen's own yes is left as it
+      // was and follows the database; turning one back on in this visit does not open the agree screen.
       return;
     }
     setConsent(on);
     const ok = await setReminderConsent(userId, on);
-    setFailed(!ok);
+    setFailedKind(ok ? null : kind);
     setSaved(ok);
     if (!ok) setConsent(!on);
   };
@@ -169,66 +197,70 @@ export function AlertsView() {
           </VStack>
         </Card>
       ) : null}
-      <Card padding={6}>
-        <VStack gap={5}>
-          <Text type="supporting" xstyle={styles.small}>
-            {t('alerts.kinds')}
-          </Text>
-          {KINDS.map((kind) => {
-            const live = LIVE.has(kind);
-            return (
-            // Pam's own sizes for the words (17px, 15px under it): Astryx's
-            // switch label is set smaller than §12 allows on a phone. The
-            // switch keeps its label, hidden, so it is still named.
-            <HStack key={kind} gap={3} align="center" wrap="nowrap">
-              <VStack gap={1} xstyle={styles.words}>
-                <HStack gap={0} align="center" wrap="nowrap">
-                  <Text xstyle={styles.label}>{t(`alerts.${kind}`)}</Text>
-                  {TERM_FOR[kind] ? <TermInfo term={TERM_FOR[kind]} /> : null}
-                </HStack>
-              </VStack>
-              {live ? null : (
-                <HStack id={`${soonId}-${kind}`}>
-                  <Badge label={t('alerts.comingSoon')} />
-                </HStack>
-              )}
-              <Switch
-                ref={(input) => {
-                  // The badge is the switch's description, so a screen reader hears "{row}, switch, off, Coming soon" (D-608).
-                  if (!input) return;
-                  if (live) input.removeAttribute('aria-describedby');
-                  else input.setAttribute('aria-describedby', `${soonId}-${kind}`);
-                }}
-                label={t(`alerts.${kind}`)}
-                isLabelHidden
-                value={live && isOn(kind)}
-                changeAction={(on) => change(kind, on)}
-                isDisabled={!userId || !live || stopped}
-              />
-            </HStack>
-            );
-          })}
-        </VStack>
-      </Card>
       <Text type="supporting" xstyle={styles.small}>
-        {/* Not "a few a week": a busy program hears more than that (D-256). */}
-        {t('alerts.how')}
+        {t('alerts.kinds')}
       </Text>
-      {/* What a text says, and never says, is on Privacy (D-608; Lena's a102). */}
-      <TextLink label={t('alerts.privacy')} accessibleLabel={tPlain('alerts.privacy.label')} href="/privacy/#texts" size="quiet" />
-      {saved && !failed ? (
+      {/* No card, no instructions, no Privacy link (D-615, Will, 18 October): a list of rows, each its own setting. */}
+      <SettingsList>
+        {ORDERED.map((kind) => {
+          const live = LIVE.has(kind);
+          const badgeId = `${soonId}-${kind}`;
+          return (
+            <SettingsRow
+              key={kind}
+              label={t(`alerts.${kind}`)}
+              adornment={TERM_FOR[kind] ? <TermInfo term={TERM_FOR[kind]} /> : null}
+              badge={live ? undefined : t('common.comingSoon')}
+              badgeId={badgeId}
+              labelFor={live ? switchIds[kind] : undefined}
+              below={
+                failedKind === kind ? (
+                  <Notice
+                    notice="something_went_wrong"
+                    title={t('notice.something_went_wrong.title')}
+                    body={t('notice.something_went_wrong.body')}
+                    contactLabel={t('help.contact.action')}
+                  />
+                ) : null
+              }
+              control={
+                <Switch
+                  ref={(input) => {
+                    // The badge is the switch's description, so a screen reader hears "{row}, switch, off, Coming soon" (D-608).
+                    if (!input) return;
+                    // The row's name is this switch's label (a tap on it works the switch): Astryx's own id for the input is what ties them.
+                    if (input.id && switchIds[kind] !== input.id) setSwitchIds((previous) => ({ ...previous, [kind]: input.id }));
+                    if (live) input.removeAttribute('aria-describedby');
+                    else input.setAttribute('aria-describedby', badgeId);
+                  }}
+                  label={t(`alerts.${kind}`)}
+                  isLabelHidden
+                  value={live && isOn(kind)}
+                  changeAction={(on) => change(kind, on)}
+                  isDisabled={!userId || !loaded || !live || stopped}
+                />
+              }
+            />
+          );
+        })}
+      </SettingsList>
+      {saved && !failedKind ? (
         <Text type="supporting" xstyle={styles.small}>
           {t('alerts.saved')}
         </Text>
       ) : null}
-      {failed ? (
-        <Notice
-          notice="something_went_wrong"
-          title={t('notice.something_went_wrong.title')}
-          body={t('notice.something_went_wrong.body')}
-          contactLabel={t('help.contact.action')}
-        />
-      ) : null}
     </SubPage>
+  );
+}
+
+/** `useSearchParams` needs a Suspense boundary in an exported app; the fallback is the real header, so the way back is always there. */
+export function AlertsView() {
+  const { t } = useI18n();
+  return (
+    <Suspense
+      fallback={<SubPage title={t('alerts.title')} backHref="/profile/" backLabel={t('nav.back.profile')} actions={<HelpButton />}>{null}</SubPage>}
+    >
+      <AlertsList />
+    </Suspense>
   );
 }

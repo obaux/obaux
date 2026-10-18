@@ -26,4 +26,12 @@ describe('one word for a planned visit in each language (D-480)', () => {
       .map(([key, words]) => `${key}: ${words}`);
     expect(said, `${locale}'s Trips tab says "${bundle['tab.trips']}"; say that`).toEqual([]);
   });
+  // The glossary frame puts an article before the word, so the article has to agree with it. "Visita" is feminine in both
+  // Spanish and Portuguese: "¿Qué es un visita?" read as an error to a Spanish reader (Iris, b74 B5). A masculine term added to the glossary
+  // needs a frame of its own, or one with no article.
+  it.each([['es', /\buna \{term\}/], ['pt-BR', /\buma \{term\}/]] as const)('%s asks "what is a visit?" with a feminine article', (locale, frame) => {
+    const bundle = BUNDLES[locale];
+    expect(bundle['glossary.trip.term'].toLowerCase()).toBe('visita');
+    expect(bundle['glossary.whatIs']).toMatch(frame);
+  });
 });

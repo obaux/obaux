@@ -31,6 +31,7 @@ import { dummyChip, statusChip } from '@/lib/caseloadLabels';
 import { HeaderActions } from './HeaderActions';
 import { StaffPeopleRow } from './StaffPeopleRow';
 import { PeopleHomeView, type HomePerson, type PeopleState } from './PeopleHomeView';
+import { StatusBadge } from '@pam/ui/StatusBadge';
 
 /** A case manager's home: the people on their caseload. */
 export function CaseloadHome() {
@@ -89,7 +90,7 @@ export function CaseloadHome() {
         placeholder: t('home.caseload.search.placeholder'),
       }}
       state={state}
-      note={isExample ? t('example.people.note') : null}
+      note={isExample ? t('common.example') : null}
       strip={<StaffPeopleRow role="admin" />}
       // §4.1: members agreed to this list at onboarding, and the case manager
       // reads the same words, so the promise is visible from both sides.
@@ -290,7 +291,6 @@ function setupCards(setup: ProgramSetup, t: (key: string) => string): Card[] {
             id: 'photo',
             kind: 'photo' as const,
             title: t('home.setup.photo.title'),
-            body: t('home.setup.photo.body'),
             href: '/profile/',
           },
         ]),
@@ -302,7 +302,6 @@ const CALENDAR_CARD = (t: (key: string) => string): Card => ({
   id: 'calendar',
   kind: 'calendar',
   title: t('home.setup.calendar.title'),
-  body: t('home.setup.calendar.body'),
   href: '/home/calendar/',
 });
 
@@ -324,7 +323,6 @@ const homeStyles = stylex.create({
   actions: { paddingBlock: '24px 16px' },
   intro: { fontSize: '16px', lineHeight: 1.5 },
   explainer: { paddingBlockEnd: '16px' },
-  note: { fontSize: '15px', lineHeight: 1.5 },
 });
 
 /**
@@ -380,9 +378,7 @@ export function CalendarPreviewView() {
         <DashedRule />
       </VStack>
       <ScheduleView appointments={exampleAppointments(t)} canCheckIn isEmbedded />
-      <Text type="supporting" xstyle={homeStyles.note}>
-        {t('home.calendar.preview.note')}
-      </Text>
+      <StatusBadge label={t('common.example')} />
     </SubPage>
   );
 }

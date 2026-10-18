@@ -59,7 +59,7 @@ async function signedInAs(page: import('@playwright/test').Page, role: 'admin' |
   await page.route(NOTIFICATIONS, (route) => route.fulfill(json([])));
   await page.route(CONTROLS, (route) => route.fulfill(json([])));
   await page.route(SAVED, (route) => route.fulfill(json([])));
-  await page.route(USER, (route) => route.fulfill(json({ id: ME, phone: '12673095265' })));
+  await page.route(USER, (route) => route.fulfill(json({ id: ME, phone: '12155550191' })));
   await page.route(POINTS, (route) => route.fulfill(json(250)));
   await page.route(PROFILES, (route) =>
     route.fulfill(
@@ -195,6 +195,6 @@ test.describe('the people strip on Home', () => {
     await expect(links.nth(0)).toContainText('Saved a new place');
     await expect(links.nth(1)).toContainText('New message');
     await expect(links.nth(1)).toHaveAttribute('href', /\/messages\/thread\/\?id=dummy-conv-dummy-m2-dummy-a1/);
-    await expect(page.getByText('Example people, so you can see how this looks.')).toBeVisible();
+    await expect(page.getByText('Example', { exact: true })).toBeVisible();
   });
 });

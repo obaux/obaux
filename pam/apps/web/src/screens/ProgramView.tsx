@@ -130,9 +130,6 @@ export function ProgramView({
       <VStack gap={3}>
         <VStack gap={1}>
           <Text xstyle={styles.heading}>{t('program.services.label')}</Text>
-          <Text type="supporting" xstyle={styles.servicesHint}>
-            {t('program.services.hint')}
-          </Text>
         </VStack>
         {services.length === 0 && !editing ? (
           <Text type="supporting" xstyle={styles.empty}>
@@ -217,7 +214,6 @@ export function ProgramView({
             {
               id: 'switch',
               label: t('program.switch.row'),
-              description: t('program.switch.row.body'),
               href: '/program/switch/',
               icon: <PlacesIcon width={26} height={26} aria-hidden />,
             },

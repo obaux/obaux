@@ -269,10 +269,21 @@ test.describe('signing up', () => {
     expect(sent, 'the sign-up request carries a role').not.toContain('role');
 
     await page.getByRole('button', { name: 'I understand' }).click();
-    await expect(page.getByRole('heading', { name: 'Text messages' })).toBeVisible();
+    // The texts step says what Text reminders says (D-608, a103): its title, the kinds of texts by their short names, the
+    // same Agree button and Not now; no introduction paragraph.
+    await expect(page.getByRole('heading', { name: 'Get text alerts', level: 1 })).toBeVisible();
     await expect(page.getByText('3 of 3', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Kinds of texts', level: 2 })).toBeVisible();
+    await expect(page.getByText('A reminder before your trip', { exact: true })).toBeVisible();
+    await expect(page.getByText('A saved place closes or moves', { exact: true })).toBeVisible();
+    // Neither text is sent yet here (texts_live is off in the stub), so each says so.
+    await expect(page.getByText('Coming soon', { exact: true })).toHaveCount(2);
+    await expect(page.getByText(/Pam can text you the reminders and notes listed below/)).toHaveCount(0);
+    await expect(page.getByText(/A note when someone wants to connect with you/)).toHaveCount(0);
+    await expect(page.getByText(/Reply STOP to stop/)).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Not now' }).or(page.getByRole('link', { name: 'Not now' }))).toBeVisible();
 
-    await page.getByRole('button', { name: 'Yes, text me reminders' }).click();
+    await page.getByRole('button', { name: 'Agree to receive texts' }).click();
 
     // Step 5: the first points, and the badge that comes with them.
     await expect(page.getByRole('heading', { name: 'You are in' })).toBeVisible();

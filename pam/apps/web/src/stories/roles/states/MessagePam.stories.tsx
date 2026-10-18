@@ -23,6 +23,8 @@ import { FactGroup, FactRow, GuideCard, ReadCard, SummaryCard, type SummaryLine 
 import { TRANSPARENCY_GROUPS, TRANSPARENCY_SCREEN } from '@pam/config';
 import { splitLine, TransparencyReading } from '../../../screens/TransparencyReading';
 import { useI18n } from '@/lib/i18n';
+import { pamSystemText } from '@/lib/pamMessages';
+import { DEFAULT_PAM_HOURS } from '@pam/config';
 import { MessagesView, type MessageRow } from '../../../screens/MessagesView';
 import { ThreadView } from '../../../app/messages/ThreadView';
 import { ThreadFrame, ThreadHeader, ThreadIntro, ThreadTop } from '../../../app/messages/ThreadFrame';
@@ -234,7 +236,32 @@ const WORDS = {
     city: 'فيلادلفيا',
   },
 };
-const useWords = () => (useI18n().locale === 'ar' ? WORDS.ar : WORDS.en);
+/**
+ * The words of the drawing. Where the app has a key for a line, it is read from the bundle (so the drawing follows the Language
+ * toolbar and cannot show English in Russian: Iris's R6); the rest are this file's stand-ins, English and Arabic only, marked
+ * above. The welcome and out-of-hours lines are drawn by the app's own `pamSystemText`.
+ */
+const useWords = () => {
+  const { t, tPlain, locale } = useI18n();
+  const base = locale === 'ar' ? WORDS.ar : WORDS.en;
+  const welcome = pamSystemText('pam.welcome', { t, tPlain, locale, firstName: 'Marcus', hours: DEFAULT_PAM_HOURS }) ?? base.welcome;
+  const outHours = pamSystemText('pam.away', { t, tPlain, locale, firstName: 'Marcus', hours: DEFAULT_PAM_HOURS }) ?? base.outHours;
+  return {
+    ...base,
+    welcome,
+    welcomeLine: welcome.length > 44 ? `${welcome.slice(0, 43).trimEnd()}…` : welcome,
+    outHours,
+    notSent: t('messages.thread.notSent'),
+    tryAgain: t('messages.thread.tryAgain'),
+    sendingLabel: t('messages.thread.sending'),
+    sentLabel: t('messages.thread.sent'),
+    // The line the app draws under a message that did not send; "Your message is still here" has no key, so it is not drawn.
+    stillHere: t('messages.thread.notSent.label'),
+    composerPlaceholder: t('messages.pam.placeholder'),
+    helpRow: t('help.desk.label'),
+    rowLine: t('help.desk.label'),
+  };
+};
 type W = ReturnType<typeof useWords>;
 
 const styles = stylex.create({
@@ -325,8 +352,10 @@ function PamComposer({ photo, placeholder, draft = null }: { readonly photo: boo
       if (draft) {
         const field = c.querySelector<HTMLElement>('[contenteditable], [role="textbox"]');
         if (field && field.textContent !== draft) field.textContent = draft;
+        // The app's own placeholder overlay, found by what it is (a leaf, aria-hidden), not by its words: in
+        // other languages it holds the app's translation, not the story's English (Lena's 320 audit).
         for (const el of c.querySelectorAll<HTMLElement>('div')) {
-          if (el.children.length === 0 && el.textContent === text) el.style.display = 'none';
+          if (el.children.length === 0 && el.getAttribute('aria-hidden') === 'true') el.style.display = 'none';
         }
       }
     };
@@ -701,6 +730,11 @@ const ThreadWelcome = pamThread('welcome');
 const ThreadOutOfHours = pamThread('out-of-hours');
 const ThreadTextFailed = pamThread('text-failed');
 const ThreadDraftKept = pamThread('draft-kept');
+/** The line under a message that did not send, in the reader's language. */
+function ThreadDraftCaption() {
+  const w = useWords();
+  return <Above lines={[w.stillHere]} />;
+}
 const ThreadPhotoSending = pamThread('photo-sending');
 const ThreadPhotoSent = pamThread('photo-sent');
 const ThreadPhotoFailed = pamThread('photo-failed');
@@ -713,7 +747,7 @@ export const P2_ThreadOutOfHours: Story = { ...member('/messages/thread/'), rend
 /** P3: a text that did not send stays in the thread, outlined, with "Not sent" and Try again under it (a 48px target). Nothing is lost. */
 export const P3_TextFailed: Story = { ...member('/messages/thread/'), render: () => <ThreadTextFailed /> };
 /** P3b: the other way to keep a draft: the words stay in the box and the line above says so (shown for comparison). */
-export const P3b_TextFailedDraftInBox: Story = { ...member('/messages/thread/'), render: () => <><ThreadDraftKept /><Above lines={[WORDS.en.stillHere]} /></> };
+export const P3b_TextFailedDraftInBox: Story = { ...member('/messages/thread/'), render: () => <><ThreadDraftKept /><ThreadDraftCaption /></> };
 /** P4: a photo on its way: dimmed, a ring of progress with a cross to stop it, "Sending…" under it. */
 export const P4_PhotoSending: Story = { ...member('/messages/thread/'), render: () => <ThreadPhotoSending /> };
 /** P5: the photo is there: the picture as sent, and a quiet "Sent" under the last message. */

@@ -32,7 +32,7 @@ async function signedInAs(page: Page, role: 'admin' | 'provider', options: { fre
     },
     [ME, options.fresh ?? false] as [string, boolean],
   );
-  await page.route('**/auth/v1/user*', (route) => route.fulfill(json({ id: ME, phone: '12673095265' })));
+  await page.route('**/auth/v1/user*', (route) => route.fulfill(json({ id: ME, phone: '12155550191' })));
   await page.route('**/rest/v1/notifications*', (route) => route.fulfill(json([])));
   await page.route('**/rest/v1/access_controls*', (route) => route.fulfill(json([])));
   await page.route('**/rest/v1/rpc/member_points*', (route) => route.fulfill(json(250)));
@@ -100,6 +100,14 @@ test.describe('the staff Home', () => {
     await links.first().click();
     await expect(page).toHaveURL(/\/invite\/new\/\?role=member/);
     await expect(page.getByRole('heading', { name: 'A link for a member', level: 1 })).toBeVisible();
+  });
+
+  test('the set-up cards are their titles: the photo card does not sell, and the program card has no explaining line (D-608)', async ({ page }) => {
+    await signedInAs(page, 'provider', { fresh: true });
+    await page.goto('/');
+    await settled(page);
+    await expect(page.getByRole('link', { name: 'Add your photo' })).toBeVisible();
+    await expect(page.getByText('A friendly face helps people feel welcome before they walk in.')).toHaveCount(0);
   });
 
   test('a new program lead, with no program yet, has no strip of people above Add your program (W4)', async ({ page }) => {

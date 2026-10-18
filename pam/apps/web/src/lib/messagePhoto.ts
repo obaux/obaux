@@ -101,6 +101,8 @@ export async function uploadMessagePhoto(
       request.setRequestHeader('apikey', SUPABASE_PUBLISHABLE_KEY);
       request.setRequestHeader('Authorization', `Bearer ${token}`);
       request.setRequestHeader('x-upsert', 'false');
+      // A photo that has not finished in a minute is "Not sent" with Try again, not "Sending…" for ever (Iris P2).
+      request.timeout = 60_000;
       request.upload.onprogress = (event) => {
         if (event.lengthComputable && event.total > 0) onProgress(Math.min(1, event.loaded / event.total));
       };
