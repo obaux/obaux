@@ -95,18 +95,22 @@ vec3 starField(vec2 q) {
   for (int L = 0; L < 2; L++) {
     float fl = float(L);
     float scale = mix(46.0, 24.0, fl);                 // cells per screen height
-    float dens  = mix(0.075, 0.03, fl);                // share of cells holding a star: sparse
+    float dens  = mix(0.15, 0.06, fl);                 // chance a cell holds a star in any given cycle: still sparse, since each is only visible part of the time
     float size  = mix(0.05, 0.055, fl);                 // tiny speckles
     vec2 g = (q + 7.3 * fl) * scale;
     vec2 id = floor(g), f = fract(g) - 0.5;
-    float h = hash(id + 11.0 * fl);
+    // each cell runs its own short life cycle: a star fades in, fades out completely, and the next one appears elsewhere
+    float P = 2.5 + 3.0 * hash(id + 2.2);
+    float cyc = uTime / P + hash(id + 3.3);
+    float n = floor(cyc);
+    float env = sin(3.14159 * fract(cyc)); env *= env;
+    float h = hash(id + 11.0 * fl + n * 7.13);
     if (h < dens) {
-      vec2 off = (vec2(hash(id + 1.7 + fl), hash(id + 5.3 + fl)) - 0.5) * 0.6;
+      vec2 off = (vec2(hash(id + 1.7 + fl + n * 3.1), hash(id + 5.3 + fl + n * 5.7)) - 0.5) * 0.6;
       float d = length(f - off);
-      float tw = 0.5 + 0.5 * sin(uTime * (0.25 + 0.55 * hash(id + 9.1)) + 6.2832 * hash(id + 3.3));  // slow fade in and out, each star on its own rhythm
       float s = exp(-d * d / (size * size));
-      vec3 tint = mix(vec3(1.0, 0.93, 0.82), vec3(0.78, 0.88, 1.0), hash(id + 4.4));
-      acc += tint * s * (0.30 + 0.70 * tw) * (0.35 + 0.35 * hash(id + 6.6));
+      vec3 tint = mix(vec3(1.0, 0.93, 0.82), vec3(0.78, 0.88, 1.0), hash(id + 4.4 + n));
+      acc += tint * s * env * (0.35 + 0.35 * hash(id + 6.6 + n));
     }
   }
   return acc;
