@@ -64,7 +64,7 @@ function failedStart(name: string, error: string): Story {
     ...base,
     name,
     // Before the screen is drawn: a conversation hides the microphone where the browser has no recogniser.
-    loaders: [...(base.loaders ?? []), async () => (standInFor(error), {})],
+    loaders: [...[base.loaders ?? []].flat(), async () => (standInFor(error), {})],
     play: async ({ canvas, userEvent, globals }) => {
       const locale = (globals as { locale?: string }).locale;
       await userEvent.click(await canvas.findByRole('button', { name: words(locale, 'messages.thread.dictate') }));
