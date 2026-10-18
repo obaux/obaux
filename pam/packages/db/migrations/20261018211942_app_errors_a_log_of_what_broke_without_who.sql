@@ -69,7 +69,8 @@ comment on table public.app_errors is
   'What broke in the app, without who (D-616): a route pattern, a key for the action, a code, build, platform, role, language. '
   'No free text, no account, phone, message text or place. Written only by report_app_error(); read only by a super admin; kept 30 days.';
 
--- Counts per caller per minute, so the limit holds. The caller is the account, or a one-way hash of the network address.
+-- Counts per caller per minute, so the limit holds. The caller is the account; everyone signed out shares one count, and the
+-- service has its own. No network address is read, not even a hash of one.
 create table public.app_error_limits (
   bucket text not null,
   minute timestamptz not null,
