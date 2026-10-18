@@ -12,13 +12,14 @@
 -- a narrow shape by the table itself.
 --
 -- WHO MAY WRITE AND READ. Only `report_app_error()`, a security definer function callable signed in or signed out (a failure to sign in
--- is a failure too), and by Edge Functions through the service role, never by a table write. Only a super admin may SELECT: RLS is on
--- and forced, anon has no grant, authenticated has SELECT through a policy that asks `is_super_admin()`, and nobody has a write grant.
+-- is a failure too), and by Edge Functions through the service role, never by a table write. Only a super admin reads, and only through
+-- `app_errors_grouped()` (rows grouped by route, action and code, with a count and first and last seen), which refuses everyone else. The
+-- table itself has RLS on and forced, a deny-all policy, and no grants.
 --
 -- WHAT KEEPS IT SMALL AND HARMLESS.
 --   * A switch, `app_errors_live`, starts 'off': with it off the function writes nothing (Lena reads it for Privacy first, and if
 --     Privacy needs a line Will signs it before the switch is turned on).
---   * A rate limit: 10 reports a minute per caller (the account, else a one-way hash of the network address, kept an hour at most),
+--   * A rate limit: 10 reports a minute per caller (the account, else a one-way hash of the network address, kept five minutes at most),
 --     and 200 a minute overall, so a loop in a screen or a person with a script cannot flood it.
 --   * The values are checked on the way in. The code must be an HTTP status, a SQLSTATE or offline/timeout/unknown, else it is stored
 --     as 'unknown'; the route loses its query and any id; the action must have the shape of a stable key (lowercase words and dots), and a
@@ -60,9 +61,9 @@ create index app_errors_action_idx on public.app_errors (action, created_at desc
 alter table public.app_errors enable row level security;
 alter table public.app_errors force row level security;
 revoke all on public.app_errors from anon, authenticated;
--- Only a super admin reads it; nobody writes it but the function (no write grant, no write policy).
-grant select on public.app_errors to authenticated;
-create policy app_errors_super_admin_reads on public.app_errors for select to authenticated using (public.is_super_admin());
+-- Nobody reads the table directly (a table with RLS and no policy is flagged as an oversight, test 03; this one is on purpose): a super admin reads it
+-- through `app_errors_grouped()`, which refuses everyone else; nobody writes it but `report_app_error()`.
+create policy app_errors_nobody on public.app_errors for all to anon, authenticated using (false) with check (false);
 
 comment on table public.app_errors is
   'What broke in the app, without who (D-616): a route pattern, a key for the action, a code, build, platform, role, language. '
@@ -128,6 +129,8 @@ begin
     v_role := coalesce(v_role, 'member');
   end if;
 
+  -- The counters only matter for the minute they count: anything older than five minutes is dropped on each report (and again by the nightly sweep).
+  delete from public.app_error_limits where minute < now() - interval '5 minutes';
   -- The rate limit: ten a minute for one caller, two hundred overall.
   v_bucket := case
     when v_uid is not null then 'u:' || v_uid::text
@@ -199,7 +202,28 @@ immutable
 set search_path = public, extensions
 as $$ select 30 $$;
 
--- Thirty days, then gone; the per-minute counters an hour.
+-- The only way to read the log: grouped, super admins only. No row ever leaves the table one by one.
+create or replace function public.app_errors_grouped(p_days integer default 7)
+returns table (area text, action text, code text, n bigint, first_seen timestamptz, last_seen timestamptz)
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+begin
+  if not public.is_super_admin() then
+    raise exception 'ONLY_A_SUPER_ADMIN' using errcode = 'P0001';
+  end if;
+  return query
+    select e.area, e.action, e.code, count(*)::bigint, min(e.created_at), max(e.created_at)
+    from public.app_errors e
+    where e.created_at >= now() - make_interval(days => greatest(1, least(coalesce(p_days, 7), public.app_errors_keep_days())))
+    group by e.area, e.action, e.code
+    order by max(e.created_at) desc;
+end $$;
+revoke all on function public.app_errors_grouped(integer) from public, anon;
+grant execute on function public.app_errors_grouped(integer) to authenticated, service_role;
+
+-- Thirty days, then gone; the per-minute counters a few minutes (the report itself clears older ones).
 create or replace function public.sweep_app_errors()
 returns integer
 language plpgsql

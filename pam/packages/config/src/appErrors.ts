@@ -24,6 +24,7 @@ export const APP_ERROR_ACTIONS = [
   'alerts.switch.changed',
   'alerts.switch.trip',
   'alerts.switch.visit',
+  'alerts.agree',
   'reminders.agree',
   'reminders.decline',
 ] as const;

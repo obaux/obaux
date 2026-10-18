@@ -80,31 +80,41 @@ select test.check('...and none of them is an account, a phone, a message, a plac
      and (column_name ~ '(profile|user|member|account|phone|body|message|place|service|ip|address|detail|note|text)')), 0);
 
 \echo ''
-\echo '--- Only a super admin reads it; nobody writes it but the function ---'
+\echo '--- Only a super admin reads it, grouped, by the function; nobody touches the table ---'
 select set_config('request.jwt.claim.sub', '', false);
 set role anon;
-select test.check_raises_like('anon cannot read the log', $$ select count(*) from public.app_errors $$, '%permission denied%');
+select test.check_raises_like('anon cannot read the table', $$ select count(*) from public.app_errors $$, '%permission denied%');
 select test.check_raises_like('...nor its counters', $$ select count(*) from public.app_error_limits $$, '%permission denied%');
 select test.check_raises_like('...nor write a row', $$ insert into public.app_errors (area, action, code, role) values ('/', 'a.b', '500', 'member') $$, '%permission denied%');
+select test.check_raises_like('...nor call the grouped read', $$ select * from public.app_errors_grouped() $$, '%permission denied%');
 set role authenticated;
 select test.as_user(:'marcus');
-select test.check('a member selecting from the log gets nothing, though rows are there',
-  (select count(*) from public.app_errors), 0);
+select test.check_raises_like('a member cannot select the table', $$ select count(*) from public.app_errors $$, '%permission denied%');
+select test.check_raises_like('a member is refused by the grouped read', $$ select * from public.app_errors_grouped() $$, '%ONLY_A_SUPER_ADMIN%');
 select test.as_user(:'dana');
-select test.check('a case manager gets nothing',
-  (select count(*) from public.app_errors), 0);
+select test.check_raises_like('a case manager cannot select the table', $$ select count(*) from public.app_errors $$, '%permission denied%');
+select test.check_raises_like('a case manager is refused by the grouped read', $$ select * from public.app_errors_grouped() $$, '%ONLY_A_SUPER_ADMIN%');
 select test.as_user(:'alice');
-select test.check('a program lead gets nothing',
-  (select count(*) from public.app_errors), 0);
+select test.check_raises_like('a program lead cannot select the table', $$ select count(*) from public.app_errors $$, '%permission denied%');
+select test.check_raises_like('a program lead is refused by the grouped read', $$ select * from public.app_errors_grouped() $$, '%ONLY_A_SUPER_ADMIN%');
 select test.check_raises_like('no signed-in person can read the counters', $$ select count(*) from public.app_error_limits $$, '%permission denied%');
 select test.check_raises_like('...nor write a row', $$ insert into public.app_errors (area, action, code, role) values ('/', 'a.b', '500', 'member') $$, '%permission denied%');
 select test.check_raises_like('...nor change one', $$ update public.app_errors set code = '200' $$, '%permission denied%');
 select test.check_raises_like('...nor delete one', $$ delete from public.app_errors $$, '%permission denied%');
 select test.as_user(:'root');
-select test.check('a super admin reads the rows',
-  (select (count(*) >= 2)::int from public.app_errors), 1);
-select test.check_raises_like('...but cannot write one either', $$ insert into public.app_errors (area, action, code, role) values ('/', 'a.b', '500', 'member') $$, '%permission denied%');
+select test.check_raises_like('even a super admin cannot select the table directly', $$ select count(*) from public.app_errors $$, '%permission denied%');
+select test.check('a super admin reads grouped rows with counts and first and last seen',
+  (select (count(*) >= 2 and sum(n) >= 2 and bool_and(first_seen <= last_seen))::int from public.app_errors_grouped()), 1);
+select test.check('...the days window is capped at the keep time',
+  (select count(*) from public.app_errors_grouped(100000)), (select count(*) from public.app_errors_grouped(30)));
 reset role;
+-- The counters older than five minutes go when the next report comes in.
+insert into public.app_error_limits (bucket, minute, n) values ('u:stale', now() - interval '10 minutes', 3);
+select set_config('request.jwt.claim.sub', '', false);
+select public.report_app_error('/', 'stale.check', '500', 'b75', 'web', 'en');
+select test.check('a report clears counters older than five minutes',
+  (select count(*) from public.app_error_limits where bucket = 'u:stale'), 0);
+delete from public.app_errors where action = 'stale.check';
 
 \echo ''
 \echo '--- What comes in is checked: no free text gets through ---'
