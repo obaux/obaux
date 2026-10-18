@@ -111,6 +111,19 @@ test.describe('agreeing to reminders', () => {
     await expect(page.getByRole('link', { name: 'Sign in' })).toBeVisible();
   });
 
+  test('sent here from a Text alerts switch, Back goes to Text alerts and says so; from Profile it is Back to Profile (Iris B2)', async ({ page }) => {
+    await page.goto('/reminders/?next=alerts&kind=message');
+    await settled(page);
+    const fromAlerts = page.getByRole('link', { name: 'Back to Text alerts' });
+    await expect(fromAlerts).toHaveAttribute('href', '/alerts/');
+    await expect(page.getByRole('link', { name: 'Back to Profile' })).toHaveCount(0);
+
+    await page.goto('/reminders/');
+    await settled(page);
+    await expect(page.getByRole('link', { name: 'Back to Profile' })).toHaveAttribute('href', '/profile/');
+    await expect(page.getByRole('link', { name: 'Back to Text alerts' })).toHaveCount(0);
+  });
+
   test('signed in, saying no is one tap and is a real answer', async ({ page }) => {
     // "Not now" writes the answer rather than doing nothing, so nobody is asked
     // twice and silence is never read as consent either way.

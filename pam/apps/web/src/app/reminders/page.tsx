@@ -59,6 +59,8 @@ function RemindersForm() {
   const { t } = useI18n();
   const router = useRouter();
   const query = useSearchParams();
+  // Sent here from a Text alerts switch (D-615): Back goes where they came from, not to Profile (Iris B2).
+  const fromAlerts = query.get('next') === 'alerts';
   const { state: session } = useSession();
 
   /**
@@ -139,8 +141,8 @@ function RemindersForm() {
       {/* The nested-page template (D-213, D-217) — reached from Profile. */}
       <SubPageHeader
         title={t('reminders.title')}
-        backHref="/profile/"
-        backLabel={t('nav.back.profile')}
+        backHref={fromAlerts ? '/alerts/' : '/profile/'}
+        backLabel={t(fromAlerts ? 'nav.back.alerts' : 'nav.back.profile')}
         actions={<HelpButton />}
       />
       {stopped ? (
