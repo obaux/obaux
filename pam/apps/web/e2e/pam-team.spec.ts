@@ -122,6 +122,19 @@ test.describe("Message Pam, the team's side (card a100)", () => {
     await page.getByRole('dialog', { name: 'Saved replies' }).getByText('Your guide is the best person for this.', { exact: false }).click();
     await expect(box).toHaveText('Hi Aaliyah, Your guide is the best person for this. You can write to them in Messages.');
     await expect(box).toBeFocused();
+    // The cursor is after the inserted words, and typing goes on from there.
+    const caret = () =>
+      box.evaluate((el) => {
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) return -1;
+        const upTo = document.createRange();
+        upTo.setStart(el, 0);
+        upTo.setEnd(selection.getRangeAt(0).startContainer, selection.getRangeAt(0).startOffset);
+        return upTo.toString().length;
+      });
+    await expect.poll(caret).toBe('Hi Aaliyah, Your guide is the best person for this. You can write to them in Messages.'.length);
+    await page.keyboard.type(' Thanks!');
+    await expect(box).toHaveText('Hi Aaliyah, Your guide is the best person for this. You can write to them in Messages. Thanks!');
     expect(server.posts).toHaveLength(0);
   });
 

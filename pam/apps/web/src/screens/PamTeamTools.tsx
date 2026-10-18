@@ -39,15 +39,28 @@ export function PamSavedReplies({ onPick }: { readonly onPick: (text: string) =>
   const bar = useRef<HTMLDivElement>(null);
   // When the sheet closes, focus goes back to the message box, not to this button (Iris T2): the box is beside it in the composer.
   const box = useRef<HTMLElement | null>(null);
-  // The reply goes in once the sheet has closed and handed focus back, so the cursor it leaves after the words stays there.
+  // The reply goes in once the sheet has really closed. While it is open the page behind it is inert (a modal dialog), so the
+  // message box cannot take the focus and the words could not go in where the cursor was. So: wait, frame by frame, until no
+  // dialog is open, then put the words in.
   const picked = useRef<string | null>(null);
+  const pick = useRef(onPick);
+  pick.current = onPick;
   useEffect(() => {
     if (open || picked.current === null) return;
     const text = picked.current;
     picked.current = null;
-    const frame = requestAnimationFrame(() => onPick(text));
+    let frame = 0;
+    let tries = 0;
+    const whenClosed = () => {
+      if (document.querySelector('dialog[open]') && tries++ < 60) {
+        frame = requestAnimationFrame(whenClosed);
+        return;
+      }
+      pick.current(text);
+    };
+    frame = requestAnimationFrame(whenClosed);
     return () => cancelAnimationFrame(frame);
-  }, [open, onPick]);
+  }, [open]);
   const openSheet = () => {
     box.current = bar.current?.parentElement?.querySelector<HTMLElement>('[contenteditable="true"]') ?? null;
     setOpen(true);
