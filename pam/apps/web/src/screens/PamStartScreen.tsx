@@ -10,7 +10,7 @@ import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { navigate } from '@/lib/navigate';
-import { pamProgramHasLead, startPamConversation, startPamProgramConversation, usePamInbox, usePamStatus } from '@/lib/pam';
+import { pamProgramHasLead, startPamConversation, startPamProgramConversation, usePamInbox, usePamStatus, type PamError } from '@/lib/pam';
 import { ThreadFrame, ThreadHeader, ThreadIntro, ThreadTop } from '../app/messages/ThreadFrame';
 import { ThreadViewLazy } from '../app/messages/ThreadViewLazy';
 import { NotIn } from '../app/NotIn';
@@ -43,7 +43,9 @@ export function PamStartScreen() {
   const inbox = usePamInbox(isTeam && live && profileId !== null);
   const [hasLead, setHasLead] = useState<boolean | null>(null);
   const [sending, setSending] = useState(false);
-  const [failed, setFailed] = useState(false);
+  // Pam's first words while they go, and after, if they did not (Iris T1): kept in the conversation as "Not sent" with Try again,
+  // as any message is, never emptied away. `why` says the calm cases apart from the ones worth trying again (T3).
+  const [first, setFirst] = useState<{ readonly body: string; readonly at: string; readonly status: 'sending' | 'failed'; readonly why: PamError | null } | null>(null);
 
   // A person with a Pam conversation already: open that one.
   const existing =
@@ -117,28 +119,33 @@ export function PamStartScreen() {
   const send = async (body: string): Promise<boolean> => {
     const text = body.trim();
     if (!text) return false;
+    const at = first?.at ?? new Date().toISOString();
     setSending(true);
-    setFailed(false);
+    setFirst({ body: text, at, status: 'sending', why: null });
+    const failedWith = (why: PamError) => {
+      setSending(false);
+      setFirst({ body: text, at, status: 'failed', why });
+      return false;
+    };
     if (profileId) {
       const result = await startPamConversation(profileId, text);
+      if (!result.ok) return failedWith(result.error);
       setSending(false);
-      if (!result.ok) {
-        setFailed(true);
-        return false;
-      }
       router.replace(`/messages/thread/?id=${encodeURIComponent(result.value)}&from=pam`);
       return true;
     }
     const result = await startPamProgramConversation(serviceId as string, text);
-    setSending(false);
     if (!result.ok) {
-      setFailed(true);
       if (result.error === 'PAM_NO_ACTIVE_LEAD') setHasLead(false);
-      return false;
+      return failedWith(result.error);
     }
+    setSending(false);
     navigate(`/pam/messages/?sent=${result.value}`);
     return true;
   };
+
+  // Refused for good (Pam is off, or this person is one Pam does not write to): a calm line, no Try again in it (T3).
+  const calm = first?.status === 'failed' && (first.why === 'PAM_OFF' || first.why === 'NOT_ALLOWED');
 
   return (
     <ThreadFrame>
@@ -146,7 +153,8 @@ export function PamStartScreen() {
         <ThreadHeader name={name} {...back} />
       </ThreadTop>
       <ThreadViewLazy
-        messages={[]}
+        messages={first ? [{ id: 'pam-first', body: first.body, createdAt: first.at, mine: true, status: first.status }] : []}
+        onRetry={() => (first ? void send(first.body) : undefined)}
         otherName={name}
         intro={
           <ThreadIntro name={name} context={null}>
@@ -156,10 +164,19 @@ export function PamStartScreen() {
                 {t('pam.start.programNote')}
               </Text>
             ) : null}
-            {failed ? (
-              <Text type="supporting" role="alert">
-                {t('pam.thread.statusFailed')}
-              </Text>
+            {first?.status === 'failed' ? (
+              calm ? (
+                <Text type="supporting" role="status">
+                  {t(first.why === 'PAM_OFF' ? 'pam.inbox.off' : 'pam.start.notAllowed')}
+                </Text>
+              ) : (
+                // The same error card as other screens (T6); Try again is on the message itself.
+                <Notice
+                  notice="something_went_wrong"
+                  title={t('notice.something_went_wrong.title')}
+                  body={t('pam.start.failed')}
+                />
+              )
             ) : null}
           </ThreadIntro>
         }

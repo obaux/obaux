@@ -1757,6 +1757,8 @@
   "pam.start.action": "Message {name} as Pam",
   "pam.start.programNote": "Goes to each of the program's leads.",
   "pam.start.placeholder": "Write as Pam",
+  "pam.start.failed": "Your message is kept below. Tap Try again to send it.",
+  "pam.start.notAllowed": "Pam doesn't write to the Pam team.",
   "pam.program.action": "Message this program",
   "pam.program.noLead": "Nobody runs this program in Pam right now.",
   "pam.inbox.sent": "Sent to {count} leads.",

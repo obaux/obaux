@@ -271,7 +271,8 @@ export default function DirectoryPage() {
                   ]}
                   trailing={
                     <HStack gap={1} align="center" wrap="nowrap">
-                      {pamLive ? (
+                      {/* Not on the Pam team itself: Pam does not write to a super admin, and the database refuses it (Iris T3). */}
+                      {pamLive && person.role !== 'super_admin' ? (
                         <IconButton
                           // Opens their Pam conversation, or starts one (Dot's b3, b5).
                           label={tPlain('pam.start.action', { name: person.firstName ?? '' })}

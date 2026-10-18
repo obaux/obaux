@@ -18,9 +18,11 @@ interface World {
   readonly hasLead?: boolean;
   readonly existing?: boolean;
   readonly locale?: string;
+  /** Pam writing first fails once: a network failure, or a refusal the database gives by name. */
+  readonly failStart?: 'error' | 'NOT_ALLOWED' | 'PAM_OFF';
 }
 
-async function team(page: Page, { status = 'open', hasLead = true, existing = false, locale }: World = {}) {
+async function team(page: Page, { status = 'open', hasLead = true, existing = false, locale, failStart }: World = {}) {
   const calls: { fn: string; args: unknown }[] = [];
   const posts: unknown[] = [];
   let threadStatus = status;
@@ -71,7 +73,17 @@ async function team(page: Page, { status = 'open', hasLead = true, existing = fa
     return null;
   });
   await rpc('pam_program_has_lead', () => hasLead);
-  await rpc('pam_start_conversation', () => PAM_C);
+  let startFailed = false;
+  await page.route('**/rest/v1/rpc/pam_start_conversation*', (route) => {
+    calls.push({ fn: 'pam_start_conversation', args: route.request().postDataJSON() });
+    if (failStart && !startFailed) {
+      startFailed = true;
+      return failStart === 'error'
+        ? route.fulfill({ status: 500, contentType: 'application/json', body: '{}' })
+        : route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ code: 'P0001', message: failStart }) });
+    }
+    return route.fulfill(json(PAM_C));
+  });
   await rpc('pam_start_program_conversation', () => 2);
   await rpc('pam_set_hours', () => null);
   return { calls, posts };
@@ -142,6 +154,35 @@ test.describe("Message Pam, the team's side (card a100)", () => {
     expect(server.calls.find((c) => c.fn === 'pam_start_conversation')?.args).toEqual({ p_profile: ASKER, p_body: 'Hi Aaliyah, your city is fixed.' });
   });
 
+  // Iris T1 and T6 (pass 2, on 1b67f588): a failure emptied the box and said so in small grey text.
+  test('when Pam writing first fails, the words stay as "Not sent" with Try again, under an error card, and Try again sends them', async ({ page }) => {
+    const server = await team(page, { failStart: 'error' });
+    await page.goto(`/pam/start/?profile=${ASKER}&name=Aaliyah`);
+    await settled(page);
+    await page.getByRole('textbox').fill('Hi Aaliyah, your city is fixed.');
+    await page.getByRole('button', { name: /send/i }).click();
+    await expect(page.getByText('Hi Aaliyah, your city is fixed.')).toBeVisible();
+    await expect(page.getByText('Not sent', { exact: true })).toBeVisible();
+    await expect(page.getByRole('alert').filter({ hasText: 'Something went wrong' })).toBeVisible();
+    await page.getByRole('button', { name: 'Not sent. Try again.' }).click();
+    await expect(page).toHaveURL(new RegExp(`/messages/thread/\\?id=${PAM_C}&from=pam`));
+    expect(server.calls.filter((c) => c.fn === 'pam_start_conversation')).toHaveLength(2);
+  });
+
+  // Iris T3: a refusal by name is said calmly, without "Try again" in the words.
+  for (const [code, line] of [['NOT_ALLOWED', "Pam doesn't write to the Pam team."], ['PAM_OFF', 'Message Pam is off.']] as const) {
+    test(`a ${code} refusal says so in one calm line, not an error card`, async ({ page }) => {
+      await team(page, { failStart: code });
+      await page.goto(`/pam/start/?profile=${ASKER}&name=Sam`);
+      await settled(page);
+      await page.getByRole('textbox').fill('Hello');
+      await page.getByRole('button', { name: /send/i }).click();
+      await expect(page.getByText(line)).toBeVisible();
+      await expect(page.getByRole('alert').filter({ hasText: 'Something went wrong' })).toHaveCount(0);
+      await expect(page.getByText('Hello', { exact: true })).toBeVisible();
+    });
+  }
+
   test('a person who already has a Pam conversation is taken to it, not to a second one', async ({ page }) => {
     await team(page, { existing: true });
     await page.goto(`/pam/start/?profile=${ASKER}&name=Aaliyah`);
@@ -201,6 +242,49 @@ test.describe("Message Pam, the team's side (card a100)", () => {
     await settled(page);
     await page.getByRole('button', { name: 'Message Aaliyah as Pam' }).click();
     await expect(page).toHaveURL(new RegExp(`/pam/start/\\?profile=${ASKER}&name=Aaliyah`));
+  });
+
+  test('Everyone offers no "as Pam" button on a super admin, whom the database refuses (Iris T3)', async ({ page }) => {
+    await team(page);
+    await page.route('**/rest/v1/rpc/directory_people*', (route) =>
+      route.fulfill(
+        json([
+          { id: ASKER, first_name: 'Aaliyah', role: 'member', region_name: 'Philadelphia', access_status: 'active', last_active_at: null, is_demo: false },
+          { id: 'a0000000-0000-4000-8000-0000000000d1', first_name: 'Sam', role: 'super_admin', region_name: null, access_status: 'active', last_active_at: null, is_demo: false },
+        ]),
+      ),
+    );
+    await page.goto('/directory/');
+    await settled(page);
+    await expect(page.getByRole('button', { name: 'Message Aaliyah as Pam' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Message Sam as Pam' })).toHaveCount(0);
+  });
+
+  test("Pam's hours: closing before opening hides the reply rather than show hours that cannot be (Iris T4)", async ({ page }) => {
+    const server = await team(page);
+    await page.goto('/pam/hours/');
+    await settled(page);
+    await expect(page.getByText(/Thanks for writing/)).toBeVisible();
+    const closes = page.getByRole('textbox', { name: 'Closes' });
+    await closes.fill('8:00 AM');
+    await closes.press('Enter');
+    await closes.blur();
+    await expect(page.getByText(/Thanks for writing/)).toHaveCount(0);
+    await expect(page.getByText(/5\sPM to 9\sAM|8\sAM/)).toHaveCount(0);
+    await page.getByRole('button', { name: 'Save' }).click();
+    await expect(page.getByRole('alert').filter({ hasText: 'Pick a closing time after the opening time.' })).toBeVisible();
+    expect(server.calls.filter((c) => c.fn === 'pam_set_hours')).toHaveLength(0);
+  });
+
+  test("Pam's hours: the time fields are 48px tall and the clock is a picture, not a 16px button (Iris T5)", async ({ page }) => {
+    await team(page);
+    await page.goto('/pam/hours/');
+    await settled(page);
+    for (const name of ['Opens', 'Closes']) {
+      const box = (await page.getByRole('textbox', { name }).boundingBox())!;
+      expect(box.height).toBeGreaterThanOrEqual(48);
+    }
+    await expect(page.getByRole('button', { name: /^Open (Opens|Closes)/ })).toHaveCount(0);
   });
 
   for (const path of ['/pam/hours/', `/pam/thread/options/?id=${PAM_C}`, '/pam/start/?service=svc-1&name=Fresh%20Start%20Kitchen']) {

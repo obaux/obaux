@@ -91,8 +91,9 @@ export function PamHoursScreen() {
     setDraft({ ...hours, ...patch });
     setSaid(null);
   };
-  // No day ticked has no reply to show (and no line of days to build): Save says what is missing.
-  const preview = hours.days.length > 0 ? pamSystemText('pam.away', { t, tPlain, locale, firstName: null, hours }) : null;
+  // Hours that cannot be (no day, or closing before opening) have no reply to show: Save says what to fix (Iris T4).
+  const valid = hours.days.length > 0 && hhmm(hours.close) > hhmm(hours.open);
+  const preview = valid ? pamSystemText('pam.away', { t, tPlain, locale, firstName: null, hours }) : null;
 
   const save = async () => {
     if (hours.days.length === 0) return setSaid('noDays');
@@ -121,13 +122,16 @@ export function PamHoursScreen() {
 
       <VStack gap={2}>
         <Text xstyle={styles.label}>{t('pam.hours.times', { zone: t('pam.hours.zone.eastern') })}</Text>
-        {/* One above the other: side by side, two time fields push the page wider than a phone. */}
+        {/* One above the other: side by side, two time fields push the page wider than a phone. The typed field on every
+            phone (Iris T5): the touch picker's own open button is a 16px target, so here the clock is only a picture. */}
         <VStack gap={2}>
           <TimeInput
             label={t('pam.hours.open')}
             value={hours.open as Time}
             onChange={(v) => change({ open: v ?? hours.open })}
             width="100%"
+            size="lg"
+            nativePicker="never"
             xstyle={styles.time}
           />
           <TimeInput
@@ -135,6 +139,8 @@ export function PamHoursScreen() {
             value={hours.close as Time}
             onChange={(v) => change({ close: v ?? hours.close })}
             width="100%"
+            size="lg"
+            nativePicker="never"
             xstyle={styles.time}
           />
         </VStack>
