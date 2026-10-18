@@ -388,7 +388,7 @@
   "nav.back.places": "返回地點",
   "nav.back.saved": "返回收藏",
   "nav.help": "協助",
-  "notice.account_limited.body": "您目前不能傳送訊息。您的引導人已關閉您帳戶的這項功能。您仍然可以閱讀您的訊息。請聯絡Pam，我們會協助您與您的引導人取得聯繫。",
+  "notice.account_limited.body": "您目前不能傳送訊息，傳給Pam的除外。傳訊息給Pam，我們會協助您與您的引導人取得聯繫。",
   "notice.account_limited.title": "部分功能已關閉",
   "notice.account_suspended.body": "您目前無法登入。您的引導人可以重新開啟。請聯絡Pam，我們會協助您與對方取得聯繫。",
   "notice.account_suspended.title": "您的帳戶已暫停",
