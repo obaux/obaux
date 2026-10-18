@@ -537,6 +537,11 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   (2) **The member's screens** (tú in Spanish): `trips.bookedForYou` "Booked for you" (es "Reservada para ti": is the feminine right under a card titled with a place?), `transparency.canSee.bookedBy`, `transparency.program.visits`, and `reminders.intro` / `reminders.what.1` (the opt-in the carrier reads: "reminders and notes listed below"; check "notes" is the word each language uses on the list).
   (3) **The guide's side:** `person.trip.bookedBy` ("Booked by {program}"; es/pt-BR "Reservada por") and `join.privacy.admin.2` ("…which ones a program booked and if they went or missed one…").
 
+- [ ] **A native reader for the ten dictation-banner lines (18 October; Lena; Sage's ledger `a2703793`, D-603).** Six translations each, written by Claude, none read by a native speaker. A person who taps the microphone in a conversation and it does not start reads one of these in Pam's warning banner (member register: tú, você, 您, вы).
+  (1) **"Pam can't use the microphone" / "Pam can't find a microphone"** and their hints (`messages.thread.dictate.problem.blocked.*`, `.noMic.*`): is "allow the microphone for Pam in your browser's settings" said the way the phone's own settings say it? es "ajustes de tu navegador", pt-BR "configurações do seu navegador", zh "浏览器设置 / 瀏覽器設定", ru «в настройках браузера», ar «في إعدادات متصفحك» (with «اسمح لـ Pam»).
+  (2) **"Speaking needs an internet connection" / "This browser can't listen in your language"** (`.offline.*`, `.language.*`): the second is not literal ("listen in a language" is not how they say it): zh "此浏览器听不懂您的语言", ru «Этот браузер не понимает речь на вашем языке», ar «لا يستطيع هذا المتصفح فهم الكلام بلغتك». Do they read as the browser's limit, not the person's fault?
+  (3) **"The microphone didn't start"** (`.failed.*`): es "El micrófono no empezó a funcionar", pt-BR "O microfone não começou a funcionar", zh "麦克风没有启动", ru «Микрофон не включился», ar «لم يبدأ الميكروفون بالعمل».
+
 - [ ] **Hear the language tags with a screen reader (10 October, D-455).** Every list
   of languages now starts each name with an English tag (EN, ES, PT-BR, ZH-CN, ZH-HK,
   RU, AR). The tag is hidden from a screen reader on purpose and each name carries
