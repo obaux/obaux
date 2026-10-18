@@ -11,13 +11,17 @@ import { List, ListItem } from '@astryxdesign/core/List';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { GlobeIcon, MessagesIcon, Page, PlacesIcon, ShieldIcon, HelpIcon } from '@pam/ui';
+import { GlobeIcon, MessagesIcon, Page, PeopleIcon, PlacesIcon, ShieldIcon, HelpIcon } from '@pam/ui';
 import { Button } from '@pam/ui/Button';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPage } from '@pam/ui/SubPage';
 import { Switch } from '@astryxdesign/core/Switch';
 import { AlertBannerHost } from '@/lib/AlertBannerHost';
+import { EyeIcon, EyeOffIcon, MailIcon } from '@pam/ui';
+import { FactGroup, FactRow, GuideCard, ReadCard, SummaryCard, type SummaryLine } from '@pam/ui/Reading';
+import { TRANSPARENCY_GROUPS, TRANSPARENCY_SCREEN } from '@pam/config';
+import { splitLine, TransparencyReading } from '../../../screens/TransparencyReading';
 import { useI18n } from '@/lib/i18n';
 import { MessagesView, type MessageRow } from '../../../screens/MessagesView';
 import { ThreadView } from '../../../app/messages/ThreadView';
@@ -61,14 +65,15 @@ const WORDS = {
     helpHint: '',
     rowLine: 'Write to Pam',
     // Option B, clean (Will, 18 October): a welcome from day one, an automatic reply out of hours, a thread like any other. Sage's words to come.
-    welcome: "Hi, welcome to Pam. Ask us anything about the app, a place or a visit. We'll answer here.",
-    outHours: "Thanks for your message. We're away right now and will answer on Monday from 9 AM. If you're in crisis, call or text 988.",
+    // Sage's words (fb410c60, signed-english.md): "Hi {name}, it's Pam. If you need help with anything, reply here."
+    welcome: "Hi Marcus, it's Pam. If you need help with anything, reply here.",
+    outHours: "Thanks for writing. Pam is here weekdays, 9 AM to 5 PM, and we'll read your message then. In a crisis, call or text 988.",
     notSent: 'Not sent',
     tryAgain: 'Try again',
     sendingLabel: 'Sending…',
     sentLabel: 'Sent',
     stillHere: 'Not sent. Your message is still here.',
-    welcomeLine: "Hi, welcome to Pam. Ask us anything about…",
+    welcomeLine: "Hi Marcus, it's Pam. If you need help with…",
     started: 'Pam started this conversation.',
     // Option C (Sage, ledger 7b280684).
     cTitle: 'The Pam team can now start a conversation with you, as Pam.',
@@ -153,14 +158,14 @@ const WORDS = {
     helpRow: 'اكتب إلى Pam',
     helpHint: '',
     rowLine: 'اكتب إلى Pam',
-    welcome: 'أهلًا بك في Pam. اسألنا عن التطبيق أو مكان أو زيارة. سنجيب هنا.',
-    outHours: 'شكرًا لرسالتك. نحن بعيدون الآن وسنرد يوم الاثنين من التاسعة صباحًا. إن كنت في أزمة فاتصل أو أرسل رسالة إلى 988.',
+    welcome: 'أهلًا ماركوس، معك Pam. إن احتجت مساعدة في أي شيء فردّ هنا.',
+    outHours: 'شكرًا لكتابتك. Pam متاح أيام الأسبوع من 9 ص إلى 5 م، وسنقرأ رسالتك حينها. في أزمة اتصل أو أرسل رسالة إلى 988.',
     notSent: 'لم تُرسل',
     tryAgain: 'حاول مرة أخرى',
     sendingLabel: 'جارٍ الإرسال…',
     sentLabel: 'أُرسلت',
     stillHere: 'لم تُرسل. رسالتك ما زالت هنا.',
-    welcomeLine: 'أهلًا بك في Pam. اسألنا عن…',
+    welcomeLine: 'أهلًا ماركوس، معك Pam. إن احتجت مساعدة…',
     started: 'بدأ Pam هذه المحادثة.',
     cTitle: 'يمكن لفريق Pam الآن أن يبدأ محادثة معك، باسم Pam.',
     cBody: 'ستراها في الرسائل، ولا يقرؤها إلا فريق Pam. يمكنك إيقاف ذلك من ملفي.',
@@ -722,6 +727,108 @@ export const P7_MessagesDayOne: Story = { ...member('/messages/'), render: () =>
 export const P7b_MessagesDayOneWithOthers: Story = { ...member('/messages/'), render: () => <MemberMessages kind="fresh-others" /> };
 /** P8: Help: the answers first, then "Write to Pam" with no hint. (X3 is the same screen.) */
 export const P8_HelpWriteToPam: Story = { ...member('/help/'), render: () => <HelpWrite /> };
+
+
+/**
+ * "What others can see" with the Pam card (Lena L4, claude/lena-message-pam-privacy; Sage's words, may still move): the last step of
+ * signing up and Profile's short version. It is TransparencyReading as it stands, with one more card, "The Pam team can see:", after
+ * "A program can see:", and one more line in the short version. It is never in the guide's list. Drawing only: `TransparencyReading`
+ * is Lena's to change; this copy exists so the card can be seen in place.
+ */
+const PAM_WORDS = {
+  heading: 'The Pam team can see',
+  line: 'What you and Pam write to each other, and the photos you send there.',
+  grey: 'Your guide and your programs cannot see any of it.',
+  summary: 'Only the Pam team can see what you and Pam write to each other, and the photos you send there.',
+};
+const asTitleLocal = (heading: string) => heading.replace(/[:：]\s*$/, '');
+
+function TransparencyWithPam({ detail }: { readonly detail: boolean }) {
+  const { t } = useI18n();
+  const byKey = new Map(TRANSPARENCY_SCREEN.canSee.map((line) => [line.key, line] as const));
+  const summary: SummaryLine[] = [
+    { text: t('transparency.summary.see'), mark: 'yes', icon: <EyeIcon /> },
+    { text: t('transparency.summary.cannot'), mark: 'no', icon: <EyeOffIcon /> },
+    { text: t('transparency.summary.reported'), mark: 'yes', icon: <MessagesIcon width={24} height={24} /> },
+    { text: t('transparency.summary.program'), mark: 'yes', icon: <PeopleIcon width={24} height={24} /> },
+    { text: PAM_WORDS.summary, mark: 'yes', icon: <MessagesIcon width={24} height={24} /> },
+    { text: t('privacy.s.contact.p1'), mark: 'call', icon: <MailIcon /> },
+  ];
+  return (
+    <VStack gap={3}>
+      <GuideCard title={t('guide.title')} body={t('guide.body')} icon={<PeopleIcon width={24} height={24} />} />
+      <SummaryCard title={t('transparency.summary.title')} lines={summary} />
+      {detail ? (
+        <>
+          <ReadCard title={asTitleLocal(t(TRANSPARENCY_SCREEN.canSeeHeadingKey))} icon={<EyeIcon />}>
+            <VStack gap={3}>
+              {TRANSPARENCY_GROUPS.map((group) => (
+                <FactGroup key={group.titleKey} title={t(group.titleKey)}>
+                  {group.keys.map((key) => {
+                    const line = byKey.get(key);
+                    if (!line) return null;
+                    const { lead, detail: more } = splitLine(t(line.key));
+                    return <FactRow key={key} lead={lead} detail={more} mark="yes" />;
+                  })}
+                </FactGroup>
+              ))}
+            </VStack>
+          </ReadCard>
+          <ReadCard title={asTitleLocal(t(TRANSPARENCY_SCREEN.cannotSeeHeadingKey))} icon={<EyeOffIcon />}>
+            <FactGroup>
+              {TRANSPARENCY_SCREEN.cannotSee.map((line) => {
+                const { lead, detail: more } = splitLine(t(line.key));
+                return <FactRow key={line.key} lead={lead} detail={more} mark="no" />;
+              })}
+            </FactGroup>
+          </ReadCard>
+          <ReadCard title={asTitleLocal(t(TRANSPARENCY_SCREEN.programHeadingKey))} icon={<PeopleIcon width={24} height={24} />}>
+            <FactGroup>
+              {TRANSPARENCY_SCREEN.program.map((line) => {
+                const { lead, detail: more } = splitLine(t(line.key));
+                return <FactRow key={line.key} lead={lead} detail={more} mark="yes" />;
+              })}
+            </FactGroup>
+          </ReadCard>
+          {/* The new card: the third, after the program's, and never in the guide's list. */}
+          <ReadCard title={PAM_WORDS.heading} icon={<MessagesIcon width={24} height={24} />}>
+            <FactGroup>
+              <FactRow lead={PAM_WORDS.line} detail={PAM_WORDS.grey} mark="yes" />
+            </FactGroup>
+          </ReadCard>
+          <Text type="supporting" xstyle={styles.helpIntro}>
+            {t(TRANSPARENCY_SCREEN.footerKey)}
+          </Text>
+        </>
+      ) : null}
+    </VStack>
+  );
+}
+
+function PrivacyFull() {
+  const { t } = useI18n();
+  return (
+    <SubPage title={t('transparency.title')} backHref="/legal/privacy/" backLabel={t('nav.back.legal')}>
+      <TransparencyWithPam detail />
+    </SubPage>
+  );
+}
+function PrivacyShort() {
+  const { t } = useI18n();
+  return (
+    <SubPage title={t('privacy.controls.title')} backHref="/legal/" backLabel={t('nav.back.legal')}>
+      <Text type="supporting" xstyle={styles.helpIntro}>
+        {t('privacy.controls.intro')}
+      </Text>
+      <TransparencyWithPam detail={false} />
+    </SubPage>
+  );
+}
+void TransparencyReading;
+/** The last step of signing up, and the full list: the Pam team's card is the third, after "A program can see". */
+export const L1_WhatOthersCanSeeFull: Story = { ...member('/legal/privacy/'), render: () => <PrivacyFull /> };
+/** Profile › What others can see, the short version: one more line, "Only the Pam team can see…". (The page's action rows below are not drawn.) */
+export const L2_WhatOthersCanSeeShort: Story = { ...member('/legal/privacy/'), render: () => <PrivacyShort /> };
 
 // The super admin's side (unchanged, plus photos in the composer)
 /** Help: the answers first, "Write to Pam" last, with its hint. */
