@@ -83,6 +83,11 @@ describe('the error log keeps what Privacy says it keeps (D-616)', () => {
     expect(sql).toMatch(/cron\.schedule\('sweep-app-errors', '[^']+', 'select public\.sweep_app_errors\(\)'\)/);
   });
 
+  it('keeps the per-account counters five minutes at most: they have their own sweep, every five minutes', () => {
+    expect(functionText('sweep_app_error_counters')).toMatch(/delete from public\.app_error_limits where minute < now\(\) - interval '5 minutes'/);
+    expect(sql).toMatch(/cron\.schedule\('sweep-app-error-counters', '\*\/5 \* \* \* \*', 'select public\.sweep_app_error_counters\(\)'\)/);
+  });
+
   it('is off until the switch is turned on, and writes nothing, not even a count, while it is off', () => {
     expect(sql).toMatch(/\('app_errors_live', 'off',/);
     const fn = functionText('report_app_error');
