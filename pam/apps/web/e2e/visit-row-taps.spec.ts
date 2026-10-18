@@ -61,19 +61,20 @@ async function pointsOnRow(page: Page, kind: 'visit' | 'interested', index: numb
   );
 }
 
+/**
+ * Opens the page and, for a schedule, steps on to the first day or week that has a visit. The example schedule is a pattern of the
+ * calendar, and on some days (a Sunday, for one) this week has nobody in it, so the page opens on a week with no rows.
+ */
 async function ready(page: Page, url: string, openDay = false) {
   await page.goto(url);
   await page.locator('html[data-row-taps]').waitFor({ state: 'attached' });
   await settled(page);
   await page.evaluate(() => document.fonts.ready);
-  // The Day, Week, Month switch is a set of segments, not tabs or buttons: found by its word.
-  if (openDay) {
-    await page.getByText('Day', { exact: true }).first().click();
-    // The day opens on today, which has nobody booked: step on to the first day that has a visit.
-    for (let step = 0; step < 8; step++) {
-      if ((await page.locator('.astryx-item', { hasText: /\d{1,2}:\d{2}\s?[AP]M/ }).count()) > 0) break;
-      await page.getByRole('button', { name: /^Next/ }).first().click();
-    }
+  if (openDay) await page.getByText('Day', { exact: true }).first().click();
+  if (url === '/interested/') return;
+  for (let step = 0; step < 12; step++) {
+    if ((await page.locator('.astryx-item', { hasText: /\d{1,2}:\d{2}\s?[AP]M/ }).count()) > 0) break;
+    await page.getByRole('button', { name: /^Next/ }).first().click();
   }
 }
 
