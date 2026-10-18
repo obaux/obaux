@@ -39,25 +39,35 @@ const SLOTS: readonly (readonly [number, number])[] = [
   [15, 30],
 ];
 
-function at(dayOffset: number, hour: number, minute: number): string {
-  const d = new Date();
+function at(today: Date, dayOffset: number, hour: number, minute: number): string {
+  const d = new Date(today);
   d.setDate(d.getDate() + dayOffset);
   d.setHours(hour, minute, 0, 0);
   return d.toISOString();
 }
 
+/** A calendar day as a whole number (the day on the phone's own calendar), so a pattern can be keyed on the date itself. */
+function dayNumber(day: Date): number {
+  return Math.floor(Date.UTC(day.getFullYear(), day.getMonth(), day.getDate()) / 86_400_000);
+}
+
 /**
  * Three weeks either side of today, weekdays only, between none and four
  * people a day — a pattern, not random, so a screenshot is the same twice.
+ *
+ * The count for a day is keyed on the date itself (its day number, mod 5), not on how far it is from today: a weekday's five days in a
+ * row come to each of 0 to 4 exactly once, so no Monday-to-Friday week is ever empty, whatever today is (it was empty on a Sunday: the
+ * old pattern, `offset * 7 + weekday`, is a multiple of 4 for every weekday of the coming week) and a day looks the same from any day.
+ * Today, when it is a weekday, always has four.
  */
-function build(): DummyAppointment[] {
+export function buildAppointments(today: Date): DummyAppointment[] {
   const out: DummyAppointment[] = [];
   for (let offset = -21; offset <= 35; offset += 1) {
-    const day = new Date();
+    const day = new Date(today);
     day.setDate(day.getDate() + offset);
     const weekday = day.getDay();
     if (weekday === 0 || weekday === 6) continue;
-    const count = offset === 0 ? 4 : Math.abs(offset * 7 + weekday) % 4;
+    const count = offset === 0 ? 4 : dayNumber(day) % 5;
     for (let i = 0; i < count; i += 1) {
       const slot = SLOTS[i]!;
       const person = PEOPLE[Math.abs(offset * 3 + i) % PEOPLE.length]!;
@@ -65,7 +75,7 @@ function build(): DummyAppointment[] {
         id: `dummy-appt-${offset}-${i}`,
         personId: person[0],
         firstName: person[1],
-        startsAt: at(offset, slot[0], slot[1]),
+        startsAt: at(today, offset, slot[0], slot[1]),
         minutes: i % 2 === 0 ? 60 : 30,
         kind: KINDS[Math.abs(offset + i) % KINDS.length]!,
       });
@@ -74,4 +84,4 @@ function build(): DummyAppointment[] {
   return out;
 }
 
-export const DUMMY_APPOINTMENTS: readonly DummyAppointment[] = build();
+export const DUMMY_APPOINTMENTS: readonly DummyAppointment[] = buildAppointments(new Date());
