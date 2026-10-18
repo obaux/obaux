@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useLiveTick } from './useLiveTick';
 
 /**
  * What has happened that this person has to act on.
@@ -50,7 +51,11 @@ export function unreadCount(state: NotificationsState): number {
   return state.status === 'ready' ? state.items.filter((item) => !item.isRead).length : 0;
 }
 
-export function useNotifications(enabled: boolean): {
+export function useNotifications(
+  enabled: boolean,
+  /** Look again on its own (the bell does; the notifications screen keeps its list as it opened, so it does not). */
+  live = true,
+): {
   state: NotificationsState;
   /**
    * Everything currently unread, in one write. Called once, by the
@@ -66,10 +71,16 @@ export function useNotifications(enabled: boolean): {
   const [state, setState] = useState<NotificationsState>({ status: 'loading' });
   const [nonce, setNonce] = useState(0);
   const refresh = useCallback(() => setNonce((n) => n + 1), []);
+  const { tick, settle } = useLiveTick(enabled && live, 30_000);
 
   useEffect(() => {
     if (!enabled) return;
     let cancelled = false;
+    let failed = false;
+    const fail = () => {
+      failed = true;
+      setState((prev) => (prev.status === 'ready' ? prev : { status: 'error' }));
+    };
 
     const load = async () => {
       try {
@@ -84,7 +95,7 @@ export function useNotifications(enabled: boolean): {
 
         if (cancelled) return;
         if (error) {
-          setState({ status: 'error' });
+          fail();
           return;
         }
 
@@ -113,16 +124,18 @@ export function useNotifications(enabled: boolean): {
           })),
         });
       } catch {
-        if (!cancelled) setState({ status: 'error' });
+        if (!cancelled) fail();
       }
     };
 
-    setState({ status: 'loading' });
-    void load();
+    setState((prev) => (prev.status === 'ready' ? prev : { status: 'loading' }));
+    void load().then(() => {
+      if (!cancelled) settle(!failed);
+    });
     return () => {
       cancelled = true;
     };
-  }, [enabled, nonce]);
+  }, [enabled, nonce, tick, settle]);
 
   const markAllSeen = useCallback(async () => {
     try {

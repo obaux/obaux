@@ -45,6 +45,9 @@ grant execute on function test.check_text(text, text, text) to authenticated, an
 \set root   '33333333-0000-0000-0000-000000000020'
 \set ivy    'cccccccc-0000-0000-0000-000000008201'
 \set wes    'cccccccc-0000-0000-0000-000000008205'
+\set lead_d 'cccccccc-0000-0000-0000-000000008206'
+\set org_d  'dddddddd-0000-0000-0000-000000008204'
+\set svc_d  'eeeeeeee-0000-0000-0000-000000008204'
 \set lead_a 'cccccccc-0000-0000-0000-000000008202'
 \set lead_b 'cccccccc-0000-0000-0000-000000008203'
 \set lead_c 'cccccccc-0000-0000-0000-000000008204'
@@ -54,26 +57,36 @@ grant execute on function test.check_text(text, text, text) to authenticated, an
 \set svc_a  'eeeeeeee-0000-0000-0000-000000008201'
 \set svc_n  'eeeeeeee-0000-0000-0000-000000008202'
 \set svc_g  'eeeeeeee-0000-0000-0000-000000008203'
+\set lead_d 'cccccccc-0000-0000-0000-000000008206'
+\set org_d  'dddddddd-0000-0000-0000-000000008204'
+\set svc_d  'eeeeeeee-0000-0000-0000-000000008204'
 \set region_north '11111111-0000-0000-0000-000000000001'
 
 reset role;
 select set_config('request.jwt.claim.sub', '', false);
 insert into auth.users (id, phone) values
-  (:'ivy', '12675550821'), (:'lead_a', '12675550822'), (:'lead_b', '12675550823'), (:'lead_c', '12675550824'), (:'wes', '12675550825');
+  (:'ivy', '12675550821'), (:'lead_a', '12675550822'), (:'lead_b', '12675550823'), (:'lead_c', '12675550824'), (:'wes', '12675550825'),
+  (:'lead_d', '12675550826');
 insert into public.orgs (id, name, type, region_id) values
   (:'org_a', 'Pam Msg Org A', 'program', :'region_north'),
   (:'org_c', 'Pam Msg Org C', 'program', :'region_north'),
-  (:'org_n', 'Pam Msg Org With Nobody', 'program', :'region_north');
+  (:'org_n', 'Pam Msg Org With Nobody', 'program', :'region_north'),
+  (:'org_d', 'Pam Msg Org D', 'program', :'region_north');
 insert into public.profiles (id, role, first_name, region_id, phone, access_status, org_id) values
   (:'ivy', 'member', 'Ivy', :'region_north', '+12675550821', 'active', null),
   (:'lead_a', 'provider', 'Lia', :'region_north', '+12675550822', 'active', :'org_a'),
   (:'lead_b', 'provider', 'Lob', :'region_north', '+12675550823', 'limited', :'org_a'),
   (:'lead_c', 'provider', 'Lic', :'region_north', '+12675550824', 'active', :'org_c'),
-  (:'wes', 'member', 'Wes', :'region_north', '+12675550825', 'active', null);
+  (:'wes', 'member', 'Wes', :'region_north', '+12675550825', 'active', null),
+  (:'lead_d', 'provider', 'Lud', :'region_north', '+12675550826', 'active', :'org_d');
+-- Lud leads Program D, and is using Pam as a member right now (0078): profiles.role says member, profile_roles still holds provider.
+insert into public.profile_roles (profile_id, role) values (:'lead_d', 'member');
+update public.profiles set role = 'member' where id = :'lead_d';
 insert into public.services (id, org_id, name, category, address, source, source_ref, needs_review, is_active) values
   (:'svc_a', :'org_a', 'Pam Msg Program A', 'workforce', '1 Pam St', 'manual', null, false, true),
   (:'svc_n', :'org_n', 'Pam Msg No Lead', 'workforce', '2 Pam St', 'manual', null, false, true),
-  (:'svc_g', null, 'Pam Msg Gathered', 'workforce', '3 Pam St', 'city_import', 'pam-msg-3', false, true);
+  (:'svc_g', null, 'Pam Msg Gathered', 'workforce', '3 Pam St', 'city_import', 'pam-msg-3', false, true),
+  (:'svc_d', :'org_d', 'Pam Msg Program D', 'workforce', '4 Pam St', 'manual', null, false, true);
 update public.app_settings set value = 'on' where key = 'pam_messaging_live';
 -- The clock is real, so Pam is open all week here: an out-of-hours reply would add a message the counts below do not expect (test 83 tests it).
 update public.app_settings set value = '{"tz":"America/New_York","days":[1,2,3,4,5,6,7],"open":"00:00","close":"23:59"}' where key = 'pam_hours';
@@ -185,6 +198,18 @@ select test.check('pam_program_has_lead says yes for a program with an active le
   (select case when public.pam_program_has_lead(:'svc_a') then 1 else 0 end)
   + (select case when public.pam_program_has_lead(:'svc_n') then 10 else 0 end)
   + (select case when public.pam_program_has_lead(:'svc_g') then 100 else 0 end), 1);
+reset role;
+select test.check('control: Lud holds provider but is acting as a member (that is the case under test)',
+  (select count(*) from public.profiles where id = :'lead_d' and role = 'member')
+  + (select count(*) from public.profile_roles where profile_id = :'lead_d' and role = 'provider'), 2);
+set role authenticated;
+select test.as_user(:'root');
+select test.check('a lead who is using Pam as a member is still a lead Pam can write to (pam_program_has_lead)',
+  (select case when public.pam_program_has_lead(:'svc_d') then 1 else 0 end), 1);
+select test.check('...and the program text reaches them (pam_start_program_conversation)',
+  public.pam_start_program_conversation(:'svc_d', 'Hello Program D')::bigint, 1);
+select test.check('...in their own Pam conversation',
+  (select count(*) from public.pam_inbox() where asker_id = :'lead_d' and preview = 'Hello Program D'), 1);
 select test.check_raises_like('a program with no lead on Pam raises PAM_NO_ACTIVE_LEAD',
   format($$ select public.pam_start_program_conversation(%L, 'hi') $$, :'svc_n'), '%PAM_NO_ACTIVE_LEAD%');
 select test.check_raises_like('...and so does a place Pam gathered from the internet (no organisation)',
