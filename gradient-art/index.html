@@ -18,6 +18,16 @@
   #phase { font-size: clamp(12px, 2.3vmin, 20px); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; opacity: .78; }
   #count { font-size: clamp(30px, 8vmin, 68px); font-weight: 300; line-height: 1; font-variant-numeric: tabular-nums; opacity: .85; }
 
+  #guide[data-ink=light] { color: #fff; text-shadow: 0 1px 14px rgba(0,0,0,.45); }
+  #guide[data-pos=below] { place-content: end center; padding-bottom: clamp(70px, 14vmin, 130px); }
+  #guide[data-pos=below] #count { font-size: clamp(28px, 6vmin, 52px); }
+  #styles {
+    position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 5; display: flex; gap: 4px; padding: 4px;
+    max-width: calc(100% - 24px); box-sizing: border-box; overflow-x: auto; border-radius: 999px;
+    background: rgba(20,18,20,.6); backdrop-filter: blur(8px);
+  }
+  #styles button { margin: 0; padding: 6px 12px; border-radius: 999px; background: transparent; font-size: 12px; touch-action: manipulation; }
+  #styles button.active { background: rgba(255,255,255,.18); }
   #panel {
     position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); width: 300px; max-height: 70%; overflow: auto;
     padding: 12px; border-radius: 10px; background: rgba(20,18,20,.82); color: #eee;
@@ -44,15 +54,17 @@
     #toggle { bottom: 20px; }
     .row input[type=range] { width: 55%; }
     #hint { display: none; }
+    #styles button { padding: 6px 9px; }
   }
 </style>
 </head>
 <body>
 <div id="stage"><canvas id="c"></canvas></div>
 <div id="guide" aria-live="off"><div id="phase">Breathe in</div><div id="count">4</div></div>
+<div id="styles"></div>
 <button id="toggle" type="button">Controls</button>
 <div id="panel"></div>
-<div id="hint">press C for controls · space to pause</div>
+<div id="hint">press C for controls · 1–5 switch style · space to pause</div>
 
 <script id="fs" type="x-shader/x-fragment">
 precision highp float;
@@ -79,6 +91,7 @@ uniform vec3 uBlobD;      // lower body: blue-grey
 uniform vec3 uBase;       // lower body base wash
 uniform vec3 uHighlight;  // glassy edge shine, liquid specular, guide ring
 uniform float uGlass;     // 0 = flat, 1 = full refraction / shine
+uniform float uStyle;     // 0 sphere · 1 bloom · 2 horizon · 3 ripple · 4 lotus
 
 const vec2  C    = vec2(0.5, 0.5);   // sphere centre
 const float RMIN = 0.19;             // radius when fully exhaled
@@ -120,8 +133,8 @@ vec3 blob(vec3 acc, inout float wsum, vec2 p, vec2 c, float r, vec3 col) {
   return acc + col * w;
 }
 
-void main() {
-  vec2 p = gl_FragCoord.xy / uRes;     // 0..1, y up (canvas is square)
+// ===== style 0: sphere — a perfect circle that grows and shrinks =====
+vec3 styleSphere(vec2 p) {
   float t = uTime * uMotion;
 
   // ---- outline: a perfect circle whose radius follows the breath ----
@@ -205,6 +218,121 @@ void main() {
   col += uHighlight * exp(-inside * 110.0) * inMask * lit * zone * 0.8 * uGlass;
   col *= 1.0 - 0.18 * uGlass * exp(-inside * 45.0) * inMask * (1.0 - lit) * zone;
 
+  return col;
+}
+
+// the warm glow from the original image, shared by the styles below
+vec3 backdrop(vec2 p) {
+  float up = min(smoothstep(0.66, 0.12, p.y + 0.10 * abs(p.x - C.x)) * (0.85 + 0.30 * uBreath), 1.0);
+  vec3 glow = mix(uGlowRed, uGlowOrange, smoothstep(0.34, 0.04, p.y));
+  return mix(uBg, glow, up) * (1.0 - 0.3 * smoothstep(0.40, 0.75, length(p - vec2(0.5, 0.25))));
+}
+
+// ===== style 1: bloom — the green ball never moves; the colours inside breathe =====
+vec3 styleBloom(vec2 p) {
+  float t = uTime * uMotion;
+  vec2 v = p - C;
+  float len = length(v);
+  vec2 w = vec2(fbm(p * 2.0 + vec2(0.0, t * 0.12)), fbm(p * 2.0 + vec2(5.2, -t * 0.10))) - 0.44;
+  float dn = length(v + w * 0.10 * uMotion) / 0.30;      // 0 at the centre, 1 at the nominal edge
+  float d = dn / mix(0.42, 1.0, uBreath);                 // exhale: colours gather in; inhale: they spread out
+
+  vec3 c = mix(uYellow, uPink, sstep(0.0, 0.50, d));
+  c = mix(c, uYellow, sstep(0.38, 1.00, d));
+  c = mix(c, uTop,    sstep(0.80, 1.45, d));
+  c += uHighlight * 0.14 * uBreath * exp(-dn * dn * 5.0);
+
+  vec3 bg = backdrop(p);
+  bg = mix(bg, uTop * 0.55, 0.20 * (0.5 + 0.5 * uBreath) * exp(-max(len - 0.30, 0.0) * 9.0));
+  float mask = 1.0 - smoothstep(0.55, 1.05, dn);          // wide feather: no outline anywhere
+  return mix(bg, c, mask);
+}
+
+// ===== style 2: horizon — a sun rises on the inhale and sets on the exhale =====
+vec3 styleHorizon(vec2 p) {
+  float t = uTime * uMotion;
+  const float HY = 0.24;
+  float sunR = mix(0.15, 0.22, uBreath);
+  vec2 sc = vec2(0.5, mix(0.14, 0.52, uBreath));
+  float ds = length(p - sc);
+
+  float skyK = smoothstep(0.85, HY, p.y);
+  vec3 sky = mix(uBg, mix(uGlowRed, uGlowOrange, smoothstep(0.55, HY, p.y)), skyK * (0.35 + 0.65 * uBreath));
+  sky = mix(sky, uGlowOrange, exp(-ds * ds / 0.12) * (0.30 + 0.55 * uBreath));
+  vec3 sunC = mix(uYellow, uPink, smoothstep(0.0, sunR, ds));
+  sky = mix(sky, sunC, 1.0 - smoothstep(sunR * 0.55, sunR, ds));
+
+  float below = smoothstep(0.0, HY, p.y);
+  vec3 water = mix(uBg * 0.8, mix(uGlowRed, uGlowOrange, 0.5) * 0.45, below);
+  float spread = 0.04 + 0.12 * (HY - p.y);
+  float refl = exp(-pow((p.x - 0.5) / spread, 2.0)) * (0.25 + 0.75 * uBreath) * below;
+  refl *= 0.55 + 0.45 * sin(p.y * 140.0 - t * 2.0 + sin(p.x * 22.0) * 2.0);
+  water += mix(uGlowOrange, uYellow, 0.5) * refl * 0.6;
+
+  float land = 1.0 - smoothstep(HY - 1.5 / uRes.y, HY + 1.5 / uRes.y, p.y);
+  vec3 col = mix(sky, water, land);
+  col += uHighlight * 0.18 * (0.3 + 0.7 * uBreath) * exp(-abs(p.y - HY) * uRes.y / 1.4);
+  return col;
+}
+
+// ===== style 3: ripple — glowing rings spread out and draw back in =====
+vec3 styleRipple(vec2 p) {
+  float t = uTime * uMotion;
+  vec2 v = p - vec2(0.5, 0.56);                          // raised a little so the cue sits clear below
+  float len = length(v), ang = atan(v.y, v.x);
+  float sc = mix(0.55, 1.0, uBreath);
+  vec3 col = mix(uBg, backdrop(p), 0.55);
+  float core = mix(0.05, 0.09, uBreath);
+  col = 1.0 - (1.0 - col) * (1.0 - uYellow * 0.45 * exp(-len * len / (core * core)));   // screen blend: layers never clip to white
+  for (int i = 0; i < 6; i++) {
+    float fi = float(i);
+    float r = 0.045 * (fi + 1.6) * sc + 0.003 * sin(ang * (3.0 + fi) + t * (0.6 + 0.2 * fi)) * uMotion;
+    float w = (0.008 + 0.003 * fi) * sc;
+    float x = (len - r) / w;
+    float line = exp(-x * x) * 0.85 + exp(-x * x / 9.0) * 0.18;
+    vec3 rc = fi < 0.5 ? uYellow : fi < 1.5 ? uPink : fi < 2.5 ? uBlobA : fi < 3.5 ? uBlobC : fi < 4.5 ? uTop : uBlobD;
+    col = 1.0 - (1.0 - col) * (1.0 - rc * line * (1.0 - 0.07 * fi));
+  }
+  return col;
+}
+
+// ===== style 4: lotus — three rings of petals open and close =====
+vec3 styleLotus(vec2 p) {
+  float t = uTime * uMotion;
+  vec2 v = p - vec2(0.5, 0.56);
+  float len = length(v);
+  float open = uBreath;
+  vec3 col = mix(uBg, backdrop(p), 0.6);
+  float gr = mix(0.12, 0.20, open);
+  col = 1.0 - (1.0 - col) * (1.0 - uTop * 0.22 * exp(-len * len / (gr * gr)));          // soft glow behind the flower
+  float rotA = t * 0.08 + open * 0.6;
+  for (int layer = 0; layer < 3; layer++) {              // outer green, then pink, then yellow on top
+    float fl = float(layer);
+    float cd = mix(0.02, 0.15 - 0.045 * fl, open);        // petal centre distance
+    float L  = mix(0.055, 0.11 - 0.025 * fl, open);       // half length
+    float Wd = mix(0.045, 0.075 - 0.010 * fl, open);      // half width
+    vec3 pc = fl < 0.5 ? uTop : fl < 1.5 ? uPink : uYellow;
+    float a0 = rotA * (1.0 - 0.5 * fl) + fl * 0.3927;
+    for (int k = 0; k < 8; k++) {
+      float a = a0 + float(k) * 0.785398;
+      vec2 dk = vec2(cos(a), sin(a));
+      float u = dot(v, dk) - cd, w2 = dot(v, vec2(-dk.y, dk.x));
+      float e = exp(-(u * u) / (L * L) - (w2 * w2) / (Wd * Wd));
+      col = mix(col, pc, smoothstep(0.08, 0.65, e) * 0.92);
+    }
+  }
+  return col;
+}
+
+void main() {
+  vec2 p = gl_FragCoord.xy / uRes;     // 0..1, y up (canvas is square)
+  vec3 col;
+  if      (uStyle < 0.5) col = styleSphere(p);
+  else if (uStyle < 1.5) col = styleBloom(p);
+  else if (uStyle < 2.5) col = styleHorizon(p);
+  else if (uStyle < 3.5) col = styleRipple(p);
+  else                   col = styleLotus(p);
+
   // dither to hide banding in the big gradients
   col += (hash(gl_FragCoord.xy + fract(uTime)) + hash(gl_FragCoord.yx + 7.3 + fract(uTime * 1.7)) - 1.0) / 255.0;
   gl_FragColor = vec4(col, 1.0);
@@ -249,6 +377,13 @@ const PATTERNS = {
   box:       { label: 'Box · 4-4-4-4',           phases: [['in', 4], ['full', 4], ['out', 4], ['empty', 4]] },
 };
 const CUES = { in: 'Breathe in', out: 'Breathe out', full: 'Hold', empty: 'Hold' };
+const STYLES = {
+  sphere:  { label: 'Sphere',  ink: 'dark',  pos: 'center' },   // perfect circle, grows and shrinks
+  bloom:   { label: 'Bloom',   ink: 'dark',  pos: 'center' },   // fixed soft green ball, colours breathe inside
+  horizon: { label: 'Horizon', ink: 'light', pos: 'below'  },   // sun rises and sets
+  ripple:  { label: 'Ripple',  ink: 'light', pos: 'below'  },   // rings spread out and draw in
+  lotus:   { label: 'Lotus',   ink: 'light', pos: 'below'  },   // petals open and close
+};
 const ease = u => 0.5 - 0.5 * Math.cos(Math.PI * u);      // slow start, slow finish, like a real breath
 
 // returns { v: 0..1 sphere size, kind, left: whole seconds remaining, cycle }
@@ -287,13 +422,14 @@ const U = n => gl.getUniformLocation(prog, n);
 const hex2rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
 const state = {
   speed: 1, motion: 0.45, glass: 0.7,              // look of the colour flow inside the sphere
-  playing: true, time: 0, clock: 0, pattern: 'calm', // clock = seconds of breathing, independent of flow speed
+  playing: true, time: 0, clock: 0, pattern: 'calm', style: 'bloom', // clock = seconds of breathing, independent of flow speed
   px: .5, py: .5, tx: .5, ty: .5, press: 0, tpress: 0,
 };
 const params = new URLSearchParams(location.search);
 if (params.has('t'))       state.clock = +params.get('t');      // jump to a moment in the breath cycle
 if (params.has('motion'))  state.motion = +params.get('motion');
 if (params.has('glass'))   state.glass = +params.get('glass');
+if (params.has('style') && STYLES[params.get('style')]) state.style = params.get('style');
 if (params.has('pattern') && PATTERNS[params.get('pattern')]) state.pattern = params.get('pattern');
 
 function resize() {
@@ -318,6 +454,7 @@ function draw(b) {
   gl.uniform1f(U('uMotion'), state.motion);
   gl.uniform1f(U('uGlass'), state.glass);
   gl.uniform1f(U('uBreath'), b.v);
+  gl.uniform1f(U('uStyle'), Object.keys(STYLES).indexOf(state.style));
   gl.uniform2f(U('uPointer'), state.px, state.py);
   gl.uniform1f(U('uPress'), state.press);
   for (const k in PALETTE) gl.uniform3fv(U(k), hex2rgb(PALETTE[k]));
@@ -366,7 +503,7 @@ for (const k in PALETTE) {
 }
 panel.insertAdjacentHTML('beforeend', `<h2 style="margin-top:12px">Colour flow</h2>
   <div class="row"><span>Amount</span><input id="motion" type="range" min="0" max="2" step=".05" value="${state.motion}"></div>
-  <div class="row"><span>Glass</span><input id="glass" type="range" min="0" max="1.5" step=".05" value="${state.glass}"></div>
+  <div class="row"><span>Glass (sphere)</span><input id="glass" type="range" min="0" max="1.5" step=".05" value="${state.glass}"></div>
   <div class="row"><span>Speed</span><input id="speed" type="range" min="0" max="3" step=".05" value="${state.speed}"></div>
   <button id="png" type="button">Save PNG</button>`);
 const patternSel = panel.querySelector('#pattern');
@@ -382,6 +519,17 @@ pauseBtn.onclick = togglePlay;
 panel.querySelector('#png').onclick = () => {
   draw(breathAt(PATTERNS[state.pattern], state.clock)); const a = document.createElement('a'); a.download = 'breath.png'; a.href = canvas.toDataURL('image/png'); a.click();
 };
+const stylesEl = document.getElementById('styles'), guideEl = document.getElementById('guide');
+function setStyle(name) {
+  if (!STYLES[name]) return;
+  state.style = name; guideEl.dataset.ink = STYLES[name].ink; guideEl.dataset.pos = STYLES[name].pos;
+  for (const b of stylesEl.children) b.classList.toggle('active', b.dataset.style === name);
+}
+for (const [k, st] of Object.entries(STYLES)) {
+  const b = document.createElement('button'); b.type = 'button'; b.dataset.style = k; b.textContent = st.label;
+  b.onclick = () => setStyle(k); stylesEl.appendChild(b);
+}
+setStyle(state.style);
 const toggleBtn = document.getElementById('toggle');
 const setPanel = open => { panel.classList.toggle('hidden', !open); toggleBtn.classList.toggle('open', open); };
 toggleBtn.onclick = () => setPanel(true);
@@ -390,8 +538,9 @@ setPanel(false);   // the breath is the page; controls stay out of the way until
 addEventListener('keydown', e => {
   if (e.key === 'c' || e.key === 'C') setPanel(panel.classList.contains('hidden'));
   if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+  const n = '12345'.indexOf(e.key); if (n >= 0 && n < Object.keys(STYLES).length) setStyle(Object.keys(STYLES)[n]);
 });
-if (params.has('clean')) { toggleBtn.remove(); document.getElementById('hint').remove(); }
+if (params.has('clean')) { toggleBtn.remove(); stylesEl.remove(); document.getElementById('hint').remove(); }
 
 // ------------------------------------------------------- public API
 window.art = {
@@ -399,6 +548,7 @@ window.art = {
   setColors(map) { for (const k in map) if (k in PALETTE) { PALETTE[k] = map[k]; if (inputs[k]) inputs[k].value = map[k]; } setInk(); },
   setPattern(name) { if (PATTERNS[name]) { state.pattern = name; state.clock = 0; patternSel.value = name; } },
   addPattern(name, label, phases) { PATTERNS[name] = { label, phases }; patternSel.add(new Option(label, name)); },
+  setStyle,
   setSpeed(v)  { state.speed = v; },
   setMotion(v) { state.motion = v; },
   setGlass(v)  { state.glass = v; },
