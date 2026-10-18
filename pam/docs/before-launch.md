@@ -11,6 +11,15 @@ STATUS row too.
 
 ## Open
 
+- [ ] **The error log: the Privacy line is signed before `app_errors_live` turns on** (Lena for Mira, 18 October 2026, D-616; Will).
+  Nico's `public.app_errors` keeps a short note when something breaks (when, route, action, error code, a short detail, app build, platform,
+  role, locale; no account, phone, message or place) for 30 days, and super admins read it. It is off until `app_errors_live` is on.
+  (1) **Will signs the line** in `docs/legal/2026-10-18-error-log-privacy-read.md` section 2 (or Sage's edit of it) **before the switch turns
+  on**: nothing is kept while it is off, so the line goes live the same day (`legal:date privacy`), not earlier. (2) Lena translates it in six
+  languages after the signature and pins it against Nico's migration (the detail never copies an error's own message; the route has no ids;
+  only super admins can select; the delete after 30 days exists). (3) Thirty days is longer than the request log's week: say if a week would do.
+  (4) The line does not say the notes are anonymous: for the first week the request log also holds the call that wrote one.
+
 - [ ] **Google Calendar sync: waiting until Will wants it on** (a71, 12 October 2026: "wait until we switch sync on. Not now."). It is built and held on the branch `claude/places-programs-google-sync` (head 5f1e70ae; D-539): not merged, not deployed, no migration applied. When Will asks for it, its two Privacy lines come back on a card with the Google Cloud checklist (the full checklist is in that branch's `docs/before-launch.md`). The calendar link (D-538) is separate and does not need it.
 
 - [ ] **Calendar link: someone taps it on a real phone** (Piper, 11 October 2026, D-538). (1) On an Android phone, make a link on
