@@ -1300,7 +1300,7 @@
   "nav.back.about": "Volver a Sobre Pam",
   "glossary.trip.term": "Visita",
   "glossary.trip.definition": "Una visita es el plan de un miembro para ir a un programa: el lugar, el día y la hora. Aparece en su mapa de Visitas, y el programa también la ve.",
-  "glossary.whatIs": "¿Qué es un {term}?",
+  "glossary.whatIs": "¿Qué es una {term}?",
   "alerts.trip": "Alguien planea una visita",
   "alerts.visit": "Un recordatorio antes de tu visita",
   "alerts.closed": "Un lugar guardado cierra o se muda",
