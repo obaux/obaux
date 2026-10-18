@@ -5000,7 +5000,7 @@ index 0c869732..c2820f44 100644
          </P>
          <ReadMore label="Texts from Pam: which ones, and why one didn’t come" href="/support/texts-from-pam/" />
 diff --git a/pam/apps/site/src/content/TextsFromPam.tsx b/pam/apps/site/src/content/TextsFromPam.tsx
-index ff3589fa..ee5f8268 100644
+index ff3589fa..45af4f6a 100644
 --- a/pam/apps/site/src/content/TextsFromPam.tsx
 +++ b/pam/apps/site/src/content/TextsFromPam.tsx
 @@ -61,8 +61,8 @@ export function TextsFromPam() {
@@ -5038,7 +5038,7 @@ index ff3589fa..ee5f8268 100644
 +          shots={[
 +            {
 +              name: 'texts-from-pam/reminders.png',
-+              alt: 'The “Get text alerts” screen in Pam. A list headed “Kinds of texts”, with “A saved place closes or moves” and “A reminder before your trip”. A “Coming soon” label sits beside the reminder. Under the list, a line says Pam sends one text each time something on the list happens, and that you can reply STOP to stop. Then two buttons: “Agree to receive texts” and “Not now”.',
++              alt: 'The “Get text alerts” screen in Pam. A list headed “Kinds of texts”, with “A saved place closes or moves” and “A reminder before your trip”. A “Coming soon” label sits beside the reminder. Under the list, a line says Pam sends one text each time something on the list happens, that you can reply STOP to stop or HELP for help, and that text and data rates may apply. Then two buttons: “Agree to receive texts” and “Not now”.',
 +              caption: 'The “Get text alerts” screen.',
 +            },
 +            {
