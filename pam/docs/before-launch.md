@@ -12,7 +12,7 @@ STATUS row too.
 ## Open
 
 - [ ] **The error log: the Privacy line is signed before `app_errors_live` turns on** (Lena for Mira, 18 October 2026, D-616; Will).
-  Nico's `public.app_errors` keeps a short note when something breaks (when, route, action, error code, a short detail, app build, platform,
+  Nico's `public.app_errors` keeps a short note when something breaks (when, route, action, error code, app build, platform,
   role, locale; no account, phone, message or place) for 30 days, and super admins read it. It is off until `app_errors_live` is on.
   (1) **Will signs the line** in `docs/legal/2026-10-18-error-log-privacy-read.md` section 2 (or Sage's edit of it) **before the switch turns
   on**: nothing is kept while it is off, so the line goes live the same day (`legal:date privacy`), not earlier. (2) Lena translates it in six
