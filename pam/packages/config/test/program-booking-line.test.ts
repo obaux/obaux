@@ -143,8 +143,10 @@ describe('the Privacy paragraph Will signed (card a94, 17 October 15:21)', () =>
     expect(EN['privacy.s.sharing.p9']).toBe(
       "If you have written to a program, signed up with it or planned a visit there, it can book a visit for you. It shows in your Trips with the program's name, and you can cancel it.",
     );
-    // Numbering has no gaps: the held Google calendar line (D-539) is the one after it, `sharing.p10`.
-    expect(EN['privacy.s.sharing.p10']).toBeUndefined();
+    // Numbering has no gaps: one visit added to a calendar (a98, Will signed it 18 October) is the one after it, `sharing.p10`, and
+    // the held Google calendar line (D-539) the one after that, `sharing.p11`.
+    expect(EN['privacy.s.sharing.p10']).toMatch(/^If you add one visit to your calendar/);
+    expect(EN['privacy.s.sharing.p11']).toBeUndefined();
     expect(EN['privacy.s.sharing.p8']).toBeDefined();
   });
 

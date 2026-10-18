@@ -168,6 +168,25 @@ export const DATA_COLLECTED: readonly CollectedData[] = [
     },
   },
   {
+    id: 'calendar-link',
+    what:
+      'Which calendar a member says they use (Apple, Google, Outlook or another), picked on Profile > Calendar, and the day they ' +
+      'linked it, with the link\'s version number and a random id Pam makes (`calendar_links`: `calendar`, `linked_on`, `version`, ' +
+      '`lookup_id`; a migration of 18 October 2026, D-604). Not the address itself: it is made from the id and the version with ' +
+      'a key only the database holds, and made again each time the member asks to see it. Nothing is kept for one visit added ' +
+      'from a booked card: the file is made on the phone and Google\'s page is a tap (`AddVisitToCalendar`, pinned in ' +
+      '`calendar-link-line.test.ts`).',
+    covers: {
+      keys: ['privacy.s.what-we-keep.p12', 'privacy.s.sharing.p6', 'privacy.s.sharing.p10'],
+      says: [
+        'a secret code it can make the link from again',
+        'which link is your newest',
+        'which calendar you told pam you use and the day you linked it',
+        'for one visit, pam does not see which calendar you choose',
+      ],
+    },
+  },
+  {
     id: 'program-details',
     what: 'A program\'s name, kind, address, phone, website, description and services, typed by its lead (join, Program tab).',
     covers: {
@@ -201,6 +220,7 @@ export const INPUT_FILES: readonly InputFile[] = [
   { file: 'apps/web/src/app/messages/ThreadView.tsx', fields: 5, collects: ['messages'] },
   { file: 'apps/web/src/screens/MemberPoliciesView.tsx', fields: 2, collects: ['signature'] },
   { file: 'apps/web/src/screens/NewTripView.tsx', fields: 1, collects: ['visit-note'] },
+  { file: 'apps/web/src/lib/useCalendarLink.ts', fields: 1, collects: ['calendar-link'] },
   { file: 'apps/web/src/screens/SupportReplyScreen.tsx', fields: 1, collects: ['help-desk-reply'] },
   { file: 'apps/web/src/app/flag/page.tsx', fields: 1, collects: ['place-report'] },
   { file: 'packages/ui/src/ProfileCards.tsx', fields: 2, collects: ['staff-photo'] },
