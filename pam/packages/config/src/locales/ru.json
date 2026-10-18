@@ -1822,5 +1822,8 @@
   "calendar.keepPrivate": "Keep this link to yourself.",
   "calendar.newLink.title": "Get a new link?",
   "calendar.newLink.body": "The old link stops working. Add the new one to your calendar again.",
-  "calendar.newLink.confirm": "Get a new link"
+  "calendar.newLink.confirm": "Get a new link",
+  "calendar.kind.other.inline": "your calendar",
+  "trips.addToCalendar.linked": "Goes to {calendar}",
+  "trips.addToCalendar.linked.label": "Goes to {calendar} through your calendar link. Opens Calendar."
 }

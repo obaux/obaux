@@ -167,7 +167,7 @@ export function CalendarLinkView() {
                 { id: 'new', label: t('calendar.newLink'), description: t('calendar.newLink.hint'), icon: <RefreshIcon width={26} height={26} />, onSelect: () => setAsking('new') },
                 {
                   id: 'off',
-                  label: calendar ? t('calendar.disconnect', { calendar: calendarName(calendar) }) : t('calendar.off'),
+                  label: calendar && calendar !== 'other' ? t('calendar.disconnect', { calendar: calendarName(calendar) }) : t('calendar.off'),
                   description: t('calendar.disconnect.hint'),
                   icon: <CrossIcon width={26} height={26} />,
                   onSelect: () => setAsking('off'),
@@ -199,9 +199,9 @@ export function CalendarLinkView() {
       />
       <ConfirmDialog
         isOpen={asking === 'off'}
-        title={calendar ? t('calendar.disconnect.title', { calendar: calendarName(calendar) }) : t('calendar.off.title')}
+        title={calendar && calendar !== 'other' ? t('calendar.disconnect.title', { calendar: calendarName(calendar) }) : t('calendar.off.title')}
         body={t('calendar.off.body')}
-        confirmLabel={calendar ? t('calendar.disconnect.confirm') : t('calendar.off.confirm')}
+        confirmLabel={calendar && calendar !== 'other' ? t('calendar.disconnect.confirm') : t('calendar.off.confirm')}
         onConfirm={() => {
           setAsking(null);
           void turnOff();
