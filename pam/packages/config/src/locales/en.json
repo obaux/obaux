@@ -1783,5 +1783,17 @@
   "pam.program.action": "Message this program",
   "pam.program.noLead": "Nobody runs this program in Pam right now, so it can't get messages.",
   "pam.inbox.sent": "Sent to {count} leads.",
-  "pam.inbox.sent.one": "Sent to {count} lead."
+  "pam.inbox.sent.one": "Sent to {count} lead.",
+  "pam.hours.title": "Pam's hours",
+  "pam.hours.row": "Pam's hours",
+  "pam.hours.days": "Days",
+  "pam.hours.times": "Times ({zone} time)",
+  "pam.hours.open": "Opens",
+  "pam.hours.close": "Closes",
+  "pam.hours.preview": "Outside these hours, people get this reply",
+  "pam.hours.save": "Save",
+  "pam.hours.said.saved": "Saved.",
+  "pam.hours.said.failed": "That didn't go through. Try again.",
+  "pam.hours.said.noDays": "Pick at least one day.",
+  "pam.hours.said.order": "Pam has to close after it opens."
 }

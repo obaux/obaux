@@ -7,7 +7,7 @@ import { List, ListItem } from '@astryxdesign/core/List';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { Loading, MessagesIcon, Notice, Page } from '@pam/ui';
+import { ClockIcon, Loading, MessagesIcon, Notice, Page } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { NOTICES } from '@pam/config';
@@ -222,6 +222,11 @@ export function PamInboxScreen() {
       <Text xstyle={styles.stat}>
         {reply ? t(`pam.inbox.replyTime.${reply.unit}`, { count: reply.count }) : t('pam.inbox.replyTime.none')}
       </Text>
+      {/* When Pam is here: the hours the out-of-hours reply follows (S4). */}
+      <MenuList
+        label={tPlain('pam.hours.row')}
+        items={[{ id: 'hours', label: t('pam.hours.row'), href: '/pam/hours/', icon: <ClockIcon width={26} height={26} aria-hidden /> }]}
+      />
     </Page>
   );
 }

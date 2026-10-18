@@ -93,6 +93,17 @@ export const MessagesToPamEmpty: Story = {
   name: 'Messages to Pam — nobody waiting',
   render: () => <>{REDESIGN_ROUTES['/pam/messages/']!.render()}</>,
 };
+// Pam writes first (card a100, Dot's b5, b6): to a person from Everyone, and to a program's leads from its page.
+export const PamStartPerson: Story = screen('super-admin', 'Pam writes first — to a person', '/pam/start/', {
+  profile: 'a0000000-0000-4000-8000-0000000000c1',
+  name: 'Aaliyah',
+});
+export const PamStartProgram: Story = screen('super-admin', 'Pam writes first — to a program', '/pam/start/', {
+  service: 'dummy-place-learning',
+  name: 'Second Chance Workforce Training',
+});
+// When Pam is here: the days and times, and the out-of-hours reply as people will get it.
+export const PamHours: Story = screen('super-admin', "Pam's hours", '/pam/hours/');
 /** ...and nobody waiting yet: the empty state's two lines, for the fit audit (Lena). */
 export const WaitingCitiesEmpty: Story = {
   ...asRole('super-admin', '/cities/waiting/', { from: 'home' }, { noWaitingCities: true }),
