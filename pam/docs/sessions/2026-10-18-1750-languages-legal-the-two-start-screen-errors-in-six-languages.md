@@ -10,7 +10,7 @@ Lena, on `claude/lena-start-errors`, on Ava's `claude/pam-message-pam-admin` @ `
 
 ## Found
 
-Both lines are drawn by no story: the failed state is reached by a send that fails, and `PamStartPerson` / `PamStartProgram` draw only the screen before it. Both lines are wrapping text (a card body, a supporting line), with no fixed width, so a cut is not expected; the 320 audit cannot confirm it. A story per state needs the mock to answer `pam_start_conversation` with an error (and `PAM_OFF` / `NOT_ALLOWED` for the calm line).
+Neither line was drawn by any story when I first looked (the failed state is reached by a send that fails). Ava then wrote four (`super-admin-screens--pam-start-person-failed`, `…-program-failed`, `…-person-not-allowed`, `…-person-off`), and Mira asked for the audit on them (18:05). On her head `18518e7a`: **0 findings new in a language at 320×760 and 320×568 in seven languages** (6 stories × 7), and the one English ellipsis at 568 is the design's own. A separate check opened each of the four stories in each of the seven languages and found the signed line in the page text every time (28 of 28; `pam.inbox.off` for the off state), so the clean audit is of the real lines, not of an empty screen.
 
 ## Left undone
 
