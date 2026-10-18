@@ -109,6 +109,10 @@ export interface MockOptions {
   readonly staffReview?: 'pair' | 'city' | 'decided' | 'other' | 'addedToExisting';
   /** Nobody waiting for a city yet (D-593): the list's empty state. */
   readonly noWaitingCities?: boolean;
+  /** Message Pam is switched off (D-605): `pam_status` says so and nothing else about Pam is shown. */
+  readonly pamOff?: boolean;
+  /** The Pam team's inbox is empty. */
+  readonly pamInboxEmpty?: boolean;
 }
 
 /** A real place of the catalogue, to plan a trip to in a story (the examples' ids are not real). */
@@ -415,6 +419,37 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
         { place: 'Norristown', people: 1 },
       ],
     })),
+    // Message Pam (D-605, D-606): the switch and the hours, a person's own conversation, and the Pam team's inbox and actions.
+    on('/rpc/pam_status', () => ({
+      body: [{
+        live: !options.pamOff, hours_tz: 'America/New_York', hours_days: [1, 2, 3, 4, 5], hours_open: '09:00:00', hours_close: '17:00:00',
+        open_now: true, next_open: null,
+      }],
+    })),
+    on('/rpc/open_pam_conversation', () => ({ body: options.pamOff ? null : 'c0000000-0000-4000-8000-0000000000a1' })),
+    on('/rpc/pam_inbox', () => ({
+      body: options.pamInboxEmpty ? [] : [
+        { conversation_id: 'c0000000-0000-4000-8000-0000000000b1', asker_id: 'a0000000-0000-4000-8000-0000000000b1', first_name: 'Marcus', role: 'member',
+          region_name: 'Philadelphia', program_name: null, status: 'open', last_message_at: onTheHour(0, 8), last_from: 'asker',
+          waiting_since: onTheHour(0, 8), preview: 'I cannot find my program on the map' },
+        { conversation_id: 'c0000000-0000-4000-8000-0000000000b2', asker_id: 'a0000000-0000-4000-8000-0000000000b2', first_name: 'Alice', role: 'provider',
+          region_name: 'Philadelphia', program_name: 'Second Chance Workforce Training', status: 'open', last_message_at: onTheHour(-1, 15), last_from: 'asker',
+          waiting_since: onTheHour(-1, 15), preview: 'Our Thursday class moved to the new address' },
+        { conversation_id: 'c0000000-0000-4000-8000-0000000000b3', asker_id: 'a0000000-0000-4000-8000-0000000000b3', first_name: 'Dana', role: 'admin',
+          region_name: 'Philadelphia', program_name: null, status: 'open', last_message_at: onTheHour(-2, 11), last_from: 'team',
+          waiting_since: null, preview: 'You are all set. Thank you for the report.' },
+        { conversation_id: 'c0000000-0000-4000-8000-0000000000b4', asker_id: 'a0000000-0000-4000-8000-0000000000b4', first_name: null, role: 'member',
+          region_name: 'Camden', program_name: null, status: 'open', last_message_at: null, last_from: null, waiting_since: null, preview: null },
+        { conversation_id: 'c0000000-0000-4000-8000-0000000000b5', asker_id: 'a0000000-0000-4000-8000-0000000000b5', first_name: 'Rosa', role: 'member',
+          region_name: 'Philadelphia', program_name: null, status: 'closed', last_message_at: onTheHour(-6, 10), last_from: 'team',
+          waiting_since: null, preview: 'Glad that worked out.' },
+      ],
+    })),
+    on('/rpc/pam_set_thread_status', () => ({ body: null })),
+    on('/rpc/pam_start_conversation', () => ({ body: 'c0000000-0000-4000-8000-0000000000b9' })),
+    on('/rpc/pam_start_program_conversation', () => ({ body: 2 })),
+    on('/rpc/pam_set_hours', () => ({ body: null })),
+    on('/rpc/pam_reply_times', () => ({ body: [{ median_seconds: 5400, mean_seconds: 7200, answered: 12 }] })),
     on('/rpc/review_program_submission', (_url, _method, body) => {
       const args = (body ?? {}) as { p_id: string };
       programsToCheck = programsToCheck.filter((row) => row.id !== args.p_id);
