@@ -69,7 +69,11 @@ test.describe('Text alerts say little (D-608, Will 18 October: "we don\'t need a
     // The badge is the switch's description: a screen reader hears "{row}, switch, off, Coming soon".
     const toggle = page.getByRole('switch', { name: 'Someone messages you' });
     await expect(toggle).toHaveAccessibleDescription('Coming soon');
-    await expect(page.getByText('One text each time, only for what is on. Reply STOP to stop, or HELP for help. Text and data rates may apply.')).toBeVisible();
+    await expect(page.getByText('Pam sends one text each time, only for what is on. Reply STOP to stop, or HELP for help. Text and data rates may apply.')).toBeVisible();
+    // A link to what a text says and never says, named for a screen reader as "Privacy: Text messages".
+    const privacy = page.getByRole('link', { name: 'Privacy: Text messages' });
+    await expect(privacy).toHaveText('Privacy');
+    await expect(privacy).toHaveAttribute('href', '/privacy/#texts');
   });
 });
 

@@ -6,7 +6,7 @@
 
 ## What
 
-- `AlertsView.tsx`: the introduction is gone; a short label, `alerts.kinds` "Kinds of texts", sits over the list; each row is its name, a "Coming soon" badge (Astryx `Badge`, neutral) where the text is not sent yet, and its switch. The sentence under each row is gone. `alerts.how` stays at the bottom, shortened.
+- `AlertsView.tsx`: the introduction is gone; a short label, `alerts.kinds` "Kinds of texts", sits over the list; each row is its name, a "Coming soon" badge (Astryx `Badge`, neutral) where the text is not sent yet, and its switch. The sentence under each row is gone. `alerts.how` stays at the bottom, final after Lena's carrier check (04768917): "Pam sends one text each time, only for what is on. Reply STOP to stop, or HELP for help. Text and data rates may apply." Under it, a small link `alerts.privacy` "Privacy" to `/privacy/#texts`, whose accessible name is `alerts.privacy.label` "Privacy: Text messages" (`tPlain`). `TextLink` gained an optional `accessibleLabel` for it.
 - The badge is the switch's description (`aria-describedby`), so a screen reader hears "{row}, switch, off, Coming soon" once, with its row. The switch's own name stays the row name.
 - No input added or removed; `data-collected.ts` unchanged.
 
@@ -16,7 +16,7 @@
 
 ## Drafts
 
-The six languages' `alerts.kinds`, `alerts.comingSoon` and `alerts.how` are **my drafts** (Nico), not Lena's: ack'd so the tests pass, to be read and replaced by her. `alerts.how` is the carrier-text line, so it needs her check against the campaign registration before it ships.
+The six languages' `alerts.kinds`, `alerts.comingSoon` and `alerts.how` are **my drafts** (Nico), not Lena's: ack'd so the tests pass, to be read and replaced by her. `alerts.how` and `alerts.privacy*` follow Sage's signed English; the six translations are still mine.
 
 ## Proof
 

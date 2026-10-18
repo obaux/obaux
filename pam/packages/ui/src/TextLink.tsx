@@ -34,6 +34,8 @@ export interface TextLinkProps {
    * screen reader listing links would otherwise say "Click here" alone (Iris, b32, P2). Nothing changes on screen.
    */
   readonly describedBy?: string;
+  /** What a screen reader says instead of the label, when it must say more than is shown ("Privacy" → "Privacy: Text messages"). Build it with `tPlain`. */
+  readonly accessibleLabel?: string;
 }
 
 /*
@@ -67,7 +69,7 @@ const styles = stylex.create({
  */
 export const textLinkLook = stylex.create({ link: linkLook });
 
-export function TextLink({ label, href, onClick, isDisabled, size = 'default', isUnderlined = false, describedBy }: TextLinkProps) {
+export function TextLink({ label, href, onClick, isDisabled, size = 'default', isUnderlined = false, describedBy, accessibleLabel }: TextLinkProps) {
   return (
     <Button
       label={label}
@@ -76,6 +78,7 @@ export function TextLink({ label, href, onClick, isDisabled, size = 'default', i
       onClick={onClick}
       isDisabled={isDisabled}
       aria-describedby={describedBy}
+      aria-label={accessibleLabel}
       xstyle={[size === 'quiet' ? styles.quiet : styles.link, isUnderlined ? styles.underlined : null]}
     />
   );

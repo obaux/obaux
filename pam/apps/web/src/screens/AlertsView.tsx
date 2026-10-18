@@ -8,7 +8,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Switch } from '@astryxdesign/core/Switch';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { Notice } from '@pam/ui';
+import { Notice, TextLink } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
@@ -93,7 +93,7 @@ const styles = stylex.create({
 });
 
 export function AlertsView() {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   const soonId = useId();
   const textsLive = useTextsLive();
   const LIVE = textsLive ? LIVE_KINDS : NONE_LIVE;
@@ -214,6 +214,8 @@ export function AlertsView() {
         {/* Not "a few a week": a busy program hears more than that (D-256). */}
         {t('alerts.how')}
       </Text>
+      {/* What a text says, and never says, is on Privacy (D-608; Lena's a102). */}
+      <TextLink label={t('alerts.privacy')} accessibleLabel={tPlain('alerts.privacy.label')} href="/privacy/#texts" size="quiet" />
       {saved && !failed ? (
         <Text type="supporting" xstyle={styles.small}>
           {t('alerts.saved')}
