@@ -64,12 +64,21 @@ describe('locale bundles', () => {
     'trips.added.policies.title.two',
     'trips.map.many.two',
     'pam.inbox.sent.two',
+    'problems.times.two',
+    'notify.app_error.two',
   ]);
+
+  // Russian's "one" is also 21, 31, 101..., so its `.one` writes the number even where English picks the singular itself and writes none.
+  const RU_ONE_WRITES_THE_NUMBER = new Set(['notify.app_error.one']);
 
   it.each(Object.entries(bundles))('%s keeps placeholders matched with English', (locale, bundle) => {
     for (const [key, value] of Object.entries(bundle)) {
       const source = en[baseKey(key)];
       expect(source, `"${key}" has no English source`).toBeDefined();
+      if (locale === 'ru' && RU_ONE_WRITES_THE_NUMBER.has(key)) {
+        expect(placeholders(value), `"${key}" is Russian's one: the number added, every other placeholder kept`).toEqual([...placeholders(source!), 'count'].sort());
+        continue;
+      }
       if (locale === 'ar' && AR_DUAL_WITHOUT_DIGIT.has(key)) {
         expect(placeholders(value), `"${key}" is a dual: no digit, every other placeholder kept`).toEqual(
           placeholders(source!).filter((name) => name !== 'count'),

@@ -107,6 +107,8 @@ function hrefFor(kind: string, subjectId: string | null): string | undefined {
   if (kind === 'visit_booked_for_you') return '/trips/';
   if (kind === 'service_flagged') return '/places/reported/?from=notifications';
   if (kind === 'staff_request_pending') return '/requests/';
+  // Something broke in the app (D-616): the Problems list.
+  if (kind === 'app_error') return '/problems/?from=notifications';
   return undefined;
 }
 
