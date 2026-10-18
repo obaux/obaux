@@ -98,12 +98,9 @@ const STEP: Record<Phase, number> = {
 // Row 5 (a92, signed by Will; Sage's ledger d05f9d80): a member's new save is seen as "when", never which place.
 const PROVIDER_EXPECT: readonly SetupArtKind[] = ['calendar', 'message', 'policy', 'private', 'alerts'];
 
-/** The small print at the foot of the city list: shown, never chosen. */
-const CITY_NOTE = '__note';
-
 const styles = stylex.create({
-  // Small print, centred, at the foot of the city list (D-369).
-  cityNote: { width: '100%', textAlign: 'center', fontSize: '13px', lineHeight: 1.4 },
+  // Small print under the city list (D-369): a line on the page, not a row in the list (Iris's run-through, P5).
+  cityNote: { fontSize: '13px', lineHeight: 1.4 },
   quietIntro: { fontSize: '16px', lineHeight: 1.5 },
   // The bell in the brand green, its middle on the first line's middle.
   bell: { flexShrink: 0, paddingBlockStart: '3px', color: colorVars['--color-icon-accent'] },
@@ -611,32 +608,23 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
               />
               {/* A list, not a box to type in (Will, 7 October, D-369): Pam is
                   only in the cities an admin has set up, so the list is those,
-                  with a line of small print at its foot that says so. If the
-                  list cannot be fetched, the box comes back — somebody offline
-                  can still say where they live. */}
+                  with a line of small print under it that says so: on the page,
+                  not a row in the list that looks tappable and isn't (Iris's
+                  run-through, P5). If the list cannot be fetched, the box comes
+                  back — somebody offline can still say where they live. */}
               {cities.length > 0 ? (
-                <Dropdown
-                  label={t(cityLabel)}
-                  width="100%"
-                  value={city}
-                  options={[
-                    ...cities.map((name) => ({ value: name, label: name })),
-                    { type: 'divider' as const },
-                    { value: CITY_NOTE, label: t('join.details.city.note'), disabled: true },
-                  ]}
-                  renderOption={(option) =>
-                    option.value === CITY_NOTE ? (
-                      <Text type="supporting" xstyle={styles.cityNote}>
-                        {option.label}
-                      </Text>
-                    ) : (
-                      option.label
-                    )
-                  }
-                  onChange={(next) => {
-                    if (next !== CITY_NOTE) setCity(next);
-                  }}
-                />
+                <VStack gap={1}>
+                  <Dropdown
+                    label={t(cityLabel)}
+                    width="100%"
+                    value={city}
+                    options={cities.map((name) => ({ value: name, label: name }))}
+                    onChange={setCity}
+                  />
+                  <Text type="supporting" xstyle={styles.cityNote}>
+                    {t('join.details.city.note')}
+                  </Text>
+                </VStack>
               ) : (
                 <TextField
                   id={cityId}
