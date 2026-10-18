@@ -39,7 +39,6 @@ const styles = stylex.create({
   // Added: no fill, the card's own green showing through; the same size and weight, still 48px to tap (Dot's story).
   slot: { flexShrink: 0 },
   added: { flexShrink: 0, minHeight: '48px', paddingInline: '4px', fontSize: '16px', fontWeight: 700, color: colorVars['--color-text-green'] },
-  changed: { fontSize: '15px', lineHeight: 1.4, color: colorVars['--color-text-secondary'], textAlign: 'center' },
   sheet: { width: '100%', paddingInline: '20px', paddingBlockEnd: '28px' },
   hint: { fontSize: '15px', lineHeight: 1.5 },
 });
@@ -85,6 +84,8 @@ function timeZone(): string | undefined {
 export interface CalendarSlot {
   readonly action: ReactNode;
   readonly actionOwnRow: boolean;
+  /** "Your calendar has the old time." inside the card, when the visit moved after it was added; otherwise null (Dot's drawing, VisitCard's `note`). */
+  readonly note: ReactNode;
 }
 
 /**
@@ -158,14 +159,15 @@ export function AddVisitToCalendar({ card, visit }: { readonly card: (slot: Cale
           </div>
         ),
         actionOwnRow: ownRow,
+        // The first sentence is for a screen reader only; the card says the second (Sage, 2e05e77a).
+        note: hasChanged ? (
+          <>
+            <VisuallyHidden>{t('calendar.addOne.changed.lead')} </VisuallyHidden>
+            {t('calendar.addOne.changed')}
+          </>
+        ) : null,
       })}
       </div>
-      {hasChanged ? (
-        <Text type="supporting" xstyle={styles.changed}>
-          <span aria-hidden>{t('calendar.addOne.changed')}</span>
-          <VisuallyHidden>{t('calendar.addOne.changed.label')}</VisuallyHidden>
-        </Text>
-      ) : null}
       <PamSheet isOpen={isOpen} onOpenChange={setIsOpen} label={tPlain('trips.addToCalendar')} kind="act" actionLabel={t('trips.confirm.close')}>
         <VStack gap={2} xstyle={styles.sheet}>
           <Text type="supporting" xstyle={styles.hint}>

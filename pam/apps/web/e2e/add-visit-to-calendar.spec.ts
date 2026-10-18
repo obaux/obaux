@@ -189,8 +189,15 @@ test('a visit that moved after it was added asks to be added again', async ({ pa
   await page.reload();
   await settled(page);
   await expect(page.getByRole('button', { name: 'Add to calendar' })).toBeVisible();
-  await expect(page.getByText('Your calendar has the old time.', { exact: true })).toBeVisible();
-  // A screen reader gets the whole sentence.
+  const line = page.getByText('Your calendar has the old time.');
+  await expect(line).toBeVisible();
+  // Inside the green card, between the countdown and its divider, not under it (Dot's drawing).
+  const card = (await page.getByText('Change appointment').locator('xpath=ancestor::*[contains(@class,"astryx-card")][1]').boundingBox())!;
+  const at = (await line.boundingBox())!;
+  expect(at.y).toBeGreaterThanOrEqual(card.y);
+  expect(at.y + at.height).toBeLessThanOrEqual(card.y + card.height);
+  expect(at.y).toBeLessThan((await page.getByText('Change appointment').boundingBox())!.y);
+  // A screen reader gets the whole sentence, in the same element.
   await expect(page.getByText('This visit changed after you added it. Your calendar has the old time.')).toHaveCount(1);
 });
 

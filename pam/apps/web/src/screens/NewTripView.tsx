@@ -391,10 +391,11 @@ export function NewTripView({
         */}
         <AddVisitToCalendar
           visit={{ id: confirmed.id, placeName: place.name, address: place.address ?? null, startsAt: confirmed.at }}
-          card={({ action, actionOwnRow }) => (
+          card={({ action, actionOwnRow, note }) => (
           <VisitCard
             action={action}
             actionOwnRow={actionOwnRow}
+            note={note}
             eyebrow={place.name}
             day={dayCard.format(confirmed.at)}
             time={timeFmt.format(confirmed.at)}
