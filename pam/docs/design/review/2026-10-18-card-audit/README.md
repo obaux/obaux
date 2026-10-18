@@ -1,5 +1,7 @@
 # Card audit, 18 October 2026
 
+> **Status (Will, 18 October, 19:22: "Keep the original layouts."):** his no-card note was about Text alerts only. Nothing in this audit changes unless he asks for a screen; "Something is wrong here" keeps its card. This stays as a record of where a card wraps a single list or form.
+
 Will's rule (D-615, Foundations › Patterns): **no card around a single list or form.** A card holds a thing of its
 own (a person, an offer, a place, a warning). This is the list of every screen in the app where a `Card` wraps the
 one list or form the screen is for, found by reading all 35 `<Card` uses in `apps/web/src` and drawing the screens in
