@@ -1294,6 +1294,10 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · speaking a message says why it did not start (18 October 2026)
+
+Built, not live: in a conversation, every failure to start the microphone (refused, no microphone, no connection, a language it cannot hear, an unexpected code, a start that throws or never answers) puts one warning banner above the box, and "Listening" shows as soon as it starts. A browser with no speech recognition keeps the mic hidden (D-603; Mira's call). Ten English lines signed by Sage (a2703793), translated by Lena (f4d7e260). Proof: twelve cases in `messages.spec.ts` that fail on main 62ba50e4, `dictationProblem.test.ts`, `dictation-problems.test.ts`. No migration. Will to try it on his phone once live.
+
 ## Messages & notifications · the audit purge reaches rows that name a person only in meta (17 October 2026)
 
 Built, not live: `purge_erased_audit()` also deletes a row when a top-level `meta` value is the erased person's id, so the `with`/`lead`/`by` rows no longer outlast the six months (D-599, migration `20261017075451`, test 77). Writers unchanged. Mira applies it after the batch's CI.
