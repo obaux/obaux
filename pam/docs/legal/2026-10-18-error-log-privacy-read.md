@@ -73,11 +73,16 @@ Why each clause is there, and what makes it true:
 | 8 | No new host | **Met** in this branch (a database function; no http, no edge function). The app's client is not on the branch yet; when it lands, `third-party-hosts.test.ts` runs on it. |
 | 9 | Off means off | **Met.** The switch is read first; off returns before the counter or the row is touched. Test 85 shows an empty log, no counter and no bell row while it is off. |
 
-### Three things I noticed that do not change the line
+### Notes from the read (updated 21:50 for Nico's `0160c1b5`)
 
-- **The rate-limit counters hold an account id for longer than "five minutes".** `app_error_limits` has rows like `u:<account id>`, minute, count. A report deletes counters older than five minutes; if nobody reports, the nightly sweep deletes those older than an hour. So a counter can sit until the next report or 04:20, up to about a day. It is no new fact: the request log (p11) already holds which account called and when for a week. If it should be tighter, run the counter delete on its own schedule every few minutes. (Nico's message said "5 minutes at most"; "up to the next report or the nightly sweep" is exact.)
-- **The signed-out counter key is an md5 of the network address with a constant salt.** An IPv4 address is only 4 billion values, so anyone who could read the counter table could invert it. Nobody can read it, and the address is in the request log for a week anyway, so I do not count it as a leak. A keyed hash (HMAC with a secret) would be the tidy version, later.
-- **The 200-a-minute cap is shared.** A script posting from many addresses could use it up and hide real reports behind its own for the minute. That is a robustness question for Nico, not Privacy.
+- **No network address is read or kept at all** (Nico's last change: signed-out reports share one cap of 30 a minute, and the signed-in counter is
+  keyed on the account). That removes the salted-md5 question I raised at 21:40 and a sentence Privacy would otherwise have needed. The pin
+  holds it (`error-log-line.test.ts`).
+- **The signed-in rate-limit counter holds an account id for "five minutes at most", with one caveat:** a report deletes counters older than five
+  minutes, and the nightly sweep deletes those older than an hour, so after a quiet night a counter can sit until the next report or 04:20. It is
+  no new fact: the request log (p11) already holds which account called and when, for a week.
+- **The shared caps (30 a minute signed out, 200 overall) can be used up** by a script, which would hide real reports for that minute. A robustness
+  question for Nico, not a Privacy one.
 
 ## 3. What the code had to do (the list I sent to Nico at 21:15; section 3a is the answer)
 
