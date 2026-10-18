@@ -8,7 +8,7 @@ Lena, on `claude/lena-message-pam-lines`, off main `1551ed31` (b69), with the he
   - L1 `privacy.s.what-we-keep.p17` (new): "If you write to Pam in the app, or Pam writes to you, we keep what you both write. Only the Pam team reads this conversation. Your guide and your programs don't see it. We keep it while you use Pam, and if you ask us to delete your account, we delete the whole conversation with it." No photos.
   - L2 `privacy.s.contact.p3` (new): "The Pam team can start a conversation with you, as Pam. You will see it in Messages, and only the Pam team can read it."
   - L3 `privacy.s.limits.p2` and `terms.s.limits.p2`: a limited account can read messages and write to Pam, and cannot send other messages. The app's notice (`notice.account_limited.body`, Sage's A29 sign-off b658ac15) comes from the held branch.
-  - L4 `transparency.pam.heading` "The Pam team can see:", `transparency.pam.messages` "What you and Pam write to each other. Your guide and your programs cannot see it.", `transparency.summary.pam` "Only the Pam team can see what you and Pam write to each other." (Sage's choice between "cannot see it" and "cannot see any of it", now there is no list, is "it" in the file until she says; one word in six languages if it changes.)
+  - L4 `transparency.pam.heading` "The Pam team can see:", `transparency.pam.messages` "What you and Pam write to each other. Your guide and your programs cannot see it.", `transparency.summary.pam` "Only the Pam team can see what you and Pam write to each other." (Sage chose "cannot see it" at 14:52, ledger `0ad73a5d`: with no list, "any of" has nothing to do.)
   - No notice in the app, no pinned line above the composer, no Profile switch: Will's "Keep the UI clean" and the a94 precedent (D-595).
 - **`legal.ts`:** what-we-keep 16 to 17, contact 2 to 3. **`legal:date all 2026-10-18`** (Privacy was 17 October, the Terms 11 October). The day is the day the lines are *merged*; it moves with the ship (`legal:date all <day>`, then `copy:ack`) in the batch that turns `pam_messaging_live` on, never after it.
 - **The transparency contract** (`TRANSPARENCY_SCREEN`): `pamHeadingKey`, `pamHeading`, `pam` (one line) and `transparency.summary.pam` in `TRANSPARENCY_I18N_KEYS`, so the completeness tests walk them and a missing translation fails CI. The screen does not draw the card yet (`TransparencyReading.tsx` is not touched): it is drawn from Dot's pictures on a101, by whoever builds it; `PAM_TEAM_CAN_READ` is the list behind it.
@@ -28,4 +28,4 @@ Lena, on `claude/lena-message-pam-lines`, off main `1551ed31` (b69), with the he
 
 ## Needs a human
 
-Sage: "cannot see it" or "cannot see any of it" on the card line (one word). The ship day, for the two dates.
+The ship day, for the two dates. (Sage has decided the card line: "cannot see it".)
