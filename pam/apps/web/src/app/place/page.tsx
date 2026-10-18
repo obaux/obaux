@@ -37,6 +37,7 @@ import { useMySignatures } from '@/lib/useMySignatures';
 import { PolicyStatusCard } from '@pam/ui/PolicyStatusCard';
 import { countdown } from '@/lib/when';
 import { VisitCard } from '@pam/ui/VisitCard';
+import { AddVisitToCalendar } from '@/screens/AddVisitToCalendar';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { examplesOn } from '@/lib/examples';
@@ -437,6 +438,17 @@ function PlaceScreen() {
         change: visit.id,
       }).toString()}`
     : null;
+  const visitCardProps = {
+    eyebrow: t(visitAhead ? 'place.visit.next' : 'place.visit.last'),
+    day: visitWhen ?? '',
+    time: visitHour,
+    // The service rides with the time (Will, 6 October, D-332): the picker is gone once the visit is booked.
+    service: visit && service ? service.name : null,
+    // How soon (D-337), like the booked screen's card.
+    countdown: visitAhead && visit ? countdown(new Date(visit.startsAt), t) : null,
+    ...(visitAhead ? { changeLabel: t('place.visit.change') } : {}),
+    changeHref: visitAhead ? changeHref : null,
+  };
   // With the place's Google ID when Pam has one (D-291): Maps opens on the place itself.
   // Only a member is written to by a program here (D-305).
   const unread = (demoRole ?? trueRole) === 'member' ? newMessageFrom(place!.name) : null;
@@ -534,19 +546,18 @@ function PlaceScreen() {
             <VStack gap={3}>
               {visitWhen ? (
                 // The visit, confirmed (D-273), as a small hero (D-281): only
-                // "Change appointment" is a link, the card itself is not.
-                <VisitCard
-                  eyebrow={t(visitAhead ? 'place.visit.next' : 'place.visit.last')}
-                  day={visitWhen}
-                  time={visitHour}
-                  // The service rides with the time (Will, 6 October, D-332):
-                  // the picker is gone once the visit is booked.
-                  service={visit && service ? service.name : null}
-                  // How soon (D-337), like the booked screen's card.
-                  countdown={visitAhead && visit ? countdown(new Date(visit.startsAt), t) : null}
-                  changeLabel={visitAhead ? t('place.visit.change') : undefined}
-                  changeHref={visitAhead ? changeHref : null}
-                />
+                // "Change appointment" is a link, the card itself is not. A visit
+                // still ahead has the calendar button in its corner (a98, Will 18 October).
+                visit && visitAhead ? (
+                  <AddVisitToCalendar
+                    visit={{ id: visit.id, placeName: place!.name, address: address ?? null, startsAt: new Date(visit.startsAt) }}
+                    card={({ action, actionOwnRow }) => (
+                      <VisitCard {...visitCardProps} action={action} actionOwnRow={actionOwnRow} />
+                    )}
+                  />
+                ) : (
+                  <VisitCard {...visitCardProps} />
+                )
               ) : null}
               {visit && visitAhead && !visit.attendance && !justMarked ? (
                 <>
