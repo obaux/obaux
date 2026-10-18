@@ -62,3 +62,9 @@ describe('a whole hour reads as a time in every language (Lena)', () => {
     expect(pamHoursLine(DEFAULT_PAM_HOURS, locale, words)).toBe(expected);
   });
 });
+
+describe('no days', () => {
+  it('is an empty line, not a thrown error (Ava)', () => {
+    expect(pamDaysLine([], 'en', (key) => key)).toBe('');
+  });
+});

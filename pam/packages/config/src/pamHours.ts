@@ -79,6 +79,7 @@ function zoneName(tz: string, t: Translate): string {
 /** "Monday to Friday", "Every day", "Saturday", or "Monday, Wednesday and Friday". */
 export function pamDaysLine(days: readonly number[], locale: string, t: Translate): string {
   const sorted = [...new Set(days)].sort((a, b) => a - b);
+  if (sorted.length === 0) return '';
   if (sorted.length === 7) return t('pam.hours.days.every');
   if (sorted.length === 1) return dayName(sorted[0]!, locale);
   const run = sorted.every((d, i) => i === 0 || d === sorted[i - 1]! + 1);

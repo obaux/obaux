@@ -191,6 +191,14 @@ export interface ThreadViewProps {
    */
   readonly pam?: boolean;
   /**
+   * What the box takes besides words: 'all' (a photo or a PDF or Word file), 'photo' (a photo only, as on Pam's side of a conversation)
+   * or 'none'. Unset: 'photo' for a Pam conversation, otherwise 'all'. The team writing first as Pam sends words only (`none`):
+   * the functions that start a conversation take a body and nothing else.
+   */
+  readonly attachments?: 'all' | 'photo' | 'none';
+  /** The box's own words (its name for a screen reader and what it says while empty); the team's "Reply as Pam", "Write as Pam". */
+  readonly placeholder?: string;
+  /**
    * The Pam team's tools for a Pam conversation (saved replies), above the composer; Ava's. Only given to the Pam team.
    * Called with `setDraft`, which replaces what is in the box and puts the cursor at its end: a saved reply fills the box and is
    * never sent by itself.
@@ -598,6 +606,8 @@ export function ThreadView({
   blocked = null,
   speechLanguage,
   pam = false,
+  attachments,
+  placeholder: placeholderProp,
   teamTools,
 }: ThreadViewProps) {
   const { t, tPlain, locale } = useI18n();
@@ -783,9 +793,11 @@ export function ThreadView({
   // so the person sees what will be sent (and learns now if it cannot be
   // opened); a PDF or a Word file of 10 MB or less is a document; anything
   // else is refused in words (D-399, D-408).
+  const mode = attachments ?? (pam ? 'photo' : 'all');
+  const boxWords = placeholderProp ?? (pam ? t('messages.pam.placeholder') : t('messages.thread.placeholder'));
   const take = async (files: readonly File[]) => {
     const file = files[0];
-    if (!file) return;
+    if (!file || mode === 'none') return;
     setAttachProblem(null);
     const photo = photoType(file);
     if (photo) {
@@ -799,7 +811,7 @@ export function ThreadView({
       return;
     }
     // Pam takes a photo (screenshots) and no document (D-605).
-    if (pam || !messageFileType(file)) {
+    if (mode !== 'all' || !messageFileType(file)) {
       refuse('wrongType');
       return;
     }
@@ -869,7 +881,7 @@ export function ThreadView({
       value={draft}
       onChange={setDraft}
       onSubmit={(value) => void submit(value)}
-      placeholder={pam ? t('messages.pam.placeholder') : t('messages.thread.placeholder')}
+      placeholder={boxWords}
       isDisabled={sending}
       elevation="none"
       xstyle={[styles.composer, dropping && styles.dropping]}
@@ -973,8 +985,8 @@ export function ThreadView({
         <ChatComposerInput
           ref={inputBox}
           handleRef={inputRef}
-          label={pam ? t('messages.pam.placeholder') : t('messages.thread.placeholder')}
-          placeholder={pam ? t('messages.pam.placeholder') : t('messages.thread.placeholder')}
+          label={boxWords}
+          placeholder={boxWords}
           hasHistory={false}
           maxRows={8}
           onFiles={(files) => void take(files)}
@@ -1000,6 +1012,8 @@ export function ThreadView({
             label={dictation.isListening ? t('messages.thread.dictateStop') : t('messages.thread.dictate')}
             xstyle={[styles.square, styles.tuck]}
           />
+          {mode === 'none' ? null : (
+          <>
           <IconButton
             label={t('messages.thread.photo.add')}
             icon={<Icon icon={PhotoIcon} size="md" color="secondary" />}
@@ -1022,7 +1036,9 @@ export function ThreadView({
             }}
             {...stylex.props(styles.fileInput)}
           />
-          {pam ? null : (
+          </>
+          )}
+          {mode !== 'all' ? null : (
             <>
               <IconButton
                 label={t('messages.thread.file.add')}
