@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ComponentProps } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
+import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { Button } from '@pam/ui/Button';
 import { MenuList } from '@pam/ui/MenuList';
 import { MessagesIcon } from '@pam/ui';
@@ -26,8 +27,9 @@ import { setPamThreadStatus, usePamInbox } from '@/lib/pam';
  */
 const styles = stylex.create({
   bar: { paddingInline: '4px' },
-  sheet: { paddingInline: '20px', paddingBlock: '8px 24px' },
-  title: { fontSize: '22px', lineHeight: 1.3, fontWeight: 700 },
+  // Clear of the sheet's grab handle, as the New message sheet is.
+  sheet: { width: '100%', paddingBlockStart: spacingVars['--spacing-6'], paddingBlockEnd: spacingVars['--spacing-4'] },
+  title: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700, paddingInline: spacingVars['--spacing-4'] },
   done: { fontSize: '17px', lineHeight: 1.4 },
 });
 
@@ -66,15 +68,20 @@ export function PamSavedReplies({ onPick }: { readonly onPick: (text: string) =>
   );
 }
 
-/** Close or Reopen this Pam conversation, for the ⋯ screen. Its status is read from the inbox, which the team already has. */
-export function PamTeamOptions({ conversationId }: { readonly conversationId: string }) {
+type MenuItem = ComponentProps<typeof MenuList>['items'][number];
+
+/**
+ * Close or Reopen this Pam conversation, for the ⋯ screen, at the head of one list with the screen's other rows (`more`). Its
+ * status is read from the inbox, which the team already has.
+ */
+export function PamTeamOptions({ conversationId, more = [] }: { readonly conversationId: string; readonly more?: readonly MenuItem[] }) {
   const { t } = useI18n();
   const [refresh, setRefresh] = useState(0);
   const inbox = usePamInbox(true, refresh);
   const [busy, setBusy] = useState(false);
   const [said, setSaid] = useState<'closed' | 'reopened' | 'failed' | null>(null);
   const row = inbox.status === 'ready' ? inbox.rows.find((r) => r.conversationId === conversationId) : undefined;
-  if (!row) return null;
+  if (!row) return <MenuList label={t('messages.options.title')} items={[...more]} />;
   const closing = row.status === 'open';
 
   const act = async () => {
@@ -88,7 +95,7 @@ export function PamTeamOptions({ conversationId }: { readonly conversationId: st
   return (
     <VStack gap={2}>
       <MenuList
-        label={t('pam.inbox.title')}
+        label={t('messages.options.title')}
         items={[
           {
             id: closing ? 'close' : 'reopen',
@@ -96,6 +103,7 @@ export function PamTeamOptions({ conversationId }: { readonly conversationId: st
             icon: <MessagesIcon width={26} height={26} aria-hidden />,
             onSelect: busy ? undefined : () => void act(),
           },
+          ...more,
         ]}
       />
       {said ? (

@@ -22,6 +22,7 @@ import { threadLineFor } from '@/lib/threadLine';
 import { messageProgram } from '@/lib/openConversation';
 import { openPamConversation, PAM_MARK, usePamStatus } from '@/lib/pam';
 import { pamSystemText } from '@/lib/pamMessages';
+import { PamSavedReplies } from '../../../screens/PamTeamTools';
 
 /**
  * One conversation — read what has been said, and send the next thing.
@@ -311,7 +312,14 @@ function ThreadScreen() {
             backHref={backHref}
             backLabel={backLabel}
             // Pam's conversation has no ⋯ for the person: no report, no block (D-605). The Pam team's has its own (Close, Reopen).
-            {...(pamAsker ? {} : { menuHref: `/messages/thread/options/?id=${encodeURIComponent(conversationId ?? '')}` })}
+            {...(pamAsker
+              ? {}
+              : {
+                  menuHref:
+                    state.isPam && state.teamView
+                      ? `/pam/thread/options/?id=${encodeURIComponent(conversationId ?? '')}`
+                      : `/messages/thread/options/?id=${encodeURIComponent(conversationId ?? '')}`,
+                })}
           />
         </ThreadTop>
         <ThreadViewLazy
@@ -337,6 +345,8 @@ function ThreadScreen() {
           // A limited account can write to Pam (Will, 18 October), so nothing limits this conversation.
           limited={state.isPam ? false : limited || accountLimited}
           pam={pamAsker}
+          // The Pam team's saved replies (D-605): a pick fills the box, and only Send sends it.
+          teamTools={state.isPam && state.teamView ? (c) => <PamSavedReplies onPick={c.setDraft} /> : undefined}
           blocked={blocked}
           speechLanguage={speechLanguage}
         />

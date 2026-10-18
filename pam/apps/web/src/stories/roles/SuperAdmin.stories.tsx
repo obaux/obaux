@@ -103,6 +103,10 @@ export const PamStartProgram: Story = screen('super-admin', 'Pam writes first â€
   name: 'Second Chance Workforce Training',
 });
 // When Pam is here: the days and times, and the out-of-hours reply as people will get it.
+/** The team's â‹¯ in a person's Pam conversation: Close (or Reopen) and what was shared; no Report, no Block (D-605). */
+export const PamThreadOptions: Story = screen('super-admin', "A Pam conversation's options", '/pam/thread/options/', {
+  id: 'c0000000-0000-4000-8000-0000000000b1',
+});
 export const PamHours: Story = screen('super-admin', "Pam's hours", '/pam/hours/');
 /** ...and nobody waiting yet: the empty state's two lines, for the fit audit (Lena). */
 export const WaitingCitiesEmpty: Story = {

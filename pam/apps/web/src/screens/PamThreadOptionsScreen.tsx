@@ -4,7 +4,6 @@ import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Loading, Notice, PhotoIcon } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
-import { MenuList } from '@pam/ui/MenuList';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
@@ -39,20 +38,17 @@ function PamThreadOptions() {
           contactLabel={t('help.contact.action')}
         />
       ) : (
-        <>
-          <PamTeamOptions conversationId={id} />
-          <MenuList
-            label={t('messages.options.title')}
-            items={[
-              {
-                id: 'files',
-                label: t('messages.options.files'),
-                href: `/messages/thread/files/?id=${encodeURIComponent(id)}`,
-                icon: <PhotoIcon {...ICON} />,
-              },
-            ]}
-          />
-        </>
+        <PamTeamOptions
+          conversationId={id}
+          more={[
+            {
+              id: 'files',
+              label: t('messages.options.files'),
+              href: `/messages/thread/files/?id=${encodeURIComponent(id)}`,
+              icon: <PhotoIcon {...ICON} />,
+            },
+          ]}
+        />
       )}
     </SubPage>
   );

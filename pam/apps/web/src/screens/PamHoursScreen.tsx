@@ -92,7 +92,8 @@ export function PamHoursScreen() {
     setDraft({ ...hours, ...patch });
     setSaid(null);
   };
-  const preview = pamSystemText('pam.away', { t, tPlain, locale, firstName: null, hours });
+  // No day ticked has no reply to show (and no line of days to build): Save says what is missing.
+  const preview = hours.days.length > 0 ? pamSystemText('pam.away', { t, tPlain, locale, firstName: null, hours }) : null;
 
   const save = async () => {
     if (hours.days.length === 0) return setSaid('noDays');
@@ -140,12 +141,14 @@ export function PamHoursScreen() {
         </VStack>
       </VStack>
 
-      <VStack gap={2}>
-        <Text xstyle={styles.label}>{t('pam.hours.preview')}</Text>
-        <Text dir="auto" xstyle={styles.preview}>
-          {preview}
-        </Text>
-      </VStack>
+      {preview ? (
+        <VStack gap={2}>
+          <Text xstyle={styles.label}>{t('pam.hours.preview')}</Text>
+          <Text dir="auto" xstyle={styles.preview}>
+            {preview}
+          </Text>
+        </VStack>
+      ) : null}
 
       {said ? (
         <Text role={said === 'saved' ? 'status' : 'alert'} xstyle={styles.status}>
