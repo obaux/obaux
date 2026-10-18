@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Role } from '@pam/config';
 import { requestLinkPreviews, wantsPreview } from './linkPreview';
 import { loadPhotos, removeUnsentPhoto, shrinkPhoto, uploadMessagePhoto } from './messagePhoto';
@@ -43,10 +43,23 @@ import { readAccountLimited } from './accountLimited';
  * message carries its name and size. It is not downloaded with the messages —
  * the conversation shows its name and size, and it is fetched when tapped.
  */
+export type MessageStatus = 'sent' | 'sending' | 'failed';
+
 export interface ThreadMessage {
   readonly id: string;
-  readonly senderId: string;
+  /** Null for a message written by no person (Pam's welcome and out-of-hours reply: D-605). */
+  readonly senderId: string | null;
   readonly body: string | null;
+  /**
+   * Where the message is: `sending` while it goes, `failed` if it did not (it stays in the conversation with a Try again, so
+   * nothing is lost), `sent` once it is stored. Everything read from the database is `sent` (D-605, Will 18 October:
+   * messaging "works better than any other part of the app").
+   */
+  readonly status: MessageStatus;
+  /** Which sentence to draw for a message written by no person (`pam.welcome`, `pam.away`), or null. */
+  readonly systemKey: string | null;
+  /** What that sentence needs (when Pam is next here), or null. */
+  readonly systemVars: Readonly<Record<string, unknown>> | null;
   /** The message's photo, as an on-phone link (D-394), or null. */
   readonly photoUrl: string | null;
   /** The message's document (D-399), not yet downloaded, or null. */
@@ -54,6 +67,8 @@ export interface ThreadMessage {
   readonly createdAt: string;
   readonly mine: boolean;
 }
+
+export type ThreadKind = 'direct' | 'mentor' | 'support';
 
 export type ThreadState =
   | { status: 'loading' }
@@ -64,7 +79,9 @@ export type ThreadState =
       otherRole: Role | null;
       /** The organisation's name when the other person is a program admin (0066, D-187). */
       otherProgramName: string | null;
-      kind: 'direct' | 'mentor';
+      kind: ThreadKind;
+      /** A person's conversation with Pam (D-605): the other side is Pam, with no profile behind it. */
+      isPam: boolean;
       messages: readonly ThreadMessage[];
     }
   | { status: 'not_found' }
@@ -72,7 +89,9 @@ export type ThreadState =
 
 interface MessageRow {
   id: string;
-  sender_id: string;
+  sender_id: string | null;
+  system_key?: string | null;
+  system_vars?: Record<string, unknown> | null;
   body: string | null;
   attachment_url: string | null;
   attachment_kind: string | null;
@@ -81,6 +100,10 @@ interface MessageRow {
   created_at: string;
 }
 
+// With the two columns a message written by no person needs (20261018071643, D-605). Until that is on the live project asking
+// for them fails the read, so the read falls back to the columns before them, then before 0080.
+const MESSAGE_COLUMNS_WITH_SYSTEM =
+  'id, sender_id, system_key, system_vars, body, attachment_url, attachment_kind, attachment_name, attachment_bytes, created_at';
 const MESSAGE_COLUMNS =
   'id, sender_id, body, attachment_url, attachment_kind, attachment_name, attachment_bytes, created_at';
 // Until 0080 is on the live project (D-399), the two document columns do not
@@ -100,29 +123,61 @@ function one<T>(value: T | T[] | null): T | null {
   return Array.isArray(value) ? (value[0] ?? null) : value;
 }
 
+/** A message that has been written but is not yet stored: on its way, or failed and kept so it can be sent again. */
+interface OutboxItem {
+  readonly id: string;
+  readonly body: string;
+  readonly attachment: OutgoingAttachment | null;
+  readonly createdAt: string;
+  readonly startedAt: number;
+  readonly status: 'sending' | 'failed';
+  /** A photo being sent, shown from the phone while it goes. */
+  readonly photoUrl: string | null;
+}
+
+const toMessage = (row: MessageRow, me: string, links: Record<string, string>, photoUrl?: string | null): ThreadMessage => ({
+  id: row.id,
+  senderId: row.sender_id,
+  body: row.body,
+  status: 'sent',
+  systemKey: row.system_key ?? null,
+  systemVars: row.system_vars ?? null,
+  photoUrl: photoUrl !== undefined ? photoUrl : (links[photoPathOf(row) ?? ''] ?? null),
+  file: fileOf(row),
+  createdAt: row.created_at,
+  mine: row.sender_id !== null && row.sender_id === me,
+});
+
 export function useThread(conversationId: string | null): {
   state: ThreadState;
+  /**
+   * Sends the words or an attachment. The message appears at once, `sending`; it becomes `sent`, or stays as `failed` with
+   * its words or picture kept, to be sent again with `retry`. True once it has gone.
+   */
   send: (body: string, attachment?: OutgoingAttachment | null) => Promise<boolean>;
+  /** Sends a failed message again, once: if the first try had in fact gone through, that is the message, not a second one. */
+  retry: (id: string) => Promise<boolean>;
+  /** A message is on its way. */
   sending: boolean;
-  sendFailed: boolean;
   /**
    * The last send was refused because this account is limited, not because
    * the connection dropped. The screen then says what is off and who to call
-   * (terms.s.limits.p3, D-427) instead of "Your connection dropped".
+   * (terms.s.limits.p3, D-427) instead of leaving a message marked as not sent.
    */
   limited: boolean;
   refresh: () => void;
 } {
-  const [state, setState] = useState<ThreadState>({ status: 'loading' });
-  const [sending, setSending] = useState(false);
-  const [sendFailed, setSendFailed] = useState(false);
+  const [loaded, setLoaded] = useState<ThreadState>({ status: 'loading' });
+  const [outbox, setOutbox] = useState<readonly OutboxItem[]>([]);
   const [limited, setLimited] = useState(false);
   const [nonce, setNonce] = useState(0);
   const refresh = useCallback(() => setNonce((n) => n + 1), []);
+  const seq = useRef(0);
+  const sendingNow = useRef(new Set<string>());
 
   useEffect(() => {
     if (!conversationId) {
-      setState({ status: 'not_found' });
+      setLoaded({ status: 'not_found' });
       return;
     }
     let cancelled = false;
@@ -134,7 +189,7 @@ export function useThread(conversationId: string | null): {
         const { data: auth } = await supabase.auth.getUser();
         if (cancelled) return;
         if (!auth.user) {
-          setState({ status: 'not_found' });
+          setLoaded({ status: 'not_found' });
           return;
         }
         const me = auth.user.id;
@@ -150,20 +205,20 @@ export function useThread(conversationId: string | null): {
 
         if (cancelled) return;
         if (membersError || partnersError) {
-          setState({ status: 'error', offline: !navigator.onLine });
+          setLoaded({ status: 'error', offline: !navigator.onLine });
           return;
         }
 
         const memberRows = (members ?? []) as {
           profile_id: string;
-          conversations: { kind: 'direct' | 'mentor' } | { kind: 'direct' | 'mentor' }[] | null;
+          conversations: { kind: ThreadKind } | { kind: ThreadKind }[] | null;
         }[];
 
         // RLS answers "am I a member" and "does this conversation exist" the
         // same way: zero rows. A genuine member always sees at least their own row.
         const mine = memberRows.find((row) => row.profile_id === me);
         if (!mine) {
-          setState({ status: 'not_found' });
+          setLoaded({ status: 'not_found' });
           return;
         }
 
@@ -172,7 +227,7 @@ export function useThread(conversationId: string | null): {
             (partners ?? []) as {
               conversation_id: string;
               first_name: string | null;
-              role: Role;
+              role: Role | null;
               program_name: string | null;
             }[]
           ).find((row) => row.conversation_id === conversationId) ?? null;
@@ -185,34 +240,29 @@ export function useThread(conversationId: string | null): {
             .eq('conversation_id', conversationId)
             .order('created_at', { ascending: true })
             .limit(200);
-        let { data: rows, error: messagesError } = await read(MESSAGE_COLUMNS);
+        let { data: rows, error: messagesError } = await read(MESSAGE_COLUMNS_WITH_SYSTEM);
+        if (messagesError) ({ data: rows, error: messagesError } = await read(MESSAGE_COLUMNS));
         if (messagesError) ({ data: rows, error: messagesError } = await read(MESSAGE_COLUMNS_BEFORE_0080));
 
         if (cancelled) return;
         if (messagesError) {
-          setState({ status: 'error', offline: !navigator.onLine });
+          setLoaded({ status: 'error', offline: !navigator.onLine });
           return;
         }
-        const loaded = (rows ?? []) as unknown as MessageRow[];
-        const links = await loadPhotos(loaded.map(photoPathOf).filter((p): p is string => p !== null));
+        const read200 = (rows ?? []) as unknown as MessageRow[];
+        const links = await loadPhotos(read200.map(photoPathOf).filter((p): p is string => p !== null));
         if (cancelled) return;
 
-        setState({
+        setLoaded({
           status: 'ready',
           meId: me,
           otherName: partner?.first_name ?? null,
           otherRole: partner?.role ?? null,
           otherProgramName: partner?.program_name ?? null,
           kind: conv?.kind ?? 'direct',
-          messages: loaded.map((row) => ({
-            id: row.id,
-            senderId: row.sender_id,
-            body: row.body,
-            photoUrl: links[photoPathOf(row) ?? ''] ?? null,
-            file: fileOf(row),
-            createdAt: row.created_at,
-            mine: row.sender_id === me,
-          })),
+          // A support conversation's other side is Pam: a partner row with no profile (20261018072339).
+          isPam: conv?.kind === 'support',
+          messages: read200.map((row) => toMessage(row, me, links)),
         });
 
         // Fire-and-forget: this is housekeeping for the bell and the list's
@@ -223,28 +273,27 @@ export function useThread(conversationId: string | null): {
           .eq('conversation_id', conversationId)
           .eq('profile_id', me);
       } catch {
-        if (!cancelled) setState({ status: 'error', offline: !navigator.onLine });
+        if (!cancelled) setLoaded({ status: 'error', offline: !navigator.onLine });
       }
     };
 
-    setState({ status: 'loading' });
+    setLoaded({ status: 'loading' });
     void load();
     return () => {
       cancelled = true;
     };
   }, [conversationId, nonce]);
 
-  const send = useCallback(
-    async (body: string, attachment: OutgoingAttachment | null = null): Promise<boolean> => {
-      const trimmed = body.trim();
-      if ((!trimmed && !attachment) || !conversationId || state.status !== 'ready') return false;
-
-      setSending(true);
-      setSendFailed(false);
+  /** One try at storing a message. True once it is in; false (and kept, or dropped when the account is limited) if not. */
+  const attempt = useCallback(
+    async (item: OutboxItem): Promise<boolean> => {
+      if (!conversationId || loaded.status !== 'ready') return false;
+      const meId = loaded.meId;
       let stored: { path: string; kind: 'photo' | 'file' } | null = null;
       try {
         let shrunk: Blob | null = null;
         let named: { name: string; bytes: number } | null = null;
+        const attachment = item.attachment;
         if (attachment?.kind === 'photo') {
           shrunk = attachment.isReady ? attachment.file : await shrinkPhoto(attachment.file);
           if (!shrunk) throw new Error('could not read the photo');
@@ -263,8 +312,8 @@ export function useThread(conversationId: string | null): {
           .from('messages')
           .insert({
             conversation_id: conversationId,
-            sender_id: state.meId,
-            body: trimmed || null,
+            sender_id: meId,
+            body: item.body || null,
             ...(stored ? { attachment_url: stored.path, attachment_kind: stored.kind } : {}),
             ...(named ? { attachment_name: named.name, attachment_bytes: named.bytes } : {}),
           })
@@ -276,27 +325,10 @@ export function useThread(conversationId: string | null): {
         const row = data as MessageRow;
         // A link starts its preview now, so Stuff shared has it ready (D-407).
         if (wantsPreview(row.body)) void requestLinkPreviews([row.id]);
-        setState((prev) =>
-          prev.status === 'ready'
-            ? {
-                ...prev,
-                messages: [
-                  ...prev.messages,
-                  {
-                    id: row.id,
-                    senderId: row.sender_id,
-                    body: row.body,
-                    // What was just picked, shown from the phone; the stored
-                    // copy is what the other person's link reads.
-                    photoUrl: shrunk ? URL.createObjectURL(shrunk) : null,
-                    file: fileOf(row),
-                    createdAt: row.created_at,
-                    mine: true,
-                  },
-                ],
-              }
-            : prev,
-        );
+        // What was just picked is shown from the phone; the stored copy is what the other person's link reads.
+        const message = toMessage(row, meId, {}, shrunk ? URL.createObjectURL(shrunk) : null);
+        setLoaded((prev) => (prev.status === 'ready' ? { ...prev, messages: [...prev.messages, message] } : prev));
+        setOutbox((prev) => prev.filter((o) => o.id !== item.id));
         return true;
       } catch {
         if (stored?.kind === 'photo') void removeUnsentPhoto(stored.path);
@@ -305,16 +337,103 @@ export function useThread(conversationId: string | null): {
         // of them is the account's doing, and it deserves its own words.
         if (await readAccountLimited()) {
           setLimited(true);
+          setOutbox((prev) => prev.filter((o) => o.id !== item.id));
         } else {
-          setSendFailed(true);
+          setOutbox((prev) => prev.map((o) => (o.id === item.id ? { ...o, status: 'failed' } : o)));
         }
         return false;
-      } finally {
-        setSending(false);
       }
     },
-    [conversationId, state],
+    [conversationId, loaded],
   );
 
-  return { state, send, sending, sendFailed, limited, refresh };
+  const send = useCallback(
+    async (body: string, attachment: OutgoingAttachment | null = null): Promise<boolean> => {
+      const trimmed = body.trim();
+      if ((!trimmed && !attachment) || !conversationId || loaded.status !== 'ready') return false;
+      setLimited(false);
+      const item: OutboxItem = {
+        id: `pending-${++seq.current}`,
+        body: trimmed,
+        attachment,
+        createdAt: new Date().toISOString(),
+        startedAt: Date.now(),
+        status: 'sending',
+        photoUrl: attachment?.kind === 'photo' ? URL.createObjectURL(attachment.file) : null,
+      };
+      setOutbox((prev) => [...prev, item]);
+      sendingNow.current.add(item.id);
+      try {
+        return await attempt(item);
+      } finally {
+        sendingNow.current.delete(item.id);
+      }
+    },
+    [conversationId, loaded.status, attempt],
+  );
+
+  const retry = useCallback(
+    async (id: string): Promise<boolean> => {
+      const item = outbox.find((o) => o.id === id);
+      if (!item || item.status !== 'failed' || sendingNow.current.has(id) || !conversationId || loaded.status !== 'ready') return false;
+      sendingNow.current.add(id);
+      setOutbox((prev) => prev.map((o) => (o.id === id ? { ...o, status: 'sending' } : o)));
+      try {
+        // The first try may have gone through and only its answer been lost: look before sending a second one, so a tap on
+        // Try again never makes a duplicate.
+        const { createClient } = await import('./supabase');
+        const supabase = createClient();
+        let probe = supabase
+          .from('messages')
+          .select(MESSAGE_COLUMNS)
+          .eq('conversation_id', conversationId)
+          .eq('sender_id', loaded.meId)
+          .gte('created_at', new Date(item.startedAt - 5000).toISOString());
+        probe = item.body ? probe.eq('body', item.body) : probe.is('body', null);
+        if (item.attachment) probe = probe.eq('attachment_kind', item.attachment.kind);
+        const { data: already } = await probe.order('created_at', { ascending: false }).limit(1);
+        const found = ((already ?? []) as unknown as MessageRow[])[0];
+        if (found) {
+          const message = toMessage(found, loaded.meId, {}, item.photoUrl);
+          setLoaded((prev) =>
+            prev.status === 'ready' && !prev.messages.some((m) => m.id === message.id)
+              ? { ...prev, messages: [...prev.messages, message] }
+              : prev,
+          );
+          setOutbox((prev) => prev.filter((o) => o.id !== id));
+          return true;
+        }
+        return await attempt(item);
+      } catch {
+        setOutbox((prev) => prev.map((o) => (o.id === id ? { ...o, status: 'failed' } : o)));
+        return false;
+      } finally {
+        sendingNow.current.delete(id);
+      }
+    },
+    [outbox, conversationId, loaded, attempt],
+  );
+
+  // What the screen reads: what is stored, then what is still on its way or did not go.
+  const state = useMemo<ThreadState>(() => {
+    if (loaded.status !== 'ready' || outbox.length === 0) return loaded;
+    const waiting: ThreadMessage[] = outbox.map((o) => ({
+      id: o.id,
+      senderId: loaded.meId,
+      body: o.body || null,
+      status: o.status,
+      systemKey: null,
+      systemVars: null,
+      photoUrl: o.photoUrl,
+      file: o.attachment?.kind === 'file'
+        ? { path: '', name: displayFileName(o.attachment.file.name), bytes: o.attachment.file.size }
+        : null,
+      createdAt: o.createdAt,
+      mine: true,
+    }));
+    return { ...loaded, messages: [...loaded.messages, ...waiting] };
+  }, [loaded, outbox]);
+
+  const sending = outbox.some((o) => o.status === 'sending');
+  return { state, send, retry, sending, limited, refresh };
 }

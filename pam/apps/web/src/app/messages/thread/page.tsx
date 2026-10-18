@@ -112,7 +112,7 @@ function ThreadScreen() {
     };
   }, [programId, signedIn, trueRole, router, params]);
 
-  const { state, send, sending, sendFailed, limited } = useThread(signedIn && realCanMessage && !exampleId ? conversationId : null);
+  const { state, send, retry, sending, limited } = useThread(signedIn && realCanMessage && !exampleId ? conversationId : null);
 
   // Somebody blocked in this conversation (0076, D-463): the composer says so.
   const { state: blockState } = useBlockState(signedIn && realCanMessage && !exampleId ? conversationId : null);
@@ -271,7 +271,7 @@ function ThreadScreen() {
           }
           onSend={send}
           sending={sending}
-          sendFailed={sendFailed}
+          onRetry={(id) => void retry(id)}
           limited={limited || accountLimited}
           blocked={blocked}
           speechLanguage={speechLanguage}

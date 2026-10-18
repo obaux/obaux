@@ -18,6 +18,7 @@ import {
   useChatStreamScroll,
   type ChatComposerInputHandle,
 } from '@astryxdesign/core/Chat';
+import { Button } from '@astryxdesign/core/Button';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { Banner } from '@astryxdesign/core/Banner';
 import { Avatar } from '@astryxdesign/core/Avatar';
@@ -141,6 +142,11 @@ export interface ThreadViewMessage {
   readonly fileUrl?: string | null;
   readonly createdAt: string;
   readonly mine: boolean;
+  /**
+   * Where my message is (D-605): `sending` while it goes, `failed` if it did not (it stays here, outlined, with "Not sent" and a
+   * Try again under it), `sent` once stored. Absent is `sent`: a conversation read from the database, and the examples.
+   */
+  readonly status?: 'sent' | 'sending' | 'failed';
 }
 
 export interface ThreadViewProps {
@@ -160,7 +166,8 @@ export interface ThreadViewProps {
   /** Sends the words, a photo or a document, or words with one; true once it has gone. */
   readonly onSend: (body: string, attachment: OutgoingAttachment | null) => Promise<boolean>;
   readonly sending: boolean;
-  readonly sendFailed: boolean;
+  /** Sends a message that did not go once more (D-605). Its id is the message's. */
+  readonly onRetry?: (id: string) => void;
   /**
    * A limited account (0031) can read but not send. The composer gives way to
    * the notice that says what is off and who to call (terms.s.limits.p3,
@@ -274,6 +281,16 @@ const styles = stylex.create({
   // times without becoming a second scroll box.
   reveal: { width: '100%', overflowX: 'clip', touchAction: 'pan-y' },
   notice: { paddingInline: spacingVars['--spacing-3'] },
+  // A message that did not go stays where it was written, outlined, so nothing is lost (D-605).
+  failedBubble: {
+    borderWidth: '2px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border-red'],
+  },
+  // "Sending…", "Not sent" and "Sent" under a bubble, quiet; the Try again beside "Not sent" is a full 48px target.
+  statusLine: { alignItems: 'center', minHeight: '24px' },
+  statusText: { fontSize: '13px', lineHeight: 1.4 },
+  retry: { minHeight: '48px', minWidth: '48px' },
   // A photo in a bubble (D-394): a 240px square, cropped to fill, that opens
   // full size when tapped. A photo or a document sits in an even 8px rim of
   // the bubble's colour — the same above it as beside it (Will, 9 October,
@@ -561,7 +578,7 @@ export function ThreadView({
   intro = null,
   onSend,
   sending,
-  sendFailed,
+  onRetry,
   limited = false,
   blocked = null,
   speechLanguage,
@@ -653,6 +670,46 @@ export function ThreadView({
   }, [dictation.isListening]);
 
   const name = otherName ?? t('messages.thread.someone');
+
+  // Under my message: "Sending…" while it goes; "Not sent" and a 48px "Try again" if it did not (D-605); a quiet "Sent" under the last
+  // message only. The same words and the same ways for a text and a photo, in every conversation.
+  const statusOf = (message: ThreadViewMessage, isLast: boolean): ReactNode => {
+    if (!message.mine) return undefined;
+    const status = message.status ?? 'sent';
+    if (status === 'sending') {
+      return (
+        <HStack xstyle={styles.statusLine} role="status">
+          <Text type="supporting" xstyle={styles.statusText}>
+            {t('messages.thread.sending')}
+          </Text>
+        </HStack>
+      );
+    }
+    if (status === 'failed') {
+      return (
+        <HStack gap={2} xstyle={styles.statusLine} data-message-status="failed">
+          <Text type="supporting" xstyle={styles.statusText}>
+            {t('messages.thread.notSent')}
+          </Text>
+          <Button
+            label={t('messages.thread.tryAgain')}
+            aria-label={tPlain('messages.thread.notSent.label')}
+            variant="secondary"
+            size="md"
+            onClick={() => onRetry?.(message.id)}
+            xstyle={styles.retry}
+          />
+        </HStack>
+      );
+    }
+    return isLast ? (
+      <HStack xstyle={styles.statusLine}>
+        <Text type="supporting" xstyle={styles.statusText}>
+          {t('messages.thread.sent')}
+        </Text>
+      </HStack>
+    ) : undefined;
+  };
   // What is picked to send — a photo (D-394) or a document (D-399), one at a
   // time — shown above where you type until it goes.
   const picker = useRef<HTMLInputElement>(null);
@@ -715,15 +772,17 @@ export function ThreadView({
 
   const submit = async (value: string) => {
     if (sending || (value.trim() === '' && !picked)) return;
-    const ok = await onSend(
-      value,
-      picked ? (picked.kind === 'photo' ? { kind: 'photo', file: picked.file, isReady: true } : { kind: 'file', file: picked.file }) : null,
-    );
-    if (ok) {
-      setDraft('');
-      clearPicked();
-      setAttachProblem(null);
-    }
+    const attachment: OutgoingAttachment | null = picked
+      ? picked.kind === 'photo'
+        ? { kind: 'photo', file: picked.file, isReady: true }
+        : { kind: 'file', file: picked.file }
+      : null;
+    // The message is in the conversation the moment it is sent, "Sending…"; if it does not go it stays there as "Not sent" with
+    // its words and its picture, and Try again sends it (D-605). So the box is empty at once and nothing is lost.
+    setDraft('');
+    clearPicked();
+    setAttachProblem(null);
+    await onSend(value, attachment);
   };
 
   // A drop anywhere on the conversation (D-399): files are taken as above; a
@@ -1029,7 +1088,9 @@ export function ThreadView({
                       styles.bubble,
                       message.mine && styles.mine,
                       (message.photoUrl != null || message.file != null) && styles.rim,
+                      message.status === 'failed' && styles.failedBubble,
                     ]}
+                    metadata={statusOf(message, i === messages.length - 1)}
                   >
                     {message.photoUrl ? (
                       <VStack gap={3}>
@@ -1072,16 +1133,6 @@ export function ThreadView({
         </ChatMessageList>
       </RevealTimes>
 
-      {sendFailed && !limited && !blocked ? (
-        <VStack xstyle={styles.notice}>
-          <Notice
-            notice="something_went_wrong"
-            title={t('messages.thread.failed.title')}
-            body={t('messages.thread.failed.body')}
-            contactLabel={t('help.contact.action')}
-          />
-        </VStack>
-      ) : null}
     </VStack>
     </ChatLayout>
     <PhotoViewer media={viewing} onClose={() => setViewing(null)} />
