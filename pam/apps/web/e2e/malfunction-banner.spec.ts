@@ -66,7 +66,7 @@ async function signedInAs(page: import('@playwright/test').Page, role: 'provider
  */
 const CLOSED = 'A saved place closes or moves';
 const ON = { sms_enabled: true, sms_stopped_at: null, alert_message: false, alert_booked: false, alert_changed: false, alert_trip: false };
-const LINE = "That didn't go through. It's not your fault, so try again.";
+const LINE = "Something's wrong on our side";
 
 async function failing(page: import('@playwright/test').Page, status: number, body = '{}') {
   await signedInAs(page, 'member', ON, 'on');
@@ -112,17 +112,24 @@ test.describe('The failure banner (D-618)', () => {
     await expect(banner).toBeVisible();
     await expect(banner.getByRole('button', { name: 'Get help' })).toHaveCount(0);
     await banner.getByRole('button', { name: 'Try again' }).click();
-    // Failed again: the second failure.
-    await expect(banner.getByRole('button', { name: 'Get help' })).toBeVisible();
-    await expect(banner).not.toContainText(/contact pam/i);
-    await banner.getByRole('button', { name: 'Get help' }).click();
-    await expect(page).toHaveURL(/\/help\/?$/);
+    // Failed again: the second failure says so, and Help has more.
+    const second = page.getByRole('alert').filter({ hasText: 'Still not working' });
+    await expect(second.getByRole('button', { name: 'Get help' })).toBeVisible();
+    await expect(second).toContainText('Help has more ways to sort this out.');
+    await expect(second).not.toContainText(/contact pam/i);
+    // The help desk's page for this (a page on the website, so the app has left): not Help in the app, and not "contact Pam".
+    const [navigation] = await Promise.all([
+      page.waitForRequest((request) => request.url().includes('/support/something-didnt-go-through/')),
+      second.getByRole('button', { name: 'Get help' }).click(),
+    ]).catch(() => [null]);
+    expect(navigation).not.toBeNull();
   });
 
   test('a signed-out failure offers Sign in', async ({ page }) => {
     await failing(page, 401, '{"code":"PGRST301","message":"JWT expired"}');
     await page.getByRole('switch', { name: CLOSED }).click();
-    const banner = page.getByRole('alert').filter({ hasText: LINE });
+    const banner = page.getByRole('alert').filter({ hasText: "You're signed out" });
+    await expect(banner).toContainText('Sign in to keep going.');
     await expect(banner.getByRole('button', { name: 'Sign in' })).toBeVisible();
     await banner.getByRole('button', { name: 'Sign in' }).click();
     await expect(page).toHaveURL(/\/signin\/\?next=\/alerts\/?$/);
@@ -131,7 +138,7 @@ test.describe('The failure banner (D-618)', () => {
   test('a refused failure (not allowed) has no Try again and no Sign in: the way out is Get help on the second', async ({ page }) => {
     await failing(page, 403, '{"code":"42501","message":"permission denied"}');
     await page.getByRole('switch', { name: CLOSED }).click();
-    const banner = page.getByRole('alert').filter({ hasText: LINE });
+    const banner = page.getByRole('alert').filter({ hasText: "This account can't do that" });
     await expect(banner).toBeVisible();
     await expect(banner.getByRole('button', { name: /try again|sign in/i })).toHaveCount(0);
     await expect(banner.getByRole('button', { name: 'Dismiss' })).toBeVisible();
@@ -141,7 +148,8 @@ test.describe('The failure banner (D-618)', () => {
     const server = await failing(page, 500);
     await context.setOffline(true);
     await page.getByRole('switch', { name: CLOSED }).click();
-    const banner = page.getByRole('alert').filter({ hasText: LINE });
+    const banner = page.getByRole('alert').filter({ hasText: "You're offline" });
+    await expect(banner).toContainText('Check your Wi-Fi or mobile data');
     await expect(banner.getByRole('button', { name: 'Try again' })).toBeVisible();
     await context.setOffline(false);
     server.heal();
@@ -158,6 +166,18 @@ test.describe('The failure banner (D-618)', () => {
     await expect(banner).toBeVisible();
     await banner.getByRole('button', { name: 'Dismiss' }).click();
     await expect(banner).toHaveCount(0);
+  });
+
+  test('"Show the latest" is the way out when someone changed it first', async ({ page }) => {
+    await failing(page, 409, '{"code":"23505","message":"duplicate"}');
+    await page.getByRole('switch', { name: CLOSED }).click();
+    const banner = page.getByRole('alert').filter({ hasText: 'This was already changed' });
+    await expect(banner).toBeVisible();
+    await expect(banner.getByRole('button', { name: /try again|sign in/i })).toHaveCount(0);
+    const reload = page.waitForEvent('load');
+    await banner.getByRole('button', { name: 'Show the latest' }).click();
+    await reload;
+    await expect(page.getByRole('switch', { name: CLOSED })).toBeVisible();
   });
 
   test('it has no WCAG A/AA violations, with the solid error ground', async ({ page }) => {

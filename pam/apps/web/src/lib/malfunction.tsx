@@ -6,8 +6,8 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { useI18n } from './i18n';
 import type { AppErrorAction } from '@pam/config';
-import { codeFromError, failureKindOf, reportAppError } from './reportAppError';
 import { navigate } from './navigate';
+import { HELP_DESK_URL } from './helpDesk';
 import { safeNext } from './signinNext';
 import type { FailureKind } from '@pam/config';
 import type { MalfunctionBannerProps } from './MalfunctionBanner';
@@ -100,6 +100,8 @@ const KIND_KEY: Record<FailureKind, string> = {
   'too-many': 'tooMany',
   changed: 'changed',
   gone: 'gone',
+  'wrong-time': 'wrongTime',
+  refused: 'refused',
   server: 'server',
 };
 const WAY_OUT: Record<FailureKind, 'retry' | 'signIn' | 'reload' | null> = {
@@ -110,6 +112,8 @@ const WAY_OUT: Record<FailureKind, 'retry' | 'signIn' | 'reload' | null> = {
   'too-many': null,
   changed: 'reload',
   gone: null,
+  'wrong-time': null,
+  refused: null,
   server: 'retry',
 };
 
@@ -196,22 +200,48 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
   // Fetched when the page is idle, not when it fails: a failure is most often the network, and a banner that has to be fetched then would not come.
   useEffect(() => {
     const idle = (window as { requestIdleCallback?: (fn: () => void) => number }).requestIdleCallback;
-    const id = idle ? idle(loadBanner) : window.setTimeout(loadBanner, 1_500);
+    const load = () => {
+      loadBanner();
+      // The classifier and the log are fetched at idle too: a failure with the phone offline would not be able to fetch them.
+      void import('./reportAppError');
+      void import('./supabase');
+    };
+    const id = idle ? idle(load) : window.setTimeout(load, 1_500);
     return () => {
       if (!idle) window.clearTimeout(id);
     };
   }, [loadBanner]);
 
   const show = useCallback<MalfunctionApi['show']>((action, error, from, options) => {
-    const code = codeFromError(error);
-    reportAppError({ action, code });
     source.current = from ?? null;
-    const again = lastFailed.current === action;
-    lastFailed.current = action;
-    setSeq((n) => n + 1);
-    setShown({ kind: failureKindOf(error), retry: options?.retry, refresh: options?.refresh, again });
-    // The banner's own weight is not in the root bundle: it loads the first time a failure is shown.
-    loadBanner();
+    // The classifier and the log are in a module fetched at idle (not in the root bundle), so the failure is looked at once it is here. An
+    // outcome that has in fact already happened (a place already saved, a visit already cancelled) shows nothing and is not logged. Whether
+    // there is a signed-in session turns the database's refusal of the anonymous key into "signed out". If the module could not be fetched
+    // (offline from the start) the banner still comes, saying the one line.
+    const present = (kind: FailureKind) => {
+      const again = lastFailed.current === action;
+      lastFailed.current = action;
+      setSeq((n) => n + 1);
+      setShown({ kind, retry: options?.retry, refresh: options?.refresh, again });
+      loadBanner();
+    };
+    void (async () => {
+      try {
+        const [mod, supabase] = await Promise.all([import('./reportAppError'), import('./supabase')]);
+        let signedIn: boolean | undefined;
+        try {
+          signedIn = Boolean((await supabase.createClient().auth.getSession()).data.session);
+        } catch {
+          signedIn = undefined;
+        }
+        const kind = mod.failureFor(action, error, signedIn === undefined ? {} : { signedIn });
+        if (kind === 'done') return;
+        mod.reportAppError({ action, code: mod.codeFromError(error) });
+        present(kind);
+      } catch {
+        present('server');
+      }
+    })();
   }, [loadBanner]);
   const clear = useCallback(() => {
     lastFailed.current = null;
@@ -263,7 +293,7 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
   };
 
   const kindKey = shown ? KIND_KEY[shown.kind] : 'server';
-  const title = said(`notice.malfunction.${kindKey}.title`, 'notice.malfunction') ?? '';
+  const title = (shown?.again ? said('notice.malfunction.again.title') : undefined) ?? said(`notice.malfunction.${kindKey}.title`, 'notice.malfunction') ?? '';
   const body = shown?.again
     ? (said('notice.malfunction.again.body') ?? said(`notice.malfunction.${kindKey}.body`))
     : said(`notice.malfunction.${kindKey}.body`);
@@ -314,14 +344,16 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
           },
         });
     }
-    if (shown.again) {
+    // Get help: when the same action fails a second time, and always for "Pam couldn't do that" (Try again would send the same thing). It opens the
+    // help desk's page for this (Wren), and never says "contact Pam".
+    if (shown.again || shown.kind === 'refused') {
       const text = label('help', 'help.title');
       if (text)
         list.push({
           label: text,
           onPress: () => {
             setShown(null);
-            navigate('/help/');
+            navigate(`${HELP_DESK_URL}something-didnt-go-through/`);
           },
         });
     }
