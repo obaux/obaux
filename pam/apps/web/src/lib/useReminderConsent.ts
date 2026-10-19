@@ -25,6 +25,11 @@ export interface TextStatus {
   /** `null` when nobody has been asked yet. A stopped person is never `true`. */
   readonly consent: boolean | null;
   readonly stopped: boolean;
+  /**
+   * The read itself failed, so nobody knows whether this number has been stopped. The screens show it as before; a save of a YES then
+   * refuses (it sends nothing) until a read works, because "could not read" is not "not stopped" (Iris, 19 October). `code` is why.
+   */
+  readonly readFailed?: { readonly code: string };
   /** The Text alerts switches (D-478): one per kind of text about something that happened. All start off. */
   readonly alerts: AlertFlags;
 }
@@ -43,11 +48,12 @@ const ALERT_COLUMN: Record<AlertKind, string> = {
 export async function getTextStatus(memberId: string): Promise<TextStatus> {
   try {
     const { createClient } = await import('./supabase');
-    const { data } = await createClient()
+    const { data, error, status } = await createClient()
       .from('notification_preferences')
       .select('sms_enabled, sms_stopped_at, alert_message, alert_booked, alert_changed, alert_trip')
       .eq('member_id', memberId)
       .maybeSingle();
+    if (error) return { consent: null, stopped: false, alerts: NO_ALERTS, readFailed: { code: codeFromAnswer(error, status) } };
 
     if (!data) return { consent: null, stopped: false, alerts: NO_ALERTS };
     const row = data as {
@@ -69,8 +75,8 @@ export async function getTextStatus(memberId: string): Promise<TextStatus> {
         trip: Boolean(row.alert_trip),
       },
     };
-  } catch {
-    return { consent: null, stopped: false, alerts: NO_ALERTS };
+  } catch (caught) {
+    return { consent: null, stopped: false, alerts: NO_ALERTS, readFailed: { code: codeFromError(caught) } };
   }
 }
 
@@ -96,7 +102,12 @@ const REFUSED_AFTER_STOP: SaveResult = { ok: false, code: 'unknown', stopped: tr
  */
 export async function setReminderConsent(memberId: string, enabled: boolean): Promise<SaveResult> {
   try {
-    if (enabled && (await getTextStatus(memberId)).stopped) return REFUSED_AFTER_STOP;
+    if (enabled) {
+      const status = await getTextStatus(memberId);
+      if (status.stopped) return REFUSED_AFTER_STOP;
+      // Could not read whether they are stopped: a yes is not saved on a guess. Turning texts off is always safe.
+      if (status.readFailed) return { ok: false, code: status.readFailed.code };
+    }
     const { createClient } = await import('./supabase');
     const { error, status } = await createClient()
       .from('notification_preferences')
@@ -122,7 +133,11 @@ export async function setTextAlert(
   alertsAreAllTheyGetTexts: boolean,
 ): Promise<SaveResult> {
   try {
-    if (on && (await getTextStatus(memberId)).stopped) return REFUSED_AFTER_STOP;
+    if (on) {
+      const status = await getTextStatus(memberId);
+      if (status.stopped) return REFUSED_AFTER_STOP;
+      if (status.readFailed) return { ok: false, code: status.readFailed.code };
+    }
     const { createClient } = await import('./supabase');
     void current;
     void alertsAreAllTheyGetTexts;

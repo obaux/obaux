@@ -10,6 +10,25 @@ set client_min_messages to notice;
 \set marcus '33333333-0000-0000-0000-00000000000c'
 \set tanya  '33333333-0000-0000-0000-00000000000d'
 
+create or replace function test.check_raises_like(label text, stmt text, pattern text)
+returns void
+language plpgsql
+as $$
+begin
+  begin
+    execute stmt;
+  exception when others then
+    if sqlerrm like pattern then
+      raise notice 'ok    % (%)', label, left(sqlerrm, 40);
+      return;
+    end if;
+    raise exception E'FAIL  %\n        raised "%", expected like "%"', label, sqlerrm, pattern;
+  end;
+  raise exception 'FAIL  % — the statement was allowed and should not have been', label;
+end;
+$$;
+grant execute on function test.check_raises_like(text, text, text) to authenticated, anon, service_role;
+
 reset role;
 delete from public.notification_preferences where member_id in (:'marcus', :'tanya');
 insert into public.notification_preferences (member_id, sms_enabled, sms_stopped_at)
@@ -30,20 +49,29 @@ select test.check_raises('...nor delete the row and start again',
 select test.check_raises('...nor insert a row of their own that carries a stop',
   $$insert into public.notification_preferences (member_id, sms_stopped_at) values (auth.uid(), null) on conflict (member_id) do update set sms_stopped_at = null$$);
 
--- What the app does still works: choosing yes, no, quiet hours.
--- (Row-level security hides the row's own other columns from nobody: they read it.)
+-- What the app does still works: quiet hours, and a switch turned off. A new YES on a stopped row is refused (Iris, 19 October): it would
+-- otherwise wait on the row and take effect the day a START clears the stop.
+select test.check_raises_like('a yes saved as an upsert on a stopped row is refused',
+  $$insert into public.notification_preferences (member_id, sms_enabled, alert_message) values (auth.uid(), true, true)
+    on conflict (member_id) do update set member_id = excluded.member_id, sms_enabled = excluded.sms_enabled, alert_message = excluded.alert_message$$,
+  '%TEXTS_STOPPED_UNTIL_START%');
+select test.check_raises_like('...and an alert switch turned on by an update is refused',
+  $$update public.notification_preferences set alert_booked = true where member_id = auth.uid()$$, '%TEXTS_STOPPED_UNTIL_START%');
+select test.check_raises_like('...and a yes inserted for the first time on a stopped row is refused too',
+  $$insert into public.notification_preferences (member_id, alert_trip) values (auth.uid(), true)
+    on conflict (member_id) do update set alert_trip = excluded.alert_trip$$, '%TEXTS_STOPPED_UNTIL_START%');
+update public.notification_preferences set quiet_hours_start = 20 where member_id = auth.uid();
+select test.check('...but a person can still change their quiet hours on a stopped row',
+  (select count(*) from public.notification_preferences where member_id = auth.uid() and quiet_hours_start = 20), 1);
+select test.check('...and a yes that was already on is not a new yes: saving it again, as the app does, still works',
+  (select count(*) from (select 1 from public.notification_preferences where member_id = auth.uid() and sms_enabled) x), 1);
 insert into public.notification_preferences (member_id, sms_enabled) values (auth.uid(), true)
   on conflict (member_id) do update set member_id = excluded.member_id, sms_enabled = excluded.sms_enabled;
-update public.notification_preferences set quiet_hours_start = 20 where member_id = auth.uid();
-select test.check('the app can still save a yes, as an upsert, the way it does',
-  (select count(*) from public.notification_preferences where member_id = auth.uid() and sms_enabled), 1);
-select test.check('...and a person can still change their quiet hours',
-  (select count(*) from public.notification_preferences where member_id = auth.uid() and quiet_hours_start = 20), 1);
 
 reset role;
 select test.check('...but the stop is still there after all of it',
   (select count(*) from public.notification_preferences where member_id = :'marcus' and sms_stopped_at is not null), 1);
-select test.check('...and saying yes did not make the dispatcher send: it still cancels, with the reason',
+select test.check('...and the dispatcher still cancels, with the reason',
   (select count(*) from (
      select 1 from public.notification_preferences np
      where np.member_id = :'marcus' and (np.sms_stopped_at is not null or np.sms_enabled = false)) x), 1);
@@ -65,6 +93,20 @@ select test.check('...nor change it (an update of somebody else''s row changes n
   (select count(*) from public.notification_preferences where member_id = :'marcus' and quiet_hours_start = 20), 1);
 set role anon;
 select test.check_raises('a signed-out visitor reads nothing', $$select count(*) from public.notification_preferences$$);
+
+-- After START the stop is cleared and a fresh yes is accepted: that yes is the one that counts.
+reset role;
+update public.notification_preferences set sms_enabled = false, alert_booked = false where member_id = :'marcus';
+update public.profiles set phone = '+12679990399' where id = :'marcus';
+select public.record_sms_start('+12679990399');
+set role authenticated;
+select test.as_user(:'marcus');
+insert into public.notification_preferences (member_id, sms_enabled, alert_booked) values (auth.uid(), true, true)
+  on conflict (member_id) do update set member_id = excluded.member_id, sms_enabled = excluded.sms_enabled, alert_booked = excluded.alert_booked;
+select test.check('after START a fresh yes is saved',
+  (select count(*) from public.notification_preferences where member_id = auth.uid() and sms_enabled and alert_booked and sms_stopped_at is null), 1);
+reset role;
+update public.notification_preferences set sms_stopped_at = now(), sms_enabled = true where member_id = :'marcus';
 
 -- The service role (what records a STOP) keeps its hands on it.
 reset role;
