@@ -1862,6 +1862,13 @@
   "appError.action.directory.demo-view": "تشغيل العرض التجريبي أو إيقافه",
   "appError.action.requests.review": "البت في طلب موظف",
   "appError.action.invite.create": "إنشاء دعوة",
+  "appError.action.places.save": "حفظ مكان",
+  "appError.action.places.unsave": "إزالة مكان محفوظ",
+  "appError.action.checkin.here": "تسجيل زيارة بزر «وصلت»",
+  "appError.action.checkin.went": "تسجيل زيارة بزر «ذهبت»",
+  "appError.action.trips.cancel": "إلغاء زيارة",
+  "appError.action.schedule.checkin": "تسجيل حضور شخص",
+  "appError.action.schedule.undo": "التراجع عن تسجيل حضور",
   "notify.app_error": "{action}: لم تتم العملية {count} مرة خلال الساعة الماضية.",
   "notify.app_error.one": "{action}: لم تتم العملية خلال الساعة الماضية.",
   "notify.app_error.two": "{action}: لم تتم العملية مرتين خلال الساعة الماضية.",
@@ -1947,12 +1954,5 @@
   "pam.inbox.waiting.days.few": "في الانتظار منذ {count} أيام",
   "pam.inbox.waiting.days.many": "في الانتظار منذ {count} يومًا",
   "common.comingSoon": "قريبا",
-  "common.example": "مثال",
-  "appError.action.places.save": "Saving a place",
-  "appError.action.places.unsave": "Removing a saved place",
-  "appError.action.checkin.here": "Marking a visit with “I'm here”",
-  "appError.action.checkin.went": "Marking a visit with “I went”",
-  "appError.action.trips.cancel": "Cancelling a visit",
-  "appError.action.schedule.checkin": "Marking someone as there",
-  "appError.action.schedule.undo": "Undoing a mark as there"
+  "common.example": "مثال"
 }

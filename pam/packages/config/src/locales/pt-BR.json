@@ -1719,6 +1719,13 @@
   "appError.action.directory.demo-view": "Ativar ou desativar a visualização de demonstração",
   "appError.action.requests.review": "Decidir sobre um pedido da equipe",
   "appError.action.invite.create": "Criar um convite",
+  "appError.action.places.save": "Salvar um lugar",
+  "appError.action.places.unsave": "Remover um lugar salvo",
+  "appError.action.checkin.here": "Marcar uma visita com “Cheguei”",
+  "appError.action.checkin.went": "Marcar uma visita com “Eu fui”",
+  "appError.action.trips.cancel": "Cancelar uma visita",
+  "appError.action.schedule.checkin": "Registrar a chegada de alguém",
+  "appError.action.schedule.undo": "Desfazer um registro de chegada",
   "notify.app_error": "{action}: não deu certo {count} vezes na última hora.",
   "notify.app_error.one": "{action}: não deu certo na última hora.",
   "waitingCities.empty.title": "Ninguém está esperando ainda",
@@ -1784,12 +1791,5 @@
   "pam.hours.said.noDays": "Escolha pelo menos um dia.",
   "pam.hours.said.order": "Escolha um horário de fechamento depois do de abertura.",
   "common.comingSoon": "Em breve",
-  "common.example": "Exemplo",
-  "appError.action.places.save": "Saving a place",
-  "appError.action.places.unsave": "Removing a saved place",
-  "appError.action.checkin.here": "Marking a visit with “I'm here”",
-  "appError.action.checkin.went": "Marking a visit with “I went”",
-  "appError.action.trips.cancel": "Cancelling a visit",
-  "appError.action.schedule.checkin": "Marking someone as there",
-  "appError.action.schedule.undo": "Undoing a mark as there"
+  "common.example": "Exemplo"
 }
