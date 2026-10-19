@@ -88,7 +88,12 @@ test.describe('reporting a place', () => {
     const sent = await signedIn(page);
     await page.goto(`/flag/?place=${PLACE}`);
 
+    // The screen is client-drawn (no radios in the page's HTML, so no tap can land before React has them), but a tap can still land during the
+    // screen's first moments: wait for the page a person reads, and for the choice to be what they see, before sending (D-616: the report
+    // carries what the screen shows).
+    await settled(page);
     await page.getByRole('radio', { name: 'It moved somewhere else' }).click();
+    await expect(page.getByRole('radio', { name: 'It moved somewhere else' })).toBeChecked();
     await page.getByRole('button', { name: 'Send this to Pam' }).click();
 
     await expect(page.getByRole('heading', { name: 'Thank you. We will check it.' })).toBeVisible();
