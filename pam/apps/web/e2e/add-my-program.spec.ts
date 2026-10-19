@@ -24,9 +24,11 @@ async function signedInMember(page: Page, request: Record<string, unknown> | nul
     }
   }, ME);
   await page.route('**/auth/v1/user*', (route) => route.fulfill(json({ id: ME })));
+  // The person's own city comes from my_region_info() now (20261019025010); the profile row no longer carries it.
+  await page.route('**/rest/v1/rpc/my_region_info*', (route) => route.fulfill(json([{ region_id: '11111111-0000-0000-0000-000000000001', name: 'Philadelphia' }])));
   await page.route('**/rest/v1/profiles*', (route) =>
     route.fulfill(
-      json({ id: ME, role: 'member', first_name: 'Ada', region_id: null, regions: { name: 'Philadelphia' }, access_status: 'active', onboarded_at: '2026-09-14T00:00:00Z' }),
+      json({ id: ME, role: 'member', first_name: 'Ada', access_status: 'active', onboarded_at: '2026-09-14T00:00:00Z' }),
     ),
   );
   await page.route('**/rest/v1/notifications*', (route) => route.fulfill(json([])));
