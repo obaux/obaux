@@ -246,10 +246,8 @@ export function pamErrorFrom(message: string | undefined): PamError {
   return CODES.find((code) => message?.includes(code)) ?? 'OTHER';
 }
 
-export type PamResult<T> =
-  | { readonly ok: true; readonly value: T }
-  /** `code` is for the error log only (D-616): the database's SQLSTATE, or the answer's status when it has none, or offline. */
-  | { readonly ok: false; readonly error: PamError; readonly code?: string };
+/** `code` is what the error log holds for the failure (a status, a SQLSTATE, offline, timeout or unknown), for the screen to report. */
+export type PamResult<T> = { readonly ok: true; readonly value: T } | { readonly ok: false; readonly error: PamError; readonly code?: string };
 
 async function call<T>(fn: string, args?: Record<string, unknown>): Promise<PamResult<T>> {
   try {

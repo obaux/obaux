@@ -16,7 +16,8 @@ import { sheet } from '@pam/ui/sheet';
 import { PAM_SAVED_REPLIES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { setPamThreadStatus, usePamInbox } from '@/lib/pam';
-import { settleWithin, useMalfunction } from '@/lib/malfunction';
+import { settleWithin } from '@/lib/settle';
+import { useMalfunction } from '@/lib/malfunction';
 
 /**
  * The Pam team's tools in a Pam conversation (card a100, D-605; Dot's x6). Only the team sees them; the person never does.

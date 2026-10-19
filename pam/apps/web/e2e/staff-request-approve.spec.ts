@@ -92,7 +92,7 @@ test('any other failure is Pam failing: the small alert at the bottom, logged, a
   await settled(page);
   await page.getByRole('button', { name: 'Approve' }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Yes, approve' }).click();
-  await expect(page.getByRole('alert').filter({ hasText: "That didn't go through. It's not your fault, so try again." })).toBeVisible();
+  await expect(page.getByRole('alert').filter({ hasText: /Something's wrong on our side|That took too long|Still not working/ })).toBeVisible();
   await expect(page.getByText('We could not save that')).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Approve' })).toBeEnabled();
   await expect(page.getByRole('link', { name: /Contact Pam/ })).toHaveCount(0);

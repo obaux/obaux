@@ -131,7 +131,7 @@ test.describe('keeping a place', () => {
     await page.goto('/');
     await settled(page);
     await page.getByRole('button', { name: 'Save' }).click();
-    const alert = page.getByRole('alert').filter({ hasText: "That didn't go through. It's not your fault, so try again." });
+    const alert = page.getByRole('alert').filter({ hasText: /Something's wrong on our side|That took too long|Still not working/ });
     await expect(alert).toBeVisible();
     await expect(page.getByText('secret detail')).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Save' })).toBeVisible();
