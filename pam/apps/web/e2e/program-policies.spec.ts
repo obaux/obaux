@@ -171,3 +171,49 @@ test('ticking a policy on a service asks the database to make it only for that s
   // The policy was already only for the computer room; now it is for the GED class too.
   expect(scoped[0]).toEqual({ p_policy_id: CONF, p_service_ids: [COMPUTERS, GED] });
 });
+
+const ALERT = /Something's wrong on our side|That took too long|Still not working/;
+const REAL_GED = 'b1b2c3d4-0000-4000-8000-0000000000aa';
+
+test('a policy that could not be added is the small alert at the bottom, with the file taken back (D-616)', async ({ page }) => {
+  await signedInLead(page, []);
+  const taken: string[] = [];
+  await page.route('**/storage/v1/object/policies/**', (route) => {
+    if (route.request().method() === 'DELETE') taken.push(route.request().url());
+    return route.fulfill(json({ Key: 'policies/x' }));
+  });
+  await page.route('**/rest/v1/rpc/add_policy*', (route) => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));
+  await page.goto('/program/policies/');
+  await settled(page);
+  await page.locator('input[type=file]').setInputFiles({ name: 'code-of-conduct.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4 test') });
+  await expect(page.getByRole('alert').filter({ hasText: ALERT })).toBeVisible();
+  await expect(page.getByText('We could not save that')).toHaveCount(0);
+});
+
+test('a policy that could not be taken off stays on the list, with the small alert at the bottom (D-616)', async ({ page }) => {
+  await signedInLead(page, [policy('conf', 'Confidentiality')]);
+  await page.route('**/rest/v1/rpc/archive_policy*', (route) => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));
+  await page.goto('/program/policies/');
+  await settled(page);
+  await page.getByRole('button', { name: 'Edit' }).click();
+  await page.getByRole('button', { name: /Remove Confidentiality/ }).click();
+  await page.getByRole('dialog').getByRole('button', { name: /^Remove|Yes/ }).first().click();
+  await expect(page.getByRole('alert').filter({ hasText: ALERT })).toBeVisible();
+  await expect(page.getByText('Confidentiality').first()).toBeVisible();
+});
+
+test('a service that could not be saved keeps what was typed, with the small alert at the bottom (D-616)', async ({ page }) => {
+  await signedInLead(page, []);
+  await page.unroute('**/rest/v1/program_services*');
+  const svc = { id: REAL_GED, service_id: PROGRAM, name: 'GED class', description: null, phone: null, website: null, address: null, hours: null, sort_order: 0, program_policy_services: [] };
+  await page.route('**/rest/v1/program_services*', (route) =>
+    route.request().method() === 'GET' ? route.fulfill(json([svc])) : route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }),
+  );
+  await page.goto(`/program/service/?id=${REAL_GED}`);
+  await settled(page);
+  await page.getByRole('textbox', { name: 'Service name' }).fill('GED class, evenings');
+  await page.getByRole('button', { name: 'Save service' }).click();
+  await expect(page.getByRole('alert').filter({ hasText: ALERT })).toBeVisible();
+  await expect(page).toHaveURL(/\/program\/service\//);
+  await expect(page.getByRole('textbox', { name: 'Service name' })).toHaveValue('GED class, evenings');
+});

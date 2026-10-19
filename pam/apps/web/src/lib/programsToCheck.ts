@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { REVIEW_DAYS } from './programSetup';
+import { attempt, type Outcome } from './settle';
 
 /**
  * The programs a super admin has still to look at (D-386, part 6):
@@ -123,16 +124,13 @@ export function useProgramsToCheck(enabled: boolean): { state: ProgramsToCheckSt
 export type ProgramDecision = 'approved' | 'changes_asked' | 'discarded';
 
 /** Decide one. Resolves false when the database refused or could not be reached. */
-export async function reviewProgram(id: string, decision: ProgramDecision, note?: string): Promise<boolean> {
-  try {
+export async function reviewProgram(id: string, decision: ProgramDecision, note?: string): Promise<Outcome> {
+  return attempt(async () => {
     const { createClient } = await import('./supabase');
-    const { error } = await createClient().rpc('review_program_submission', {
+    return createClient().rpc('review_program_submission', {
       p_id: id,
       p_decision: decision,
       ...(note ? { p_note: note } : {}),
     });
-    return !error;
-  } catch {
-    return false;
-  }
+  });
 }

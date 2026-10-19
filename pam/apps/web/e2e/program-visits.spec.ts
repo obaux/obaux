@@ -54,8 +54,9 @@ test('Home lists the visits planned at the lead\'s own program, by first name, w
 });
 
 const VISIT = 'aaaaaaaa-0000-4000-8000-000000005701';
+// Starting now: the database takes a check-in from two hours before the start (D-616), so the circle is only drawn near it.
 const here = (checkedInAt: string | null = null) => ({
-  appointment_id: VISIT, member_id: 'm1', first_name: 'Tanya', starts_at: soon(0), ends_at: null,
+  appointment_id: VISIT, member_id: 'm1', first_name: 'Tanya', starts_at: new Date(Date.now() + 10 * 60_000).toISOString(), ends_at: null,
   status: checkedInAt ? 'attended' : 'scheduled', service_name: 'GED class', checked_in_at: checkedInAt,
 });
 
@@ -164,4 +165,37 @@ test('the card has no Message row when either has blocked the other (D-542)', as
   await settled(page);
   await expect(page.getByRole('heading', { name: 'Tanya', level: 1 })).toBeVisible();
   await expect(page.getByText('Message Tanya')).toHaveCount(0);
+});
+
+test('a visit days away has no check-in circle: the database would refuse it, so the circle is not drawn (D-616)', async ({ page }) => {
+  await signedInLead(page, [
+    here(),
+    { appointment_id: 'aaaaaaaa-0000-4000-8000-000000005702', member_id: 'm2', first_name: 'Luis', starts_at: soon(6), ends_at: null, status: 'scheduled', service_name: null, checked_in_at: null },
+  ]);
+  await page.goto('/');
+  await settled(page);
+  await expect(page.getByRole('button', { name: 'Check Tanya in' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Check Luis in' })).toHaveCount(0);
+});
+
+test('a second tap on the circle before the database answers is not a second check_in_visit (Iris L3)', async ({ page }) => {
+  await signedInLead(page, [here()]);
+  let asked = 0;
+  let release: (() => void) | undefined;
+  const held = new Promise<void>((resolve) => (release = resolve));
+  await page.route('**/rest/v1/rpc/check_in_visit*', async (route) => {
+    asked += 1;
+    await held;
+    await route.fulfill(json([{ appointment_id: VISIT, status: 'attended', checked_in_at: new Date().toISOString(), points: 100 }]));
+  });
+  await page.goto('/');
+  await settled(page);
+  const circle = page.getByRole('button', { name: 'Check Tanya in' });
+  await circle.click();
+  await expect.poll(() => asked).toBe(1);
+  await circle.click();
+  await page.waitForTimeout(300);
+  release!();
+  await expect(page.getByRole('button', { name: /Tanya is checked in/ })).toBeVisible();
+  expect(asked).toBe(1);
 });

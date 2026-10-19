@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { Category } from '@pam/config';
 import type { NearbyPlace } from './usePlaces';
+import { attempt, type Outcome } from './settle';
 
 /**
  * Places with an open flag, for the people who review them (D-189).
@@ -118,15 +119,12 @@ export function useFlaggedPlaces(enabled: boolean): { state: FlaggedPlacesState;
  * list, or take it off and tell whoever saved it. Super admin only, which the
  * function enforces; the screen only offers it to one.
  */
-export async function resolveFlag(flagId: string, action: 'keep' | 'remove'): Promise<boolean> {
-  try {
+export async function resolveFlag(flagId: string, action: 'keep' | 'remove'): Promise<Outcome> {
+  return attempt(async () => {
     const { createClient } = await import('./supabase');
-    const { error } = await createClient().rpc('resolve_service_flag', {
+    return createClient().rpc('resolve_service_flag', {
       p_flag_id: flagId,
       p_action: action,
     });
-    return !error;
-  } catch {
-    return false;
-  }
+  });
 }

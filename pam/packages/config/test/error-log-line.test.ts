@@ -107,7 +107,14 @@ describe('the error log keeps what Privacy says it keeps (D-616)', () => {
       return Array.from(block.matchAll(/^\s+\('([^']+)'\),?$/gm), (m) => m[1]!);
     };
     const routes = listed('app_error_routes');
-    const actions = listed('app_error_actions');
+    // The first migration seeds the list; a later one may add keys with a plain insert (plan C's two calendar actions), so the list is every such insert.
+    const added = readdirSync(MIGRATIONS)
+      .filter((f) => f.endsWith('.sql'))
+      .map((f) => readFileSync(MIGRATIONS + f, 'utf8'))
+      .flatMap((text) =>
+        Array.from(text.matchAll(/insert\s+into\s+public\.app_error_actions\s*\(action\)\s*values([^;]*);/gi), (m) => Array.from(m[1]!.matchAll(/\(\s*'([^']+)'\s*\)/g), (k) => k[1]!)).flat(),
+      );
+    const actions = [...new Set([...listed('app_error_actions'), ...added])];
 
     it('has both lists, and they are the app\'s own (the config test holds them equal; this keeps the line honest if that test goes)', () => {
       expect(routes.length).toBeGreaterThan(10);

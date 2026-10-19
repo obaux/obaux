@@ -11,6 +11,12 @@ describe('inMarkWindow', () => {
     expect(inMarkWindow(at(-3.9), NOW)).toBe(true);
     expect(inMarkWindow(at(-4.1), NOW)).toBe(false);
   });
+  it('closes three hours after the visit ends, so a longer visit stays open longer and a shorter one closes sooner', () => {
+    expect(inMarkWindow(at(-4.9), NOW, 120)).toBe(true);
+    expect(inMarkWindow(at(-5.1), NOW, 120)).toBe(false);
+    expect(inMarkWindow(at(-3.4), NOW, 30)).toBe(true);
+    expect(inMarkWindow(at(-3.6), NOW, 30)).toBe(false);
+  });
 });
 
 describe('refusalOf', () => {

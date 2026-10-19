@@ -9,6 +9,7 @@ import { Button } from '@pam/ui/Button';
 import { Loading, Notice, PlaceCard } from '@pam/ui';
 import { NOTICES, type Category } from '@pam/config';
 import { examplesOn } from '@/lib/examples';
+import { useMalfunction } from '@/lib/malfunction';
 import { DUMMY_FLAGS } from '@pam/config/dummy-places';
 import { useI18n } from '@/lib/i18n';
 import { placeStatus } from '@/lib/usePlaceStatus';
@@ -69,7 +70,7 @@ export function ReportedPlaces({
 }) {
   const { t, locale } = useI18n();
   const [busy, setBusy] = useState<string | null>(null);
-  const [failed, setFailed] = useState(false);
+  const malfunction = useMalfunction();
   const [decidedDummies, setDecidedDummies] = useState<readonly string[]>([]);
   // Taking a place off the list asks first; every decision says what was done afterwards (Iris's super admin pass, W1).
   const [confirming, setConfirming] = useState<Row | null>(null);
@@ -108,18 +109,18 @@ export function ReportedPlaces({
 
   const decide = async (row: Row, action: 'keep' | 'remove') => {
     if (busy) return;
-    setFailed(false);
     setDone(null);
     if (showDummy) {
       setDecidedDummies((prev) => [...prev, row.flagId]);
       setDone({ key: action, place: row.name });
       return;
     }
+    const from = document.activeElement;
     setBusy(row.flagId);
-    const ok = await resolveFlag(row.flagId, action);
+    const out = await resolveFlag(row.flagId, action);
     setBusy(null);
-    if (!ok) {
-      setFailed(true);
+    if (!out.ok) {
+      malfunction.show('places.review', out.error, from);
       return;
     }
     setDone({ key: action, place: row.name });
@@ -139,15 +140,6 @@ export function ReportedPlaces({
           notice={state.offline ? 'offline' : 'something_went_wrong'}
           title={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].titleKey)}
           body={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].bodyKey)}
-          contactLabel={t('help.contact.action')}
-        />
-      ) : null}
-
-      {failed ? (
-        <Notice
-          notice="something_went_wrong"
-          title={t('places.reported.failed.title')}
-          body={t('places.reported.failed.body')}
           contactLabel={t('help.contact.action')}
         />
       ) : null}

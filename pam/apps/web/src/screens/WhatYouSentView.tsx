@@ -14,6 +14,7 @@ import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/navigate';
 import { markFreshAccount, readSentProgram, startOver, useProgramSetup, type SentProgram } from '@/lib/programSetup';
 import { withdrawSubmission } from '@/lib/useOwnProgram';
+import { useMalfunction } from '@/lib/malfunction';
 import { useSession } from '@/lib/useSession';
 import { ConfirmDialog } from './ConfirmDialog';
 import { intlLocale } from '@pam/config';
@@ -72,7 +73,7 @@ export function WhatYouSentView({ sent: given }: { readonly sent?: SentProgram |
   // The program on file, when there is one (D-447); what this tab remembers otherwise.
   const sent = given ?? (setup.program ? setup.sent : readSentProgram());
   const [isAsking, setIsAsking] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const malfunction = useMalfunction();
   // Delete and start over on a program on file withdraws its send (D-462); the
   // menu offers it only when there is a send to withdraw.
   const submissionId = setup.program?.submissionId ?? null;
@@ -95,27 +96,21 @@ export function WhatYouSentView({ sent: given }: { readonly sent?: SentProgram |
             navigate('/program/');
             return;
           }
-          void withdrawSubmission(submissionId).then((ok) => {
+          const from = document.activeElement;
+          void withdrawSubmission(submissionId).then((out) => {
             setIsAsking(false);
-            if (ok) {
+            if (out.ok) {
               // Nothing is on file again: Add a program, not the example (D-385).
               markFreshAccount();
               navigate('/program/');
+            } else {
+              malfunction.show('request.withdraw', out.error, from);
             }
-            else setFailed(true);
           });
         }}
         cancelLabel={t('programs.sent.startOver.keep')}
         onCancel={() => setIsAsking(false)}
       />
-      {failed ? (
-        <Notice
-          notice="something_went_wrong"
-          title={t('join.failed.title')}
-          body={t('join.failed.body')}
-          contactLabel={t('help.contact.action')}
-        />
-      ) : null}
       {sent ? (
         <>
           <Text type="supporting" xstyle={styles.when}>

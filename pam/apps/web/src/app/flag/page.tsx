@@ -14,6 +14,8 @@ import { HelpButton } from '../../screens/HelpButton';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { SERVICE_FLAG_REASON_KEYS, type ServiceFlagReason } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
+import { useMalfunction } from '@/lib/malfunction';
+import { attempt } from '@/lib/settle';
 
 /**
  * "Something is wrong here."
@@ -57,7 +59,8 @@ function FlagForm() {
 
   const [reason, setReason] = useState<ServiceFlagReason>('closed');
   const [note, setNote] = useState('');
-  const [status, setStatus] = useState<'idle' | 'sending' | 'done' | 'failed'>('idle');
+  const [status, setStatus] = useState<'idle' | 'sending' | 'done'>('idle');
+  const malfunction = useMalfunction();
 
   // The nested-page template (D-213, D-217): back goes to the place the
   // report is about, or to Explore when there is none.
@@ -91,17 +94,22 @@ function FlagForm() {
 
   const send = async () => {
     setStatus('sending');
-    try {
+    const from = document.activeElement;
+    const outcome = await attempt(async () => {
       const { createClient } = await import('@/lib/supabase');
-      const { error } = await createClient().rpc('flag_service', {
+      return createClient().rpc('flag_service', {
         p_service_id: serviceId,
         p_reason: reason,
         p_note: note.trim() === '' ? null : note.trim(),
       });
-      setStatus(error ? 'failed' : 'done');
-    } catch {
-      setStatus('failed');
+    });
+    if (outcome.ok) {
+      setStatus('done');
+      return;
     }
+    // Not sent (D-616): the small alert at the bottom, and the form as it was, with what was typed.
+    setStatus('idle');
+    malfunction.show('flag.send', outcome.error, from);
   };
 
   if (status === 'done') {
@@ -124,15 +132,6 @@ function FlagForm() {
   return (
     <Page gap={4}>
       {header}
-
-      {status === 'failed' ? (
-        <Notice
-          notice="something_went_wrong"
-          title={t('flag.failed.title')}
-          body={t('flag.failed.body')}
-          contactLabel={t('help.contact.action')}
-        />
-      ) : null}
 
       <Card padding={4} xstyle={styles.card}>
         <VStack gap={3}>

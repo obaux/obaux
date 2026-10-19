@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { settleWithin } from './settle';
+import { settleWithin, withStatus } from './settle';
 
 /**
  * Who has been checked in (D-316, Will, 6 October): a program taps the circle
@@ -36,6 +36,22 @@ function write(next: Readonly<Record<string, string>>): void {
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/**
+ * From two hours before a visit starts until fourteen days after it ends: the database refuses a check-in outside it (`OUTSIDE_THE_VISIT_WINDOW`,
+ * migration 20261011145930), so a circle outside it would only fail. A visit's end is its start and its length (the database takes an hour when
+ * it has none).
+ */
+export function inCheckInWindow(startsAt: string, minutes: number, now: number = Date.now()): boolean {
+  const start = new Date(startsAt).getTime();
+  const end = start + (minutes > 0 ? minutes : 60) * 60_000;
+  return now >= start - 2 * 3_600_000 && now <= end + 14 * 86_400_000;
+}
+
+/** Whether the circle is offered for this visit: a real visit only inside the window; an example visit (not a uuid) any time. */
+export function canMarkNow(id: string, startsAt: string, minutes: number, now: number = Date.now()): boolean {
+  return !UUID.test(id) || inCheckInWindow(startsAt, minutes, now);
+}
+
 /** What a change came to: done, or not done, with the error (for the log's code) and, when no answer came in time, the late answer. */
 export type CheckInResult = { readonly ok: true } | { readonly ok: false; readonly error: unknown; readonly late?: Promise<void> };
 
@@ -48,8 +64,8 @@ async function ask(door: 'check_in_visit' | 'undo_check_in', appointmentId: stri
     const settled = await settleWithin(Promise.resolve(createClient().rpc(door, { p_appointment_id: appointmentId })));
     if (settled.status === 'timeout') return { ok: false, error: settled.error, late: settled.late };
     if (settled.status === 'failed') return { ok: false, error: settled.error };
-    const { data, error } = settled.value;
-    if (error) return { ok: false, error };
+    const { data, error, status } = settled.value;
+    if (error) return { ok: false, error: withStatus(error, status) };
     const row = (Array.isArray(data) ? data[0] : data) as { status?: string } | undefined;
     return { ok: true, stillMarked: row?.status === 'attended' };
   } catch (error) {

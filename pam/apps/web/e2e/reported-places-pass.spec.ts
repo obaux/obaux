@@ -83,3 +83,14 @@ test('keeping a place says so, in one tap (W1)', async ({ page }) => {
   await page.getByRole('button', { name: 'Keep it' }).click();
   await expect(page.getByText('Corner Pantry 0 stays on the list.')).toBeVisible();
 });
+
+test('a decision that did not go through is the small alert at the bottom, and the place stays on the list (D-616)', async ({ page }) => {
+  await asSuper(page, 1);
+  await page.route('**/rest/v1/rpc/resolve_service_flag*', (route) => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));
+  await page.goto('/places/reported/');
+  await settled(page);
+  await page.getByRole('button', { name: 'Keep it' }).click();
+  await expect(page.getByRole('alert').filter({ hasText: /Something's wrong on our side|That took too long|Still not working/ })).toBeVisible();
+  await expect(page.getByText('Corner Pantry 0 stays on the list.')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Keep it' })).toBeVisible();
+});

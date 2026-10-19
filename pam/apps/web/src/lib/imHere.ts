@@ -1,6 +1,6 @@
 'use client';
 
-import { settleWithin } from './settle';
+import { settleWithin, withStatus } from './settle';
 
 /**
  * "I'm here" and "I went" (D-535): a member marks their own visit.
@@ -12,10 +12,15 @@ import { settleWithin } from './settle';
  */
 export const HERE_METERS = 150;
 
-/** From two hours before the visit to four hours after it starts (the database checks the real end). */
-export function inMarkWindow(startsAt: string, now: number = Date.now()): boolean {
+/**
+ * From two hours before the visit starts to three hours after it ends, as the database has it (`i_am_here` and `i_went`, migration
+ * 20261011145930). The trip a member reads carries no end, so the visit is taken to last an hour, which is what the database does for one
+ * with no end; `minutes` is for a visit whose length is known.
+ */
+export function inMarkWindow(startsAt: string, now: number = Date.now(), minutes: number = 60): boolean {
   const start = new Date(startsAt).getTime();
-  return now >= start - 2 * 3_600_000 && now <= start + 4 * 3_600_000;
+  const end = start + (minutes > 0 ? minutes : 60) * 60_000;
+  return now >= start - 2 * 3_600_000 && now <= end + 3 * 3_600_000;
 }
 
 export type HereResult =
@@ -66,10 +71,10 @@ export async function markHere(visitId: string): Promise<HereResult> {
     );
     if (settled.status === 'timeout') return { kind: 'error', error: settled.error, late: settled.late };
     if (settled.status === 'failed') return { kind: 'error', error: settled.error };
-    const { data, error } = settled.value;
+    const { data, error, status } = settled.value;
     if (error) {
       const why = refusalOf(error.message);
-      return why === 'too-late' || why === 'no-location' ? { kind: why } : { kind: 'error', error };
+      return why === 'too-late' || why === 'no-location' ? { kind: why } : { kind: 'error', error: withStatus(error, status) };
     }
     const row = (Array.isArray(data) ? data[0] : data) as { there?: boolean; points?: number } | undefined;
     return row?.there ? { kind: 'there', points: row.points ?? 0 } : { kind: 'not-yet' };
@@ -84,10 +89,10 @@ export async function markWent(visitId: string): Promise<WentResult> {
     const settled = await settleWithin(Promise.resolve(createClient().rpc('i_went', { p_appointment_id: visitId })));
     if (settled.status === 'timeout') return { kind: 'error', error: settled.error, late: settled.late };
     if (settled.status === 'failed') return { kind: 'error', error: settled.error };
-    const { data, error } = settled.value;
+    const { data, error, status } = settled.value;
     if (error) {
       const why = refusalOf(error.message);
-      return why === 'too-late' || why === 'limit' ? { kind: why } : { kind: 'error', error };
+      return why === 'too-late' || why === 'limit' ? { kind: why } : { kind: 'error', error: withStatus(error, status) };
     }
     const row = (Array.isArray(data) ? data[0] : data) as { points?: number } | undefined;
     return { kind: 'went', points: row?.points ?? 0 };

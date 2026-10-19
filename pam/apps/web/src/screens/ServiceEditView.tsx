@@ -12,10 +12,11 @@ import { TextArea } from "@astryxdesign/core/TextArea";
 import { VStack } from "@astryxdesign/core/VStack";
 import type { DummyService } from "@pam/config/dummy-services";
 import type { WeekHours } from "@pam/config/hours";
-import { BigButton, Notice, TextField, TextLink } from "@pam/ui";
+import { BigButton, TextField, TextLink } from "@pam/ui";
 import { SubPage } from "@pam/ui/SubPage";
 import { useI18n } from "@/lib/i18n";
 import { navigate } from "@/lib/navigate";
+import { useMalfunction } from "@/lib/malfunction";
 import { usePolicies } from "@/lib/usePolicies";
 import { useServices } from "@/lib/useServices";
 import { useProgramSetup } from "@/lib/programSetup";
@@ -69,7 +70,7 @@ export function ServiceEditView({
   // The program this is for: the service's own, or — a new one — the lead's.
   const programId = existing?.placeId ?? setup.program?.id ?? PROGRAM_PLACE_ID;
   const [isSaving, setIsSaving] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const malfunction = useMalfunction();
   const [draft, setDraft] = useState<DummyService>(
     existing ?? {
       id: `service-added-${Date.now()}`,
@@ -118,9 +119,9 @@ export function ServiceEditView({
   const submit = async () => {
     setTried(true);
     if (draft.name.trim() === "" || isSaving) return;
-    setFailed(false);
+    const from = document.activeElement;
     setIsSaving(true);
-    const ok = await save({
+    const out = await save({
       ...draft,
       placeId: programId,
       name: draft.name.trim(),
@@ -131,9 +132,9 @@ export function ServiceEditView({
       hours: draft.hours ?? null,
     });
     setIsSaving(false);
-    // Not saved: stay with what was typed, and say so.
-    if (!ok) {
-      setFailed(true);
+    // Not saved: stay with what was typed, and say so at the bottom (D-616).
+    if (!out.ok) {
+      malfunction.show("service.save", out.error, from);
       return;
     }
     navigate("/program/");
@@ -150,15 +151,6 @@ export function ServiceEditView({
       <Text type="supporting" xstyle={styles.intro}>
         {t("program.service.intro")}
       </Text>
-
-      {failed ? (
-        <Notice
-          notice="something_went_wrong"
-          title={t("join.failed.title")}
-          body={t("join.failed.body")}
-          contactLabel={t('help.contact.action')}
-        />
-      ) : null}
 
       <Card padding={6}>
         <VStack gap={3}>
@@ -330,10 +322,11 @@ export function ServiceEditView({
         confirmLabel={t("program.service.remove.yes")}
         onConfirm={() => {
           if (!existing) return;
-          void remove(existing.id).then((ok) => {
+          const from = document.activeElement;
+          void remove(existing.id).then((out) => {
             setAsking(false);
-            if (ok) navigate("/program/");
-            else setFailed(true);
+            if (out.ok) navigate("/program/");
+            else malfunction.show("service.remove", out.error, from);
           });
         }}
         cancelLabel={t("program.service.remove.no")}

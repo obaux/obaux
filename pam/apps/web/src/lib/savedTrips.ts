@@ -1,5 +1,5 @@
 import { addTrip, cancelTripHere, moveTrip, setSavedTrips, readAddedTrips, type AddedTrip } from './addedTrips';
-import { settleWithin } from './settle';
+import { settleWithin, withStatus } from './settle';
 import type { SessionState } from './useSession';
 
 /**
@@ -224,7 +224,7 @@ export async function cancelSavedOrLocalTrip(id: string): Promise<CancelResult> 
     const settled = await settleWithin(Promise.resolve(createClient().rpc('cancel_trip', { p_id: id })));
     if (settled.status === 'timeout') return { ok: false, error: settled.error, late: settled.late };
     if (settled.status === 'failed') return { ok: false, error: settled.error };
-    if (settled.value.error) return { ok: false, error: settled.value.error };
+    if (settled.value.error) return { ok: false, error: withStatus(settled.value.error, settled.value.status) };
     await loadSavedTrips();
     return { ok: true };
   } catch (error) {

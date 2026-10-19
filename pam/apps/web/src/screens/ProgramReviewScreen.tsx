@@ -13,6 +13,7 @@ import { SubPage } from '@pam/ui/SubPage';
 import { categoryLabelKey, displayPhone, intlLocale, type Category } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { goBack } from '@/lib/navigate';
+import { useMalfunction } from '@/lib/malfunction';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import {
@@ -56,7 +57,7 @@ export function ProgramReviewScreen({ id }: { readonly id: string | null }) {
   const { state } = useProgramsToCheck(isSuperAdmin);
 
   const [busy, setBusy] = useState<ProgramDecision | null>(null);
-  const [failed, setFailed] = useState(false);
+  const malfunction = useMalfunction();
   const [asking, setAsking] = useState(false);
   const [note, setNote] = useState('');
   const [needNote, setNeedNote] = useState(false);
@@ -106,15 +107,14 @@ export function ProgramReviewScreen({ id }: { readonly id: string | null }) {
       return;
     }
     setNeedNote(false);
-    setFailed(false);
+    const from = document.activeElement;
     setBusy(decision);
-    const ok = await reviewProgram(program.id, decision, decision === 'changes_asked' ? note.trim() : undefined);
+    const out = await reviewProgram(program.id, decision, decision === 'changes_asked' ? note.trim() : undefined);
     setBusy(null);
-    if (ok) {
+    if (out.ok) {
       setAsking(false);
       setDecided(decision);
-    }
-    else setFailed(true);
+    } else malfunction.show('programs.review', out.error, from);
   };
 
   const footer = decided ? (
@@ -247,15 +247,6 @@ export function ProgramReviewScreen({ id }: { readonly id: string | null }) {
             ) : null}
           </VStack>
         </Card>
-      ) : null}
-
-      {failed ? (
-        <Notice
-          notice="something_went_wrong"
-          title={t('requests.failed.title')}
-          body={t('requests.failed.body')}
-          contactLabel={t('help.contact.action')}
-        />
       ) : null}
 
 

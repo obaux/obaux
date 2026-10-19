@@ -40,6 +40,16 @@ export const APP_ERROR_ACTIONS = [
   'trips.cancel',
   'schedule.checkin',
   'schedule.undo',
+  'flag.send',
+  'program.save',
+  'service.save',
+  'service.remove',
+  'request.withdraw',
+  'policies.upload',
+  'policies.remove',
+  'program.add',
+  'places.review',
+  'programs.review',
 ] as const;
 
 export type AppErrorAction = (typeof APP_ERROR_ACTIONS)[number];

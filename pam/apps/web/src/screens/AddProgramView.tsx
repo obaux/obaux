@@ -7,6 +7,7 @@ import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { markSetupDone, readSentProgram, saveSentProgram } from '@/lib/programSetup';
 import { askToAddProgram } from '@/lib/useProgramRequest';
+import { useMalfunction } from '@/lib/malfunction';
 import { asksForOwnProgram, resendOwnProgram, submitOwnProgram, useOwnProgram } from '@/lib/useOwnProgram';
 import { useSession } from '@/lib/useSession';
 import { Notice } from '@pam/ui';
@@ -76,7 +77,7 @@ export function AddProgramView({
   const [step, setStep] = useState(() => (isEditing ? PROGRAM_STEPS.length - 1 : 0));
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const malfunction = useMalfunction();
   const { state: session } = useSession();
   // A signed-in program lead, not a demo account: their send is saved for real.
   const isReal = mode === 'lead' && asksForOwnProgram(session) !== null;
@@ -98,16 +99,23 @@ export function AddProgramView({
       if (mode === 'ask') {
         if (session.status !== 'signed-in') return;
         setBusy(true);
-        setFailed(false);
-        const result = await askToAddProgram(program, {
-          firstName: session.session.firstName ?? '',
-          city: session.session.regionName ?? '',
-          language: locale,
-        });
+        const from = document.activeElement;
+        let why: unknown;
+        const result = await askToAddProgram(
+          program,
+          {
+            firstName: session.session.firstName ?? '',
+            city: session.session.regionName ?? '',
+            language: locale,
+          },
+          (error) => {
+            why = error;
+          },
+        );
         setBusy(false);
-        // Already waiting or approved counts as sent: the request is on file.
+        // Already waiting or approved counts as sent: the request is on file. Not sent: the alert at the bottom, and the form as it was (D-616).
         if (result === 'failed') {
-          setFailed(true);
+          malfunction.show('program.add', why, from);
           return;
         }
         onAsked?.();
@@ -115,12 +123,12 @@ export function AddProgramView({
       }
       if (isReal) {
         setBusy(true);
-        setFailed(false);
-        const ok = resendId !== null ? await resendOwnProgram(resendId, program) : await submitOwnProgram(program);
+        const from = document.activeElement;
+        const out = resendId !== null ? await resendOwnProgram(resendId, program) : await submitOwnProgram(program);
         setBusy(false);
-        // Not on file: stay on the last question with what was typed, and say so.
-        if (!ok) {
-          setFailed(true);
+        // Not on file: stay on the last question with what was typed, and say so at the bottom (D-616).
+        if (!out.ok) {
+          malfunction.show('program.add', out.error, from);
           return;
         }
       }
@@ -161,14 +169,6 @@ export function AddProgramView({
           (Will, 7 October, D-365). That Pam checks a new program is said
           once, on the last step, where it is about to happen. */}
       <VStack gap={4}>
-        {failed ? (
-          <Notice
-            notice="something_went_wrong"
-            title={t('join.failed.title')}
-            body={t('join.failed.body')}
-            contactLabel={t('help.contact.action')}
-          />
-        ) : null}
         {wizard.body}
       </VStack>
     </SubPage>

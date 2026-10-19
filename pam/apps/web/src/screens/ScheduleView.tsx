@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { Button } from '@pam/ui/Button';
@@ -23,7 +23,7 @@ import { DashedRule } from '@pam/ui/DashedRule';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { useI18n } from '@/lib/i18n';
 import { isVerified, usePolicies } from '@/lib/usePolicies';
-import { checkIn, rereadCheckIns, undoCheckIn, useCheckIns, type CheckInResult } from '@/lib/checkIns';
+import { canMarkNow, checkIn, rereadCheckIns, undoCheckIn, useCheckIns, type CheckInResult } from '@/lib/checkIns';
 import { useMalfunction } from '@/lib/malfunction';
 import { intlLocale } from '@pam/config';
 import { ConfirmDialog } from './ConfirmDialog';
@@ -331,6 +331,8 @@ function CheckInButton({
   const [burst, setBurst] = useState(0);
   const [isTipOpen, setTipOpen] = useState(false);
   const [isAsking, setAsking] = useState(false);
+  // One check-in out at a time: a second tap on the circle before the database answers is not a second send (Iris L3).
+  const sending = useRef(false);
   const malfunction = useMalfunction();
   /** The save did not go through (D-616): the small alert at the bottom, the circle as it was, and a late answer read again. */
   const failed = (action: 'schedule.checkin' | 'schedule.undo', result: Extract<CheckInResult, { ok: false }>) => {
@@ -356,7 +358,10 @@ function CheckInButton({
               return;
             }
             // A real visit is saved first; the circle fills when the database says yes.
+            if (sending.current) return;
+            sending.current = true;
             void checkIn(id).then((result) => {
+              sending.current = false;
               if (!result.ok) return failed('schedule.checkin', result);
               setBurst((n) => n + 1);
               setTipOpen(true);
@@ -471,6 +476,8 @@ export function ScheduleView({
   const row = (a: Appointment, withDay = false) => {
     const d = new Date(a.startsAt);
     const isChecked = Boolean(checkIns[a.id]);
+    // The circle only where the database would take the mark: a visit not yet within two hours of starting, or long past, shows the person (D-616).
+    const markable = canCheckIn && (isChecked || canMarkNow(a.id, a.startsAt, a.minutes));
     const kind = withDay ? `${fmt.day.format(d)} · ${a.kindLabel}` : a.kindLabel;
     return (
       <ListItem
@@ -495,7 +502,7 @@ export function ScheduleView({
         description={
           <Text type="supporting" xstyle={styles.description}>
             {/* Said plainly either way (Will, D-316): "Not checked in" / "Checked in". */}
-            {canCheckIn ? `${kind} · ${t(isChecked ? 'schedule.checkedIn' : 'schedule.notCheckedIn')}` : kind}
+            {markable ? `${kind} · ${t(isChecked ? 'schedule.checkedIn' : 'schedule.notCheckedIn')}` : kind}
           </Text>
         }
         startContent={
@@ -507,7 +514,7 @@ export function ScheduleView({
           </VStack>
         }
         endContent={
-          canCheckIn ? (
+          markable ? (
             <CheckInButton id={a.id} name={a.firstName} isChecked={isChecked} t={t} tPlain={tPlain} />
           ) : (
             <Avatar size="md" name={a.firstName} tooltip={false} alt="" />
