@@ -38,6 +38,10 @@ Nico's classifier is final at `9df19119` (ten kinds, `failureFor(action, caught,
 1. The pictures Will sees are of the real Text alerts screen on the e2e build, not a story: `docs/design/review/2026-10-19-d618-banner/` (offline, signed out, server, changed, refused, wrong time and second failure, in light, dark, Arabic and Russian at 320×568). Wrong time is raised from the screen where it really comes up (Mira, 02:00): "I'm here" on a visit outside its time (`checkin.here` with the guard's `OUTSIDE_THE_VISIT_WINDOW`), shot on the e2e build of the real visit page, with the answer stubbed as the database gives it; the other six are on Text alerts.
 2. Offline, the second failure keeps the offline words and Try again, with no Get help and no "Still not working": the help desk is on the website and cannot load offline. Test added (`offline, a second failure keeps the offline words…`); it fails without the change on a build of the tree without it.
 
+## The surface (Mira, 02:36)
+
+Red is for a fault: only server and timeout. Everything else (offline, signed out, not allowed, a limit, changed, gone, wrong time, refused) is the calm card, the inverse of the page, as D-619's notices are, so "Not at this time" is not drawn as though something broke. The pictures were re-shot on the real screens after that change (the seven kinds in four modes; wrong time from "I'm here").
+
 ## Left undone
 
 - b77 (Piper's `settle.ts`) is not on main yet: merge main when it is, and resolve `malfunction.tsx` there.
