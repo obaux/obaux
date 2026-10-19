@@ -37,3 +37,20 @@ that screen. Nothing in the card audit changes.
 
 The row is laid out in logical directions only, so it mirrors in Arabic. It is checked at 320px with the longest
 language, where the name wraps and the row grows.
+
+## When Pam fails (D-617, from Will's D-616 job)
+
+Will, 18 October: *"Use the smaller alert banner. Overlaid below at bottom of page. Let's set this as an alert pattern
+for malfunctions."* and *"The switch shouldn't turn on if the connection is not established."*
+
+1. **A malfunction is Pam failing**, a save, a switch or a send. Say it with the small alert, once, with no reason
+   and no Contact Pam button (`notice.malfunction`).
+2. **It sits at the bottom**, above the tab bar, the safe area and the keyboard, never over the control that failed.
+3. **No timer.** It goes on the next tap or key, a successful retry, or leaving the screen.
+4. **A switch moves only after its save succeeds**, and shows it is saving. No answer in 15 s is a failure; a late
+   success is read back. A heart, star, language picker or role switcher that saves at once follows the same rule.
+5. **A reason the person can fix stays by the field**; a page that cannot load keeps its card; a failed message keeps
+   "Not sent" on the bubble.
+6. **Every failure is logged with a code only**, through `useMalfunction().show`, which is the only way to show it.
+
+Seen in Components › Feedback › Malfunction alert.

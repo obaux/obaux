@@ -103,5 +103,9 @@ export const SHOT_SIZES: Record<string, { w: number; h: number }> = {
   "signing-a-programs-rules/sign.png": {
     "w": 390,
     "h": 844
+  },
+  "texts-from-pam/_signup-texts.png": {
+    "w": 390,
+    "h": 844
   }
 };

@@ -165,6 +165,13 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
             icon: <GlobeIcon {...ICON} />,
             ...(waitingCount > 0 ? { value: String(waitingCount) } : {}),
           },
+          // What broke in the app this week (D-616), beside the team's other tools.
+          {
+            id: 'problems',
+            label: t('problems.title'),
+            href: isHome ? '/problems/?from=home' : '/problems/',
+            icon: <ShieldIcon {...ICON} />,
+          },
         ]}
       />
 

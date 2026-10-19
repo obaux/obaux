@@ -22,6 +22,10 @@
 
 import bundle from './templates.json' with { type: 'json' };
 import { localeOf, render, UnsendableError } from './render.ts';
+import { reportFunctionError } from './reportError.ts';
+
+// What the error log (D-616) needs from this function: the project address and the service key it already holds.
+const DEPS = { get: (name: string) => Deno.env.get(name), fetch: (input: RequestInfo | URL, init?: RequestInit) => fetch(input, init) };
 
 interface Due {
   id: string;
@@ -132,6 +136,7 @@ export async function dispatch(limit = 50) {
       const reason = error instanceof Error ? error.message : String(error);
       failures.push({ id: row.id, reason });
       await reportFailure(row.id, reason);
+      await reportFunctionError(DEPS, 'function.dispatch-sms', error);
     }
   }
 
@@ -155,6 +160,7 @@ Deno.serve(async (request) => {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
+    await reportFunctionError(DEPS, 'function.dispatch-sms', error);
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : String(error) }),
       { status: 500, headers: { 'Content-Type': 'application/json' } },
