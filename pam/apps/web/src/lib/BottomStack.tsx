@@ -69,6 +69,9 @@ const styles = stylex.create({
   },
   // How far up it sits: measured (see `useBottomInset`), so a dynamic style, not an inline one.
   raisedBy: (inset: number) => ({ bottom: `calc(${inset}px + var(--spacing-3) + env(safe-area-inset-bottom, 0px))` }),
+  // Room at the end of the page as tall as the stack, so every control can scroll up clear of it.
+  spacer: { display: 'block', pointerEvents: 'none' },
+  spacerHeight: (height: number) => ({ height: `${height}px` }),
   stack: {
     width: '100%',
     maxWidth: '560px',
@@ -202,6 +205,16 @@ export function BottomStack({
 }) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const inset = useBottomInset();
+  const [height, setHeight] = useState(0);
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host || typeof ResizeObserver === 'undefined') return;
+    const measure = () => setHeight(Math.ceil(host.getBoundingClientRect().height));
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(host);
+    return () => observer.disconnect();
+  }, []);
 
   // A failure is gone with the next tap or key, a successful retry, or leaving the screen: never on a timer. A tap inside the stack is its own
   // (its buttons do their work), and Tab only moves toward them.
@@ -231,16 +244,19 @@ export function BottomStack({
     const top = hostRef.current.getBoundingClientRect().top;
     const control = source.getBoundingClientRect();
     if (control.bottom > top - 8) window.scrollBy({ top: control.bottom - top + 16, behavior: 'auto' });
-  }, [seq, source, inset]);
+  }, [seq, source, inset, height]);
 
   return (
-    <div ref={hostRef} {...stylex.props(styles.host, styles.raisedBy(inset))}>
-      <div {...stylex.props(styles.stack)}>
-        {notices.map((notice) => (
-          <NoticeToast key={notice.id} spec={notice.spec} onClose={() => onCloseNotice(notice.id)} />
-        ))}
-        {failure ? <FailureBanner key={failure.seq} failure={failure} onClose={onCloseBanner} /> : null}
+    <>
+      <div ref={hostRef} {...stylex.props(styles.host, styles.raisedBy(inset))}>
+        <div {...stylex.props(styles.stack)}>
+          {notices.map((notice) => (
+            <NoticeToast key={notice.id} spec={notice.spec} onClose={() => onCloseNotice(notice.id)} />
+          ))}
+          {failure ? <FailureBanner key={failure.seq} failure={failure} onClose={onCloseBanner} /> : null}
+        </div>
       </div>
-    </div>
+      <div aria-hidden="true" {...stylex.props(styles.spacer, styles.spacerHeight(height))} />
+    </>
   );
 }

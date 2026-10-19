@@ -105,6 +105,19 @@ test.describe('The failure banner (D-618)', () => {
     await expect(banner).toHaveCount(0);
   });
 
+  test('while the banner is up the page scrolls its last control clear of it (320x568)', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 568 });
+    await failing(page, 500);
+    await page.getByRole('switch', { name: CLOSED }).click();
+    const banner = page.getByRole('alert').filter({ hasText: LINE });
+    await expect(banner).toBeVisible();
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    const switches = page.getByRole('switch');
+    const last = (await switches.last().boundingBox())!;
+    const top = (await banner.boundingBox())!.y;
+    expect(last.y + last.height).toBeLessThanOrEqual(top);
+  });
+
   test('the same switch failing twice in a row adds "Get help" (no "contact Pam" words), which opens Help', async ({ page }) => {
     await failing(page, 500);
     await page.getByRole('switch', { name: CLOSED }).click();
