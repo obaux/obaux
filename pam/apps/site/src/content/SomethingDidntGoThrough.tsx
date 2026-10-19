@@ -13,7 +13,7 @@ import { Body, Lead, P, Section } from '../components/Prose';
 export function SomethingDidntGoThrough() {
   return (
     <Body>
-      <Lead>When something doesn’t work, Pam shows a short message at the top of the screen. Find its title below.</Lead>
+      <Lead>When something doesn’t work, Pam shows a short message at the bottom of the screen. Find its title below.</Lead>
 
       <Section title="You’re offline">
         <P>Your phone has no internet right now.</P>
