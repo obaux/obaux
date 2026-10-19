@@ -262,7 +262,7 @@ test.describe('the case manager screen', () => {
     await page.getByLabel('Their mobile number').fill('215 555 0111');
     await page.getByRole('button', { name: 'Create link' }).click();
 
-    await expect(page.getByRole('alert').filter({ hasText: "That didn't go through. It's not your fault, so try again." })).toBeVisible();
+    await expect(page.getByRole('alert').filter({ hasText: /Something's wrong on our side|That took too long|Still not working/ })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'We could not make a code' })).toHaveCount(0);
     await expect(page.getByLabel('Their first name')).toHaveValue('Rosa');
     await expect.poll(() => reports.length).toBe(1);

@@ -224,7 +224,8 @@ test.describe('The agree screen is the only opt-in (D-615, Lena, 18 October)', (
 
 test.describe('Text alerts: what Iris found in b74 (B3, B6)', () => {
   const CLOSED = 'A saved place closes or moves';
-  const MALFUNCTION = "That didn't go through. It's not your fault, so try again.";
+  // A failed write is the server's (500), or no answer in 15 seconds (timeout): each says its own title (D-618).
+  const MALFUNCTION = /Something's wrong on our side|That took too long|Still not working/;
   const ON = { sms_enabled: true, sms_stopped_at: null, alert_message: false, alert_booked: false, alert_changed: false, alert_trip: false };
 
   test('B3 (D-616): when a write fails the switch stays put and the small alert is fixed at the bottom, clear of the switch', async ({ page }) => {
@@ -533,7 +534,7 @@ test.describe('The reminders screen with a yes already on file (Iris C2)', () =>
     await page.goto('/reminders/');
     await settled(page);
     await page.getByRole('button', { name: 'Agree to receive texts' }).click();
-    await expect(page.getByRole('alert').filter({ hasText: "That didn't go through" })).toBeVisible();
+    await expect(page.getByRole('alert').filter({ hasText: "Something's wrong on our side" })).toBeVisible();
     await expect(page.getByText('Something went wrong')).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Agree to receive texts' })).toBeEnabled();
     await expect.poll(() => reports.length).toBe(1);
