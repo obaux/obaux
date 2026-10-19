@@ -20,13 +20,18 @@ None.
 
 - `staff-request-approve.spec`: the new test fails on main, 3 of 3, and passes now. With `invite.spec`, all pass. Config:
   1501 passed. tsc is clean.
-- 320 check in Arabic and Russian with the notice showing: no sideways scroll, no clipped text, the lines wrap. Pictures:
-  `docs/design/review/2026-10-19-review-gone/review-gone-320-{ar,ru}.png`.
+- 320 check in Arabic and Russian with the notice showing: no sideways scroll, no clipped text, the lines wrap. Picture:
+  `docs/design/review/2026-10-19-review-gone/review-gone-320-ar.png`, reshot without the buttons; the Russian one, shot
+  before they went, was removed.
+
+Then, on Mira's call (02:52): once a request is gone or already decided, Approve and Deny go (they could only fail again),
+and the header's Back is the way out. A gone request also loses "Text {name}", because the account was deleted and there's no
+one to text; if that leaves the list empty, the list isn't drawn. No new words. Two new `staff-request-approve` tests (gone;
+already decided) fail on the screen before this change, 6 of 6, and pass now.
 
 ## Left undone
 
-Approve and Deny are still offered under a request that is gone, as they are under one already decided. Taking them away is
-a separate call.
+Nothing.
 
 ## Needs a human
 

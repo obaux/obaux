@@ -135,6 +135,10 @@ export function RequestReviewScreen({ userId }: { readonly userId: string | null
     else setDecided(decision);
   };
   const done = addedAsLead || decided !== null;
+  // Decided elsewhere, or gone with the account: Approve and Deny could only fail again, so they go, and the header's Back is the
+  // way out; a gone account has no one to text either (Mira, 02:52).
+  const closedElsewhere = failed === 'decided' || failed === 'gone';
+  const gone = failed === 'gone';
 
   return (
     <SubPage
@@ -143,25 +147,27 @@ export function RequestReviewScreen({ userId }: { readonly userId: string | null
       {...back}
       actions={<HelpButton />}
       footer={
-        <VStack gap={2} xstyle={styles.actions}>
-          {done ? (
-            <BigButton label={t('nav.back.requests')} onPress={() => goBack('/requests/')} />
-          ) : (
-            <>
-              <BigButton
-                label={busy === 'approved' ? t('requests.saving') : t('requests.approve')}
-                isDisabled={busy !== null}
-                onPress={() => ask('approved')}
-              />
-              <BigButton
-                label={busy === 'denied' ? t('requests.saving') : t('requests.deny')}
-                variant="secondary"
-                isDisabled={busy !== null}
-                onPress={() => ask('denied')}
-              />
-            </>
-          )}
-        </VStack>
+        closedElsewhere ? undefined : (
+          <VStack gap={2} xstyle={styles.actions}>
+            {done ? (
+              <BigButton label={t('nav.back.requests')} onPress={() => goBack('/requests/')} />
+            ) : (
+              <>
+                <BigButton
+                  label={busy === 'approved' ? t('requests.saving') : t('requests.approve')}
+                  isDisabled={busy !== null}
+                  onPress={() => ask('approved')}
+                />
+                <BigButton
+                  label={busy === 'denied' ? t('requests.saving') : t('requests.deny')}
+                  variant="secondary"
+                  isDisabled={busy !== null}
+                  onPress={() => ask('denied')}
+                />
+              </>
+            )}
+          </VStack>
+        )
       }
     >
       <Text type="supporting" xstyle={styles.facts}>
@@ -191,29 +197,35 @@ export function RequestReviewScreen({ userId }: { readonly userId: string | null
         program lead described at sign-up, and a text to them first, "to make
         sure they coordinate how to use the app".
       */}
-      <MenuList
-        label={name}
-        items={[
-          ...(row.program
-            ? [
-                {
-                  id: 'program',
-                  label: row.program.name,
-                  description: t('requests.viewProgram.hint'),
-                  href: `/requests/program/?id=${encodeURIComponent(row.userId)}`,
-                  icon: <PlacesIcon {...ICON} />,
-                },
-              ]
-            : []),
-          {
-            id: 'text',
-            label: t('requests.text', { name: row.firstName ?? t('invite.expired.someone') }),
-            ...(text.missing ? { description: t('requests.text.none') } : {}),
-            onSelect: () => void text.open(),
-            icon: <MessagesIcon {...ICON} />,
-          },
-        ]}
-      />
+      {row.program || !gone ? (
+        <MenuList
+          label={name}
+          items={[
+            ...(row.program
+              ? [
+                  {
+                    id: 'program',
+                    label: row.program.name,
+                    description: t('requests.viewProgram.hint'),
+                    href: `/requests/program/?id=${encodeURIComponent(row.userId)}`,
+                    icon: <PlacesIcon {...ICON} />,
+                  },
+                ]
+              : []),
+            ...(gone
+              ? []
+              : [
+                  {
+                    id: 'text',
+                    label: t('requests.text', { name: row.firstName ?? t('invite.expired.someone') }),
+                    ...(text.missing ? { description: t('requests.text.none') } : {}),
+                    onSelect: () => void text.open(),
+                    icon: <MessagesIcon {...ICON} />,
+                  },
+                ]),
+          ]}
+        />
+      ) : null}
 
       {addedAsLead ? (
         <Notice notice="admin_out_of_region" title={t('requests.done.title', { name: first })} body={t('requests.done.body')} />

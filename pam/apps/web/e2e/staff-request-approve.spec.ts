@@ -93,6 +93,29 @@ test("a request whose person's account was deleted says it is gone, not that it 
   await expect(page.getByRole('alert').filter({ hasText: "It's not your fault" })).toHaveCount(0);
 });
 
+for (const [state, code, still] of [
+  ['gone with its account', 'REQUEST_NOT_FOUND', 'This request is no longer here'],
+  ['already decided', 'REQUEST_ALREADY_DECIDED', 'This request was already decided'],
+] as const) {
+  test(`a request ${state} offers no Approve or Deny, only the way back (Mira, 02:52)`, async ({ page }) => {
+    await signedInAsSuperAdmin(page, 'provider');
+    await page.route('**/rest/v1/rpc/review_staff_request*', (route) =>
+      route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ code: 'P0001', message: code }) }),
+    );
+    await page.goto(`/requests/review/?id=${WHO}`);
+    await settled(page);
+    await page.getByRole('button', { name: 'Approve' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Yes, approve' }).click();
+    await expect(page.getByText(still)).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Approve' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Deny' })).toHaveCount(0);
+    // The header's Back is still there: no dead end.
+    await expect(page.getByRole('button', { name: 'Back to Requests' })).toBeVisible();
+    // A gone account has no one to text; one only decided elsewhere still does.
+    await expect(page.getByText(/Text Pia/)).toHaveCount(code === 'REQUEST_NOT_FOUND' ? 0 : 1);
+  });
+}
+
 test('any other failure is Pam failing: the small alert at the bottom, logged, and no Contact Pam (D-616)', async ({ page }) => {
   await signedInAsSuperAdmin(page, 'provider');
   const reports: unknown[] = [];
