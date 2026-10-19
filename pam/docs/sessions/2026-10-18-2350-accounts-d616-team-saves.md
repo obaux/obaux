@@ -40,7 +40,7 @@ None that need a file: this is D-616 and D-617 as written.
 - The log carries the action and code only: the specs check that no name, phone or person id goes into `report_app_error`.
 - `check-bundle-budget`: within budget, 5.6 kB spare. Config: 1491 passed. Web unit: 224 passed. tsc is clean.
 - The full e2e result is in the READY.
-- Pictures: `docs/design/review/2026-10-18-d616-team-saves/` (five screens × 390 English, 320 dark, 320 Arabic).
+- Pictures: `docs/design/review/2026-10-18-d616-team-saves/`: all five at 390 light, plus demo view at 320 dark and 320 Arabic, at 600px tall so content sits behind the alert. Reshot after merging Dot's surface fix (ef8b19af).
 
 ## Left undone
 
