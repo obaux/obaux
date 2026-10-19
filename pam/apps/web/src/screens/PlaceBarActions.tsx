@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { useRouter } from 'next/navigation';
 import { DropdownMenu } from '@astryxdesign/core/DropdownMenu';
@@ -93,6 +93,18 @@ export function PlaceBarActions({
   const router = useRouter();
   // Each tap that saves says "Saved" by the button for about two seconds (Will, 11 October); taking it off says nothing.
   const [savedTaps, setSavedTaps] = useState(0);
+  // "Saved" is said once the save has gone through, not at the tap (D-616, Iris L4): a failed save says only the alert. A tap never
+  // answered stops waiting after a little more than the save's own 15 seconds.
+  const awaitingSave = useRef(false);
+  const stopWaiting = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!isSaved || !awaitingSave.current) return;
+    awaitingSave.current = false;
+    setSavedTaps((n) => n + 1);
+  }, [isSaved]);
+  useEffect(() => () => {
+    if (stopWaiting.current) clearTimeout(stopWaiting.current);
+  }, []);
   return (
     <>
       {onSave ? (
@@ -102,7 +114,13 @@ export function PlaceBarActions({
           variant="ghost"
           aria-pressed={isSaved}
           onClick={() => {
-            if (!isSaved) setSavedTaps((n) => n + 1);
+            if (!isSaved) {
+              awaitingSave.current = true;
+              if (stopWaiting.current) clearTimeout(stopWaiting.current);
+              stopWaiting.current = setTimeout(() => {
+                awaitingSave.current = false;
+              }, 20_000);
+            }
             onSave();
           }}
           icon={

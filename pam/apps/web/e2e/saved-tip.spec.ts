@@ -104,6 +104,23 @@ test.describe('the Saved tooltip', () => {
     await expect(tip(page)).toHaveCount(0, { timeout: 4000 });
   });
 
+  test("a save that did not go through says no \"Saved\": only the alert, and the bookmark stays as it was (Iris L4)", async ({ page }) => {
+    await signedIn(page);
+    await page.route('**/rest/v1/saved_places*', (route) =>
+      route.request().method() === 'GET' ? route.fulfill(json([])) : route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }),
+    );
+    await page.goto(`/place/?id=${PLACE.id}`);
+    await settled(page);
+    await page.getByRole('button', { name: 'Save this place' }).click();
+    await expect(page.getByRole('alert').filter({ hasText: "That didn't go through" })).toBeVisible();
+    // At the moment the alert is up, not later: the old tip rose at the tap and was gone by the time anyone looked again.
+    expect(await tip(page).count()).toBe(0);
+    await page.waitForTimeout(500);
+    await expect(tip(page)).toHaveCount(0);
+    await expect(announced(page)).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Save this place' })).toHaveAttribute('aria-pressed', 'false');
+  });
+
   test('with reduce-motion there is no fade at all', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await signedIn(page);

@@ -17,6 +17,16 @@ export function timeoutError(): Error {
   return Object.assign(new Error('timeout'), { name: 'AbortError' });
 }
 
+/**
+ * What the log needs of a failed answer: its name, its SQLSTATE and the HTTP status the answer came with. A 500 from the gateway has
+ * no SQLSTATE, so the status is what names it; without it the log says `unknown` (Iris L5). Only these three leave: not the message.
+ */
+export function withStatus(error: unknown, status: unknown): unknown {
+  if (!error || typeof error !== 'object') return error;
+  const { name, code } = error as { name?: unknown; code?: unknown };
+  return { name, code, status };
+}
+
 /** Waits for a save for `ms`; after that it is called failed, and the late answer is handed back to be re-read (Iris's A6). */
 export function settleWithin<T>(save: Promise<T>, ms = SAVE_TIMEOUT_MS): Promise<Settled<T>> {
   return new Promise((resolve) => {

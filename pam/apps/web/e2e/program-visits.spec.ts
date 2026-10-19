@@ -165,3 +165,25 @@ test('the card has no Message row when either has blocked the other (D-542)', as
   await expect(page.getByRole('heading', { name: 'Tanya', level: 1 })).toBeVisible();
   await expect(page.getByText('Message Tanya')).toHaveCount(0);
 });
+
+test('a second tap on the circle before the database answers is not a second check_in_visit (Iris L3)', async ({ page }) => {
+  await signedInLead(page, [here()]);
+  let asked = 0;
+  let release: (() => void) | undefined;
+  const held = new Promise<void>((resolve) => (release = resolve));
+  await page.route('**/rest/v1/rpc/check_in_visit*', async (route) => {
+    asked += 1;
+    await held;
+    await route.fulfill(json([{ appointment_id: VISIT, status: 'attended', checked_in_at: new Date().toISOString(), points: 100 }]));
+  });
+  await page.goto('/');
+  await settled(page);
+  const circle = page.getByRole('button', { name: 'Check Tanya in' });
+  await circle.click();
+  await expect.poll(() => asked).toBe(1);
+  await circle.click();
+  await page.waitForTimeout(300);
+  release!();
+  await expect(page.getByRole('button', { name: /Tanya is checked in/ })).toBeVisible();
+  expect(asked).toBe(1);
+});

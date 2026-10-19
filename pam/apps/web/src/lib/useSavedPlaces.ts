@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Category, Role } from '@pam/config';
 import { useMalfunction } from './malfunction';
-import { settleWithin } from './settle';
+import { settleWithin, withStatus } from './settle';
 
 /**
  * The places a member kept.
@@ -169,11 +169,11 @@ export function useSavedPlaces(
     const supabase = createClient();
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) throw new Error('signed out');
-    const { error } =
+    const { error, status } =
       change === 'save'
         ? await supabase.from('saved_places').insert({ member_id: auth.user.id, service_id: serviceId })
         : await supabase.from('saved_places').delete().eq('member_id', auth.user.id).eq('service_id', serviceId);
-    if (error) throw error;
+    if (error) throw withStatus(error, status);
   }, []);
 
   /** The set moves only once the write has gone through; a failure, or no answer in 15 seconds, is the alert and the set stays as it was. */
