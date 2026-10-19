@@ -126,7 +126,7 @@ class OrbHero {
                                  // so the middle row needs an odd count and rows.length must be odd.
       empty: [[0, 0], [1, 0], [1, 4]],  // [row, column] of circles with no icon (zero-based)
       pitch: 0.195,              // distance between neighbours in a row. The widest row must fit:
-                                 // (widest - 1) / 2 * pitch + size.circle <= 0.5  (here 2 * 0.195 + 0.09 = 0.48)
+                                 // (widest - 1) / 2 * pitch + size.circle <= 0.5  (here 2 * 0.195 + 0.08 = 0.47)
       rowSpacing: 0.87,          // row gap as a share of pitch. 0.87 is a true hex lattice
       center: [0.5, 0.5],        // where the hero sits, as a fraction of the canvas [x, y]
     },
@@ -134,7 +134,7 @@ class OrbHero {
     size: {                      // radii, in canvas widths
       start: 0.15,               // hero radius at t = 0
       heroPeak: 0.34,            // hero radius when fully grown
-      circle: 0.09,              // radius of every other circle at rest
+      circle: 0.08,              // radius of every other circle at rest
       heroRestScale: 1.12,       // hero's resting radius = circle * this
     },
 

@@ -178,7 +178,7 @@ new OrbHero(canvas, { size: { circle: 0.08 }, spring: { size: { zeta: 0.5 } } })
 |---|---|---|
 | `size.start` | `0.15` | Hero radius at t = 0. |
 | `size.heroPeak` | `0.34` | Hero radius when fully grown. Keep ≤ half the canvas height (`aspect / 2`, 0.375 at 4:3). |
-| `size.circle` | `0.09` | Radius of every other circle at rest. |
+| `size.circle` | `0.08` | Radius of every other circle at rest. |
 | `size.heroRestScale` | `1.12` | The hero rests at `circle × this`. |
 
 ### Timing (seconds)
