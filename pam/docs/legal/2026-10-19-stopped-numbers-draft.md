@@ -1,4 +1,4 @@
-# A stopped number follows its number onto an account — draft for Lena's read (19 October 2026)
+# A stopped number follows its number onto an account — draft for Lena's read (19 October 2026), revised after her read (a38ed8a6)
 
 Nico. Mira, 01:00: draft it, keep no readable number, keyed hash in the Vault, nothing else in the table, Lena reads before anything is built
 past the draft, Sage writes the Privacy line, Will signs. Texts stay off until both are live.
@@ -55,3 +55,17 @@ the stop"; making the hash unkeyed fails "the hash is keyed". Full DB suite pass
 
 No expiry; no rehash of old rows; no change to what a STOP from a known number does (unchanged); no Privacy page edit (Sage and Will); nothing that
 sends.
+
+## Revised after Lena's read (01:12)
+
+1. **Who can compare.** The service role could: it had `phone_hash` and the table. Now `phone_hash` and the table are closed to it too (tested). It can still
+   ask `phone_is_stopped(number)`, because the dispatcher has to ask about a number. So the Privacy line must not say "nobody can". What the keyed hash
+   protects is a copy of the table (backup, dump, export) being useless without the key.
+2. **The row after a carry.** Deleted when the stop is carried onto the account, so the list holds only people with no account and a stop goes with
+   the account it lives on. A deleted person who comes back starts with texts off and must say yes again. (Lena's recommendation; the other choice
+   would have meant "it stays after you delete your account" on the page.)
+3. **Old plain-hash rows.** Removed from the design: no legacy function, no "or legacy" branches. The migration refuses to run if `phone_stops` has any row,
+   so the desk reads `count(*)` first (Lena expects 0: sms-inbound has never been on). If it is not 0, we decide together before applying.
+4. **The key** is a launch item (Lena put it on the before-launch list): a lost key, or a project move without the Vault, makes every `k1:` stop stop
+   matching. `PHONE_STOP_KEY_MISSING` raises rather than guessing.
+5. **Sage's line**: Lena's rewrite replaces my draft line above ("Nobody can turn it back into your number" is not true).

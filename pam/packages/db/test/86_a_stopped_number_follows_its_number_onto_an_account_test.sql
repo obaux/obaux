@@ -38,7 +38,7 @@ select test.check_bool('...whose day is a date, not a moment',
   (select data_type from information_schema.columns where table_schema = 'public' and table_name = 'phone_stops' and column_name = 'stopped_at') = 'date', true);
 select test.check('...the hash is keyed (k1:), not the old plain digest, and has nothing of the number in it',
   (select count(*) from public.phone_stops
-   where phone_hash like 'k1:%' and phone_hash <> public.phone_hash_legacy('+12675550177') and phone_hash not like '%2675550177%'), 1::bigint);
+   where phone_hash like 'k1:%' and phone_hash <> encode(extensions.digest('+12675550177', 'sha256'), 'hex') and phone_hash not like '%2675550177%'), 1::bigint);
 select test.check_bool('the same number in another format has the same hash',
   public.phone_hash('+1 (267) 555-0177') = public.phone_hash('+12675550177'), true);
 select test.check_bool('...another number has another', public.phone_hash('+12675550178') = public.phone_hash('+12675550177'), false);
@@ -59,30 +59,29 @@ select test.check('...the audit log says a stop was carried, without a number',
   (select count(*) from public.audit_log where action = 'sms.stop' and target_id = :'marcus' and meta = '{"carried": true}'::jsonb), 1::bigint);
 select test.check('an account with another number is not affected',
   (select count(*) from public.notification_preferences where member_id = :'tanya'), 0::bigint);
-select test.check_bool('the number still counts as stopped', public.phone_is_stopped('+12675550177'), true);
+select test.check('...and the number leaves the list: it holds only people with no account', (select count(*) from public.phone_stops), 0::bigint);
+select test.check_bool('the number still counts as stopped, now through the account', public.phone_is_stopped('+12675550177'), true);
 
 select public.record_sms_stop('+12675550188');
 insert into auth.users (id, phone) values (:'newbie', '12675550188');
 insert into public.profiles (id, role, phone) values (:'newbie', 'member', '+12675550188');
-select test.check('a new account made with another stopped number gets the stop at once',
-  (select count(*) from public.notification_preferences where member_id = :'newbie' and sms_stopped_at is not null), 1::bigint);
+select test.check('a new account made with another stopped number gets the stop at once, and that number leaves the list too',
+  (select count(*) from public.notification_preferences where member_id = :'newbie' and sms_stopped_at is not null)
+  + (select count(*) from public.phone_stops) * 10, 1::bigint);
 select public.record_sms_start('+12675550188');
 
 \echo ''
 \echo '--- START clears it, both forms ---'
 select public.record_sms_start('+12675550177');
-select test.check('a START from the number empties the list', (select count(*) from public.phone_stops), 0::bigint);
-select test.check('...and clears the stop on the account that carried it',
+select test.check('a START from the number clears the stop on the account that carried it',
   (select count(*) from public.notification_preferences where member_id = :'marcus' and sms_stopped_at is not null), 0::bigint);
 
-insert into public.phone_stops (phone_hash) values (public.phone_hash_legacy('+12675550199'));
-select test.check_bool('an old plain-hash row still counts as stopped', public.phone_is_stopped('+12675550199'), true);
-update public.profiles set phone = '+12675550199' where id = :'tanya';
-select test.check('...and follows its number onto an account too',
-  (select count(*) from public.notification_preferences where member_id = :'tanya' and sms_stopped_at is not null), 1::bigint);
-select public.record_sms_start('+12675550199');
-select test.check('...and a START removes it', (select count(*) from public.phone_stops), 0::bigint);
-select test.check_bool('...so the number no longer counts as stopped', public.phone_is_stopped('+12675550199'), false);
+-- A START for a number with no account removes its row.
+select public.record_sms_stop('+12675550166');
+select test.check('a STOP from a number with no account is a row...', (select count(*) from public.phone_stops), 1::bigint);
+select public.record_sms_start('+12675550166');
+select test.check('...and a START from it removes the row', (select count(*) from public.phone_stops), 0::bigint);
+select test.check_bool('...so the number no longer counts as stopped', public.phone_is_stopped('+12675550166'), false);
 
 \echo ''
 \echo '--- Nobody but the database reads any of it ---'
@@ -94,6 +93,10 @@ select test.check_raises('...nor the key', $$select public.phone_stop_key()$$);
 reset role;
 select test.check_bool('the key is not callable by the service role either: only the hash functions read it',
   has_function_privilege('service_role', 'public.phone_stop_key()', 'execute'), false);
+select test.check_bool('...nor can it ask for a hash', has_function_privilege('service_role', 'public.phone_hash(text)', 'execute'), false);
+select test.check_bool('...nor read the table', has_table_privilege('service_role', 'public.phone_stops', 'select'), false);
+select test.check_bool('...but it can still ask whether a number has stopped, which the dispatcher needs',
+  has_function_privilege('service_role', 'public.phone_is_stopped(text)', 'execute'), true);
 
 delete from public.profiles where id = :'newbie';
 delete from auth.users where id = :'newbie';
