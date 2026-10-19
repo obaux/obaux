@@ -30,6 +30,7 @@ export const FAILURE_CODES: Readonly<Record<string, FailureKind>> = {
   timeout: 'timeout',
   '401': 'signed-out',
   PGRST301: 'signed-out',
+  PGRST303: 'signed-out',
   'JWT expired': 'signed-out',
   '403': 'not-allowed',
   '42501': 'not-allowed',
@@ -69,6 +70,7 @@ export function classifyFailure(code: unknown, online: boolean = true): FailureK
 export function classifyGuardMessage(message: unknown): FailureKind | null {
   const text = typeof message === 'string' ? message : '';
   if (/PAM_RATE_LIMITED/.test(text)) return 'too-many';
+  if (/JWT expired|JWT (is )?(invalid|malformed)/i.test(text)) return 'signed-out';
   if (/VISIT_CANCELLED|REQUEST_ALREADY_DECIDED|ALREADY_DECIDED|TRIP_NOT_FOUND/.test(text)) return 'changed';
   if (/_NOT_FOUND|\bNOT_FOUND\b|No such (message|account)|nobody else in that conversation/i.test(text)) return 'gone';
   if (/ACCOUNT_NOT_ACTIVE|NOT_A_PROGRAM_LEAD|NO_LEAD_HERE|\bONLY_[A-Z_]+/.test(text)) return 'not-allowed';

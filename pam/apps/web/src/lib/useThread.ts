@@ -418,13 +418,14 @@ export function useThread(conversationId: string | null): {
           const setProgress = (fraction: number) =>
             setOutbox((prev) => prev.map((o) => (o.id === item.id ? { ...o, progress: fraction } : o)));
           setProgress(0);
-          const path = await uploadMessagePhoto(conversationId, shrunk, setProgress);
-          if (!path) throw new Error('upload failed');
-          stored = { path, kind: 'photo' };
+          const uploaded = await uploadMessagePhoto(conversationId, shrunk, setProgress);
+          // The storage code stays with the failure (a 403 is not-allowed, a 401 signed-out), not just the words "upload failed".
+          if (uploaded.path === null) throw Object.assign(new Error('upload failed'), { code: uploaded.code });
+          stored = { path: uploaded.path, kind: 'photo' };
         } else if (attachment?.kind === 'file') {
-          const path = await uploadMessageFile(conversationId, attachment.file);
-          if (!path) throw new Error('upload failed');
-          stored = { path, kind: 'file' };
+          const uploaded = await uploadMessageFile(conversationId, attachment.file);
+          if (uploaded.path === null) throw Object.assign(new Error('upload failed'), { code: uploaded.code });
+          stored = { path: uploaded.path, kind: 'file' };
           named = { name: displayFileName(attachment.file.name), bytes: attachment.file.size };
         }
         const { createClient } = await import('./supabase');

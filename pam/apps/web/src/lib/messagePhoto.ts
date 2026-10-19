@@ -17,6 +17,8 @@
  * from the phone's memory. Never as a link: a signed link works for anyone
  * holding it until it runs out, and a photo here is nobody else's to open.
  */
+import { appErrorCode } from '@pam/config';
+import { codeFromError } from './reportAppError';
 import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from './project';
 
 const LONG_EDGE = 1600;
@@ -70,8 +72,20 @@ export async function shrinkPhoto(file: Blob): Promise<Blob | null> {
   }
 }
 
+/** What an upload answers: the path, or why it did not go as a code the error log and the alert's kind can read (a storage 403 stays a 403). */
+export type UploadResult = { readonly path: string } | { readonly path: null; readonly code: string };
+
+const failed = (code: string): UploadResult => ({ path: null, code });
+
+/** The code of a storage error: its HTTP status if it has one, else what the phone's network says. */
+export function storageCode(error: unknown): string {
+  const status = (error as { statusCode?: unknown; status?: unknown } | null)?.statusCode ?? (error as { status?: unknown } | null)?.status;
+  const fromStatus = appErrorCode(typeof status === 'string' || typeof status === 'number' ? status : null);
+  return fromStatus !== 'unknown' ? fromStatus : codeFromError(error);
+}
+
 /**
- * Stores a shrunk photo in the conversation's folder; its path, or null. `onProgress` hears how much has gone (0 to 1) while it
+ * Stores a shrunk photo in the conversation's folder; its path, or the code of what went wrong. `onProgress` hears how much has gone (0 to 1) while it
  * does, so a slow connection shows a bar rather than a message that seems stuck (D-609). With it, the same request the storage
  * client makes is made over `XMLHttpRequest` instead, the only way a browser reports an upload's progress; the person's own
  * sign-in goes with it, so the database decides exactly as before (0079).
@@ -80,22 +94,22 @@ export async function uploadMessagePhoto(
   conversationId: string,
   photo: Blob,
   onProgress?: (fraction: number) => void,
-): Promise<string | null> {
+): Promise<UploadResult> {
   try {
     const { createClient } = await import('./supabase');
     const supabase = createClient();
     const path = `${conversationId}/${crypto.randomUUID()}.jpg`;
     if (!onProgress || typeof XMLHttpRequest === 'undefined') {
       const { error } = await supabase.storage.from(BUCKET).upload(path, photo, { contentType: 'image/jpeg', upsert: false });
-      return error ? null : path;
+      return error ? failed(storageCode(error)) : { path };
     }
     const { data: auth } = await supabase.auth.getSession();
     const token = auth.session?.access_token;
-    if (!token) return null;
+    if (!token) return failed('401');
     const form = new FormData();
     form.append('cacheControl', '3600');
     form.append('', new File([photo], 'photo.jpg', { type: 'image/jpeg' }));
-    return await new Promise<string | null>((resolve) => {
+    return await new Promise<UploadResult>((resolve) => {
       const request = new XMLHttpRequest();
       request.open('POST', `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`);
       request.setRequestHeader('apikey', SUPABASE_PUBLISHABLE_KEY);
@@ -106,14 +120,14 @@ export async function uploadMessagePhoto(
       request.upload.onprogress = (event) => {
         if (event.lengthComputable && event.total > 0) onProgress(Math.min(1, event.loaded / event.total));
       };
-      request.onload = () => resolve(request.status >= 200 && request.status < 300 ? path : null);
-      request.onerror = () => resolve(null);
-      request.ontimeout = () => resolve(null);
-      request.onabort = () => resolve(null);
+      request.onload = () => resolve(request.status >= 200 && request.status < 300 ? { path } : failed(appErrorCode(request.status)));
+      request.onerror = () => resolve(failed(codeFromError(null)));
+      request.ontimeout = () => resolve(failed('timeout'));
+      request.onabort = () => resolve(failed('timeout'));
       request.send(form);
     });
-  } catch {
-    return null;
+  } catch (caught) {
+    return failed(codeFromError(caught));
   }
 }
 
