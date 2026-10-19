@@ -1,9 +1,8 @@
 'use client';
 
 import * as stylex from '@stylexjs/stylex';
-import { MediaTheme } from '@astryxdesign/core/theme';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import type { NoticeToastSpec } from '@pam/ui';
+import type { NoticeToastSpec } from '@pam/ui/noticeSink';
 
 /**
  * The stack's stand-in (D-619): the same place and ground, the title, the line and Contact Pam as a plain link, drawn with nothing to fetch.
@@ -14,12 +13,12 @@ import type { NoticeToastSpec } from '@pam/ui';
 const styles = stylex.create({
   stack: { width: '100%', maxWidth: '560px', display: 'flex', flexDirection: 'column', gap: '8px', pointerEvents: 'auto' },
   card: { boxSizing: 'border-box', width: '100%', padding: '16px', borderRadius: '12px', boxShadow: '0 4px 16px oklch(0 0 0 / 25%)' },
-  dark: { backgroundColor: colorVars['--color-background-inverted'] },
+  // The dark card: the inverse of the page, so its words are the page's own colour (light on dark, and dark on light in dark mode).
+  dark: { backgroundColor: colorVars['--color-background-inverted'], color: 'var(--color-background-body)' },
   red: { backgroundColor: colorVars['--color-error'], color: colorVars['--color-on-error'] },
   title: { margin: 0, fontSize: '17px', fontWeight: 600, lineHeight: 1.3 },
   body: { margin: 0, marginBlockStart: '4px', fontSize: '16px', lineHeight: 1.4 },
   link: { display: 'inline-flex', alignItems: 'center', minHeight: '48px', color: 'inherit', fontSize: '16px', fontWeight: 600, textDecorationLine: 'underline' },
-  banner: { backgroundColor: colorVars['--color-error'], color: colorVars['--color-on-error'], fontSize: '16px', fontWeight: 600, lineHeight: 1.35 },
 });
 
 export interface PlainNotice {
@@ -48,13 +47,13 @@ export function PlainStack({ notices, lostBanner }: { readonly notices: readonly
             role={spec.status === 'info' ? 'status' : 'alert'}
             {...stylex.props(styles.card, spec.status === 'error' ? styles.red : styles.dark)}
           >
-            {spec.status === 'error' ? inner : <MediaTheme mode="auto" fallback="dark">{inner}</MediaTheme>}
+            {inner}
           </div>
         );
       })}
       {lostBanner ? (
-        <div role="alert" {...stylex.props(styles.card, styles.banner)}>
-          {lostBanner}
+        <div role="alert" {...stylex.props(styles.card, styles.red)}>
+          <p {...stylex.props(styles.title)}>{lostBanner}</p>
         </div>
       ) : null}
     </div>

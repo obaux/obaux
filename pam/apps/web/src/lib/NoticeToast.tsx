@@ -10,7 +10,7 @@ import { IconButton } from '@astryxdesign/core/IconButton';
 import { Toast } from '@astryxdesign/core/Toast';
 import { Button } from '@pam/ui/Button';
 import { HelpIcon } from '@pam/ui/icons';
-import type { NoticeToastSpec } from '@pam/ui';
+import type { NoticeToastSpec } from '@pam/ui/noticeSink';
 import { useI18n } from './i18n';
 
 /**

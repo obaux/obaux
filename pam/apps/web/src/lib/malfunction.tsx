@@ -5,13 +5,8 @@ import { usePathname } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { useI18n } from './i18n';
 import type { AppErrorAction } from '@pam/config';
-import { codeFromError, failureKindOf, reportAppError } from './reportAppError';
-import { navigate } from './navigate';
-import { safeNext } from './signinNext';
-import type { FailureKind } from '@pam/config';
-import type { MalfunctionBannerProps } from './MalfunctionBanner';
-import type { BottomStack as BottomStackType, StackNotice } from './BottomStack';
-import { NoticeSinkContext, type NoticeSink, type NoticeToastSpec } from '@pam/ui';
+import type { BottomStack as BottomStackType, Failure, StackNotice } from './BottomStack';
+import { NoticeSinkContext, type NoticeSink, type NoticeToastSpec } from '@pam/ui/noticeSink';
 import { PlainStack } from './PlainStack';
 
 /**
@@ -29,41 +24,6 @@ import { PlainStack } from './PlainStack';
  * `CompactNotice` by the control, as before; a page that cannot load keeps its `Notice` card (there is nothing else on
  * the screen); a failed message send keeps "Not sent" on the bubble (it is logged, with no overlay).
  */
-
-/** A save, a switch or a tap that has not been answered in this long counts as failed; a send keeps its 30 (D-616). */
-export const SAVE_TIMEOUT_MS = 15_000;
-
-export type Settled<T> =
-  | { readonly status: 'ok'; readonly value: T }
-  | { readonly status: 'failed'; readonly error: unknown }
-  /** No answer in time. `late` settles when the save finally answers, success or failure: read the truth again then. */
-  | { readonly status: 'timeout'; readonly late: Promise<void> };
-
-/** Waits for a save for `ms`; after that it is called failed, and the late answer is handed back to be re-read (Iris's A6). */
-export function settleWithin<T>(save: Promise<T>, ms = SAVE_TIMEOUT_MS): Promise<Settled<T>> {
-  return new Promise((resolve) => {
-    let done = false;
-    const timer = setTimeout(() => {
-      if (done) return;
-      done = true;
-      resolve({ status: 'timeout', late: save.then(() => undefined, () => undefined) });
-    }, ms);
-    save.then(
-      (value) => {
-        if (done) return;
-        done = true;
-        clearTimeout(timer);
-        resolve({ status: 'ok', value });
-      },
-      (error: unknown) => {
-        if (done) return;
-        done = true;
-        clearTimeout(timer);
-        resolve({ status: 'failed', error });
-      },
-    );
-  });
-}
 
 export interface MalfunctionOptions {
   /** Runs the same action again. With it the banner offers "Try again"; without it, no button (callers from before D-618 are unchanged). */
@@ -85,35 +45,6 @@ interface MalfunctionApi {
 }
 
 const MalfunctionContext = createContext<MalfunctionApi | null>(null);
-
-/**
- * The words and the way out for each kind of failure (D-618; Sage's signed words, mapped to keys at `docs/signed-english.md`). A kind with no
- * key yet says `notice.malfunction` and nothing else, so the banner is right before Lena's keys land and better after.
- *   retry   Try again, when the caller can run the action again (`options.retry`).
- *   signIn  Sign in, back to this screen where Sign in can take the person back to it.
- *   reload  Show the latest, re-reading the screen.
- * The second failure of the same action adds Get help, and says that Help has more ways to sort it out.
- */
-const KIND_KEY: Record<FailureKind, string> = {
-  offline: 'offline',
-  timeout: 'timeout',
-  'signed-out': 'signedOut',
-  'not-allowed': 'notAllowed',
-  'too-many': 'tooMany',
-  changed: 'changed',
-  gone: 'gone',
-  server: 'server',
-};
-const WAY_OUT: Record<FailureKind, 'retry' | 'signIn' | 'reload' | null> = {
-  offline: 'retry',
-  timeout: 'retry',
-  'signed-out': 'signIn',
-  'not-allowed': null,
-  'too-many': null,
-  changed: 'reload',
-  gone: null,
-  server: 'retry',
-};
 
 const styles = stylex.create({
   // Over the page, under nothing that matters: above sticky headers and the tab bar, taking no taps itself.
@@ -161,13 +92,11 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
   const pathname = usePathname();
   // `seq` makes each failure its own alert, so a screen reader says it once for each one (and two in a row are one alert, replaced).
   const [seq, setSeq] = useState(0);
-  const [shown, setShown] = useState<{ readonly kind: FailureKind; readonly retry: (() => void) | undefined; readonly refresh: (() => void) | undefined; readonly again: boolean } | null>(null);
+  const [shown, setShown] = useState<Omit<Failure, 'seq'> | null>(null);
   const [Stack, setStack] = useState<typeof BottomStackType | null>(null);
   // The status `Notice`s on screen, as toasts (D-619), and the ones a person closed.
   const [notices, setNotices] = useState<readonly StackNotice[]>([]);
   const [closed, setClosed] = useState<ReadonlySet<string>>(new Set());
-  // The banner could not be fetched (a failure shown while the phone is offline): a plain line of words stands in for it.
-  const [bannerLost, setBannerLost] = useState(false);
   const source = useRef<Element | null>(null);
   const hostRef = useRef<HTMLDivElement | null>(null);
   // The action that last failed and has not since succeeded, left, or been cleared: its next failure is the second.
@@ -178,7 +107,8 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
       if (!current) {
         import('./BottomStack').then(
           (mod) => setStack(() => mod.BottomStack),
-          () => setBannerLost(true),
+          // Not fetched (offline): the plain stand-in stays, with the same words.
+          () => undefined,
         );
       }
       return current;
@@ -187,20 +117,25 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
   // Fetched when the page is idle, not when it fails: a failure is most often the network, and the stack that has to be fetched then would not come.
   useEffect(() => {
     const idle = (window as { requestIdleCallback?: (fn: () => void) => number }).requestIdleCallback;
-    const id = idle ? idle(loadBanner) : window.setTimeout(loadBanner, 1_500);
+    const load = () => {
+      loadBanner();
+      // The log is written by a module fetched at idle too: a failure with the phone offline would not be able to fetch it.
+      void import('./reportAppError');
+    };
+    const id = idle ? idle(load) : window.setTimeout(load, 1_500);
     return () => {
       if (!idle) window.clearTimeout(id);
     };
   }, [loadBanner]);
 
   const show = useCallback<MalfunctionApi['show']>((action, error, from, options) => {
-    const code = codeFromError(error);
-    reportAppError({ action, code });
+    // The log is written after the fact and nothing waits for it, so the reporter (and the classifier it carries) is not in the root bundle.
+    void import('./reportAppError').then((mod) => mod.reportAppError({ action, code: mod.codeFromError(error) }));
     source.current = from ?? null;
     const again = lastFailed.current === action;
     lastFailed.current = action;
     setSeq((n) => n + 1);
-    setShown({ kind: failureKindOf(error), retry: options?.retry, refresh: options?.refresh, again });
+    setShown({ error, retry: options?.retry, refresh: options?.refresh, again });
     // The banner's own weight is not in the root bundle: it loads the first time a failure is shown.
     loadBanner();
   }, [loadBanner]);
@@ -266,79 +201,6 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
   const sink = useMemo<NoticeSink>(() => ({ register, unregister }), [register, unregister]);
   const closeNotice = useCallback((id: string) => setClosed((previous) => new Set(previous).add(id)), []);
 
-  // A word is a key's, or the one line every failure said before the keys existed; a missing key comes back as itself.
-  const said = (key: string, fallback?: string): string | undefined => {
-    const text = t(key);
-    if (text !== key) return text;
-    return fallback ? t(fallback) : undefined;
-  };
-
-  const kindKey = shown ? KIND_KEY[shown.kind] : 'server';
-  const title = said(`notice.malfunction.${kindKey}.title`, 'notice.malfunction') ?? '';
-  const body = shown?.again
-    ? (said('notice.malfunction.again.body') ?? said(`notice.malfunction.${kindKey}.body`))
-    : said(`notice.malfunction.${kindKey}.body`);
-
-  const actions = useMemo(() => {
-    if (!shown) return [];
-    const list: { label: string; onPress: () => void }[] = [];
-    const way = WAY_OUT[shown.kind];
-    const label = (key: string, fallback?: string) => {
-      const text = t(`notice.malfunction.action.${key}`);
-      return text !== `notice.malfunction.action.${key}` ? text : fallback ? t(fallback) : null;
-    };
-    if (way === 'signIn') {
-      const text = label('signIn', 'signin.title');
-      if (text)
-        list.push({
-          label: text,
-          onPress: () => {
-            setShown(null);
-            // Back to this screen afterwards where Sign in can take the person back to it (its short list of screens); Home otherwise.
-            const next = safeNext(window.location.pathname);
-            navigate(next ? `/signin/?next=${next}` : '/signin/');
-          },
-        });
-    }
-    if (way === 'retry' && shown.retry) {
-      const retry = shown.retry;
-      const text = label('retry', 'messages.thread.tryAgain');
-      if (text)
-        list.push({
-          label: text,
-          onPress: () => {
-            setShown(null);
-            retry();
-          },
-        });
-    }
-    if (way === 'reload') {
-      const refresh = shown.refresh;
-      const text = label('reload');
-      if (text)
-        list.push({
-          label: text,
-          onPress: () => {
-            setShown(null);
-            if (refresh) refresh();
-            else window.location.reload();
-          },
-        });
-    }
-    if (shown.again) {
-      const text = label('help', 'help.title');
-      if (text)
-        list.push({
-          label: text,
-          onPress: () => {
-            setShown(null);
-            navigate('/help/');
-          },
-        });
-    }
-    return list;
-  }, [shown, t]);
-
   return (
     <MalfunctionContext.Provider value={api}>
       <NoticeSinkContext.Provider value={sink}>
@@ -348,11 +210,12 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
             {Stack ? (
               <Stack
                 notices={visibleNotices}
-                banner={shown ? { seq, title, body, actions, onClose: () => setShown(null) } : null}
+                failure={shown ? { seq, ...shown } : null}
+                onCloseBanner={() => setShown(null)}
                 onCloseNotice={closeNotice}
               />
             ) : (
-              <PlainStack notices={visibleNotices} lostBanner={shown && bannerLost ? title : null} />
+              <PlainStack notices={visibleNotices} lostBanner={shown ? t('notice.malfunction') : null} />
             )}
           </div>
         ) : null}
