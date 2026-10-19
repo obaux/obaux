@@ -7,7 +7,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
-import { Toast } from '@astryxdesign/core/Toast';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { Button } from '@pam/ui/Button';
 import { HelpIcon } from '@pam/ui/icons';
 import type { NoticeToastSpec } from '@pam/ui/noticeSink';
@@ -27,74 +27,65 @@ const ICON = { error: 'error', warning: 'warning', info: 'info' } as const;
 const styles = stylex.create({
   row: { width: '100%' },
   words: { flexGrow: 1, minWidth: 0 },
-  title: { fontSize: '17px', lineHeight: 1.3, fontWeight: 600, margin: 0 },
-  body: { fontSize: '16px', lineHeight: 1.4 },
+  title: { fontSize: '17px', lineHeight: 1.3, fontWeight: 600, margin: 0, color: 'inherit' },
+  body: { fontSize: '16px', lineHeight: 1.4, color: 'inherit' },
   action: { minHeight: '48px', fontSize: '16px', fontWeight: 600 },
-  link: { minHeight: '48px', fontSize: '16px', textDecorationLine: 'underline' },
-  close: { minHeight: '48px', minWidth: '48px', flexShrink: 0 },
-  holder: { width: '100%' },
+  link: { minHeight: '48px', fontSize: '16px', textDecorationLine: 'underline', color: 'inherit' },
+  close: { minHeight: '48px', minWidth: '48px', flexShrink: 0, color: 'inherit' },
+  card: { boxSizing: 'border-box', width: '100%', padding: '16px', borderRadius: '12px', boxShadow: '0 4px 16px oklch(0 0 0 / 25%)' },
+  // The inverse of the page, so its words are the page's own colour (light on dark in light mode, dark on light in dark mode).
+  calmCard: { backgroundColor: colorVars['--color-background-inverted'], color: 'var(--color-background-body)' },
+  errorCard: { backgroundColor: colorVars['--color-error'], color: colorVars['--color-on-error'] },
 });
 
 export function NoticeToast({ spec, onClose }: { readonly spec: NoticeToastSpec; readonly onClose: () => void }) {
   const { tPlain } = useI18n();
-  const card = (
-    <Toast
-      // Only an error is the red card. A warning (offline, an account with some things turned off) is a calm state, not a fault, so it is
-      // Astryx's dark card, and says so to a screen reader with its own alert role (the Notice card's rule: alert for warning, status for info).
-      type={spec.status === 'error' ? 'error' : 'info'}
-      body={spec.title}
-      isAutoHide={false}
-      autoHideDuration={0}
-      onDismiss={() => {
-        if (spec.closable) onClose();
-      }}
-      renderContent={({ dismiss }) => (
-        <HStack gap={2} align="start" wrap="nowrap" xstyle={styles.row} {...(spec.status === 'warning' ? { role: 'alert' } : {})}>
-          <Icon icon={ICON[spec.status]} color="inherit" />
-          <VStack gap={1} xstyle={styles.words}>
-            <Heading level={2} xstyle={styles.title}>
-              {spec.title}
-            </Heading>
-            {spec.body ? <Text xstyle={styles.body}>{spec.body}</Text> : null}
-            {spec.retry || spec.contact ? (
-              <HStack gap={2} wrap="wrap" align="center">
-                {spec.retry ? <Button label={spec.retry.label} variant="secondary" clickAction={spec.retry.onPress} xstyle={styles.action} /> : null}
-                {spec.contact ? (
-                  <Button
-                    label={spec.contact.label}
-                    variant={spec.quiet ? 'ghost' : 'secondary'}
-                    href={spec.contact.href}
-                    icon={<HelpIcon />}
-                    xstyle={spec.quiet ? styles.link : styles.action}
-                  />
-                ) : null}
-              </HStack>
+  const error = spec.status === 'error';
+  const content = (
+    <HStack gap={2} align="start" wrap="nowrap" xstyle={styles.row} {...(spec.status === 'warning' ? { role: 'alert' } : {})}>
+      <Icon icon={ICON[spec.status]} color="inherit" />
+      <VStack gap={1} xstyle={styles.words}>
+        <Heading level={2} xstyle={styles.title}>
+          {spec.title}
+        </Heading>
+        {spec.body ? <Text xstyle={styles.body}>{spec.body}</Text> : null}
+        {spec.retry || spec.contact ? (
+          <HStack gap={2} wrap="wrap" align="center">
+            {spec.retry ? <Button label={spec.retry.label} variant="secondary" clickAction={spec.retry.onPress} xstyle={styles.action} /> : null}
+            {spec.contact ? (
+              <Button
+                label={spec.contact.label}
+                variant={spec.quiet ? 'ghost' : 'secondary'}
+                href={spec.contact.href}
+                icon={<HelpIcon />}
+                xstyle={spec.quiet ? styles.link : styles.action}
+              />
             ) : null}
-          </VStack>
-          {spec.closable ? (
-            <IconButton
-              label={tPlain('common.dismiss')}
-              icon={<Icon icon="close" size="sm" color="inherit" />}
-              variant="ghost"
-              onClick={dismiss}
-              xstyle={styles.close}
-            />
-          ) : null}
-        </HStack>
-      )}
-    />
+          </HStack>
+        ) : null}
+      </VStack>
+      {spec.closable ? (
+        <IconButton
+          label={tPlain('common.dismiss')}
+          icon={<Icon icon="close" size="sm" color="inherit" />}
+          variant="ghost"
+          onClick={onClose}
+          xstyle={styles.close}
+        />
+      ) : null}
+    </HStack>
   );
-  if (spec.closable) return card;
-  // No swipe for a state that lasts: the touch is stopped on the way down, so the card's own gesture never starts.
+  // The card is Astryx's toast look (the inverted surface for a calm state, the error surface for a fault) drawn here, not Astryx's `Toast`:
+  // that component's own modules (the swipe, the timers, the top-layer viewport) add 4.5 kB gz to the first load, and none of it is wanted. A state
+  // that lasts has no close and no swipe; a one-off has a close and no swipe. An error is announced at once, a calm state when it is reached.
   return (
     <div
-      {...stylex.props(styles.holder)}
-      onTouchStartCapture={(event) => event.stopPropagation()}
-      onPointerDownCapture={(event) => {
-        if (event.pointerType === 'pen') event.stopPropagation();
-      }}
+      role={spec.status === 'info' ? 'status' : 'alert'}
+      aria-live={error ? 'assertive' : 'polite'}
+      aria-atomic="true"
+      {...stylex.props(styles.card, error ? styles.errorCard : styles.calmCard)}
     >
-      {card}
+      {content}
     </div>
   );
 }
