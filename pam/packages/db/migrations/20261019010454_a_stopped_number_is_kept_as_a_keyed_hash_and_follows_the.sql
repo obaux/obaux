@@ -1,6 +1,6 @@
 -- contract: phone_stops.stopped_at is cut from a time to a day (Mira, 19 October: "no time beyond the day"), and phone_hash changes from a plain
--- SHA-256 to a keyed one, so a stop is no longer a hash anyone can reverse by trying every number. Old rows still count (see below) until a START
--- removes them; no stop is forgotten.
+-- SHA-256 to a keyed one, so a stop is no longer a hash anyone can reverse by trying every number. The migration REFUSES to run if the table has any
+-- row (they would be plain hashes that cannot be kept honestly): the desk reads the count first, and Lena expects it to be 0.
 --
 -- DRAFT. Written for Lena's Privacy read before anything is built past it (Mira, 01:00). Not applied, and nothing that sends is on until texts_live is
 -- on and the Privacy line for this table is signed.
@@ -22,16 +22,28 @@
 --     account, no number.
 --   * `record_sms_stop` (unchanged in code) writes the new keyed hash when no profile matches; `record_sms_start` removes it, and any old plain-hash
 --     row for the same number.
---   * `phone_is_stopped` counts a number as stopped if either form of its hash is in the table, so an old row still stops texts until a START
---     removes it. Nothing is rehashed: a one-way hash cannot be redone without the number.
+--   * There is no old form to keep: the migration stops if the table has rows, so every row that ever exists is a keyed one.
 --   * When a profile gets a number, or changes it (insert, or update of phone), a trigger looks the number's hash up and, if it is there, puts the
---     stop on the account (`notification_preferences.sms_stopped_at`, texts still off). It never clears a stop; only START does. The audit log
---     records that a stop was carried, naming the account and nothing about the number.
+--     stop on the account (`notification_preferences.sms_stopped_at`, texts still off) AND DELETES THE ROW, so the list holds only people with no
+--     account (Lena, 19 October: otherwise a stop from a number with an account goes when the account is deleted, and a stop from a number without
+--     one outlives it, two promises for the same words). It never clears a stop; only START does. The audit log records that a stop was carried,
+--     naming the account and nothing about the number.
+--   * Nobody outside the database can compare a number to the list except by asking `phone_is_stopped`, which the dispatcher needs: `phone_hash` and
+--     the table are closed to the service role too. What the keyed hash protects is a COPY of the table (a backup, a dump, an export) being
+--     useless without the key.
 --
--- NOT CHANGED. The stopped-number row stays after it is carried (the number said STOP, whoever holds it); START clears both. A person who changes
--- their number to one that has not said STOP keeps the stop on the account until they send START from the number it came from, as before.
+-- NOT CHANGED. A person who changes their number to one that has not said STOP keeps the stop on the account until they send START from the
+-- number it came from, as before.
 --
 -- Expand-only apart from the two contract changes named above.
+
+do $guard$
+begin
+  if exists (select 1 from public.phone_stops) then
+    raise exception 'phone_stops is not empty: rows made before this are plain hashes. Read them and decide with Lena before applying (expected: none, sms-inbound has never been on).';
+  end if;
+end;
+$guard$;
 
 do $do$
 begin
@@ -73,18 +85,6 @@ end;
 $$;
 revoke all on function public.phone_stop_key() from public, anon, authenticated, service_role;
 
--- The old, plain hash: kept only to recognise rows made before this.
-create or replace function public.phone_hash_legacy(p_phone text)
-returns text
-language sql
-immutable
-set search_path = public, extensions
-as $$
-  select encode(extensions.digest(public.to_e164(p_phone), 'sha256'), 'hex');
-$$;
-revoke all on function public.phone_hash_legacy(text) from public, anon, authenticated;
-grant execute on function public.phone_hash_legacy(text) to service_role;
-
 -- The keyed hash. Null for a value that is not a phone number.
 create or replace function public.phone_hash(p_phone text)
 returns text
@@ -102,12 +102,12 @@ begin
   return 'k1:' || encode(extensions.hmac(v_e164, public.phone_stop_key(), 'sha256'), 'hex');
 end;
 $$;
-revoke all on function public.phone_hash(text) from public, anon, authenticated;
-grant execute on function public.phone_hash(text) to service_role;
+revoke all on function public.phone_hash(text) from public, anon, authenticated, service_role;
 
 alter table public.phone_stops
   alter column stopped_at type date using stopped_at::date,
   alter column stopped_at set default current_date;
+revoke all on public.phone_stops from service_role;
 comment on table public.phone_stops is
   'A number that texted STOP: a keyed hash (HMAC-SHA256, key in the Vault) and the day. Nothing else, no account, no number, no message (D-524, and the follow-up of 19 October). START removes it.';
 
@@ -119,8 +119,7 @@ security definer
 set search_path = public, extensions
 as $$
   select exists (
-           select 1 from public.phone_stops s
-           where s.phone_hash in (public.phone_hash(p_phone), public.phone_hash_legacy(p_phone))
+           select 1 from public.phone_stops s where s.phone_hash = public.phone_hash(p_phone)
          )
       or exists (
            select 1
@@ -140,8 +139,7 @@ declare
   v_member uuid;
   v_changed integer;
 begin
-  delete from public.phone_stops
-  where phone_hash in (public.phone_hash(p_phone), public.phone_hash_legacy(p_phone));
+  delete from public.phone_stops where phone_hash = public.phone_hash(p_phone);
 
   select id into v_member from public.profiles where phone = public.to_e164(p_phone);
   if v_member is null then
@@ -176,15 +174,14 @@ begin
   if tg_op = 'UPDATE' and new.phone is not distinct from old.phone then
     return new;
   end if;
-  if exists (
-       select 1 from public.phone_stops s
-       where s.phone_hash in (public.phone_hash(new.phone), public.phone_hash_legacy(new.phone))
-     ) then
+  if exists (select 1 from public.phone_stops s where s.phone_hash = public.phone_hash(new.phone)) then
     insert into public.notification_preferences (member_id, sms_stopped_at)
     values (new.id, now())
     on conflict (member_id) do update
       set sms_stopped_at = coalesce(public.notification_preferences.sms_stopped_at, now()),
           updated_at = now();
+    -- The stop now lives on the account and goes with it; the list holds only numbers with no account.
+    delete from public.phone_stops where phone_hash = public.phone_hash(new.phone);
     insert into public.audit_log (actor_id, action, target_type, target_id, meta)
     values (null, 'sms.stop', 'profile', new.id, '{"carried": true}'::jsonb);
   end if;
