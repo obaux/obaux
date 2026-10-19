@@ -11,7 +11,7 @@ import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/navigate';
 import { useSession } from '@/lib/useSession';
-import { createInvite, listRegions, type CreatedInvite } from '@/lib/useCaseload';
+import { createInvite, loadRegions, type CreatedInvite } from '@/lib/useCaseload';
 import { settleWithin } from '@/lib/settle';
 import { useMalfunction } from '@/lib/malfunction';
 import { NotIn } from '../app/NotIn';
@@ -54,6 +54,8 @@ export function InviteNewView({ role }: { readonly role: string | null }) {
       : null;
 
   const [regions, setRegions] = useState<{ id: string; name: string }[]>([]);
+  /** The cities could not be read (or there are none). Create link reads them again (as it does before the first read is in), and says so if it still cannot. */
+  const [regionsFailed, setRegionsFailed] = useState<unknown>(null);
   const [regionId, setRegionId] = useState('');
   const [needsCity, setNeedsCity] = useState(false);
   const [invite, setInvite] = useState<CreatedInvite | null>(null);
@@ -64,11 +66,17 @@ export function InviteNewView({ role }: { readonly role: string | null }) {
   useEffect(() => {
     if (!isSuperAdmin) return;
     let cancelled = false;
-    void listRegions().then((list) => {
-      if (cancelled) return;
-      setRegions(list);
-      if (list.length === 1) setRegionId(list[0]!.id);
-    });
+    void loadRegions().then(
+      (list) => {
+        if (cancelled) return;
+        setRegions(list);
+        setRegionsFailed(list.length === 0 ? { code: 'unknown' } : null);
+        if (list.length === 1) setRegionId(list[0]!.id);
+      },
+      (error: unknown) => {
+        if (!cancelled) setRegionsFailed(error);
+      },
+    );
     return () => {
       cancelled = true;
     };
@@ -111,15 +119,36 @@ export function InviteNewView({ role }: { readonly role: string | null }) {
   if (!mayMake) return frame(<Loading label={t('common.loading')} variant="screen" />);
 
   const make = async (who: InviteWho) => {
-    if (isSuperAdmin && !regionId) {
+    const control = document.activeElement;
+    let city = regionId;
+    // A super admin's cities that could not be read (Iris, D-618): "Pick a city first" sat in a list that was never drawn, so the
+    // tap did nothing anyone could see. Read them again; if they still cannot be read, it is Pam failing: the bottom alert.
+    if (isSuperAdmin && (regionsFailed !== null || regions.length === 0)) {
+      const settledCities = await settleWithin(loadRegions());
+      const list = settledCities.status === 'ok' ? settledCities.value : [];
+      if (list.length === 0) {
+        const cause = settledCities.status === 'failed' ? settledCities.error : { code: settledCities.status === 'timeout' ? 'timeout' : 'unknown' };
+        malfunction.show('invite.create', cause, control);
+        return;
+      }
+      malfunction.clear();
+      setRegions(list);
+      setRegionsFailed(null);
+      if (list.length > 1) {
+        setNeedsCity(true);
+        return;
+      }
+      city = list[0]!.id;
+      setRegionId(city);
+    }
+    if (isSuperAdmin && !city) {
       setNeedsCity(true);
       return;
     }
     setNeedsCity(false);
-    const control = document.activeElement;
     setRefused(null);
     setBusy(true);
-    const settled = await settleWithin(createInvite(allowed!, who, isSuperAdmin ? regionId : undefined));
+    const settled = await settleWithin(createInvite(allowed!, who, isSuperAdmin ? city : undefined));
     setBusy(false);
     if (settled.status === 'ok') {
       malfunction.clear();

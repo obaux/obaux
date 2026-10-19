@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { codeFromAnswer } from './reportAppError';
 
 /**
  * The people an admin is responsible for.
@@ -225,10 +226,17 @@ export async function createInvite(
 /** The cities Pam serves, with ids, for somebody allowed to see them. */
 export async function listRegions(): Promise<{ id: string; name: string }[]> {
   try {
-    const { createClient } = await import('./supabase');
-    const { data } = await createClient().from('regions').select('id, name').order('name');
-    return (data ?? []) as { id: string; name: string }[];
+    return await loadRegions();
   } catch {
     return [];
   }
+}
+
+/** The same, but a failure is thrown rather than read as "no cities", for a screen that cannot go on without one. */
+export async function loadRegions(): Promise<{ id: string; name: string }[]> {
+  const { createClient } = await import('./supabase');
+  const { data, error, status } = await createClient().from('regions').select('id, name').order('name');
+  // The answer's status names a 500 that carries no database code (Iris L5).
+  if (error) throw { code: codeFromAnswer(error, status) };
+  return (data ?? []) as { id: string; name: string }[];
 }
