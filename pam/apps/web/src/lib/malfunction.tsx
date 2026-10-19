@@ -124,15 +124,8 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
   const register = useCallback((id: string, spec: NoticeToastSpec) => {
     setNotices((previous) => [...previous.filter((n) => n.id !== id), { id, spec }]);
   }, []);
-  const unregister = useCallback((id: string) => {
-    setNotices((previous) => previous.filter((n) => n.id !== id));
-    setClosed((previous) => {
-      if (!previous.has(id)) return previous;
-      const next = new Set(previous);
-      next.delete(id);
-      return next;
-    });
-  }, []);
+  // An id is unique to one `Notice` mount, so a closed id never needs forgetting.
+  const unregister = useCallback((id: string) => setNotices((previous) => previous.filter((n) => n.id !== id)), []);
   const sink = useMemo<NoticeSink>(() => ({ register, unregister }), [register, unregister]);
   const closeNotice = useCallback((id: string) => setClosed((previous) => new Set(previous).add(id)), []);
 
