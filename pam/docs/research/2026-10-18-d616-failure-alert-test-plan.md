@@ -277,7 +277,7 @@ gives:
   codes. So PostgREST's own codes (`PGRST116`, `PGRST301`, 8 characters) log as `unknown`, and every
   raised error logs as `P0001`, losing its word. Signed-out and gone then look like a server fault in
   the list. I'll record the code each kind logs, and flag any kind the list can't tell apart.
-- **G8. No wrong-time failures.**
+- **G8. Wrong time: the windows match, and a closed window says so.**
   - The Schedule circle isn't offered (or is disabled with a reason) on a visit more than 2 h ahead.
   - The "I'm here" and "I went" card isn't shown once the database's window is closed, including a
     visit under an hour, at `coalesce(ends_at, start + 1h) + 3h`.
