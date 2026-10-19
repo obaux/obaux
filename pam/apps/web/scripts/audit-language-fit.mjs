@@ -31,6 +31,11 @@
  *            Arabic) in a place nobody reads it off the screen: an attribute such as
  *            `aria-label` or `alt`, or text a screen reader speaks and no eye sees (D-435). A label
  *            built with `tPlain` has none; this is what notices one that was not.
+ *   title    a page header's small title, cut by an ellipsis. The nested-page bar repeats the page's title in one
+ *            line and shows it from the first 48px of scrolling; until then it is transparent and `aria-hidden`,
+ *            so the ellipsis check above skips it as not there, and the big title under it wraps and is always
+ *            whole. A person who scrolls reads "Receba alertas por mens…" (18 October: the agree screen's title,
+ *            "Get text alerts" in six languages, was cut in es, pt-BR, ru and ar and no run said so).
  *
  * What it cannot see: a carousel shows one slide at a time, and the other slides are scrolled away (a
  * line wholly outside its scroller is not measured, on purpose). So a carousel needs **one story per
@@ -349,6 +354,28 @@ function measure() {
     const el = node.parentElement;
     if (el && ISOLATE.test(node.nodeValue ?? '') && spoken(el)) push('isolate', el, (node.nodeValue ?? '').replace(/[\u2068\u2069]/g, '⁋'), 'text only a screen reader reads');
   }
+
+  // 8. A header's small title cut by an ellipsis. `hidden()` treats a transparent box as absent, which is right for a carousel's
+  // other slides and wrong for the bar title: it is invisible only until the page scrolls 48px, then it is the one line a person
+  // reads at the top of the screen. So measure every one-line ellipsis box that is hidden by transparency alone (a box that is
+  // display:none, visibility:hidden or `hidden` is really gone) against the room its bar leaves it: the layout does not depend on
+  // the opacity, so the width it would have when shown is the width it has now. A box that is not transparent is step 2's.
+  const onlyTransparent = (el) => {
+    let faded = false;
+    for (let n = el; n && n !== document.documentElement; n = n.parentElement) {
+      const s2 = style(n);
+      if (s2.display === 'none' || s2.visibility === 'hidden' || n.hasAttribute('hidden')) return false;
+      if (s2.position === 'absolute' && n.clientWidth <= 1 && n.clientHeight <= 1) return false;
+      if (Number(s2.opacity) === 0) faded = true;
+    }
+    return faded;
+  };
+  for (const el of document.body.querySelectorAll('*')) {
+    const s2 = style(el);
+    if (s2.textOverflow !== 'ellipsis' || s2.whiteSpace !== 'nowrap' || !(s2.overflowX === 'hidden' || s2.overflowX === 'clip')) continue;
+    if (!(el.textContent ?? '').trim() || el.scrollWidth <= el.clientWidth + 1 || !onlyTransparent(el)) continue;
+    push('title', el, el.textContent ?? '', `${el.scrollWidth} > ${el.clientWidth}`);
+  }
   return out;
 }
 
@@ -411,11 +438,16 @@ const { results, failures } = await run();
 // design's own" (17 October: English "Search your members" was cut in the case manager Home's pill, so a rule that only
 // failed what is new in a language let the pill through in all seven).
 const isWords = (f) => f.kind === 'placeholder';
+// A header's small title is cut by an ellipsis by design when it is long (SubPage.tsx `barTitle`; the big title under it wraps and is whole). The
+// pseudo-language is English made 40% longer to stretch the layout, so every long title is cut there and the list would say nothing: it is a real
+// language's titles that this kind is for.
+const isPseudoTitle = (r, f) => r.locale === 'pseudo' && f.kind === 'title';
 const baseline = new Set();
 for (const r of results) if (r.locale === 'en') for (const f of r.found) if (!isWords(f)) baseline.add(`${r.id}|${f.key}`);
 const fresh = [];
 for (const r of results) {
   for (const f of r.found) {
+    if (isPseudoTitle(r, f)) continue;
     const isNew = isWords(f) || (r.locale !== 'en' && !baseline.has(`${r.id}|${f.key}`));
     if (isNew) fresh.push({ id: r.id, title: r.title, name: r.name, locale: r.locale, ...f });
   }
