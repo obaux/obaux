@@ -15,6 +15,8 @@
  * one in a message so the conversation can show it as a card (D-399).
  */
 import { intlLocale } from '@pam/config';
+import { codeFromError } from './reportAppError';
+import { storageCode, type UploadResult } from './messagePhoto';
 
 const BUCKET = 'message-files';
 
@@ -73,18 +75,18 @@ export function displayFileName(name: string): string {
   return (clean || 'document').slice(0, 200);
 }
 
-/** Stores a document in the conversation's folder; its path, or null. */
-export async function uploadMessageFile(conversationId: string, file: File): Promise<string | null> {
+/** Stores a document in the conversation's folder; its path, or the code of what went wrong. */
+export async function uploadMessageFile(conversationId: string, file: File): Promise<UploadResult> {
   const type = messageFileType(file);
-  if (!type) return null;
+  if (!type) return { path: null, code: 'unknown' };
   try {
     const { createClient } = await import('./supabase');
     const ext = extensionOf(file.name) || (type === TYPES.pdf ? 'pdf' : 'docx');
     const path = `${conversationId}/${crypto.randomUUID()}.${ext}`;
     const { error } = await createClient().storage.from(BUCKET).upload(path, file, { contentType: type, upsert: false });
-    return error ? null : path;
-  } catch {
-    return null;
+    return error ? { path: null, code: storageCode(error) } : { path };
+  } catch (caught) {
+    return { path: null, code: codeFromError(caught) };
   }
 }
 

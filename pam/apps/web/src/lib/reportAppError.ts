@@ -1,4 +1,4 @@
-import { appErrorCode, appErrorRoute, isAppErrorAction } from '@pam/config';
+import { appErrorCode, appErrorRoute, classifyFailure, classifyGuardMessage, isAppErrorAction, type FailureKind } from '@pam/config';
 
 /**
  * Tells the team that something a person did did not work (D-616; Will: "if something breaks, create an error log so the team can
@@ -111,13 +111,60 @@ export type ActionResult = { readonly ok: true } | { readonly ok: false; readonl
  */
 export function codeFromError(caught: unknown, online: boolean = typeof navigator === 'undefined' || navigator.onLine !== false): string {
   if (!online) return 'offline';
-  const error = caught as { name?: unknown; code?: unknown; status?: unknown } | null | undefined;
-  if (error?.name === 'AbortError') return 'timeout';
+  // A caller that has only a word to give (`'timeout'`) gives it as the error itself.
+  if (typeof caught === 'string') return appErrorCode(caught);
+  const error = caught as { name?: unknown; message?: unknown; code?: unknown; status?: unknown } | null | undefined;
+  // supabase-js reports an abort as an error with no name, only a message that begins with it; a fetch abort has the name.
+  if (error?.name === 'AbortError' || (typeof error?.message === 'string' && /^AbortError\b/.test(error.message))) return 'timeout';
   // A SQLSTATE is the most exact thing the database says; a PostgREST error with none (a 500, a gateway) is named by the HTTP status
   // of the answer instead (Iris D2).
   const own = appErrorCode(typeof error?.code === 'string' || typeof error?.code === 'number' ? error.code : null);
   if (own !== 'unknown') return own;
   return appErrorCode(typeof error?.status === 'number' || typeof error?.status === 'string' ? error.status : null);
+}
+
+/**
+ * The kind of a caught failure, for the alert's words (D-618): the same code the log holds, put through `classifyFailure`. Takes the error
+ * (or the `{ code }` a screen hands `useMalfunction().show`); the one case a code cannot say, a send refused for sending too fast, is read
+ * from its message here, where the message is still in hand, and the message goes no further.
+ */
+export function failureKindOf(caught: unknown, options: boolean | FailureOptions = {}): FailureKind {
+  const { online = typeof navigator === 'undefined' || navigator.onLine !== false, signedIn } = typeof options === 'boolean' ? { online: options } : options;
+  if (!online) return 'offline';
+  const error = caught as { message?: unknown; code?: unknown } | string | null | undefined;
+  // The whole error is read before `appErrorCode` narrows it: an expired sign-in (PGRST301) or a missing row (PGRST116) is told apart here,
+  // where the log would only hold "unknown". A guard's own word, where the message is still in hand, says more than the code (every guard is
+  // P0001 / 400); none of the message goes further.
+  const named = classifyGuardMessage(typeof error === 'object' && error !== null ? error.message : undefined);
+  if (named) return named;
+  const raw = typeof error === 'object' && error !== null && typeof error.code === 'string' ? error.code : null;
+  // With no sign-in the client falls back to the anonymous key, and a refusal for that is 42501, the same code as "this account may not".
+  if (signedIn === false && raw === '42501') return 'signed-out';
+  if (raw && classifyFailure(raw, true) !== 'server') return classifyFailure(raw, true);
+  const code = codeFromError(caught, online);
+  if (signedIn === false && code === '42501') return 'signed-out';
+  return classifyFailure(code, online);
+}
+
+export interface FailureOptions {
+  /** Whether the phone has a network (read from the browser when left out). */
+  readonly online?: boolean;
+  /** Whether there is a signed-in session. Left out when it is not known; `false` turns a 42501 (the anonymous key's refusal) into signed-out. */
+  readonly signedIn?: boolean;
+}
+
+/**
+ * What the alert should do about a failed action: `'done'` when the outcome the person wanted has in fact already happened, so nothing is
+ * shown (saving a place that is already saved, cancelling a visit that is already cancelled, deciding a request somebody else decided),
+ * else the kind. A send whose 30-second abort landed is not decided here: Try again looks for the first copy before it sends another.
+ */
+export function failureFor(action: string, caught: unknown, options: boolean | FailureOptions = {}): FailureKind | 'done' {
+  const message = String((caught as { message?: unknown } | null | undefined)?.message ?? '');
+  const code = String((caught as { code?: unknown } | null | undefined)?.code ?? '');
+  if (action === 'places.save' && code === '23505') return 'done';
+  if (action === 'trips.cancel' && /TRIP_NOT_FOUND|VISIT_CANCELLED/.test(message)) return 'done';
+  if (action === 'requests.review' && /ALREADY_DECIDED/.test(message)) return 'done';
+  return failureKindOf(caught, options);
 }
 
 /** The code for a failed call whose answer carries a status: `const { error, status } = await ...; codeFromAnswer(error, status)`. */
