@@ -433,7 +433,7 @@ export function useThread(conversationId: string | null): {
         // request may still have reached the database, which is what Try again's look before sending is for.
         const giveUp = new AbortController();
         const deadline = setTimeout(() => giveUp.abort(), SEND_DEADLINE_MS);
-        const { data, error } = await supabase
+        const { data, error, status } = await supabase
           .from('messages')
           .insert({
             conversation_id: conversationId,
@@ -446,7 +446,8 @@ export function useThread(conversationId: string | null): {
           .abortSignal(giveUp.signal)
           .single();
         clearTimeout(deadline);
-        if (error || !data) throw error ?? new Error('insert failed');
+        // The answer's HTTP status goes with the error, so a failure with no SQLSTATE is still named (Iris D2).
+        if (error || !data) throw error ? Object.assign(error, { status }) : new Error('insert failed');
         stored = null;
 
         const row = data as MessageRow;

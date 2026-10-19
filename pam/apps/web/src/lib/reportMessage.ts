@@ -1,6 +1,6 @@
 'use client';
 
-import { codeFromError, reportAppError } from './reportAppError';
+import { codeFromAnswer, codeFromError, type ActionResult } from './reportAppError';
 
 /**
  * Says a message is not safe (D-177).
@@ -11,20 +11,18 @@ import { codeFromError, reportAppError } from './reportAppError';
  * `MESSAGE_REPORT_REASONS`' keys, stored as-is — the words a reviewer reads
  * come from the locale bundle at render time, the same way a place flag's
  * reason does (0036), so nobody's free text lands in front of somebody with
- * power over them. Returns `false` when refused or offline; the screen says
- * so with a Notice, never silently.
+ * power over them. Answers `ok: false` with its code when refused or offline; the screen says
+ * so with the small alert, never silently.
  */
-export async function reportMessage(messageId: string, reason: string): Promise<boolean> {
+export async function reportMessage(messageId: string, reason: string): Promise<ActionResult> {
   try {
     const { createClient } = await import('./supabase');
-    const { error } = await createClient().rpc('report_message', {
+    const { error, status } = await createClient().rpc('report_message', {
       p_message_id: messageId,
       p_reason: reason,
     });
-    if (error) reportAppError({ action: 'messages.report', code: codeFromError(error) });
-    return !error;
+    return error ? { ok: false, code: codeFromAnswer(error, status) } : { ok: true };
   } catch (caught) {
-    reportAppError({ action: 'messages.report', code: codeFromError(caught) });
-    return false;
+    return { ok: false, code: codeFromError(caught) };
   }
 }
