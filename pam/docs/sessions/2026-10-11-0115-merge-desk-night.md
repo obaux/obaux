@@ -2106,6 +2106,47 @@
   until Ava shot one on Everyone. Fixed in ef8b19af, and every b77 picture was re-shot over real content. Lesson: a
   picture of anything that floats over a page is taken over a busy part of that page.
 
+- **A merge wrote seven keys twice (b77, found 02:08 by Lena).** Merging Piper's names into en.json (b77 merge 15,
+  081fe6e1) left the seven appError.action.* keys in the file twice, with the same words. JSON.parse keeps the last
+  one, so nothing failed and the tip checks did not look. Lena's raw-text test (c7d86f06, failing on main and naming the
+  seven) is in b78. Lesson: a merge of a JSON file is checked as text, not only as parsed data.
+- **A finished change was split only when someone asked (b78, 03:14).** Nico's region_id close (999c118f) took away the
+  column the live app still reads (useSession's select). Applied with the app, a person on the old page would have hit
+  the session error screen until they reloaded. Split at 03:19 (e4a187a1): add my_region_info, ship the app that reads it,
+  take the column away a day later. Lesson: a migration that takes something away ships as add, then app, then take
+  away, never in one push with the app that stops using it.
+- **A re-export was dropped under a READY that still used it (b78 trial, 03:50).** Dot's tip dropped settleWithin's
+  re-export from malfunction.tsx after Nico's READY 227a0fa1 had added two imports of it; the trial's tsc failed on the
+  merge, never on either branch. Lesson: before taking a READY that removes an export, the desk searches every READY
+  in the batch for its importers.
+- **The alert Will asked for was not the alert we built (b78, 04:51).** Will at 03:47 gave a picture of the blue Banner as
+  the look for every alert, in red. Dot built it with the team's own rules on top (16px text, a 48px action) and every
+  kind was shot before Will saw one; at 04:51 he said it "looks blown up". Lesson: when Will gives a reference, the
+  reference is the spec; one picture next to it goes to him before the rest is built.
+- **A taller alert covered the button just tapped on a small phone (b78, 04:48).** The Banner was taller than the
+  compact alert it replaced; Dot's targeted set passed, and Nico's "never covers the button just tapped" specs in his
+  own lane failed at 320 wide. Fixed by Dot (de7f7bd4 spacer, then 8f51e6c1: the control scrolls clear once the spacer
+  is measured). Lesson: a change of an alert's size is re-proven against every lane's specs that guard it.
+- **A change of shared words went past the targeted runs (b78 trial, 05:20).** Every READY ran its own specs and passed;
+  the full run on the assembled trial found 44 failures, all tests in three lanes still waiting for the old failure
+  line. No screen was broken. Lesson: the full run on the assembled push is what proves a change other lanes read; the
+  push rule in team.md ("Mira sets when the next push goes") keeps it to one.
+- **The desk named the wrong owner for a failure (b78, 05:25).** I told Dot five failing spec files were on main; they
+  came from Piper's 171268f7, not yet merged. The message was withdrawn before it was read. Lesson: before telling a lane a
+  failure is on main, check `git merge-base --is-ancestor <commit> origin/main`.
+- **Will's decisions did not show on his page (19 October, 04:51).** Will asked why his decisions and changes were not
+  showing as items on the Control Room. They were going only into "What I'm doing", which had not changed since 01:58, and
+  into the roadmap's "waiting" lines. Fixed the same hour: Your notes (v49), with the rule in control-room.md that a note
+  is written before anyone is sent to build it.
+- **Mira's answers did not reach the page for five days (14 to 19 October).** control-room.md has said since 10 October
+  that every answer goes into `chat/` as well as the comment thread. From 14 October the desk answered only in the
+  threads, so the page's conversation showed Will's messages unanswered. Found at 05:21 while building the answer box;
+  every answer since carries `re` and `about`. Lesson: the rule existed and was not followed; the answer box makes a
+  missing answer visible on the item itself.
+- **A publish without its link made a second Control Room (b78, 03:07).** After a context reset the desk published the
+  page without its `url`, which made a separate private copy (no data, no capabilities). Told Will; it stays until he
+  says to delete it. Lesson: after a reset, the Control Room is published with its link.
+
 ## Decisions
 
 - Will's answer on a card goes to the teammate waiting on it the same turn. If that teammate needs Will's own
@@ -2113,6 +2154,15 @@
 - A new copy job from Will goes to Sage first. Wording still comes back to Will as a card before anything
   ships.
 
+- **D-619a (02:31):** the toast is drawn from Astryx primitives and tokens, not Astryx's Toast component: the
+  component added 4.5 kB to first load (its swipe and timers, and a theme leak) and Will wants no swipe. Revisit if
+  Astryx fixes the leak.
+- **D-621 (03:47, amended 04:51; Dot):** every alert in the bottom stack, the failure banner and the status notices, is
+  Astryx's Banner, status error, in the look of Will's blue reference: the Banner's own text sizes (Will overrides
+  the 16px rule for alerts), the × in the top corner, quiet buttons of the same width. Blue information notes stay
+  blue; warning banners are unchanged. The gate screens (paused account, unfinished sign-up, could not load) use the
+  new header.
+- **Mira sets the next push (05:18):** in team.md. The time is on the Control Room, marked tentative.
 ## Verified
 
 | Check | Result |
@@ -2396,6 +2446,9 @@
 | 20261018211942 live | Not applied in b77. It waits for Will's yes in the session (its constraint change); then dispatch-sms is redeployed, the switch and the Privacy line go on together, and one test report is sent |
 | Batch b77, before its last four inputs (37474955; full checks stopped at 1500 of 2655 e2e with 0 failures once every input was in) | build, tsc, web unit 227, budget 5.5 kB, ui 132; config 1 failed: the privacy guard read Pam's hours as having no field (the lesson above; fixed in cfe3a0f3) |
 | Batch b77, full run (e99e663f: 9aac8b6f + Nico a7f240b5; Lena 0c15d75c, 80bc9a72, ac241fbc, 80cf7827, ec6ffac2, cfe3a0f3; Ava 2d94bff2, cdff2806; Dot a7061274, ef8b19af, 88975d23; Piper be3d5ee5; Iris 9ef5b943, f56ef6cd; Sage ec7c8426): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y / language fit | config 1501 passed (4 skipped, 1 todo); copy in step; ui 132; ui build; site 124; site tsc; build:e2e; tsc; web unit 229; budget 4.9 kB to spare; e2e 2669 passed, 22 skipped, 0 failed, no retries (35.0 m); storybook built, no bundle names the live project; site build; site a11y 125 scans, 0 problems; language fit on the Storybook (en, ar, 760): 5 Arabic findings, all in fit-known.json, none new |
+
+| b77 main CI (6773c9c4, pushed 01:51:40) | Migrations and RLS (01:53), Publish Storybook, Types/unit/build, Accessibility (02:33): all four green; Vercel web (01:57) and pam-site (01:53) success |
+| b78 trial, full run (6ff54be6 on mira/b78-trial: every READY then in, with Dot ca281b2b) | config 1590 passed; ui 132; site 125; build; tsc; web unit 245; budget 2.0 kB to spare; e2e 2739 passed, 22 skipped, 44 failed (44.5 m), every failure a test waiting for the old failure line ("That didn't go through …"): Nico's alerts and messages specs (adapted in 058e6d68), Ava's invite.spec:123, and nine tests from Piper's second D-616 batch (171268f7), each on all three phone sizes; storybook built, no bundle names the live project; site build; site a11y 125 scans, 0 problems |
 
 ## Left undone
 

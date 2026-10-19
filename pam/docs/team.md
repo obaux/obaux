@@ -208,6 +208,19 @@ message is the one not sent.
 - **The merge desk batches:** READY branches waiting together are merged together, with
   one run of checks and one wait for CI. The Control Room is brought up to date with each
   batch, and whenever Will has something to do, not after every teammate's note.
+- **Mira sets when the next push goes** (Will, 19 October, 05:18: "decide when the next push
+  is going to be based on the current tasks. Prioritize based on saving tokens, and be strategic
+  about this so things don't break in the app"):
+  - one push per set of work that is ready together, not one per READY;
+  - each lane tests only what it touched; **the full run happens once, on the assembled
+    push**, and nothing joins after it starts;
+  - a lane that can't be ready by the time Mira gives it moves to the push after; nothing
+    waits on it, and nothing half-done goes in;
+  - the time comes from what is left, is shown on the Control Room's Next push with its
+    date (marked tentative until it is certain), and is moved there the moment it slips.
+  A change of words or behaviour that other lanes' tests read (a shared alert's wording, a
+  component's size) still gets that full run before the push: on 19 October the targeted
+  runs passed and the full run found 44 tests in three lanes still waiting for the old words.
 - **No Vercel previews.** Branches don't deploy (10 October: they used half the daily
   deploys). Show work in Storybook, which Chromatic builds for every push.
 - **Scheduled work is quiet when there is nothing to do:** the nightly map, the Friday
@@ -258,7 +271,7 @@ The kinds:
 | **BLOCKED** | you cannot go on | what blocks you and what would unblock it |
 | **FINDING** | you find something outside your lane — a bug, a stale record, a risk | where; what; the evidence. You do not fix it |
 | **MIGRATION** | a migration file is ready | the file; expand or contract; what must be live first; the database tests you ran |
-| **READY** | a branch is ready to merge | branch and head commit; migration first or not; lanes touched; every check with its result (the language-fit check too if copy or UI changed); a `Screens:` line if a screen was added, removed or rewired; what to tell Will |
+| **READY** | a branch is ready to merge | branch and head commit; migration first or not; lanes touched; every check with its result (the language-fit check too if copy or UI changed); a `Screens:` line if a screen was added, removed or rewired; what to tell Will; a last line "For the roadmap:" saying which Next push item it moves and its pictures (path and when they were taken) |
 | **DONE** | you stop work for now | what changed; branch and head; what is left; what you are waiting on |
 
 - **Don't go quiet.** A turn that pushed work ends with READY or DONE (one of them, not
