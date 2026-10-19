@@ -1,10 +1,10 @@
 -- contract: the notification kinds the old check lists are all still allowed; the list only grows by 'app_error' (the same shape as 20261017062631).
+-- EDITED IN PLACE (Iris D1, 19 October): never applied live, so the closed lists of actions and routes were added here, not in a second migration.
 --
 -- App errors: a log of what broke, without who (D-616; Will, 18 October 2026, 21:14: "if something breaks, please create an error log so
 -- the team can be notified and fix the issue").
 --
--- WHAT IT HOLDS. One row per failure the app reports: when, the screen's route as a PATTERN (`area`, /person/[id]/, never an id or a
--- query), a stable key for what was being done (`action`, e.g. alerts.switch.closed), the code it failed with (an HTTP status, a
+-- WHAT IT HOLDS. One row per failure the app reports: when, the screen's route (`area`, one of the app's screens, never an id or a query), a stable key for what was being done (`action`, e.g. alerts.switch.closed), the code it failed with (an HTTP status, a
 -- Postgres SQLSTATE, or offline / timeout / unknown), the app build, the platform, the role the person was acting as (read here from
 -- their sign-in, not taken from the app), and the language. NO free text at all (Lena's Privacy read, Mira 21:23): an error's own
 -- message carries the value that broke it ("Key (phone)=(...) already exists"), so there is no detail column and the function takes none.
@@ -82,6 +82,137 @@ alter table public.app_error_limits force row level security;
 revoke all on public.app_error_limits from anon, authenticated;
 create policy app_error_limits_nobody on public.app_error_limits for all to anon, authenticated using (false) with check (false);
 
+-- The two closed lists (Iris D1): an action must be one the app has, and a route must be a screen the app has, else the report is refused / filed
+-- as /unknown. A shape check alone let "aaliyah.smith" and "/aaliyah-smith/" through, and both are a name. The lists are the app's own
+-- (`APP_ERROR_ACTIONS`, `APP_ERROR_ROUTES` in @pam/config; a test holds each to the lines below). A new action or screen is a new migration.
+create table public.app_error_actions (action text primary key);
+create table public.app_error_routes (route text primary key);
+alter table public.app_error_actions enable row level security;
+alter table public.app_error_actions force row level security;
+revoke all on public.app_error_actions from anon, authenticated;
+create policy app_error_actions_nobody on public.app_error_actions for all to anon, authenticated using (false) with check (false);
+alter table public.app_error_routes enable row level security;
+alter table public.app_error_routes force row level security;
+revoke all on public.app_error_routes from anon, authenticated;
+create policy app_error_routes_nobody on public.app_error_routes for all to anon, authenticated using (false) with check (false);
+
+-- app_error_actions: begin
+insert into public.app_error_actions (action) values
+  ('messages.send'),
+  ('messages.photo'),
+  ('messages.retry'),
+  ('messages.load'),
+  ('messages.pam.open'),
+  ('messages.block'),
+  ('messages.unblock'),
+  ('messages.report'),
+  ('alerts.switch.closed'),
+  ('alerts.switch.message'),
+  ('alerts.switch.booked'),
+  ('alerts.switch.changed'),
+  ('alerts.switch.trip'),
+  ('alerts.switch.visit'),
+  ('alerts.agree'),
+  ('reminders.agree'),
+  ('reminders.decline'),
+  ('function.dispatch-sms'),
+  ('pam.hours.save'),
+  ('pam.thread.status'),
+  ('directory.demo-view'),
+  ('requests.review'),
+  ('invite.create'),
+  ('places.save'),
+  ('places.unsave'),
+  ('checkin.here'),
+  ('checkin.went'),
+  ('trips.cancel'),
+  ('schedule.checkin'),
+  ('schedule.undo')
+on conflict do nothing;
+-- app_error_actions: end
+
+-- app_error_routes: begin
+insert into public.app_error_routes (route) values
+  ('/'),
+  ('/about/'),
+  ('/account/'),
+  ('/admin/'),
+  ('/alerts/'),
+  ('/calendar/'),
+  ('/cities/waiting/'),
+  ('/connections/'),
+  ('/directory/'),
+  ('/flag/'),
+  ('/gallery/'),
+  ('/help/'),
+  ('/help/report-place/'),
+  ('/help/safety/'),
+  ('/help/topics/'),
+  ('/home/calendar/'),
+  ('/interested/'),
+  ('/invite/'),
+  ('/invite/add/'),
+  ('/invite/expired/'),
+  ('/invite/in-use/'),
+  ('/invite/new/'),
+  ('/invites/'),
+  ('/join/'),
+  ('/language/'),
+  ('/legal/'),
+  ('/legal/privacy/'),
+  ('/legal/privacy/copy/'),
+  ('/legal/privacy/delete/'),
+  ('/messages/'),
+  ('/messages/pam/'),
+  ('/messages/thread/'),
+  ('/messages/thread/files/'),
+  ('/messages/thread/options/'),
+  ('/messages/thread/report/'),
+  ('/notifications/'),
+  ('/pam/hours/'),
+  ('/pam/messages/'),
+  ('/pam/start/'),
+  ('/pam/thread/options/'),
+  ('/person/'),
+  ('/person/connect/'),
+  ('/person/past/'),
+  ('/person/policies/'),
+  ('/place/'),
+  ('/place/policies/'),
+  ('/place/policies/view/'),
+  ('/places/'),
+  ('/places/reported/'),
+  ('/points/'),
+  ('/privacy/'),
+  ('/problems/'),
+  ('/profile/'),
+  ('/profile/add-program/'),
+  ('/program/'),
+  ('/program/book/'),
+  ('/program/book/new/'),
+  ('/program/policies/'),
+  ('/program/policies/view/'),
+  ('/program/sent/'),
+  ('/program/service/'),
+  ('/program/switch/'),
+  ('/programs/'),
+  ('/programs/new/'),
+  ('/programs/review/'),
+  ('/programs/review/item/'),
+  ('/reminders/'),
+  ('/reply/'),
+  ('/requests/'),
+  ('/requests/program/'),
+  ('/requests/review/'),
+  ('/saved/'),
+  ('/signin/'),
+  ('/terms/'),
+  ('/trips/'),
+  ('/trips/new/'),
+  ('/use-as/')
+on conflict do nothing;
+-- app_error_routes: end
+
 insert into public.app_settings (key, value, description) values
   ('app_errors_live', 'off',
    'Whether the app reports a failed action to the error log (D-616). Off: report_app_error writes nothing. Turned on by the merge desk once Lena has '
@@ -153,14 +284,15 @@ begin
   -- Checked on the way in. A report must not break the screen that sent it, so nothing here raises: a bad route or code is made harmless, and
   -- a report whose action is not a stable key is simply not taken (the closed list of keys is in the app's code).
   v_action := coalesce(p_action, '');
-  if v_action !~ '^[a-z][a-z0-9-]{0,29}(\.[a-z0-9][a-z0-9-]{0,29}){1,3}$' or char_length(v_action) > 60 then
+  if v_action !~ '^[a-z][a-z0-9-]{0,29}(\.[a-z0-9][a-z0-9-]{0,29}){1,3}$' or char_length(v_action) > 60
+     or not exists (select 1 from public.app_error_actions a where a.action = v_action) then
     return false;
   end if;
-  -- The route as a pattern: no query, no fragment, and any id made a placeholder (uuids and long digit runs).
+  -- The route: no query, no fragment, a closing slash, and it must be a screen the app has (Iris D1). Anything else, a name typed into an
+  -- address for one, is filed as /unknown.
   v_area := split_part(split_part(coalesce(p_area, ''), '?', 1), '#', 1);
-  v_area := regexp_replace(v_area, '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}', '[id]', 'g');
-  v_area := regexp_replace(v_area, '[0-9]{4,}', '[id]', 'g');
-  if v_area !~ '^/[A-Za-z0-9/_\[\]-]{0,98}$' then v_area := '/unknown'; end if;
+  if char_length(v_area) > 1 and right(v_area, 1) <> '/' then v_area := v_area || '/'; end if;
+  if not exists (select 1 from public.app_error_routes r where r.route = v_area) then v_area := '/unknown'; end if;
   -- The code from a closed shape; anything else (an error's own words, for one) is just "unknown".
   v_code := coalesce(p_code, '');
   if not (v_code ~ '^[0-9]{3}$' or v_code ~ '^[0-9A-Z]{5}$' or v_code in ('offline', 'timeout', 'unknown')) then

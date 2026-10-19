@@ -202,6 +202,30 @@ test.describe('Message Pam, the person\'s side', () => {
     expect(box.width).toBeGreaterThanOrEqual(47.5);
   });
 
+  test('the line with the 988 call is spaced like the other lines of the reply: the tap area does not stretch it (Iris R3)', async ({ page }) => {
+    await world(page, { away: true });
+    await page.goto(`/messages/thread/?id=${PAM_C}`);
+    await settled(page);
+    const call = page.getByRole('link', { name: 'Call or text 988' });
+    const pitches = await call.evaluate((el) => {
+      const parent = el.parentElement!;
+      const tops = new Set<number>();
+      const walker = document.createTreeWalker(parent, NodeFilter.SHOW_TEXT);
+      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        if (!node.textContent?.trim()) continue;
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        for (const rect of Array.from(range.getClientRects())) tops.add(Math.round(rect.top));
+      }
+      // Pieces of one line (the number sits a pixel or two off its neighbours' tops) are one line.
+      const lines: number[] = [];
+      for (const top of Array.from(tops).sort((a, b) => a - b)) if (lines.length === 0 || top - lines[lines.length - 1]! > 8) lines.push(top);
+      return lines.slice(1).map((top, i) => top - lines[i]!);
+    });
+    expect(pitches.length).toBeGreaterThanOrEqual(2);
+    for (const pitch of pitches) expect(Math.abs(pitch - pitches[0]!)).toBeLessThan(2);
+  });
+
   test('the team reads Pam\'s welcome and the out-of-hours reply as Pam, with her mark, never as the person (Iris R1)', async ({ page }) => {
     // Marcus wrote one line between the two; the team is a super admin looking at his conversation.
     await world(page, { role: 'super_admin', team: true, away: true });
