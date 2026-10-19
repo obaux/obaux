@@ -29,13 +29,14 @@ update public.profiles set phone = '+12679990411' where id = :'marcus';
 update public.profiles set phone = '+12679990412' where id = :'tanya';
 
 \echo ''
-\echo '--- What is kept: a keyed hash and a day, nothing else ---'
+\echo '--- What is kept: a keyed hash, nothing else ---'
+create temp table audit_before as select count(*)::bigint as n from public.audit_log;
 select public.record_sms_stop('+12675550177');
 select test.check('a STOP from a number with no account is remembered, as one row', (select count(*) from public.phone_stops), 1::bigint);
-select test.check('...with only a hash and a day: two columns',
-  (select count(*) from information_schema.columns where table_schema = 'public' and table_name = 'phone_stops'), 2::bigint);
-select test.check_bool('...whose day is a date, not a moment',
-  (select data_type from information_schema.columns where table_schema = 'public' and table_name = 'phone_stops' and column_name = 'stopped_at') = 'date', true);
+select test.check('...with only the hash: one column, no time, no day',
+  (select count(*) from information_schema.columns where table_schema = 'public' and table_name = 'phone_stops'), 1::bigint);
+select test.check('...and nothing is written to the audit log on that branch',
+  (select count(*) from public.audit_log) - (select n from audit_before), 0::bigint);
 select test.check('...the hash is keyed (k1:), not the old plain digest, and has nothing of the number in it',
   (select count(*) from public.phone_stops
    where phone_hash like 'k1:%' and phone_hash <> encode(extensions.digest('+12675550177', 'sha256'), 'hex') and phone_hash not like '%2675550177%'), 1::bigint);
@@ -82,6 +83,35 @@ select test.check('a STOP from a number with no account is a row...', (select co
 select public.record_sms_start('+12675550166');
 select test.check('...and a START from it removes the row', (select count(*) from public.phone_stops), 0::bigint);
 select test.check_bool('...so the number no longer counts as stopped', public.phone_is_stopped('+12675550166'), false);
+
+\echo ''
+\echo '--- An erased account that was stopped leaves its number stopped ---'
+update public.profiles set phone = '+12675550144' where id = :'tanya';
+insert into public.notification_preferences (member_id, sms_stopped_at) values (:'tanya', now())
+  on conflict (member_id) do update set sms_stopped_at = now();
+select test.check('before the account is erased the list is empty', (select count(*) from public.phone_stops), 0::bigint);
+delete from public.profiles where id = :'newbie';
+select test.check('an account with no stop that is erased adds nothing', (select count(*) from public.phone_stops), 0::bigint);
+insert into auth.users (id, phone) values ('dddddddd-0000-4000-8000-0000000086a2', '12675550133');
+insert into public.profiles (id, role, phone) values ('dddddddd-0000-4000-8000-0000000086a2', 'member', '+12675550133');
+insert into public.notification_preferences (member_id, sms_stopped_at) values ('dddddddd-0000-4000-8000-0000000086a2', now());
+delete from public.profiles where id = 'dddddddd-0000-4000-8000-0000000086a2';
+delete from auth.users where id = 'dddddddd-0000-4000-8000-0000000086a2';
+select test.check('a stopped account that is erased puts its number back in the list', 
+  (select count(*) from public.phone_stops where phone_hash = public.phone_hash('+12675550133')), 1::bigint);
+select test.check_bool('...so the number still counts as stopped', public.phone_is_stopped('+12675550133'), true);
+insert into auth.users (id, phone) values ('dddddddd-0000-4000-8000-0000000086a3', '12675550133');
+insert into public.profiles (id, role, phone) values ('dddddddd-0000-4000-8000-0000000086a3', 'member', '+12675550133');
+select test.check('...and a person who joins again with that number starts stopped, with texts off',
+  (select count(*) from public.notification_preferences where member_id = 'dddddddd-0000-4000-8000-0000000086a3' and sms_stopped_at is not null and sms_enabled = false), 1::bigint);
+select test.check('...and the list is empty again', (select count(*) from public.phone_stops), 0::bigint);
+delete from public.profiles where id = 'dddddddd-0000-4000-8000-0000000086a3';
+delete from auth.users where id = 'dddddddd-0000-4000-8000-0000000086a3';
+delete from public.phone_stops;
+
+\echo ''
+\echo '--- No reversible hash of a number is left anywhere ---'
+select test.check('every hash in the support-text log is the keyed one', (select count(*) from public.support_texts_log where phone_hash not like 'k1:%'), 0::bigint);
 
 \echo ''
 \echo '--- Nobody but the database reads any of it ---'
