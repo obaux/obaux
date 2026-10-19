@@ -447,7 +447,7 @@
   "notice.malfunction.action.retry": "Intentar de nuevo",
   "notice.malfunction.action.signIn": "Entrar",
   "notice.malfunction.action.reload": "Mostrar lo último",
-  "notice.malfunction.action.help": "Pedir ayuda",
+  "notice.malfunction.action.help": "Buscar ayuda",
   "notice.something_went_wrong.title": "Algo salió mal",
   "notify.demo.newInterest": "{count} personas están interesadas en {program}",
   "notify.demo.pointsEarned": "Ganaste {points} puntos por {reason}",

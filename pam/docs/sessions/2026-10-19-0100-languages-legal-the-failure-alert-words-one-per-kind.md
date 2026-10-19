@@ -10,3 +10,4 @@
 ## Open
 - Native readers: the Russian slow-connection question, "Show the latest" (Mostrar lo último / Mostrar o mais recente / 显示最新 / 顯示最新 / Показать актуальное / عرض الأحدث), and the `notAllowed` titles.
 - The words are not used by any screen until Dot's and Nico's branches land; an audit of the real banner (`claude/messages-failure-kinds` and Dot's alert) at 320 in ru and ar goes with them.
+- **Sage 00:33:** "Get help" is `help.title`, so the Spanish button is «Buscar ayuda» (not the Profile row's «Pedir ayuda»); `failure-alert-words.test.ts` now holds that in all seven languages, and that the quoted button words in the lines ("Try again", "Show the latest") are the words on the buttons. English is held to Sage's 32 / 60 characters; the other languages to 32 / 72, with the real check being the banner audit.
