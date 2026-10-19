@@ -986,5 +986,9 @@
   {
     "key": "ar|ellipsis|super-admin-screens--messages-to-pam-closed|Glad that worked out.",
     "reason": "A row in Messages to Pam keeps what was said to one line and trims it with an ellipsis; that is the design, in English too (the English row is \"You: …\" in one text node and is trimmed the same way, so it is listed with the English defects). In Arabic the row is two text nodes, the label \"أنت:\" and then the words, so the detector reports the words alone under a different text and calls it new. The words are what the person wrote, in English in the story, and are not a translation. Found by the 320 audit of claude/lena-pam-team-words @ 959a0df1 (18 October); none of the 30 keys in that commit is on this row."
+  },
+  {
+    "key": "ru|overlap|components-actions-bringfriend--just-copied|Копировать ⟷ Ссылка скопирована",
+    "reason": "By design (D-338, D-339, Will): \"Link copied\" is drawn over the link field and Copy together, on Copy's own opaque pale green, for 3 seconds, so Copy's label (and the link) are under it and not seen. In Russian the centred words are wide enough to sit over Copy's label, which the detector counts as two lines overlapping; a person sees one line («Ссылка скопирована», with its tick) on a green bar, as in English and the other five languages (looked at 18 Oct 2026 at 320×760, 450 ms after the tap: no text under the words shows). The shorter «Скопировано» would say less (the link, not an address or a name) and the audit would still not see a fault, so the signed words stay."
   }
 ]
