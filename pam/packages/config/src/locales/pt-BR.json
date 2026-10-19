@@ -691,6 +691,8 @@
   "requests.failed.city.body": "Escolha a cidade da conta da pessoa ou recuse este pedido.",
   "requests.failed.decided.title": "Este pedido já foi decidido",
   "requests.failed.decided.body": "Volte à lista para ver como ficou.",
+  "requests.failed.gone.body": "A conta de {name} foi apagada, então não há nada a decidir. Volte à lista.",
+  "requests.failed.gone.title": "Este pedido não está mais aqui",
   "requests.done.title": "{name} agora também é líder de programa",
   "requests.done.body": "Enviamos uma mensagem avisando que a pessoa já está dentro.",
   "requests.wants.provider": "Quer adicionar um programa",

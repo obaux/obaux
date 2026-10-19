@@ -688,6 +688,8 @@
   "requests.failed.city.body": "Elija la ciudad de su cuenta, o rechace esta solicitud.",
   "requests.failed.decided.title": "Esta solicitud ya se decidió",
   "requests.failed.decided.body": "Vuelva a la lista para ver cómo quedó.",
+  "requests.failed.gone.body": "La cuenta de {name} se borró, así que no hay nada que decidir. Vuelva a la lista.",
+  "requests.failed.gone.title": "Esta solicitud ya no está aquí",
   "requests.done.title": "{name} ahora también es líder de programa",
   "requests.done.body": "Le enviamos un texto para avisarle que ya está dentro.",
   "requests.wants.provider": "Quiere añadir un programa",

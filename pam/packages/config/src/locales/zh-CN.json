@@ -691,6 +691,8 @@
   "requests.failed.city.body": "请选择对方账号所在的城市，或拒绝这份申请。",
   "requests.failed.decided.title": "这份申请已经有结果",
   "requests.failed.decided.body": "请回到列表查看当前情况。",
+  "requests.failed.gone.body": "{name}的账号已被删除，所以没有什么可决定的。请回到列表。",
+  "requests.failed.gone.title": "这份申请已不在这里",
   "requests.done.title": "{name}现在也是项目负责人",
   "requests.done.body": "我们已发短信告知对方已加入。",
   "requests.wants.provider": "想添加一个项目",

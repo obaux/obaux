@@ -751,6 +751,8 @@
   "requests.failed.city.body": "اختر المدينة التي فيها حسابه، أو ارفض هذا الطلب.",
   "requests.failed.decided.title": "تم البت في هذا الطلب بالفعل",
   "requests.failed.decided.body": "ارجع إلى القائمة لترى وضعه.",
+  "requests.failed.gone.body": "تم حذف حساب {name}، فلا شيء لاتخاذ قرار بشأنه. ارجع إلى القائمة.",
+  "requests.failed.gone.title": "لم يعد هذا الطلب موجودا",
   "requests.done.title": "{name} أصبح الآن أيضا مسؤول برنامج",
   "requests.done.body": "أرسلنا إليه رسالة بأنه أصبح داخل التطبيق.",
   "requests.wants.provider": "يريد إضافة برنامج",
