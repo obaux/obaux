@@ -185,7 +185,12 @@ export async function createInvite(
   /** Who it is for — name and phone required (0077, D-373); staff also an email (0086, D-441). */
   who: { readonly firstName: string; readonly phone: string; readonly email?: string },
   /** Which city, when the caller has none of their own — a super admin (0049). */
-  regionId?: string,
+  regionId: string | undefined,
+  /**
+   * One attempt's id (20261019021939): sent again on a retry, so an answer lost to a timeout does not make a second invite (or a
+   * second staff email); the database hands the first one back. A new one whenever the details change.
+   */
+  requestId: string,
 ): Promise<CreatedInvite> {
   {
     const { createClient } = await import('./supabase');
@@ -196,13 +201,15 @@ export async function createInvite(
     // invite with one. A member's never carries it.
     const { data, error } =
       role === 'member'
-        ? await supabase.rpc('create_invite', {
+        ? await supabase.rpc('create_invite_once', {
+            p_request_id: requestId,
             p_role: role,
             p_first_name: who.firstName,
             p_phone: who.phone,
             ...where,
           })
-        : await supabase.rpc('create_staff_invite', {
+        : await supabase.rpc('create_staff_invite_once', {
+            p_request_id: requestId,
             p_role: role,
             p_email: who.email ?? '',
             p_first_name: who.firstName,

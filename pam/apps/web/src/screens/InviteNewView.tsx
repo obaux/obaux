@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
 import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
@@ -58,6 +58,8 @@ export function InviteNewView({ role }: { readonly role: string | null }) {
   const [invite, setInvite] = useState<CreatedInvite | null>(null);
   const [busy, setBusy] = useState(false);
   const malfunction = useMalfunction();
+  /** The id of the attempt in hand: the same while the details are the same (a retry), new when anything changes (Mira, 02:14). */
+  const attempt = useRef<{ readonly details: string; readonly id: string } | null>(null);
   const [refused, setRefused] = useState<'phone' | 'emailInvalid' | null>(null);
 
   useEffect(() => {
@@ -118,7 +120,9 @@ export function InviteNewView({ role }: { readonly role: string | null }) {
     const control = document.activeElement;
     setRefused(null);
     setBusy(true);
-    const settled = await settleWithin(createInvite(allowed!, who, isSuperAdmin ? regionId : undefined));
+    const details = JSON.stringify([allowed, who.firstName, who.phone, who.email ?? null, isSuperAdmin ? regionId : null]);
+    if (attempt.current?.details !== details) attempt.current = { details, id: crypto.randomUUID() };
+    const settled = await settleWithin(createInvite(allowed!, who, isSuperAdmin ? regionId : undefined, attempt.current.id));
     setBusy(false);
     if (settled.status === 'ok') {
       malfunction.clear();

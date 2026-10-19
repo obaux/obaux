@@ -120,6 +120,65 @@ test.describe('inviting somebody, on a page of its own (D-444)', () => {
     expect(asked[0]).toMatchObject({ p_role: 'member', p_region_id: PHILLY });
   });
 
+  test('an answer lost to a timeout, then Try again: the same attempt, one invite, one code, one staff email (20261019021939)', async ({ page }) => {
+    await page.clock.install();
+    await signedInAs(page, 'super_admin', [CITIES[0]]);
+    // The database as the migration makes it: one invite per request id, and only one email queued with it.
+    const made = new Map<string, string>();
+    const calls: Record<string, unknown>[] = [];
+    let holdFirst = true;
+    await page.route(STAFF_INVITE, async (route) => {
+      const body = route.request().postDataJSON() as Record<string, unknown>;
+      calls.push(body);
+      const id = String(body['p_request_id']);
+      if (!made.has(id)) made.set(id, `K4RZ7W${made.size + 2}H`);
+      if (holdFirst) {
+        holdFirst = false;
+        return; // The answer never comes back: the invite was made, and the phone does not know.
+      }
+      await route.fulfill(json({ code: made.get(id), expires_at: '2026-10-26T21:09:28Z', role: 'provider' }));
+    });
+    await page.goto('/invite/new/?role=provider');
+    await page.clock.runFor(500);
+    await settled(page);
+    await page.getByLabel('Their first name').fill('Bo');
+    await page.getByLabel('Their mobile number').fill('215 555 0112');
+    await page.getByLabel('Their email').fill('bo@example.org');
+    await page.getByRole('button', { name: 'Create link' }).click();
+    await page.clock.runFor(15_500);
+    await expect(page.getByRole('alert').filter({ hasText: "That didn't go through. It's not your fault, so try again." })).toBeVisible();
+    await page.getByRole('button', { name: 'Create link' }).click();
+    // The code and the link that carries it: the first invite's, not a second one.
+    await expect(page.getByText(/K4RZ7W2H/).first()).toBeVisible();
+    expect(calls).toHaveLength(2);
+    expect(calls[1]!['p_request_id']).toBe(calls[0]!['p_request_id']);
+    expect(String(calls[0]!['p_request_id'])).toMatch(/^[0-9a-f-]{36}$/);
+    expect(made.size).toBe(1);
+  });
+
+  test('after a timeout, fixing a detail is a new attempt, not the old invite back (20261019021939)', async ({ page }) => {
+    await page.clock.install();
+    await signedInAs(page, 'admin');
+    const calls: Record<string, unknown>[] = [];
+    await page.route(INVITE, async (route) => {
+      calls.push(route.request().postDataJSON() as Record<string, unknown>);
+      if (calls.length === 1) return; // lost
+      await route.fulfill(json({ code: '9T3YTVMT', expires_at: '2026-10-26T21:09:28Z', role: 'member' }));
+    });
+    await page.goto('/invite/new/?role=member');
+    await page.clock.runFor(500);
+    await settled(page);
+    await page.getByLabel('Their first name').fill('Rsoa');
+    await page.getByLabel('Their mobile number').fill('215 555 0111');
+    await page.getByRole('button', { name: 'Create link' }).click();
+    await page.clock.runFor(15_500);
+    await page.getByLabel('Their first name').fill('Rosa');
+    await page.getByRole('button', { name: 'Create link' }).click();
+    await expect.poll(() => calls.length).toBe(2);
+    expect(calls[1]!['p_first_name']).toBe('Rosa');
+    expect(calls[1]!['p_request_id']).not.toBe(calls[0]!['p_request_id']);
+  });
+
   test('a case manager is never asked for a city, and a program may not invite a case manager', async ({ page }) => {
     await signedInAs(page, 'admin');
     const asked: Record<string, unknown>[] = [];
