@@ -2,7 +2,7 @@
 
 Scope (Mira, 19 October): every use of `Notice` whose kind is not `empty` (`NOTICES` kinds `banner`: error, warning, info). Not in scope: `EmptyState` (kind `empty`: `service_not_available`, `no_caseload_members`, `admin_out_of_region`, `no_places_found`, `no_mentors_found`, 37 uses) and `CompactNotice` (the one-line alert by a field).
 
-85 `<Notice` uses in `apps/web/src` outside stories and tests (89 with the stories' own); 44 are status cards. **Lasting** = a state the person is in: the toast has no close while it is true and goes when the state ends. **One-off** = something that happened: it can be closed. **Action** = a failed save or send: these are the rows the D-616/D-618 owners are already moving onto `useMalfunction().show`, so they stop being cards at all (see "What this leaves for the toast").
+85 `<Notice` uses in `apps/web/src` outside stories and tests (89 with the stories' own); 47 are status cards (26 lasting, 19 one-off, 2 in the gallery), the other 38 are `EmptyState`s. **Lasting** = a state the person is in: the toast has no close while it is true and goes when the state ends. **One-off** = something that happened: it can be closed. **Action** = a failed save or send: these are the rows the D-616/D-618 owners are already moving onto `useMalfunction().show`, so they stop being cards at all (see "What this leaves for the toast").
 
 ## Account states (lasting)
 
@@ -51,6 +51,6 @@ Scope (Mira, 19 October): every use of `Notice` whose kind is not `empty` (`NOTI
 
 ## What this leaves for the toast
 
-- **Lasting, 22 uses**: the 9 account states, 13 pages that cannot load, plus the 4 not-here rows and the invite problems (counted above). No close while true.
-- **One-off actions, 18 uses**: most are D-616/D-618 conversions in flight; once converted they no longer render a `Notice`. Until then they become a closable toast.
-- **A reason the person can fix, 3 uses** (`SignInScreen`, `PoliciesView` ×2): D-616 keeps these inline by the field, so they are better left a card or a `CompactNotice` than a toast; to decide.
+- **Lasting, 26**: 9 account states, 13 pages that cannot load, 4 not-here or invite-problem screens. No close while the state is true.
+- **One-off actions, 19**: 16 are D-616/D-618 conversions in flight (once converted they no longer render a `Notice`; until then a closable toast), and **3 are a reason the person can fix** (`SignInScreen`, `PoliciesView` ×2), which D-616 keeps inline by the field: better a `CompactNotice` than a toast, to decide.
+- **Gallery, 2**: the component gallery's own examples.
