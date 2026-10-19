@@ -120,7 +120,14 @@ insert into public.app_error_actions (action) values
   ('pam.thread.status'),
   ('directory.demo-view'),
   ('requests.review'),
-  ('invite.create')
+  ('invite.create'),
+  ('places.save'),
+  ('places.unsave'),
+  ('checkin.here'),
+  ('checkin.went'),
+  ('trips.cancel'),
+  ('schedule.checkin'),
+  ('schedule.undo')
 on conflict do nothing;
 -- app_error_actions: end
 
