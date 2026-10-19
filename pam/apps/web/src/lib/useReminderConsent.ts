@@ -112,7 +112,7 @@ export async function setReminderConsent(memberId: string, enabled: boolean): Pr
  * only turns that switch off: it never withdraws the yes (Lena, 18 October, D-615: a switch is only on once the person has agreed on
  * the consent screen, and no text goes without a switch on, so a staff member who turns the last one off has not left a way to be
  * texted, and does not have to agree again to turn one back on; a STOP still ends everything). `alertsAreAllTheyGetTexts` is kept for
- * callers and no longer changes anything. Always refused for a yes after a STOP (`stopped`); the database holds the same line.
+ * callers and no longer changes anything. Always refused for a yes after a STOP (`stopped`): the app checks this, and the database does not, so this check is the only guard.
  */
 export async function setTextAlert(
   memberId: string,

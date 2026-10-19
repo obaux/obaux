@@ -83,8 +83,8 @@ test('when the database refuses, the circle stays empty', async ({ page }) => {
   await page.goto('/');
   await settled(page);
   await page.getByRole('button', { name: 'Check Tanya in' }).click();
-  // The small alert at the bottom, with no reason (D-616); the circle stays empty.
-  await expect(page.getByRole('alert').filter({ hasText: "That didn't go through. It's not your fault, so try again." })).toBeVisible();
+  // The small alert at the bottom (D-616), in the words for a check-in outside the visit's time ("Not at this time", D-618); the circle stays empty.
+  await expect(page.getByRole('alert').filter({ hasText: /Not at this time/ })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Check Tanya in' })).toBeVisible();
 });
 
@@ -116,7 +116,7 @@ test('a visit the member marked themselves looks like any marked visit: undo ask
   await page.getByRole('button', { name: /Tanya is checked in/ }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Undo check-in' }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
-  await expect(page.getByRole('alert').filter({ hasText: "That didn't go through" })).toHaveCount(0);
+  await expect(page.getByRole('alert').filter({ hasText: /Something's wrong on our side|That took too long|Still not working/ })).toHaveCount(0);
   await expect(page.getByRole('button', { name: /Tanya is checked in/ })).toBeVisible();
   // Nothing on the screen says who marked it.
   await expect(page.getByText(/themselves|marked it/i)).toHaveCount(0);

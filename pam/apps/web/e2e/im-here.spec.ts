@@ -126,7 +126,7 @@ test('at a place with no lead on Pam there is no I\'m here and no I went: nobody
   await expect(page.getByRole('button', { name: 'I went' })).toHaveCount(0);
 });
 
-const ALERT = "That didn't go through. It's not your fault, so try again.";
+const ALERT = /Something's wrong on our side|That took too long|Still not working/;
 
 test("a failed I'm here is the small alert at the bottom, with no reason, and the button is as it was (D-616)", async ({ page, context }) => {
   await context.grantPermissions(['geolocation']);

@@ -418,13 +418,14 @@ export function useThread(conversationId: string | null): {
           const setProgress = (fraction: number) =>
             setOutbox((prev) => prev.map((o) => (o.id === item.id ? { ...o, progress: fraction } : o)));
           setProgress(0);
-          const path = await uploadMessagePhoto(conversationId, shrunk, setProgress);
-          if (!path) throw new Error('upload failed');
-          stored = { path, kind: 'photo' };
+          const uploaded = await uploadMessagePhoto(conversationId, shrunk, setProgress);
+          // The storage code stays with the failure (a 403 is not-allowed, a 401 signed-out), not just the words "upload failed".
+          if (uploaded.path === null) throw Object.assign(new Error('upload failed'), { code: uploaded.code });
+          stored = { path: uploaded.path, kind: 'photo' };
         } else if (attachment?.kind === 'file') {
-          const path = await uploadMessageFile(conversationId, attachment.file);
-          if (!path) throw new Error('upload failed');
-          stored = { path, kind: 'file' };
+          const uploaded = await uploadMessageFile(conversationId, attachment.file);
+          if (uploaded.path === null) throw Object.assign(new Error('upload failed'), { code: uploaded.code });
+          stored = { path: uploaded.path, kind: 'file' };
           named = { name: displayFileName(attachment.file.name), bytes: attachment.file.size };
         }
         const { createClient } = await import('./supabase');
@@ -523,7 +524,7 @@ export function useThread(conversationId: string | null): {
         const { createClient } = await import('./supabase');
         const supabase = createClient();
         // Asked by who and when only: what a person typed never goes in a URL the logs keep (a66), so the words are compared here.
-        const { data: recent } = await supabase
+        const { data: recent, error: lookError, status: lookStatus } = await supabase
           .from('messages')
           .select(MESSAGE_COLUMNS)
           .eq('conversation_id', conversationId)
@@ -531,6 +532,8 @@ export function useThread(conversationId: string | null): {
           .gte('created_at', new Date(item.startedAt - 5000).toISOString())
           .order('created_at', { ascending: false })
           .limit(20);
+        // If the look itself failed, nobody knows whether the first try went through: sending again could make a second copy, so it stays Not sent.
+        if (lookError) throw Object.assign(lookError, { status: lookStatus });
         const found = ((recent ?? []) as unknown as MessageRow[]).find(
           (row) =>
             (row.body ?? '') === item.body &&
