@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { APP_ERROR_ACTIONS, APP_ERROR_ROUTES } from '../src/appErrors.js';
 import { EN } from './_bundles.js';
 
 /**
@@ -98,6 +99,52 @@ describe('the error log keeps what Privacy says it keeps (D-616)', () => {
     // Rows older than five minutes go, by a job every five minutes (and on each report): none lives past ten.
     expect(functionText('sweep_app_error_counters')).toMatch(/delete from public\.app_error_limits where minute < now\(\) - interval '5 minutes'/);
     expect(sql).toMatch(/cron\.schedule\('sweep-app-error-counters', '\*\/5 \* \* \* \*', 'select public\.sweep_app_error_counters\(\)'\)/);
+  });
+
+  describe('the screen and the action come from two closed lists, so no one can put a name in either (Iris D1)', () => {
+    const listed = (name: string): string[] => {
+      const block = sql.split(`-- ${name}: begin`)[1]?.split(`-- ${name}: end`)[0] ?? '';
+      return Array.from(block.matchAll(/^\s+\('([^']+)'\),?$/gm), (m) => m[1]!);
+    };
+    const routes = listed('app_error_routes');
+    const actions = listed('app_error_actions');
+
+    it('has both lists, and they are the app\'s own (the config test holds them equal; this keeps the line honest if that test goes)', () => {
+      expect(routes.length).toBeGreaterThan(10);
+      expect(actions.length).toBeGreaterThan(20);
+      expect(actions.sort()).toEqual([...APP_ERROR_ACTIONS].sort());
+      expect(routes.sort()).toEqual([...APP_ERROR_ROUTES].sort());
+    });
+
+    it('lists only fixed screens: words and dashes between slashes, no free segment such as [id] or a typed name', () => {
+      expect(routes.filter((r) => !/^(\/|\/([a-z0-9-]+\/)+)$/.test(r))).toEqual([]);
+      expect(routes.filter((r) => /[[\]{}:*?]/.test(r))).toEqual([]);
+    });
+
+    it('keeps an action only if it is on the list, and a route only if it is on the list, else "/unknown"', () => {
+      const fn = functionText('report_app_error');
+      expect(fn).toMatch(/not exists \(select 1 from public\.app_error_actions a where a\.action = v_action\) then\s+return false;/);
+      expect(fn).toMatch(/if not exists \(select 1 from public\.app_error_routes r where r\.route = v_area\) then v_area := '\/unknown'; end if;/);
+    });
+
+    it('never stores what it was given: the route and the action reach the row only through those checks', () => {
+      const body = functionText('report_app_error').split('returns boolean')[1] ?? '';
+      expect([...body.matchAll(/\bp_area\b/g)]).toHaveLength(1);
+      expect([...body.matchAll(/\bp_action\b/g)]).toHaveLength(1);
+      expect(body).toMatch(/insert into public\.app_errors[^;]*\bv_area\b/);
+      expect(body).toMatch(/insert into public\.app_errors[^;]*\bv_action\b/);
+    });
+
+    it('is written to by the migration alone: shut like the log, and nothing in a function adds a route or an action', () => {
+      for (const table of ['app_error_actions', 'app_error_routes']) {
+        expect(sql).toMatch(new RegExp(`alter table public\\.${table} enable row level security;`));
+        expect(sql).toMatch(new RegExp(`alter table public\\.${table} force row level security;`));
+        expect(sql).toMatch(new RegExp(`revoke all on public\\.${table} from anon, authenticated;`));
+        expect(sql).toMatch(new RegExp(`create policy ${table}_nobody on public\\.${table} for all to anon, authenticated using \\(false\\) with check \\(false\\);`));
+      }
+      // Two inserts each: none outside the seed blocks.
+      expect([...sql.matchAll(/insert into public\.app_error_(actions|routes)\b/g)]).toHaveLength(2);
+    });
   });
 
   it('is off until the switch is turned on, and writes nothing, not even a count, while it is off', () => {
