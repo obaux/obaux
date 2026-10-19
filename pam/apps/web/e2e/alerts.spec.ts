@@ -255,6 +255,27 @@ test.describe('Text alerts: what Iris found in b74 (B3, B6)', () => {
     if (bar) expect(box.y + box.height).toBeLessThanOrEqual(bar.y + 1);
   });
 
+  test('D-616: the alert has a surface of its own, so what is under it does not read through its words', async ({ page }) => {
+    await signedInAs(page, 'member', ON, 'on');
+    await page.route(PREFS, (route) => (route.request().method() === 'GET' ? route.fulfill(json(ON)) : route.fulfill({ status: 500, contentType: 'application/json', body: '{}' })));
+    await page.goto('/alerts/');
+    await settled(page);
+    await page.getByRole('switch', { name: CLOSED }).click();
+    const alert = page.getByRole('alert').filter({ hasText: MALFUNCTION });
+    await expect(alert).toBeVisible();
+    // Some layer from the alert up to the page is opaque: the alert is not drawn straight onto the content.
+    const opaque = await alert.evaluate((el) => {
+      for (let node: Element | null = el; node && node !== document.body; node = node.parentElement) {
+        const m = getComputedStyle(node).backgroundColor.match(/rgba?\(([^)]+)\)/);
+        if (!m) continue;
+        const parts = m[1]!.split(',').map((v) => parseFloat(v));
+        if (parts.length === 3 || (parts[3] ?? 1) >= 0.99) return true;
+      }
+      return false;
+    });
+    expect(opaque).toBe(true);
+  });
+
   test('D-616: the switch shows it is saving and moves only when the save succeeds', async ({ page }) => {
     await signedInAs(page, 'member', ON, 'on');
     let release: (() => void) | undefined;
