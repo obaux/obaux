@@ -24,40 +24,9 @@ import { codeFromError, reportAppError } from './reportAppError';
  * the screen); a failed message send keeps "Not sent" on the bubble (it is logged, with no overlay).
  */
 
-/** A save, a switch or a tap that has not been answered in this long counts as failed; a send keeps its 30 (D-616). */
-export const SAVE_TIMEOUT_MS = 15_000;
-
-export type Settled<T> =
-  | { readonly status: 'ok'; readonly value: T }
-  | { readonly status: 'failed'; readonly error: unknown }
-  /** No answer in time. `late` settles when the save finally answers, success or failure: read the truth again then. */
-  | { readonly status: 'timeout'; readonly late: Promise<void> };
-
-/** Waits for a save for `ms`; after that it is called failed, and the late answer is handed back to be re-read (Iris's A6). */
-export function settleWithin<T>(save: Promise<T>, ms = SAVE_TIMEOUT_MS): Promise<Settled<T>> {
-  return new Promise((resolve) => {
-    let done = false;
-    const timer = setTimeout(() => {
-      if (done) return;
-      done = true;
-      resolve({ status: 'timeout', late: save.then(() => undefined, () => undefined) });
-    }, ms);
-    save.then(
-      (value) => {
-        if (done) return;
-        done = true;
-        clearTimeout(timer);
-        resolve({ status: 'ok', value });
-      },
-      (error: unknown) => {
-        if (done) return;
-        done = true;
-        clearTimeout(timer);
-        resolve({ status: 'failed', error });
-      },
-    );
-  });
-}
+import { SAVE_TIMEOUT_MS, settleWithin, type Settled } from './settle';
+export { SAVE_TIMEOUT_MS, settleWithin };
+export type { Settled };
 
 interface MalfunctionApi {
   /**
@@ -84,7 +53,14 @@ const styles = stylex.create({
   },
   // How far up it sits: measured (see `useBottomInset`), so a dynamic style, not an inline one.
   raisedBy: (inset: number) => ({ bottom: `calc(${inset}px + 12px + env(safe-area-inset-bottom, 0px))` }),
-  inner: { width: '100%', maxWidth: '560px', boxShadow: '0 4px 16px oklch(0 0 0 / 25%)' },
+  // It floats over whatever is under it, so it has a surface of its own (CompactNotice has none: inline it is on the page's).
+  inner: {
+    width: '100%',
+    maxWidth: '560px',
+    borderRadius: '8px',
+    backgroundColor: 'var(--color-background-popover)',
+    boxShadow: '0 4px 16px oklch(0 0 0 / 25%)',
+  },
 });
 
 /** How far up the alert sits: above the tab bar when there is one, and above the keyboard when it is up. */

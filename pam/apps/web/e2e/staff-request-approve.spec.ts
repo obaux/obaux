@@ -78,8 +78,13 @@ test('a role pair Pam does not allow is explained in staff words, with no call t
   await expect(page.getByRole('link', { name: /Contact Pam/ })).toHaveCount(0);
 });
 
-test('any other failure says nothing changed, and does not send a super admin to Contact Pam', async ({ page }) => {
+test('any other failure is Pam failing: the small alert at the bottom, logged, and no Contact Pam (D-616)', async ({ page }) => {
   await signedInAsSuperAdmin(page, 'provider');
+  const reports: unknown[] = [];
+  await page.route('**/rest/v1/rpc/report_app_error*', (route) => {
+    reports.push(route.request().postDataJSON());
+    return route.fulfill(json(null));
+  });
   await page.route('**/rest/v1/rpc/review_staff_request*', (route) =>
     route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ message: 'boom' }) }),
   );
@@ -87,7 +92,10 @@ test('any other failure says nothing changed, and does not send a super admin to
   await settled(page);
   await page.getByRole('button', { name: 'Approve' }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Yes, approve' }).click();
-  await expect(page.getByText('We could not save that')).toBeVisible();
-  await expect(page.getByText(/Nothing was changed/)).toBeVisible();
+  await expect(page.getByRole('alert').filter({ hasText: "That didn't go through. It's not your fault, so try again." })).toBeVisible();
+  await expect(page.getByText('We could not save that')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Approve' })).toBeEnabled();
   await expect(page.getByRole('link', { name: /Contact Pam/ })).toHaveCount(0);
+  await expect.poll(() => reports.length).toBe(1);
+  expect(reports[0]).toMatchObject({ p_action: 'requests.review' });
 });

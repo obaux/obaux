@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -199,6 +199,18 @@ export function PlaceCard({
   labels,
 }: PlaceCardProps) {
   const [savedTaps, setSavedTaps] = useState(0);
+  // "Saved" is said when the save has gone through, not at the tap (D-616: a control moves only after its save, so the word that says it
+  // moved does too). A tap that is never answered stops waiting after the save's own 15 seconds and a little more.
+  const awaitingSave = useRef(false);
+  const stopWaiting = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!isSaved || !awaitingSave.current) return;
+    awaitingSave.current = false;
+    setSavedTaps((n) => n + 1);
+  }, [isSaved]);
+  useEffect(() => () => {
+    if (stopWaiting.current) clearTimeout(stopWaiting.current);
+  }, []);
   return (
     <Card padding={4} xstyle={styles.card}>
       <VStack gap={3}>
@@ -231,7 +243,13 @@ export function PlaceCard({
                     icon={<BookmarkIcon isFilled={isSaved} />}
                     variant="ghost"
                     onClick={() => {
-                      if (!isSaved) setSavedTaps((n) => n + 1);
+                      if (!isSaved) {
+                        awaitingSave.current = true;
+                        if (stopWaiting.current) clearTimeout(stopWaiting.current);
+                        stopWaiting.current = setTimeout(() => {
+                          awaitingSave.current = false;
+                        }, 20_000);
+                      }
                       onSave();
                     }}
                     aria-pressed={isSaved}

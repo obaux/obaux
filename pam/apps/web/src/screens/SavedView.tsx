@@ -45,7 +45,6 @@ export interface SavedViewProps {
   readonly state: SavedPlacesState;
   readonly onUnsave: (id: string) => void;
   readonly headerActions?: ReactNode;
-  readonly failed?: boolean;
   /** On the title's line — a case manager's People / Programs switch (D-218, D-233). */
   readonly switcher?: ReactNode;
   /** Drawn instead of the saved places — a case manager's starred people. */
@@ -99,7 +98,6 @@ export function SavedView({
   state,
   onUnsave,
   headerActions,
-  failed,
   switcher,
   replace,
   browseHref = '/',
@@ -136,15 +134,6 @@ export function SavedView({
       />
 
       {replace}
-
-      {!replace && failed ? (
-        <Notice
-          notice="something_went_wrong"
-          title={t('saved.failed.title')}
-          body={t('saved.failed.body')}
-          contactLabel={t('help.contact.action')}
-        />
-      ) : null}
 
       {!replace && state.status === 'loading' ? <PlaceCardSkeletonList label={t('common.loading')} count={2} /> : null}
 
@@ -221,7 +210,7 @@ export function SavedScreen() {
   const { state: session } = useSession();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { demoRole, viewedRole } = useRoleView(trueRole);
-  const { state, unsave, failed } = useSavedPlaces(session.status === 'signed-in', demoRole);
+  const { state, unsave } = useSavedPlaces(session.status === 'signed-in', demoRole);
   // A member's next visits, for the tags on Saved (D-292).
   const visits = useNextVisits(viewedRole === 'member');
   const starred = useStarredPeople();
@@ -283,7 +272,6 @@ export function SavedScreen() {
         // Edit alone at the top: a member's Saved since D-224, and a case
         // manager's too now (Will, 3 October, D-255) — no bell, no Help.
         headerActions={undefined}
-        failed={failed}
         browseHref={isCaseManager ? '/programs/' : '/'}
         edit={{
           isOn: isEditing,
