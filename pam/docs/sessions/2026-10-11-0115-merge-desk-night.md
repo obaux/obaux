@@ -1738,6 +1738,24 @@
   Nico's failureFor, Dot's banner, Wren's help post as a draft); at 00:26 he answered a105: the warning cards become
   the toast (D-619, Dot). The error log's migration waits for Will's yes in this session, then dispatch-sms is
   redeployed and one test failure goes through. b76's entry gives 23:30 as its end; its push was at 23:27:47.
+- **Batch b78 (19 October, 06:28 to 07:20).** The failure alert as Will asked for it. Every alert in the bottom stack
+  is Astryx's Banner in red (D-621, Will 03:47: "The blue variant (but in red) is the style of alert banner I want to
+  use across the entire app"), at the Banner's own small text, with the × alone in the top corner and quiet buttons of
+  equal width (Will 04:51: "This alert looks blown up"); it says what kind of failure it is and what to do (D-618),
+  the warning cards are notices in the same stack (D-619), and Try again always does something: a screen's retry, else
+  the control that failed is pressed again, else the screen is re-read (Dot c7cb9f25; the desk found at 05:38 that 30
+  of 31 call sites said "tap Try again" with no button). The stack leaves room at the end of the page and scrolls the
+  tapped control clear on a small phone (Nico's L1 specs found it covered at 320). The paused, unfinished sign-up and
+  could-not-load screens use the new top bar. Iris's b77 findings L1 to L10 are fixed in every lane: Nico 28e1c86d
+  (kinds, offline at once, real codes, retry on four saves), Piper 45bf55cd with 8fc3e993 (no button disabled for
+  good, a check-in sent once, Saved only once saved, and ten more saves on the alert, with a visit days away showing
+  no check-in circle), Ava 2654f712, bb20f7a4 and 5545e114 (the city list, real codes, a request whose person is
+  gone). Lena: no key twice in a language file (c7d86f06), two retired lines (816ba2bf), account-region (be0afa15).
+  Wren's Help post goes live (07cfadb2); Sage records a106 (efe9ea3f); Iris's D-616 pass (3a3f1dea). The Control Room
+  got Your notes, Next push as section 03, picture rounds, the answer box and the dots (v48 to v52, control-room.md),
+  and the next push's time is now set by the desk (team.md). Migration 20261019020000 (Piper's ten names) is in the
+  tree, not applied: it follows 20261018211942, which still waits for Will's yes. b77's entry gives 01:54 as its end;
+  its push was at 01:51:40.
 
 ## What was wrong, and what missed it
 
@@ -2454,9 +2472,18 @@
 
 | b77 main CI (6773c9c4, pushed 01:51:40) | Migrations and RLS (01:53), Publish Storybook, Types/unit/build, Accessibility (02:33): all four green; Vercel web (01:57) and pam-site (01:53) success |
 | b78 trial, full run (6ff54be6 on mira/b78-trial: every READY then in, with Dot ca281b2b) | config 1590 passed; ui 132; site 125; build; tsc; web unit 245; budget 2.0 kB to spare; e2e 2739 passed, 22 skipped, 44 failed (44.5 m), every failure a test waiting for the old failure line ("That didn't go through …"): Nico's alerts and messages specs (adapted in 058e6d68), Ava's invite.spec:123, and nine tests from Piper's second D-616 batch (171268f7), each on all three phone sizes; storybook built, no bundle names the live project; site build; site a11y 125 scans, 0 problems |
+| Batch b78, full run (db1af842: main 6773c9c4 + Dot c7cb9f25; Ava 2654f712, bb20f7a4, 5545e114; Nico 28e1c86d; Lena c7d86f06, 816ba2bf, be0afa15; Piper 45bf55cd; Wren 07cfadb2; Sage efe9ea3f; Iris 3a3f1dea; the desk's draft records): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | config 1590 passed (4 skipped, 1 todo); copy in step; ui 132; ui build; site 125; site tsc; build:e2e; tsc; web unit 246; budget 1.7 kB to spare; e2e 2810 passed, 22 skipped, 0 failed, no retries (41.5 m); storybook built, no bundle names the live project; site build; site a11y 130 scans, 0 problems. Then Dot's b8373530 (four pictures, no code). Pictures for Will from this tip: the place report and a service save failing, at 320 light and dark, both with Try again (the press fallback) |
 
 ## Left undone
 
+- **As of b78 (19 October, 07:20):** Every alert is the red Banner Will chose, small, with Try again wherever it says
+  so, and the help post that explains it is live. The error log's migration (20261018211942) still waits for Will's
+  yes in this session; then Piper's ten names (20261019020000), dispatch-sms redeployed, the switch and the Privacy
+  line together, and one test report. Next (b79): Ava's invite-once (D-620, its migration first), Nico's region_id add
+  and app (the revoke a day later), the owners' retry on the screens that rely on Try again pressing their control.
+  Then STOP and the stopped-number list before texts. With Will: the migration's yes; whether the number ending 5265
+  is his own; the connect text; a97/a98 and an iPhone try; a86; the website's photo line; a91, a93, a84, a88, a102;
+  the stray Control Room copy.
 - **As of b77 (19 October, 01:54):** Every failed save in Piper's, Ava's and Nico's lanes is the bottom alert, on a
   surface of its own. The error log's migration has its closed lists and waits for Will's yes in this session; then
   dispatch-sms is redeployed, the switch and the Privacy line go on together (Lena 68a81d66, re-dated on the day) and
