@@ -249,15 +249,51 @@ test.describe('the case manager screen', () => {
     await expect(page.getByText(/\/signin\/\?invite=K4RZ7W2H/)).toBeVisible();
   });
 
-  test('a failed invite is explained, not swallowed', async ({ page }) => {
+  test('a failed invite is said in the small alert at the bottom, logged, and keeps what was typed (D-616)', async ({ page }) => {
     await signedInAs(page, 'admin', []);
+    const reports: unknown[] = [];
+    await page.route('**/rest/v1/rpc/report_app_error*', (route) => {
+      reports.push(route.request().postDataJSON());
+      return route.fulfill({ status: 200, contentType: 'application/json', body: 'null' });
+    });
     await page.route(INVITE, (route) => route.fulfill({ status: 500, body: '{}' }));
     await page.goto('/invite/new/?role=member');
     await page.getByLabel('Their first name').fill('Rosa');
     await page.getByLabel('Their mobile number').fill('215 555 0111');
     await page.getByRole('button', { name: 'Create link' }).click();
 
-    await expect(page.getByRole('heading', { name: 'We could not make a code' })).toBeVisible();
+    await expect(page.getByRole('alert').filter({ hasText: "That didn't go through. It's not your fault, so try again." })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'We could not make a code' })).toHaveCount(0);
+    await expect(page.getByLabel('Their first name')).toHaveValue('Rosa');
+    await expect.poll(() => reports.length).toBe(1);
+    // Only the action and a code: never the name or number that was typed.
+    expect(reports[0]).toMatchObject({ p_action: 'invite.create' });
+    expect(JSON.stringify(reports[0])).not.toMatch(/Rosa|555/);
+  });
+
+  test('a number the database refuses is said by the field, not as the alert, and is not logged (D-618, INVITE_NEEDS_PHONE)', async ({ page }) => {
+    await signedInAs(page, 'admin', []);
+    const reports: unknown[] = [];
+    await page.route('**/rest/v1/rpc/report_app_error*', (route) => {
+      reports.push(route.request().postDataJSON());
+      return route.fulfill({ status: 200, contentType: 'application/json', body: 'null' });
+    });
+    // Ten digits pass the form's own check; the leading 0 is not a real mobile number to the database.
+    await page.route(INVITE, (route) =>
+      route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ code: 'P0001', message: 'INVITE_NEEDS_PHONE' }) }),
+    );
+    await page.goto('/invite/new/?role=member');
+    await page.getByLabel('Their first name').fill('Rosa');
+    await page.getByLabel('Their mobile number').fill('0215 555 011');
+    await page.getByRole('button', { name: 'Create link' }).click();
+
+    await expect(page.getByRole('alert').filter({ hasText: 'Add their mobile number, with the area code.' })).toBeVisible();
+    await expect(page.getByRole('alert').filter({ hasText: "It's not your fault" })).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'We could not make a code' })).toHaveCount(0);
+    // Fixing the number takes the line away.
+    await page.getByLabel('Their mobile number').fill('215 555 0111');
+    await expect(page.getByText('Add their mobile number, with the area code.')).toHaveCount(0);
+    expect(reports).toHaveLength(0);
   });
 
   test('the status chip says what is actually switched off', async ({ page }) => {
