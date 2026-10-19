@@ -11,6 +11,8 @@
  *   too-many    too many tries in a short time (429, PAM_RATE_LIMITED): wait a little.
  *   changed     someone changed it first, or it is already done (409, 23505, 40001).
  *   gone        what it points at is not there any more (404, 406, PGRST116, 23503).
+ *   wrong-time  the time is not right for it yet or any more: the visit's window (OUTSIDE_THE_VISIT_WINDOW) or a visit planned too late
+ *               (PLANNED_TOO_LATE). Nothing to fix; it works near the time of the visit.
  *   refused     the database turned the request down with a reason of its own (a guard: 400, P0001, bad data). Only what no guard word names
  *               (below) lands here.
  *   server      Pam's side, or not known: a 5xx, and every code not listed (unknown). The kind to fall back to.
@@ -19,7 +21,7 @@
  * turns both into the HTTP status; `PAM_RATE_LIMITED` is a raised message (SQLSTATE P0001, HTTP 400) and is recognised only where the
  * message is still in hand (the thread's send), not from a code.
  */
-export const FAILURE_KINDS = ['offline', 'timeout', 'signed-out', 'not-allowed', 'too-many', 'changed', 'gone', 'refused', 'server'] as const;
+export const FAILURE_KINDS = ['offline', 'timeout', 'signed-out', 'not-allowed', 'too-many', 'changed', 'gone', 'wrong-time', 'refused', 'server'] as const;
 
 export type FailureKind = (typeof FAILURE_KINDS)[number];
 
@@ -74,6 +76,12 @@ export function classifyGuardMessage(message: unknown): FailureKind | null {
   if (/VISIT_CANCELLED|REQUEST_ALREADY_DECIDED|ALREADY_DECIDED|TRIP_NOT_FOUND/.test(text)) return 'changed';
   if (/_NOT_FOUND|\bNOT_FOUND\b|No such (message|account)|nobody else in that conversation/i.test(text)) return 'gone';
   if (/ACCOUNT_NOT_ACTIVE|NOT_A_PROGRAM_LEAD|NO_LEAD_HERE|\bONLY_[A-Z_]+/.test(text)) return 'not-allowed';
-  if (/OUTSIDE_THE_VISIT_WINDOW|PLANNED_TOO_LATE|ROLE_PAIR_NOT_ALLOWED|ACCOUNT_IN_OTHER_CITY|INVITE_NEEDS_PHONE/.test(text)) return 'refused';
+  if (/OUTSIDE_THE_VISIT_WINDOW|PLANNED_TOO_LATE/.test(text)) return 'wrong-time';
+  if (/ROLE_PAIR_NOT_ALLOWED|ACCOUNT_IN_OTHER_CITY|INVITE_NEEDS_PHONE/.test(text)) return 'refused';
   return null;
+}
+
+/** The kind as its locale key part (`notice.malfunction.<key>.title`): `signed-out` is `signedOut`, `wrong-time` is `wrongTime`. */
+export function failureKindKey(kind: FailureKind): string {
+  return kind.replace(/-([a-z])/g, (_, letter: string) => letter.toUpperCase());
 }

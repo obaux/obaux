@@ -156,7 +156,9 @@ describe('what Iris found in the codes (D-618)', () => {
     expect(codeFromError({ message: 'not an AbortError at the start', code: '' }, true)).toBe('unknown');
   });
   it('a guard\'s own word names the kind where the message is in hand; the code alone says refused', () => {
-    expect(failureKindOf({ code: 'P0001', message: 'OUTSIDE_THE_VISIT_WINDOW' }, true)).toBe('refused');
+    expect(failureKindOf({ code: 'P0001', message: 'OUTSIDE_THE_VISIT_WINDOW' }, true)).toBe('wrong-time');
+    expect(failureKindOf({ code: 'P0001', message: 'PLANNED_TOO_LATE' }, true)).toBe('wrong-time');
+    expect(failureKindOf({ code: 'P0001', message: 'ROLE_PAIR_NOT_ALLOWED' }, true)).toBe('refused');
     expect(failureKindOf({ code: 'P0001', message: 'VISIT_CANCELLED' }, true)).toBe('changed');
     expect(failureKindOf({ code: 'P0001', message: 'VISIT_NOT_FOUND' }, true)).toBe('gone');
     expect(failureKindOf({ code: 'P0001', message: 'ONLY_A_SUPER_ADMIN' }, true)).toBe('not-allowed');
