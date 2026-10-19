@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import type { Role } from '@pam/config';
+import { codeFromAnswer } from './reportAppError';
 
 /**
  * Every account, for the person operating Pam.
@@ -111,9 +112,10 @@ export function useDirectory(
  */
 export async function setDemoView(userId: string, enabled: boolean): Promise<void> {
   const { createClient } = await import('./supabase');
-  const { error } = await createClient().rpc('set_demo_view', {
+  const { error, status } = await createClient().rpc('set_demo_view', {
     p_user_id: userId,
     p_enabled: enabled,
   });
-  if (error) throw error;
+  // The answer's status names a 500 that carries no database code (Iris L5).
+  if (error) throw { code: codeFromAnswer(error, status) };
 }

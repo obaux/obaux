@@ -97,5 +97,6 @@ test('any other failure is Pam failing: the small alert at the bottom, logged, a
   await expect(page.getByRole('button', { name: 'Approve' })).toBeEnabled();
   await expect(page.getByRole('link', { name: /Contact Pam/ })).toHaveCount(0);
   await expect.poll(() => reports.length).toBe(1);
-  expect(reports[0]).toMatchObject({ p_action: 'requests.review' });
+  // A 500 with no database code is logged by its status (Iris L5).
+  expect(reports[0]).toMatchObject({ p_action: 'requests.review', p_code: '500' });
 });

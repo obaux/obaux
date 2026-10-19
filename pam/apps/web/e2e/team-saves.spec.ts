@@ -150,3 +150,68 @@ test.describe("Pam's hours, Close and Reopen (D-616)", () => {
     expect(reports[0]).toMatchObject({ p_action: 'pam.thread.status' });
   });
 });
+
+test.describe("The codes that reach the log, and Close/Reopen's busy cue (Iris's b77 re-test: L5, L6, L9)", () => {
+  const PAM_ROW = [{ conversation_id: PAM_C, asker_id: ASKER, first_name: 'Aaliyah', role: 'member', region_name: 'Philadelphia', program_name: null, status: 'open', last_message_at: new Date().toISOString(), last_from: 'asker', waiting_since: new Date().toISOString(), preview: 'Hi' }];
+  const bare500 = { status: 500, contentType: 'application/json', body: '{}' };
+  const internal = { status: 500, contentType: 'application/json', body: JSON.stringify({ code: 'XX000', message: 'internal' }) };
+
+  test('L5: a 500 with no database code on Demo view is logged as 500, not unknown', async ({ page }) => {
+    const reports = await superAdmin(page);
+    await page.route('**/rest/v1/rpc/directory_people*', (route) =>
+      route.fulfill(json([{ id: 'p1', first_name: 'Marcus', role: 'member', region_name: 'Philadelphia', access_status: 'active', last_active_at: null, is_demo: false }])),
+    );
+    await page.route('**/rest/v1/rpc/set_demo_view*', (route) => route.fulfill(bare500));
+    await page.goto('/directory/');
+    await settled(page);
+    await page.getByRole('switch', { name: 'Demo view for Marcus' }).click();
+    await expect(malfunction(page)).toBeVisible();
+    await expect.poll(() => reports.length).toBe(1);
+    expect(reports[0]).toMatchObject({ p_action: 'directory.demo-view', p_code: '500' });
+  });
+
+  test("L6: Pam's hours keeps the database's own code (XX000) for the log", async ({ page }) => {
+    const reports = await superAdmin(page);
+    await page.route('**/rest/v1/rpc/pam_set_hours*', (route) => route.fulfill(internal));
+    await page.goto('/pam/hours/');
+    await settled(page);
+    await page.getByRole('button', { name: 'Save' }).click();
+    await expect(malfunction(page)).toBeVisible();
+    await expect.poll(() => reports.length).toBe(1);
+    expect(reports[0]).toMatchObject({ p_action: 'pam.hours.save', p_code: 'XX000' });
+  });
+
+  test('L5, L6: Close conversation keeps its code: XX000 when the database says one, 500 when it says none', async ({ page }) => {
+    const reports = await superAdmin(page);
+    await page.route('**/rest/v1/rpc/pam_inbox*', (route) => route.fulfill(json(PAM_ROW)));
+    let answers = 0;
+    await page.route('**/rest/v1/rpc/pam_set_thread_status*', (route) => route.fulfill(++answers === 1 ? internal : bare500));
+    await page.goto(`/pam/thread/options/?id=${PAM_C}`);
+    await settled(page);
+    await page.getByRole('button', { name: 'Close conversation' }).click();
+    await expect.poll(() => reports.length).toBe(1);
+    await page.getByRole('button', { name: 'Close conversation' }).click();
+    await expect.poll(() => reports.length).toBe(2);
+    expect(reports.map((r) => r['p_code'])).toEqual(['XX000', '500']);
+  });
+
+  test('L9: Close conversation says it is saving while it saves, and stops when it is done', async ({ page }) => {
+    await superAdmin(page);
+    let status = 'open';
+    await page.route('**/rest/v1/rpc/pam_inbox*', (route) => route.fulfill(json([{ ...PAM_ROW[0], status }])));
+    let release: (() => void) | undefined;
+    const held = new Promise<void>((resolve) => (release = resolve));
+    await page.route('**/rest/v1/rpc/pam_set_thread_status*', async (route) => {
+      await held;
+      status = 'closed';
+      await route.fulfill(json(null));
+    });
+    await page.goto(`/pam/thread/options/?id=${PAM_C}`);
+    await settled(page);
+    await page.getByRole('button', { name: 'Close conversation' }).click();
+    await expect(page.getByRole('status').filter({ hasText: 'Saving...' })).toBeVisible();
+    release!();
+    await expect(page.getByRole('status').filter({ hasText: 'Closed.' })).toBeVisible();
+    await expect(page.getByText('Saving...')).toHaveCount(0);
+  });
+});

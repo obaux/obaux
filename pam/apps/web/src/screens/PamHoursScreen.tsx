@@ -112,7 +112,7 @@ export function PamHoursScreen() {
       return;
     }
     // Pam failing, not the hours (D-616): the bottom alert, logged. What to fix in the fields stays here, by Save.
-    malfunction.show('pam.hours.save', settled.status === 'timeout' ? { code: 'timeout' } : { code: undefined }, document.activeElement);
+    malfunction.show('pam.hours.save', { code: settled.status === 'timeout' ? 'timeout' : settled.status === 'ok' && !settled.value.ok ? settled.value.code : undefined }, document.activeElement);
   };
 
   return (

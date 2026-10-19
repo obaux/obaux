@@ -195,7 +195,7 @@ export async function createInvite(
     // A case manager or a program lead is invited with an email, through its own
     // door (0086): the database refuses a staff invite without one, and a member
     // invite with one. A member's never carries it.
-    const { data, error } =
+    const { data, error, status } =
       role === 'member'
         ? await supabase.rpc('create_invite', {
             p_role: role,
@@ -210,8 +210,9 @@ export async function createInvite(
             p_phone: who.phone,
             ...where,
           });
-    // Thrown, so the screen can say it failed and the log can keep its code (D-616).
-    if (error) throw error;
+    // Thrown, so the screen can say it failed and the log can keep its code (D-616): the database's own, or the answer's status
+    // when it has none (Iris L5). The message travels too, for the refusals the screen reads (INVITE_NEEDS_PHONE).
+    if (error) throw { code: codeFromAnswer(error, status), message: error.message };
     if (!data) throw { code: 'unknown' };
 
     const invite = (Array.isArray(data) ? data[0] : data) as {
