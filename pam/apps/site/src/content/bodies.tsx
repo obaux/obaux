@@ -16,6 +16,7 @@ import { StartHere } from './StartHere';
 import { TalkingToPam } from './TalkingToPam';
 import { YourLanguage } from './YourLanguage';
 import { CantSignIn } from './CantSignIn';
+import { SomethingDidntGoThrough } from './SomethingDidntGoThrough';
 import { YourSafety } from './YourSafety';
 import { PlaceTold } from './PlaceTold';
 import { TextsFromPam } from './TextsFromPam';
@@ -31,6 +32,7 @@ import { WhoIsMyGuide } from './WhoIsMyGuide';
  */
 export const BODIES: Record<string, () => JSX.Element> = {
   'cant-sign-in': CantSignIn,
+  'something-didnt-go-through': SomethingDidntGoThrough,
   'your-safety': YourSafety,
   'case-manager-assignments': CaseManagerAssignments,
   'keeping-your-listing-up-to-date': KeepingYourListing,
