@@ -33,6 +33,9 @@ export const APP_ERROR_ACTIONS = [
   'directory.demo-view',
   'requests.review',
   'invite.create',
+  // Places and programs
+  'calendar.link',
+  'calendar.link.off',
 ] as const;
 
 export type AppErrorAction = (typeof APP_ERROR_ACTIONS)[number];

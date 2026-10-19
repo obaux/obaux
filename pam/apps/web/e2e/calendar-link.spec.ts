@@ -176,3 +176,29 @@ test('Another calendar: Disconnect uses the plain turn-off words, not "Disconnec
   await expect(page.getByRole('button', { name: /^Turn it off/ }).first()).toBeVisible();
   await expect(page.getByText(/Disconnect Another calendar/)).toHaveCount(0);
 });
+
+const ALERT = "That didn't go through. It's not your fault, so try again.";
+
+test('a link that could not be made says so at the bottom, with no reason, and nothing changes (D-616)', async ({ page }) => {
+  await signedIn(page, NONE);
+  await page.route('**/rest/v1/rpc/calendar_link_issue*', (route) => route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ message: 'secret detail' }) }));
+  await page.goto('/calendar/');
+  await settled(page);
+  await page.getByText('Google Calendar', { exact: true }).click();
+  await expect(page.getByRole('alert').filter({ hasText: ALERT })).toBeVisible();
+  await expect(page.getByText('secret detail')).toHaveCount(0);
+  // Still asking which calendar: nothing was made. The page's own notice is for a page that cannot load, not for this.
+  await expect(page.getByText('Which calendar do you use?')).toBeVisible();
+  await expect(page.getByText('Something went wrong')).toHaveCount(0);
+});
+
+test('a disconnect that did not go through leaves the link as it was, with the small alert (D-616)', async ({ page }) => {
+  await signedIn(page, GOOGLE);
+  await page.route('**/rest/v1/rpc/calendar_link_off*', (route) => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));
+  await page.goto('/calendar/');
+  await settled(page);
+  await page.getByRole('button', { name: /^Disconnect Google Calendar/ }).first().click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Disconnect' }).click();
+  await expect(page.getByRole('alert').filter({ hasText: ALERT })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Copy link' })).toBeVisible();
+});

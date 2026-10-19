@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { SUPABASE_URL } from './project';
+import { settleWithin, useMalfunction } from './malfunction';
 
 /**
  * A member's calendar link (D-538, D-604): a secret address that a calendar app follows to show their Pam visits, each one the place's name,
@@ -63,7 +64,7 @@ function localTimeZone(): string {
 export function useCalendarLink(enabled: boolean) {
   const [state, setState] = useState<CalendarLinkState>({ status: 'loading' });
   const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const malfunction = useMalfunction();
 
   const client = useCallback(async () => (await import('./supabase')).createClient(), []);
 
@@ -99,36 +100,47 @@ export function useCalendarLink(enabled: boolean) {
   const make = useCallback(
     async (calendar?: CalendarKind) => {
       setBusy(true);
-      setFailed(false);
-      try {
-        const { error } = await (await client()).rpc('calendar_link_issue', { p_calendar: calendar ?? null, p_timezone: localTimeZone() });
-        if (error) throw new Error('make');
-        const next = await read();
-        if (next.status !== 'on') throw new Error('make');
-        setState(next);
-      } catch {
-        setFailed(true);
-      } finally {
-        setBusy(false);
+      const from = typeof document === 'undefined' ? null : document.activeElement;
+      // The screen changes only once the link is made and read back, and a link with no answer in 15 seconds counts as failed (D-616).
+      const settled = await settleWithin(
+        (async () => {
+          const { error } = await (await client()).rpc('calendar_link_issue', { p_calendar: calendar ?? null, p_timezone: localTimeZone() });
+          if (error) throw error;
+          const next = await read();
+          if (next.status !== 'on') throw new Error('make');
+          return next;
+        })(),
+      );
+      setBusy(false);
+      if (settled.status === 'ok') {
+        setState(settled.value);
+        return;
       }
+      malfunction.show('calendar.link', settled.status === 'failed' ? settled.error : 'timeout', from);
+      // No answer in time: it may still have been made, so read it again once it answers.
+      if (settled.status === 'timeout') void settled.late.then(() => read().then(setState, () => undefined));
     },
-    [client, read],
+    [client, read, malfunction],
   );
 
   /** Disconnect: Pam forgets the link, the calendar chosen and the day. */
   const turnOff = useCallback(async () => {
     setBusy(true);
-    setFailed(false);
-    try {
-      const { error } = await (await client()).rpc('calendar_link_off');
-      if (error) throw new Error('off');
+    const from = typeof document === 'undefined' ? null : document.activeElement;
+    const settled = await settleWithin(
+      (async () => {
+        const { error } = await (await client()).rpc('calendar_link_off');
+        if (error) throw error;
+      })(),
+    );
+    setBusy(false);
+    if (settled.status === 'ok') {
       setState({ status: 'off' });
-    } catch {
-      setFailed(true);
-    } finally {
-      setBusy(false);
+      return;
     }
-  }, [client]);
+    malfunction.show('calendar.link.off', settled.status === 'failed' ? settled.error : 'timeout', from);
+    if (settled.status === 'timeout') void settled.late.then(() => read().then(setState, () => undefined));
+  }, [client, read, malfunction]);
 
-  return { state, busy, failed, make, turnOff };
+  return { state, busy, make, turnOff };
 }

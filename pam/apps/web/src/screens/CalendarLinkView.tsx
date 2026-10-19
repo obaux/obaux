@@ -40,7 +40,7 @@ export function CalendarLinkView() {
   const { t, tPlain, locale } = useI18n();
   const { state: session } = useSession();
   const signedIn = session.status === 'signed-in';
-  const { state, busy, failed, make, turnOff } = useCalendarLink(signedIn);
+  const { state, busy, make, turnOff } = useCalendarLink(signedIn);
   const [asking, setAsking] = useState<'new' | 'off' | null>(null);
   const [copied, setCopied] = useState(false);
   // Apple Calendar's button only where a webcal:// address opens something. Read after the page is up (the
@@ -88,7 +88,7 @@ export function CalendarLinkView() {
     <SubPage title={t('calendar.title')} backHref="/profile/" backLabel={tPlain('nav.back.profile')} actions={<HelpButton />}>
       <Text xstyle={styles.body}>{t('calendar.intro.plan')}</Text>
 
-      {state.status === 'error' || failed ? (
+      {state.status === 'error' ? (
         <Notice
           notice="something_went_wrong"
           title={t('notice.something_went_wrong.title')}
