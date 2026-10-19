@@ -77,7 +77,7 @@ export function SomethingDidntGoThrough() {
       </Section>
 
       <Section title="Still not working">
-        <P>This shows when the same thing doesn’t go through twice in a row.</P>
+        <P>This shows when the same thing doesn’t go through twice in a row, unless you’re offline.</P>
         <P>Try the steps above for the message you saw first.</P>
         <P>Tap “Get help” to find more help in Pam.</P>
       </Section>
