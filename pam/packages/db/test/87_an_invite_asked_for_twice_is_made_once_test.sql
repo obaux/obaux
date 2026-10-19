@@ -107,5 +107,23 @@ select test.check('the id is a column with nothing personal in it, unique per in
 select test.check('the old doors are still there, unchanged, for a live app that has not moved yet',
   (select count(*) from pg_proc where proname in ('create_invite', 'create_staff_invite') and pronamespace = 'public'::regnamespace), 2);
 
+\echo ''
+\echo '--- A first attempt that was refused leaves nothing behind, so the same id can try again (Nico) ---'
+set role authenticated;
+select test.as_user(:'dana');
+select test.check_raises_like('the first attempt is refused for its number', $$ select public.create_invite_once('87000000-0000-4000-8000-000000000004', 'member', '0267 555 87', null, 'Ola') $$, '%INVITE_NEEDS_PHONE%');
+select (public.create_invite_once('87000000-0000-4000-8000-000000000004', 'member', '267-555-8705', null, 'Ola')).code as fixed_code \gset
+reset role;
+select test.check('...and the same id, with the number fixed, makes the invite',
+  (select count(*) from public.invites where code = :'fixed_code' and request_id = '87000000-0000-4000-8000-000000000004'), 1);
+
+\echo ''
+\echo '--- Nobody reads another inviter''s request ids (Nico) ---'
+set role authenticated;
+select test.as_user(:'ray');
+select test.check('another case manager sees none of Dana''s invites, and so none of their ids',
+  (select count(*) from public.invites where request_id in ('87000000-0000-4000-8000-000000000001', '87000000-0000-4000-8000-000000000002')), 0);
+reset role;
+
 -- Count only our own rows, and leave none behind.
-delete from public.invites where phone in ('+12675558701', '+12675558702', '+12675558703', '+12675558704');
+delete from public.invites where phone in ('+12675558701', '+12675558702', '+12675558703', '+12675558704', '+12675558705');

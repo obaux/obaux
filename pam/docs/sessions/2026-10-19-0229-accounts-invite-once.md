@@ -45,4 +45,4 @@ D-620.
 
 ## Needs a human
 
-Nico reviews the migration (Mira). Lena classifies `invites.request_id`.
+Nothing. Nico reviewed the migration (02:37, "sound, ship it"); his two suggestions are in test 87 (a refused first attempt, then the same id with a fixed number, makes the invite; another inviter cannot read the ids). Lena classified `invites.request_id` as not personal (02:37). The apply waits for Will at the prompt.
