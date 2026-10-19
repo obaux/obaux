@@ -83,8 +83,8 @@ test('when the database refuses, the circle stays empty', async ({ page }) => {
   await page.goto('/');
   await settled(page);
   await page.getByRole('button', { name: 'Check Tanya in' }).click();
-  // The small alert at the bottom, with no reason (D-616); the circle stays empty.
-  await expect(page.getByRole('alert').filter({ hasText: /Something's wrong on our side|That took too long|Still not working/ })).toBeVisible();
+  // The small alert at the bottom (D-616), in the words for a check-in outside the visit's time ("Not at this time", D-618); the circle stays empty.
+  await expect(page.getByRole('alert').filter({ hasText: /Not at this time/ })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Check Tanya in' })).toBeVisible();
 });
 
