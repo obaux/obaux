@@ -168,8 +168,8 @@ test.describe('the conversation list', () => {
 
     await expect(page.getByRole('link', { name: /Marcus/ })).toBeVisible();
     await expect(page.getByRole('button', { name: 'New message' })).toHaveCount(0);
-    await expect(page.getByRole('alert').getByText('Some things are turned off')).toBeVisible();
-    await expect(page.getByRole('alert').getByRole('link', { name: /Contact Pam/ })).toHaveAttribute('href', '/help/');
+    await expect(page.getByRole('alert').filter({ hasText: 'Some things are turned off' }).first()).toBeVisible();
+    await expect(page.getByRole('alert').filter({ hasText: 'Some things are turned off' }).getByRole('link', { name: /Contact Pam/ })).toHaveAttribute('href', '/help/');
 
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
     expect(results.violations).toEqual([]);
@@ -200,7 +200,7 @@ test.describe('the conversation list', () => {
     const sheet = page.getByRole('dialog', { name: 'New message' });
     await sheet.getByRole('button', { name: /Marcus/ }).click();
 
-    await expect(page.getByRole('alert').getByText('Some things are turned off')).toBeVisible();
+    await expect(page.getByRole('alert').filter({ hasText: 'Some things are turned off' }).first()).toBeVisible();
     await expect(page.getByRole('dialog', { name: 'New message' })).toHaveCount(0);
     await expect(page.getByText('Your connection dropped')).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'New message' })).toHaveCount(0);
@@ -635,25 +635,23 @@ test.describe('a conversation', () => {
     await expect(page.getByRole('textbox')).toHaveCount(0);
     await expect(page.getByRole('button', { name: /send/i })).toHaveCount(0);
     // ...and Pam says so, with a way to reach a person.
-    await expect(page.getByRole('alert').getByText('Some things are turned off')).toBeVisible();
+    await expect(page.getByRole('alert').filter({ hasText: 'Some things are turned off' }).first()).toBeVisible();
     // It begins with what is off, says why, then points to Pam (Will, 9 October).
-    const notice = page.getByRole('alert');
+    const notice = page.getByRole('alert').filter({ hasText: 'Some things are turned off' });
     await expect(notice.getByText(/^You cannot send messages right now\./)).toBeVisible();
     await expect(notice.getByText(/Your guide turned this off for your account\./)).toBeVisible();
     await expect(notice.getByText(/your plan/i)).toHaveCount(0);
     const call = notice.getByRole('link', { name: /Contact Pam/ });
     await expect(call).toHaveAttribute('href', '/help/');
-    // The quiet card: body text at the smallest size (16px), and the call is a
-    // link, not a filled primary button — still a 48px target.
-    expect(await notice.getByText(/^You cannot send messages/).evaluate((el) => getComputedStyle(el).fontSize)).toBe('16px');
+    // The alert is Banner's own small text (Will, 19 October 04:51, over A23's 16px for alerts), and the call is a quiet ghost button, not a filled
+    // primary one: no fill, at least the 24px target of WCAG 2.5.8.
+    expect(await notice.getByText(/^You cannot send messages/).evaluate((el) => parseFloat(getComputedStyle(el).fontSize))).toBeLessThanOrEqual(14);
     const look = await call.evaluate((el) => {
       const c = getComputedStyle(el);
-      return { size: c.fontSize, line: c.textDecorationLine, bg: c.backgroundColor, h: el.getBoundingClientRect().height };
+      return { bg: c.backgroundColor, h: el.getBoundingClientRect().height };
     });
-    expect(look.size).toBe('16px');
-    expect(look.line).toContain('underline');
     expect(look.bg).toBe('rgba(0, 0, 0, 0)');
-    expect(look.h).toBeGreaterThanOrEqual(48);
+    expect(look.h).toBeGreaterThanOrEqual(24);
 
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
     expect(results.violations).toEqual([]);
@@ -685,7 +683,7 @@ test.describe('a conversation', () => {
     await page.getByRole('textbox').fill('See you Thursday.');
     await page.getByRole('button', { name: /send/i }).click();
 
-    await expect(page.getByRole('alert').getByText('Some things are turned off')).toBeVisible();
+    await expect(page.getByRole('alert').filter({ hasText: 'Some things are turned off' }).first()).toBeVisible();
     await expect(page.getByText('Your connection dropped')).toHaveCount(0);
     await expect(page.getByRole('textbox')).toHaveCount(0);
   });
@@ -1003,7 +1001,7 @@ test.describe('a conversation', () => {
 
     await page.getByRole('button', { name: 'Block this person' }).click();
     await page.getByRole('button', { name: 'Block', exact: true }).click();
-    const alert = page.getByRole('alert').filter({ hasText: "That didn't go through" });
+    const alert = page.getByRole('alert').filter({ hasText: /Something's wrong on our side|That took too long|Still not working/ });
     await expect(alert).toBeVisible();
     // No card in the page, and the person is still where they can try again.
     await expect(page.getByText('Something went wrong')).toHaveCount(0);
@@ -1015,7 +1013,7 @@ test.describe('a conversation', () => {
     await page.goto(`/messages/thread/report/?id=${CONVO}`);
     await settled(page);
     await page.getByRole('button', { name: 'Send report' }).click();
-    await expect(page.getByRole('alert').filter({ hasText: "That didn't go through" })).toBeVisible();
+    await expect(page.getByRole('alert').filter({ hasText: /Something's wrong on our side|That took too long|Still not working/ })).toBeVisible();
     await expect(page.getByText('Something went wrong')).toHaveCount(0);
     await expect.poll(() => reports.length).toBe(2);
     expect(reports[1]).toMatchObject({ p_action: 'messages.report' });
