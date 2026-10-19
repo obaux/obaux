@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { SUPABASE_URL } from './project';
-import { settleWithin, useMalfunction } from './malfunction';
+import { useMalfunction } from './malfunction';
+import { settleWithin } from './settle';
 
 /**
  * A member's calendar link (D-538, D-604): a secret address that a calendar app follows to show their Pam visits, each one the place's name,

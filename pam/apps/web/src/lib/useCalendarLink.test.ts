@@ -1,4 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+// The alert's provider draws with StyleX, which is compiled by the app's build, not by this test; only the helpers are under test here.
+vi.mock('./malfunction', () => ({ useMalfunction: () => ({ show: () => undefined, clear: () => undefined }) }));
+
 import { appleUrl, feedUrl, isAppleDevice } from './useCalendarLink';
 
 describe('isAppleDevice', () => {
