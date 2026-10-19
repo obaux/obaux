@@ -4,7 +4,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Button } from '@pam/ui/Button';
 import { HelpIcon } from '@pam/ui/icons';
 import type { NoticeToastSpec } from '@pam/ui/noticeSink';
-import { StackBanner } from './StackBanner';
+import { StackBanner, bannerAction, bannerLink } from './StackBanner';
 
 /**
  * One status `Notice` as Astryx's `Banner` in red (D-621; Will, 19 October: "The blue variant (but in red) is the style of alert banner I want to
@@ -24,13 +24,14 @@ export function NoticeToast({ spec, onClose }: { readonly spec: NoticeToastSpec;
       actions={
         spec.retry || spec.contact ? (
           <HStack gap={1} wrap="wrap" align="center">
-            {spec.retry ? <Button label={spec.retry.label} variant="secondary" clickAction={spec.retry.onPress} /> : null}
+            {spec.retry ? <Button label={spec.retry.label} variant="secondary" clickAction={spec.retry.onPress} xstyle={bannerAction} /> : null}
             {spec.contact ? (
               <Button
                 label={spec.contact.label}
                 variant={spec.quiet ? 'ghost' : 'secondary'}
                 href={spec.contact.href}
                 icon={<HelpIcon />}
+                xstyle={spec.quiet ? bannerLink : bannerAction}
               />
             ) : null}
           </HStack>

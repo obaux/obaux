@@ -2,7 +2,7 @@
 
 import { HStack } from '@astryxdesign/core/HStack';
 import { Button } from '@pam/ui/Button';
-import { StackBanner } from './StackBanner';
+import { StackBanner, bannerAction } from './StackBanner';
 
 /**
  * The banner a failed save, switch or send raises (D-618; Will, 19 October). Astryx's `Banner` in red, as every alert is (D-621): see `StackBanner`.
@@ -31,7 +31,7 @@ export function MalfunctionBanner({ title, body, actions, onClose }: Malfunction
         actions.length > 0 ? (
           <HStack gap={1} wrap="wrap" align="center">
             {actions.map((action) => (
-              <Button key={action.label} label={action.label} variant="secondary" onClick={action.onPress} />
+              <Button key={action.label} label={action.label} variant="secondary" onClick={action.onPress} xstyle={bannerAction} />
             ))}
           </HStack>
         ) : undefined

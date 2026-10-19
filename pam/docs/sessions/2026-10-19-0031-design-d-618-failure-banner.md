@@ -42,6 +42,12 @@ Nico's classifier is final at `9df19119` (ten kinds, `failureFor(action, caught,
 
 Red is for a fault: only server and timeout. Everything else (offline, signed out, not allowed, a limit, changed, gone, wrong time, refused) is the calm card, the inverse of the page, as D-619's notices are, so "Not at this time" is not drawn as though something broke. The pictures were re-shot on the real screens after that change (the seven kinds in four modes; wrong time from "I'm here").
 
+## D-621 (Will 03:47, via Mira 03:52)
+
+Every alert is Astryx's `Banner status="error"` (the same component as the visit page's blue info banner, in red): the failure banner and the status notices are drawn by one `StackBanner`, on an opaque backing of the page's colour so nothing reads through, with the stack, the lasting-has-no-close rule and the words kept. It supersedes D-619 point 4 and the calm-surface change (red for all). Calm states are `role="alert"` too (Banner's). Banner is loaded with the lazy stack: budget 2.3 kB spare on the tip.
+Two defects the run found and fixed: Banner's title and line are 14 and 12px, so the words are set at Pam's 16px (A23, D-432); and the buttons were 32px, so they are 48px (§2.5).
+The old header: `TabGate`'s paused, no-profile and could-not-load states and `/account/`'s not-signed-in, error, no-profile and paused states drew `AppHeader` and the Help block; they use the new bar now. `SignInScreen`'s `AppHeader` is the current sign-in bar (D-502). Pictures: `docs/design/review/2026-10-19-d621-banner/`. Targeted e2e: 1,344 tests, 6 failures, all two tests (a 12px body and a 32px button), fixed and re-run green.
+
 ## Left undone
 
 - b77 (Piper's `settle.ts`) is not on main yet: merge main when it is, and resolve `malfunction.tsx` there.
