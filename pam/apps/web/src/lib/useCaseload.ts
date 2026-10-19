@@ -186,8 +186,8 @@ export async function createInvite(
   who: { readonly firstName: string; readonly phone: string; readonly email?: string },
   /** Which city, when the caller has none of their own — a super admin (0049). */
   regionId?: string,
-): Promise<CreatedInvite | null> {
-  try {
+): Promise<CreatedInvite> {
+  {
     const { createClient } = await import('./supabase');
     const supabase = createClient();
     const where = regionId ? { p_region_id: regionId } : {};
@@ -209,7 +209,9 @@ export async function createInvite(
             p_phone: who.phone,
             ...where,
           });
-    if (error || !data) return null;
+    // Thrown, so the screen can say it failed and the log can keep its code (D-616).
+    if (error) throw error;
+    if (!data) throw { code: 'unknown' };
 
     const invite = (Array.isArray(data) ? data[0] : data) as {
       code: string;
@@ -217,8 +219,6 @@ export async function createInvite(
       role: 'member' | 'provider' | 'admin';
     };
     return { code: invite.code, expiresAt: invite.expires_at, role: invite.role };
-  } catch {
-    return null;
   }
 }
 

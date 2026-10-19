@@ -928,6 +928,12 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Accounts & invites · The team's saves on Dot's rule (18 October) — READY on `claude/pam-d616-team-saves` (D-616 part b)
+
+The Demo view switch moves only after its save (it shows that it is saving; a failure or 15 s leaves it put). Failures of
+Pam's hours, Close/Reopen, New invite and an unexpected staff-review error show the bottom alert (`notice.malfunction`) and
+are logged with their action key; reasons a person can act on stay inline. Proven by `e2e/team-saves.spec.ts`.
+
 ## Accounts & invites · Problems, what broke this week (18 October) — READY on `claude/pam-problems-list` (D-616, b76)
 
 A super admin's `/problems/` reads `app_errors_grouped` (7 days, newest first): the action's name, key, route, code, count, last
