@@ -1,7 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Category, Role } from '@pam/config';
+import { useMalfunction } from './malfunction';
+import { settleWithin } from './settle';
 
 /**
  * The places a member kept.
@@ -13,11 +15,11 @@ import type { Category, Role } from '@pam/config';
  *
  * Two things this deliberately does:
  *
- * **It answers before the network does.** Saving is one tap on a cheap phone on
- * a bad connection, and a card that waits 800ms to acknowledge is a card
- * somebody taps twice. The list updates first and the write follows; if the
- * write fails the change is rolled back and `failed` goes true, so the screen
- * can say so rather than quietly losing it.
+ * **A control moves only after its save** (D-616, D-617). The heart, or the Remove on Saved, changes when the write has gone through,
+ * not before: a place that says "Saved" and is not is worse than a save that visibly failed. A save that has not been answered in 15
+ * seconds counts as failed; when its answer finally comes, the set is read again, so the screen shows what is true. A failure is the
+ * small alert at the bottom (`useMalfunction`), named `places.save` or `places.unsave` in the error log, and it scrolls the heart clear.
+ * While a place's write is out, a second tap on it is ignored, so nobody taps twice because nothing moved.
  *
  * **It keeps the whole set in memory.** A member has a handful of saved places,
  * not thousands, so every screen that cares can ask "is this one saved" without
@@ -101,11 +103,12 @@ export function useSavedPlaces(
   isSaved: (serviceId: string) => boolean;
   save: (place: SavedPlace) => Promise<void>;
   unsave: (serviceId: string) => Promise<void>;
-  /** A write did not reach the database. The screen says so; the list is unchanged. */
-  failed: boolean;
 } {
   const [state, setState] = useState<SavedPlacesState>({ status: 'loading' });
-  const [failed, setFailed] = useState(false);
+  const [reads, setReads] = useState(0);
+  const malfunction = useMalfunction();
+  /** The places whose write is out: a second tap on one of them is ignored until it is answered. */
+  const writing = useRef(new Set<string>());
 
   useEffect(() => {
     if (!enabled) {
@@ -152,7 +155,7 @@ export function useSavedPlaces(
     return () => {
       cancelled = true;
     };
-  }, [enabled, demoRole]);
+  }, [enabled, demoRole, reads]);
 
   const isSaved = useCallback(
     (serviceId: string) =>
@@ -160,73 +163,55 @@ export function useSavedPlaces(
     [state],
   );
 
+  /** One write to the database: the row, in or out. Throws on any failure. */
+  const write = useCallback(async (change: 'save' | 'unsave', serviceId: string): Promise<void> => {
+    const { createClient } = await import('./supabase');
+    const supabase = createClient();
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth.user) throw new Error('signed out');
+    const { error } =
+      change === 'save'
+        ? await supabase.from('saved_places').insert({ member_id: auth.user.id, service_id: serviceId })
+        : await supabase.from('saved_places').delete().eq('member_id', auth.user.id).eq('service_id', serviceId);
+    if (error) throw error;
+  }, []);
+
+  /** The set moves only once the write has gone through; a failure, or no answer in 15 seconds, is the alert and the set stays as it was. */
+  const change = useCallback(
+    async (kind: 'save' | 'unsave', serviceId: string, apply: (places: readonly SavedPlace[]) => readonly SavedPlace[]) => {
+      if (state.status !== 'ready' || writing.current.has(serviceId)) return;
+      const from = typeof document === 'undefined' ? null : document.activeElement;
+      const next = apply(state.places);
+
+      if (demoRole) {
+        setState({ status: 'ready', places: next });
+        const { writeDemoSaved } = await import('./savedPlacesDemo');
+        writeDemoSaved(demoRole, next);
+        return;
+      }
+
+      writing.current.add(serviceId);
+      const settled = await settleWithin(write(kind, serviceId));
+      writing.current.delete(serviceId);
+      if (settled.status === 'ok') {
+        setState((now) => (now.status === 'ready' ? { status: 'ready', places: apply(now.places) } : now));
+        return;
+      }
+      malfunction.show(kind === 'save' ? 'places.save' : 'places.unsave', settled.status === 'failed' ? settled.error : 'timeout', from);
+      // No answer in time: the write may still land, so read the set again once it has answered.
+      if (settled.status === 'timeout') void settled.late.then(() => setReads((n) => n + 1));
+    },
+    [state, demoRole, malfunction, write],
+  );
+
   const save = useCallback(
-    async (place: SavedPlace) => {
-      if (state.status !== 'ready' || state.places.some((p) => p.id === place.id)) return;
-      const before = state.places;
-      const after = [place, ...before];
-      setFailed(false);
-      setState({ status: 'ready', places: after });
-
-      if (demoRole) {
-        const { writeDemoSaved } = await import('./savedPlacesDemo');
-        writeDemoSaved(demoRole, after);
-        return;
-      }
-
-      try {
-        const { createClient } = await import('./supabase');
-        const supabase = createClient();
-        const { data: auth } = await supabase.auth.getUser();
-        if (!auth.user) throw new Error('signed out');
-
-        const { error } = await supabase
-          .from('saved_places')
-          .insert({ member_id: auth.user.id, service_id: place.id });
-        if (error) throw error;
-      } catch {
-        // Put it back the way it was. A place that says "Saved" and is not is
-        // worse than a save that visibly failed.
-        setState({ status: 'ready', places: before });
-        setFailed(true);
-      }
-    },
-    [state, demoRole],
+    (place: SavedPlace) => change('save', place.id, (places) => (places.some((p) => p.id === place.id) ? places : [place, ...places])),
+    [change],
   );
-
   const unsave = useCallback(
-    async (serviceId: string) => {
-      if (state.status !== 'ready') return;
-      const before = state.places;
-      const after = before.filter((place) => place.id !== serviceId);
-      setFailed(false);
-      setState({ status: 'ready', places: after });
-
-      if (demoRole) {
-        const { writeDemoSaved } = await import('./savedPlacesDemo');
-        writeDemoSaved(demoRole, after);
-        return;
-      }
-
-      try {
-        const { createClient } = await import('./supabase');
-        const supabase = createClient();
-        const { data: auth } = await supabase.auth.getUser();
-        if (!auth.user) throw new Error('signed out');
-
-        const { error } = await supabase
-          .from('saved_places')
-          .delete()
-          .eq('member_id', auth.user.id)
-          .eq('service_id', serviceId);
-        if (error) throw error;
-      } catch {
-        setState({ status: 'ready', places: before });
-        setFailed(true);
-      }
-    },
-    [state, demoRole],
+    (serviceId: string) => change('unsave', serviceId, (places) => places.filter((place) => place.id !== serviceId)),
+    [change],
   );
 
-  return { state, isSaved, save, unsave, failed };
+  return { state, isSaved, save, unsave };
 }

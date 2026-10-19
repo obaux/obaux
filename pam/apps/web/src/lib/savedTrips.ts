@@ -1,4 +1,5 @@
 import { addTrip, cancelTripHere, moveTrip, setSavedTrips, readAddedTrips, type AddedTrip } from './addedTrips';
+import { settleWithin } from './settle';
 import type { SessionState } from './useSession';
 
 /**
@@ -211,20 +212,25 @@ export async function moveSavedOrLocalTrip(id: string, startsAt: string): Promis
 /**
  * Cancel a visit: in the database when it is a saved one (which also cancels
  * its day-before text, `sync_trip_reminder`), in this tab when not. Resolves
- * false when it could not be cancelled. Points already earned stay (D-468).
+ * not-ok, with why, when it could not be cancelled. Points already earned stay (D-468).
  */
-export async function cancelSavedOrLocalTrip(id: string): Promise<boolean> {
+export async function cancelSavedOrLocalTrip(id: string): Promise<CancelResult> {
   if (!isSavedPlace(id)) {
     cancelTripHere(id);
-    return true;
+    return { ok: true };
   }
   try {
     const { createClient } = await import('./supabase');
-    const { error } = await createClient().rpc('cancel_trip', { p_id: id });
-    if (error) return false;
+    const settled = await settleWithin(Promise.resolve(createClient().rpc('cancel_trip', { p_id: id })));
+    if (settled.status === 'timeout') return { ok: false, error: 'timeout', late: settled.late };
+    if (settled.status === 'failed') return { ok: false, error: settled.error };
+    if (settled.value.error) return { ok: false, error: settled.value.error };
     await loadSavedTrips();
-    return true;
-  } catch {
-    return false;
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error };
   }
 }
+
+/** Cancelled, or not: with the error for the log's code and, when no answer came in 15 seconds, the late answer (read the trips again then). */
+export type CancelResult = { readonly ok: true } | { readonly ok: false; readonly error: unknown; readonly late?: Promise<void> };

@@ -1784,5 +1784,12 @@
   "pam.hours.said.noDays": "請至少選擇一天。",
   "pam.hours.said.order": "請選擇晚於開始時間的結束時間。",
   "common.comingSoon": "即將推出",
-  "common.example": "示範"
+  "common.example": "示範",
+  "appError.action.places.save": "Saving a place",
+  "appError.action.places.unsave": "Removing a saved place",
+  "appError.action.checkin.here": "Marking that you are here",
+  "appError.action.checkin.went": "Saying you went",
+  "appError.action.trips.cancel": "Cancelling a visit",
+  "appError.action.schedule.checkin": "Marking someone as there",
+  "appError.action.schedule.undo": "Taking back that mark"
 }

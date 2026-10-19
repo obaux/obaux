@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { settleWithin } from './settle';
 
 /**
  * Who has been checked in (D-316, Will, 6 October): a program taps the circle
@@ -8,7 +9,8 @@ import { useEffect, useState } from 'react';
  * the trips a member adds (D-225). A real visit (a uuid) is the database's
  * (D-526, attendance part B): the lead's tap asks `check_in_visit` and the
  * browser copy only follows what the database said, so a failed ask leaves
- * the circle as it was. An example visit stays in the session. Only a
+ * the circle as it was (D-616: and the small alert at the bottom says so; an ask
+ * with no answer in 15 seconds counts as failed, and is read again once it answers). An example visit stays in the session. Only a
  * program checks people in, for now.
  */
 const KEY = 'pam.checkins';
@@ -34,41 +36,63 @@ function write(next: Readonly<Record<string, string>>): void {
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-/** Asks the database to change a real visit; false when it said no or could not be reached. */
-async function ask(
-  door: 'check_in_visit' | 'undo_check_in',
-  appointmentId: string,
-): Promise<{ readonly ok: boolean; readonly stillMarked: boolean }> {
+/** What a change came to: done, or not done, with the error (for the log's code) and, when no answer came in time, the late answer. */
+export type CheckInResult = { readonly ok: true } | { readonly ok: false; readonly error: unknown; readonly late?: Promise<void> };
+
+type Asked = { readonly ok: true; readonly stillMarked: boolean } | { readonly ok: false; readonly error: unknown; readonly late?: Promise<void> };
+
+/** Asks the database to change a real visit. */
+async function ask(door: 'check_in_visit' | 'undo_check_in', appointmentId: string): Promise<Asked> {
   try {
     const { createClient } = await import('./supabase');
-    const { data, error } = await createClient().rpc(door, { p_appointment_id: appointmentId });
+    const settled = await settleWithin(Promise.resolve(createClient().rpc(door, { p_appointment_id: appointmentId })));
+    if (settled.status === 'timeout') return { ok: false, error: 'timeout', late: settled.late };
+    if (settled.status === 'failed') return { ok: false, error: settled.error };
+    const { data, error } = settled.value;
+    if (error) return { ok: false, error };
     const row = (Array.isArray(data) ? data[0] : data) as { status?: string } | undefined;
-    return { ok: !error, stillMarked: row?.status === 'attended' };
-  } catch {
-    return { ok: false, stillMarked: false };
+    return { ok: true, stillMarked: row?.status === 'attended' };
+  } catch (error) {
+    return { ok: false, error };
   }
 }
 
-/** Marks the visit as arrived, now. Resolves false when a real visit could not be saved. */
-export async function checkIn(appointmentId: string): Promise<boolean> {
-  if (UUID.test(appointmentId) && !(await ask('check_in_visit', appointmentId)).ok) return false;
-  write({ ...readCheckIns(), [appointmentId]: new Date().toISOString() });
-  return true;
+/** The check-ins of the program's visits, read again from the database (after a save that answered late). */
+export async function rereadCheckIns(): Promise<void> {
+  try {
+    const { createClient } = await import('./supabase');
+    const { data, error } = await createClient().rpc('my_program_visits');
+    if (error) return;
+    const rows = (data ?? []) as { appointment_id: string; checked_in_at: string | null }[];
+    seedCheckIns(rows.map((row) => ({ id: row.appointment_id, checkedInAt: row.checked_in_at })));
+  } catch {
+    // Not read: the circle stays as the last answer left it.
+  }
 }
 
-/** Takes it back — a mistaken tap, confirmed first. Resolves false when a real visit could not be saved. */
-export async function undoCheckIn(appointmentId: string): Promise<boolean> {
+/** Marks the visit as arrived, now. A real visit that could not be saved says so, and the circle stays as it was. */
+export async function checkIn(appointmentId: string): Promise<CheckInResult> {
+  if (UUID.test(appointmentId)) {
+    const answer = await ask('check_in_visit', appointmentId);
+    if (!answer.ok) return answer;
+  }
+  write({ ...readCheckIns(), [appointmentId]: new Date().toISOString() });
+  return { ok: true };
+}
+
+/** Takes it back — a mistaken tap, confirmed first. A real visit that could not be saved says so. */
+export async function undoCheckIn(appointmentId: string): Promise<CheckInResult> {
   if (UUID.test(appointmentId)) {
     const answer = await ask('undo_check_in', appointmentId);
-    if (!answer.ok) return false;
+    if (!answer.ok) return answer;
     // Still marked after the undo: the mark was not the program's to take back. The screen
     // says nothing different for it (the database answers the same either way, D-535).
-    if (answer.stillMarked) return true;
+    if (answer.stillMarked) return { ok: true };
   }
   const next = { ...readCheckIns() };
   delete next[appointmentId];
   write(next);
-  return true;
+  return { ok: true };
 }
 
 /** What the database says about real visits just read: checked in where it is, not where it is not. */

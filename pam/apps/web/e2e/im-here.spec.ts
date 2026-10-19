@@ -125,3 +125,38 @@ test('at a place with no lead on Pam there is no I\'m here and no I went: nobody
   await expect(page.getByRole('button', { name: "I'm here" })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'I went' })).toHaveCount(0);
 });
+
+const ALERT = "That didn't go through. It's not your fault, so try again.";
+
+test("a failed I'm here is the small alert at the bottom, with no reason, and the button is as it was (D-616)", async ({ page, context }) => {
+  await context.grantPermissions(['geolocation']);
+  await context.setGeolocation({ latitude: 39.95, longitude: -75.16 });
+  await signedIn(page, hoursFromNow(0.5));
+  await page.route('**/rest/v1/rpc/i_am_here*', (route) => route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ message: 'secret detail' }) }));
+  await open(page);
+  await page.getByRole('button', { name: "I'm here" }).click();
+  await expect(page.getByRole('alert').filter({ hasText: ALERT })).toBeVisible();
+  await expect(page.getByText('secret detail')).toHaveCount(0);
+  await expect(page.getByText('We could not save that')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: "I'm here" })).toBeEnabled();
+});
+
+test('a failed I went is the same small alert, and the link is as it was (D-616)', async ({ page }) => {
+  await signedIn(page, hoursFromNow(0.5));
+  await page.route('**/rest/v1/rpc/i_went*', (route) => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));
+  await open(page);
+  await page.getByRole('button', { name: 'I went' }).click();
+  await expect(page.getByRole('alert').filter({ hasText: ALERT })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'I went' })).toBeVisible();
+});
+
+test('a visit that could not be cancelled stays, with the small alert at the bottom (D-616)', async ({ page }) => {
+  await signedIn(page, hoursFromNow(5));
+  await page.route('**/rest/v1/rpc/cancel_trip*', (route) => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));
+  await open(page);
+  await page.getByText('Cancel this visit').click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Yes, cancel it' }).click();
+  await expect(page.getByRole('alert').filter({ hasText: ALERT })).toBeVisible();
+  await expect(page.getByText('We could not cancel that visit')).toHaveCount(0);
+  await expect(page.getByText('Cancel this visit')).toBeVisible();
+});

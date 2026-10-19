@@ -5,6 +5,7 @@ import { Banner } from '@astryxdesign/core/Banner';
 import { VStack } from '@astryxdesign/core/VStack';
 import { BigButton, TextLink } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
+import { useMalfunction } from '@/lib/malfunction';
 import { markHere, markWent } from '@/lib/imHere';
 import { loadSavedTrips } from '@/lib/savedTrips';
 
@@ -14,7 +15,7 @@ import { loadSavedTrips } from '@/lib/savedTrips';
  * the database says whether that is the place; "I went" says so without sharing a
  * position, for fewer points. Nothing about where the person is stays in the app.
  */
-type Step = 'idle' | 'locating' | 'sending' | 'not-yet' | 'no-location' | 'limit' | 'too-late' | 'failed' | 'done';
+type Step = 'idle' | 'locating' | 'sending' | 'not-yet' | 'no-location' | 'limit' | 'too-late' | 'done';
 
 export function ImHereCard({
   visitId,
@@ -27,6 +28,7 @@ export function ImHereCard({
   readonly onMarked?: () => void;
 }) {
   const { t } = useI18n();
+  const malfunction = useMalfunction();
   const [step, setStep] = useState<Step>('idle');
   const [points, setPoints] = useState(0);
   const locating = step === 'locating';
@@ -40,17 +42,25 @@ export function ImHereCard({
     // Trips and this page read the visit again: it is marked now.
     void loadSavedTrips();
   };
+  /** The save did not go through (D-616): the small alert at the bottom, and the card is as it was. A late answer is read again. */
+  const failed = (action: 'checkin.here' | 'checkin.went', result: { readonly error: unknown; readonly late?: Promise<void> }) => {
+    setStep('idle');
+    malfunction.show(action, result.error, document.activeElement);
+    void result.late?.then(() => loadSavedTrips());
+  };
   const here = async () => {
     setStep('locating');
     const result = await markHere(visitId);
     if (result.kind === 'there') return done(result.points);
-    setStep(result.kind === 'error' ? 'failed' : result.kind);
+    if (result.kind === 'error') return failed('checkin.here', result);
+    setStep(result.kind);
   };
   const went = async () => {
     setStep('sending');
     const result = await markWent(visitId);
     if (result.kind === 'went') return done(result.points);
-    setStep(result.kind === 'error' ? 'failed' : result.kind);
+    if (result.kind === 'error') return failed('checkin.went', result);
+    setStep(result.kind);
   };
 
   if (step === 'done') {
@@ -62,7 +72,6 @@ export function ImHereCard({
       {step === 'no-location' ? <Banner status="info" title={t('checkin.noLocation', { place: placeName })} /> : null}
       {step === 'limit' ? <Banner status="info" title={t('checkin.limit')} /> : null}
       {step === 'too-late' ? <Banner status="info" title={t('checkin.tooLate')} /> : null}
-      {step === 'failed' ? <Banner status="error" title={t('join.failed.title')} /> : null}
       <BigButton
         label={t(locating ? 'checkin.locating' : 'checkin.here')}
         isDisabled={busy}
