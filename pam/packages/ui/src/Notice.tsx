@@ -152,10 +152,11 @@ export function Notice({
   const contactHref = contactHrefProp ?? fromApp;
   const offersContact = definition.offersSupport && Boolean(contactLabel);
 
-  // A status card is a toast where the app has one (D-619), and the card here is what it falls back to.
+  // A status card is a toast where the app has one (D-619; the app draws a stand-in of the same look until the toast has loaded). The card
+  // here is only for where there is no sink at all.
   const sink = useContext(NoticeSinkContext);
   const id = useId();
-  const toasted = definition.kind !== 'empty' && sink?.ready === true;
+  const toasted = definition.kind !== 'empty' && sink !== null;
   const register = sink?.register;
   const unregister = sink?.unregister;
   const status = definition.status;

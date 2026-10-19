@@ -3,7 +3,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
-import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { useI18n } from './i18n';
 import type { AppErrorAction } from '@pam/config';
 import { codeFromError, failureKindOf, reportAppError } from './reportAppError';
@@ -13,6 +12,7 @@ import type { FailureKind } from '@pam/config';
 import type { MalfunctionBannerProps } from './MalfunctionBanner';
 import type { BottomStack as BottomStackType, StackNotice } from './BottomStack';
 import { NoticeSinkContext, type NoticeSink, type NoticeToastSpec } from '@pam/ui';
+import { PlainStack } from './PlainStack';
 
 /**
  * When Pam fails (D-616, Will, 18 October: "Let's use the smaller alert banner. Overlaid below at bottom of page. Let's
@@ -125,20 +125,6 @@ const styles = stylex.create({
     justifyContent: 'center',
     paddingInline: '16px',
     pointerEvents: 'none',
-  },
-  // The banner's stand-in when it could not be fetched: the same ground and words, no buttons.
-  lost: {
-    width: '100%',
-    maxWidth: '560px',
-    boxSizing: 'border-box',
-    padding: '16px',
-    borderRadius: '12px',
-    fontSize: '16px',
-    fontWeight: 600,
-    lineHeight: 1.35,
-    backgroundColor: colorVars['--color-error'],
-    color: colorVars['--color-on-error'],
-    pointerEvents: 'auto',
   },
   // How far up it sits: measured (see `useBottomInset`), so a dynamic style, not an inline one.
   raisedBy: (inset: number) => ({ bottom: `calc(${inset}px + 12px + env(safe-area-inset-bottom, 0px))` }),
@@ -263,8 +249,8 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
 
   const api = useMemo(() => ({ show, clear }), [show, clear]);
 
-  // What a status `Notice` hands over (packages/ui `NoticeSink`). Not ready until the stack has loaded, so until then, and if it never
-  // does, the `Notice` draws its card and nothing is ever unsaid.
+  // What a status `Notice` hands over (packages/ui `NoticeSink`). Drawn by the stack once it has loaded, and by the plain stand-in until
+  // then (and if it never does), so nothing is ever unsaid.
   const register = useCallback((id: string, spec: NoticeToastSpec) => {
     setNotices((previous) => [...previous.filter((n) => n.id !== id), { id, spec }]);
   }, []);
@@ -277,7 +263,7 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
       return next;
     });
   }, []);
-  const sink = useMemo<NoticeSink>(() => ({ ready: Stack !== null, register, unregister }), [Stack, register, unregister]);
+  const sink = useMemo<NoticeSink>(() => ({ register, unregister }), [register, unregister]);
   const closeNotice = useCallback((id: string) => setClosed((previous) => new Set(previous).add(id)), []);
 
   // A word is a key's, or the one line every failure said before the keys existed; a missing key comes back as itself.
@@ -357,20 +343,17 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
     <MalfunctionContext.Provider value={api}>
       <NoticeSinkContext.Provider value={sink}>
         {children}
-        {shown && !Stack && bannerLost ? (
+        {stackOpen ? (
           <div ref={hostRef} {...stylex.props(styles.host, styles.raisedBy(inset))}>
-            <div role="alert" {...stylex.props(styles.lost)}>
-              {title}
-            </div>
-          </div>
-        ) : null}
-        {stackOpen && Stack ? (
-          <div ref={hostRef} {...stylex.props(styles.host, styles.raisedBy(inset))}>
-            <Stack
-              notices={visibleNotices}
-              banner={shown ? { seq, title, body, actions, onClose: () => setShown(null) } : null}
-              onCloseNotice={closeNotice}
-            />
+            {Stack ? (
+              <Stack
+                notices={visibleNotices}
+                banner={shown ? { seq, title, body, actions, onClose: () => setShown(null) } : null}
+                onCloseNotice={closeNotice}
+              />
+            ) : (
+              <PlainStack notices={visibleNotices} lostBanner={shown && bannerLost ? title : null} />
+            )}
           </div>
         ) : null}
       </NoticeSinkContext.Provider>

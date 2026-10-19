@@ -6,7 +6,7 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
-import { AppHeader, Notice, Page, TextLink } from '@pam/ui';
+import { AppHeader, CompactNotice, Page, TextLink } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { OnboardingSlides } from '@pam/ui/OnboardingSlides';
 import { useI18n } from '@/lib/i18n';
@@ -325,14 +325,11 @@ export function SignInScreen({
 
   const onFirstStep = state.step !== 'code' && state.step !== 'verifying' && state.step !== 'done';
 
+  // The code could not be sent (D-619: said as the one-line alert by the field, not a card): an invalid number says how to fix it; Pam's own
+  // failure says so in one line, and the Send button the person is looking at is the way to try again.
   const failedNotice =
     state.step === 'failed' ? (
-      <Notice
-        notice="something_went_wrong"
-        title={t(`signin.failed.${state.reason}.title`)}
-        body={state.phone === null ? t('signin.phone.invalid') : t(`signin.failed.${state.reason}.body`)}
-        contactLabel={t('help.contact.action')}
-      />
+      <CompactNotice text={state.phone === null ? t('signin.phone.invalid') : t(`signin.failed.${state.reason}.title`)} />
     ) : null;
 
   const card =
