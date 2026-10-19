@@ -1816,5 +1816,12 @@
   "calendar.addOne.changed": "Your calendar has the old time.",
   "calendar.addOne.changed.lead": "This visit changed after you added it.",
   "appError.action.calendar.link": "Making a calendar link",
-  "appError.action.calendar.link.off": "Turning off a calendar link"
+  "appError.action.calendar.link.off": "Turning off a calendar link",
+  "appError.action.places.save": "收藏地點",
+  "appError.action.places.unsave": "移除收藏的地點",
+  "appError.action.checkin.here": "用「我到了」標記到訪",
+  "appError.action.checkin.went": "用「我去過了」標記到訪",
+  "appError.action.trips.cancel": "取消到訪",
+  "appError.action.schedule.checkin": "為某人簽到",
+  "appError.action.schedule.undo": "取消簽到"
 }

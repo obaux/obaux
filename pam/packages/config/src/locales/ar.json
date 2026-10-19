@@ -1979,5 +1979,12 @@
   "calendar.addOne.changed": "Your calendar has the old time.",
   "calendar.addOne.changed.lead": "This visit changed after you added it.",
   "appError.action.calendar.link": "Making a calendar link",
-  "appError.action.calendar.link.off": "Turning off a calendar link"
+  "appError.action.calendar.link.off": "Turning off a calendar link",
+  "appError.action.places.save": "حفظ مكان",
+  "appError.action.places.unsave": "إزالة مكان محفوظ",
+  "appError.action.checkin.here": "تسجيل زيارة بزر «وصلت»",
+  "appError.action.checkin.went": "تسجيل زيارة بزر «ذهبت»",
+  "appError.action.trips.cancel": "إلغاء زيارة",
+  "appError.action.schedule.checkin": "تسجيل حضور شخص",
+  "appError.action.schedule.undo": "التراجع عن تسجيل حضور"
 }

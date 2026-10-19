@@ -1911,5 +1911,12 @@
   "calendar.addOne.changed": "Your calendar has the old time.",
   "calendar.addOne.changed.lead": "This visit changed after you added it.",
   "appError.action.calendar.link": "Making a calendar link",
-  "appError.action.calendar.link.off": "Turning off a calendar link"
+  "appError.action.calendar.link.off": "Turning off a calendar link",
+  "appError.action.places.save": "Сохранение места",
+  "appError.action.places.unsave": "Удаление сохранённого места",
+  "appError.action.checkin.here": "Отметка визита кнопкой «Я на месте»",
+  "appError.action.checkin.went": "Отметка визита кнопкой «Визит состоялся»",
+  "appError.action.trips.cancel": "Отмена визита",
+  "appError.action.schedule.checkin": "Отметка о приходе человека",
+  "appError.action.schedule.undo": "Отмена отметки о приходе"
 }

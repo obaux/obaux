@@ -117,7 +117,7 @@ export function useCalendarLink(enabled: boolean) {
         setState(settled.value);
         return;
       }
-      malfunction.show('calendar.link', settled.status === 'failed' ? settled.error : 'timeout', from);
+      malfunction.show('calendar.link', settled.error, from);
       // No answer in time: it may still have been made, so read it again once it answers.
       if (settled.status === 'timeout') void settled.late.then(() => read().then(setState, () => undefined));
     },
@@ -139,7 +139,7 @@ export function useCalendarLink(enabled: boolean) {
       setState({ status: 'off' });
       return;
     }
-    malfunction.show('calendar.link.off', settled.status === 'failed' ? settled.error : 'timeout', from);
+    malfunction.show('calendar.link.off', settled.error, from);
     if (settled.status === 'timeout') void settled.late.then(() => read().then(setState, () => undefined));
   }, [client, read, malfunction]);
 

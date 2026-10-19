@@ -1816,5 +1816,12 @@
   "calendar.addOne.changed": "Your calendar has the old time.",
   "calendar.addOne.changed.lead": "This visit changed after you added it.",
   "appError.action.calendar.link": "Making a calendar link",
-  "appError.action.calendar.link.off": "Turning off a calendar link"
+  "appError.action.calendar.link.off": "Turning off a calendar link",
+  "appError.action.places.save": "Guardar un lugar",
+  "appError.action.places.unsave": "Quitar un lugar guardado",
+  "appError.action.checkin.here": "Marcar una visita con “Ya llegué”",
+  "appError.action.checkin.went": "Marcar una visita con “Fui”",
+  "appError.action.trips.cancel": "Cancelar una visita",
+  "appError.action.schedule.checkin": "Registrar la llegada de alguien",
+  "appError.action.schedule.undo": "Deshacer un registro de llegada"
 }
