@@ -88,6 +88,8 @@ export type AskResult = 'ok' | 'waiting' | 'approved' | 'failed';
 export async function askToAddProgram(
   details: ProgramDetails,
   who: { readonly firstName: string; readonly city: string; readonly language: string },
+  /** Told why when the ask fails (a code for the error log; its words go no further), D-616. */
+  onFailure?: (error: unknown) => void,
 ): Promise<AskResult> {
   try {
     const { createClient } = await import('./supabase');
@@ -113,8 +115,10 @@ export async function askToAddProgram(
     const message = (error as { message?: string }).message ?? '';
     if (message.includes('REQUEST_ALREADY_WAITING')) return 'waiting';
     if (message.includes('REQUEST_ALREADY_APPROVED')) return 'approved';
+    onFailure?.(error);
     return 'failed';
-  } catch {
+  } catch (error) {
+    onFailure?.(error);
     return 'failed';
   }
 }

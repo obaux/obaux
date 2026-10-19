@@ -189,3 +189,18 @@ test('a radio sits level with the first line of its label, whether the label wra
   // The long fourth reason wraps at every width the specs run at, so the case is really exercised.
   expect(wrapped).toBeGreaterThan(0);
 });
+
+const ALERT = "That didn't go through. It's not your fault, so try again.";
+
+test('a report that did not go through is the small alert at the bottom, and what was picked stays (D-616)', async ({ page }) => {
+  await signedIn(page);
+  await page.route(FLAG, (route) => route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ message: 'secret detail' }) }));
+  await page.goto(`/flag/?place=${PLACE}`);
+  await page.getByRole('radio', { name: 'It moved somewhere else' }).click();
+  await page.getByRole('button', { name: 'Send this to Pam' }).click();
+  await expect(page.getByRole('alert').filter({ hasText: ALERT })).toBeVisible();
+  await expect(page.getByText('secret detail')).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Thank you. We will check it.' })).toHaveCount(0);
+  await expect(page.getByRole('radio', { name: 'It moved somewhere else' })).toBeChecked();
+  await expect(page.getByRole('button', { name: 'Send this to Pam' })).toBeEnabled();
+});

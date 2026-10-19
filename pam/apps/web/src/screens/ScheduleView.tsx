@@ -23,7 +23,7 @@ import { DashedRule } from '@pam/ui/DashedRule';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { useI18n } from '@/lib/i18n';
 import { isVerified, usePolicies } from '@/lib/usePolicies';
-import { checkIn, rereadCheckIns, undoCheckIn, useCheckIns, type CheckInResult } from '@/lib/checkIns';
+import { canMarkNow, checkIn, rereadCheckIns, undoCheckIn, useCheckIns, type CheckInResult } from '@/lib/checkIns';
 import { useMalfunction } from '@/lib/malfunction';
 import { intlLocale } from '@pam/config';
 import { ConfirmDialog } from './ConfirmDialog';
@@ -471,6 +471,8 @@ export function ScheduleView({
   const row = (a: Appointment, withDay = false) => {
     const d = new Date(a.startsAt);
     const isChecked = Boolean(checkIns[a.id]);
+    // The circle only where the database would take the mark: a visit not yet within two hours of starting, or long past, shows the person (D-616).
+    const markable = canCheckIn && (isChecked || canMarkNow(a.id, a.startsAt, a.minutes));
     const kind = withDay ? `${fmt.day.format(d)} · ${a.kindLabel}` : a.kindLabel;
     return (
       <ListItem
@@ -495,7 +497,7 @@ export function ScheduleView({
         description={
           <Text type="supporting" xstyle={styles.description}>
             {/* Said plainly either way (Will, D-316): "Not checked in" / "Checked in". */}
-            {canCheckIn ? `${kind} · ${t(isChecked ? 'schedule.checkedIn' : 'schedule.notCheckedIn')}` : kind}
+            {markable ? `${kind} · ${t(isChecked ? 'schedule.checkedIn' : 'schedule.notCheckedIn')}` : kind}
           </Text>
         }
         startContent={
@@ -507,7 +509,7 @@ export function ScheduleView({
           </VStack>
         }
         endContent={
-          canCheckIn ? (
+          markable ? (
             <CheckInButton id={a.id} name={a.firstName} isChecked={isChecked} t={t} tPlain={tPlain} />
           ) : (
             <Avatar size="md" name={a.firstName} tooltip={false} alt="" />

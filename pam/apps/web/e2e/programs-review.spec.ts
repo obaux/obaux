@@ -152,4 +152,16 @@ test.describe('programs to check', () => {
     await expect(page.getByRole('button', { name: 'Approve' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Discard' })).toHaveCount(0);
   });
+
+  test("a decision that did not go through is the small alert at the bottom, and the leader's request is still waiting (D-616)", async ({ page }) => {
+    await signedInAsSuperAdmin(page, [row({})]);
+    await page.route('**/rest/v1/rpc/review_program_submission*', (route) => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));
+    await page.goto('/programs/review/item/?id=sub-1');
+    await settled(page);
+    await page.getByRole('button', { name: 'Approve' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Yes, approve' }).click();
+    await expect(page.getByRole('alert').filter({ hasText: "That didn't go through. It's not your fault, so try again." })).toBeVisible();
+    await expect(page.getByText('Hearth Kitchen Training is approved')).toHaveCount(0);
+    await expect(page.getByText('Days waiting: 4')).toBeVisible();
+  });
 });

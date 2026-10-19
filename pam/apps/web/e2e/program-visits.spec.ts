@@ -54,8 +54,9 @@ test('Home lists the visits planned at the lead\'s own program, by first name, w
 });
 
 const VISIT = 'aaaaaaaa-0000-4000-8000-000000005701';
+// Starting now: the database takes a check-in from two hours before the start (D-616), so the circle is only drawn near it.
 const here = (checkedInAt: string | null = null) => ({
-  appointment_id: VISIT, member_id: 'm1', first_name: 'Tanya', starts_at: soon(0), ends_at: null,
+  appointment_id: VISIT, member_id: 'm1', first_name: 'Tanya', starts_at: new Date(Date.now() + 10 * 60_000).toISOString(), ends_at: null,
   status: checkedInAt ? 'attended' : 'scheduled', service_name: 'GED class', checked_in_at: checkedInAt,
 });
 
@@ -164,4 +165,15 @@ test('the card has no Message row when either has blocked the other (D-542)', as
   await settled(page);
   await expect(page.getByRole('heading', { name: 'Tanya', level: 1 })).toBeVisible();
   await expect(page.getByText('Message Tanya')).toHaveCount(0);
+});
+
+test('a visit days away has no check-in circle: the database would refuse it, so the circle is not drawn (D-616)', async ({ page }) => {
+  await signedInLead(page, [
+    here(),
+    { appointment_id: 'aaaaaaaa-0000-4000-8000-000000005702', member_id: 'm2', first_name: 'Luis', starts_at: soon(6), ends_at: null, status: 'scheduled', service_name: null, checked_in_at: null },
+  ]);
+  await page.goto('/');
+  await settled(page);
+  await expect(page.getByRole('button', { name: 'Check Tanya in' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Check Luis in' })).toHaveCount(0);
 });

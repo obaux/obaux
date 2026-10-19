@@ -19,6 +19,8 @@ import { addressActionsFor } from '@/lib/addressActions';
 import { useSession } from '@/lib/useSession';
 import { useProgramSetup } from '@/lib/programSetup';
 import { saveOwnProgram, withdrawSubmission } from '@/lib/useOwnProgram';
+import { useMalfunction } from '@/lib/malfunction';
+import type { Outcome } from '@/lib/settle';
 import { AddProgramView } from './AddProgramView';
 import { ProgramReviewView } from './ProgramReviewView';
 import { usePolicies } from '@/lib/usePolicies';
@@ -95,9 +97,9 @@ export function ProgramView({
   /** A change to the name or address waiting for Pam (D-462). */
   readonly pending?: { readonly name: string | null; readonly address: string | null } | null;
   /** Take the waiting change back; resolves false when it could not be. */
-  readonly onCancelPending?: () => Promise<boolean>;
+  readonly onCancelPending?: () => Promise<Outcome>;
   /** A real program: write the edit; resolves false when it could not be saved. */
-  readonly onSave?: (draft: ProgramDetailsData) => Promise<boolean>;
+  readonly onSave?: (draft: ProgramDetailsData) => Promise<Outcome>;
   /** A real lead's program: the way to their other programs, and to add one (D-318). */
   readonly canSwitch?: boolean;
 }) {
@@ -106,7 +108,7 @@ export function ProgramView({
   const [draft, setDraft] = useState(initial);
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const malfunction = useMalfunction();
   const [isSaving, setIsSaving] = useState(false);
   // What was asked of Pam, said once after saving (D-447).
   const [askedPam, setAskedPam] = useState(false);
@@ -164,15 +166,15 @@ export function ProgramView({
     const next = { ...draft, name: draft.name.trim() };
     if (onSave) {
       setIsSaving(true);
-      const ok = await onSave(next);
+      const from = document.activeElement;
+      const out = await onSave(next);
       setIsSaving(false);
-      // Not saved: stay in the form with what was typed, and say so.
-      if (!ok) {
-        setFailed(true);
+      // Not saved: stay in the form with what was typed, and say so at the bottom (D-616).
+      if (!out.ok) {
+        malfunction.show('program.save', out.error, from);
         return;
       }
     }
-    setFailed(false);
     // A live program's new name or address waits for Pam: the page keeps the
     // ones members see (D-447).
     const asks = isLive && (next.name !== program.name || next.address.trim() !== program.address.trim());
@@ -199,7 +201,6 @@ export function ProgramView({
               // The number as people read it, not as the database keeps it.
               setDraft({ ...program, phone: displayPhone(program.phone) });
               setSaved(false);
-              setFailed(false);
               setEditing(true);
             }}
             xstyle={styles.edit}
@@ -230,21 +231,21 @@ export function ProgramView({
           {...(onCancelPending
             ? {
                 endContent: (
-                  <Button label={t('program.pending.cancel')} variant="ghost" onClick={() => void onCancelPending()} />
+                  <Button
+                    label={t('program.pending.cancel')}
+                    variant="ghost"
+                    onClick={() => {
+                      const from = document.activeElement;
+                      void onCancelPending().then((out) => {
+                        if (!out.ok) malfunction.show('request.withdraw', out.error, from);
+                      });
+                    }}
+                  />
                 ),
               }
             : {})}
         />
       ) : null}
-      {failed ? (
-        <Notice
-          notice="something_went_wrong"
-          title={t('join.failed.title')}
-          body={t('join.failed.body')}
-          contactLabel={t('help.contact.action')}
-        />
-      ) : null}
-
       {editing ? (
         <Card padding={6}>
           <VStack gap={3}>

@@ -42,3 +42,23 @@ export function settleWithin<T>(save: Promise<T>, ms = SAVE_TIMEOUT_MS): Promise
     );
   });
 }
+
+/** What a save came to, for a screen that draws the failure itself: done, or not, with the error (for the log's code). */
+export type Outcome = { readonly ok: true } | { readonly ok: false; readonly error: unknown };
+
+export const DONE: Outcome = { ok: true };
+
+/**
+ * Makes a call that writes, and says how it came out: done, or not done with why. The call may answer `{ error }` (a database call) or throw; one
+ * with no answer in 15 seconds counts as failed with a timeout. The error's own words never leave here: callers pass it to the log, which keeps a code.
+ */
+export async function attempt(call: () => PromiseLike<{ readonly error?: unknown } | void>): Promise<Outcome> {
+  const settled = await settleWithin(
+    (async () => {
+      const answer = await call();
+      if (answer && answer.error) throw answer.error;
+    })(),
+  );
+  if (settled.status === 'ok') return DONE;
+  return { ok: false, error: settled.error };
+}

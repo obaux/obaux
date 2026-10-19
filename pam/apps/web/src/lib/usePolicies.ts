@@ -108,7 +108,12 @@ function subscribe(listener: () => void): () => void {
 export type AddPolicyResult = 'ok' | 'too_many' | 'too_big' | 'bad_type' | 'failed';
 
 /** Put the files in the program's folder of the private bucket, then make the policy from them. */
-async function savePolicy(programId: string, files: readonly File[], replaces: string | null): Promise<AddPolicyResult> {
+async function savePolicy(
+  programId: string,
+  files: readonly File[],
+  replaces: string | null,
+  onFailure?: (error: unknown) => void,
+): Promise<AddPolicyResult> {
   const problem = checkPolicyFiles(files);
   if (problem !== 'none') return problem;
   if (files.length === 0) return 'ok';
@@ -136,7 +141,8 @@ async function savePolicy(programId: string, files: readonly File[], replaces: s
     if (error) throw error;
     await loadPolicies(programId);
     return 'ok';
-  } catch {
+  } catch (error) {
+    onFailure?.(error);
     // Files that never made it into a policy are taken back (the database allows this).
     try {
       const { createClient } = await import('./supabase');
@@ -151,11 +157,11 @@ async function savePolicy(programId: string, files: readonly File[], replaces: s
 export function usePolicies(): {
   readonly policies: readonly DummyPolicy[];
   /** Resolves with how it went; a real program's can fail where the example set cannot. */
-  readonly add: (files: readonly File[]) => Promise<AddPolicyResult>;
+  readonly add: (files: readonly File[], onFailure?: (error: unknown) => void) => Promise<AddPolicyResult>;
   /** Resolves false when a real program's policy could not be taken off. */
-  readonly remove: (ids: readonly string[]) => Promise<boolean>;
+  readonly remove: (ids: readonly string[], onFailure?: (error: unknown) => void) => Promise<boolean>;
   /** A new version of a real policy (the old one is archived and kept). */
-  readonly replace: (id: string, files: readonly File[]) => Promise<AddPolicyResult>;
+  readonly replace: (id: string, files: readonly File[], onFailure?: (error: unknown) => void) => Promise<AddPolicyResult>;
   /** The database is still being asked: screens hold their "none yet" back. */
   readonly isLoading: boolean;
   /** The real program these belong to; null for the example set. */
@@ -186,8 +192,8 @@ export function usePolicies(): {
   }, [programId]);
 
   const add = useCallback(
-    async (files: readonly File[]): Promise<AddPolicyResult> => {
-      if (programId !== null) return savePolicy(programId, files, null);
+    async (files: readonly File[], onFailure?: (error: unknown) => void): Promise<AddPolicyResult> => {
+      if (programId !== null) return savePolicy(programId, files, null, onFailure);
       const kept = read();
       const now = new Date().toISOString();
       const added = files.map((file, i) => ({
@@ -205,7 +211,7 @@ export function usePolicies(): {
   );
 
   const remove = useCallback(
-    async (ids: readonly string[]): Promise<boolean> => {
+    async (ids: readonly string[], onFailure?: (error: unknown) => void): Promise<boolean> => {
       if (programId !== null) {
         try {
           const { createClient } = await import('./supabase');
@@ -216,7 +222,8 @@ export function usePolicies(): {
           }
           await loadPolicies(programId);
           return true;
-        } catch {
+        } catch (error) {
+          onFailure?.(error);
           await loadPolicies(programId);
           return false;
         }
@@ -229,8 +236,8 @@ export function usePolicies(): {
   );
 
   const replace = useCallback(
-    async (id: string, files: readonly File[]): Promise<AddPolicyResult> => {
-      if (programId !== null) return savePolicy(programId, files, id);
+    async (id: string, files: readonly File[], onFailure?: (error: unknown) => void): Promise<AddPolicyResult> => {
+      if (programId !== null) return savePolicy(programId, files, id, onFailure);
       const result = await add(files);
       if (result === 'ok') await remove([id]);
       return result;

@@ -2,6 +2,7 @@
 
 import { useEffect, useSyncExternalStore } from 'react';
 import type { ProgramDetails } from './useJoin';
+import { attempt, DONE, type Outcome } from './settle';
 import type { SessionState } from './useSession';
 import {
   OWN_PROGRAM_COLUMNS,
@@ -147,18 +148,13 @@ export function refreshOwnProgram(): Promise<void> {
  * organisation is made if they have none, and the listing waits for Pam.
  * Resolves false when it could not be saved; nothing is shown as sent then.
  */
-export async function submitOwnProgram(details: ProgramDetails): Promise<boolean> {
-  try {
-    const { createClient } = await import('./supabase');
-    const { error } = await createClient().rpc('submit_program', submitArguments(details));
-    if (error) return false;
-    // Add a program returns to the new one (D-318): the newest is shown.
-    pickOwnProgram(null);
-    await refreshOwnProgram();
-    return true;
-  } catch {
-    return false;
-  }
+export async function submitOwnProgram(details: ProgramDetails): Promise<Outcome> {
+  const out = await attempt(async () => (await import('./supabase')).createClient().rpc('submit_program', submitArguments(details)));
+  if (!out.ok) return out;
+  // Add a program returns to the new one (D-318): the newest is shown.
+  pickOwnProgram(null);
+  await refreshOwnProgram();
+  return DONE;
 }
 
 /**
@@ -167,16 +163,11 @@ export async function submitOwnProgram(details: ProgramDetails): Promise<boolean
  * correction while it waits. The same submission goes back to review. Resolves
  * false when it could not be saved.
  */
-export async function resendOwnProgram(submissionId: string, details: ProgramDetails): Promise<boolean> {
-  try {
-    const { createClient } = await import('./supabase');
-    const { error } = await createClient().rpc('resend_program_submission', resendArguments(submissionId, details));
-    if (error) return false;
-    await refreshOwnProgram();
-    return true;
-  } catch {
-    return false;
-  }
+export async function resendOwnProgram(submissionId: string, details: ProgramDetails): Promise<Outcome> {
+  const out = await attempt(async () => (await import('./supabase')).createClient().rpc('resend_program_submission', resendArguments(submissionId, details)));
+  if (!out.ok) return out;
+  await refreshOwnProgram();
+  return DONE;
 }
 
 /**
@@ -185,7 +176,7 @@ export async function resendOwnProgram(submissionId: string, details: ProgramDet
  * written to the live listing but asked of Pam (`request_program_change`), and
  * waits beside it. A program still being checked changes in place.
  */
-export async function saveOwnProgram(program: OwnProgram, draft: EditableProgram): Promise<boolean> {
+export async function saveOwnProgram(program: OwnProgram, draft: EditableProgram): Promise<Outcome> {
   // A program still being checked is corrected through its submission, so the
   // record Pam reads says the same as the listing (and a request for changes is
   // answered by saving).
@@ -200,11 +191,13 @@ export async function saveOwnProgram(program: OwnProgram, draft: EditableProgram
       website: draft.website,
     });
   }
-  try {
+  let changed = false;
+  const out = await attempt(async () => {
     const { createClient } = await import('./supabase');
     const supabase = createClient();
     const { error } = await supabase.from('services').update(editColumns(draft, program.isLive)).eq('id', program.id);
-    if (error) return false;
+    if (error) throw error;
+    changed = true;
     const change = program.isLive ? changeRequest(program, draft) : null;
     if (change) {
       const { error: changeError } = await supabase.rpc('request_program_change', {
@@ -214,16 +207,12 @@ export async function saveOwnProgram(program: OwnProgram, draft: EditableProgram
         p_subcategory: change.subcategory,
         p_address: change.address,
       });
-      if (changeError) {
-        await refreshOwnProgram();
-        return false;
-      }
+      if (changeError) throw changeError;
     }
-    await refreshOwnProgram();
-    return true;
-  } catch {
-    return false;
-  }
+  });
+  // Something was written, or no one can say: read the program again either way, so the page shows what is true.
+  if (changed || !out.ok) await refreshOwnProgram();
+  return out;
 }
 
 /**
@@ -231,16 +220,11 @@ export async function saveOwnProgram(program: OwnProgram, draft: EditableProgram
  * (D-385), or "Cancel these changes" on a live program's (D-447). The record is
  * kept; a first listing is taken off so it can never go live late.
  */
-export async function withdrawSubmission(submissionId: string): Promise<boolean> {
-  try {
-    const { createClient } = await import('./supabase');
-    const { error } = await createClient().rpc('withdraw_program_submission', { p_id: submissionId });
-    if (error) return false;
-    await refreshOwnProgram();
-    return true;
-  } catch {
-    return false;
-  }
+export async function withdrawSubmission(submissionId: string): Promise<Outcome> {
+  const out = await attempt(async () => (await import('./supabase')).createClient().rpc('withdraw_program_submission', { p_id: submissionId }));
+  if (!out.ok) return out;
+  await refreshOwnProgram();
+  return DONE;
 }
 
 function subscribe(listener: () => void): () => void {

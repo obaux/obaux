@@ -20,6 +20,7 @@ import { SubPage } from '@pam/ui/SubPage';
 import type { DummyPolicy } from '@pam/config/dummy-policies';
 import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/navigate';
+import { useMalfunction } from '@/lib/malfunction';
 import { openPolicyFile, usePolicies, type AddPolicyResult } from '@/lib/usePolicies';
 import { POLICY_ACCEPT, type ProgramPolicy } from '@/lib/programPolicies';
 import { servicesForPolicy } from '@pam/config/dummy-services';
@@ -74,16 +75,21 @@ export function PoliciesScreen() {
   const { t, tPlain } = useI18n();
   const { policies, add, remove, isLoading, programId } = usePolicies();
   const { forPlace } = useServices();
+  const malfunction = useMalfunction();
   const [isEditing, setIsEditing] = useState(false);
   // A file that was wrong, or a policy that could not be saved: said, with what was chosen kept in mind.
   const [problem, setProblem] = useState<AddPolicyResult>('ok');
   const [busy, setBusy] = useState(false);
   const addFiles = async (files: readonly File[]) => {
+    const from = document.activeElement;
+    let error: unknown;
     setBusy(true);
     setProblem('ok');
-    const result = await add(files);
+    const result = await add(files, (e) => (error = e));
     setBusy(false);
-    setProblem(result);
+    // The person's own mistakes (a wrong type, too big) stay here; Pam's failing is the alert at the bottom (D-616).
+    if (result === 'failed') malfunction.show('policies.upload', error, from);
+    else setProblem(result);
   };
   const [asking, setAsking] = useState<DummyPolicy | null>(null);
   // Which services ask for it (D-313): named by none means everyone signs it.
@@ -180,7 +186,12 @@ export function PoliciesScreen() {
         body={t('policies.remove.body')}
         confirmLabel={t('policies.remove.yes')}
         onConfirm={() => {
-          if (asking) remove([asking.id]);
+          if (!asking) return;
+          const from = document.activeElement;
+          let error: unknown;
+          void remove([asking.id], (e) => (error = e)).then((ok) => {
+            if (!ok) malfunction.show('policies.remove', error, from);
+          });
           setAsking(null);
         }}
         cancelLabel={t('policies.remove.no')}
@@ -193,6 +204,7 @@ export function PoliciesScreen() {
 export function PolicyScreen({ id }: { readonly id: string | null }) {
   const { t, tPlain, locale } = useI18n();
   const { policies, replace } = usePolicies();
+  const malfunction = useMalfunction();
   const [tab, setTab] = useState<'preview' | 'signed'>('preview');
   const [problem, setProblem] = useState<AddPolicyResult>('ok');
   const [busy, setBusy] = useState(false);
@@ -233,11 +245,14 @@ export function PolicyScreen({ id }: { readonly id: string | null }) {
                 accept={POLICY_ACCEPT}
                 onFiles={(files) => {
                   void (async () => {
+                    const from = document.activeElement;
+                    let error: unknown;
                     setBusy(true);
                     setProblem('ok');
-                    const result = await replace(policy.id, files);
+                    const result = await replace(policy.id, files, (e) => (error = e));
                     setBusy(false);
-                    setProblem(result);
+                    if (result === 'failed') malfunction.show('policies.upload', error, from);
+                    else setProblem(result);
                     // The old version is archived: back to the list, where the new one is.
                     if (result === 'ok') navigate('/program/policies/');
                   })();

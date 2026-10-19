@@ -118,6 +118,14 @@ test('a visit days away has no I\'m here', async ({ page }) => {
   await expect(page.getByRole('button', { name: "I'm here" })).toHaveCount(0);
 });
 
+test("a visit that ended hours ago has no I'm here and no I went: the database would refuse it (D-616)", async ({ page }) => {
+  await signedIn(page, hoursFromNow(-6));
+  await open(page);
+  await expect(page.getByRole('heading', { name: 'Riverside Job Center' }).first()).toBeVisible();
+  await expect(page.getByRole('button', { name: "I'm here" })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'I went' })).toHaveCount(0);
+});
+
 test('at a place with no lead on Pam there is no I\'m here and no I went: nobody is there to mark it (D-545)', async ({ page }) => {
   await signedIn(page, hoursFromNow(-0.5), false);
   await open(page);

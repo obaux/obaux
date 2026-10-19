@@ -5,6 +5,7 @@ import { DUMMY_SERVICES, servicesFor, type DummyService } from '@pam/config/dumm
 import { PROGRAM_SERVICE_COLUMNS, serviceColumns, serviceFromRow, type ProgramServiceRow } from './programServices';
 import { examplesOn } from './examples';
 import { isSavedPlace } from './savedTrips';
+import { attempt, DONE, type Outcome } from './settle';
 
 /**
  * A program's services (D-313), and a lead's changes to them.
@@ -104,10 +105,10 @@ function subscribe(listener: () => void): () => void {
 export function useServices(): {
   readonly services: readonly DummyService[];
   readonly forPlace: (placeId: string) => readonly DummyService[];
-  /** Resolves false when a real program's service could not be saved. */
-  readonly save: (service: DummyService) => Promise<boolean>;
-  /** Resolves false when a real program's service could not be removed. */
-  readonly remove: (id: string) => Promise<boolean>;
+  /** Done, or not (with why) when a real program's service could not be saved. */
+  readonly save: (service: DummyService) => Promise<Outcome>;
+  /** Done, or not (with why) when a real program's service could not be removed. */
+  readonly remove: (id: string) => Promise<Outcome>;
 } {
   const [local, setLocal] = useState<readonly DummyService[]>([]);
   const realNow = useSyncExternalStore(
@@ -130,13 +131,14 @@ export function useServices(): {
 
   const services = useMemo(() => [...local, ...Object.values(realNow).flat()], [local, realNow]);
 
-  const save = useCallback(async (service: DummyService): Promise<boolean> => {
+  const save = useCallback(async (service: DummyService): Promise<Outcome> => {
     if (!isSavedPlace(service.placeId)) {
       const kept = read();
       write({ changed: { ...kept.changed, [service.id]: service }, removed: kept.removed.filter((id) => id !== service.id) });
-      return true;
+      return DONE;
     }
-    try {
+    let touched = false;
+    const out = await attempt(async () => {
       const { createClient } = await import('./supabase');
       const supabase = createClient();
       const columns = serviceColumns(service);
@@ -146,16 +148,17 @@ export function useServices(): {
       let serviceId = service.id;
       if (isSavedPlace(service.id)) {
         const { error } = await supabase.from('program_services').update({ ...columns, service_id: undefined }).eq('id', service.id);
-        if (error) return false;
+        if (error) throw error;
       } else {
         const { data, error } = await supabase
           .from('program_services')
           .insert({ ...columns, sort_order: before.length })
           .select('id')
           .single();
-        if (error || !data) return false;
+        if (error || !data) throw error ?? new Error('no row');
         serviceId = (data as { id: string }).id;
       }
+      touched = true;
       // Which policies are only for this service (D-313 step 2): each one that was ticked or unticked is
       // set again with the program's other services that name it, plus this one if it is ticked now.
       const wasFor = before.find((s) => s.id === serviceId)?.policyIds ?? [];
@@ -167,38 +170,29 @@ export function useServices(): {
           p_policy_id: policyId,
           p_service_ids: on ? [...others, serviceId] : others,
         });
-        if (error) {
-          loading.delete(service.placeId);
-          await loadProgram(service.placeId);
-          return false;
-        }
+        if (error) throw error;
       }
+    });
+    // Something was written, or no one can say: read the program again either way, so the page shows what is true.
+    if (touched || !out.ok) {
       loading.delete(service.placeId);
       await loadProgram(service.placeId);
-      return true;
-    } catch {
-      return false;
     }
+    return out;
   }, []);
 
-  const remove = useCallback(async (id: string): Promise<boolean> => {
+  const remove = useCallback(async (id: string): Promise<Outcome> => {
     const programId = Object.keys(real).find((key) => (real[key] ?? NONE).some((s) => s.id === id));
     if (programId === undefined) {
       const kept = read();
       const changed = { ...kept.changed };
       delete changed[id];
       write({ changed, removed: [...kept.removed, id] });
-      return true;
+      return DONE;
     }
-    try {
-      const { createClient } = await import('./supabase');
-      const { error } = await createClient().from('program_services').delete().eq('id', id);
-      if (error) return false;
-      await loadProgram(programId);
-      return true;
-    } catch {
-      return false;
-    }
+    const out = await attempt(async () => (await import('./supabase')).createClient().from('program_services').delete().eq('id', id));
+    await loadProgram(programId);
+    return out;
   }, []);
 
   const forPlace = useCallback(
