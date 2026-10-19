@@ -237,13 +237,26 @@ export function BottomStack({
     };
   }, [seq, onCloseBanner]);
 
-  // The control that failed is never under the banner: scroll it clear.
+  // The control that failed is never under the banner: scroll it clear, once the spacer below has made room for it and again if the page
+  // settles taller (the screen redraws after a failed save). Only for the first second, so it never fights a person who scrolls.
   const source = failure?.source ?? null;
   useEffect(() => {
     if (seq === undefined || !source || !hostRef.current) return;
-    const top = hostRef.current.getBoundingClientRect().top;
-    const control = source.getBoundingClientRect();
-    if (control.bottom > top - 8) window.scrollBy({ top: control.bottom - top + 16, behavior: 'auto' });
+    const host = hostRef.current;
+    const clear = () => {
+      const top = host.getBoundingClientRect().top;
+      const control = source.getBoundingClientRect();
+      if (control.bottom > top - 8) window.scrollBy({ top: control.bottom - top + 16, behavior: 'auto' });
+    };
+    const frame = requestAnimationFrame(clear);
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(clear);
+    observer?.observe(document.body);
+    const stop = window.setTimeout(() => observer?.disconnect(), 1000);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(stop);
+      observer?.disconnect();
+    };
   }, [seq, source, inset, height]);
 
   return (
