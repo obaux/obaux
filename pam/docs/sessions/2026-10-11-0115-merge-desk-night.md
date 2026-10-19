@@ -2134,6 +2134,11 @@
 - **The desk named the wrong owner for a failure (b78, 05:25).** I told Dot five failing spec files were on main; they
   came from Piper's 171268f7, not yet merged. The message was withdrawn before it was read. Lesson: before telling a lane a
   failure is on main, check `git merge-base --is-ancestor <commit> origin/main`.
+- **The alert said "tap Try again" with no Try again to tap (b78, found 05:38).** The offline, timeout and server
+  lines end "then tap Try again", but the banner offered the button only when a caller passed `retry`, and on the trial
+  tip one call site of 31 did. Piper's and Ava's pictures both showed the line and only the ×; the desk had passed
+  Piper's. Fixed once in the banner (Dot): with no `retry`, Try again presses the control that failed again, else re-reads
+  the screen. Lesson: a picture is read word by word against what is on it; a line that says "tap X" needs an X.
 - **Will's decisions did not show on his page (19 October, 04:51).** Will asked why his decisions and changes were not
   showing as items on the Control Room. They were going only into "What I'm doing", which had not changed since 01:58, and
   into the roadmap's "waiting" lines. Fixed the same hour: Your notes (v49), with the rule in control-room.md that a note
