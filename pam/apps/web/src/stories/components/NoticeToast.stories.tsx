@@ -2,7 +2,10 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Card } from '@astryxdesign/core/Card';
 import { Text } from '@astryxdesign/core/Text';
+import { expect, userEvent, within } from 'storybook/test';
 import { Notice, Page } from '@pam/ui';
+import { Button } from '@pam/ui/Button';
+import { useMalfunction } from '@/lib/malfunction';
 import { NOTICES, type NoticeKey } from '@pam/config';
 import { useStoryText } from '../support/useStoryText';
 
@@ -15,11 +18,13 @@ import { useStoryText } from '../support/useStoryText';
  *
  * Shown here over a screen of real content, so what the toast covers and what it does not is visible.
  */
-function Over({ notice, closable = false }: { readonly notice: NoticeKey; readonly closable?: boolean }) {
+function Over({ notice, closable = false, fails = false }: { readonly notice: NoticeKey; readonly closable?: boolean; readonly fails?: boolean }) {
   const tr = useStoryText();
+  const malfunction = useMalfunction();
   return (
     <Page gap={3}>
       <Text type="supporting">Your people</Text>
+      {fails ? <Button label="Save" variant="secondary" clickAction={() => malfunction.show('alerts.switch.closed', { code: 500 }, null, { retry: () => undefined })} /> : null}
       {['Program · Philadelphia', 'Mentor · Camden', 'Program · Chester', 'Case manager · Delaware', 'Program · Norristown', 'Mentor · Allentown', 'Program · Reading', 'Mentor · Lancaster'].map((line) => (
         <Card key={line} padding={4}>
           <Text>{line}</Text>
@@ -54,4 +59,12 @@ export const PageWontLoad: Story = { render: () => <Over notice="something_went_
 export const InviteExpired: Story = { render: () => <Over notice="invite_expired" /> };
 /** A one-off the person may close. */
 export const Closable: Story = { render: () => <Over notice="something_went_wrong" closable /> };
+/** A state toast and the failure banner on screen together: one column, the banner at the bottom edge, nothing over anything. */
+export const WithTheFailureBanner: Story = {
+  render: () => <Over notice="offline" fails />,
+  play: async ({ canvasElement }) => {
+    await userEvent.click(await within(canvasElement).findByRole('button', { name: 'Save' }));
+    await expect(await within(document.body).findByRole('button', { name: /try again/i }, { timeout: 3000 })).toBeVisible();
+  },
+};
 export const Arabic: Story = { render: () => <Over notice="account_suspended" />, globals: { locale: 'ar' } };
