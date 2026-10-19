@@ -79,6 +79,20 @@ test.describe('a code that did not work', () => {
     expect(box.height).toBeLessThan(64);
   });
 
+  test('the small alert has a red stripe and a fill of its own, not the text colour on nothing', async ({ page }) => {
+    await toTheCodeStep(page, '654321');
+    await page.getByLabel(en['signin.code.label']).fill('123456');
+    const alert = page.getByRole('alert').filter({ hasText: en['signin.code.wrong'] });
+    await expect(alert).toBeVisible();
+    const look = await alert.evaluate((el) => {
+      const cs = getComputedStyle(el);
+      return { stripe: cs.borderInlineStartColor, text: cs.color, fill: cs.backgroundColor };
+    });
+    // The stripe says "error": it is not the text's own colour (an unset token falls back to it), and the row is filled.
+    expect(look.stripe).not.toBe(look.text);
+    expect(look.fill).not.toBe('rgba(0, 0, 0, 0)');
+  });
+
   test('the same wrong code can be typed again, and a right one signs in', async ({ page }) => {
     const attempts = await toTheCodeStep(page, '654321');
     const field = page.getByLabel(en['signin.code.label']);
