@@ -82,3 +82,10 @@ $$;
 grant usage on schema storage to anon, authenticated, service_role;
 grant select, insert, update, delete on storage.objects to authenticated;
 grant select on storage.buckets to anon, authenticated;
+
+-- The Vault, as far as the migrations read it: names and their decrypted values. The real one is Supabase's (an extension); this only stands in so a
+-- function that reads a secret by name can be run here. The value is a test key, nowhere near a real one.
+create schema if not exists vault;
+create table if not exists vault.decrypted_secrets (name text primary key, decrypted_secret text);
+insert into vault.decrypted_secrets (name, decrypted_secret) values ('phone_stop_key', 'test-key-for-the-throwaway-database-only')
+  on conflict (name) do nothing;
