@@ -16,9 +16,13 @@ STATUS row too.
   role, locale; no account, phone, message or place) for 30 days, and super admins read it. It is off until `app_errors_live` is on.
   (1) **Will signs the line** in `docs/legal/2026-10-18-error-log-privacy-read.md` section 2 (or Sage's edit of it) **before the switch turns
   on**: nothing is kept while it is off, so the line goes live the same day (`legal:date privacy`), not earlier. (2) Lena translates it in six
-  languages after the signature. The migration is already pinned (`claude/lena-app-errors-pins`: nine columns, no free text, super admins only, thirty days
-  swept nightly by `pg_cron`, the switch off by default). (3) Thirty days is longer than the request log's week: say if a week would do.
-  (4) The line does not say the notes are anonymous: for the first week the request log also holds the call that wrote one.
+  languages after the signature. **Signed 19 October 00:13 (Will, card a104: "Approved on the flow, let's test to ensure it works"), read by Mira as the line
+  with "on the Pam team" in the role list (Sage 460904c0), 30 days, role kept; Will can still say otherwise. Translated in six languages on `claude/lena-error-log-line`**
+  (`privacy.s.what-we-keep.p17`, listed in `legal.ts`; the three pins in `error-log-line.test.ts` are live), held with its "Last updated" date until the day the
+  switch turns on (`legal:date privacy`, then `copy:ack`): the line and the switch go live together, after the migration is live and one test report shows on Will's bell.
+  The migration is pinned (the log's nine columns, no free text, super admins only, thirty days swept nightly by `pg_cron`, the counters, the two closed lists, the switch off
+  by default). (3) Thirty days is longer than the request log's week: Will kept 30. (4) The line does not say the notes are anonymous: for the first week the request log
+  also holds the call that wrote one. (5) Native readers: "note" (nota / nota / 记录 / 記錄 / заметка / ملاحظة) and the role list in each language.
 
 - [ ] **Google Calendar sync: waiting until Will wants it on** (a71, 12 October 2026: "wait until we switch sync on. Not now."). It is built and held on the branch `claude/places-programs-google-sync` (head 5f1e70ae; D-539): not merged, not deployed, no migration applied. When Will asks for it, its two Privacy lines come back on a card with the Google Cloud checklist (the full checklist is in that branch's `docs/before-launch.md`). The calendar link (D-538) is separate and does not need it.
 
