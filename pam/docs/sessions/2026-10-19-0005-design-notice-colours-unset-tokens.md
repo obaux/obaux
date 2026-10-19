@@ -4,7 +4,9 @@
 
 ## What changed
 
-`packages/ui/src/Notice.tsx`: the stripes and the compact fill used three custom properties the theme never defines (`--color-text-error`, `--color-text-warning`, `--color-background-sunken`), so each fell to its fallback: a stripe in the text's own colour (black in light, white in dark) and no fill. They now use ones the theme does define: `--color-text-red` (error), `--color-text-orange` (warning) and `--color-background-muted` (the compact fill). Info already used `--color-text-accent`, which exists.
+`packages/ui/src/Notice.tsx`, the compact row only: its fill and stripe used custom properties the theme never defines (`--color-background-sunken`, `--color-text-error`, `--color-text-warning`), so each fell to its fallback: a stripe in the text's own colour and no fill. They now use ones the theme does define: `--color-text-red` (error), `--color-text-orange` (warning) and `--color-background-muted` (the fill). Info already used `--color-text-accent`.
+
+The full `Notice` card has the same three unset names for its stripe. They are **left as they are** (Mira, 19 October: Will has seen the black stripe for a week, and a stripe colour across many screens is his to see first). Before/after pictures of the offline card are in `docs/design/review/2026-10-19-notice-card-offline-{before,after}-{light,dark}-320.png`; if he says yes, the card stripes follow as their own small change (the two lines in `styles.error` and `styles.warning`).
 
 ## Was it meant to look like that?
 
@@ -12,7 +14,7 @@ No. Nothing records it: D-509 and D-510 (the small alert) say nothing of fill or
 
 ## What changes on screen
 
-The inline compact alert (sign-in's wrong code, the only inline use) gets a light fill and a red stripe. The full `Notice` card's stripe goes from the text colour to red (error) or orange (warning), as its icon already is. Colours only; no layout moves. Pictures: `docs/design/review/2026-10-19-notice-colours-after-*`.
+The inline compact alert (sign-in's wrong code, the only inline use) and the bottom alert get a light fill and a red stripe. Colours only; no layout moves. Pictures: `docs/design/review/2026-10-19-notice-colours-after-compact-*`.
 
 ## Verified
 
@@ -20,4 +22,4 @@ New test in `e2e/signin-wrong-code.spec.ts` (stripe is not the text colour, the 
 
 ## Left undone
 
-Will has not seen the card stripes in colour; if he wants them as they were (the text colour), the card styles can go back and only the compact row keeps the new ones.
+The full card stripes, waiting on Will.

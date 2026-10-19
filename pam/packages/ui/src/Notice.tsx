@@ -114,8 +114,8 @@ const styles = stylex.create({
     borderInlineStartWidth: '4px',
     borderInlineStartStyle: 'solid',
   },
-  error: { borderInlineStartColor: 'var(--color-text-red, currentColor)' },
-  warning: { borderInlineStartColor: 'var(--color-text-orange, currentColor)' },
+  error: { borderInlineStartColor: 'var(--color-text-error, currentColor)' },
+  warning: { borderInlineStartColor: 'var(--color-text-warning, currentColor)' },
   info: { borderInlineStartColor: 'var(--color-text-accent, currentColor)' },
 });
 
