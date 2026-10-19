@@ -23,3 +23,14 @@ Swept: no screen in `apps/web` still draws `AppHeader` or the Help block but the
 ## What a later session might reverse
 
 Calm states announced as alerts; the opaque backing (if Astryx gives `Banner` an opaque variant).
+
+## The look, brought closer to the blue banner (Will, 19 October 04:51)
+
+"This alert looks blown up. Nothing like the blue one in the reference image. Please make sure text is small for alerts, X buttons sit neatly on right corner. And action buttons are symmetrical and not overly loud."
+
+- **Text is Banner's own size** (title 14px, line 12px), as the blue `Banner status="info"` on the place page. This **overrides A23/D-432's 16px reading size for alerts**, by Will's word. The 16px overrides in `StackBanner` are gone.
+- **The close sits in the top corner** (top-left in Arabic) and never wraps onto the actions row: the actions moved into the description, under the line, so the end area holds only the close.
+- **Actions are quiet and symmetrical**: Astryx `Button` ghost at size `sm`, in the banner's red with a thin red edge, not the pale green pill. Two share one width side by side when they fit, and stack one above the other (still equal) when a longer language's labels do not (Russian); one sits alone at its own width. Contact Pam on the paused notice is the same button.
+- **48px target: Will's look wins.** The buttons are Astryx's small size (about 32px tall), with 8px between them, which meets WCAG 2.5.8 (24px). The e2e check is now at least 24px.
+- **Room for the page**: a spacer at the end of the page as tall as the stack, and the tapped control is scrolled clear on the next frame and again when the page resizes in the first second (Nico's L1 checks at 320x568).
+- Pictures: `docs/design/review/2026-10-19-d621-banner/` (light, dark, Arabic, Russian; compare-blue-* shows the red failure under the blue "only to help you plan" banner).

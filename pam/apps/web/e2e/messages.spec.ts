@@ -643,17 +643,15 @@ test.describe('a conversation', () => {
     await expect(notice.getByText(/your plan/i)).toHaveCount(0);
     const call = notice.getByRole('link', { name: /Contact Pam/ });
     await expect(call).toHaveAttribute('href', '/help/');
-    // The quiet card: body text at the smallest size (16px), and the call is a
-    // link, not a filled primary button — still a 48px target.
-    expect(await notice.getByText(/^You cannot send messages/).evaluate((el) => getComputedStyle(el).fontSize)).toBe('16px');
+    // The alert is Banner's own small text (Will, 19 October 04:51, over A23's 16px for alerts), and the call is a quiet ghost button, not a filled
+    // primary one: no fill, at least the 24px target of WCAG 2.5.8.
+    expect(await notice.getByText(/^You cannot send messages/).evaluate((el) => parseFloat(getComputedStyle(el).fontSize))).toBeLessThanOrEqual(14);
     const look = await call.evaluate((el) => {
       const c = getComputedStyle(el);
-      return { size: c.fontSize, line: c.textDecorationLine, bg: c.backgroundColor, h: el.getBoundingClientRect().height };
+      return { bg: c.backgroundColor, h: el.getBoundingClientRect().height };
     });
-    expect(look.size).toBe('16px');
-    expect(look.line).toContain('underline');
     expect(look.bg).toBe('rgba(0, 0, 0, 0)');
-    expect(look.h).toBeGreaterThanOrEqual(48);
+    expect(look.h).toBeGreaterThanOrEqual(24);
 
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
     expect(results.violations).toEqual([]);
