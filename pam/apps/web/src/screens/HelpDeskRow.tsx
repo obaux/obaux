@@ -1,9 +1,11 @@
 'use client';
 
-import { GlobeIcon } from '@pam/ui';
+import { GlobeIcon, MessagesIcon } from '@pam/ui';
 import { MenuList, type MenuItem } from '@pam/ui/MenuList';
 import { useI18n } from '@/lib/i18n';
 import { HELP_DESK_URL } from '@/lib/helpDesk';
+import { usePamStatus } from '@/lib/pam';
+import { useSession } from '@/lib/useSession';
 
 const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
 
@@ -16,6 +18,10 @@ const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
  */
 export function useHelpDeskItem(id = 'desk'): MenuItem {
   const { t } = useI18n();
+  const toPam = useWriteToPamItem();
+  // Signed in with messaging Pam on (D-605, Iris W2): "Contact Pam" opens the person's conversation with Pam, in the app, instead of
+  // the website. Off, signed out, or the Pam team: it is what it was.
+  if (toPam) return { id, label: t('help.desk.label'), href: toPam.href, icon: <MessagesIcon {...ICON} /> };
   return {
     id,
     label: t('help.desk.label'),
@@ -30,4 +36,20 @@ export function useHelpDeskItem(id = 'desk'): MenuItem {
 export function HelpDeskRow({ label }: { readonly label: string }) {
   const item = useHelpDeskItem();
   return <MenuList label={label} items={[item]} />;
+}
+
+/**
+ * "Write to Pam" (D-605, Will's a100: "update the help routes so they can reach Pam within the app, not just by filling out the
+ * 'still stuck' form"): the last row of Help, after the answers, for a signed-in person when messaging Pam is on. It opens their
+ * conversation with Pam. Everything else on Help is static and works with no session; this one row is added when there is a session
+ * and Pam is on, and is simply not there otherwise (signed out, switched off, or the Pam team, who are Pam).
+ */
+export function useWriteToPamItem(): MenuItem | null {
+  const { t } = useI18n();
+  const { state: session } = useSession();
+  const signedIn = session.status === 'signed-in' && session.session.role !== 'super_admin';
+  const pam = usePamStatus(signedIn);
+  if (!signedIn || pam.status !== 'ready') return null;
+  // Only the href is read (Contact Pam and Your safety's "talk to someone" both use it); the label is the help desk's own words.
+  return { id: 'pam', label: t('help.desk.label'), href: '/messages/pam/', icon: <MessagesIcon {...ICON} /> };
 }

@@ -23,11 +23,19 @@ test('booking for a member ends on an example that says nothing was booked or te
   await page.getByRole('button', { name: 'Book for Miguel' }).click();
 
   await expect(page.getByRole('heading', { name: 'Example booking for Miguel' })).toBeVisible();
-  await expect(page.getByText(/This is only an example: nothing was booked with the program, and nobody was texted/)).toBeVisible();
+  await expect(page.getByText(/^Example\. Nothing was booked\.$/)).toBeVisible();
   await expect(page.getByText(/Pam texted/)).toHaveCount(0);
   await expect(page.getByText(/^The text:/)).toHaveCount(0);
   await expect(page.getByRole('heading', { name: /^Booked for/ })).toHaveCount(0);
 
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
   expect(results.violations).toEqual([]);
+});
+
+test('Add a person says nothing about a text: no text is sent and no visit is saved (D-608)', async ({ page }) => {
+  await page.goto('/program/book/new/');
+  await settled(page);
+  await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
+  await expect(page.getByText(/They get one text from Pam with a link/)).toHaveCount(0);
+  await expect(page.getByText(/Nothing else is sent unless they join/)).toHaveCount(0);
 });

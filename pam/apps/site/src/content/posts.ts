@@ -105,7 +105,7 @@ const ALL: readonly SupportPost[] = [
     audience: 'everyone',
     title: 'Texts from Pam: which ones, and why one didn’t come',
     summary: 'The few texts Pam sends today, the rules for them, and what to do when one does not come.',
-    updated: '2026-10-17',
+    updated: '2026-10-18',
     keywords: ['text', 'sms', 'code', 'sign in', 'reminder', 'stop', 'quiet hours', 'not now', 'did not come', 'no text'],
   },
   {
@@ -188,7 +188,7 @@ const ALL: readonly SupportPost[] = [
     audience: 'members, case managers and program leads',
     title: 'Messages: who can write, and why nothing is texted',
     summary: 'Who can start a chat with whom, how to send and report a message, and why a message does not come by text.',
-    updated: '2026-10-12',
+    updated: '2026-10-18',
     keywords: ['message', 'chat', 'conversation', 'report', 'photo', 'document', 'new message', 'unsafe'],
   },
   {

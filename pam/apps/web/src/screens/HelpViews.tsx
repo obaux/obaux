@@ -5,12 +5,12 @@ import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { BigButton, FlagIcon, GlobeIcon, HelpIcon, PhoneIcon, ShieldIcon } from '@pam/ui';
+import { BigButton, FlagIcon, GlobeIcon, HelpIcon, MessagesIcon, PhoneIcon, ShieldIcon } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
 import { MenuList } from '@pam/ui/MenuList';
 import { useI18n } from '@/lib/i18n';
 import { HELP_SAFETY_URL } from '@/lib/helpDesk';
-import { HelpDeskRow, useHelpDeskItem } from '@/screens/HelpDeskRow';
+import { HelpDeskRow, useHelpDeskItem, useWriteToPamItem } from '@/screens/HelpDeskRow';
 
 /**
  * Get help, as a list of the kinds of help (D-213, from the reference Will
@@ -100,6 +100,7 @@ export function HelpTopicsView() {
  */
 export function HelpSafetyView() {
   const { t } = useI18n();
+  const toPam = useWriteToPamItem();
   return (
     <SubPage title={t('help.safety.title')} backHref="/help/" backLabel={t('nav.back.help')}>
       <Card padding={6}>
@@ -139,14 +140,23 @@ export function HelpSafetyView() {
               href: '/messages/',
               icon: <FlagIcon {...ICON} />,
             },
-            {
-              id: 'desk',
-              label: t('help.safety.talk.heading'),
-              description: t('help.safety.talk.body'),
-              href: HELP_SAFETY_URL,
-              isExternal: true,
-              icon: <GlobeIcon {...ICON} />,
-            },
+            // Signed in with messaging Pam on (D-605, Iris W2): the person's conversation with Pam, in the app; otherwise the website.
+            toPam
+              ? {
+                  id: 'desk',
+                  label: t('help.safety.talk.heading'),
+                  description: t('help.safety.talk.body'),
+                  href: toPam.href,
+                  icon: <MessagesIcon {...ICON} />,
+                }
+              : {
+                  id: 'desk',
+                  label: t('help.safety.talk.heading'),
+                  description: t('help.safety.talk.body'),
+                  href: HELP_SAFETY_URL,
+                  isExternal: true,
+                  icon: <GlobeIcon {...ICON} />,
+                },
           ]}
         />
       </VStack>

@@ -269,10 +269,21 @@ test.describe('signing up', () => {
     expect(sent, 'the sign-up request carries a role').not.toContain('role');
 
     await page.getByRole('button', { name: 'I understand' }).click();
-    await expect(page.getByRole('heading', { name: 'Text messages' })).toBeVisible();
+    // The texts step says what Text reminders says (D-608, a103): its title, the kinds of texts by their short names, the
+    // same Agree button and Not now; no introduction paragraph.
+    await expect(page.getByRole('heading', { name: 'Get text alerts', level: 1 })).toBeVisible();
     await expect(page.getByText('3 of 3', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Kinds of texts', level: 2 })).toBeVisible();
+    await expect(page.getByText('A reminder before your trip', { exact: true })).toBeVisible();
+    await expect(page.getByText('A saved place closes or moves', { exact: true })).toBeVisible();
+    // Neither text is sent yet here (texts_live is off in the stub), so each says so.
+    await expect(page.getByText('Coming soon', { exact: true })).toHaveCount(2);
+    await expect(page.getByText(/Pam can text you the reminders and notes listed below/)).toHaveCount(0);
+    await expect(page.getByText(/A note when someone wants to connect with you/)).toHaveCount(0);
+    await expect(page.getByText(/Reply STOP to stop/)).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Not now' }).or(page.getByRole('link', { name: 'Not now' }))).toBeVisible();
 
-    await page.getByRole('button', { name: 'Yes, text me reminders' }).click();
+    await page.getByRole('button', { name: 'Agree to receive texts' }).click();
 
     // Step 5: the first points, and the badge that comes with them.
     await expect(page.getByRole('heading', { name: 'You are in' })).toBeVisible();
@@ -419,15 +430,13 @@ test.describe('signing up', () => {
     await expect(page.getByText(/want to hear when Pam opens|Pam cannot text you/)).toHaveCount(0);
   });
 
-  test('the city list holds only cities; "only in these cities" is a line under it, not a row (Iris\'s run-through, P5)', async ({ page }) => {
+  test('the city list holds only cities, and no line explains it (Iris P5, then D-608)', async ({ page }) => {
     await newcomer(page);
     await page.goto('/join/');
     const list = page.getByRole('combobox', { name: 'City you live in' });
     await expect(list).toContainText('Philadelphia');
-    const note = page.getByText('Pam is only in these cities for now.');
-    // On the page, under the field, before the list is opened.
-    await expect(note).toBeVisible();
-    expect((await note.boundingBox())!.y).toBeGreaterThan((await list.boundingBox())!.y);
+    // The list shows which cities Pam is in; a line saying so is gone (D-608, Sage's audit).
+    await expect(page.getByText('Pam is only in these cities for now.')).toHaveCount(0);
     await settled(page);
     await list.click();
     // Every row is a city that can be chosen: nothing in the list that looks tappable and isn't.
@@ -435,7 +444,7 @@ test.describe('signing up', () => {
     await expect(rows).toHaveCount(1);
     await expect(rows).toHaveText('Philadelphia');
     await expect(page.getByRole('option', { disabled: true })).toHaveCount(0);
-    await expect(page.getByRole('listbox').getByText('Pam is only in these cities for now.')).toHaveCount(0);
+    await expect(page.getByText('Pam is only in these cities for now.')).toHaveCount(0);
   });
 
   test('a name is asked for before anything is sent', async ({ page }) => {

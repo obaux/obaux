@@ -218,8 +218,14 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
           </>
         ) : isMember && !noMessagesTab ? undefined : (
           // A member's Home has no header actions, unless the Messages tab is hidden (nobody to message):
-          // the bell lives there then, so notifications stay one tap away (Will, 11 October 2026).
-          <HeaderActions role={demoRole ?? trueRole} enabled={session.status === 'signed-in'} hasHelp={!isMember} />
+          // the bell lives there then, so notifications stay one tap away (Will, 11 October 2026), and only
+          // while something is unread (Will, 18 October): with nothing new the search bar has the whole row.
+          <HeaderActions
+            role={demoRole ?? trueRole}
+            enabled={session.status === 'signed-in'}
+            hasHelp={!isMember}
+            bellOnlyWhenNew={isMember}
+          />
         )
       }
       nextTrip={

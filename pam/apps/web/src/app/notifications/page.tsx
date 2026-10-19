@@ -33,6 +33,7 @@ import { useNotifications, unreadCount } from '@/lib/useNotifications';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useDemoView } from '@/lib/useDemoView';
 import { whenHappened } from '@/lib/when';
+import { StatusBadge } from '@pam/ui/StatusBadge';
 
 /**
  * Everything that has happened, as a log.
@@ -61,7 +62,6 @@ import { whenHappened } from '@/lib/when';
  */
 
 const styles = stylex.create({
-  note: { fontSize: '15px', lineHeight: 1.5 },
   // As Messages' empty state (MessagesView).
   state: { paddingBlock: '48px' },
 });
@@ -92,6 +92,12 @@ function describe(
   if (bodyKey === 'notify.staff_request_pending' && typeof bodyVars['role'] === 'string') {
     return t(bodyKey, { ...bodyVars, role: t(`role.${bodyVars['role']}`) });
   }
+  // The database writes the action's key (D-616); the bell says its name, or the key when it has none yet.
+  if (bodyKey === 'notify.app_error' && typeof bodyVars['action'] === 'string') {
+    const nameKey = `appError.action.${bodyVars['action']}`;
+    const name = t(nameKey);
+    return t(bodyKey, { ...bodyVars, action: name === nameKey ? bodyVars['action'] : name });
+  }
   return t(bodyKey, bodyVars);
 }
 
@@ -107,6 +113,8 @@ function hrefFor(kind: string, subjectId: string | null): string | undefined {
   if (kind === 'visit_booked_for_you') return '/trips/';
   if (kind === 'service_flagged') return '/places/reported/?from=notifications';
   if (kind === 'staff_request_pending') return '/requests/';
+  // Something broke in the app (D-616): the Problems list.
+  if (kind === 'app_error') return '/problems/?from=notifications';
   return undefined;
 }
 
@@ -140,7 +148,7 @@ export default function NotificationsPage() {
   const signedIn = session.status === 'signed-in';
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { viewedRole } = useRoleView(trueRole);
-  const { state, markAllSeen } = useNotifications(signedIn);
+  const { state, markAllSeen } = useNotifications(signedIn, false);
   const unread = unreadCount(state);
   const isDemo = useDemoView(session);
 
@@ -237,9 +245,7 @@ export default function NotificationsPage() {
               }))}
               labels={{ empty: t('notify.none'), new: t('notify.new'), earlier: t('notify.earlier') }}
             />
-            <Text type="supporting" xstyle={styles.note}>
-              {t('notify.example.note')}
-            </Text>
+            <StatusBadge label={t('common.example')} />
           </VStack>
         ) : null}
 

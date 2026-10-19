@@ -29,7 +29,7 @@
  *   changes  — the newest decisions this flow shows, newest first
  */
 
-export const UPDATED = '2026-10-16';
+export const UPDATED = '2026-10-18';
 
 /**
  * Where each screen opens live: Chromatic's build of `main`, `https://main--<app id>.chromatic.com`.
@@ -859,6 +859,13 @@ export const flows = [
         path: '/messages/thread/',
         changed: 'D-349',
       },
+      waitingCities: {
+        title: 'Cities people are waiting for',
+        story: 'super-admin-screens--waiting-cities',
+        path: '/cities/waiting/',
+        changed: 'D-593',
+        note: 'Counts only, biggest first: where to open next (card a96); nobody yet says so in two lines',
+      },
     },
     edges: [
       ['home', 'requestReview', 'A request'],
@@ -876,8 +883,10 @@ export const flows = [
       ['profile', 'programsToCheck', 'Programs to check'],
       ['home', 'programsToCheck', 'Programs to check'],
       ['programsToCheck', 'programReview', 'A program'],
+      ['home', 'waitingCities', 'Cities people are waiting for'],
     ],
     changes: [
+      'D-593 — Cities people are waiting for: a Home row (with how many people wait) opens a count per city, biggest first (card a96)',
       'D-558 — no "See the app as" row or screen for a super admin (the view-as page is gone)',
       'D-386 — Programs to check: what leaders sent for Pam to look at, with Approve, Ask for changes and Discard',
       'D-189 — Reported places is a screen of its own, from Profile and the bell\'s "a place was reported" row, no longer only a chip on the old Places page',

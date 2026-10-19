@@ -24,6 +24,8 @@
     "./icons": "./src/icons.tsx",
     "./TextLink": "./src/TextLink.tsx",
     "./Badge": "./src/Badge.tsx",
+    "./StatusBadge": "./src/StatusBadge.tsx",
+    "./SettingsList": "./src/SettingsList.tsx",
     "./SearchPill": "./src/SearchPill.tsx",
     "./FloatingAction": "./src/FloatingAction.tsx",
     "./CategoryChips": "./src/CategoryChips.tsx",

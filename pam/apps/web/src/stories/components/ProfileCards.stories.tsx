@@ -4,6 +4,7 @@ import { BellIcon, StarIcon } from '@pam/ui';
 import { BadgeArt, ConnectionsArt } from '@pam/ui/BadgeArt';
 import { FeatureTile, FeatureTileRow, ProfileSummary, PromoCard } from '@pam/ui/ProfileCards';
 import { SetupArt } from '@pam/ui/SetupArt';
+import { useStoryText } from '../support/useStoryText';
 
 /** The Profile screen's cards: who you are with up to three numbers, two feature tiles side by side, and a single offer. Use ProfileSummary at the top of a profile. */
 const meta = {
@@ -57,19 +58,25 @@ export const FeatureTiles: Story = {
 
 /** A single PromoCard offer. */
 export const Promo: Story = {
-  render: () => (
-    <PromoCard
-      title="Get text reminders"
-      body="Coming soon: texts about your visits and the places you saved."
-      href="/reminders/"
-      art={<SetupArt kind="alerts" size={72} />}
-    />
-  ),
+  render: function Render() {
+    // The app's own words, read from the bundle (the offer's name changed once already: B4).
+    const tr = useStoryText();
+    return (
+      <PromoCard
+        title={tr('profile.promo.reminders.title')}
+        badge={tr('common.comingSoon')}
+        href="/reminders/"
+        art={<SetupArt kind="alerts" size={72} />}
+      />
+    );
+  },
 };
 
 /** The full Profile stack, as the screen lays it out. */
 export const FullProfile: Story = {
-  render: (args) => (
+  render: function Render(args) {
+    const tr = useStoryText();
+    return (
     <VStack gap={4}>
       <ProfileSummary {...args} />
       <FeatureTileRow>
@@ -77,11 +84,12 @@ export const FullProfile: Story = {
         <FeatureTile label="Connections" href="/connections/" art={<ConnectionsArt size={88} />} />
       </FeatureTileRow>
       <PromoCard
-        title="Get text reminders"
-        body="Coming soon: texts about your visits and the places you saved."
+        title={tr('profile.promo.reminders.title')}
+        badge={tr('common.comingSoon')}
         href="/reminders/"
         art={<BellIcon width={36} height={36} aria-hidden />}
       />
     </VStack>
-  ),
+    );
+  },
 };

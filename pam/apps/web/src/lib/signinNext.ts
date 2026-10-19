@@ -6,8 +6,14 @@
  * being one of the few Pam screens listed below: an exact match, never an address, a scheme, a host, a `//`, or anything else. Anything
  * not on the list is `null` and Sign in behaves as if it had not been there. It is kept for the length of the sign-up (the tab's
  * session storage) and used once, after the person is in; an account that already runs a program (a program lead) ignores it.
+ *
+ * `/messages/pam/` (D-605) is the second: the website's "Open Pam" sends a signed-out person through Sign in and back to their conversation
+ * with Pam. Unlike Add my program it is for every role but the Pam team (they have no conversation with themselves).
+ *
+ * `/alerts/` (D-615) is the third: a Text alerts switch tapped before anybody has agreed to texts goes to the consent screen and comes back
+ * here once they have. For the roles that have Text alerts (member, case manager, program lead).
  */
-export const NEXT_ALLOWED: readonly string[] = ['/profile/add-program/'];
+export const NEXT_ALLOWED: readonly string[] = ['/profile/add-program/', '/messages/pam/', '/alerts/'];
 
 const KEY = 'pam.signin-next';
 
@@ -37,8 +43,12 @@ export function takeNext(role?: string | null): string | null {
   try {
     const stored = window.sessionStorage.getItem(KEY);
     window.sessionStorage.removeItem(KEY);
+    const next = safeNext(stored);
+    // Their conversation with Pam is for anyone with an account but the Pam team; Add my program is for members alone.
+    if (next === '/messages/pam/') return role === 'super_admin' ? null : next;
+    if (next === '/alerts/') return role === 'super_admin' ? null : next;
     if (role !== undefined && role !== 'member') return null;
-    return safeNext(stored);
+    return next;
   } catch {
     return null;
   }

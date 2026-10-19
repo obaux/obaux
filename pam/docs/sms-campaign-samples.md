@@ -1,5 +1,7 @@
 # Sample messages for the carrier registration
 
+> **For the next filing use `docs/sms-refile-packet.md` (18 October 2026).** It is read from the code on `main`, in the form's order. Three statements below are wrong against the screens and must not be pasted again: the sign-in screen does **not** say how to stop (it says "Pam texts you a code to sign in"); STOP is not "permanent" and HELP does not "reach a person"; and staff **do** type an invited person's number. This page stays as the history of the earlier filings.
+
 Everything Pam can send, in the order a person is likely to meet it. Paste these
 into the A2P campaign's sample-message boxes exactly as they appear — carriers
 compare them against real traffic later, and a sample that does not match what
@@ -84,7 +86,7 @@ Two consequences worth knowing before submitting:
 
 ## "How do end-users consent to receive messages?", to paste as written
 
-990 characters, so it clears a 1024 cap — count before editing it.
+989 characters, so it clears a 1024 cap — count before editing it. (Changed on 18 October 2026, D-608: the screen's line is now "Reply STOP to stop, or HELP for help", so this paragraph no longer says STOP is "permanent" or that HELP "reaches a person"; the HELP reply is an address, not a person, and a reviewer compares this paragraph with the screenshot.)
 
 **This is the third version, and the app changed twice under it.** The first
 described consent as implied by typing a number; rejected with **30925,
@@ -116,7 +118,7 @@ to the reminders screen below (D-139, 17 September) — sign-in codes are not
 optional the way reminders are, so the room to be honest about STOP, HELP and
 rates belongs on the screen where a member is actually choosing something.
 
-> End users opt in inside the Pam app, on a screen dedicated to that choice, and nothing is pre-selected. A person is invited by a staff member and enters their own mobile number on the sign-in screen to request a one-time code; Pam has no passwords, so requesting the code is the request to be texted it. After signing in, the person is shown a "Text reminders" screen listing what would be sent (for a member: a reminder before a planned visit and a note if a saved place closes or moves), saying plainly which of them Pam sends today, and that STOP stops them permanently, HELP reaches a person, and rates may apply. Consent is a button labelled "Agree to receive texts": pressing it is the affirmative act, and the words agreed to are on the control itself. There is no checkbox, so nothing can arrive pre-selected. A "Not now" button records the decline, and Pam works either way, so consent is never required to use Pam. Numbers are never bought, rented, or entered by staff for anyone. *(Pending Will's answer on card a61: a person asking for help on joinpam.org may also type their own mobile number into the help form to ask for an answer by text. Pam sends that one answer to that number, once, with STOP and HELP, and nothing else.)*
+> End users opt in inside the Pam app, on a screen dedicated to that choice, and nothing is pre-selected. A person is invited by a staff member and enters their own mobile number on the sign-in screen to request a one-time code; Pam has no passwords, so requesting the code is the request to be texted it. After signing in, the person is shown a "Text reminders" screen listing what would be sent (for a member: a reminder before a planned visit and a note if a saved place closes or moves), saying plainly which of them Pam sends today, and that replying STOP stops them, replying HELP gets help, and rates may apply. Consent is a button labelled "Agree to receive texts": pressing it is the affirmative act, and the words agreed to are on the control itself. There is no checkbox, so nothing can arrive pre-selected. A "Not now" button records the decline, and Pam works either way, so consent is never required to use Pam. Numbers are never bought, rented, or entered by staff for anyone. *(Pending Will's answer on card a61: a person asking for help on joinpam.org may also type their own mobile number into the help form to ask for an answer by text. Pam sends that one answer to that number, once, with STOP and HELP, and nothing else.)*
 
 Attach the **Text reminders** screenshot, not the sign-in one. The reviewer is
 checking that the box is really unticked and that the wording quoted here is

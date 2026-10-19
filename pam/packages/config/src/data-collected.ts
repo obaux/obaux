@@ -223,6 +223,11 @@ export const INPUT_FILES: readonly InputFile[] = [
     notPersonal: 'Filters the visits already on the phone; the typed words are not sent.',
   },
   {
+    file: 'apps/web/src/screens/PamHoursScreen.tsx',
+    fields: 1,
+    notPersonal: "The Pam team's opening and closing times (D-605): a setting for the whole app, nothing about a person.",
+  },
+  {
     file: 'apps/web/src/screens/PeopleHomeView.tsx',
     fields: 1,
     notPersonal: 'Filters the staff member\'s list already on the phone; the typed words are not sent.',

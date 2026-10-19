@@ -9,6 +9,7 @@ import { useRoleView } from '@/lib/useViewedRole';
 import { tabFor } from '@/lib/tabs';
 import { useProgramSetup } from '@/lib/programSetup';
 import { useMessagingReach } from '@/lib/useMessagingReach';
+import { usePamBootstrap } from '@/lib/pam';
 import { RoleTabBar } from './RoleTabBar';
 import { UnreadMessagesLazy } from './UnreadMessagesLazy';
 
@@ -36,6 +37,12 @@ export function AppTabBar() {
   const { viewedRole } = useRoleView(trueRole);
   // The Messages tab is for people who have someone to message or a conversation (useMessagingReach).
   const reach = useMessagingReach(session.status === 'signed-in', pathname ?? '');
+  // Everyone's own conversation with Pam is made on the first load after the switch is on, with its welcome (D-605); the count of
+  // unread conversations waits for that, so the welcome is in it. The Pam team have none.
+  const { ready: pamReady } = usePamBootstrap(
+    session.status === 'signed-in' ? session.session.userId : null,
+    trueRole === 'super_admin',
+  );
   if (!tab || session.status !== 'signed-in' || trueRole === null) return null;
 
   const role: Role = viewedRole ?? trueRole;
@@ -55,7 +62,7 @@ export function AppTabBar() {
 
   return (
     <>
-      <UnreadMessagesLazy enabled={canCount} onCount={onCount} />
+      <UnreadMessagesLazy enabled={canCount && pamReady} onCount={onCount} />
       {role === 'provider' && tab === 'program' ? <ProgramBarWhenLive tab={tab}>{bar}</ProgramBarWhenLive> : bar}
     </>
   );

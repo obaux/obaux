@@ -1,0 +1,59 @@
+# The current specs (claude/pam-message-pam-admin @ 55471733) against 1b67f588 (Iris pass 2), narrow-320, 18 October ~18:27 UTC
+# Fail here: T1 (+T6, the error card), T2, T3 (button on a super admin; NOT_ALLOWED and PAM_OFF), T4, W6, P4, P5, P6, P7 (photos only), the 20-second look.
+# W5 passes: it was already fixed at 1b67f588. T5 passes on narrow-320 (a fine pointer never had the button); on iphone-se-viewport, where the 16px open button is, it fails (below).
+
+  ✓   2 e2e/pam-inbox.spec.ts:88:7 › Messages to Pam (card a100) › Home's first row counts the conversations waiting for a reply, as a plain number (D-586)
+  ✘   1 e2e/pam-inbox.spec.ts:105:7 › Messages to Pam (card a100) › with the switch off there is no row, and the inbox shows nothing and reads nothing
+  ✓   4 e2e/pam-inbox.spec.ts:128:7 › Messages to Pam (card a100) › waiting longest first with how long, then answered, then closed folded at the foot
+  ✓   5 e2e/pam-inbox.spec.ts:167:7 › Messages to Pam (card a100) › says only a first name, the role and the region or program: nothing else about the person
+  ✓   6 e2e/pam-inbox.spec.ts:177:7 › Messages to Pam (card a100) › nobody waiting says so in one line
+  ✓   7 e2e/pam-inbox.spec.ts:184:7 › Messages to Pam (card a100) › in Arabic at 320, an English message keeps its own order after "أنت:" (D-435)
+  ✘   8 e2e/pam-inbox.spec.ts:197:7 › Messages to Pam (card a100) › looks again every 20 seconds: a new message shows without a reload, and a failed look keeps the list
+  ✓   9 e2e/pam-inbox.spec.ts:221:9 › Messages to Pam (card a100) › a member is refused, and the inbox is never asked
+  ✓  10 e2e/pam-inbox.spec.ts:221:9 › Messages to Pam (card a100) › a case manager is refused, and the inbox is never asked
+  ✓  11 e2e/pam-inbox.spec.ts:230:7 › Messages to Pam (card a100) › has no WCAG A/AA violations
+  ✓  12 e2e/pam-place.spec.ts:21:7 › A program's page, for the Pam team (card a100) › with Message Pam on, the row is "Message this program" and opens Pam writing to it
+  ✓  13 e2e/pam-place.spec.ts:31:7 › A program's page, for the Pam team (card a100) › with Message Pam off, the row stays D-349's: the lead by name, in an ordinary conversation
+  ✓  14 e2e/pam-place.spec.ts:41:7 › A program's page, for the Pam team (card a100) › a member never sees it, whatever the switch says
+  ✘  15 e2e/pam-team.spec.ts:97:7 › Message Pam, the team's side (card a100) › a saved reply fills the box and nothing is sent until Send
+  ✘   3 e2e/pam-inbox.spec.ts:119:7 › Messages to Pam (card a100) › when the inbox cannot be read, Try again reads it again (Iris P5)
+  ✘  16 e2e/pam-team.spec.ts:114:7 › Message Pam, the team's side (card a100) › a saved reply goes in after what was already typed, and the box has focus again
+  ✘  17 e2e/pam-team.spec.ts:129:7 › Message Pam, the team's side (card a100) › Pam's welcome reads as Pam's, on the person's side, never as the team's own
+  ✓  19 e2e/pam-team.spec.ts:149:7 › Message Pam, the team's side (card a100) › the team's ⋯ is its own: Close, then Reopen, and Files; no Report, no Block (W5)
+  ✘  18 e2e/pam-team.spec.ts:139:7 › Message Pam, the team's side (card a100) › the team replies as Pam, with photos only: no document button
+  ✘  20 e2e/pam-team.spec.ts:172:7 › Message Pam, the team's side (card a100) › Pam writes first to a person: the empty conversation, then the thread it started
+  ✘  21 e2e/pam-team.spec.ts:188:7 › Message Pam, the team's side (card a100) › when Pam writing first fails, the words stay as "Not sent" with Try again, under an error card, and Try again sends them
+  ✘  22 e2e/pam-team.spec.ts:204:9 › Message Pam, the team's side (card a100) › a NOT_ALLOWED refusal says so in one calm line: no error card, no Try again
+  ✓  24 e2e/pam-team.spec.ts:218:7 › Message Pam, the team's side (card a100) › a person who already has a Pam conversation is taken to it, not to a second one
+  ✘  23 e2e/pam-team.spec.ts:204:9 › Message Pam, the team's side (card a100) › a PAM_OFF refusal says so in one calm line: no error card, no Try again
+  ✓  25 e2e/pam-team.spec.ts:224:7 › Message Pam, the team's side (card a100) › Pam writes to a program's leads, and the inbox says how many it went to
+  ✓  26 e2e/pam-team.spec.ts:243:7 › Message Pam, the team's side (card a100) › Pam's hours: the reply people get changes with the fields, and Save sends the hours
+  ✓  28 e2e/pam-team.spec.ts:256:7 › Message Pam, the team's side (card a100) › Pam's hours with no day ticked says so and sends nothing
+  ✓  29 e2e/pam-team.spec.ts:268:7 › Message Pam, the team's side (card a100) › Everyone offers "Message … as Pam" on a person while Pam is live
+  ✘  27 e2e/pam-team.spec.ts:236:7 › Message Pam, the team's side (card a100) › a program nobody runs says so in one line and offers no composer
+  ✘  30 e2e/pam-team.spec.ts:279:7 › Message Pam, the team's side (card a100) › Everyone offers no "as Pam" button on a super admin, whom the database refuses (Iris T3)
+  ✓  32 e2e/pam-team.spec.ts:311:7 › Message Pam, the team's side (card a100) › Pam's hours: the time fields are 48px tall and the clock is a picture, not a 16px button (Iris T5)
+  ✘  31 e2e/pam-team.spec.ts:295:7 › Message Pam, the team's side (card a100) › Pam's hours: closing before opening hides the reply rather than show hours that cannot be (Iris T4)
+  ✓  33 e2e/pam-team.spec.ts:323:9 › Message Pam, the team's side (card a100) › /pam/hours/ has no WCAG A/AA violations
+  ✓  34 e2e/pam-team.spec.ts:323:9 › Message Pam, the team's side (card a100) › /pam/thread/options/ has no WCAG A/AA violations
+  ✓  35 e2e/pam-team.spec.ts:323:9 › Message Pam, the team's side (card a100) › /pam/start/ has no WCAG A/AA violations
+    Error: expect(locator).toBeVisible() failed
+  3) e2e/pam-inbox.spec.ts:197:7 › Messages to Pam (card a100) › looks again every 20 seconds: a new message shows without a reload, and a failed look keeps the list 
+    Error Context: test-results/pam-inbox-Messages-to-Pam--02ab8--failed-look-keeps-the-list-narrow-320/error-context.md
+    Error: expect(locator).toHaveAttribute(expected) failed
+    Error: expect(locator).toHaveText(expected) failed
+    Error: expect(locator).toHaveAccessibleName(expected) failed
+    Error: expect(locator).toHaveAccessibleName(expected) failed
+    Error: expect(locator).toHaveAccessibleName(expected) failed
+    Error: expect(locator).toBeVisible() failed
+    Error: expect(locator).toBeVisible() failed
+    Error: expect(locator).toBeVisible() failed
+    Error: expect(locator).toBeVisible() failed
+    Error: expect(locator).toHaveCount(expected) failed
+    Error: expect(locator).toHaveCount(expected) failed
+  14 failed
+    e2e/pam-inbox.spec.ts:197:7 › Messages to Pam (card a100) › looks again every 20 seconds: a new message shows without a reload, and a failed look keeps the list 
+  21 passed (1.3m)
+
+## T5 on iphone-se-viewport against 1b67f588
+  ✘ Pam's hours: the time fields are 48px tall and the clock is a picture, not a 16px button (Iris T5) — expected 0 'Open Opens/Closes' buttons, received 2

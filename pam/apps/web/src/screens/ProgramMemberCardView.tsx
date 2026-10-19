@@ -102,9 +102,6 @@ export function ProgramMemberCardView({ id, header }: { readonly id: string | nu
           </Text>
         )}
       </VStack>
-      <Text type="supporting" xstyle={styles.note}>
-        {t('person.card.note')}
-      </Text>
     </Page>
   );
 }

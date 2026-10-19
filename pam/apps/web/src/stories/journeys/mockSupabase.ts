@@ -111,6 +111,42 @@ export interface MockOptions {
   readonly staffReview?: 'pair' | 'city' | 'decided' | 'other' | 'addedToExisting';
   /** Nobody waiting for a city yet (D-593): the list's empty state. */
   readonly noWaitingCities?: boolean;
+  /** Nothing has broken in the app this week (D-616): Problems' empty state. */
+  readonly noProblems?: boolean;
+  /** Message Pam is switched off (D-605): `pam_status` says so and nothing else about Pam is shown. */
+  readonly pamOff?: boolean;
+  /** The Pam team's inbox is empty. */
+  readonly pamInboxEmpty?: boolean;
+  /**
+   * The person's own Pam conversation (D-605): only Pam's welcome; after a message sent outside Pam's hours, with the automatic
+   * reply; or a message that did not go ("Not sent", Try again).
+   */
+  readonly pamThread?: 'welcome' | 'away' | 'notSent';
+  /** Pam writing first fails (Iris T1, T3): on the network, or refused by name. Unset: it goes. */
+  readonly pamStartFails?: 'error' | 'NOT_ALLOWED' | 'PAM_OFF';
+}
+
+const PAM_CONVO_ID = 'c0000000-0000-4000-8000-0000000000a1';
+
+/** How the database answers Pam writing first, when a story asks it to fail (Iris T1, T3). */
+function startAnswer(fails: MockOptions['pamStartFails']): { status: number; body: unknown } | null {
+  if (!fails) return null;
+  return fails === 'error' ? { status: 500, body: {} } : { status: 400, body: { code: 'P0001', message: fails } };
+}
+
+/** The rows of a person's Pam conversation for a story (D-605). */
+function pamThreadMessages(state: 'welcome' | 'away' | 'notSent') {
+  const row = (id: string, sender: string | null, systemKey: string | null, systemVars: unknown, body: string, ago: number) => ({
+    id, conversation_id: PAM_CONVO_ID, sender_id: sender, system_key: systemKey, system_vars: systemVars, body,
+    attachment_url: null, attachment_kind: null, created_at: new Date(Date.now() - ago).toISOString(),
+  });
+  const welcome = row('pw', null, 'pam.welcome', null, '', 7_200_000);
+  if (state !== 'away') return [welcome];
+  return [
+    welcome,
+    row('pu', ME_ID, null, null, 'Is anyone there tonight?', 600_000),
+    row('pa', null, 'pam.away', { opensAt: new Date(Date.now() + 36_000_000).toISOString() }, '', 599_000),
+  ];
 }
 
 /** A real place of the catalogue, to plan a trip to in a story (the examples' ids are not real). */
@@ -417,6 +453,45 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
         { place: 'Norristown', people: 1 },
       ],
     })),
+    // Problems (D-616): what broke, grouped by screen, action and code, newest first. No person, no free text.
+    on('/rpc/app_errors_grouped', () => ({
+      body: options.noProblems ? [] : [
+        { area: '/alerts/', action: 'alerts.switch.closed', code: '500', n: 4, first_seen: onTheHour(-2, 9), last_seen: onTheHour(0, 11) },
+        { area: '/messages/thread/', action: 'messages.photo', code: 'timeout', n: 2, first_seen: onTheHour(-1, 15), last_seen: onTheHour(-1, 16) },
+        { area: '/reminders/', action: 'reminders.agree', code: 'offline', n: 1, first_seen: onTheHour(-5, 10), last_seen: onTheHour(-5, 10) },
+      ],
+    })),
+    // Message Pam (D-605, D-606): the switch and the hours, a person's own conversation, and the Pam team's inbox and actions.
+    on('/rpc/pam_status', () => ({
+      body: [{
+        live: !options.pamOff, hours_tz: 'America/New_York', hours_days: [1, 2, 3, 4, 5], hours_open: '09:00:00', hours_close: '17:00:00',
+        open_now: true, next_open: null,
+      }],
+    })),
+    on('/rpc/open_pam_conversation', () => ({ body: options.pamOff ? null : 'c0000000-0000-4000-8000-0000000000a1' })),
+    on('/rpc/pam_inbox', () => ({
+      body: options.pamInboxEmpty ? [] : [
+        { conversation_id: 'c0000000-0000-4000-8000-0000000000b1', asker_id: 'a0000000-0000-4000-8000-0000000000b1', first_name: 'Marcus', role: 'member',
+          region_name: 'Philadelphia', program_name: null, status: 'open', last_message_at: onTheHour(0, 8), last_from: 'asker',
+          waiting_since: onTheHour(0, 8), preview: 'I cannot find my program on the map' },
+        { conversation_id: 'c0000000-0000-4000-8000-0000000000b2', asker_id: 'a0000000-0000-4000-8000-0000000000b2', first_name: 'Alice', role: 'provider',
+          region_name: 'Philadelphia', program_name: 'Second Chance Workforce Training', status: 'open', last_message_at: onTheHour(-1, 15), last_from: 'asker',
+          waiting_since: onTheHour(-1, 15), preview: 'Our Thursday class moved to the new address' },
+        { conversation_id: 'c0000000-0000-4000-8000-0000000000b3', asker_id: 'a0000000-0000-4000-8000-0000000000b3', first_name: 'Dana', role: 'admin',
+          region_name: 'Philadelphia', program_name: null, status: 'open', last_message_at: onTheHour(-2, 11), last_from: 'team',
+          waiting_since: null, preview: 'You are all set. Thank you for the report.' },
+        { conversation_id: 'c0000000-0000-4000-8000-0000000000b4', asker_id: 'a0000000-0000-4000-8000-0000000000b4', first_name: null, role: 'member',
+          region_name: 'Camden', program_name: null, status: 'open', last_message_at: null, last_from: null, waiting_since: null, preview: null },
+        { conversation_id: 'c0000000-0000-4000-8000-0000000000b5', asker_id: 'a0000000-0000-4000-8000-0000000000b5', first_name: 'Rosa', role: 'member',
+          region_name: 'Philadelphia', program_name: null, status: 'closed', last_message_at: onTheHour(-6, 10), last_from: 'team',
+          waiting_since: null, preview: 'Glad that worked out.' },
+      ],
+    })),
+    on('/rpc/pam_set_thread_status', () => ({ body: null })),
+    on('/rpc/pam_start_conversation', () => startAnswer(options.pamStartFails) ?? { body: 'c0000000-0000-4000-8000-0000000000b9' }),
+    on('/rpc/pam_program_has_lead', () => ({ body: true })),
+    on('/rpc/pam_start_program_conversation', () => startAnswer(options.pamStartFails) ?? { body: 2 }),
+    on('/rpc/pam_set_hours', () => ({ body: null })),
     on('/rpc/review_program_submission', (_url, _method, body) => {
       const args = (body ?? {}) as { p_id: string };
       programsToCheck = programsToCheck.filter((row) => row.id !== args.p_id);
@@ -703,6 +778,9 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/served_cities', () => ({ body: [{ city: 'Philadelphia' }] })),
     on('/rest/v1/conversation_members', (url, method) => {
       if (method === 'PATCH') return { body: [] };
+      if (options.pamThread && url.includes(`conversation_id=eq.${PAM_CONVO_ID}`)) {
+        return { body: [{ profile_id: ME_ID, conversations: { kind: 'support' } }] };
+      }
       if (url.includes('conversation_id=eq.')) {
         return {
           body: [
@@ -729,7 +807,11 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/message_program', () => ({ body: CONVO_ID })),
     // Counting a screen open (a76): a story never writes, and does not count either.
     on('/rpc/count_screen_open', () => ({ body: null })),
-    on('/rpc/conversation_partners', () => ({ body: [partnerFor(role)] })),
+    on('/rpc/conversation_partners', () => ({
+      body: options.pamThread
+        ? [{ conversation_id: PAM_CONVO_ID, profile_id: null, first_name: null, role: null, program_name: null }]
+        : [partnerFor(role)],
+    })),
     on('/rpc/conversation_block_state', () => ({
       body: [{ i_blocked: options.blocked === 'mine', blocked_me: options.blocked === 'theirs' }],
     })),
@@ -737,6 +819,10 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/block_in_conversation', () => ({ body: null })),
     on('/rpc/unblock_in_conversation', () => ({ body: null })),
     on('/rest/v1/messages', (_url, method) => {
+      if (options.pamThread) {
+        if (method === 'POST') return options.pamThread === 'notSent' ? { status: 500, body: {} } : { body: { id: 'new', sender_id: ME_ID, body: 'Sent from Storybook', created_at: new Date().toISOString() } };
+        return { body: pamThreadMessages(options.pamThread) };
+      }
       if (method !== 'POST') return { body: threadFor(role) };
       // What `messages_insert_sender` answers a limited account (0031).
       if (options.limited) {
@@ -747,7 +833,7 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
       }
       return { body: { id: 'new', sender_id: ME_ID, body: 'Sent from Storybook', created_at: new Date().toISOString() } };
     }),
-    on('/rest/v1/app_settings', (url) => ({ body: { value: url.includes('texts_live') ? 'on' : '+12673095265' } })),
+    on('/rest/v1/app_settings', (url) => ({ body: { value: url.includes('texts_live') ? 'on' : '+12155550191' } })),
     on('/rest/v1/regions', () => ({ body: [{ id: REGION_ID, name: 'Philadelphia' }] })),
     on('/rest/v1/staff_requests', () => ({ body: STAFF_REQUESTS })),
     // Invite links (0071, D-258): PAM-OLD1 is the example expired link; any

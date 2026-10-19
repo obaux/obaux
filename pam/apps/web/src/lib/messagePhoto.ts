@@ -17,6 +17,8 @@
  * from the phone's memory. Never as a link: a signed link works for anyone
  * holding it until it runs out, and a photo here is nobody else's to open.
  */
+import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from './project';
+
 const LONG_EDGE = 1600;
 const BUCKET = 'message-photos';
 
@@ -68,15 +70,48 @@ export async function shrinkPhoto(file: Blob): Promise<Blob | null> {
   }
 }
 
-/** Stores a shrunk photo in the conversation's folder; its path, or null. */
-export async function uploadMessagePhoto(conversationId: string, photo: Blob): Promise<string | null> {
+/**
+ * Stores a shrunk photo in the conversation's folder; its path, or null. `onProgress` hears how much has gone (0 to 1) while it
+ * does, so a slow connection shows a bar rather than a message that seems stuck (D-609). With it, the same request the storage
+ * client makes is made over `XMLHttpRequest` instead, the only way a browser reports an upload's progress; the person's own
+ * sign-in goes with it, so the database decides exactly as before (0079).
+ */
+export async function uploadMessagePhoto(
+  conversationId: string,
+  photo: Blob,
+  onProgress?: (fraction: number) => void,
+): Promise<string | null> {
   try {
     const { createClient } = await import('./supabase');
+    const supabase = createClient();
     const path = `${conversationId}/${crypto.randomUUID()}.jpg`;
-    const { error } = await createClient()
-      .storage.from(BUCKET)
-      .upload(path, photo, { contentType: 'image/jpeg', upsert: false });
-    return error ? null : path;
+    if (!onProgress || typeof XMLHttpRequest === 'undefined') {
+      const { error } = await supabase.storage.from(BUCKET).upload(path, photo, { contentType: 'image/jpeg', upsert: false });
+      return error ? null : path;
+    }
+    const { data: auth } = await supabase.auth.getSession();
+    const token = auth.session?.access_token;
+    if (!token) return null;
+    const form = new FormData();
+    form.append('cacheControl', '3600');
+    form.append('', new File([photo], 'photo.jpg', { type: 'image/jpeg' }));
+    return await new Promise<string | null>((resolve) => {
+      const request = new XMLHttpRequest();
+      request.open('POST', `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`);
+      request.setRequestHeader('apikey', SUPABASE_PUBLISHABLE_KEY);
+      request.setRequestHeader('Authorization', `Bearer ${token}`);
+      request.setRequestHeader('x-upsert', 'false');
+      // A photo that has not finished in a minute is "Not sent" with Try again, not "Sending…" for ever (Iris P2).
+      request.timeout = 60_000;
+      request.upload.onprogress = (event) => {
+        if (event.lengthComputable && event.total > 0) onProgress(Math.min(1, event.loaded / event.total));
+      };
+      request.onload = () => resolve(request.status >= 200 && request.status < 300 ? path : null);
+      request.onerror = () => resolve(null);
+      request.ontimeout = () => resolve(null);
+      request.onabort = () => resolve(null);
+      request.send(form);
+    });
   } catch {
     return null;
   }

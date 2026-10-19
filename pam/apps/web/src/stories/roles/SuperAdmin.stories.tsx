@@ -85,11 +85,70 @@ export const RequestReview: Story = screen('super-admin', 'A request to review',
 export const ProgramsToCheck: Story = screen('super-admin', 'Programs to check', '/programs/review/');
 /** Cities people are waiting for (D-593, card a96): counts only, biggest first. */
 export const WaitingCities: Story = screen('super-admin', 'Cities people are waiting for', '/cities/waiting/', { from: 'home' });
+// Messages to Pam (card a100, Dot's x5): waiting longest first with how long, answered, closed folded at the foot.
+export const MessagesToPam: Story = screen('super-admin', 'Messages to Pam', '/pam/messages/', { from: 'home' });
+export const MessagesToPamClosed: Story = screen('super-admin', 'Messages to Pam — closed conversations', '/pam/messages/', { show: 'closed' });
+export const MessagesToPamEmpty: Story = {
+  ...asRole('super-admin', '/pam/messages/', { from: 'home' }, { pamInboxEmpty: true }),
+  name: 'Messages to Pam — nobody waiting',
+  render: () => <>{REDESIGN_ROUTES['/pam/messages/']!.render()}</>,
+};
+// Pam writes first (card a100, Dot's b5, b6): to a person from Everyone, and to a program's leads from its page.
+export const PamStartPerson: Story = screen('super-admin', 'Pam writes first — to a person', '/pam/start/', {
+  profile: 'a0000000-0000-4000-8000-0000000000c1',
+  name: 'Aaliyah',
+});
+export const PamStartProgram: Story = screen('super-admin', 'Pam writes first — to a program', '/pam/start/', {
+  service: 'dummy-place-learning',
+  name: 'Second Chance Workforce Training',
+});
+/**
+ * Pam writing first, when it does not go (Iris T1, T3, T6): the words stay as "Not sent" with Try again under an error card, or,
+ * refused by name, one calm line in place of the conversation. The story types and sends, so the 320 audit and the pictures see the state.
+ */
+const sendFirst: Story['play'] = async ({ canvas, userEvent }) => {
+  const box = await canvas.findByRole('textbox');
+  await userEvent.click(box);
+  await userEvent.keyboard('Hi, your city is fixed.');
+  // Send in the story's language: the button's name is the word for Send.
+  const send = new RegExp(`^(${[en, es, ptBR, zhCN, zhHK, ru, ar].map((b) => (b as Record<string, string>)['messages.thread.send']).join('|')})$`);
+  await userEvent.click(await canvas.findByRole('button', { name: send }));
+};
+const startFails = (
+  name: string,
+  query: Record<string, string>,
+  pamStartFails: 'error' | 'NOT_ALLOWED' | 'PAM_OFF',
+): Story => ({
+  ...asRole('super-admin', '/pam/start/', query, { pamStartFails }),
+  name,
+  render: () => <>{REDESIGN_ROUTES['/pam/start/']!.render()}</>,
+  play: sendFirst,
+});
+const PERSON = { profile: 'a0000000-0000-4000-8000-0000000000c1', name: 'Aaliyah' };
+const PROGRAM = { service: 'dummy-place-learning', name: 'Second Chance Workforce Training' };
+export const PamStartPersonFailed: Story = startFails('Pam writes first — to a person, not sent', PERSON, 'error');
+export const PamStartPersonNotAllowed: Story = startFails('Pam writes first — to the Pam team, refused', PERSON, 'NOT_ALLOWED');
+export const PamStartPersonOff: Story = startFails('Pam writes first — Message Pam is off', PERSON, 'PAM_OFF');
+export const PamStartProgramFailed: Story = startFails('Pam writes first — to a program, not sent', PROGRAM, 'error');
+// When Pam is here: the days and times, and the out-of-hours reply as people will get it.
+/** The team's ⋯ in a person's Pam conversation: Close (or Reopen) and what was shared; no Report, no Block (D-605). */
+export const PamThreadOptions: Story = screen('super-admin', "A Pam conversation's options", '/pam/thread/options/', {
+  id: 'c0000000-0000-4000-8000-0000000000b1',
+});
+export const PamHours: Story = screen('super-admin', "Pam's hours", '/pam/hours/');
 /** ...and nobody waiting yet: the empty state's two lines, for the fit audit (Lena). */
 export const WaitingCitiesEmpty: Story = {
   ...asRole('super-admin', '/cities/waiting/', { from: 'home' }, { noWaitingCities: true }),
   name: 'Cities people are waiting for — nobody yet',
   render: () => <>{REDESIGN_ROUTES['/cities/waiting/']!.render()}</>,
+};
+/** Problems (D-616): what broke in the app this week, newest first; no person, no free text. */
+export const Problems: Story = screen('super-admin', 'Problems', '/problems/', { from: 'notifications' });
+/** ...and nothing broke: one line. */
+export const ProblemsEmpty: Story = {
+  ...asRole('super-admin', '/problems/', {}, { noProblems: true }),
+  name: 'Problems — nothing this week',
+  render: () => <>{REDESIGN_ROUTES['/problems/']!.render()}</>,
 };
 export const ProgramToCheckNew: Story = screen('super-admin', 'A new program to check (waiting four days)', '/programs/review/item/', { id: 'check-1' });
 export const ProgramToCheckChange: Story = screen('super-admin', 'A change to a live program', '/programs/review/item/', { id: 'check-2' });

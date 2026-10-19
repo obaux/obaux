@@ -111,23 +111,32 @@ function problems(m: Measured): string[] {
   return found;
 }
 
-/** The rows that cannot be got to: each is scrolled into view inside the list, then must be inside the list and the screen. */
-async function unreachable(page: Page, listRole: 'menu' | 'listbox', rowRole: 'menuitemradio' | 'option'): Promise<string[]> {
+/**
+ * The rows that cannot be got to: each is scrolled into view, then must be inside the list and the screen. By default whatever scrolls
+ * (the list, the sheet round it, the page) may be scrolled; with `listOnly` just the list is, because a menu whose last row is got to
+ * only by scrolling the page and the menu together has not put it in reach.
+ */
+async function unreachable(page: Page, listRole: 'menu' | 'listbox', rowRole: 'menuitemradio' | 'option', listOnly = false): Promise<string[]> {
   return page.evaluate(
-    ({ listRole, rowRole }) => {
+    ({ listRole, rowRole, listOnly }) => {
       const rows = [...document.querySelectorAll<HTMLElement>(`[role="${rowRole}"]`)].filter((row) => row.getBoundingClientRect().height > 0);
       const list = rows[0]?.closest<HTMLElement>(`[role="${listRole}"]`);
       if (!list) return ['no list'];
       const lost: string[] = [];
       for (const row of rows) {
-        row.scrollIntoView({ block: 'nearest' });
+        if (listOnly) {
+          const before = row.getBoundingClientRect();
+          const box = list.getBoundingClientRect();
+          if (before.bottom > box.bottom) list.scrollTop += before.bottom - box.bottom;
+          else if (before.top < box.top) list.scrollTop -= box.top - before.top;
+        } else row.scrollIntoView({ block: 'nearest' });
         const b = row.getBoundingClientRect();
         const l = list.getBoundingClientRect();
         if (b.top < l.top - 0.5 || b.bottom > l.bottom + 0.5 || b.top < -0.5 || b.bottom > window.innerHeight + 0.5) lost.push((row.textContent ?? '').trim());
       }
       return lost;
     },
-    { listRole, rowRole },
+    { listRole, rowRole, listOnly },
   );
 }
 
@@ -139,6 +148,15 @@ async function placeField(field: Locator, top: number): Promise<void> {
 }
 
 const SIGN_UP = 'Sign up: "Choose a language"';
+
+/** What holds the rows: the sheet (a dialog) or, in a menu, its popover. */
+async function holderOf(page: Page, rowRole: 'menuitemradio' | 'option'): Promise<{ top: number; bottom: number } | null> {
+  return page.evaluate((rowRole) => {
+    const rows = [...document.querySelectorAll<HTMLElement>(`[role="${rowRole}"]`)].filter((row) => row.getBoundingClientRect().height > 0);
+    const box = rows[0]?.closest<HTMLElement>('dialog, [popover]')?.getBoundingClientRect();
+    return box ? { top: box.top, bottom: box.bottom } : null;
+  }, rowRole);
+}
 
 for (const size of SIZES) {
   for (const locale of ['en', 'ar'] as const) {
@@ -204,16 +222,62 @@ test.describe('320×320', () => {
     await page.getByRole('combobox', { name: en['onboarding.language.title'] }).click();
     const m = await measure(page, 'listbox', 'option');
     expect(m.list, 'a list was found').not.toBeNull();
-    // What the list sits in: the sheet (a dialog) or, in a menu, its popover.
-    const holder = await page.evaluate(() => {
-      const rows = [...document.querySelectorAll<HTMLElement>('[role="option"]')].filter((row) => row.getBoundingClientRect().height > 0);
-      const box = rows[0]?.closest<HTMLElement>('dialog, [popover]')?.getBoundingClientRect();
-      return box ? { top: box.top, bottom: box.bottom } : null;
-    });
+    const holder = await holderOf(page, 'option');
     expect(holder, 'the list sits in a sheet or a popover').not.toBeNull();
     expect(holder!.top, 'it starts on the screen').toBeGreaterThanOrEqual(-0.5);
     expect(holder!.bottom, 'it ends on the screen').toBeLessThanOrEqual(m.screen.height + 0.5);
     expect(await unreachable(page, 'listbox', 'option'), 'languages that cannot be scrolled to').toEqual([]);
+  });
+
+  // The list in the sheet has no cap of its own (it had Astryx's 300px, then 288px): the sheet scrolls, and a list that scrolls inside it as well
+  // is two boxes for one list, which had to be scrolled together to reach Arabic (Mira, 18 October: one box is the sheet's).
+  test(`${SIGN_UP} on a screen too short for the whole list scrolls in one box, the sheet's, and every language is reached by it`, async ({ page }) => {
+    await newcomer(page);
+    await page.goto('/join/');
+    await settled(page);
+    await page.getByRole('combobox', { name: en['onboarding.language.title'] }).click();
+    const m = await measure(page, 'listbox', 'option');
+    expect(m.list, 'a list was found').not.toBeNull();
+    const result = await page.evaluate(() => {
+      const rows = [...document.querySelectorAll<HTMLElement>('[role="option"]')].filter((row) => row.getBoundingClientRect().height > 0);
+      const list = rows[0]!.closest<HTMLElement>('[role="listbox"]')!;
+      // Every box round the list that scrolls: the list itself, the sheet's content, anything else.
+      const boxes: HTMLElement[] = [];
+      for (let el: HTMLElement | null = list; el && el !== document.documentElement; el = el.parentElement) {
+        if (/(auto|scroll)/.test(getComputedStyle(el).overflowY) && el.scrollHeight > el.clientHeight + 1) boxes.push(el);
+      }
+      const names = boxes.map((box) => box.getAttribute('role') ?? box.tagName.toLowerCase());
+      const lost: string[] = [];
+      for (const row of rows) {
+        for (const box of boxes) {
+          const edge = box.getBoundingClientRect();
+          const b = row.getBoundingClientRect();
+          if (b.bottom > edge.bottom) box.scrollTop += b.bottom - edge.bottom;
+          else if (b.top < edge.top) box.scrollTop -= edge.top - b.top;
+        }
+        const b = row.getBoundingClientRect();
+        if (b.top < -0.5 || b.bottom > window.innerHeight + 0.5) lost.push((row.textContent ?? '').trim());
+      }
+      return { names, lost, listScrolls: boxes.includes(list) };
+    });
+    expect(result.names, 'the boxes that scroll round the list').toHaveLength(1);
+    expect(result.listScrolls, 'the list itself does not scroll').toBe(false);
+    expect(result.lost, 'languages the sheet cannot be scrolled to').toEqual([]);
+  });
+
+  // The globe's menu opens under the globe, so on this screen it has 248px of room and the cap alone (288px) ran it 40px past the bottom:
+  // Arabic was reached only by scrolling the page and the menu together (Iris, 18 October). The popover keeps to the room it has.
+  test("Sign in: the globe's menu on a screen too short for the whole list stays on the screen, and every language can be scrolled to", async ({ page }) => {
+    await page.goto('/signin/');
+    await settled(page);
+    await page.getByRole('button', { name: en['language.title'] }).first().click();
+    const m = await measure(page, 'menu', 'menuitemradio');
+    expect(m.list, 'a menu was found').not.toBeNull();
+    const holder = await holderOf(page, 'menuitemradio');
+    expect(holder, 'the menu sits in a popover').not.toBeNull();
+    expect(holder!.top, 'it starts on the screen').toBeGreaterThanOrEqual(-0.5);
+    expect(holder!.bottom, 'it ends on the screen').toBeLessThanOrEqual(m.screen.height + 0.5);
+    expect(await unreachable(page, 'menu', 'menuitemradio', true), 'languages that cannot be scrolled to by scrolling the menu alone').toEqual([]);
   });
 });
 

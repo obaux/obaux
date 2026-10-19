@@ -18,6 +18,7 @@ import {
   useChatStreamScroll,
   type ChatComposerInputHandle,
 } from '@astryxdesign/core/Chat';
+import { Button } from '@astryxdesign/core/Button';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { Banner } from '@astryxdesign/core/Banner';
 import { Avatar } from '@astryxdesign/core/Avatar';
@@ -26,6 +27,8 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
+import { Link } from '@astryxdesign/core/Link';
+import { ProgressBar } from '@astryxdesign/core/ProgressBar';
 import { Thumbnail } from '@astryxdesign/core/Thumbnail';
 import { DocumentIcon, Notice, PhotoIcon } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
@@ -141,6 +144,20 @@ export interface ThreadViewMessage {
   readonly fileUrl?: string | null;
   readonly createdAt: string;
   readonly mine: boolean;
+  /**
+   * Where my message is (D-605): `sending` while it goes, `failed` if it did not (it stays here, outlined, with "Not sent" and a
+   * Try again under it), `sent` once stored. Absent is `sent`: a conversation read from the database, and the examples.
+   */
+  readonly status?: 'sent' | 'sending' | 'failed';
+  /** How much of its photo has gone (0 to 1) while it is uploading, or absent. */
+  readonly progress?: number | null;
+  /**
+   * Who wrote it, when that is not the other person of the conversation: the team's view of a Pam conversation says "Pam" (with its mark)
+   * for the welcome and the out-of-hours reply. Used for the avatar and the hidden "{name}, {time}" label.
+   */
+  readonly author?: { readonly name: string; readonly photoUrl?: string | null };
+  /** Which sentence this is, for a message written by no person (`pam.away`), or absent. */
+  readonly systemKey?: string | null;
 }
 
 export interface ThreadViewProps {
@@ -160,13 +177,19 @@ export interface ThreadViewProps {
   /** Sends the words, a photo or a document, or words with one; true once it has gone. */
   readonly onSend: (body: string, attachment: OutgoingAttachment | null) => Promise<boolean>;
   readonly sending: boolean;
-  readonly sendFailed: boolean;
+  /** Sends a message that did not go once more (D-605). Its id is the message's. */
+  readonly onRetry?: (id: string) => void;
   /**
    * A limited account (0031) can read but not send. The composer gives way to
    * the notice that says what is off and who to call (terms.s.limits.p3,
    * D-427); the messages stay where they are.
    */
   readonly limited?: boolean;
+  /**
+   * The last send was refused for sending too many too fast (Pam's limit): the words (and photo) go back in the box, and a calm line
+   * says to wait a little. There is no "Not sent" and no Try again for it, which would only be refused again.
+   */
+  readonly tooFast?: { readonly n: number; readonly body: string; readonly attachment: OutgoingAttachment | null } | null;
   /**
    * Somebody blocked in this conversation (0076, D-463): `mine` when the reader did,
    * `theirs` when the other person did. Reading and reporting stay; the composer
@@ -175,6 +198,29 @@ export interface ThreadViewProps {
   readonly blocked?: 'mine' | 'theirs' | null;
   /** BCP-47 tag for dictation, e.g. "en-US" or "es-US". */
   readonly speechLanguage: string;
+  /**
+   * A person's conversation with Pam (D-605). The composer says "Write to Pam", takes a photo and no document (the microphone
+   * stays), and there is no limit notice: a limited account can write to Pam.
+   */
+  readonly pam?: boolean;
+  /**
+   * What the box takes besides words: 'all' (a photo or a PDF or Word file), 'photo' (a photo only, as on Pam's side of a conversation)
+   * or 'none'. Unset: 'photo' for a Pam conversation, otherwise 'all'. The team writing first as Pam sends words only (`none`):
+   * the functions that start a conversation take a body and nothing else.
+   */
+  readonly attachments?: 'all' | 'photo' | 'none';
+  /** The box's own words (its name for a screen reader and what it says while empty); the team's "Reply as Pam", "Write as Pam". */
+  readonly placeholder?: string;
+  /**
+   * The Pam team's tools for a Pam conversation (saved replies), above the composer; Ava's. Only given to the Pam team.
+   * Called with `setDraft`, which replaces what is in the box and puts the cursor at its end: a saved reply fills the box and is
+   * never sent by itself.
+   */
+  readonly teamTools?: (composer: {
+    readonly setDraft: (text: string) => void;
+    /** Puts words into the box at the cursor (a space first if the letter before it is not one), keeps what was typed, focuses the box, leaves the cursor after them. */
+    readonly insertDraft: (text: string) => void;
+  }) => ReactNode;
 }
 
 /**
@@ -274,6 +320,20 @@ const styles = stylex.create({
   // times without becoming a second scroll box.
   reveal: { width: '100%', overflowX: 'clip', touchAction: 'pan-y' },
   notice: { paddingInline: spacingVars['--spacing-3'] },
+  // A message that did not go stays where it was written, outlined, so nothing is lost (D-605).
+  failedBubble: {
+    borderWidth: '2px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border-red'],
+  },
+  // "Sending…", "Not sent" and "Sent" under a bubble, quiet; the Try again beside "Not sent" is a full 48px target.
+  statusLine: { alignItems: 'center', minHeight: '24px' },
+  progress: { width: '160px', maxWidth: '100%' },
+  // The number in the out-of-hours reply is a call (Iris P1): vertical padding on an inline link lengthens what a thumb can hit, not the line.
+  // Padding on the sides is cancelled by the same margin, so the space round the number stays a word space and the hit area is 48px wide.
+  callLink: { paddingBlock: '14px', paddingInline: '12px', marginInline: '-12px', fontWeight: 600 },
+  statusText: { fontSize: '13px', lineHeight: 1.4 },
+  retry: { minHeight: '48px', minWidth: '48px' },
   // A photo in a bubble (D-394): a 240px square, cropped to fill, that opens
   // full size when tapped. A photo or a document sits in an even 8px rim of
   // the bubble's colour — the same above it as beside it (Will, 9 October,
@@ -561,10 +621,15 @@ export function ThreadView({
   intro = null,
   onSend,
   sending,
-  sendFailed,
+  onRetry,
   limited = false,
+  tooFast = null,
   blocked = null,
   speechLanguage,
+  pam = false,
+  attachments,
+  placeholder: placeholderProp,
+  teamTools,
 }: ThreadViewProps) {
   const { t, tPlain, locale } = useI18n();
   const inputRef = useRef<ChatComposerInputHandle>(null);
@@ -639,6 +704,96 @@ export function ThreadView({
   // Only then: someone editing the middle of a long message by hand is
   // never pulled away from where they are.
   const inputBox = useRef<HTMLDivElement>(null);
+  // Where the cursor was in the box when it last had one: tapping a button outside the box takes the focus (and the selection) away,
+  // so the place is kept from every change of selection inside it.
+  const savedRange = useRef<Range | null>(null);
+  useEffect(() => {
+    const keep = () => {
+      const editable = inputBox.current?.querySelector<HTMLElement>('[contenteditable]');
+      const selection = window.getSelection();
+      if (!editable || !selection || selection.rangeCount === 0) return;
+      const range = selection.getRangeAt(0);
+      if (editable.contains(range.startContainer) && editable.contains(range.endContainer)) savedRange.current = range.cloneRange();
+    };
+    document.addEventListener('selectionchange', keep);
+    return () => document.removeEventListener('selectionchange', keep);
+  }, []);
+  const insertDraft = (text: string) => {
+    const editable = inputBox.current?.querySelector<HTMLElement>('[contenteditable]');
+    if (!editable) {
+      setDraft((now) => (now === '' || /\s$/.test(now) ? now + text : `${now} ${text}`));
+      return;
+    }
+    editable.focus();
+    const selection = window.getSelection();
+    const place = savedRange.current && editable.contains(savedRange.current.startContainer) ? savedRange.current.cloneRange() : null;
+    const range = place ?? (() => {
+      const end = document.createRange();
+      end.selectNodeContents(editable);
+      end.collapse(false);
+      return end;
+    })();
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+    // A space first, unless the box is empty or the letter before the cursor already is one.
+    const before = document.createRange();
+    before.setStart(editable, 0);
+    before.setEnd(range.startContainer, range.startOffset);
+    const behind = before.toString();
+    const lead = behind === '' || /\s$/.test(behind) ? '' : ' ';
+    if (!document.execCommand('insertText', false, lead + text)) {
+      setDraft((now) => (now === '' || /\s$/.test(now) ? now + text : `${now} ${text}`));
+      return;
+    }
+    // The box is drawn again from its words once the change reaches state, and the browser puts its cursor back at the very start
+    // (Ava, T2). So where the cursor stands now, counted in letters, is put back after that, on the next frame and the one after.
+    const after = window.getSelection();
+    if (!after || after.rangeCount === 0) return;
+    const upTo = document.createRange();
+    upTo.setStart(editable, 0);
+    upTo.setEnd(after.getRangeAt(0).endContainer, after.getRangeAt(0).endOffset);
+    const letters = upTo.toString().length;
+    const restore = () => {
+      const box = inputBox.current?.querySelector<HTMLElement>('[contenteditable]');
+      if (!box) return;
+      const walker = document.createTreeWalker(box, NodeFilter.SHOW_TEXT);
+      let left = letters;
+      let node = walker.nextNode();
+      while (node && left > (node.textContent?.length ?? 0)) {
+        left -= node.textContent?.length ?? 0;
+        node = walker.nextNode();
+      }
+      const place = document.createRange();
+      if (node) place.setStart(node, left);
+      else {
+        place.selectNodeContents(box);
+        place.collapse(false);
+      }
+      place.collapse(true);
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(place);
+    };
+    requestAnimationFrame(() => {
+      restore();
+      requestAnimationFrame(restore);
+    });
+  };
+  // Fills the box with words that were not typed (a saved reply), focuses it and leaves the cursor at the end.
+  const fillDraft = (text: string) => {
+    setDraft(text);
+    requestAnimationFrame(() => {
+      const editable = inputBox.current?.querySelector<HTMLElement>('[contenteditable]');
+      if (!editable) return;
+      editable.focus();
+      const range = document.createRange();
+      range.selectNodeContents(editable);
+      range.collapse(false);
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+    });
+  };
   useEffect(() => {
     if (!dictation.isListening) return;
     const editable = inputBox.current?.querySelector<HTMLElement>('[contenteditable]');
@@ -653,6 +808,65 @@ export function ThreadView({
   }, [dictation.isListening]);
 
   const name = otherName ?? t('messages.thread.someone');
+  // 988 in Pam's out-of-hours reply is a call: one tap opens the dialler, as it does on Your safety (Iris P1). Its name says what it is.
+  const callable = (body: string): ReactNode =>
+    body.split(/(988)/).map((part, index) =>
+      part === '988' ? (
+        <Link key={index} href="tel:988" label={tPlain('help.safety.crisis.heading')} xstyle={styles.callLink}>
+          988
+        </Link>
+      ) : (
+        part
+      ),
+    );
+
+  // Under my message: "Sending…" while it goes; "Not sent" and a 48px "Try again" if it did not (D-605); a quiet "Sent" under the last
+  // message only. The same words and the same ways for a text and a photo, in every conversation.
+  const statusOf = (message: ThreadViewMessage, isLast: boolean): ReactNode => {
+    if (!message.mine) return undefined;
+    const status = message.status ?? 'sent';
+    if (status === 'sending') {
+      return (
+        <VStack gap={1} xstyle={styles.statusLine} role="status">
+          <Text type="supporting" xstyle={styles.statusText}>
+            {t('messages.thread.sending')}
+          </Text>
+          {typeof message.progress === 'number' ? (
+            <ProgressBar
+              label={tPlain('messages.thread.sending')}
+              isLabelHidden
+              value={Math.round(message.progress * 100)}
+              xstyle={styles.progress}
+            />
+          ) : null}
+        </VStack>
+      );
+    }
+    if (status === 'failed') {
+      return (
+        <HStack gap={2} xstyle={styles.statusLine} data-message-status="failed">
+          <Text type="supporting" xstyle={styles.statusText}>
+            {t('messages.thread.notSent')}
+          </Text>
+          <Button
+            label={t('messages.thread.tryAgain')}
+            aria-label={tPlain('messages.thread.notSent.label')}
+            variant="secondary"
+            size="md"
+            onClick={() => onRetry?.(message.id)}
+            xstyle={styles.retry}
+          />
+        </HStack>
+      );
+    }
+    return isLast ? (
+      <HStack xstyle={styles.statusLine}>
+        <Text type="supporting" xstyle={styles.statusText}>
+          {t('messages.thread.sent')}
+        </Text>
+      </HStack>
+    ) : undefined;
+  };
   // What is picked to send — a photo (D-394) or a document (D-399), one at a
   // time — shown above where you type until it goes.
   const picker = useRef<HTMLInputElement>(null);
@@ -681,14 +895,33 @@ export function ThreadView({
     });
   };
 
+  // Sent too many, too fast (Pam's limit): what was written goes back in the box, and a calm line says to wait a little.
+  const [rateLine, setRateLine] = useState(false);
+  const seenTooFast = useRef(0);
+  useEffect(() => {
+    if (!tooFast || tooFast.n === seenTooFast.current) return;
+    seenTooFast.current = tooFast.n;
+    setDraft((now) => (now.trim() === '' ? tooFast.body : now));
+    if (tooFast.attachment?.kind === 'photo') {
+      const photo = tooFast.attachment.file;
+      setPicked((prev) => prev ?? { kind: 'photo', file: photo, preview: URL.createObjectURL(photo) });
+    } else if (tooFast.attachment?.kind === 'file') {
+      const file = tooFast.attachment.file;
+      setPicked((prev) => prev ?? { kind: 'file', file });
+    }
+    setRateLine(true);
+  }, [tooFast]);
+
   // Any way a file arrives — a picker, a drop, a paste — comes through here:
   // a JPEG, a PNG or an iPhone photo is a photo, shrunk to a JPEG right away
   // so the person sees what will be sent (and learns now if it cannot be
   // opened); a PDF or a Word file of 10 MB or less is a document; anything
   // else is refused in words (D-399, D-408).
+  const mode = attachments ?? (pam ? 'photo' : 'all');
+  const boxWords = placeholderProp ?? (pam ? t('messages.pam.placeholder') : t('messages.thread.placeholder'));
   const take = async (files: readonly File[]) => {
     const file = files[0];
-    if (!file) return;
+    if (!file || mode === 'none') return;
     setAttachProblem(null);
     const photo = photoType(file);
     if (photo) {
@@ -701,7 +934,8 @@ export function ThreadView({
       setPicked({ kind: 'photo', file: shrunk, preview: URL.createObjectURL(shrunk) });
       return;
     }
-    if (!messageFileType(file)) {
+    // Pam takes a photo (screenshots) and no document (D-605).
+    if (mode !== 'all' || !messageFileType(file)) {
       refuse('wrongType');
       return;
     }
@@ -715,15 +949,18 @@ export function ThreadView({
 
   const submit = async (value: string) => {
     if (sending || (value.trim() === '' && !picked)) return;
-    const ok = await onSend(
-      value,
-      picked ? (picked.kind === 'photo' ? { kind: 'photo', file: picked.file, isReady: true } : { kind: 'file', file: picked.file }) : null,
-    );
-    if (ok) {
-      setDraft('');
-      clearPicked();
-      setAttachProblem(null);
-    }
+    const attachment: OutgoingAttachment | null = picked
+      ? picked.kind === 'photo'
+        ? { kind: 'photo', file: picked.file, isReady: true }
+        : { kind: 'file', file: picked.file }
+      : null;
+    // The message is in the conversation the moment it is sent, "Sending…"; if it does not go it stays there as "Not sent" with
+    // its words and its picture, and Try again sends it (D-605). So the box is empty at once and nothing is lost.
+    setDraft('');
+    clearPicked();
+    setAttachProblem(null);
+    setRateLine(false);
+    await onSend(value, attachment);
   };
 
   // A drop anywhere on the conversation (D-399): files are taken as above; a
@@ -769,7 +1006,7 @@ export function ThreadView({
       value={draft}
       onChange={setDraft}
       onSubmit={(value) => void submit(value)}
-      placeholder={t('messages.thread.placeholder')}
+      placeholder={boxWords}
       isDisabled={sending}
       elevation="none"
       xstyle={[styles.composer, dropping && styles.dropping]}
@@ -848,7 +1085,7 @@ export function ThreadView({
               <Banner
                 status="warning"
                 title={t(`messages.thread.attach.${attachProblem}.title`)}
-                description={t(`messages.thread.attach.${attachProblem}.hint`)}
+                description={t(pam && attachProblem === 'wrongType' ? 'messages.thread.attach.wrongType.pam.hint' : `messages.thread.attach.${attachProblem}.hint`)}
                 endContent={
                   <IconButton
                     label={t('messages.thread.attach.close')}
@@ -873,8 +1110,8 @@ export function ThreadView({
         <ChatComposerInput
           ref={inputBox}
           handleRef={inputRef}
-          label={t('messages.thread.placeholder')}
-          placeholder={t('messages.thread.placeholder')}
+          label={boxWords}
+          placeholder={boxWords}
           hasHistory={false}
           maxRows={8}
           onFiles={(files) => void take(files)}
@@ -900,6 +1137,8 @@ export function ThreadView({
             label={dictation.isListening ? t('messages.thread.dictateStop') : t('messages.thread.dictate')}
             xstyle={[styles.square, styles.tuck]}
           />
+          {mode === 'none' ? null : (
+          <>
           <IconButton
             label={t('messages.thread.photo.add')}
             icon={<Icon icon={PhotoIcon} size="md" color="secondary" />}
@@ -922,28 +1161,34 @@ export function ThreadView({
             }}
             {...stylex.props(styles.fileInput)}
           />
-          <IconButton
-            label={t('messages.thread.file.add')}
-            icon={<Icon icon={DocumentIcon} size="md" color="secondary" />}
-            variant="ghost"
-            size="md"
-            isDisabled={sending}
-            onClick={() => docPicker.current?.click()}
-            xstyle={styles.square}
-          />
-          <input
-            ref={docPicker}
-            type="file"
-            accept={MESSAGE_FILE_ACCEPT}
-            tabIndex={-1}
-            aria-hidden
-            onChange={(event) => {
-              const files = [...(event.target.files ?? [])];
-              event.target.value = '';
-              void take(files);
-            }}
-            {...stylex.props(styles.fileInput)}
-          />
+          </>
+          )}
+          {mode !== 'all' ? null : (
+            <>
+              <IconButton
+                label={t('messages.thread.file.add')}
+                icon={<Icon icon={DocumentIcon} size="md" color="secondary" />}
+                variant="ghost"
+                size="md"
+                isDisabled={sending}
+                onClick={() => docPicker.current?.click()}
+                xstyle={styles.square}
+              />
+              <input
+                ref={docPicker}
+                type="file"
+                accept={MESSAGE_FILE_ACCEPT}
+                tabIndex={-1}
+                aria-hidden
+                onChange={(event) => {
+                  const files = [...(event.target.files ?? [])];
+                  event.target.value = '';
+                  void take(files);
+                }}
+                {...stylex.props(styles.fileInput)}
+              />
+            </>
+          )}
         </>
       }
       sendButton={
@@ -962,7 +1207,32 @@ export function ThreadView({
   return (
     <>
     <ChatLayout
-      composer={composer}
+      composer={
+        teamTools || rateLine ? (
+          <VStack>
+            {teamTools ? teamTools({ setDraft: fillDraft, insertDraft }) : null}
+            {rateLine ? (
+              <Banner
+                status="info"
+                title={t('messages.thread.rateLimited')}
+                endContent={
+                  <IconButton
+                    label={t('messages.thread.attach.close')}
+                    icon={<Icon icon="close" size="md" />}
+                    variant="ghost"
+                    size="md"
+                    onClick={() => setRateLine(false)}
+                    xstyle={styles.square}
+                  />
+                }
+              />
+            ) : null}
+            {composer}
+          </VStack>
+        ) : (
+          composer
+        )
+      }
       density="compact"
       scrollButton={<ScrollToBottom />}
       xstyle={styles.layout}
@@ -995,7 +1265,9 @@ export function ThreadView({
               translation && message.body ? (
                 <TranslatedBody original={message.body} translation={translation} {...(extra ? { captionStyle: extra } : {})} />
               ) : (
-                <Text dir="auto" xstyle={[styles.body, extra]}>{message.body ?? ''}</Text>
+                <Text dir="auto" xstyle={[styles.body, extra]}>
+                  {message.systemKey === 'pam.away' && message.body ? callable(message.body) : (message.body ?? '')}
+                </Text>
               );
             // A divider opens each day (D-389).
             const isNewDay = i === 0 || dayKey(message.createdAt) !== dayKey(messages[i - 1]!.createdAt);
@@ -1015,12 +1287,16 @@ export function ThreadView({
                   // screen reader hears "You, 2:14 PM" before the words.
                   name={
                     <VisuallyHidden>
-                      {tPlain('messages.thread.from', { name: message.mine ? tPlain('messages.thread.you') : name, time })}
+                      {tPlain('messages.thread.from', { name: message.mine ? tPlain('messages.thread.you') : (message.author?.name ?? name), time })}
                     </VisuallyHidden>
                   }
                   avatar={
                     message.mine ? undefined : (
-                      <Avatar size="md" name={name} {...(otherPhotoUrl ? { src: otherPhotoUrl } : {})} />
+                      <Avatar
+                        size="md"
+                        name={message.author?.name ?? name}
+                        {...(message.author ? (message.author.photoUrl ? { src: message.author.photoUrl } : {}) : otherPhotoUrl ? { src: otherPhotoUrl } : {})}
+                      />
                     )
                   }
                 >
@@ -1029,7 +1305,9 @@ export function ThreadView({
                       styles.bubble,
                       message.mine && styles.mine,
                       (message.photoUrl != null || message.file != null) && styles.rim,
+                      message.status === 'failed' && styles.failedBubble,
                     ]}
+                    metadata={statusOf(message, i === messages.length - 1)}
                   >
                     {message.photoUrl ? (
                       <VStack gap={3}>
@@ -1072,16 +1350,6 @@ export function ThreadView({
         </ChatMessageList>
       </RevealTimes>
 
-      {sendFailed && !limited && !blocked ? (
-        <VStack xstyle={styles.notice}>
-          <Notice
-            notice="something_went_wrong"
-            title={t('messages.thread.failed.title')}
-            body={t('messages.thread.failed.body')}
-            contactLabel={t('help.contact.action')}
-          />
-        </VStack>
-      ) : null}
     </VStack>
     </ChatLayout>
     <PhotoViewer media={viewing} onClose={() => setViewing(null)} />

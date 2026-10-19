@@ -74,12 +74,14 @@ test.describe('reporting a place', () => {
     await expect(page.getByRole('textbox', { name: /you can skip this/ })).toBeVisible();
   });
 
-  test('says nobody at the place is told who reported it', async ({ page }) => {
-    // The person doing this usually has the least power in the situation. It is
-    // stated rather than left to be assumed.
+  test('asks the question and does not explain: "nobody at the place is told" is on the Privacy page (D-608)', async ({ page }) => {
+    // The person doing this usually has the least power in the situation; what happens to who they are is said in Privacy
+    // (what-we-keep.p15), not above the reasons.
     await signedIn(page);
     await page.goto(`/flag/?place=${PLACE}`);
-    await expect(page.getByText(/Nobody at the place is told who said so/)).toBeVisible();
+    await expect(page.getByRole('radio', { name: 'It moved somewhere else' })).toBeVisible();
+    await expect(page.getByText(/Nobody at the place is told who said so/)).toHaveCount(0);
+    await expect(page.getByText(/Tell us what is wrong and we will check it/)).toHaveCount(0);
   });
 
   test('sends the reason the member picked, and says what happens next', async ({ page }) => {
@@ -90,6 +92,8 @@ test.describe('reporting a place', () => {
     await page.getByRole('button', { name: 'Send this to Pam' }).click();
 
     await expect(page.getByRole('heading', { name: 'Thank you. We will check it.' })).toBeVisible();
+    // The thank-you is the whole message (D-608).
+    await expect(page.getByText('Somebody at Pam looks at every one of these.')).toHaveCount(0);
     await expect.poll(() => sent[0]?.p_reason).toBe('moved');
     // An empty note is null, not "" — the database stores nothing rather than
     // an empty string somebody has to interpret later.
@@ -157,4 +161,31 @@ test.describe('reporting a place', () => {
     }
     expect(results.violations).toEqual([]);
   });
+});
+
+test('a radio sits level with the first line of its label, whether the label wraps or not (Mira, 18 October)', async ({ page }) => {
+  await signedIn(page);
+  await page.goto(`/flag/?place=${PLACE}`);
+  await settled(page);
+  const radios = page.getByRole('radio');
+  const count = await radios.count();
+  expect(count).toBe(4);
+  let wrapped = 0;
+  for (let i = 0; i < count; i++) {
+    const m = await radios.nth(i).evaluate((input) => {
+      const row = input.closest('.astryx-item') as HTMLElement;
+      const circle = (input.parentElement as HTMLElement).getBoundingClientRect();
+      const label = row.querySelector('span[id]') as HTMLElement;
+      const box = label.getBoundingClientRect();
+      const line = parseFloat(getComputedStyle(label).lineHeight);
+      // The first line's own box (an inline span is shorter than its line), whose middle is the middle of that line.
+      const lines = Math.round((box.height - 17) / line) + 1;
+      const firstLine = box.height - (lines - 1) * line;
+      return { circleY: circle.y + circle.height / 2, firstLineY: box.y + firstLine / 2, lines };
+    });
+    if (m.lines > 1) wrapped++;
+    expect(Math.abs(m.circleY - m.firstLineY)).toBeLessThanOrEqual(1);
+  }
+  // The long fourth reason wraps at every width the specs run at, so the case is really exercised.
+  expect(wrapped).toBeGreaterThan(0);
 });
