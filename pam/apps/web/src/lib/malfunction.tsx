@@ -1,12 +1,15 @@
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
-import { CompactNotice } from '@pam/ui';
 import { useI18n } from './i18n';
 import type { AppErrorAction } from '@pam/config';
 import { codeFromError, reportAppError } from './reportAppError';
+import { navigate } from './navigate';
+import { safeNext } from './signinNext';
+import { failureKindOf, type FailureKind } from './malfunctionKind';
+import type { MalfunctionBannerProps } from './MalfunctionBanner';
 
 /**
  * When Pam fails (D-616, Will, 18 October: "Let's use the smaller alert banner. Overlaid below at bottom of page. Let's
@@ -59,17 +62,35 @@ export function settleWithin<T>(save: Promise<T>, ms = SAVE_TIMEOUT_MS): Promise
   });
 }
 
+export interface MalfunctionOptions {
+  /** Runs the same action again. With it the banner offers "Try again"; without it, no button (callers from before D-618 are unchanged). */
+  readonly retry?: () => void;
+}
+
 interface MalfunctionApi {
   /**
    * Draws the alert and logs the failure. `source` is the control that failed: it is scrolled clear of the alert.
    * `action` is a key on the closed list in `@pam/config` (`APP_ERROR_ACTIONS`), never built from what a person typed.
+   * What the banner offers depends on what failed (D-618): "Try again" when `options.retry` is given, "Sign in" when the person is
+   * signed out, and "Get help" when the same action fails a second time in a row (nothing says "contact Pam").
    */
-  readonly show: (action: AppErrorAction, error: unknown, source?: Element | null) => void;
-  /** A successful retry: the alert goes. */
+  readonly show: (action: AppErrorAction, error: unknown, source?: Element | null, options?: MalfunctionOptions) => void;
+  /** A successful retry: the alert goes, and the action is no longer counted as having failed. */
   readonly clear: () => void;
 }
 
 const MalfunctionContext = createContext<MalfunctionApi | null>(null);
+
+/**
+ * The words for each kind of failure. Every kind says the same one line until Sage's per-kind title and line land (D-618); each is
+ * then a key here and nothing else changes.
+ */
+const WORDS: Record<FailureKind, { readonly title: string; readonly body?: string }> = {
+  offline: { title: 'notice.malfunction' },
+  signedOut: { title: 'notice.malfunction' },
+  server: { title: 'notice.malfunction' },
+  other: { title: 'notice.malfunction' },
+};
 
 const styles = stylex.create({
   // Over the page, under nothing that matters: above sticky headers and the tab bar, taking no taps itself.
@@ -84,14 +105,6 @@ const styles = stylex.create({
   },
   // How far up it sits: measured (see `useBottomInset`), so a dynamic style, not an inline one.
   raisedBy: (inset: number) => ({ bottom: `calc(${inset}px + 12px + env(safe-area-inset-bottom, 0px))` }),
-  // It floats over whatever is under it, so it has a surface of its own (CompactNotice has none: inline it is on the page's).
-  inner: {
-    width: '100%',
-    maxWidth: '560px',
-    borderRadius: '8px',
-    backgroundColor: 'var(--color-background-popover)',
-    boxShadow: '0 4px 16px oklch(0 0 0 / 25%)',
-  },
 });
 
 /** How far up the alert sits: above the tab bar when there is one, and above the keyboard when it is up. */
@@ -125,51 +138,109 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
   const pathname = usePathname();
   // `seq` makes each failure its own alert, so a screen reader says it once for each one (and two in a row are one alert, replaced).
   const [seq, setSeq] = useState(0);
-  const [shown, setShown] = useState(false);
+  const [shown, setShown] = useState<{ readonly kind: FailureKind; readonly retry: (() => void) | undefined; readonly again: boolean } | null>(null);
+  const [Banner, setBanner] = useState<ComponentType<MalfunctionBannerProps> | null>(null);
   const source = useRef<Element | null>(null);
   const hostRef = useRef<HTMLDivElement | null>(null);
+  // The action that last failed and has not since succeeded, left, or been cleared: its next failure is the second.
+  const lastFailed = useRef<string | null>(null);
 
-  const show = useCallback<MalfunctionApi['show']>((action, error, from) => {
-    reportAppError({ action, code: codeFromError(error) });
+  const show = useCallback<MalfunctionApi['show']>((action, error, from, options) => {
+    const code = codeFromError(error);
+    reportAppError({ action, code });
     source.current = from ?? null;
+    const again = lastFailed.current === action;
+    lastFailed.current = action;
     setSeq((n) => n + 1);
-    setShown(true);
+    setShown({ kind: failureKindOf(code), retry: options?.retry, again });
+    // The banner's own weight is not in the root bundle: it loads the first time a failure is shown.
+    setBanner((current: ComponentType<MalfunctionBannerProps> | null) => {
+      if (!current) void import('./MalfunctionBanner').then((mod) => setBanner(() => mod.MalfunctionBanner));
+      return current;
+    });
   }, []);
-  const clear = useCallback(() => setShown(false), []);
+  const clear = useCallback(() => {
+    lastFailed.current = null;
+    setShown(null);
+  }, []);
 
-  // Gone with the next tap or key, a successful retry, or leaving the screen: never on a timer.
+  // Gone with the next tap or key, a successful retry, or leaving the screen: never on a timer. A tap inside the banner is its own
+  // (its buttons do their work), and Tab only moves toward them.
+  const open = shown !== null;
   useEffect(() => {
-    if (!shown) return;
-    const dismiss = () => setShown(false);
-    document.addEventListener('pointerdown', dismiss, true);
-    document.addEventListener('keydown', dismiss, true);
-    return () => {
-      document.removeEventListener('pointerdown', dismiss, true);
-      document.removeEventListener('keydown', dismiss, true);
+    if (!open) return;
+    const inside = (target: EventTarget | null) => target instanceof Node && !!hostRef.current?.contains(target);
+    const onPointer = (event: Event) => {
+      if (!inside(event.target)) setShown(null);
     };
-  }, [shown, seq]);
-  useEffect(() => setShown(false), [pathname]);
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Tab' || event.key === 'Shift' || inside(event.target)) return;
+      setShown(null);
+    };
+    document.addEventListener('pointerdown', onPointer, true);
+    document.addEventListener('keydown', onKey, true);
+    return () => {
+      document.removeEventListener('pointerdown', onPointer, true);
+      document.removeEventListener('keydown', onKey, true);
+    };
+  }, [open, seq]);
+  useEffect(() => {
+    lastFailed.current = null;
+    setShown(null);
+  }, [pathname]);
 
-  const inset = useBottomInset(shown);
+  const inset = useBottomInset(open);
 
   // The control that failed is never under the alert: scroll it clear.
   useEffect(() => {
-    if (!shown || !source.current || !hostRef.current) return;
+    if (!open || !Banner || !source.current || !hostRef.current) return;
     const alertTop = hostRef.current.getBoundingClientRect().top;
     const control = source.current.getBoundingClientRect();
     if (control.bottom > alertTop - 8) window.scrollBy({ top: control.bottom - alertTop + 16, behavior: 'auto' });
-  }, [shown, seq, inset]);
+  }, [open, Banner, seq, inset]);
 
   const api = useMemo(() => ({ show, clear }), [show, clear]);
+
+  const actions = useMemo(() => {
+    if (!shown) return [];
+    const list: { label: string; onPress: () => void }[] = [];
+    if (shown.kind === 'signedOut') {
+      list.push({
+        label: t('signin.title'),
+        onPress: () => {
+          setShown(null);
+          // Back to this screen afterwards where Sign in can take the person back to it (its short list of screens); Home otherwise.
+          const next = safeNext(window.location.pathname);
+          navigate(next ? `/signin/?next=${next}` : '/signin/');
+        },
+      });
+    }
+    if (shown.retry) {
+      const retry = shown.retry;
+      list.push({
+        label: t('messages.thread.tryAgain'),
+        onPress: () => {
+          setShown(null);
+          retry();
+        },
+      });
+    }
+    if (shown.again) list.push({ label: t('help.title'), onPress: () => { setShown(null); navigate('/help/'); } });
+    return list;
+  }, [shown, t]);
 
   return (
     <MalfunctionContext.Provider value={api}>
       {children}
-      {shown ? (
+      {shown && Banner ? (
         <div ref={hostRef} {...stylex.props(styles.host, styles.raisedBy(inset))}>
-          <div key={seq} {...stylex.props(styles.inner)}>
-            <CompactNotice status="error" text={t('notice.malfunction')} />
-          </div>
+          <Banner
+            key={seq}
+            title={t(WORDS[shown.kind].title)}
+            body={WORDS[shown.kind].body ? t(WORDS[shown.kind].body as string) : undefined}
+            actions={actions}
+            onClose={() => setShown(null)}
+          />
         </div>
       ) : null}
     </MalfunctionContext.Provider>
