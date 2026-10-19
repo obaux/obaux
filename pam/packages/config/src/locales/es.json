@@ -338,8 +338,6 @@
   "messages.report.cancel": "Olvídelo",
   "messages.report.done.title": "Gracias. Pam lo va a revisar.",
   "messages.report.done.body": "Pam y tu guía ahora pueden ver este mensaje, y su foto o documento si tiene uno. Nada más del chat.",
-  "messages.report.failed.title": "Eso no se envió",
-  "messages.report.failed.body": "Se perdió la conexión, o este mensaje ya fue reportado. Intenta de nuevo, o contacta a Pam.",
   "messages.start.member.title": "Escríbele a tu gestor de casos o a tu programa",
   "messages.thread.from": "{name}, {time}",
   "messages.thread.lead": "Líder de programa",
