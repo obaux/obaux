@@ -11,6 +11,8 @@ import { navigate } from './navigate';
 import { safeNext } from './signinNext';
 import type { FailureKind } from '@pam/config';
 import type { MalfunctionBannerProps } from './MalfunctionBanner';
+import type { BottomStack as BottomStackType, StackNotice } from './BottomStack';
+import { NoticeSinkContext, type NoticeSink, type NoticeToastSpec } from '@pam/ui';
 
 /**
  * When Pam fails (D-616, Will, 18 October: "Let's use the smaller alert banner. Overlaid below at bottom of page. Let's
@@ -174,7 +176,10 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
   // `seq` makes each failure its own alert, so a screen reader says it once for each one (and two in a row are one alert, replaced).
   const [seq, setSeq] = useState(0);
   const [shown, setShown] = useState<{ readonly kind: FailureKind; readonly retry: (() => void) | undefined; readonly refresh: (() => void) | undefined; readonly again: boolean } | null>(null);
-  const [Banner, setBanner] = useState<ComponentType<MalfunctionBannerProps> | null>(null);
+  const [Stack, setStack] = useState<typeof BottomStackType | null>(null);
+  // The status `Notice`s on screen, as toasts (D-619), and the ones a person closed.
+  const [notices, setNotices] = useState<readonly StackNotice[]>([]);
+  const [closed, setClosed] = useState<ReadonlySet<string>>(new Set());
   // The banner could not be fetched (a failure shown while the phone is offline): a plain line of words stands in for it.
   const [bannerLost, setBannerLost] = useState(false);
   const source = useRef<Element | null>(null);
@@ -183,17 +188,17 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
   const lastFailed = useRef<string | null>(null);
 
   const loadBanner = useCallback(() => {
-    setBanner((current: ComponentType<MalfunctionBannerProps> | null) => {
+    setStack((current: typeof BottomStackType | null) => {
       if (!current) {
-        import('./MalfunctionBanner').then(
-          (mod) => setBanner(() => mod.MalfunctionBanner),
+        import('./BottomStack').then(
+          (mod) => setStack(() => mod.BottomStack),
           () => setBannerLost(true),
         );
       }
       return current;
     });
   }, []);
-  // Fetched when the page is idle, not when it fails: a failure is most often the network, and a banner that has to be fetched then would not come.
+  // Fetched when the page is idle, not when it fails: a failure is most often the network, and the stack that has to be fetched then would not come.
   useEffect(() => {
     const idle = (window as { requestIdleCallback?: (fn: () => void) => number }).requestIdleCallback;
     const id = idle ? idle(loadBanner) : window.setTimeout(loadBanner, 1_500);
@@ -243,17 +248,37 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
     setShown(null);
   }, [pathname]);
 
-  const inset = useBottomInset(open);
+  // The stack is open for a failure (the banner) and for any status `Notice` on screen that has not been closed.
+  const visibleNotices = useMemo(() => notices.filter((n) => !closed.has(n.id)), [notices, closed]);
+  const stackOpen = open || visibleNotices.length > 0;
+  const inset = useBottomInset(stackOpen);
 
   // The control that failed is never under the alert: scroll it clear.
   useEffect(() => {
-    if (!open || !Banner || !source.current || !hostRef.current) return;
+    if (!open || !Stack || !source.current || !hostRef.current) return;
     const alertTop = hostRef.current.getBoundingClientRect().top;
     const control = source.current.getBoundingClientRect();
     if (control.bottom > alertTop - 8) window.scrollBy({ top: control.bottom - alertTop + 16, behavior: 'auto' });
-  }, [open, Banner, seq, inset]);
+  }, [open, Stack, seq, inset]);
 
   const api = useMemo(() => ({ show, clear }), [show, clear]);
+
+  // What a status `Notice` hands over (packages/ui `NoticeSink`). Not ready until the stack has loaded, so until then, and if it never
+  // does, the `Notice` draws its card and nothing is ever unsaid.
+  const register = useCallback((id: string, spec: NoticeToastSpec) => {
+    setNotices((previous) => [...previous.filter((n) => n.id !== id), { id, spec }]);
+  }, []);
+  const unregister = useCallback((id: string) => {
+    setNotices((previous) => previous.filter((n) => n.id !== id));
+    setClosed((previous) => {
+      if (!previous.has(id)) return previous;
+      const next = new Set(previous);
+      next.delete(id);
+      return next;
+    });
+  }, []);
+  const sink = useMemo<NoticeSink>(() => ({ ready: Stack !== null, register, unregister }), [Stack, register, unregister]);
+  const closeNotice = useCallback((id: string) => setClosed((previous) => new Set(previous).add(id)), []);
 
   // A word is a key's, or the one line every failure said before the keys existed; a missing key comes back as itself.
   const said = (key: string, fallback?: string): string | undefined => {
@@ -330,25 +355,25 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
 
   return (
     <MalfunctionContext.Provider value={api}>
-      {children}
-      {shown && !Banner && bannerLost ? (
-        <div ref={hostRef} {...stylex.props(styles.host, styles.raisedBy(inset))}>
-          <div role="alert" {...stylex.props(styles.lost)}>
-            {title}
+      <NoticeSinkContext.Provider value={sink}>
+        {children}
+        {shown && !Stack && bannerLost ? (
+          <div ref={hostRef} {...stylex.props(styles.host, styles.raisedBy(inset))}>
+            <div role="alert" {...stylex.props(styles.lost)}>
+              {title}
+            </div>
           </div>
-        </div>
-      ) : null}
-      {shown && Banner ? (
-        <div ref={hostRef} {...stylex.props(styles.host, styles.raisedBy(inset))}>
-          <Banner
-            key={seq}
-            title={title}
-            body={body}
-            actions={actions}
-            onClose={() => setShown(null)}
-          />
-        </div>
-      ) : null}
+        ) : null}
+        {stackOpen && Stack ? (
+          <div ref={hostRef} {...stylex.props(styles.host, styles.raisedBy(inset))}>
+            <Stack
+              notices={visibleNotices}
+              banner={shown ? { seq, title, body, actions, onClose: () => setShown(null) } : null}
+              onCloseNotice={closeNotice}
+            />
+          </div>
+        ) : null}
+      </NoticeSinkContext.Provider>
     </MalfunctionContext.Provider>
   );
 }

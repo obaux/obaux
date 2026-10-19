@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useId, useRef, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { Card } from '@astryxdesign/core/Card';
@@ -14,6 +14,7 @@ import { HelpIcon } from './icons.js';
 import { textLinkLook } from './TextLink.js';
 import { pam } from './tokens.stylex.js';
 import { NOTICES, type NoticeKey } from '@pam/config';
+import { NoticeSinkContext } from './noticeSink.js';
 
 /**
  * How Pam says something went wrong, or that there is nothing here.
@@ -88,6 +89,12 @@ export interface NoticeProps {
    * the 48px target, the alert role.
    */
   quiet?: boolean;
+  /**
+   * A one-off the person may close (D-619). A status `Notice` is a toast where the app has one, and a state that lasts (offline, an account
+   * that is paused, a page that cannot load) is not closable: it goes when the state ends, and a member must not be able to swipe away the
+   * reason their account is paused. Say `closable` only for something that happened once.
+   */
+  closable?: boolean;
 }
 
 const styles = stylex.create({
@@ -137,12 +144,39 @@ export function Notice({
   userFacingNote,
   retry,
   quiet = false,
+  closable = false,
 }: NoticeProps) {
   const definition = NOTICES[notice];
   const message = userFacingNote?.trim() || body;
   const fromApp = useContext(ContactHrefContext);
   const contactHref = contactHrefProp ?? fromApp;
   const offersContact = definition.offersSupport && Boolean(contactLabel);
+
+  // A status card is a toast where the app has one (D-619), and the card here is what it falls back to.
+  const sink = useContext(NoticeSinkContext);
+  const id = useId();
+  const toasted = definition.kind !== 'empty' && sink?.ready === true;
+  const register = sink?.register;
+  const unregister = sink?.unregister;
+  const status = definition.status;
+  const retryLabel = retry?.label ?? null;
+  // A caller's handler is a new function every render; the toast keeps one and calls the latest, so it is not torn down and redrawn each time.
+  const retryPress = useRef<(() => void) | null>(null);
+  retryPress.current = retry?.onPress ?? null;
+  useEffect(() => {
+    if (!toasted || !register || !unregister) return;
+    register(id, {
+      status,
+      title,
+      body: message,
+      contact: offersContact ? { label: contactLabel ?? '', href: contactHref } : null,
+      retry: retryLabel ? { label: retryLabel, onPress: () => retryPress.current?.() } : null,
+      quiet,
+      closable,
+    });
+    return () => unregister(id);
+  }, [toasted, register, unregister, id, status, title, message, offersContact, contactLabel, contactHref, retryLabel, quiet, closable]);
+  if (toasted) return null;
 
   const actions = (
     <>

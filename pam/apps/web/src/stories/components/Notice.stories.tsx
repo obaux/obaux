@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { VStack } from '@astryxdesign/core/VStack';
-import { CompactNotice, Notice, Page, type NoticeProps } from '@pam/ui';
+import { CompactNotice, Notice, NoticeSinkContext, Page, type NoticeProps } from '@pam/ui';
 import { NOTICES, type NoticeKey } from '@pam/config';
 import { useStoryText } from '../support/useStoryText';
 
@@ -37,10 +37,13 @@ const meta = {
   tags: ['autodocs'],
   component: Notice,
   decorators: [
+    // The card itself (the app draws a status Notice as a toast, D-619: see Components/Feedback/Notice toast): no sink here.
     (Story) => (
-      <Page gap={4}>
-        <Story />
-      </Page>
+      <NoticeSinkContext.Provider value={null}>
+        <Page gap={4}>
+          <Story />
+        </Page>
+      </NoticeSinkContext.Provider>
     ),
   ],
   render: (args) => <LocalisedNotice {...args} />,
