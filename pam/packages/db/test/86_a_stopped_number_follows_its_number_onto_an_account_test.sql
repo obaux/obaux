@@ -85,26 +85,22 @@ select test.check('...and a START from it removes the row', (select count(*) fro
 select test.check_bool('...so the number no longer counts as stopped', public.phone_is_stopped('+12675550166'), false);
 
 \echo ''
-\echo '--- An erased account that was stopped leaves its number stopped ---'
-update public.profiles set phone = '+12675550144' where id = :'tanya';
-insert into public.notification_preferences (member_id, sms_stopped_at) values (:'tanya', now())
-  on conflict (member_id) do update set sms_stopped_at = now();
-select test.check('before the account is erased the list is empty', (select count(*) from public.phone_stops), 0::bigint);
-delete from public.profiles where id = :'newbie';
-select test.check('an account with no stop that is erased adds nothing', (select count(*) from public.phone_stops), 0::bigint);
+\echo '--- Erasing an account forgets its stop ---'
 insert into auth.users (id, phone) values ('dddddddd-0000-4000-8000-0000000086a2', '12675550133');
 insert into public.profiles (id, role, phone) values ('dddddddd-0000-4000-8000-0000000086a2', 'member', '+12675550133');
 insert into public.notification_preferences (member_id, sms_stopped_at) values ('dddddddd-0000-4000-8000-0000000086a2', now());
+select test.check('a stopped account that is erased adds nothing to the list', 
+  (select count(*) from public.phone_stops), 0::bigint);
 delete from public.profiles where id = 'dddddddd-0000-4000-8000-0000000086a2';
 delete from auth.users where id = 'dddddddd-0000-4000-8000-0000000086a2';
-select test.check('a stopped account that is erased puts its number back in the list', 
-  (select count(*) from public.phone_stops where phone_hash = public.phone_hash('+12675550133')), 1::bigint);
-select test.check_bool('...so the number still counts as stopped', public.phone_is_stopped('+12675550133'), true);
+select test.check('...erased, it leaves nothing behind: the list is empty', (select count(*) from public.phone_stops), 0::bigint);
+select test.check('...and nothing of its stop remains on any account',
+  (select count(*) from public.notification_preferences where member_id = 'dddddddd-0000-4000-8000-0000000086a2'), 0::bigint);
+select test.check_bool('...so the number no longer counts as stopped (Twilio keeps blocking it at the carrier)', public.phone_is_stopped('+12675550133'), false);
 insert into auth.users (id, phone) values ('dddddddd-0000-4000-8000-0000000086a3', '12675550133');
 insert into public.profiles (id, role, phone) values ('dddddddd-0000-4000-8000-0000000086a3', 'member', '+12675550133');
-select test.check('...and a person who joins again with that number starts stopped, with texts off',
-  (select count(*) from public.notification_preferences where member_id = 'dddddddd-0000-4000-8000-0000000086a3' and sms_stopped_at is not null and sms_enabled = false), 1::bigint);
-select test.check('...and the list is empty again', (select count(*) from public.phone_stops), 0::bigint);
+select test.check('...and a person who joins with that number starts with no stop and no yes',
+  (select count(*) from public.notification_preferences where member_id = 'dddddddd-0000-4000-8000-0000000086a3'), 0::bigint);
 delete from public.profiles where id = 'dddddddd-0000-4000-8000-0000000086a3';
 delete from auth.users where id = 'dddddddd-0000-4000-8000-0000000086a3';
 delete from public.phone_stops;
