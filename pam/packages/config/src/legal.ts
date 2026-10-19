@@ -56,7 +56,7 @@ export const PRIVACY: LegalDocument = {
     // D-414 — where members are told what limiting an account does (the
     // terms say it too, `terms.s.limits`): the policy is the page they re-read.
     section('privacy', 'limits', 2),
-    section('privacy', 'texts', 3),
+    section('privacy', 'texts', 4),
     section('privacy', 'never-say', 2),
     section('privacy', 'sharing', 9),
     // Only while messages are translated (D-423): the page says it exactly

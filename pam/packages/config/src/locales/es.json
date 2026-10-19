@@ -586,6 +586,7 @@
   "privacy.s.texts.p1": "Le enviamos un código cuando entra. Después podemos enviarle recordatorios y avisos de su cuenta.",
   "privacy.s.texts.p2": "Responda STOP cuando quiera y los mensajes paran. Nada en la app los vuelve a encender.",
   "privacy.s.texts.p3": "Su compañía de teléfono puede cobrarle por los mensajes. Eso es entre usted y ellos.",
+  "privacy.s.texts.p4": "Si usted responde STOP a un mensaje de texto de Pam y no tiene una cuenta, Pam guarda un código codificado hecho a partir de su número, no el número en sí. Lo guardamos solo para que Pam no le vuelva a enviar mensajes, aunque más adelante usted se una. La lista de estos códigos no contiene ningún número de teléfono. Pam solo puede comprobar si un número que ya tiene está en la lista. Borramos el código cuando usted envía START a Pam, o cuando se une y su STOP pasa a su cuenta.",
   "privacy.s.texts.title": "Mensajes de texto",
   "privacy.s.translation.p1": "Si un mensaje está escrito en un idioma que usted no lee, Pam puede mostrárselo en el suyo. Debajo dice “Traducido”, y puede tocar para ver lo que escribió la persona.",
   "privacy.s.translation.p2": "Para hacerlo, Pam envía las palabras de ese mensaje a Claude, una IA creada por Anthropic. Recibe las palabras y nada más. No recibe su nombre, su número de teléfono ni con quién habla. Anthropic borra las palabras en un plazo de 30 días y no las usa para entrenar su IA. Si sus controles de seguridad marcan un mensaje, Anthropic puede conservarlo hasta dos años. También puede conservar un mensaje si la ley lo exige.",
