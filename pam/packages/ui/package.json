@@ -22,6 +22,7 @@
     "./Segment": "./src/Segment.tsx",
     "./Button": "./src/Button.tsx",
     "./icons": "./src/icons.tsx",
+    "./noticeSink": "./src/noticeSink.ts",
     "./TextLink": "./src/TextLink.tsx",
     "./Badge": "./src/Badge.tsx",
     "./StatusBadge": "./src/StatusBadge.tsx",

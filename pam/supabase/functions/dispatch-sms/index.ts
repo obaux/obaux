@@ -22,7 +22,7 @@
 
 import bundle from './templates.json' with { type: 'json' };
 import { localeOf, render, UnsendableError } from './render.ts';
-import { reportFunctionError } from './reportError.ts';
+import { codeOf, reportFunctionError } from './reportError.ts';
 
 // What the error log (D-616) needs from this function: the project address and the service key it already holds.
 const DEPS = { get: (name: string) => Deno.env.get(name), fetch: (input: RequestInfo | URL, init?: RequestInit) => fetch(input, init) };
@@ -111,6 +111,15 @@ export async function dispatch(limit = 50) {
   let sent = 0;
   const failures: { id: string; reason: string }[] = [];
 
+  // One line in the error log for each kind of failure in a run, not one per row: a missing setting would fail every text the same way.
+  const reportedCodes = new Set<string>();
+  const reportOnce = async (error: unknown) => {
+    const key = codeOf(error);
+    if (reportedCodes.has(key)) return;
+    reportedCodes.add(key);
+    await reportFunctionError(DEPS, 'function.dispatch-sms', error);
+  };
+
   for (const row of due) {
     let body: string;
     try {
@@ -136,7 +145,7 @@ export async function dispatch(limit = 50) {
       const reason = error instanceof Error ? error.message : String(error);
       failures.push({ id: row.id, reason });
       await reportFailure(row.id, reason);
-      await reportFunctionError(DEPS, 'function.dispatch-sms', error);
+      await reportOnce(error);
     }
   }
 

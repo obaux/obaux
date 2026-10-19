@@ -22,6 +22,7 @@ describe('reportFunctionError', () => {
   it('sends "unknown" when the error carries no status, and never the error words', () => {
     expect(codeOf(new Error('Something (phone)=(+12155550100)'))).toBe('unknown');
     expect(codeOf('rpc: 500 body')).toBe('500');
+    expect(codeOf(new Error('claim_outbound_messages: 500 {"message":"x"}'))).toBe('500');
     expect(codeOf(undefined)).toBe('unknown');
   });
 

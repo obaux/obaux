@@ -35,17 +35,25 @@ describe('the app error log takes only what is on its closed lists (D-616)', () 
 
 /** Iris D1: the database holds the same closed lists as the app, and the app's routes are the app's folders. */
 describe('the closed lists the database holds', () => {
-  const migration = readFileSync(
-    new URL('../../db/migrations/20261018211942_app_errors_a_log_of_what_broke_without_who.sql', import.meta.url),
-    'utf8',
-  );
+  const dir = fileURLToPath(new URL('../../db/migrations/', import.meta.url));
+  const migrations = readdirSync(dir).filter((f) => f.endsWith('.sql')).map((f) => readFileSync(join(dir, f), 'utf8'));
+  const migration = readFileSync(join(dir, '20261018211942_app_errors_a_log_of_what_broke_without_who.sql'), 'utf8');
+  /** Every action any migration inserts into app_error_actions: the first one seeds the list, a later one adds keys with a plain
+   * `insert into public.app_error_actions (action) values ('key'), ... on conflict do nothing;`. */
+  const seeded = (): string[] =>
+    migrations.flatMap((sql) =>
+      Array.from(sql.matchAll(/insert\s+into\s+public\.app_error_actions\s*\(action\)\s*values([^;]*);/gi), (m) =>
+        Array.from(m[1]!.matchAll(/\(\s*'([^']+)'\s*\)/g), (k) => k[1]!),
+      ).flat(),
+    );
   const listed = (name: string): string[] => {
     const block = migration.split(`-- ${name}: begin`)[1]?.split(`-- ${name}: end`)[0] ?? '';
     return Array.from(block.matchAll(/^\s+\('([^']+)'\),?$/gm), (m) => m[1]!);
   };
 
   it('the actions in the migration are APP_ERROR_ACTIONS, no more and no fewer', () => {
-    expect(listed('app_error_actions').sort()).toEqual([...APP_ERROR_ACTIONS].sort());
+    // Across every migration that inserts into the table (the first seeds it; a later one may add keys), not one file.
+    expect([...new Set(seeded())].sort()).toEqual([...APP_ERROR_ACTIONS].sort());
   });
 
   it('the routes in the migration are APP_ERROR_ROUTES, no more and no fewer', () => {

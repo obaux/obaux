@@ -10,7 +10,7 @@ export interface ReportDeps {
 /** An HTTP status in a message like "Twilio 429: ..." (only the three digits are kept), else "unknown". */
 export function codeOf(error: unknown): string {
   const text = error instanceof Error ? error.message : String(error);
-  const match = /^[A-Za-z-]+:? ([0-9]{3})\b/.exec(text);
+  const match = /^[A-Za-z_-]+:? ([0-9]{3})\b/.exec(text);
   return match ? match[1]! : 'unknown';
 }
 

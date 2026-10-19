@@ -6,7 +6,7 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
-import { AppHeader, Notice, Page, TextLink } from '@pam/ui';
+import { AppHeader, CompactNotice, Notice, Page, TextLink } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { OnboardingSlides } from '@pam/ui/OnboardingSlides';
 import { useI18n } from '@/lib/i18n';
@@ -325,14 +325,21 @@ export function SignInScreen({
 
   const onFirstStep = state.step !== 'code' && state.step !== 'verifying' && state.step !== 'done';
 
+  // The code could not be sent (D-619). An invalid number is a mistake fixed on the spot: the one-line alert by the field. Pam failing to send it
+  // is not, and this person cannot get in, so it keeps the way to a person (A9, A28): a toast with Contact Pam, which they can close.
   const failedNotice =
     state.step === 'failed' ? (
-      <Notice
-        notice="something_went_wrong"
-        title={t(`signin.failed.${state.reason}.title`)}
-        body={state.phone === null ? t('signin.phone.invalid') : t(`signin.failed.${state.reason}.body`)}
-        contactLabel={t('help.contact.action')}
-      />
+      state.phone === null ? (
+        <CompactNotice text={t('signin.phone.invalid')} />
+      ) : (
+        <Notice
+          notice="something_went_wrong"
+          title={t(`signin.failed.${state.reason}.title`)}
+          body={t(`signin.failed.${state.reason}.body`)}
+          contactLabel={t('help.contact.action')}
+          closable
+        />
+      )
     ) : null;
 
   const card =

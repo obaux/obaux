@@ -32,6 +32,7 @@ export { LanguageSwitching, type LanguageSwitchingProps } from './LanguageSwitch
  * `@pam/ui/Skeletons`.
  */
 export { Notice, CompactNotice, ContactHrefProvider, type NoticeProps, type CompactNoticeProps } from './Notice.js';
+export { NoticeSinkContext, type NoticeSink, type NoticeToastSpec } from './noticeSink.js';
 export { AppHeader, type AppHeaderProps } from './AppHeader.js';
 export { AreaChip, type AreaChipProps } from './AreaChip.js';
 export { Page, type PageProps } from './Page.js';
