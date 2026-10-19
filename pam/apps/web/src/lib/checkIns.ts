@@ -46,7 +46,7 @@ async function ask(door: 'check_in_visit' | 'undo_check_in', appointmentId: stri
   try {
     const { createClient } = await import('./supabase');
     const settled = await settleWithin(Promise.resolve(createClient().rpc(door, { p_appointment_id: appointmentId })));
-    if (settled.status === 'timeout') return { ok: false, error: 'timeout', late: settled.late };
+    if (settled.status === 'timeout') return { ok: false, error: settled.error, late: settled.late };
     if (settled.status === 'failed') return { ok: false, error: settled.error };
     const { data, error } = settled.value;
     if (error) return { ok: false, error };

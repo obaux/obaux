@@ -10,7 +10,12 @@ export type Settled<T> =
   | { readonly status: 'ok'; readonly value: T }
   | { readonly status: 'failed'; readonly error: unknown }
   /** No answer in time. `late` settles when the save finally answers, success or failure: read the truth again then. */
-  | { readonly status: 'timeout'; readonly late: Promise<void> };
+  | { readonly status: 'timeout'; readonly error: unknown; readonly late: Promise<void> };
+
+/** What a save with no answer in time is, to the log: an abort, which `codeFromError` names `timeout` (Iris, D-618). */
+export function timeoutError(): Error {
+  return Object.assign(new Error('timeout'), { name: 'AbortError' });
+}
 
 /** Waits for a save for `ms`; after that it is called failed, and the late answer is handed back to be re-read (Iris's A6). */
 export function settleWithin<T>(save: Promise<T>, ms = SAVE_TIMEOUT_MS): Promise<Settled<T>> {
@@ -19,7 +24,7 @@ export function settleWithin<T>(save: Promise<T>, ms = SAVE_TIMEOUT_MS): Promise
     const timer = setTimeout(() => {
       if (done) return;
       done = true;
-      resolve({ status: 'timeout', late: save.then(() => undefined, () => undefined) });
+      resolve({ status: 'timeout', error: timeoutError(), late: save.then(() => undefined, () => undefined) });
     }, ms);
     save.then(
       (value) => {

@@ -64,7 +64,7 @@ export async function markHere(visitId: string): Promise<HereResult> {
     const settled = await settleWithin(
       Promise.resolve(createClient().rpc('i_am_here', { p_appointment_id: visitId, p_lat: position.lat, p_lon: position.lon })),
     );
-    if (settled.status === 'timeout') return { kind: 'error', error: 'timeout', late: settled.late };
+    if (settled.status === 'timeout') return { kind: 'error', error: settled.error, late: settled.late };
     if (settled.status === 'failed') return { kind: 'error', error: settled.error };
     const { data, error } = settled.value;
     if (error) {
@@ -82,7 +82,7 @@ export async function markWent(visitId: string): Promise<WentResult> {
   try {
     const { createClient } = await import('./supabase');
     const settled = await settleWithin(Promise.resolve(createClient().rpc('i_went', { p_appointment_id: visitId })));
-    if (settled.status === 'timeout') return { kind: 'error', error: 'timeout', late: settled.late };
+    if (settled.status === 'timeout') return { kind: 'error', error: settled.error, late: settled.late };
     if (settled.status === 'failed') return { kind: 'error', error: settled.error };
     const { data, error } = settled.value;
     if (error) {

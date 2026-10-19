@@ -222,7 +222,7 @@ export async function cancelSavedOrLocalTrip(id: string): Promise<CancelResult> 
   try {
     const { createClient } = await import('./supabase');
     const settled = await settleWithin(Promise.resolve(createClient().rpc('cancel_trip', { p_id: id })));
-    if (settled.status === 'timeout') return { ok: false, error: 'timeout', late: settled.late };
+    if (settled.status === 'timeout') return { ok: false, error: settled.error, late: settled.late };
     if (settled.status === 'failed') return { ok: false, error: settled.error };
     if (settled.value.error) return { ok: false, error: settled.value.error };
     await loadSavedTrips();
