@@ -111,11 +111,15 @@ test.describe('The failure banner (D-618)', () => {
     await page.getByRole('switch', { name: CLOSED }).click();
     const banner = page.getByRole('alert').filter({ hasText: LINE });
     await expect(banner).toBeVisible();
-    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
     const switches = page.getByRole('switch');
-    const last = (await switches.last().boundingBox())!;
-    const top = (await banner.boundingBox())!.y;
-    expect(last.y + last.height).toBeLessThanOrEqual(top);
+    // The spacer is measured a moment after the banner shows: scroll to the end until the last control is clear of it.
+    await expect
+      .poll(async () => {
+        await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+        const last = (await switches.last().boundingBox())!;
+        return last.y + last.height <= (await banner.boundingBox())!.y;
+      })
+      .toBe(true);
   });
 
   test('the same switch failing twice in a row adds "Get help" (no "contact Pam" words), which opens Help', async ({ page }) => {
