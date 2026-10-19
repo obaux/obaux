@@ -120,7 +120,7 @@ export function useSession(): { state: SessionState; refresh: () => void } {
         const { data: profile, error } = await supabase
           .from('profiles')
           .select(
-            'id, role, first_name, photo_url, region_id, access_status, onboarded_at, preferred_language, is_demo, regions(name), profile_roles!profile_roles_profile_id_fkey(role)',
+            'id, role, first_name, photo_url, access_status, onboarded_at, preferred_language, is_demo, profile_roles!profile_roles_profile_id_fkey(role)',
           )
           .eq('id', auth.user.id)
           .maybeSingle();
@@ -142,7 +142,17 @@ export function useSession(): { state: SessionState; refresh: () => void } {
           return;
         }
 
-        const region = profile.regions as { name: string } | { name: string }[] | null;
+        // The person's own city comes from my_region_info(): the column is not selectable by a client role (20261019025010), and an embed needs it.
+        // Not having it is not a reason to fail the sign-in: the screens that use it treat no city as no city.
+        let region: { region_id: string | null; name: string | null } | null = null;
+        try {
+          const { data: info } = await supabase.rpc('my_region_info');
+          const row = (Array.isArray(info) ? info[0] : info) as { region_id?: string | null; name?: string | null } | null | undefined;
+          region = row ? { region_id: row.region_id ?? null, name: row.name ?? null } : null;
+        } catch {
+          region = null;
+        }
+        if (cancelled) return;
         const given = (profile.profile_roles as { role: Role }[] | null | undefined)?.map((r) => r.role) ?? [];
         const next: SessionState = {
           status: 'signed-in',
@@ -152,8 +162,8 @@ export function useSession(): { state: SessionState; refresh: () => void } {
             roles: given.length > 0 ? given : [profile.role as Role],
             firstName: (profile.first_name as string | null) ?? null,
             photoUrl: (profile.photo_url as string | null) ?? null,
-            regionId: (profile.region_id as string | null) ?? null,
-            regionName: Array.isArray(region) ? (region[0]?.name ?? null) : (region?.name ?? null),
+            regionId: region?.region_id ?? null,
+            regionName: region?.name ?? null,
             isOnboarded: profile.onboarded_at !== null && profile.onboarded_at !== undefined,
             locale: isSupportedLocale(profile.preferred_language as string)
               ? (profile.preferred_language as Locale)
