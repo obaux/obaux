@@ -935,6 +935,12 @@ and first seen; no person, no free text. Opened from the bell's `app_error` row 
 and a row beside Waiting cities. Proven by `e2e/problems.spec.ts`. Part (b), the team-side saves on Dot's rule, waits for Dot's
 hook on main.
 
+## Accounts & invites · Pam's hours, each day a full row (18 October) — READY on `claude/pam-team-targets` (Iris C1, C3)
+
+On Pam's hours the days are a `CheckboxList`: full-width rows about 49px tall, each tappable anywhere on it (C1). The 64px
+Messages to Pam and Pam's hours rows already open from a tap anywhere through `tapRows`; a spec proves it (C3). Proven by
+`e2e/pam-team.spec.ts`.
+
 ## Accounts & invites · Message Pam, the Pam team's side (18 October) — S1 to S4 with Iris's passes 1 and 2 and Dot's review, one READY on main, behind Nico's switch (card a100, D-613)
 
 Built on `claude/pam-message-pam-admin` @ 1b67f588, stacked on Nico's `claude/messages-pam-s0-s1a`.
