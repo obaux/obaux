@@ -437,6 +437,16 @@ STATUS row too.
   Will to say yes. `docs/sms-campaign-samples.md` has the nine texts and the description
   (1,015 of 1,024 characters) for the one filing.
 
+- [ ] **Texts: STOP, START and the number that stopped, three things before the texts go live** (Lena's read, 19 October 2026,
+  `docs/legal/2026-10-19-stop-start-and-stopped-numbers-privacy-read.md`; Mira 01:00, Nico `claude/messages-stop-needs-start`).
+  (1) No line promises texts can be turned back on; the two places that name the way back ("contact Pam" in the *Texts from
+  Pam* support post, "Reply START to get them again" in the filed opt-out message) are only true once `sms-inbound` is
+  deployed, and then the post says *text START*. (2) A STOP from a number with no account is kept as a hash of the number
+  (`phone_stops`, live since 11 October, D-524; `support_texts_log` keeps one for support texts) and **Privacy names neither**;
+  Nico's keyed version also makes the stop count for someone who joins later. It needs one line in *Text messages*
+  (`privacy.s.texts.p4`): Sage writes, Will signs, it goes live the day `sms-inbound` turns on. (3) Before that day Nico reads back
+  that `phone_stops` and `support_texts_log` are empty (an unsalted hash cannot be re-keyed, so old rows are deleted, not kept).
+
 - [ ] **Review the SMS copy** still waiting for a name in `reviewedBy`
   (STATUS row 2).
 
