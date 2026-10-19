@@ -1789,5 +1789,12 @@
   "pam.hours.said.noDays": "Pick at least one day.",
   "pam.hours.said.order": "Pick a closing time after the opening time.",
   "common.comingSoon": "Coming soon",
-  "common.example": "Example"
+  "common.example": "Example",
+  "appError.action.places.save": "Saving a place",
+  "appError.action.places.unsave": "Removing a saved place",
+  "appError.action.checkin.here": "Marking a visit with “I'm here”",
+  "appError.action.checkin.went": "Marking a visit with “I went”",
+  "appError.action.trips.cancel": "Cancelling a visit",
+  "appError.action.schedule.checkin": "Marking someone as there",
+  "appError.action.schedule.undo": "Undoing a mark as there"
 }

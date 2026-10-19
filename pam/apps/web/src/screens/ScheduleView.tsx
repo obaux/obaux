@@ -23,7 +23,8 @@ import { DashedRule } from '@pam/ui/DashedRule';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { useI18n } from '@/lib/i18n';
 import { isVerified, usePolicies } from '@/lib/usePolicies';
-import { checkIn, undoCheckIn, useCheckIns } from '@/lib/checkIns';
+import { checkIn, rereadCheckIns, undoCheckIn, useCheckIns, type CheckInResult } from '@/lib/checkIns';
+import { useMalfunction } from '@/lib/malfunction';
 import { intlLocale } from '@pam/config';
 import { ConfirmDialog } from './ConfirmDialog';
 
@@ -330,18 +331,20 @@ function CheckInButton({
   const [burst, setBurst] = useState(0);
   const [isTipOpen, setTipOpen] = useState(false);
   const [isAsking, setAsking] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const malfunction = useMalfunction();
+  /** The save did not go through (D-616): the small alert at the bottom, the circle as it was, and a late answer read again. */
+  const failed = (action: 'schedule.checkin' | 'schedule.undo', result: Extract<CheckInResult, { ok: false }>) => {
+    malfunction.show(action, result.error, document.activeElement);
+    void result.late?.then(() => rereadCheckIns());
+  };
   useEffect(() => {
     if (!isTipOpen) return;
-    const timer = setTimeout(() => {
-      setTipOpen(false);
-      setFailed(false);
-    }, 1600);
+    const timer = setTimeout(() => setTipOpen(false), 1600);
     return () => clearTimeout(timer);
   }, [isTipOpen]);
   return (
     <HStack xstyle={styles.checkWrap}>
-      <Tooltip content={failed ? t('join.failed.title') : t('schedule.checkedIn')} isOpen={isTipOpen} placement="above">
+      <Tooltip content={t('schedule.checkedIn')} isOpen={isTipOpen} placement="above">
         <IconButton
           label={tPlain(isChecked ? 'schedule.checkin.undo' : 'schedule.checkin.do', { name })}
           variant="ghost"
@@ -353,13 +356,8 @@ function CheckInButton({
               return;
             }
             // A real visit is saved first; the circle fills when the database says yes.
-            void checkIn(id).then((ok) => {
-              if (!ok) {
-                setFailed(true);
-                setTipOpen(true);
-                return;
-              }
-              setFailed(false);
+            void checkIn(id).then((result) => {
+              if (!result.ok) return failed('schedule.checkin', result);
               setBurst((n) => n + 1);
               setTipOpen(true);
             });
@@ -385,9 +383,8 @@ function CheckInButton({
         body={t('schedule.checkin.undo.body')}
         confirmLabel={t('schedule.checkin.undo.confirm')}
         onConfirm={() => {
-          void undoCheckIn(id).then((ok) => {
-            setFailed(!ok);
-            setTipOpen(!ok);
+          void undoCheckIn(id).then((result) => {
+            if (!result.ok) failed('schedule.undo', result);
             setAsking(false);
           });
         }}
