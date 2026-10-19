@@ -19,6 +19,7 @@ import { useSession } from '@/lib/useSession';
 import { useThread } from '@/lib/useThread';
 import { reportMessage } from '@/lib/reportMessage';
 import { blockInConversation, unblockInConversation, useBlockState } from '@/lib/blocking';
+import { useMalfunction } from '@/lib/malfunction';
 
 /**
  * A conversation's ⋯ page (D-213, Will, 1 October): the thread's secondary
@@ -67,8 +68,9 @@ function ThreadOptions() {
   const { state: blockState, reload } = useBlockState(!pair && signedIn ? id : null);
   const [exampleBlocked, setExampleBlocked] = useState(false);
   const iBlocked = pair ? exampleBlocked : blockState?.iBlocked === true;
-  const [phase, setPhase] = useState<'menu' | 'confirm' | 'done' | 'failed'>('menu');
+  const [phase, setPhase] = useState<'menu' | 'confirm' | 'done'>('menu');
   const [busy, setBusy] = useState(false);
+  const malfunction = useMalfunction();
   // What the screen said when it was asked: the state flips once it is done, the words must not.
   const [wasUnblock, setWasUnblock] = useState(false);
 
@@ -76,15 +78,21 @@ function ThreadOptions() {
     setBusy(true);
     const unblocking = iBlocked;
     setWasUnblock(unblocking);
-    let ok = true;
     if (pair) {
       setExampleBlocked(!unblocking);
     } else {
-      ok = unblocking ? await unblockInConversation(id) : await blockInConversation(id);
-      if (ok) await reload();
+      const result = unblocking ? await unblockInConversation(id) : await blockInConversation(id);
+      if (!result.ok) {
+        // The small alert at the bottom, and the log (D-616); the person stays on this screen to try again.
+        malfunction.show(unblocking ? 'messages.unblock' : 'messages.block', { code: result.code });
+        setBusy(false);
+        return;
+      }
+      malfunction.clear();
+      await reload();
     }
     setBusy(false);
-    setPhase(ok ? 'done' : 'failed');
+    setPhase('done');
   };
 
   if (phase !== 'menu') {
@@ -108,14 +116,6 @@ function ThreadOptions() {
                 {t('messages.block.body')}
               </Text>
             )}
-            {phase === 'failed' ? (
-              <Notice
-                notice="something_went_wrong"
-                title={t('notice.something_went_wrong.title')}
-                body={t('notice.something_went_wrong.body')}
-                contactLabel={t('help.contact.action')}
-              />
-            ) : null}
             <BigButton
               label={t(`messages.${kind}.confirm`)}
               onPress={() => void confirm()}
@@ -183,7 +183,8 @@ function ThreadReport() {
   const { state: session } = useSession();
   const { state } = useThread(!example && session.status === 'signed-in' ? id : null);
   const [reason, setReason] = useState<MessageReportReason>(MESSAGE_REPORT_REASONS[0]);
-  const [phase, setPhase] = useState<'choosing' | 'sending' | 'done' | 'failed'>('choosing');
+  const [phase, setPhase] = useState<'choosing' | 'sending' | 'done'>('choosing');
+  const malfunction = useMalfunction();
 
   const latest =
     state.status === 'ready' ? [...state.messages].reverse().find((m) => !m.mine) ?? null : null;
@@ -196,7 +197,15 @@ function ThreadReport() {
     }
     if (!latest) return;
     setPhase('sending');
-    setPhase((await reportMessage(latest.id, reason)) ? 'done' : 'failed');
+    const result = await reportMessage(latest.id, reason);
+    if (result.ok) {
+      malfunction.clear();
+      setPhase('done');
+      return;
+    }
+    // The small alert at the bottom, and the log (D-616); the reasons stay as they were, ready to send again.
+    malfunction.show('messages.report', { code: result.code });
+    setPhase('choosing');
   };
 
   const back = `/messages/thread/options/?id=${encodeURIComponent(id)}`;
@@ -229,14 +238,6 @@ function ThreadReport() {
               <RadioListItem key={key} value={key} label={t(`messages.report.reason.${key}`)} />
             ))}
           </RadioList>
-          {phase === 'failed' ? (
-            <Notice
-              notice="something_went_wrong"
-              title={t('messages.report.failed.title')}
-              body={t('messages.report.failed.body')}
-              contactLabel={t('help.contact.action')}
-            />
-          ) : null}
           <BigButton
             label={phase === 'sending' ? t('messages.report.sending') : t('messages.report.send')}
             onPress={() => void send()}

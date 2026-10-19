@@ -33,7 +33,6 @@ export const APP_ERROR_ACTIONS = [
   'directory.demo-view',
   'requests.review',
   'invite.create',
-  // Places and programs
   'places.save',
   'places.unsave',
   'checkin.here',
@@ -60,4 +59,98 @@ export function appErrorCode(value: unknown): string {
   const text = typeof value === 'number' ? String(value) : typeof value === 'string' ? value : '';
   if (/^[0-9]{3}$/.test(text) || /^[0-9A-Z]{5}$/.test(text) || (APP_ERROR_WORD_CODES as readonly string[]).includes(text)) return text;
   return 'unknown';
+}
+
+/**
+ * The screens the log may name (D-616, Iris D1): every route the app has, as its address with a closing slash. The database holds the same
+ * list (`app_error_routes`) and stores any other address as `/unknown`, so a name or a word typed into an address can never reach the log.
+ * A test holds this list to the app's folders; a new screen is added here and in a migration.
+ */
+export const APP_ERROR_ROUTES = [
+  '/',
+  '/about/',
+  '/account/',
+  '/admin/',
+  '/alerts/',
+  '/calendar/',
+  '/cities/waiting/',
+  '/connections/',
+  '/directory/',
+  '/flag/',
+  '/gallery/',
+  '/help/',
+  '/help/report-place/',
+  '/help/safety/',
+  '/help/topics/',
+  '/home/calendar/',
+  '/interested/',
+  '/invite/',
+  '/invite/add/',
+  '/invite/expired/',
+  '/invite/in-use/',
+  '/invite/new/',
+  '/invites/',
+  '/join/',
+  '/language/',
+  '/legal/',
+  '/legal/privacy/',
+  '/legal/privacy/copy/',
+  '/legal/privacy/delete/',
+  '/messages/',
+  '/messages/pam/',
+  '/messages/thread/',
+  '/messages/thread/files/',
+  '/messages/thread/options/',
+  '/messages/thread/report/',
+  '/notifications/',
+  '/pam/hours/',
+  '/pam/messages/',
+  '/pam/start/',
+  '/pam/thread/options/',
+  '/person/',
+  '/person/connect/',
+  '/person/past/',
+  '/person/policies/',
+  '/place/',
+  '/place/policies/',
+  '/place/policies/view/',
+  '/places/',
+  '/places/reported/',
+  '/points/',
+  '/privacy/',
+  '/problems/',
+  '/profile/',
+  '/profile/add-program/',
+  '/program/',
+  '/program/book/',
+  '/program/book/new/',
+  '/program/policies/',
+  '/program/policies/view/',
+  '/program/sent/',
+  '/program/service/',
+  '/program/switch/',
+  '/programs/',
+  '/programs/new/',
+  '/programs/review/',
+  '/programs/review/item/',
+  '/reminders/',
+  '/reply/',
+  '/requests/',
+  '/requests/program/',
+  '/requests/review/',
+  '/saved/',
+  '/signin/',
+  '/terms/',
+  '/trips/',
+  '/trips/new/',
+  '/use-as/',
+] as const;
+
+export type AppErrorRoute = (typeof APP_ERROR_ROUTES)[number];
+
+/** Where a report from this address is filed: the screen if the app has it, else `/unknown`. Mirrors the database. */
+export function appErrorRoute(pathname: unknown): string {
+  const text = typeof pathname === 'string' ? pathname.split('?')[0]!.split('#')[0]! : '';
+  const withSlash = text.length > 1 && !text.endsWith('/') ? `${text}/` : text;
+  return (APP_ERROR_ROUTES as readonly string[]).includes(withSlash) ? withSlash : '/unknown';
 }
