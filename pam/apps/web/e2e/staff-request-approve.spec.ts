@@ -78,7 +78,7 @@ test('a role pair Pam does not allow is explained in staff words, with no call t
   await expect(page.getByRole('link', { name: /Contact Pam/ })).toHaveCount(0);
 });
 
-test('a request whose person deleted their sign-in says it is gone, not that it was decided (Iris, D-618)', async ({ page }) => {
+test('a request whose person's account was deleted says it is gone, not that it was decided (Iris, D-618)', async ({ page }) => {
   await signedInAsSuperAdmin(page, 'provider');
   await page.route('**/rest/v1/rpc/review_staff_request*', (route) =>
     route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ code: 'P0001', message: 'REQUEST_NOT_FOUND' }) }),
@@ -88,7 +88,7 @@ test('a request whose person deleted their sign-in says it is gone, not that it 
   await page.getByRole('button', { name: 'Approve' }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Yes, approve' }).click();
   await expect(page.getByText('This request is no longer here')).toBeVisible();
-  await expect(page.getByText(/Pia's sign-in was deleted/)).toBeVisible();
+  await expect(page.getByText(/Pia's account was deleted/)).toBeVisible();
   await expect(page.getByText('This request was already decided')).toHaveCount(0);
   await expect(page.getByRole('alert').filter({ hasText: "It's not your fault" })).toHaveCount(0);
 });

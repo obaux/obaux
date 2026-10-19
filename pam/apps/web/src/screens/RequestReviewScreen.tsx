@@ -241,7 +241,7 @@ export function RequestReviewScreen({ userId }: { readonly userId: string | null
       {failed && failed !== 'other' ? (
         <Notice
           notice="admin_out_of_region"
-          // Gone is not decided: the request went with the person's sign-in (staff_requests cascades from auth.users; Iris, D-618).
+          // Gone is not decided: the request went with the person's account (staff_requests cascades from auth.users; Iris, D-618).
           title={t(`requests.failed.${failed}.title`, { name: first })}
           body={t(`requests.failed.${failed}.body`, { name: first })}
         />
