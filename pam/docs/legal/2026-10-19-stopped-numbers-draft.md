@@ -70,13 +70,15 @@ sends.
    matching. `PHONE_STOP_KEY_MISSING` raises rather than guessing.
 5. **Sage's line**: Lena's rewrite replaces my draft line above ("Nobody can turn it back into your number" is not true).
 
-## Revised after the desk's decisions (Mira, 01:11)
+## Final, after the desk's decisions (Mira, 01:11 and 01:14)
 
-- No old rows exist (live count: `phone_stops` 0, `support_texts_log` 0). The migration deletes any old-hash row it finds, with the reason in its header.
+- No old rows exist (live count: `phone_stops` 0, `support_texts_log` 0). The migration deletes any old-hash row it finds. No plain-hash form remains anywhere.
 - `stopped_at` is dropped: the table is the keyed hash and nothing else.
-- **An erased account that was stopped puts the keyed hash of its number back in the list**, so that number stays stopped. This is the one case where the
-  list holds a number that once had an account. It means "delete my account" leaves a scrambled code of the number behind when the person had replied
-  STOP; the Privacy line has to say so (Lena: this changes how-long.p1 and your-choices.p2, which promise deletion on request; the stop is kept so we never
-  text a number that asked us to stop, and it goes on a START).
+- The row is deleted when the stop is carried onto an account (the account's `sms_stopped_at` holds it from then on).
+- **Erasing an account forgets its stop.** Nothing is put back in the list, so "ask us to delete it and we will" and the six-month line stay true; Twilio's
+  own opt-out keeps blocking that number at the carrier. A person who joins later with that number starts with no stop and no yes. (An earlier version
+  put the hash back on erasure; the desk reversed it, and a test now pins that erasure adds nothing.)
 - Nothing is written to the audit log or any log on the no-account branch (tested).
 - `support_texts_log` keeps the keyed hash, not the plain one; its old rows (none) are deleted.
+- `service_role` cannot call `phone_hash` or read the table; it can ask `phone_is_stopped`.
+- The Vault key `phone_stop_key` travels with every backup, restore and project move (Lena's launch item; Mira puts it on the switch-on checklist).

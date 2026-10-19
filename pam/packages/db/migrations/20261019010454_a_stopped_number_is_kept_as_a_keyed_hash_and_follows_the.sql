@@ -24,8 +24,9 @@
 --   * There is no old form to keep. Any row with the old hash is deleted here (there are none live) and `support_texts_log`, which kept the same plain
 --     hash for each number a super admin texted, is cleaned the same way and now gets the keyed hash too (`phone_hash` is what writes it), so no
 --     reversible hash of a number is left anywhere.
---   * An erased account that was stopped puts the keyed hash of its number BACK in the list (Mira, 19 October), so a number that said STOP stays
---     stopped when its account goes. This is the one case where the list holds a number that once had an account. Privacy says so.
+--   * Erasing an account forgets its stop (Mira, 19 October, final): the account's `sms_stopped_at` goes with it and nothing is put back in the
+--     list, which keeps "ask us to delete it and we will" and the six-month line true. Twilio's own opt-out keeps blocking that number at the
+--     carrier regardless.
 --   * Nothing is written to the audit log or any function log on the no-account branch: a STOP from a number with no account leaves one hash and
 --     nothing else.
 --   * When a profile gets a number, or changes it (insert, or update of phone), a trigger looks the number's hash up and, if it is there, puts the
@@ -193,26 +194,3 @@ drop trigger if exists profiles_carry_a_stopped_number on public.profiles;
 create trigger profiles_carry_a_stopped_number
   after insert or update of phone on public.profiles
   for each row execute function public.carry_a_stopped_number_onto_the_account();
-
--- A stopped account that is erased leaves its number stopped: the keyed hash goes back in the list before the account's own record goes.
-create or replace function public.keep_the_stop_of_an_erased_account()
-returns trigger
-language plpgsql
-security definer
-set search_path = public, extensions
-as $$
-begin
-  if old.phone is not null
-     and exists (select 1 from public.notification_preferences np where np.member_id = old.id and np.sms_stopped_at is not null)
-     and public.phone_hash(old.phone) is not null then
-    insert into public.phone_stops (phone_hash) values (public.phone_hash(old.phone)) on conflict do nothing;
-  end if;
-  return old;
-end;
-$$;
-revoke all on function public.keep_the_stop_of_an_erased_account() from public, anon, authenticated;
-
-drop trigger if exists profiles_keep_the_stop_when_erased on public.profiles;
-create trigger profiles_keep_the_stop_when_erased
-  before delete on public.profiles
-  for each row execute function public.keep_the_stop_of_an_erased_account();
