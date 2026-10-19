@@ -16,8 +16,8 @@ import { SUPPORTED_LOCALES } from '../src/i18n.js';
  * role ask about a number it did not mean to, or writes a log line about a stopped number makes the line untrue, and this fails until the
  * line (and Will) catch up. Nico's database test 86 holds the behaviour; this holds what the page promises.
  *
- * Two things were still being decided when this was written (whether the table keeps a day, and whether an erased account puts its code
- * back): neither is pinned here, and the checks on the line's own words apply once `privacy.s.texts.p4` exists in English.
+ * Whether an erased account puts its code back was still being decided when this was written; the build and the line must agree on it
+ * whichever way it goes (last tests of the first block), and the checks on the line's own words apply once `privacy.s.texts.p4` exists.
  */
 const MIGRATIONS = fileURLToPath(new URL('../../db/migrations/', import.meta.url));
 const names = readdirSync(MIGRATIONS);
@@ -59,11 +59,18 @@ describe('the list of stopped numbers keeps what Privacy says it keeps (D-524, 1
     expect(original).toMatch(/grant execute on function public\.phone_is_stopped\(text\) to service_role;/);
   });
 
-  it('refuses to apply over rows made before it, because an old row is a plain hash and cannot be re-keyed', () => {
-    expect(keyed).toMatch(/if exists \(select 1 from public\.phone_stops\) then\s+raise exception/);
+  it('keeps no old form: a plain-hash row is deleted, in the list and in the help-desk text log, because it cannot be re-keyed', () => {
+    expect(keyed).toMatch(/delete from public\.phone_stops where phone_hash not like 'k1:%';/);
+    expect(keyed).toMatch(/delete from public\.support_texts_log where phone_hash not like 'k1:%';/);
   });
 
-  it('holds the code and nothing about the person: no column for a number, an account, a message or a count', () => {
+  it('writes the help-desk text log through the same keyed code, so no reversible hash of a number is left anywhere', () => {
+    const inserts = [...(original + keyed).matchAll(/insert into public\.support_texts_log \([^)]*\)\s+values \(([^;]*)\);/g)].map((m) => m[1]!);
+    expect(inserts.length).toBeGreaterThan(0);
+    for (const values of inserts) expect(values).toContain('public.phone_hash(');
+  });
+
+  it('holds the code and nothing else: the list has one column, the keyed hash (no day, no account, no number, no message, no count)', () => {
     const created = original.slice(original.indexOf('create table if not exists public.phone_stops ('));
     const columns = created
       .slice(0, created.indexOf('\n);'))
@@ -71,11 +78,9 @@ describe('the list of stopped numbers keeps what Privacy says it keeps (D-524, 1
       .slice(1)
       .map((line) => line.trim().split(/\s+/)[0]!)
       .filter((word) => /^[a-z_]+$/.test(word));
-    const added = [...keyed.matchAll(/alter table public\.phone_stops\s+(?:add|alter) column ([a-z_]+)/g)].map((m) => m[1]!);
-    for (const column of [...columns, ...added]) {
-      expect(['phone_hash', 'stopped_at'], `phone_stops column ${column}`).toContain(column);
-    }
-    expect(columns[0]).toBe('phone_hash');
+    const dropped = [...keyed.matchAll(/alter table public\.phone_stops drop column ([a-z_]+)/g)].map((m) => m[1]!);
+    const added = [...keyed.matchAll(/alter table public\.phone_stops\s+add column ([a-z_]+)/g)].map((m) => m[1]!);
+    expect([...columns.filter((c) => !dropped.includes(c)), ...added]).toEqual(['phone_hash']);
   });
 
   it('keeps no readable number: the only notice a function raises is about the Vault being missing, and none names the number', () => {
@@ -112,6 +117,23 @@ describe('the list of stopped numbers keeps what Privacy says it keeps (D-524, 1
     expect(audit).not.toMatch(/phone/);
   });
 
+  // Whether an erased account puts its code back was decided twice in one night (Mira 01:11 then 01:14). The build and the line must agree,
+  // whichever it is: if a trigger puts the code back on erase, the line says so; if not, it does not.
+  const putsBackOnErase = /before delete on public\.profiles/.test(keyed);
+
+  it.runIf(putsBackOnErase)('if an erased account puts its code back, it writes only the keyed code, only for an account that had a STOP, and says nothing in any log', () => {
+    const fn = functionText(keyed, 'keep_the_stop_of_an_erased_account');
+    expect(fn).toMatch(/insert into public\.phone_stops \(phone_hash\) values \(public\.phone_hash\(old\.phone\)\)/);
+    expect(fn).toMatch(/np\.sms_stopped_at is not null/);
+    expect(fn).not.toMatch(/audit_log|raise |notice/i);
+  });
+
+  it('the build and the line agree on an erased account: the line says "delete your account" only if the code is put back', () => {
+    const line = EN['privacy.s.texts.p4'];
+    if (!line) return; // the line is not in yet: nothing to compare
+    expect(/delete your account/i.test(line), 'p4 mentions deleting the account').toBe(putsBackOnErase);
+  });
+
   describe('the line in Privacy (privacy.s.texts.p4; Sage writes, Will signs, it goes live the day sms-inbound turns on)', () => {
     const KEY = 'privacy.s.texts.p4';
     const text = EN[KEY];
@@ -121,12 +143,12 @@ describe('the list of stopped numbers keeps what Privacy says it keeps (D-524, 1
       expect(texts?.bodyKeys[3]).toBe(KEY);
     });
 
-    it.runIf(text)('says it is a scrambled code and not the number, that nobody reads it, and how it ends, and does not say nobody can compare', () => {
+    it.runIf(text)('says it is a scrambled code and not the number, that Pam can only check a number it already has, and how it ends, and never that nobody can compare', () => {
       expect(text).toMatch(/scrambled/i);
-      expect(text).toMatch(/not the number/i);
-      expect(text).toMatch(/nobody reads it/i);
+      expect(text).toMatch(/not the number|no phone numbers? in it/i);
+      expect(text, 'the service role can ask about a number, so the line says what Pam can do, not what nobody can').toMatch(/only check whether a number it already has/i);
       expect(text).toMatch(/START/);
-      expect(text, 'the service role can check a number against the list, so the line must not promise otherwise').not.toMatch(/nobody can/i);
+      expect(text).not.toMatch(/nobody can/i);
     });
 
     for (const locale of SUPPORTED_LOCALES.filter((l) => l !== 'en')) {
