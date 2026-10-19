@@ -16,6 +16,11 @@ D-616 part (b), on Dot's `useMalfunction` and `settleWithin` (b76):
   `unknown`.
 - **New invite** (`invite.create`): the "We could not make a code" card is gone; the bottom alert replaces it, and the form
   keeps what was typed. `createInvite` throws. A late invite is not shown: it was made, nobody sees it, and it expires.
+- **The database's field refusals on an invite stay inline** (Mira, 00:41, from Iris's D-618 table): `INVITE_NEEDS_PHONE` (a
+  number that passes the form's 10-digit check but isn't a real mobile number, such as one with a leading 0) and
+  `INVITE_EMAIL_INVALID` show as the form's own field line by the fields, with no alert and nothing logged. Editing the field
+  clears the line. They reuse the signed `invite.who.need.phone` / `.emailInvalid` words. Before, they showed the "We could
+  not make a code" card (main), or the bottom alert (51f3e541).
 - **Staff request review** (`requests.review`): an unexpected failure, or no answer in 15 s, shows the bottom alert (a late
   answer re-reads the requests). The named refusals (other city, pair not allowed, already decided) stay inline, as before.
 
@@ -43,6 +48,11 @@ None that need a file: this is D-616 and D-617 as written.
 - Pictures: `docs/design/review/2026-10-18-d616-team-saves/`: all five at 390 light, plus demo view at 320 dark and 320 Arabic, at 600px tall so content sits behind the alert. Reshot after merging Dot's surface fix (ef8b19af).
 
 ## Left undone
+
+- **A retry can make a second invite** (Iris's D-618 table): if the answer to `create_invite` is lost (a timeout) the
+  invite may exist; trying again makes another, and for staff a second email. The plan is to take it after b77 (Mira, 00:41).
+- From the same table, for later: a super admin whose `listRegions()` fails gets `needsCity` with no visible line (the
+  city note is drawn only with more than one region); `requests.review` shows "gone" with the "decided" words.
 
 - `pam.thread.statusFailed` and `pam.hours.said.failed` are no longer drawn. Removing keys from all seven bundles and the
   ledger is Lena's call, so they stay for now.

@@ -58,6 +58,7 @@ export function InviteNewView({ role }: { readonly role: string | null }) {
   const [invite, setInvite] = useState<CreatedInvite | null>(null);
   const [busy, setBusy] = useState(false);
   const malfunction = useMalfunction();
+  const [refused, setRefused] = useState<'phone' | 'emailInvalid' | null>(null);
 
   useEffect(() => {
     if (!isSuperAdmin) return;
@@ -115,6 +116,7 @@ export function InviteNewView({ role }: { readonly role: string | null }) {
     }
     setNeedsCity(false);
     const control = document.activeElement;
+    setRefused(null);
     setBusy(true);
     const settled = await settleWithin(createInvite(allowed!, who, isSuperAdmin ? regionId : undefined));
     setBusy(false);
@@ -123,6 +125,10 @@ export function InviteNewView({ role }: { readonly role: string | null }) {
       setInvite(settled.value);
       return;
     }
+    // A field the database refused is the person's to fix: said by the field, not an alert, and not logged (D-618, Iris).
+    const message = settled.status === 'failed' ? String((settled.error as { message?: unknown } | null)?.message ?? '') : '';
+    if (message.includes('INVITE_NEEDS_PHONE')) return setRefused('phone');
+    if (message.includes('INVITE_EMAIL_INVALID')) return setRefused('emailInvalid');
     // The bottom alert, logged (D-616); the form keeps what was typed, so Make the invite is one tap again. A late invite is not
     // shown: it was made, unseen, and expires on its own; trying again makes another.
     malfunction.show('invite.create', settled.status === 'timeout' ? { code: 'timeout' } : settled.error, control);
@@ -150,7 +156,13 @@ export function InviteNewView({ role }: { readonly role: string | null }) {
               </VStack>
             </Card>
           ) : null}
-          <InviteForWho role={allowed!} busy={busy} onSubmit={(who) => void make(who)} />
+          <InviteForWho
+            role={allowed!}
+            busy={busy}
+            onSubmit={(who) => void make(who)}
+            refused={refused}
+            onEdit={() => setRefused(null)}
+          />
         </>
       )}
     </>,

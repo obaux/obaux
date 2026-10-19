@@ -271,6 +271,31 @@ test.describe('the case manager screen', () => {
     expect(JSON.stringify(reports[0])).not.toMatch(/Rosa|555/);
   });
 
+  test('a number the database refuses is said by the field, not as the alert, and is not logged (D-618, INVITE_NEEDS_PHONE)', async ({ page }) => {
+    await signedInAs(page, 'admin', []);
+    const reports: unknown[] = [];
+    await page.route('**/rest/v1/rpc/report_app_error*', (route) => {
+      reports.push(route.request().postDataJSON());
+      return route.fulfill({ status: 200, contentType: 'application/json', body: 'null' });
+    });
+    // Ten digits pass the form's own check; the leading 0 is not a real mobile number to the database.
+    await page.route(INVITE, (route) =>
+      route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ code: 'P0001', message: 'INVITE_NEEDS_PHONE' }) }),
+    );
+    await page.goto('/invite/new/?role=member');
+    await page.getByLabel('Their first name').fill('Rosa');
+    await page.getByLabel('Their mobile number').fill('0215 555 011');
+    await page.getByRole('button', { name: 'Create link' }).click();
+
+    await expect(page.getByRole('alert').filter({ hasText: 'Add their mobile number, with the area code.' })).toBeVisible();
+    await expect(page.getByRole('alert').filter({ hasText: "It's not your fault" })).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'We could not make a code' })).toHaveCount(0);
+    // Fixing the number takes the line away.
+    await page.getByLabel('Their mobile number').fill('215 555 0111');
+    await expect(page.getByText('Add their mobile number, with the area code.')).toHaveCount(0);
+    expect(reports).toHaveLength(0);
+  });
+
   test('the status chip says what is actually switched off', async ({ page }) => {
     // "Some things turned off" is the member's wording and answers nothing on a
     // caseload: off how, and which? The case manager's next move is to explain
