@@ -25,8 +25,9 @@ describe('the failure alert: one title, one line per kind', () => {
 
   it.each(LOCALES)('%s: the buttons a line names are the words on those buttons', (locale) => {
     const b = BUNDLES[locale];
-    for (const kind of ['offline', 'timeout', 'server', 'refused'] as const) expect(b[`${N}${kind}.body`], `${kind}.body names Try again`).toContain(b[`${N}action.retry`]!);
+    for (const kind of ['offline', 'timeout', 'server'] as const) expect(b[`${N}${kind}.body`], `${kind}.body names Try again`).toContain(b[`${N}action.retry`]!);
     expect(b[`${N}changed.body`], 'changed.body names Show the latest').toContain(b[`${N}action.reload`]!);
+    expect(b[`${N}refused.body`], 'refused.body names Get help').toContain(b[`${N}action.help`]!);
     expect(b[`${N}action.help`], 'the Help button is the Help screen\'s name').toBe(b['help.title']);
   });
 
