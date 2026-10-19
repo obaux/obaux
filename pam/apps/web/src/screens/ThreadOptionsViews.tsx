@@ -20,6 +20,8 @@ import { useThread } from '@/lib/useThread';
 import { reportMessage } from '@/lib/reportMessage';
 import { blockInConversation, unblockInConversation, useBlockState } from '@/lib/blocking';
 import { useMalfunction } from '@/lib/malfunction';
+import { settleWithin } from '@/lib/settle';
+import { isOffline } from '@/lib/reportAppError';
 
 /**
  * A conversation's ⋯ page (D-213, Will, 1 October): the thread's secondary
@@ -75,16 +77,26 @@ function ThreadOptions() {
   const [wasUnblock, setWasUnblock] = useState(false);
 
   const confirm = async () => {
-    setBusy(true);
     const unblocking = iBlocked;
+    const action = unblocking ? 'messages.unblock' : 'messages.block';
+    // The button just tapped is kept clear of the alert (Iris L1); no network is said at once and no answer in 15 s is a failure (L7).
+    const tapped = typeof document === 'undefined' ? null : document.activeElement;
+    if (!pair && isOffline()) {
+      malfunction.show(action, { code: 'offline' }, tapped, { retry: () => void confirm() });
+      return;
+    }
+    setBusy(true);
     setWasUnblock(unblocking);
     if (pair) {
       setExampleBlocked(!unblocking);
     } else {
-      const result = unblocking ? await unblockInConversation(id) : await blockInConversation(id);
-      if (!result.ok) {
+      const settled = await settleWithin(unblocking ? unblockInConversation(id) : blockInConversation(id));
+      if (settled.status !== 'ok' || !settled.value.ok) {
         // The small alert at the bottom, and the log (D-616); the person stays on this screen to try again.
-        malfunction.show(unblocking ? 'messages.unblock' : 'messages.block', { code: result.code });
+        const code = settled.status === 'ok' && !settled.value.ok ? settled.value.code : settled.status === 'timeout' ? 'timeout' : 'unknown';
+        malfunction.show(action, { code }, tapped, { retry: () => void confirm() });
+        // No answer in time: the block may still land, so read where it stands once it has answered.
+        if (settled.status === 'timeout') void settled.late.then(() => reload());
         setBusy(false);
         return;
       }
@@ -196,15 +208,21 @@ function ThreadReport() {
       return;
     }
     if (!latest) return;
+    const tapped = typeof document === 'undefined' ? null : document.activeElement;
+    if (isOffline()) {
+      malfunction.show('messages.report', { code: 'offline' }, tapped, { retry: () => void send() });
+      return;
+    }
     setPhase('sending');
-    const result = await reportMessage(latest.id, reason);
-    if (result.ok) {
+    const settled = await settleWithin(reportMessage(latest.id, reason));
+    if (settled.status === 'ok' && settled.value.ok) {
       malfunction.clear();
       setPhase('done');
       return;
     }
     // The small alert at the bottom, and the log (D-616); the reasons stay as they were, ready to send again.
-    malfunction.show('messages.report', { code: result.code });
+    const code = settled.status === 'ok' && !settled.value.ok ? settled.value.code : settled.status === 'timeout' ? 'timeout' : 'unknown';
+    malfunction.show('messages.report', { code }, tapped, { retry: () => void send() });
     setPhase('choosing');
   };
 

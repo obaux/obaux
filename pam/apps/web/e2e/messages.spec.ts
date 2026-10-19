@@ -804,6 +804,11 @@ test.describe('a conversation', () => {
 
   test('a send that gets no answer becomes Not sent with Try again after a while, and Try again makes no second copy (Iris P2)', async ({ page }) => {
     await signedInAs(page, 'member');
+    const reports: Record<string, unknown>[] = [];
+    await page.route('**/rest/v1/rpc/report_app_error', (route) => {
+      reports.push(route.request().postDataJSON() as Record<string, unknown>);
+      return route.fulfill(json(false));
+    });
     await withOneConversation(page);
     await page.clock.install();
     let posts = 0;
@@ -829,6 +834,9 @@ test.describe('a conversation', () => {
     await expect(page.getByText('Sending…', { exact: true }).first()).toBeVisible();
     await page.clock.runFor(31_000);
     await expect(page.getByText('Not sent', { exact: true })).toBeVisible();
+    // The give-up is a timeout in the log, not "unknown" (Iris L8).
+    await expect.poll(() => reports.length).toBe(1);
+    expect(reports[0]).toMatchObject({ p_action: 'messages.send', p_code: 'timeout' });
     await page.getByRole('button', { name: 'Not sent. Try again.' }).click();
     await expect(page.getByText('Not sent', { exact: true })).toHaveCount(0);
     await expect(page.getByText('See you Thursday.')).toHaveCount(1);
@@ -1018,6 +1026,43 @@ test.describe('a conversation', () => {
     await expect.poll(() => reports.length).toBe(2);
     expect(reports[1]).toMatchObject({ p_action: 'messages.report' });
     expect(JSON.stringify(reports)).not.toMatch(/Is the class still|reason/i);
+  });
+
+  test('block and report: the alert never covers the button just tapped, and no network is said at once (Iris L1, L7)', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await withOneConversation(page);
+    await page.route('**/rest/v1/rpc/conversation_block_state*', (route) => route.fulfill(json([{ i_blocked: false, blocked_me: false }])));
+    await page.route('**/rest/v1/rpc/block_in_conversation*', (route) => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));
+    await page.route(REPORT, (route) => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));
+    await page.setViewportSize({ width: 320, height: 568 });
+    const cleared = async (name: string) => {
+      const alert = page.getByRole('alert').filter({ hasText: "Something's wrong on our side" });
+      await expect(alert).toBeVisible();
+      await page.waitForTimeout(300);
+      const a = (await alert.boundingBox())!;
+      const b = (await page.getByRole('button', { name, exact: true }).boundingBox())!;
+      expect(b.y + b.height, name).toBeLessThanOrEqual(a.y + 1);
+    };
+    await page.goto(`/messages/thread/options/?id=${CONVO}`);
+    await settled(page);
+    await page.getByRole('button', { name: 'Block this person' }).click();
+    await page.getByRole('button', { name: 'Block', exact: true }).click();
+    await cleared('Block');
+
+    await page.goto(`/messages/thread/report/?id=${CONVO}`);
+    await settled(page);
+    await page.getByRole('button', { name: 'Send report' }).click();
+    await cleared('Send report');
+
+    // No network: said at once, without waiting for a request to fail. A fresh screen, as the failure banner stays until the person leaves.
+    await page.goto(`/messages/thread/report/?id=${CONVO}`);
+    await settled(page);
+    await page.context().setOffline(true);
+    const started = Date.now();
+    await page.getByRole('button', { name: 'Send report' }).click();
+    await expect(page.getByRole('alert').filter({ hasText: "You're offline" })).toBeVisible({ timeout: 1500 });
+    expect(Date.now() - started).toBeLessThan(2000);
+    await page.context().setOffline(false);
   });
 
   test('in a blocked conversation the composer gives way to a notice, and the messages stay', async ({ page }) => {
@@ -1361,6 +1406,11 @@ test.describe('photos and documents, picked or pasted (D-408)', () => {
 
   test('a photo shows its progress while it goes, and when it did not go it stays "Not sent" with the picture and Try again sends it once (D-609)', async ({ page }) => {
     await signedInAs(page, 'admin');
+    const reports: Record<string, unknown>[] = [];
+    await page.route('**/rest/v1/rpc/report_app_error', (route) => {
+      reports.push(route.request().postDataJSON() as Record<string, unknown>);
+      return route.fulfill(json(false));
+    });
     await withOneConversation(page);
     let uploads = 0;
     let release: () => void = () => {};
@@ -1393,6 +1443,9 @@ test.describe('photos and documents, picked or pasted (D-408)', () => {
     release();
 
     await expect(page.getByText('Not sent', { exact: true })).toBeVisible();
+    // A storage refusal keeps its status in the log, not "unknown" (Iris L8).
+    await expect.poll(() => reports.length).toBe(1);
+    expect(reports[0]).toMatchObject({ p_action: 'messages.photo', p_code: '500' });
     await expect(page.getByRole('progressbar')).toHaveCount(0);
     await expect(page.getByRole('img', { name: 'A photo you sent' })).toBeVisible();
     expect(inserts).toBe(0);

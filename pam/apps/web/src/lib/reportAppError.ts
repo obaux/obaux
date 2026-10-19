@@ -167,6 +167,11 @@ export function failureFor(action: string, caught: unknown, options: boolean | F
   return failureKindOf(caught, options);
 }
 
+/** Whether the phone says it has no network. A save checks this first and says so at once instead of waiting for a request to fail (Iris L7). */
+export function isOffline(): boolean {
+  return typeof navigator !== 'undefined' && navigator.onLine === false;
+}
+
 /** The code for a failed call whose answer carries a status: `const { error, status } = await ...; codeFromAnswer(error, status)`. */
 export function codeFromAnswer(error: unknown, status: unknown): string {
   const base = (error ?? {}) as { name?: unknown; code?: unknown };

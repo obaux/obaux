@@ -540,4 +540,77 @@ test.describe('The reminders screen with a yes already on file (Iris C2)', () =>
     await expect.poll(() => reports.length).toBe(1);
     expect(reports[0]).toMatchObject({ p_action: 'reminders.agree', p_code: '500', p_area: '/reminders/' });
   });
+
+  test('the alert never covers the button just tapped, at 320x568 (Iris L1)', async ({ page }) => {
+    await signedInAs(page, 'member', null, 'on');
+    await page.route(PREFS, (route) => (route.request().method() === 'GET' ? route.fulfill(json(null)) : route.fulfill({ status: 500, contentType: 'application/json', body: '{}' })));
+    await page.setViewportSize({ width: 320, height: 568 });
+    await page.goto('/reminders/');
+    await settled(page);
+    for (const name of ['Agree to receive texts', 'Not now']) {
+      // A fresh screen for each button: the failure banner stays until the save works or the person leaves.
+      await page.goto('/reminders/');
+      await settled(page);
+      const target = page.getByRole('button', { name }).or(page.getByRole('link', { name })).first();
+      await target.scrollIntoViewIfNeeded();
+      await target.click();
+      const alert = page.getByRole('alert').filter({ hasText: "Something's wrong on our side" });
+      await expect(alert).toBeVisible();
+      await page.waitForTimeout(300);
+      const a = (await alert.boundingBox())!;
+      const b = (await target.boundingBox())!;
+      expect(b.y + b.height, name).toBeLessThanOrEqual(a.y + 1);
+    }
+  });
+
+  test('with no network it says so at once, and a hung save is a failure after 15 seconds (Iris L7)', async ({ page }) => {
+    await signedInAs(page, 'member', null, 'on');
+    await page.goto('/reminders/');
+    await settled(page);
+    await page.context().setOffline(true);
+    const started = Date.now();
+    await page.getByRole('button', { name: 'Agree to receive texts' }).click();
+    await expect(page.getByRole('alert').filter({ hasText: "You're offline" })).toBeVisible({ timeout: 1500 });
+    expect(Date.now() - started).toBeLessThan(2000);
+    await page.context().setOffline(false);
+  });
+
+  test('a save that never answers is a failure after 15 seconds, logged as a timeout', async ({ page }) => {
+    const reports: Record<string, unknown>[] = [];
+    await page.route('**/rest/v1/rpc/report_app_error', (route) => {
+      reports.push(route.request().postDataJSON() as Record<string, unknown>);
+      return route.fulfill(json(false));
+    });
+    await signedInAs(page, 'member', null, 'on');
+    await page.route(PREFS, (route) => (route.request().method() === 'GET' ? route.fulfill(json(null)) : new Promise(() => undefined)));
+    await page.clock.install();
+    await page.goto('/reminders/');
+    await settled(page);
+    await page.getByRole('button', { name: 'Agree to receive texts' }).click();
+    await page.clock.fastForward(16_000);
+    await expect(page.getByRole('alert').filter({ hasText: 'That took too long' })).toBeVisible();
+    await expect.poll(() => reports.length).toBe(1);
+    expect(reports[0]).toMatchObject({ p_action: 'reminders.agree', p_code: 'timeout' });
+  });
+
+  test('the agree reached from a Text alerts switch is logged as alerts.agree (Iris L10)', async ({ page }) => {
+    const reports: Record<string, unknown>[] = [];
+    await page.route('**/rest/v1/rpc/report_app_error', (route) => {
+      reports.push(route.request().postDataJSON() as Record<string, unknown>);
+      return route.fulfill(json(false));
+    });
+    await signedInAs(page, 'member', null, 'on');
+    await page.route(PREFS, (route) => (route.request().method() === 'GET' ? route.fulfill(json(null)) : route.fulfill({ status: 500, contentType: 'application/json', body: '{}' })));
+    await page.goto('/reminders/?next=alerts&kind=message');
+    await settled(page);
+    await page.getByRole('button', { name: 'Agree to receive texts' }).click();
+    await expect.poll(() => reports.length).toBe(1);
+    expect(reports[0]).toMatchObject({ p_action: 'alerts.agree', p_code: '500' });
+    // A fresh screen: the failure banner stays until the save works or the person leaves.
+    await page.goto('/reminders/?next=alerts&kind=message');
+    await settled(page);
+    await page.getByRole('button', { name: 'Not now' }).or(page.getByRole('link', { name: 'Not now' })).first().click();
+    await expect.poll(() => reports.length).toBe(2);
+    expect(reports[1]).toMatchObject({ p_action: 'reminders.decline' });
+  });
 });

@@ -13,6 +13,8 @@ import { HelpButton } from '../../screens/HelpButton';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { useMalfunction } from '@/lib/malfunction';
+import { settleWithin } from '@/lib/settle';
+import { isOffline } from '@/lib/reportAppError';
 import { setReminderConsent } from '@/lib/useReminderConsent';
 import { TextKindsList } from '../../screens/TextKindsList';
 
@@ -115,13 +117,28 @@ function RemindersForm() {
    */
   const answer = async (value: boolean) => {
     if (session.status !== 'signed-in') return;
+    // Which action this is for the log: the agree reached from a Text alerts switch is alerts.agree (Iris L10), any other agree is reminders.agree.
+    const action = value ? (fromAlerts ? 'alerts.agree' : 'reminders.agree') : 'reminders.decline';
+    // The control just tapped: the alert is kept clear of it (Iris L1, at 320x568 it covered it). Found by its words, not by focus: a link
+    // that is tapped does not always take focus.
+    const label = value ? t('reminders.agree') : t('reminders.skip');
+    const tapped =
+      typeof document === 'undefined'
+        ? null
+        : (Array.from(document.querySelectorAll('button, a')).find((el) => el.textContent?.trim() === label) ?? document.activeElement);
+    // No network is said at once (Iris L7: it took 7 s), and no answer in 15 seconds is a failure (settleWithin), like a switch.
+    if (isOffline()) {
+      malfunction.show(action, { code: 'offline' }, tapped, { retry: () => void answer(value) });
+      return;
+    }
     setBusy(true);
-    const result = await setReminderConsent(session.session.userId, value);
-
-    if (!result.ok) {
-      setBusy(false);
+    const settled = await settleWithin(setReminderConsent(session.session.userId, value));
+    setBusy(false);
+    if (settled.status !== 'ok' || !settled.value.ok) {
       // A yes after a STOP is refused, not a failure: nothing is drawn or logged (the screen reads the STOP back and asks nothing).
-      if (!result.stopped) malfunction.show(value ? 'reminders.agree' : 'reminders.decline', { code: result.code });
+      if (settled.status === 'ok' && !settled.value.ok && settled.value.stopped) return;
+      const code = settled.status === 'ok' && !settled.value.ok ? settled.value.code : settled.status === 'timeout' ? 'timeout' : 'unknown';
+      malfunction.show(action, { code }, tapped, { retry: () => void answer(value) });
       return;
     }
     malfunction.clear();
