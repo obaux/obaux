@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { expect, userEvent, within } from 'storybook/test';
+import { Card } from '@astryxdesign/core/Card';
+import { Text } from '@astryxdesign/core/Text';
+import { VStack } from '@astryxdesign/core/VStack';
 import { Switch } from '@astryxdesign/core/Switch';
 import { SettingsList, SettingsRow } from '@pam/ui/SettingsList';
 import { useMalfunction } from '@/lib/malfunction';
@@ -17,11 +20,11 @@ import { useStoryText } from '../support/useStoryText';
  *
  * In these stories the save always fails, so the alert is what you see after the tap.
  */
-function FailingSwitch() {
+function FailingSwitch({ busy = false }: { readonly busy?: boolean }) {
   const tr = useStoryText();
   const malfunction = useMalfunction();
   const [pending, setPending] = useState(false);
-  return (
+  const row = (
     <SettingsList>
       <SettingsRow
         label={tr('alerts.closed')}
@@ -46,6 +49,18 @@ function FailingSwitch() {
       />
     </SettingsList>
   );
+  if (!busy) return row;
+  // A screen full of cards, so the alert is seen over real content and not an empty page: what is under it must not read through.
+  return (
+    <VStack gap={3}>
+      {row}
+      {['Program · Philadelphia', 'Mentor · Camden', 'Program · Chester', 'Case manager · Delaware', 'Program · Norristown', 'Mentor · Allentown', 'Program · Reading', 'Mentor · Lancaster', 'Program · York'].map((line) => (
+        <Card key={line} padding={4}>
+          <Text>{line}</Text>
+        </Card>
+      ))}
+    </VStack>
+  );
 }
 
 const meta = {
@@ -66,6 +81,9 @@ export const AfterTheTap: Story = {
     await expect(await within(document.body).findByRole('alert', {}, { timeout: 3000 })).toBeVisible();
   },
 };
+
+/** Over a busy screen: the alert has a surface of its own, so the cards under it do not read through its words. */
+export const OverContent: Story = { ...AfterTheTap, render: () => <FailingSwitch busy /> };
 
 export const Spanish: Story = { ...AfterTheTap, globals: { locale: 'es' } };
 export const Arabic: Story = { ...AfterTheTap, globals: { locale: 'ar' } };
