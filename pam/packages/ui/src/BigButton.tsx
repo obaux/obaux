@@ -3,6 +3,7 @@
 import * as stylex from '@stylexjs/stylex';
 import { Button } from './Button.js';
 import type { ReactNode } from 'react';
+import { stripIsolates } from '@pam/config';
 import { Text } from '@astryxdesign/core/Text';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { Press } from './motion.js';
@@ -100,7 +101,9 @@ export function BigButton({
   return (
     <Press>
       <Button
-        label={badge ? `${label}${nameJoiner}${badge}` : label}
+        // The name is not drawn, so it carries no bidi isolates (D-435): a caller that built the label or the count with `t` still
+        // gives a screen reader plain words. What is drawn below keeps them.
+        label={stripIsolates(badge ? `${label}${nameJoiner}${badge}` : label)}
         variant={variant}
         size="lg"
         width="100%"

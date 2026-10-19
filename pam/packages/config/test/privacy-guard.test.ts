@@ -28,7 +28,7 @@ const SCANNED_DIRS = ['apps/web/src', 'packages/ui/src'];
 const SKIPPED = /(^|\/)(stories|__tests__|e2e|gallery)(\/|$)|\.(test|spec|stories)\.(tsx?|mjs)$/;
 /** One match = one field, picker, pad, microphone or location request. */
 const COLLECTOR =
-  /<(TextField|TextArea|SearchField|SearchPill|CheckboxInput|VoiceInput|SignaturePad|ChatComposerInput|StaffInviteEmailInput|InviteEmailInput|PolicyUploadCard|input|textarea)\b|navigator\.geolocation|SpeechRecognition|getUserMedia|type="file"/g;
+  /<(TextField|TextArea|SearchField|SearchPill|CheckboxInput|CheckboxList|VoiceInput|SignaturePad|ChatComposerInput|StaffInviteEmailInput|InviteEmailInput|PolicyUploadCard|input|textarea)\b|navigator\.geolocation|SpeechRecognition|getUserMedia|type="file"/g;
 
 const stripComments = (source: string): string =>
   source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');

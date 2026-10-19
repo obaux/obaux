@@ -106,6 +106,40 @@ test.describe('keeping a place', () => {
       .toBe(true);
   });
 
+  test('the heart moves only after the save has gone through (D-616)', async ({ page }) => {
+    await signedIn(page, []);
+    let answer: (() => void) | null = null;
+    await page.route(SAVED_ROWS, (route) => {
+      answer = () => void route.fulfill(json([]));
+    });
+    await page.goto('/');
+    await settled(page);
+    await page.getByRole('button', { name: 'Save' }).click();
+    await expect.poll(() => answer !== null).toBe(true);
+    // The database has not answered: the heart has not moved.
+    await expect(page.getByRole('button', { name: 'Save' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Saved' })).toHaveCount(0);
+    answer!();
+    await expect(page.getByRole('button', { name: 'Saved' })).toBeVisible();
+    // "Saved" is said (and shown) once the save went through.
+    await expect(page.locator('[role=status]').filter({ hasText: /^Saved$/ })).toHaveCount(1);
+  });
+
+  test('a save that fails leaves the heart as it was and says so at the bottom, without a reason (D-616)', async ({ page }) => {
+    await signedIn(page, []);
+    await page.route(SAVED_ROWS, (route) => route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ message: 'secret detail' }) }));
+    await page.goto('/');
+    await settled(page);
+    await page.getByRole('button', { name: 'Save' }).click();
+    const alert = page.getByRole('alert').filter({ hasText: "That didn't go through. It's not your fault, so try again." });
+    await expect(alert).toBeVisible();
+    await expect(page.getByText('secret detail')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Save' })).toBeVisible();
+    await expect(page.getByText('That did not save')).toHaveCount(0);
+    // The word "Saved" beside the heart is for a save that went through (Will, 11 October): not for this one.
+    await expect(page.locator('main').getByText('Saved', { exact: true })).toHaveCount(0);
+  });
+
   test('the Saved tab lists what was kept, and Explore does not carry a second copy', async ({ page }) => {
     await signedIn(page, [PLACE]);
     await page.goto('/saved/');

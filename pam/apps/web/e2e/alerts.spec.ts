@@ -255,6 +255,27 @@ test.describe('Text alerts: what Iris found in b74 (B3, B6)', () => {
     if (bar) expect(box.y + box.height).toBeLessThanOrEqual(bar.y + 1);
   });
 
+  test('D-616: the alert has a surface of its own, so what is under it does not read through its words', async ({ page }) => {
+    await signedInAs(page, 'member', ON, 'on');
+    await page.route(PREFS, (route) => (route.request().method() === 'GET' ? route.fulfill(json(ON)) : route.fulfill({ status: 500, contentType: 'application/json', body: '{}' })));
+    await page.goto('/alerts/');
+    await settled(page);
+    await page.getByRole('switch', { name: CLOSED }).click();
+    const alert = page.getByRole('alert').filter({ hasText: MALFUNCTION });
+    await expect(alert).toBeVisible();
+    // Some layer from the alert up to the page is opaque: the alert is not drawn straight onto the content.
+    const opaque = await alert.evaluate((el) => {
+      for (let node: Element | null = el; node && node !== document.body; node = node.parentElement) {
+        const m = getComputedStyle(node).backgroundColor.match(/rgba?\(([^)]+)\)/);
+        if (!m) continue;
+        const parts = m[1]!.split(',').map((v) => parseFloat(v));
+        if (parts.length === 3 || (parts[3] ?? 1) >= 0.99) return true;
+      }
+      return false;
+    });
+    expect(opaque).toBe(true);
+  });
+
   test('D-616: the switch shows it is saving and moves only when the save succeeds', async ({ page }) => {
     await signedInAs(page, 'member', ON, 'on');
     let release: (() => void) | undefined;
@@ -479,5 +500,43 @@ test.describe('Text alerts', () => {
     await settled(page);
     await expect(page.getByRole('switch', { name: 'Someone wants to connect' })).toBeDisabled();
     await expect(page.getByText('Coming soon').first()).toBeVisible();
+  });
+});
+
+test.describe('The reminders screen with a yes already on file (Iris C2)', () => {
+  const YES = { sms_enabled: true, sms_stopped_at: null, alert_message: false, alert_booked: false, alert_changed: false, alert_trip: false };
+
+  test('says it is saved and does not ask again', async ({ page }) => {
+    await signedInAs(page, 'member', YES, 'on');
+    await page.goto('/reminders/');
+    await settled(page);
+    await expect(page.getByText('Saved.', { exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Agree to receive texts' })).toHaveCount(0);
+  });
+
+  test('still asks when nothing is on file', async ({ page }) => {
+    await signedInAs(page, 'member', null, 'on');
+    await page.goto('/reminders/');
+    await settled(page);
+    await expect(page.getByRole('button', { name: 'Agree to receive texts' })).toBeVisible();
+    await expect(page.getByText('Saved.', { exact: true })).toHaveCount(0);
+  });
+
+  test('a save that fails shows the small alert, not a card, and tells the error log (D-616)', async ({ page }) => {
+    const reports: Record<string, unknown>[] = [];
+    await page.route('**/rest/v1/rpc/report_app_error', (route) => {
+      reports.push(route.request().postDataJSON() as Record<string, unknown>);
+      return route.fulfill(json(false));
+    });
+    await signedInAs(page, 'member', null, 'on');
+    await page.route(PREFS, (route) => (route.request().method() === 'GET' ? route.fulfill(json(null)) : route.fulfill({ status: 500, contentType: 'application/json', body: '{}' })));
+    await page.goto('/reminders/');
+    await settled(page);
+    await page.getByRole('button', { name: 'Agree to receive texts' }).click();
+    await expect(page.getByRole('alert').filter({ hasText: "That didn't go through" })).toBeVisible();
+    await expect(page.getByText('Something went wrong')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Agree to receive texts' })).toBeEnabled();
+    await expect.poll(() => reports.length).toBe(1);
+    expect(reports[0]).toMatchObject({ p_action: 'reminders.agree', p_code: '500', p_area: '/reminders/' });
   });
 });

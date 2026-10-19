@@ -1,6 +1,6 @@
 'use client';
 
-import { codeFromError } from './reportAppError';
+import { codeFromAnswer, codeFromError } from './reportAppError';
 
 /**
  * Whether somebody has agreed to be texted reminders.
@@ -98,10 +98,10 @@ export async function setReminderConsent(memberId: string, enabled: boolean): Pr
   try {
     if (enabled && (await getTextStatus(memberId)).stopped) return REFUSED_AFTER_STOP;
     const { createClient } = await import('./supabase');
-    const { error } = await createClient()
+    const { error, status } = await createClient()
       .from('notification_preferences')
       .upsert({ member_id: memberId, sms_enabled: enabled }, { onConflict: 'member_id' });
-    return error ? { ok: false, code: codeFromError(error) } : SAVED;
+    return error ? { ok: false, code: codeFromAnswer(error, status) } : SAVED;
   } catch (caught) {
     return { ok: false, code: codeFromError(caught) };
   }
@@ -128,8 +128,8 @@ export async function setTextAlert(
     void alertsAreAllTheyGetTexts;
     const row: Record<string, unknown> = { member_id: memberId, [ALERT_COLUMN[kind]]: on };
     if (on) row.sms_enabled = true;
-    const { error } = await createClient().from('notification_preferences').upsert(row, { onConflict: 'member_id' });
-    return error ? { ok: false, code: codeFromError(error) } : SAVED;
+    const { error, status } = await createClient().from('notification_preferences').upsert(row, { onConflict: 'member_id' });
+    return error ? { ok: false, code: codeFromAnswer(error, status) } : SAVED;
   } catch (caught) {
     return { ok: false, code: codeFromError(caught) };
   }
