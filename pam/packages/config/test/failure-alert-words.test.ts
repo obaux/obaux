@@ -10,7 +10,7 @@ import { BUNDLES, EN, OTHER_LOCALES } from './_bundles.js';
  * check is the 320 audit of the banner.
  */
 const N = 'notice.malfunction.';
-const KINDS = ['offline', 'timeout', 'signedOut', 'notAllowed', 'tooMany', 'changed', 'gone', 'server'] as const;
+const KINDS = ['offline', 'timeout', 'signedOut', 'notAllowed', 'tooMany', 'changed', 'gone', 'server', 'wrongTime', 'refused'] as const;
 const LOCALES = ['en', ...OTHER_LOCALES] as const;
 
 describe('the failure alert: one title, one line per kind', () => {
@@ -25,7 +25,7 @@ describe('the failure alert: one title, one line per kind', () => {
 
   it.each(LOCALES)('%s: the buttons a line names are the words on those buttons', (locale) => {
     const b = BUNDLES[locale];
-    for (const kind of ['offline', 'timeout', 'server'] as const) expect(b[`${N}${kind}.body`], `${kind}.body names Try again`).toContain(b[`${N}action.retry`]!);
+    for (const kind of ['offline', 'timeout', 'server', 'refused'] as const) expect(b[`${N}${kind}.body`], `${kind}.body names Try again`).toContain(b[`${N}action.retry`]!);
     expect(b[`${N}changed.body`], 'changed.body names Show the latest').toContain(b[`${N}action.reload`]!);
     expect(b[`${N}action.help`], 'the Help button is the Help screen\'s name').toBe(b['help.title']);
   });
