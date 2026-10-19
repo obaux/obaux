@@ -232,7 +232,9 @@ gives:
   can only do this near the time of the visit."). A window can still close while the screen is open,
   even after Piper makes the check-in circle and the "I'm here" card match the database's windows.
   **G8** checks both.
-- **`refused` carries Try again** in Sage's words: "Check what you entered or picked".
+- **`refused` has Get help as its only button** (Sage, `98875861`): "Pam couldn't do that / Check
+  what you chose or typed. If it's right, tap Get help." Get help opens
+  `/support/something-didnt-go-through/`.
 - An outcome that already happened is `done` (Nico's classifier) and shows nothing (G3).
 - `INVITE_NEEDS_PHONE` is inline, by the field (Ava), not the alert.
 
@@ -285,11 +287,16 @@ gives:
   - With the clock moved past the edge while the page stays open, the tap gives `wrongTime`'s words
     ("Not at this time / You can only do this near the time of the visit."), not "Pam's side". No
     Try again is offered, since trying again can't help until the window opens.
-- **G9. `refused` and its Try again.** A `P0001` the screen can't map, a `23514` and a `22P02` show
-  Sage's line, "Check what you entered or picked", with Try again.
-  - Try again re-sends once, with what's now entered or picked.
-  - After the person changes the field, it succeeds.
-  - Unchanged, a second failure shows Get help (G4).
+- **G9. `refused` and its Get help.** Sage revised it at `98875861` (claude/sage-signs), replacing
+  `5c1956c9`. A `P0001` the screen can't map, a `23514` and a `22P02` show:
+  - the title "Pam couldn't do that";
+  - the line "Check what you chose or typed. If it's right, tap Get help.";
+  - Get help as the **only** button. There's no Try again, on the first failure or any later one.
+
+  Get help opens the help post `/support/something-didnt-go-through/`, and Back returns to the same
+  screen with what was typed or picked still there. After the person changes the field, the action
+  succeeds and no alert is left. The words fit at 320 in all seven languages, with Get help at least
+  44×44.
 
 ## Needs Will's phone
 
