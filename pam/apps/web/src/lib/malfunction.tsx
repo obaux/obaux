@@ -293,8 +293,11 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
   };
 
   const kindKey = shown ? KIND_KEY[shown.kind] : 'server';
-  const title = (shown?.again ? said('notice.malfunction.again.title') : undefined) ?? said(`notice.malfunction.${kindKey}.title`, 'notice.malfunction') ?? '';
-  const body = shown?.again
+  // The second failure of the same action says Help has more, and offers Get help; offline it does not: the help desk is on the website, and
+  // a phone with no network cannot reach it, so offline keeps its own words and Try again (D-618, Mira 19 October).
+  const second = Boolean(shown?.again) && shown?.kind !== 'offline';
+  const title = (second ? said('notice.malfunction.again.title') : undefined) ?? said(`notice.malfunction.${kindKey}.title`, 'notice.malfunction') ?? '';
+  const body = second
     ? (said('notice.malfunction.again.body') ?? said(`notice.malfunction.${kindKey}.body`))
     : said(`notice.malfunction.${kindKey}.body`);
 
@@ -346,7 +349,7 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
     }
     // Get help: when the same action fails a second time, and always for "Pam couldn't do that" (Try again would send the same thing). It opens the
     // help desk's page for this (Wren), and never says "contact Pam".
-    if (shown.again || shown.kind === 'refused') {
+    if (shown.kind === 'refused' || (shown.again && shown.kind !== 'offline')) {
       const text = label('help', 'help.title');
       if (text)
         list.push({

@@ -33,6 +33,11 @@ Nico's classifier is final at `9df19119` (ten kinds, `failureFor(action, caught,
 - The classifier is out of the root bundle (a lazy import), as Mira asked: budget within with 2.5 kB spare on this branch.
 - Specs on the real words: server, second failure (with its title and body and the help-desk request), signed out, not allowed, offline, changed (Show the latest reloads), close with no timer, axe, and the alerts.spec titles. 102 passed on all three projects.
 
+## Mira's two fixes (01:38)
+
+1. The pictures Will sees are of the real Text alerts screen on the e2e build, not a story: `docs/design/review/2026-10-19-d618-banner/` (offline, signed out, server, changed, refused, wrong time and second failure, in light, dark, Arabic and Russian at 320×568). Wrong time cannot be raised from Text alerts (its kind comes from a database guard's words, which the save's result does not carry), so that one was shot from a scratch build with a one-line flag in `AlertsView`, reverted and not committed.
+2. Offline, the second failure keeps the offline words and Try again, with no Get help and no "Still not working": the help desk is on the website and cannot load offline. Test added (`offline, a second failure keeps the offline words…`); it fails without the change on a build of the tree without it.
+
 ## Left undone
 
 - b77 (Piper's `settle.ts`) is not on main yet: merge main when it is, and resolve `malfunction.tsx` there.

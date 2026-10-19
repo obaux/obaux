@@ -157,6 +157,20 @@ test.describe('The failure banner (D-618)', () => {
     await expect(page.getByRole('switch', { name: CLOSED })).not.toBeChecked();
   });
 
+  test('offline, a second failure keeps the offline words and Try again, with no Get help (the help desk is on the website)', async ({ page, context }) => {
+    await failing(page, 500);
+    await context.setOffline(true);
+    await page.getByRole('switch', { name: CLOSED }).click();
+    const banner = page.getByRole('alert').filter({ hasText: "You're offline" });
+    await expect(banner.getByRole('button', { name: 'Try again' })).toBeVisible();
+    // Still offline: the same action fails again.
+    await banner.getByRole('button', { name: 'Try again' }).click();
+    await expect(banner.getByRole('button', { name: 'Try again' })).toBeVisible();
+    await expect(banner).toContainText('Check your Wi-Fi or mobile data');
+    await expect(page.getByRole('alert').filter({ hasText: 'Still not working' })).toHaveCount(0);
+    await expect(banner.getByRole('button', { name: 'Get help' })).toHaveCount(0);
+  });
+
   test('the close button takes it away, and it is never a timer', async ({ page }) => {
     await failing(page, 500);
     await page.getByRole('switch', { name: CLOSED }).click();
