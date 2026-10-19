@@ -139,9 +139,10 @@ test.describe('inviting somebody, on a page of its own (D-444)', () => {
     await page.getByLabel('Their first name').fill('Rosa');
     await page.getByLabel('Their mobile number').fill('215 555 0111');
     await page.getByRole('button', { name: 'Create link' }).click();
-    await expect(page.getByRole('alert').filter({ hasText: "That didn't go through. It's not your fault, so try again." })).toBeVisible();
+    // The cities' read failed with a 500: the alert's title for that kind (D-618, D-621), logged with its code.
+    await expect(page.getByRole('alert').filter({ hasText: "Something's wrong on our side" })).toBeVisible();
     await expect.poll(() => reports.length).toBe(1);
-    expect(reports[0]).toMatchObject({ p_action: 'invite.create' });
+    expect(reports[0]).toMatchObject({ p_action: 'invite.create', p_code: '500' });
     expect(asked).toHaveLength(0);
     await expect(page.getByLabel('Their first name')).toHaveValue('Rosa');
   });

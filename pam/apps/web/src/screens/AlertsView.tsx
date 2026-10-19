@@ -11,7 +11,8 @@ import { SettingsList, SettingsRow } from '@pam/ui/SettingsList';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
-import { settleWithin, useMalfunction } from '@/lib/malfunction';
+import { useMalfunction } from '@/lib/malfunction';
+import { settleWithin } from '@/lib/settle';
 import { ALERT_TEXTS_LIVE } from '@/lib/alertTextsLive';
 import { useTextsLive } from '@/lib/useTextsLive';
 import { setReminderConsent, setTextAlert, type AlertFlags, type AlertKind } from '@/lib/useReminderConsent';
@@ -204,7 +205,7 @@ function AlertsList() {
     }
     // Nothing moved. Only a code leaves this screen for the log (D-616, Nico): the save's own, or 'timeout'.
     const code = settled.status === 'ok' ? (settled.value.ok ? 'unknown' : settled.value.code) : settled.status === 'timeout' ? 'timeout' : 'unknown';
-    malfunction.show(`alerts.switch.${kind}`, { code }, control);
+    malfunction.show(`alerts.switch.${kind}`, { code }, control, { retry: () => void change(kind, on, control) });
     if (settled.status === 'timeout') void settled.late.then(() => reread());
   };
 
