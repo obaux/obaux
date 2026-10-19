@@ -6,7 +6,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
 import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
-import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { colorVars, fontWeightVars, radiusVars, shadowVars, spacingVars, textSizeVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { Button } from '@pam/ui/Button';
 import { useI18n } from './i18n';
 
@@ -35,21 +35,22 @@ const styles = stylex.create({
     width: '100%',
     maxWidth: '560px',
     boxSizing: 'border-box',
-    paddingBlock: '8px',
-    paddingInlineStart: '16px',
-    paddingInlineEnd: '4px',
-    borderRadius: '12px',
+    paddingBlock: spacingVars['--spacing-2'],
+    paddingInlineStart: spacingVars['--spacing-4'],
+    paddingInlineEnd: spacingVars['--spacing-1'],
+    borderRadius: radiusVars['--radius-container'],
     backgroundColor: colorVars['--color-error'],
     color: colorVars['--color-on-error'],
-    boxShadow: '0 4px 16px oklch(0 0 0 / 25%)',
+    boxShadow: shadowVars['--shadow-high'],
     // The host takes no taps (the page under it stays usable); the banner does.
     pointerEvents: 'auto',
   },
-  words: { flexGrow: 1, minWidth: 0, paddingBlock: '8px' },
-  title: { fontSize: '16px', fontWeight: 600, lineHeight: 1.35, color: colorVars['--color-on-error'] },
-  body: { fontSize: '14px', lineHeight: 1.4, color: colorVars['--color-on-error'] },
-  action: { minHeight: '48px', fontSize: '16px', fontWeight: 600, paddingInline: '12px', color: colorVars['--color-on-error'] },
-  close: { minHeight: '48px', minWidth: '48px', flexShrink: 0, color: colorVars['--color-on-error'] },
+  words: { flexGrow: 1, minWidth: 0, paddingBlock: spacingVars['--spacing-2'] },
+  // 16px is Pam's reading size (A23); Astryx has no token for it.
+  title: { fontSize: '16px', fontWeight: fontWeightVars['--font-weight-semibold'], lineHeight: 1.35, color: colorVars['--color-on-error'] },
+  body: { fontSize: textSizeVars['--font-size-base'], lineHeight: 1.4, color: colorVars['--color-on-error'] },
+  action: { minHeight: spacingVars['--spacing-12'], fontSize: '16px', fontWeight: fontWeightVars['--font-weight-semibold'], paddingInline: spacingVars['--spacing-3'], color: colorVars['--color-on-error'] },
+  close: { minHeight: spacingVars['--spacing-12'], minWidth: spacingVars['--spacing-12'], flexShrink: 0, color: colorVars['--color-on-error'] },
 });
 
 export function MalfunctionBanner({ title, body, actions, onClose }: MalfunctionBannerProps) {

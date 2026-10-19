@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
+import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { failureKindKey, type FailureKind } from '@pam/config';
 import type { NoticeToastSpec } from '@pam/ui/noticeSink';
 import { MalfunctionBanner } from './MalfunctionBanner';
@@ -63,17 +64,17 @@ const styles = stylex.create({
     zIndex: 60,
     display: 'flex',
     justifyContent: 'center',
-    paddingInline: '16px',
+    paddingInline: spacingVars['--spacing-4'],
     pointerEvents: 'none',
   },
   // How far up it sits: measured (see `useBottomInset`), so a dynamic style, not an inline one.
-  raisedBy: (inset: number) => ({ bottom: `calc(${inset}px + 12px + env(safe-area-inset-bottom, 0px))` }),
+  raisedBy: (inset: number) => ({ bottom: `calc(${inset}px + var(--spacing-3) + env(safe-area-inset-bottom, 0px))` }),
   stack: {
     width: '100%',
     maxWidth: '560px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '8px',
+    gap: spacingVars['--spacing-2'],
     // The host takes no taps (the page under it stays usable); what is in the stack does.
     pointerEvents: 'auto',
   },
