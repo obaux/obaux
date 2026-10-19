@@ -97,10 +97,10 @@ test.describe('A status notice is a toast (D-619)', () => {
     const box = (await toast.boundingBox())!;
     expect(box.y + box.height).toBeLessThanOrEqual(568);
     expect(box.y).toBeGreaterThan(568 / 4);
-    // The way out is a 48px link, and a state that lasts has no close.
+    // The way out is a quiet button at Astryx's small size (Will, 19 October 04:51; at least the 24px of WCAG 2.5.8), and a state that lasts has no close.
     const contact = toast.getByRole('link', { name: /Contact Pam/ });
     await expect(contact).toBeVisible();
-    expect(((await contact.boundingBox())!).height).toBeGreaterThanOrEqual(47);
+    expect(((await contact.boundingBox())!).height).toBeGreaterThanOrEqual(24);
     await expect(toast.getByRole('button', { name: 'Dismiss' })).toHaveCount(0);
     // Nothing the person can do takes it away: a tap elsewhere, a key, a swipe on it.
     await page.mouse.click(10, 10);

@@ -1,6 +1,5 @@
 'use client';
 
-import { HStack } from '@astryxdesign/core/HStack';
 import { Button } from '@pam/ui/Button';
 import { StackBanner, bannerAction } from './StackBanner';
 
@@ -29,11 +28,9 @@ export function MalfunctionBanner({ title, body, actions, onClose }: Malfunction
       onClose={onClose}
       actions={
         actions.length > 0 ? (
-          <HStack gap={1} wrap="wrap" align="center">
-            {actions.map((action) => (
-              <Button key={action.label} label={action.label} variant="secondary" onClick={action.onPress} xstyle={bannerAction} />
-            ))}
-          </HStack>
+          actions.map((action) => (
+            <Button key={action.label} label={action.label} variant="ghost" size="sm" onClick={action.onPress} xstyle={bannerAction} />
+          ))
         ) : undefined
       }
     />

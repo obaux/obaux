@@ -122,6 +122,26 @@ test.describe('The failure banner (D-618)', () => {
       .toBe(true);
   });
 
+  test('the close sits in the top corner, the words are Banner\'s small size, and two actions are the same width side by side (Will 04:51)', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 568 });
+    await failing(page, 500);
+    const toggle = page.getByRole('switch', { name: CLOSED });
+    await toggle.click();
+    await page.getByRole('alert').filter({ hasText: LINE }).getByRole('button', { name: 'Try again' }).click();
+    const banner = page.getByRole('alert').filter({ hasText: 'Still not working' });
+    await expect(banner.getByRole('button', { name: 'Get help' })).toBeVisible();
+    const box = (await banner.boundingBox())!;
+    const close = (await banner.getByRole('button', { name: 'Dismiss' }).boundingBox())!;
+    expect(close.y).toBeLessThan(box.y + 20);
+    expect(close.x + close.width).toBeGreaterThan(box.x + box.width - 24);
+    const again = (await banner.getByRole('button', { name: 'Try again' }).boundingBox())!;
+    const help = (await banner.getByRole('button', { name: 'Get help' }).boundingBox())!;
+    expect(Math.abs(again.width - help.width)).toBeLessThan(2);
+    expect(Math.abs(again.y - help.y)).toBeLessThan(2);
+    const size = await banner.locator('span[role=heading]').evaluate((el) => getComputedStyle(el).fontSize);
+    expect(parseFloat(size)).toBeLessThanOrEqual(14);
+  });
+
   test('the same switch failing twice in a row adds "Get help" (no "contact Pam" words), which opens Help', async ({ page }) => {
     await failing(page, 500);
     await page.getByRole('switch', { name: CLOSED }).click();
