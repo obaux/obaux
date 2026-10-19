@@ -1,6 +1,6 @@
--- contract: phone_stops.stopped_at is cut from a time to a day (Mira, 19 October: "no time beyond the day"), and phone_hash changes from a plain
--- SHA-256 to a keyed one, so a stop is no longer a hash anyone can reverse by trying every number. The migration REFUSES to run if the table has any
--- row (they would be plain hashes that cannot be kept honestly): the desk reads the count first, and Lena expects it to be 0.
+-- contract: phone_stops loses its stopped_at column (Mira, 19 October: the day is not needed, so the table is the keyed hash and nothing else), and
+-- phone_hash changes from a plain SHA-256 to a keyed one, so a stop is no longer a hash anyone can reverse by trying every number. Any row made
+-- with the old hash is deleted here: there are none (counted live on 19 October: phone_stops 0 rows, support_texts_log 0 rows).
 --
 -- DRAFT. Written for Lena's Privacy read before anything is built past it (Mira, 01:00). Not applied, and nothing that sends is on until texts_live is
 -- on and the Privacy line for this table is signed.
@@ -18,11 +18,16 @@
 --   * The hash is HMAC-SHA256 of the E.164 number with a key that lives only in the Vault (`phone_stop_key`, made here, never seen by anyone who
 --     writes code, never in the repository). Without the key, the table cannot be turned back into numbers or even tested against a guessed one.
 --     The stored value carries a `k1:` prefix so a new hash and an old one can be told apart.
---   * The table keeps ONE thing about the person: that this number said STOP, and the day. `stopped_at` becomes a date. No message, no count, no
---     account, no number.
+--   * The table keeps ONE thing: that this number said STOP. One column, the hash. No time, no day, no message, no count, no account, no number.
 --   * `record_sms_stop` (unchanged in code) writes the new keyed hash when no profile matches; `record_sms_start` removes it, and any old plain-hash
 --     row for the same number.
---   * There is no old form to keep: the migration stops if the table has rows, so every row that ever exists is a keyed one.
+--   * There is no old form to keep. Any row with the old hash is deleted here (there are none live) and `support_texts_log`, which kept the same plain
+--     hash for each number a super admin texted, is cleaned the same way and now gets the keyed hash too (`phone_hash` is what writes it), so no
+--     reversible hash of a number is left anywhere.
+--   * An erased account that was stopped puts the keyed hash of its number BACK in the list (Mira, 19 October), so a number that said STOP stays
+--     stopped when its account goes. This is the one case where the list holds a number that once had an account. Privacy says so.
+--   * Nothing is written to the audit log or any function log on the no-account branch: a STOP from a number with no account leaves one hash and
+--     nothing else.
 --   * When a profile gets a number, or changes it (insert, or update of phone), a trigger looks the number's hash up and, if it is there, puts the
 --     stop on the account (`notification_preferences.sms_stopped_at`, texts still off) AND DELETES THE ROW, so the list holds only people with no
 --     account (Lena, 19 October: otherwise a stop from a number with an account goes when the account is deleted, and a stop from a number without
@@ -37,13 +42,9 @@
 --
 -- Expand-only apart from the two contract changes named above.
 
-do $guard$
-begin
-  if exists (select 1 from public.phone_stops) then
-    raise exception 'phone_stops is not empty: rows made before this are plain hashes. Read them and decide with Lena before applying (expected: none, sms-inbound has never been on).';
-  end if;
-end;
-$guard$;
+-- Rows with the old hash (there are none live): deleted, because they cannot be kept honestly and cannot be rehashed without their numbers.
+delete from public.phone_stops where phone_hash not like 'k1:%';
+delete from public.support_texts_log where phone_hash not like 'k1:%';
 
 do $do$
 begin
@@ -104,12 +105,10 @@ end;
 $$;
 revoke all on function public.phone_hash(text) from public, anon, authenticated, service_role;
 
-alter table public.phone_stops
-  alter column stopped_at type date using stopped_at::date,
-  alter column stopped_at set default current_date;
+alter table public.phone_stops drop column stopped_at;
 revoke all on public.phone_stops from service_role;
 comment on table public.phone_stops is
-  'A number that texted STOP: a keyed hash (HMAC-SHA256, key in the Vault) and the day. Nothing else, no account, no number, no message (D-524, and the follow-up of 19 October). START removes it.';
+  'A number that texted STOP: its keyed hash (HMAC-SHA256, key in the Vault) and nothing else: no time, no account, no number, no message (D-524, and the follow-up of 19 October). START removes it.';
 
 create or replace function public.phone_is_stopped(p_phone text)
 returns boolean
@@ -194,3 +193,26 @@ drop trigger if exists profiles_carry_a_stopped_number on public.profiles;
 create trigger profiles_carry_a_stopped_number
   after insert or update of phone on public.profiles
   for each row execute function public.carry_a_stopped_number_onto_the_account();
+
+-- A stopped account that is erased leaves its number stopped: the keyed hash goes back in the list before the account's own record goes.
+create or replace function public.keep_the_stop_of_an_erased_account()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+begin
+  if old.phone is not null
+     and exists (select 1 from public.notification_preferences np where np.member_id = old.id and np.sms_stopped_at is not null)
+     and public.phone_hash(old.phone) is not null then
+    insert into public.phone_stops (phone_hash) values (public.phone_hash(old.phone)) on conflict do nothing;
+  end if;
+  return old;
+end;
+$$;
+revoke all on function public.keep_the_stop_of_an_erased_account() from public, anon, authenticated;
+
+drop trigger if exists profiles_keep_the_stop_when_erased on public.profiles;
+create trigger profiles_keep_the_stop_when_erased
+  before delete on public.profiles
+  for each row execute function public.keep_the_stop_of_an_erased_account();

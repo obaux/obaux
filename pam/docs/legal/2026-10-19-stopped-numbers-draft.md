@@ -69,3 +69,14 @@ sends.
 4. **The key** is a launch item (Lena put it on the before-launch list): a lost key, or a project move without the Vault, makes every `k1:` stop stop
    matching. `PHONE_STOP_KEY_MISSING` raises rather than guessing.
 5. **Sage's line**: Lena's rewrite replaces my draft line above ("Nobody can turn it back into your number" is not true).
+
+## Revised after the desk's decisions (Mira, 01:11)
+
+- No old rows exist (live count: `phone_stops` 0, `support_texts_log` 0). The migration deletes any old-hash row it finds, with the reason in its header.
+- `stopped_at` is dropped: the table is the keyed hash and nothing else.
+- **An erased account that was stopped puts the keyed hash of its number back in the list**, so that number stays stopped. This is the one case where the
+  list holds a number that once had an account. It means "delete my account" leaves a scrambled code of the number behind when the person had replied
+  STOP; the Privacy line has to say so (Lena: this changes how-long.p1 and your-choices.p2, which promise deletion on request; the stop is kept so we never
+  text a number that asked us to stop, and it goes on a START).
+- Nothing is written to the audit log or any log on the no-account branch (tested).
+- `support_texts_log` keeps the keyed hash, not the plain one; its old rows (none) are deleted.
