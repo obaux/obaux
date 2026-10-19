@@ -214,6 +214,17 @@ export const DATA_COLLECTED: readonly CollectedData[] = [
       'For Will (the reported-message clause, with a102): `privacy.s.who-can-see.p3` says staff see a reported message; ' +
       'no line says the reason and the report are kept.',
   },
+  {
+    id: 'staff-region',
+    what:
+      'The city (region) a super admin picks for a person they invite or approve (`InviteNewView`, `RequestReviewScreen`): ' +
+      'kept on that person\'s account (`profiles.region_id`) and shown in the Everyone list. It is data about the person, even though ' +
+      'they do not choose it.',
+    covers: null,
+    gap:
+      'For Will (the desk, Mira 19 October): `privacy.s.what-we-keep.p1` covers a city the person gives about themselves ' +
+      '(`home_city`, picked on About you); no line says Pam also keeps the city a staff member serves, which Pam\'s team chooses.',
+  },
 ];
 
 /**
@@ -386,18 +397,11 @@ export const INPUT_FILES: readonly InputFile[] = [
     file: 'apps/web/src/app/directory/page.tsx',
     fields: 2,
     notPersonal:
-      'A filter for the list already on the phone, and the switch with which the Pam team marks an account as a demo account (a mark Pam\'s staff set, not something the person gives).',
+      'A filter for the list already on the phone, and the Pam team\'s switch that makes one account\'s own screens show example data ' +
+      '(0057, `profiles.is_demo`). It says nothing about the person: it changes what that account sees, not what Pam knows about them.',
   },
-  {
-    file: 'apps/web/src/screens/InviteNewView.tsx',
-    fields: 1,
-    notPersonal: 'A super admin picks which city an invite is for; the invited person\'s name and number are typed in InviteForWho.',
-  },
-  {
-    file: 'apps/web/src/screens/RequestReviewScreen.tsx',
-    fields: 1,
-    notPersonal: 'A super admin picks the city a staff member will serve when approving their request; a decision by the Pam team, not something the person gives.',
-  },
+  { file: 'apps/web/src/screens/InviteNewView.tsx', fields: 1, collects: ['staff-region'] },
+  { file: 'apps/web/src/screens/RequestReviewScreen.tsx', fields: 1, collects: ['staff-region'] },
   {
     file: 'packages/ui/src/Dropdown.tsx',
     fields: 1,
