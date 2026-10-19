@@ -120,6 +120,50 @@ test.describe('inviting somebody, on a page of its own (D-444)', () => {
     expect(asked[0]).toMatchObject({ p_role: 'member', p_region_id: PHILLY });
   });
 
+  test("cities that cannot be read: Create link says so in the bottom alert, sends nothing, and is logged (Iris, D-618)", async ({ page }) => {
+    await signedInAs(page, 'super_admin', CITIES);
+    // Registered after signedInAs, so it wins: every read of the cities fails.
+    await page.route(REGIONS, (route) => route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ message: 'boom' }) }));
+    const asked: unknown[] = [];
+    await page.route(INVITE, (route) => {
+      asked.push(route.request().postDataJSON());
+      return route.fulfill(json({ code: '9T3YTVMT', expires_at: '2026-10-12T21:09:28Z', role: 'member' }));
+    });
+    const reports: Record<string, unknown>[] = [];
+    await page.route('**/rest/v1/rpc/report_app_error*', (route) => {
+      reports.push(route.request().postDataJSON() as Record<string, unknown>);
+      return route.fulfill(json(null));
+    });
+    await page.goto('/invite/new/?role=member');
+    await settled(page);
+    await page.getByLabel('Their first name').fill('Rosa');
+    await page.getByLabel('Their mobile number').fill('215 555 0111');
+    await page.getByRole('button', { name: 'Create link' }).click();
+    await expect(page.getByRole('alert').filter({ hasText: "That didn't go through. It's not your fault, so try again." })).toBeVisible();
+    await expect.poll(() => reports.length).toBe(1);
+    expect(reports[0]).toMatchObject({ p_action: 'invite.create' });
+    expect(asked).toHaveLength(0);
+    await expect(page.getByLabel('Their first name')).toHaveValue('Rosa');
+  });
+
+  test('cities that failed the first time are read again on Create link, and then asked for', async ({ page }) => {
+    await signedInAs(page, 'super_admin', CITIES);
+    let reads = 0;
+    await page.route(REGIONS, (route) => {
+      reads += 1;
+      return reads === 1 ? route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }) : route.fulfill(json(CITIES));
+    });
+    await page.goto('/invite/new/?role=member');
+    await settled(page);
+    await expect(page.getByRole('radio')).toHaveCount(0);
+    await page.getByLabel('Their first name').fill('Rosa');
+    await page.getByLabel('Their mobile number').fill('215 555 0111');
+    await page.getByRole('button', { name: 'Create link' }).click();
+    // Read again: now there are cities to pick from, and the tap says to pick one.
+    await expect(page.getByRole('radio')).toHaveCount(CITIES.length);
+    await expect(page.getByText('Pick a city first.')).toBeVisible();
+  });
+
   test('a case manager is never asked for a city, and a program may not invite a case manager', async ({ page }) => {
     await signedInAs(page, 'admin');
     const asked: Record<string, unknown>[] = [];

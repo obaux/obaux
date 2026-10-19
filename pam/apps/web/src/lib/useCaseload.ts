@@ -225,10 +225,16 @@ export async function createInvite(
 /** The cities Pam serves, with ids, for somebody allowed to see them. */
 export async function listRegions(): Promise<{ id: string; name: string }[]> {
   try {
-    const { createClient } = await import('./supabase');
-    const { data } = await createClient().from('regions').select('id, name').order('name');
-    return (data ?? []) as { id: string; name: string }[];
+    return await loadRegions();
   } catch {
     return [];
   }
+}
+
+/** The same, but a failure is thrown rather than read as "no cities", for a screen that cannot go on without one. */
+export async function loadRegions(): Promise<{ id: string; name: string }[]> {
+  const { createClient } = await import('./supabase');
+  const { data, error } = await createClient().from('regions').select('id, name').order('name');
+  if (error) throw error;
+  return (data ?? []) as { id: string; name: string }[];
 }
