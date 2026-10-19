@@ -120,12 +120,33 @@ test.describe('The failure banner (D-618)', () => {
   });
 
   test('a signed-out failure offers Sign in', async ({ page }) => {
-    await failing(page, 403, '{"code":"42501","message":"new row violates row-level security policy"}');
+    await failing(page, 401, '{"code":"PGRST301","message":"JWT expired"}');
     await page.getByRole('switch', { name: CLOSED }).click();
     const banner = page.getByRole('alert').filter({ hasText: LINE });
     await expect(banner.getByRole('button', { name: 'Sign in' })).toBeVisible();
     await banner.getByRole('button', { name: 'Sign in' }).click();
     await expect(page).toHaveURL(/\/signin\/\?next=\/alerts\/?$/);
+  });
+
+  test('a refused failure (not allowed) has no Try again and no Sign in: the way out is Get help on the second', async ({ page }) => {
+    await failing(page, 403, '{"code":"42501","message":"permission denied"}');
+    await page.getByRole('switch', { name: CLOSED }).click();
+    const banner = page.getByRole('alert').filter({ hasText: LINE });
+    await expect(banner).toBeVisible();
+    await expect(banner.getByRole('button', { name: /try again|sign in/i })).toHaveCount(0);
+    await expect(banner.getByRole('button', { name: 'Dismiss' })).toBeVisible();
+  });
+
+  test('offline (the phone has no network) offers Try again', async ({ page, context }) => {
+    const server = await failing(page, 500);
+    await context.setOffline(true);
+    await page.getByRole('switch', { name: CLOSED }).click();
+    const banner = page.getByRole('alert').filter({ hasText: LINE });
+    await expect(banner.getByRole('button', { name: 'Try again' })).toBeVisible();
+    await context.setOffline(false);
+    server.heal();
+    await banner.getByRole('button', { name: 'Try again' }).click();
+    await expect(page.getByRole('switch', { name: CLOSED })).not.toBeChecked();
   });
 
   test('the close button takes it away, and it is never a timer', async ({ page }) => {

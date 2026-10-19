@@ -97,6 +97,7 @@ const tapSwitch = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
 
 export const Offline: Story = { render: () => <FailingSwitch busy code="offline" />, play: tapSwitch };
 export const SignedOut: Story = { render: () => <FailingSwitch busy code={401} />, play: tapSwitch };
+export const Changed: Story = { render: () => <FailingSwitch busy code={409} />, play: tapSwitch };
 export const ServerFailed: Story = { render: () => <FailingSwitch busy code={500} />, play: tapSwitch };
 /** The same action failing again after "Try again": the banner adds Get help. */
 export const SecondFailure: Story = {

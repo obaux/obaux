@@ -13,10 +13,15 @@ Will, 19 October, 00:13 (Control Room), via the merge desk: *"for the error bann
 5. **Lazy.** The banner's render loads the first time a failure is shown, like the banner at the top, so the root bundle carries only the logic (the budget spare went from 6.0 to 5.4 kB).
 6. **`show(action, error, control)` keeps its signature**; `retry` is an optional fourth argument, so callers from before D-618 show no button.
 
-## Not decided here
+## Words and kinds
 
-- The words per kind (title and line) are Sage's. Until they land every kind says `notice.malfunction`, in a table (`WORDS` in `malfunction.tsx`) where each is one key. The buttons use words already signed (Try again, Sign in, Get help). "Reload" is not built: there is no signed word for it.
-- Kind comes from the code (`malfunctionKind.ts`), a stand-in for Nico's `classifyFailure`. Only a closed code reaches it, so an expired sign-in (`PGRST301`) arrives as `unknown`; the real classifier sees the whole error.
+The words are Sage's, signed at `ab6b9cc4` and mapped to keys at `6905e0e3` (`docs/signed-english.md`): `notice.malfunction.<kind>.title` / `.body` for the eight kinds, `notice.malfunction.again.body` for the second failure, `notice.malfunction.action.{retry,signIn,reload,help}` ("Show the latest" for reload). The kind comes from Nico's `failureKindOf` (`claude/messages-failure-kinds` @ `aed95a9c`, merged). The way out per kind is Sage's: Try again for offline, timeout and server (when the caller gave a retry), Sign in for signed-out, Show the latest for changed, none for not-allowed, too-many and gone; Get help on the second failure of the same action.
+
+**Until Lena puts the keys in the bundles** a kind with no key says `notice.malfunction` and shows no body, and a button with no key shows only if a word already signed exists for it (Try again, Sign in, Get help); Show the latest has none yet, so that button waits for its key. Nothing is added to `en.json` here.
+
+## The banner must be there when the network is not
+
+A failure is most often the network, so a banner that is fetched when it is needed would not come. It is fetched when the page is idle, and if it still could not be fetched a plain line of the same words on the same ground stands in. Found by a test that went offline before tapping.
 
 ## What a later session might reverse
 
