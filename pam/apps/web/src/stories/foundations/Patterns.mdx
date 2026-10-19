@@ -60,3 +60,20 @@ action, close), still at the bottom, and it says how to put it right: Try again 
 out, Get help when the same thing fails twice. Contact Pam is the last resort and is never said in those words. Taps inside it are its
 own; the banner is `useMalfunction().show(action, error, control, { retry })` and nothing else.
 
+## Every alert is Astryx's Banner, in red (D-621)
+
+Will, 19 October: *"The blue variant (but in red) is the style of alert banner I want to use across the entire app."*
+
+1. **One component.** An alert (a failure, an offline or paused account, a page that did not load, an invite that cannot be used) is
+   `Banner status="error"`: the tinted ground, the icon and title in red, the line, the actions at the end. Not a card, not a dark toast, not a
+   solid red block, and never a redraw from primitives. The blue and warning banners that are notes stay as they are.
+2. **At the bottom, in one stack**, above the tab bar, the keyboard and the safe area, on an opaque backing of the page's colour so
+   nothing under it reads through. A failure is the banner at the edge; a state the screen is in is above it.
+3. **A state that lasts has no close**, and goes when the state ends. A one-off can be closed. Every alert is announced at once (`role="alert"`).
+4. **It says how to put it right**: Try again, Sign in, Show the latest, Get help, Contact Pam. Contact Pam is the last resort and is not said when the
+   fix is elsewhere.
+5. **The screens that gate the app use the new header** (the large title bar with the round Help, or the sub-page bar with the round back), never the
+   old logo-and-Help-block page.
+
+Seen in Components › Feedback › Malfunction alert and Notice toast.
+

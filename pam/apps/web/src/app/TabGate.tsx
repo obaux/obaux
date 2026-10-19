@@ -2,7 +2,7 @@
 
 import { useEffect, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { AppHeader, HelpBar, Loading, Notice, Page } from '@pam/ui';
+import { Loading, Notice, Page } from '@pam/ui';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
@@ -53,10 +53,11 @@ export function TabGate({ children }: { readonly children: ReactNode }) {
 
   if (session.status === 'no-profile' || session.status === 'suspended') {
     return (
+      // The new layout's own bar (D-621; Will, 19 October: "This page is using the old header"): Help is the round button, and there is no
+      // Help block under the content. Sign out stays reachable: it is in `NotIn`.
       <Page gap={4}>
-        <AppHeader />
+        <LargeTitleHeader title={t('account.title')} isTitleHidden actions={<HeaderActions enabled={false} />} />
         <NotIn status={session.status} title={t('directory.signedOut.title')} body={t('reminders.signedOut')} />
-        <HelpBar label={t('nav.help')} variant="block" />
       </Page>
     );
   }
@@ -65,14 +66,13 @@ export function TabGate({ children }: { readonly children: ReactNode }) {
     const key = session.offline ? 'offline' : 'something_went_wrong';
     return (
       <Page gap={4}>
-        <AppHeader />
+        <LargeTitleHeader title={t('account.title')} isTitleHidden actions={<HeaderActions enabled={false} />} />
         <Notice
           notice={key}
           title={t(NOTICES[key].titleKey)}
           body={t(NOTICES[key].bodyKey)}
           contactLabel={t('help.contact.action')}
         />
-        <HelpBar label={t('nav.help')} variant="block" />
       </Page>
     );
   }

@@ -1,5 +1,7 @@
 # D-618 — D-618 The failure banner takes the alert banner's style, and says how to put it right
 
+> **Surface superseded by D-621** (Will, 19 October, 03:47): the failure banner is Astryx's `Banner` in red for every kind. The words, the way out per kind and the rest stand.
+
 **Date:** 2026-10-19 · **Branch:** `claude/pam-design-malfunction-banner`
 
 Will, 19 October, 00:13 (Control Room), via the merge desk: *"for the error banner please use the other alert banner style (ensure it fits properly on screen), and if saying something didn't work, please let users know how to resolve it … contact pam as a last resort (but don't explicitly state that)."*

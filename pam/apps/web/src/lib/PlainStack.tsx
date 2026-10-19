@@ -1,7 +1,7 @@
 'use client';
 
 import * as stylex from '@stylexjs/stylex';
-import { colorVars, fontWeightVars, radiusVars, spacingVars, textSizeVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { colorVars, fontWeightVars, radiusVars, shadowVars, spacingVars, textSizeVars } from '@astryxdesign/core/theme/tokens.stylex';
 import type { NoticeToastSpec } from '@pam/ui/noticeSink';
 
 /**
@@ -14,10 +14,17 @@ const styles = stylex.create({
   // The stand-in has no measuring (the tab bar, the keyboard): it sits at the bottom edge until the stack has loaded.
   host: { position: 'fixed', insetInline: 0, insetBlockEnd: `calc(${spacingVars['--spacing-3']} + env(safe-area-inset-bottom, 0px))`, zIndex: 60, display: 'flex', justifyContent: 'center', paddingInline: spacingVars['--spacing-4'], pointerEvents: 'none' },
   stack: { width: '100%', maxWidth: '560px', display: 'flex', flexDirection: 'column', gap: spacingVars['--spacing-2'], pointerEvents: 'auto' },
-  card: { boxSizing: 'border-box', width: '100%', padding: spacingVars['--spacing-4'], borderRadius: radiusVars['--radius-container'] },
-  // The dark card: the inverse of the page, so its words are the page's own colour (light on dark, and dark on light in dark mode).
-  dark: { backgroundColor: colorVars['--color-background-inverted'], color: colorVars['--color-background-body'] },
-  red: { backgroundColor: colorVars['--color-error'], color: colorVars['--color-on-error'] },
+  // Banner's red, in plain markup: the error tint over the page's own colour (so it is opaque over content), in the red text colour.
+  card: {
+    boxSizing: 'border-box',
+    width: '100%',
+    padding: spacingVars['--spacing-4'],
+    borderRadius: radiusVars['--radius-container'],
+    boxShadow: shadowVars['--shadow-high'],
+    backgroundColor: colorVars['--color-background-body'],
+    backgroundImage: 'linear-gradient(var(--color-error-muted), var(--color-error-muted))',
+    color: colorVars['--color-text-red'],
+  },
   title: { margin: 0, fontSize: textSizeVars['--font-size-lg'], fontWeight: fontWeightVars['--font-weight-semibold'] },
   // 16px is Pam's reading size (A23); Astryx has no token for it (its base is 14px, its next step 17px).
   body: { margin: 0, fontSize: '16px' },
@@ -48,15 +55,15 @@ export function PlainStack({ notices, lostBanner }: { readonly notices: readonly
         return (
           <div
             key={id}
-            role={spec.status === 'info' ? 'status' : 'alert'}
-            {...stylex.props(styles.card, spec.status === 'error' ? styles.red : styles.dark)}
+            role="alert"
+            {...stylex.props(styles.card)}
           >
             {inner}
           </div>
         );
       })}
       {lostBanner ? (
-        <div role="alert" {...stylex.props(styles.card, styles.red)}>
+        <div role="alert" {...stylex.props(styles.card)}>
           <p {...stylex.props(styles.title)}>{lostBanner}</p>
         </div>
       ) : null}

@@ -1,5 +1,7 @@
 # D-619 — D-619 A status Notice is the toast, in the one stack with the failure banner
 
+> **Superseded in part by D-621** (Will, 19 October, 03:47): every alert is Astryx's `Banner` in red. Point 4 (red for a fault, a calm card for the rest) and the drawn-here card are replaced; the stack, the lasting-has-no-close rule and the stand-in stand.
+
 **Date:** 2026-10-19 · **Branch:** `claude/pam-design-warning-toast`
 
 Will, 19 October, 00:26 (answering a105): *"I want to stop using this style. Please use the toast banner instead."* The merge desk read "this style" as the status card (`Notice`) and "the toast banner" as Astryx's `Toast`; no toast was in use before.

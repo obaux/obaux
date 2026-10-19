@@ -3,13 +3,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
-import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
-import { AppHeader, BigButton, HelpBar, Notice, Page, PageTitle } from '@pam/ui';
+import { BigButton, Notice, SubPage } from '@pam/ui';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSession, signOut } from '@/lib/useSession';
 import { ProfileLoading, ProfileScreen } from '../../screens/ProfileScreen';
+import { HelpButton } from '../../screens/HelpButton';
 
 /**
  * Your account — and the way out.
@@ -77,30 +77,25 @@ export default function AccountPage() {
 
   if (session.status === 'signed-out') {
     return (
-      <Page gap={4}>
-        <AppHeader accountHref={null} />
-        <PageTitle title={t('account.title')} backHref="/" backLabel={t('nav.back.home')} />
+      // The new layout's bar (D-621): the round back and Help, not the old page's logo and Help block.
+      <SubPage title={t('account.title')} backHref="/" backLabel={t('nav.back.home')} actions={<HelpButton />}>
         <Text xstyle={styles.intro}>{t('account.signedOut')}</Text>
         <BigButton label={t('signin.title')} href="/signin/" />
-        <HelpBar label={t('nav.help')} variant="block" />
-      </Page>
+      </SubPage>
     );
   }
 
   if (session.status === 'error') {
     const key = session.offline ? 'offline' : 'something_went_wrong';
     return (
-      <Page gap={4}>
-        <AppHeader accountHref={null} />
-        <PageTitle title={t('account.title')} backHref="/" backLabel={t('nav.back.home')} />
+      <SubPage title={t('account.title')} backHref="/" backLabel={t('nav.back.home')} actions={<HelpButton />}>
         <Notice
           notice={key}
           title={t(NOTICES[key].titleKey)}
           body={t(NOTICES[key].bodyKey)}
           contactLabel={t('help.contact.action')}
         />
-        <HelpBar label={t('nav.help')} variant="block" />
-      </Page>
+      </SubPage>
     );
   }
 
@@ -113,10 +108,7 @@ export default function AccountPage() {
    * account is paused is told so once, here, rather than by every screen.
    */
   return (
-    <Page gap={4}>
-      <AppHeader accountHref={null} />
-      <PageTitle title={t('account.title')} backHref="/" backLabel={t('nav.back.home')} />
-
+    <SubPage title={t('account.title')} backHref="/" backLabel={t('nav.back.home')} actions={<HelpButton />}>
       {session.status === 'suspended' ? (
         <Notice
           notice="account_suspended"
@@ -133,8 +125,6 @@ export default function AccountPage() {
         </>
       ) : null}
 
-      <HelpBar label={t('nav.help')} variant="block" />
-
       {/* No line under the button (D-608): nobody needs it to decide. */}
       <BigButton
         label={busy ? t('account.signingOut') : t('signin.signout')}
@@ -142,6 +132,6 @@ export default function AccountPage() {
         onPress={() => void leave()}
         isDisabled={busy}
       />
-    </Page>
+    </SubPage>
   );
 }

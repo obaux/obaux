@@ -186,7 +186,7 @@ function FailureBanner({ failure, onClose }: { readonly failure: Failure; readon
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [kind, failure, t, onClose]);
 
-  return <MalfunctionBanner title={title} body={body} actions={actions} tone={kind === 'server' || kind === 'timeout' ? 'fault' : 'calm'} onClose={onClose} />;
+  return <MalfunctionBanner title={title} body={body} actions={actions} onClose={onClose} />;
 }
 
 export function BottomStack({
