@@ -141,6 +141,24 @@ test("a failed I'm here is the small alert at the bottom, with no reason, and th
   await expect(page.getByRole('button', { name: "I'm here" })).toBeEnabled();
 });
 
+test("a failed I'm here offers Try again although the screen passes no retry: it presses I'm here again (the line says to tap it)", async ({ page, context }) => {
+  await context.grantPermissions(['geolocation']);
+  await context.setGeolocation({ latitude: 39.95, longitude: -75.16 });
+  await signedIn(page, hoursFromNow(0.5));
+  let asked = 0;
+  await page.route('**/rest/v1/rpc/i_am_here*', (route) => {
+    asked += 1;
+    return asked === 1 ? route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }) : route.fulfill(json([{ appointment_id: VISIT, there: true, points: 100 }]));
+  });
+  await open(page);
+  await page.getByRole('button', { name: "I'm here" }).click();
+  const alert = page.getByRole('alert').filter({ hasText: ALERT });
+  await alert.getByRole('button', { name: 'Try again' }).click();
+  await expect.poll(() => asked).toBe(2);
+  await expect(page.getByText('Your visit is marked.')).toBeVisible();
+  await expect(alert).toHaveCount(0);
+});
+
 test('a failed I went is the same small alert, and the link is as it was (D-616)', async ({ page }) => {
   await signedIn(page, hoursFromNow(0.5));
   await page.route('**/rest/v1/rpc/i_went*', (route) => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));

@@ -28,6 +28,8 @@ export interface StackNotice {
 export interface Failure {
   readonly seq: number;
   readonly kind: FailureKind;
+  /** The action on the closed list that failed (for the dev-build note when there is nothing to try again). */
+  readonly action: string;
   readonly retry: (() => void) | undefined;
   readonly refresh: (() => void) | undefined;
   readonly again: boolean;
@@ -108,6 +110,14 @@ function useBottomInset(): number {
   return inset;
 }
 
+/** What a person presses: the control a failed save came from can be pressed again the way they would by hand. */
+const PRESSABLE = 'button, a[href], input[type="checkbox"], [role="button"], [role="switch"], [role="checkbox"], [role="link"]';
+function pressable(source: Element | null): source is HTMLElement {
+  return source instanceof HTMLElement && source.isConnected && source.closest(PRESSABLE) === source;
+}
+/** Disabled is looked at when "Try again" is pressed, not when it is drawn: the screen that failed is still catching up with its own state then. */
+const enabled = (control: HTMLElement) => !(control as HTMLButtonElement).disabled && control.getAttribute('aria-disabled') !== 'true';
+
 function FailureBanner({ failure, onClose }: { readonly failure: Failure; readonly onClose: () => void }) {
   const { t } = useI18n();
   const kind = failure.kind;
@@ -146,15 +156,22 @@ function FailureBanner({ failure, onClose }: { readonly failure: Failure; readon
           },
         });
     }
-    if (way === 'retry' && failure.retry) {
-      const retry = failure.retry;
+    if (way === 'retry') {
+      // Try again runs what the caller gave; with none it presses the control that failed again, as the person would by hand; with neither, the
+      // caller's refresh. With none of these the line would send people to a button that is not there, so there is no button and a dev build says so.
+      const source = failure.source;
+      const run = (): (() => void) | null =>
+        failure.retry ?? (pressable(source) ? () => (enabled(source) ? source.click() : failure.refresh?.()) : (failure.refresh ?? null));
       const text = label('retry', 'messages.thread.tryAgain');
-      if (text)
+      if (run() === null) {
+        if (process.env.NODE_ENV !== 'production') console.error(`[alert] "${failure.action}" failed with nothing to try again: pass options.retry`);
+      } else if (text)
         list.push({
           label: text,
           onPress: () => {
+            const again = run();
             onClose();
-            retry();
+            again?.();
           },
         });
     }

@@ -67,3 +67,7 @@ The spacer alone was not enough (Nico/Mira, b77 L1 on /reminders/ and thread rep
 ## D-621 look (Will 04:51)
 
 `StackBanner` uses Banner's own text sizes; actions are quiet ghost `sm` buttons in the description under the line, equal width (flex-wrap, basis 5rem, min-width max-content); close alone in the corner. e2e: new test "the close sits in the top corner…", the Contact Pam check is >=24px. Pictures re-shot, old ones replaced.
+
+## Try again with no retry (Mira 05:40)
+
+`BottomStack` Try again: retry, else press `source`, else refresh, else no button + dev console.error. `malfunction.tsx` notes the last pressed control; `classifyFailure.sourceOf` picks the source. Disabled is checked at press time (the card is still catching up when the banner draws). Budget 2.1 kB spare. Pictures re-shot (Save now shows Try again).

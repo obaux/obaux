@@ -22,3 +22,15 @@ export async function classifyAndLog(action: string, error: unknown): Promise<Fa
   reportAppError({ action, code: codeFromError(error) });
   return kind;
 }
+
+/**
+ * The control a failure came from, for "Try again" and the scroll-clear: the one the caller named (the pressable around it), else the one pressed last
+ * if that was in the last 20 seconds (a save gives up after 15, settle.ts), else whatever the caller named. A button the save disabled has lost focus
+ * by the time it fails, so the caller's `document.activeElement` is often the page itself.
+ */
+const PRESS = 'button, a[href], [role="button"], [role="switch"], [role="checkbox"], input[type="checkbox"]';
+export function sourceOf(from: Element | null | undefined, pressed: { readonly element: Element; readonly at: number } | null): Element | null {
+  const there = (element: Element | null | undefined): element is Element => !!element && element.isConnected && element !== document.body && element !== document.documentElement;
+  const named = there(from) ? from : null;
+  return named?.closest(PRESS) ?? (pressed && Date.now() - pressed.at < 20_000 && there(pressed.element) ? pressed.element : null) ?? named;
+}

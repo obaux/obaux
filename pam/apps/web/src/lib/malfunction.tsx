@@ -26,7 +26,7 @@ import { PlainStack } from './PlainStack';
  */
 
 export interface MalfunctionOptions {
-  /** Runs the same action again. With it the banner offers "Try again"; without it, no button (callers from before D-618 are unchanged). */
+  /** Runs the same action again. Without it, "Try again" presses the control that failed (`source`) again, then `refresh`; with none of these there is no button. */
   readonly retry?: () => void;
   /** Re-reads the screen, for "Show the latest" when someone changed it first. Left out, the page is reloaded. */
   readonly refresh?: () => void;
@@ -46,6 +46,8 @@ interface MalfunctionApi {
 
 const MalfunctionContext = createContext<MalfunctionApi | null>(null);
 
+const PRESS = 'button, a[href], [role="button"], [role="switch"], [role="checkbox"], input[type="checkbox"]';
+
 export function MalfunctionProvider({ children }: { readonly children: ReactNode }) {
   const { t } = useI18n();
   const pathname = usePathname();
@@ -56,7 +58,9 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
   // The status `Notice`s on screen, as toasts (D-619), and the ones a person closed.
   const [notices, setNotices] = useState<readonly StackNotice[]>([]);
   const [closed, setClosed] = useState<ReadonlySet<string>>(new Set());
-  const source = useRef<Element | null>(null);
+  // The control a person pressed last (not one in an alert): what "Try again" presses when a screen passed no retry, and where the page scrolls to keep
+  // clear of the alert. A save that is running often disables its button, so the focused element has moved by the time it fails.
+  const lastPressed = useRef<{ readonly element: Element; readonly at: number } | null>(null);
   const hostRef = useRef<HTMLDivElement | null>(null);
   // The action that last failed and has not since succeeded, left, or been cleared: its next failure is the second.
   const lastFailed = useRef<string | null>(null);
@@ -72,6 +76,14 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
       }
       return current;
     });
+  }, []);
+  useEffect(() => {
+    const note = (event: Event) => {
+      const target = event.target instanceof Element ? event.target.closest(PRESS) : null;
+      if (target && !target.closest('[role="alert"]')) lastPressed.current = { element: target, at: Date.now() };
+    };
+    document.addEventListener('click', note, true);
+    return () => document.removeEventListener('click', note, true);
   }, []);
   // Fetched when the page is idle, not when it fails: a failure is most often the network, and the stack that has to be fetched then would not come.
   useEffect(() => {
@@ -91,16 +103,20 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
     // The classifier, the log and the session check are in a module fetched at idle (not in the root bundle), so the failure is looked at once it
     // is here. An outcome that has in fact already happened (a place already saved) shows nothing. If the module could not be fetched (offline
     // from the start) the banner still comes, saying the one line.
-    const present = (kind: FailureKind) => {
+    const present = (kind: FailureKind, source: Element | null) => {
       const again = lastFailed.current === action;
       lastFailed.current = action;
       setSeq((n) => n + 1);
-      setShown({ kind, retry: options?.retry, refresh: options?.refresh, again, source: from ?? null });
+      setShown({ kind, action, retry: options?.retry, refresh: options?.refresh, again, source });
       loadBanner();
     };
+    const pressed = lastPressed.current;
     import('./classifyFailure').then(
-      (mod) => mod.classifyAndLog(action, error).then((kind) => (kind === 'done' ? options?.refresh?.() : present(kind)), () => present('server')),
-      () => present('server'),
+      (mod) => {
+        const source = mod.sourceOf(from, pressed);
+        return mod.classifyAndLog(action, error).then((kind) => (kind === 'done' ? options?.refresh?.() : present(kind, source)), () => present('server', source));
+      },
+      () => present('server', from ?? null),
     );
   }, [loadBanner]);
   const clear = useCallback(() => {
