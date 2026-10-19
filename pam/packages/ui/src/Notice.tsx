@@ -247,11 +247,11 @@ const compactStyles = stylex.create({
     borderInlineStartWidth: '4px',
     borderInlineStartStyle: 'solid',
     borderRadius: '8px',
-    backgroundColor: 'var(--color-background-sunken, transparent)',
+    backgroundColor: 'var(--color-background-muted, transparent)',
   },
   text: { fontSize: '16px', lineHeight: 1.4 },
-  error: { borderInlineStartColor: 'var(--color-text-error, currentColor)' },
-  warning: { borderInlineStartColor: 'var(--color-text-warning, currentColor)' },
+  error: { borderInlineStartColor: 'var(--color-text-red, currentColor)' },
+  warning: { borderInlineStartColor: 'var(--color-text-orange, currentColor)' },
   info: { borderInlineStartColor: 'var(--color-text-accent, currentColor)' },
 });
 
