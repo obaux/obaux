@@ -57,3 +57,7 @@ The old header: `TabGate`'s paused, no-profile and could-not-load states and `/a
 ## Needs a human
 
 Will to see the pictures before it ships.
+
+## Follow-up: banner never traps a control (Nico, 320x568)
+
+`BottomStack` now adds an in-flow spacer as tall as the stack at the end of the page, so the last controls scroll above the banner. Test: `malfunction-banner.spec.ts` "scrolls its last control clear" (fails on the old build: 455 vs 413).
