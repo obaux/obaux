@@ -516,6 +516,6 @@ test.describe('The reminders screen with a yes already on file (Iris C2)', () =>
     await expect(page.getByText('Something went wrong')).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Agree to receive texts' })).toBeEnabled();
     await expect.poll(() => reports.length).toBe(1);
-    expect(reports[0]).toMatchObject({ p_action: 'reminders.agree' });
+    expect(reports[0]).toMatchObject({ p_action: 'reminders.agree', p_code: '500', p_area: '/reminders/' });
   });
 });

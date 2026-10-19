@@ -1,6 +1,6 @@
 'use client';
 
-import { codeFromError, type ActionResult } from './reportAppError';
+import { codeFromAnswer, codeFromError, type ActionResult } from './reportAppError';
 
 /**
  * Says a message is not safe (D-177).
@@ -17,11 +17,11 @@ import { codeFromError, type ActionResult } from './reportAppError';
 export async function reportMessage(messageId: string, reason: string): Promise<ActionResult> {
   try {
     const { createClient } = await import('./supabase');
-    const { error } = await createClient().rpc('report_message', {
+    const { error, status } = await createClient().rpc('report_message', {
       p_message_id: messageId,
       p_reason: reason,
     });
-    return error ? { ok: false, code: codeFromError(error) } : { ok: true };
+    return error ? { ok: false, code: codeFromAnswer(error, status) } : { ok: true };
   } catch (caught) {
     return { ok: false, code: codeFromError(caught) };
   }

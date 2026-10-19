@@ -875,7 +875,8 @@ test.describe('a conversation', () => {
 
     await expect.poll(() => reports.length).toBe(1);
     expect(reports[0]).toMatchObject({ p_action: 'messages.send', p_area: '/messages/thread/', p_platform: 'web' });
-    expect(String(reports[0]!['p_code'])).toMatch(/^([0-9]{3}|[0-9A-Z]{5}|offline|timeout|unknown)$/);
+    // The 500 answer carries no SQLSTATE, so the HTTP status names it (Iris D2).
+    expect(reports[0]).toMatchObject({ p_code: '500' });
     expect(JSON.stringify(reports)).not.toMatch(/2155550100|My number/);
   });
 
@@ -1009,7 +1010,7 @@ test.describe('a conversation', () => {
     await expect(page.getByRole('heading', { name: 'Block this person?' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Block', exact: true })).toBeEnabled();
     await expect.poll(() => reports.length).toBe(1);
-    expect(reports[0]).toMatchObject({ p_action: 'messages.block' });
+    expect(reports[0]).toMatchObject({ p_action: 'messages.block', p_code: '500', p_area: '/messages/thread/options/' });
 
     await page.goto(`/messages/thread/report/?id=${CONVO}`);
     await settled(page);

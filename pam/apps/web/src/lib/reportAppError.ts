@@ -1,4 +1,4 @@
-import { appErrorCode, isAppErrorAction } from '@pam/config';
+import { appErrorCode, appErrorRoute, isAppErrorAction } from '@pam/config';
 
 /**
  * Tells the team that something a person did did not work (D-616; Will: "if something breaks, create an error log so the team can
@@ -113,8 +113,22 @@ export function codeFromError(caught: unknown, online: boolean = typeof navigato
   if (!online) return 'offline';
   const error = caught as { name?: unknown; code?: unknown; status?: unknown } | null | undefined;
   if (error?.name === 'AbortError') return 'timeout';
-  const code = typeof error?.code === 'string' || typeof error?.code === 'number' ? error.code : error?.status;
-  return appErrorCode(typeof code === 'string' || typeof code === 'number' ? code : null);
+  // A SQLSTATE is the most exact thing the database says; a PostgREST error with none (a 500, a gateway) is named by the HTTP status
+  // of the answer instead (Iris D2).
+  const own = appErrorCode(typeof error?.code === 'string' || typeof error?.code === 'number' ? error.code : null);
+  if (own !== 'unknown') return own;
+  return appErrorCode(typeof error?.status === 'number' || typeof error?.status === 'string' ? error.status : null);
+}
+
+/** The code for a failed call whose answer carries a status: `const { error, status } = await ...; codeFromAnswer(error, status)`. */
+export function codeFromAnswer(error: unknown, status: unknown): string {
+  const base = (error ?? {}) as { name?: unknown; code?: unknown };
+  return codeFromError({ name: base.name, code: base.code, status });
+}
+
+/** Whether the database answered at all: any HTTP status means it did (even a 5xx with nothing in it); only a network failure (status 0) did not. */
+export function databaseAnswered(answer: { readonly status?: number }): boolean {
+  return typeof answer.status === 'number' && answer.status > 0;
 }
 
 function platform(): string {
@@ -128,10 +142,9 @@ export const reportAppError = createReporter({
     // Loaded when a report goes, not with the page: every route's Providers import this file (through the malfunction alert),
     // and a static import put the whole Supabase client in the root layout's chunk, 84 kB over §12's budget (b76).
     const { createClient } = await import('./supabase');
-    const { error } = await createClient().rpc('report_app_error', wire);
-    // A refusal from the database (switch off, rate limit, bad value) is an answer, not a network failure.
-    // A PostgREST answer carries a code; a network failure does not.
-    return !error || Boolean((error as { code?: string }).code);
+    // Any answer is an answer (a refusal, a 5xx with nothing in it): it is dropped, not sent again with every later failure (Iris D3).
+    // Only a network failure stays queued.
+    return databaseAnswered(await createClient().rpc('report_app_error', wire));
   },
   online: () => typeof navigator === 'undefined' || navigator.onLine !== false,
   whenOnline: (fn) => {
@@ -145,7 +158,7 @@ export const reportAppError = createReporter({
       locale = null;
     }
     return {
-      p_area: typeof location !== 'undefined' ? location.pathname : '/',
+      p_area: typeof location !== 'undefined' ? appErrorRoute(location.pathname) : '/',
       p_build: process.env['NEXT_PUBLIC_PAM_BUILD'] ?? null,
       p_platform: platform(),
       p_locale: locale,

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { codeFromError, type ActionResult } from './reportAppError';
+import { codeFromAnswer, codeFromError, type ActionResult } from './reportAppError';
 
 /**
  * Blocking, from inside a conversation (0076, D-206; the control is D-463).
@@ -40,8 +40,8 @@ export async function getBlockState(conversationId: string): Promise<BlockState 
 async function call(name: 'block_in_conversation' | 'unblock_in_conversation', conversationId: string): Promise<ActionResult> {
   try {
     const { createClient } = await import('./supabase');
-    const { error } = await createClient().rpc(name, { p_conversation: conversationId });
-    return error ? { ok: false, code: codeFromError(error) } : { ok: true };
+    const { error, status } = await createClient().rpc(name, { p_conversation: conversationId });
+    return error ? { ok: false, code: codeFromAnswer(error, status) } : { ok: true };
   } catch (caught) {
     return { ok: false, code: codeFromError(caught) };
   }
