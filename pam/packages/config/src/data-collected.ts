@@ -215,15 +215,18 @@ export const DATA_COLLECTED: readonly CollectedData[] = [
       'no line says the reason and the report are kept.',
   },
   {
-    id: 'staff-region',
+    id: 'account-region',
     what:
-      'The city (region) a super admin picks for a person they invite or approve (`InviteNewView`, `RequestReviewScreen`): ' +
-      'kept on that person\'s account (`profiles.region_id`) and shown in the Everyone list. It is data about the person, even though ' +
-      'they do not choose it.',
+      'The city (region) on every account (`profiles.region_id`), copied from the invite or the approval when the account is made ' +
+      '(`redeem_invite`, 0086): picked by a super admin for a staff member (`InviteNewView`, `RequestReviewScreen`) and by the person ' +
+      'who invites a member. It is data about the person, even though a staff member does not choose it, and it is shown in the ' +
+      'Everyone list.',
     covers: null,
     gap:
-      'For Will (the desk, Mira 19 October): `privacy.s.what-we-keep.p1` covers a city the person gives about themselves ' +
-      '(`home_city`, picked on About you); no line says Pam also keeps the city a staff member serves, which Pam\'s team chooses.',
+      'For Will (the desk, Mira 19 October; Sage is redrafting `what-we-keep.p7`): `privacy.s.what-we-keep.p1` covers a city the person ' +
+      'gives about themselves (`home_city`, picked on About you); no line says Pam also keeps the city of the account, which the ' +
+      'invite or the approval sets for a member as well as for staff. Closing `region_id` to other signed-in people, the way ' +
+      '`last_name` and `home_city` were closed (20261016145411), goes to Nico before launch, so a line cannot yet say only the Pam team sees it.',
   },
 ];
 
@@ -400,8 +403,8 @@ export const INPUT_FILES: readonly InputFile[] = [
       'A filter for the list already on the phone, and the Pam team\'s switch that makes one account\'s own screens show example data ' +
       '(0057, `profiles.is_demo`). It says nothing about the person: it changes what that account sees, not what Pam knows about them.',
   },
-  { file: 'apps/web/src/screens/InviteNewView.tsx', fields: 1, collects: ['staff-region'] },
-  { file: 'apps/web/src/screens/RequestReviewScreen.tsx', fields: 1, collects: ['staff-region'] },
+  { file: 'apps/web/src/screens/InviteNewView.tsx', fields: 1, collects: ['account-region'] },
+  { file: 'apps/web/src/screens/RequestReviewScreen.tsx', fields: 1, collects: ['account-region'] },
   {
     file: 'packages/ui/src/Dropdown.tsx',
     fields: 1,
