@@ -18,13 +18,13 @@ export function timeoutError(): Error {
 }
 
 /**
- * What the log needs of a failed answer: its name, its SQLSTATE and the HTTP status the answer came with. A 500 from the gateway has
- * no SQLSTATE, so the status is what names it; without it the log says `unknown` (Iris L5). Only these three leave: not the message.
+ * A failed answer with the HTTP status it came with. A 500 from the gateway has no SQLSTATE, so the status is what names it; without it
+ * the log says `unknown` (Iris L5). The message stays in hand for the alert's kind (a guard's own words, D-618); the log never sends it.
  */
 export function withStatus(error: unknown, status: unknown): unknown {
   if (!error || typeof error !== 'object') return error;
-  const { name, code } = error as { name?: unknown; code?: unknown };
-  return { name, code, status };
+  const { name, code, message } = error as { name?: unknown; code?: unknown; message?: unknown };
+  return { name, code, message, status };
 }
 
 /** Waits for a save for `ms`; after that it is called failed, and the late answer is handed back to be re-read (Iris's A6). */

@@ -112,13 +112,31 @@ test.describe('the Saved tooltip', () => {
     await page.goto(`/place/?id=${PLACE.id}`);
     await settled(page);
     await page.getByRole('button', { name: 'Save this place' }).click();
-    await expect(page.getByRole('alert').filter({ hasText: "That didn't go through" })).toBeVisible();
+    await expect(page.getByRole('alert').filter({ hasText: /Something's wrong on our side|That took too long|Still not working/ })).toBeVisible();
     // At the moment the alert is up, not later: the old tip rose at the tap and was gone by the time anyone looked again.
     expect(await tip(page).count()).toBe(0);
     await page.waitForTimeout(500);
     await expect(tip(page)).toHaveCount(0);
     await expect(announced(page)).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Save this place' })).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  test('a save the database says is already there is no alert, and the saved list is read again (D-618 done)', async ({ page }) => {
+    await signedIn(page);
+    let reads = 0;
+    await page.route('**/rest/v1/rpc/saved_places_mine*', (route) => {
+      reads += 1;
+      return route.fulfill(json([]));
+    });
+    await page.route('**/rest/v1/saved_places*', (route) =>
+      route.request().method() === 'GET' ? route.fulfill(json([])) : route.fulfill({ status: 409, contentType: 'application/json', body: JSON.stringify({ code: '23505', message: 'duplicate' }) }),
+    );
+    await page.goto(`/place/?id=${PLACE.id}`);
+    await settled(page);
+    const before = reads;
+    await page.getByRole('button', { name: 'Save this place' }).click();
+    await expect.poll(() => reads).toBeGreaterThan(before);
+    await expect(page.locator('[data-pam-malfunction]')).toHaveCount(0);
   });
 
   test('with reduce-motion there is no fade at all', async ({ page }) => {

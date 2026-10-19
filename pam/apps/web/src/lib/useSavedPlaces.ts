@@ -197,7 +197,7 @@ export function useSavedPlaces(
         setState((now) => (now.status === 'ready' ? { status: 'ready', places: apply(now.places) } : now));
         return;
       }
-      malfunction.show(kind === 'save' ? 'places.save' : 'places.unsave', settled.error, from);
+      malfunction.show(kind === 'save' ? 'places.save' : 'places.unsave', settled.error, from, { refresh: () => setReads((n) => n + 1) });
       // No answer in time: the write may still land, so read the set again once it has answered.
       if (settled.status === 'timeout') void settled.late.then(() => setReads((n) => n + 1));
     },

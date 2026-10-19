@@ -733,7 +733,7 @@ function PlaceScreen() {
             return;
           }
           // Not cancelled (D-616): the small alert at the bottom, the visit as it was, and a late answer read again.
-          malfunction.show('trips.cancel', result.error, document.activeElement);
+          malfunction.show('trips.cancel', result.error, document.activeElement, { refresh: () => void loadSavedTrips() });
           void result.late?.then(() => loadSavedTrips());
         }}
         cancelLabel={t('place.visit.cancel.no')}

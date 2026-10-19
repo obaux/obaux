@@ -204,3 +204,20 @@ test("a second tap on I'm here while the first is out is not a second send (Iris
   await expect(page.getByText('Your visit is marked.')).toBeVisible();
   expect(asked).toBe(1);
 });
+
+test('a visit already cancelled is no alert, and the visit is read again (D-618 done)', async ({ page }) => {
+  await signedIn(page, hoursFromNow(5));
+  let reads = 0;
+  await page.route('**/rest/v1/rpc/my_trips*', (route) => {
+    reads += 1;
+    return route.fulfill(json([{ id: VISIT, service_id: PLACE, place_name: 'Riverside Job Center', category: 'workforce', address: '1234 Market St', lat: 39.95, lon: -75.16, starts_at: hoursFromNow(5), note: null, status: 'scheduled' }]));
+  });
+  await page.route('**/rest/v1/rpc/cancel_trip*', (route) => route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ message: 'VISIT_CANCELLED' }) }));
+  await open(page);
+  const before = reads;
+  await page.getByText('Cancel this visit').click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Yes, cancel it' }).click();
+  await expect.poll(() => reads).toBeGreaterThan(before);
+  await expect(page.locator('[data-pam-malfunction]')).toHaveCount(0);
+  await expect(page.getByRole('alert').filter({ hasText: /Something's wrong|didn't go through/ })).toHaveCount(0);
+});

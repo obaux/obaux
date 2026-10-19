@@ -124,12 +124,12 @@ export function RequestReviewScreen({ userId }: { readonly userId: string | null
     // Pam failing, not the decision (D-616): the bottom alert, logged; a late answer is read back. A reason the super admin can
     // act on (another city, a pair Pam does not allow, already decided) stays here, by the buttons.
     if (settled.status === 'timeout') {
-      malfunction.show('requests.review', { code: 'timeout' }, document.activeElement);
+      malfunction.show('requests.review', { code: 'timeout' }, document.activeElement, { refresh });
       void settled.late.then(refresh);
       return;
     }
     const result = settled.status === 'ok' ? settled.value : ({ ok: false, reason: 'other', cause: settled.error } as const);
-    if (!result.ok && result.reason === 'other') malfunction.show('requests.review', result.cause, document.activeElement);
+    if (!result.ok && result.reason === 'other') malfunction.show('requests.review', result.cause, document.activeElement, { refresh });
     else if (!result.ok) setFailed(result.reason);
     else if (result.addedToExisting) setAddedAsLead(true);
     // Said on this screen, then back to the list the way they came (not a new page on top: P2).
