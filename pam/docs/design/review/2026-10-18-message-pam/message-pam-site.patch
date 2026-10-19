@@ -1,0 +1,310 @@
+diff --git a/pam/apps/site/src/components/HelpRequest.tsx b/pam/apps/site/src/components/HelpRequest.tsx
+index 96eef817..611d9ed8 100644
+--- a/pam/apps/site/src/components/HelpRequest.tsx
++++ b/pam/apps/site/src/components/HelpRequest.tsx
+@@ -10,7 +10,7 @@ import { TextArea } from '@astryxdesign/core/TextArea';
+ import { TextInput } from '@astryxdesign/core/TextInput';
+ import { VStack } from '@astryxdesign/core/VStack';
+ import { Button } from '@pam/ui/Button';
+-import { HELP_REQUEST_ORIGINS, HELP_REQUEST_URL } from '../lib/links';
++import { HELP_REQUEST_ORIGINS, HELP_REQUEST_URL, OPEN_PAM_URL } from '../lib/links';
+ import { HelpAddress } from './HelpAddress';
+ import { SoftButton } from './SoftButton';
+ import { tap } from '../lib/tap';
+@@ -104,6 +104,16 @@ function CloseMark() {
+ 
+ type Phase = 'address' | 'form' | 'sending' | 'sent' | 'failed';
+ 
++/** For someone with an account (a100, Sage's words): the way to Pam inside the app. The form below is for everyone else. */
++function InTheApp() {
++  return (
++    <VStack gap={3}>
++      <Text as="p">Have an account? Write to Pam in the app.</Text>
++      <SoftButton label="Open Pam" href={OPEN_PAM_URL} xstyle={styles.open} />
++    </VStack>
++  );
++}
++
+ /**
+  * The words under "Still stuck?": the address while the form is off, a call-out that opens the form when it is on (A28,
+  * Will; Nico's `help-request`, D-521; Will, 13 October: "the help form shouldn't be directly on the page they're in, we
+@@ -151,7 +161,7 @@ export function HelpRequest() {
+     }
+     if (!wasOpen.current) return;
+     wasOpen.current = false;
+-    const id = window.requestAnimationFrame(() => calloutBox.current?.querySelector<HTMLElement>('a, button')?.focus());
++    const id = window.requestAnimationFrame(() => calloutBox.current?.querySelector<HTMLElement>('button')?.focus());
+     return () => window.cancelAnimationFrame(id);
+   }, [open]);
+ 
+@@ -219,6 +229,7 @@ export function HelpRequest() {
+         <Heading level={2} xstyle={[type.heading_title24, styles.title]}>
+           Still stuck?
+         </Heading>
++        <InTheApp />
+         <Text as="p">
+           <span ref={sentinel} aria-hidden="true" />
+           Write to us at <HelpAddress />. Tell us what happened and what you see on the screen. A person at Pam reads
+@@ -294,6 +305,7 @@ export function HelpRequest() {
+       <Heading level={2} xstyle={[type.heading_title24, styles.title]}>
+         Still stuck?
+       </Heading>
++      <InTheApp />
+       <Text as="p" xstyle={styles.intro}>
+         Write to us. A person at Pam reads every message.
+       </Text>
+diff --git a/pam/apps/site/src/content/CaseManagerAssignments.tsx b/pam/apps/site/src/content/CaseManagerAssignments.tsx
+index 419166b3..1dd1ba5d 100644
+--- a/pam/apps/site/src/content/CaseManagerAssignments.tsx
++++ b/pam/apps/site/src/content/CaseManagerAssignments.tsx
+@@ -36,7 +36,7 @@ export function CaseManagerAssignments() {
+           write down why, and the reason is kept in a log.
+         </Text>
+         <Text as="p">
+-          A limited account can read messages but can’t send them. A paused account can’t sign in. Pam
++          A limited account can read messages and write to Pam, but can’t send other messages. A paused account can’t sign in. Pam
+           always tells you when something is turned off and who to ask, and you can always contact Pam for
+           help.
+         </Text>
+diff --git a/pam/apps/site/src/content/MessagesInPam.tsx b/pam/apps/site/src/content/MessagesInPam.tsx
+index 4e9baa62..f08a64cd 100644
+--- a/pam/apps/site/src/content/MessagesInPam.tsx
++++ b/pam/apps/site/src/content/MessagesInPam.tsx
+@@ -8,7 +8,7 @@ import { HowTo, ShotCard } from '../components/HowTo';
+  * or with any program that has a lead on Pam, before and without signing up or planning a visit; a
+  * program may START a chat with a member only if the member is signed up with it or has a visit planned
+  * there that is not cancelled, and otherwise only answer a member who wrote to it; a case manager with
+- * their own members; a super admin with case managers and program leads, never a member; nobody else.
++ * their own members; Pam (the super admin) may start a chat with anyone and anyone with an account may write to Pam (a100); nobody else.
+  * Signed (Sage; Will, a72, 12 October 03:33); live with D-541 part 2 (b22, 12 October). What a program sees when a member writes to it is said by
+  * "What others can see" and the Privacy page, not here. A message never
+  * queues a text (migration 0064). Blocking is the ⋯ menu's "Block this person" (D-463, words from
+@@ -21,7 +21,7 @@ export function MessagesInPam() {
+       <Lead>
+         You can message your own case manager. You can also write to a program that is on Pam, even before you
+         plan a visit, and they can answer you. A program can start a chat with you only if you are signed up with
+-        them or have a visit planned there. Otherwise only you can start one, and they can answer. Your own case manager can start a chat with you too. Nobody else can.
++        them or have a visit planned there. Otherwise only you can start one, and they can answer. Your own case manager can start a chat with you too, and so can Pam. Nobody else can. Anyone with an account can write to Pam.
+       </Lead>
+ 
+       <Section title="Who can write to whom">
+@@ -30,13 +30,13 @@ export function MessagesInPam() {
+           rowHeading="You are"
+           columns={['You can start a chat with']}
+           rows={[
+-            { label: 'A member', cells: ['Your own case manager, or any program that is on Pam.'] },
+-            { label: 'A case manager', cells: ['The members who are assigned to you, and a super admin.'] },
+-            { label: 'A program lead', cells: ['Members who are signed up with your program or have a visit planned there, and anyone who wrote to you (you can answer). And a super admin.'] },
+-            { label: 'A super admin', cells: ['Case managers and program leads. Never a member.'] },
++            { label: 'A member', cells: ['Pam, your own case manager, or any program that is on Pam.'] },
++            { label: 'A case manager', cells: ['The members who are assigned to you, and Pam.'] },
++            { label: 'A program lead', cells: ['Members who are signed up with your program or have a visit planned there, and anyone who wrote to you (you can answer). And Pam.'] },
++            { label: 'Pam', cells: ['Anyone with an account.'] },
+           ]}
+         />
+-        <P>Members cannot message other members. A super admin is the person who runs Pam.</P>
++        <P>Members cannot message other members. Messages from Pam are written by the Pam team, the people who run Pam.</P>
+       </Section>
+ 
+       <Section title="Send a message">
+@@ -112,6 +112,7 @@ export function MessagesInPam() {
+           Anyone in a conversation can block: a member, a case manager, a program lead or a super admin.
+           Blocking does not report anyone. To report a message, use “Report suspicious activity” above.
+         </P>
++        <P>The conversation with Pam has no block or report, because it is where you get help.</P>
+       </Section>
+     </Body>
+   );
+diff --git a/pam/apps/site/src/content/PamWords.tsx b/pam/apps/site/src/content/PamWords.tsx
+index 8cb10d05..52a62c07 100644
+--- a/pam/apps/site/src/content/PamWords.tsx
++++ b/pam/apps/site/src/content/PamWords.tsx
+@@ -106,7 +106,7 @@ export function PamWords() {
+             {
+               label: "Limited",
+               cells: [
+-                "An account with some things turned off. A limited account can read messages but cannot send them.",
++                "An account with some things turned off. A limited account can read messages and write to Pam, but cannot send other messages.",
+               ],
+             },
+             {
+diff --git a/pam/apps/site/src/content/StartHere.tsx b/pam/apps/site/src/content/StartHere.tsx
+index a1ec2609..125da82a 100644
+--- a/pam/apps/site/src/content/StartHere.tsx
++++ b/pam/apps/site/src/content/StartHere.tsx
+@@ -51,9 +51,9 @@ export function StartHere() {
+         <HowTo
+           title="What to do"
+           steps={[
+-            'Your guide turned this off. You can still read your messages.',
++            'Your guide turned this off. You can still read your messages, and you can write to Pam.',
+             'If your account is paused, your guide can turn it back on.',
+-            'Contact Pam and we will help you reach your guide.',
++            'Write to Pam and we will help you reach your guide.',
+           ]}
+         />
+         <ReadMore label="More: Case manager assignments" href="/support/case-manager-assignments/" />
+diff --git a/pam/apps/site/src/content/TalkingToPam.tsx b/pam/apps/site/src/content/TalkingToPam.tsx
+index 5e2b31f6..122833e1 100644
+--- a/pam/apps/site/src/content/TalkingToPam.tsx
++++ b/pam/apps/site/src/content/TalkingToPam.tsx
+@@ -12,6 +12,16 @@ export function TalkingToPam() {
+     <Body>
+       <Lead>Someone at Pam can help you. You do not need to know what to ask for.</Lead>
+ 
++      <Section title="Write to Pam in the app">
++        <HowTo
++          steps={[
++            'Tap Messages, then Pam. Or tap Help, then “Write to Pam”.',
++            'Type your message and tap Send. You can add a photo, like a screenshot of what you see.',
++          ]}
++        />
++        <P>A person at Pam reads every message. Pam’s answer comes in the app.</P>
++      </Section>
++
+       <Section title="Start here, on the help desk">
+         <HowTo
+           title="Find an answer"
+@@ -22,12 +32,12 @@ export function TalkingToPam() {
+         />
+       </Section>
+ 
+-      <Section title="Still stuck? Write to us">
++      <Section title="No account, or can’t sign in? Write to us">
+         <P>
+           At the end of every article, and when a search finds nothing, “Still stuck?” lets you write to Pam. Tell us
+           what happened and what you see on the screen. A person at Pam reads every message.
+         </P>
+-        <P>Pam has no phone line. Writing to us is the way to reach a person.</P>
++        <P>Pam has no phone line. If you can’t use the app, writing to us here is how you reach a person.</P>
+       </Section>
+ 
+       <Section title="What we can help with">
+diff --git a/pam/apps/site/src/content/post-updated.json b/pam/apps/site/src/content/post-updated.json
+index f3277e3a..fd857fe5 100644
+--- a/pam/apps/site/src/content/post-updated.json
++++ b/pam/apps/site/src/content/post-updated.json
+@@ -4,8 +4,8 @@
+     "words": "e14c8cfc9593df9fee824e8dc91a84d43813ef0d37caf7d367da39bb4e48668d"
+   },
+   "case-manager-assignments": {
+-    "date": "2026-10-11",
+-    "words": "3d0a520e11a18f960bd13890a15ba5c0a869ef4fef3801da0bc1006d8f37f41c"
++    "date": "2026-10-18",
++    "words": "316b9f37f687b41951dba0e5e76a1b4ce99ae7dac214ffa009ce96b6df55797e"
+   },
+   "is-the-place-told": {
+     "date": "2026-10-17",
+@@ -24,16 +24,16 @@
+     "words": "73849fb0d1c5dda4eb6e27c3e6a895c2cc8eba40b75654849232dd70ff926350"
+   },
+   "messages-in-pam": {
+-    "date": "2026-10-12",
+-    "words": "b7069c3d3c8d8a22654c9f6a4e90d97289aaceb586c2ebaf0fa77632ec93fd9a"
++    "date": "2026-10-18",
++    "words": "740761472446ce14399fff64904650b7505d372f322dafdfa51a859d385057ce"
+   },
+   "one-phone-two-sides": {
+     "date": "2026-10-10",
+     "words": "6700364317d43658aec14cce675669681081100705cc4df52a63be39d6623f2e"
+   },
+   "pam-words": {
+-    "date": "2026-10-10",
+-    "words": "2cdc54e7be7e89d73e098ce79d23fa8e9a8410ce67d920873af48daf48f2e9a6"
++    "date": "2026-10-18",
++    "words": "883b8051dab956b98c5dbb56fa6c7f48709de4e4a202af7e6f1c23f38b0c4166"
+   },
+   "planning-a-visit": {
+     "date": "2026-10-17",
+@@ -60,12 +60,12 @@
+     "words": "94189b31b8851e6db1e8e96db2e4fcfee63ded5cfe76626bb1dc59433cb204df"
+   },
+   "start-here": {
+-    "date": "2026-10-11",
+-    "words": "273b9aab574cbaf26e49b764259a06be1131cb2756b7da15cae0c02c47ab0245"
++    "date": "2026-10-18",
++    "words": "67ee2611096743228b607d900de1d380151e47db43c596bf6f45f8ba8a8fdb2e"
+   },
+   "talking-to-pam": {
+-    "date": "2026-10-11",
+-    "words": "f78f84fc60054feda2e833b190bab421d9f69ffb7ffddf7e40a57c3bf1fbad1f"
++    "date": "2026-10-18",
++    "words": "2b9db3e50e470d3ea4a98877873d79d22438c323ca87810b56361dae3a04afc1"
+   },
+   "texts-from-pam": {
+     "date": "2026-10-17",
+diff --git a/pam/apps/site/src/content/posts.ts b/pam/apps/site/src/content/posts.ts
+index b9bda365..63171ff9 100644
+--- a/pam/apps/site/src/content/posts.ts
++++ b/pam/apps/site/src/content/posts.ts
+@@ -60,7 +60,7 @@ const ALL: readonly SupportPost[] = [
+     audience: 'everyone',
+     title: 'When something isn’t working, start here',
+     summary: 'The most common reasons Pam gets stuck, and what to do about each one.',
+-    updated: '2026-10-11',
++    updated: '2026-10-18',
+     keywords: ['not working', 'problem', 'error', 'stuck', 'something went wrong', 'blank', 'empty', 'wont load', 'offline', 'no signal', 'code', 'invite', 'paused', 'missing place', 'broken', 'help'],
+   },
+   {
+@@ -69,7 +69,7 @@ const ALL: readonly SupportPost[] = [
+     audience: 'everyone',
+     title: 'Getting help from Pam',
+     summary: 'How to find an answer on the help desk, how to write to a person at Pam, and what to do if you are in danger.',
+-    updated: '2026-10-11',
++    updated: '2026-10-18',
+     keywords: ['call', 'phone', 'phone number', 'number', 'talk', 'real person', 'human', 'someone', 'write', 'email', 'contact', 'still stuck', '911', '988', 'crisis', 'danger', 'unsafe', 'report'],
+   },
+   {
+@@ -161,7 +161,7 @@ const ALL: readonly SupportPost[] = [
+     audience: 'everyone',
+     title: 'Pam words, in plain English',
+     summary: 'Guide, case manager, program, policy, points and more: what each word means in Pam.',
+-    updated: '2026-10-10',
++    updated: '2026-10-18',
+     keywords: ['words', 'glossary', 'meaning', 'what does', 'guide', 'policy', 'program lead', 'level', 'badge', 'limited', 'paused'],
+   },
+   {
+@@ -188,7 +188,7 @@ const ALL: readonly SupportPost[] = [
+     audience: 'members, case managers and program leads',
+     title: 'Messages: who can write, and why nothing is texted',
+     summary: 'Who can start a chat with whom, how to send and report a message, and why a message does not come by text.',
+-    updated: '2026-10-12',
++    updated: '2026-10-18',
+     keywords: ['message', 'chat', 'conversation', 'report', 'photo', 'document', 'new message', 'unsafe'],
+   },
+   {
+@@ -232,7 +232,7 @@ const ALL: readonly SupportPost[] = [
+     title: 'Case manager assignments',
+     summary:
+       'Who your case manager is, what a case manager can and can’t see, and what is always written down.',
+-    updated: '2026-10-11',
++    updated: '2026-10-18',
+   },
+ ];
+ 
+diff --git a/pam/apps/site/src/content/section-labels.ts b/pam/apps/site/src/content/section-labels.ts
+index d541cc64..f0f1cf65 100644
+--- a/pam/apps/site/src/content/section-labels.ts
++++ b/pam/apps/site/src/content/section-labels.ts
+@@ -62,7 +62,7 @@ export const SECTION_LABELS: Readonly<Record<string, Readonly<Record<string, str
+   },
+   'talking-to-pam': {
+     'Start here, on the help desk': 'Find an answer',
+-    'Still stuck? Write to us': 'Write to us',
++    'No account, or can’t sign in? Write to us': 'Write to us',
+     'What we can help with': 'What we help with',
+     'In danger right now?': 'In danger',
+     'A message feels unsafe': 'Unsafe message',
+diff --git a/pam/apps/site/src/lib/links.ts b/pam/apps/site/src/lib/links.ts
+index 1731703f..f3aabc94 100644
+--- a/pam/apps/site/src/lib/links.ts
++++ b/pam/apps/site/src/lib/links.ts
+@@ -11,6 +11,8 @@ export const APP_URL = (
+ export const SIGN_IN_URL = `${APP_URL}/signin/`;
+ /** Sign in, then straight to Add my program (the app keeps `next` to one listed screen, used once, never for a program lead: S1). */
+ export const ADD_PROGRAM_URL = `${APP_URL}/signin/?next=/profile/add-program/`;
++/** Where "Open Pam" on Still stuck? goes (a100; Nico's route, 6b449896): signed in, it opens the person's Pam conversation; signed out, it goes through Sign in and comes back; with the switch off, it lands on Messages. */
++export const OPEN_PAM_URL = `${APP_URL}/messages/pam/`;
+ export const PRIVACY_URL = `${APP_URL}/privacy/`;
+ export const TERMS_URL = `${APP_URL}/terms/`;
+ 

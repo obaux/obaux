@@ -27,6 +27,15 @@ export interface SupportPost {
 
 const ALL: readonly SupportPost[] = [
   {
+    slug: 'something-didnt-go-through',
+    topic: 'members',
+    audience: 'everyone',
+    title: 'When something doesn’t go through',
+    summary: 'What each message means when something you tap doesn’t work, and what you can do about it.',
+    updated: '2026-10-19',
+    keywords: ['didn’t go through', 'didn’t work', 'not working', 'error', 'failed', 'offline', 'signed out', 'try again', 'slow', 'something’s wrong', 'couldn’t use that', 'not at this time', 'already changed'],
+  },
+  {
     slug: 'program-books-a-visit',
     topic: 'members',
     audience: 'everyone',
