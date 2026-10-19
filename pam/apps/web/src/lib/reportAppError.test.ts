@@ -143,3 +143,24 @@ describe('failureKindOf (D-618)', () => {
     expect(failureKindOf(new Error('PAM_RATE_LIMITED'), true)).toBe('too-many');
   });
 });
+
+describe('what Iris found in the codes (D-618)', () => {
+  it('a bare word given as the error is its own code: the "timeout" the saves pass', () => {
+    expect(codeFromError('timeout', true)).toBe('timeout');
+    expect(codeFromError('offline', true)).toBe('offline');
+    expect(codeFromError('some words (phone)=(+12155550100)', true)).toBe('unknown');
+  });
+  it('a supabase-js abort has no name, only a message that begins with it', () => {
+    expect(codeFromError({ message: 'AbortError: signal is aborted without reason', code: '' }, true)).toBe('timeout');
+    expect(failureKindOf({ message: 'AbortError: The operation was aborted', code: '' }, true)).toBe('timeout');
+    expect(codeFromError({ message: 'not an AbortError at the start', code: '' }, true)).toBe('unknown');
+  });
+  it('a guard\'s own word names the kind where the message is in hand; the code alone says refused', () => {
+    expect(failureKindOf({ code: 'P0001', message: 'OUTSIDE_THE_VISIT_WINDOW' }, true)).toBe('refused');
+    expect(failureKindOf({ code: 'P0001', message: 'VISIT_CANCELLED' }, true)).toBe('changed');
+    expect(failureKindOf({ code: 'P0001', message: 'VISIT_NOT_FOUND' }, true)).toBe('gone');
+    expect(failureKindOf({ code: 'P0001', message: 'ONLY_A_SUPER_ADMIN' }, true)).toBe('not-allowed');
+    expect(failureKindOf({ code: 'P0001', message: 'something nobody listed' }, true)).toBe('refused');
+    expect(failureKindOf({ code: 'P0001', message: 'VISIT_CANCELLED' }, false)).toBe('offline');
+  });
+});

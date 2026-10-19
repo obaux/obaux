@@ -1,4 +1,4 @@
-import { appErrorCode, appErrorRoute, classifyFailure, isAppErrorAction, type FailureKind } from '@pam/config';
+import { appErrorCode, appErrorRoute, classifyFailure, classifyGuardMessage, isAppErrorAction, type FailureKind } from '@pam/config';
 
 /**
  * Tells the team that something a person did did not work (D-616; Will: "if something breaks, create an error log so the team can
@@ -111,8 +111,11 @@ export type ActionResult = { readonly ok: true } | { readonly ok: false; readonl
  */
 export function codeFromError(caught: unknown, online: boolean = typeof navigator === 'undefined' || navigator.onLine !== false): string {
   if (!online) return 'offline';
-  const error = caught as { name?: unknown; code?: unknown; status?: unknown } | null | undefined;
-  if (error?.name === 'AbortError') return 'timeout';
+  // A caller that has only a word to give (`'timeout'`) gives it as the error itself.
+  if (typeof caught === 'string') return appErrorCode(caught);
+  const error = caught as { name?: unknown; message?: unknown; code?: unknown; status?: unknown } | null | undefined;
+  // supabase-js reports an abort as an error with no name, only a message that begins with it; a fetch abort has the name.
+  if (error?.name === 'AbortError' || (typeof error?.message === 'string' && /^AbortError\b/.test(error.message))) return 'timeout';
   // A SQLSTATE is the most exact thing the database says; a PostgREST error with none (a 500, a gateway) is named by the HTTP status
   // of the answer instead (Iris D2).
   const own = appErrorCode(typeof error?.code === 'string' || typeof error?.code === 'number' ? error.code : null);
@@ -126,7 +129,9 @@ export function codeFromError(caught: unknown, online: boolean = typeof navigato
  * from its message here, where the message is still in hand, and the message goes no further.
  */
 export function failureKindOf(caught: unknown, online: boolean = typeof navigator === 'undefined' || navigator.onLine !== false): FailureKind {
-  if (String((caught as { message?: unknown } | null | undefined)?.message ?? '').includes('PAM_RATE_LIMITED')) return 'too-many';
+  // A guard's own word, where the message is still in hand, says more than the code (every guard is P0001 / 400); it goes no further.
+  const named = classifyGuardMessage((caught as { message?: unknown } | null | undefined)?.message);
+  if (named && online) return named;
   return classifyFailure(codeFromError(caught, online), online);
 }
 
