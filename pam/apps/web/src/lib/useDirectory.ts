@@ -105,16 +105,15 @@ export function useDirectory(
   return { state, refresh };
 }
 
-/** Grants or revokes the demo view on one account (0057). Super admin only. */
-export async function setDemoView(userId: string, enabled: boolean): Promise<boolean> {
-  try {
-    const { createClient } = await import('./supabase');
-    const { error } = await createClient().rpc('set_demo_view', {
-      p_user_id: userId,
-      p_enabled: enabled,
-    });
-    return !error;
-  } catch {
-    return false;
-  }
+/**
+ * Grants or revokes the demo view on one account (0057). Super admin only. Throws the database's or the network's error, so the
+ * switch can say it failed and the log can keep its code (D-616).
+ */
+export async function setDemoView(userId: string, enabled: boolean): Promise<void> {
+  const { createClient } = await import('./supabase');
+  const { error } = await createClient().rpc('set_demo_view', {
+    p_user_id: userId,
+    p_enabled: enabled,
+  });
+  if (error) throw error;
 }

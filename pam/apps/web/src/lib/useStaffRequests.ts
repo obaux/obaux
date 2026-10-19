@@ -126,7 +126,8 @@ export type ReviewFailure = 'pair' | 'city' | 'decided' | 'gone' | 'other';
 
 export type ReviewResult =
   | { readonly ok: true; readonly addedToExisting: boolean }
-  | { readonly ok: false; readonly reason: ReviewFailure };
+  /** `cause` is the database's or the network's error, for the log's code only (D-616). */
+  | { readonly ok: false; readonly reason: ReviewFailure; readonly cause?: unknown };
 
 function failureOf(message: string): ReviewFailure {
   if (message.includes('ROLE_PAIR_NOT_ALLOWED')) return 'pair';
@@ -155,14 +156,14 @@ export async function reviewStaffRequest(
       p_decision: decision,
       ...(regionId ? { p_region_id: regionId } : {}),
     });
-    if (error) return { ok: false, reason: failureOf(error.message ?? '') };
+    if (error) return { ok: false, reason: failureOf(error.message ?? ''), cause: error };
     if (decision === 'denied') return { ok: true, addedToExisting: false };
     // A super admin reads any account's roles: member and provider together means the role was added to an account that existed.
     const { data } = await supabase.from('profile_roles').select('role').eq('profile_id', userId);
     const roles = Array.isArray(data) ? data.map((r) => (r as { role?: string }).role) : [];
     return { ok: true, addedToExisting: roles.includes('member') && roles.includes('provider') };
-  } catch {
-    return { ok: false, reason: 'other' };
+  } catch (caught) {
+    return { ok: false, reason: 'other', cause: caught };
   }
 }
 

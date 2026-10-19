@@ -15,6 +15,7 @@ import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { setPamHours, usePamStatus } from '@/lib/pam';
 import { pamSystemText } from '@/lib/pamMessages';
+import { settleWithin, useMalfunction } from '@/lib/malfunction';
 import { NotIn } from '../app/NotIn';
 
 /**
@@ -44,7 +45,8 @@ export function PamHoursScreen() {
   const pam = usePamStatus(isTeam);
   const [draft, setDraft] = useState<PamHours | null>(null);
   const [saving, setSaving] = useState(false);
-  const [said, setSaid] = useState<'saved' | 'failed' | 'noDays' | 'order' | null>(null);
+  const [said, setSaid] = useState<'saved' | 'noDays' | 'order' | null>(null);
+  const malfunction = useMalfunction();
 
   useEffect(() => {
     if (pam.status === 'ready' && draft === null) {
@@ -99,9 +101,15 @@ export function PamHoursScreen() {
     if (hours.days.length === 0) return setSaid('noDays');
     if (hours.close <= hours.open) return setSaid('order');
     setSaving(true);
-    const result = await setPamHours(hours.tz, hours.days, hours.open, hours.close);
+    const settled = await settleWithin(setPamHours(hours.tz, hours.days, hours.open, hours.close));
     setSaving(false);
-    setSaid(result.ok ? 'saved' : 'failed');
+    if (settled.status === 'ok' && settled.value.ok) {
+      setSaid('saved');
+      malfunction.clear();
+      return;
+    }
+    // Pam failing, not the hours (D-616): the bottom alert, logged. What to fix in the fields stays here, by Save.
+    malfunction.show('pam.hours.save', settled.status === 'timeout' ? { code: 'timeout' } : { code: undefined }, document.activeElement);
   };
 
   return (
