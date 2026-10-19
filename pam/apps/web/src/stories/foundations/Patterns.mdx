@@ -54,3 +54,9 @@ for malfunctions."* and *"The switch shouldn't turn on if the connection is not 
 6. **Every failure is logged with a code only**, through `useMalfunction().show`, which is the only way to show it.
 
 Seen in Components › Feedback › Malfunction alert.
+
+**Update (D-618, Will 19 October).** The alert for a failure is drawn in the alert banner's style (solid error ground, title, line,
+action, close), still at the bottom, and it says how to put it right: Try again where the action can be run again, Sign in when signed
+out, Get help when the same thing fails twice. Contact Pam is the last resort and is never said in those words. Taps inside it are its
+own; the banner is `useMalfunction().show(action, error, control, { retry })` and nothing else.
+

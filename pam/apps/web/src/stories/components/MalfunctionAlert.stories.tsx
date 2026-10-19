@@ -18,9 +18,11 @@ import { useStoryText } from '../support/useStoryText';
  * A switch moves only after its save has gone through. While it saves it stays where it was and shows it is
  * working. A reason the person can fix (a wrong code, a file too big) stays inline by the field.
  *
- * In these stories the save always fails, so the alert is what you see after the tap.
+ * In these stories the save always fails, so the banner is what you see after the tap. What it offers depends on what failed (D-618):
+ * Try again where the caller can run the action again, Sign in when the person is signed out, and Get help on the second failure of the same
+ * action (never "contact Pam" in so many words).
  */
-function FailingSwitch({ busy = false }: { readonly busy?: boolean }) {
+function FailingSwitch({ busy = false, code = 500 }: { readonly busy?: boolean; readonly code?: string | number }) {
   const tr = useStoryText();
   const malfunction = useMalfunction();
   const [pending, setPending] = useState(false);
@@ -39,10 +41,13 @@ function FailingSwitch({ busy = false }: { readonly busy?: boolean }) {
             onChange={(_on, event) => {
               setPending(true);
               // A save that answers with an error after a moment: the switch stays on, and the alert says so.
-              window.setTimeout(() => {
-                setPending(false);
-                malfunction.show('alerts.switch.closed', { status: 500 }, event.target);
-              }, 400);
+              const fail = () =>
+                window.setTimeout(() => {
+                  setPending(false);
+                  // "Try again" runs the same action: here it fails the same way, which is the second failure.
+                  malfunction.show('alerts.switch.closed', { code }, event.target, { retry: () => { setPending(true); fail(); } });
+                }, 400);
+              fail();
             }}
           />
         }
@@ -84,6 +89,24 @@ export const AfterTheTap: Story = {
 
 /** Over a busy screen: the alert has a surface of its own, so the cards under it do not read through its words. */
 export const OverContent: Story = { ...AfterTheTap, render: () => <FailingSwitch busy /> };
+
+const tapSwitch = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+  await userEvent.click(await within(canvasElement).findByRole('switch'));
+  await expect(await within(document.body).findByRole('alert', {}, { timeout: 3000 })).toBeVisible();
+};
+
+export const Offline: Story = { render: () => <FailingSwitch busy code="offline" />, play: tapSwitch };
+export const SignedOut: Story = { render: () => <FailingSwitch busy code={401} />, play: tapSwitch };
+export const ServerFailed: Story = { render: () => <FailingSwitch busy code={500} />, play: tapSwitch };
+/** The same action failing again after "Try again": the banner adds Get help. */
+export const SecondFailure: Story = {
+  render: () => <FailingSwitch busy code={500} />,
+  play: async (context) => {
+    await tapSwitch(context);
+    await userEvent.click(await within(document.body).findByRole('button', { name: /try again/i }));
+    await expect(await within(document.body).findByRole('button', { name: /get help/i }, { timeout: 3000 })).toBeVisible();
+  },
+};
 
 export const Spanish: Story = { ...AfterTheTap, globals: { locale: 'es' } };
 export const Arabic: Story = { ...AfterTheTap, globals: { locale: 'ar' } };
