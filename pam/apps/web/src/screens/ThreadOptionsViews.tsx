@@ -19,7 +19,8 @@ import { useSession } from '@/lib/useSession';
 import { useThread } from '@/lib/useThread';
 import { reportMessage } from '@/lib/reportMessage';
 import { blockInConversation, unblockInConversation, useBlockState } from '@/lib/blocking';
-import { settleWithin, useMalfunction } from '@/lib/malfunction';
+import { useMalfunction } from '@/lib/malfunction';
+import { settleWithin } from '@/lib/settle';
 import { isOffline } from '@/lib/reportAppError';
 
 /**
