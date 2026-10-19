@@ -701,6 +701,8 @@
   "requests.failed.city.body": "Выберите город, в котором находится аккаунт, или отклоните эту заявку.",
   "requests.failed.decided.title": "По этой заявке уже принято решение",
   "requests.failed.decided.body": "Вернитесь к списку, чтобы посмотреть, что с ней.",
+  "requests.failed.gone.body": "Аккаунт {name} был удалён, поэтому решать нечего. Вернитесь к списку.",
+  "requests.failed.gone.title": "Этой заявки больше нет",
   "requests.done.title": "{name} теперь ещё и руководитель программы",
   "requests.done.body": "Мы отправили сообщение, что доступ открыт.",
   "requests.wants.provider": "Хочет добавить программу",

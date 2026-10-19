@@ -665,6 +665,8 @@
   "requests.failed.city.body": "請選擇對方帳戶所在的城市，或拒絕這項申請。",
   "requests.failed.decided.title": "這項申請已有決定",
   "requests.failed.decided.body": "請返回列表查看目前情況。",
+  "requests.failed.gone.body": "{name}的帳戶已被刪除，所以沒有什麼需要決定。請返回列表。",
+  "requests.failed.gone.title": "這項申請已不在這裏",
   "requests.done.title": "{name}現在也是計劃負責人",
   "requests.done.body": "我們已傳短訊通知對方已加入。",
   "requests.wants.provider": "想新增一個計劃",
