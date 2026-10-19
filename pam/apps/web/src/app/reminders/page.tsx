@@ -123,7 +123,7 @@ function RemindersForm() {
     const tapped = typeof document === 'undefined' ? null : document.activeElement;
     // No network is said at once (Iris L7: it took 7 s), and no answer in 15 seconds is a failure (settleWithin), like a switch.
     if (isOffline()) {
-      malfunction.show(action, { code: 'offline' }, tapped);
+      malfunction.show(action, { code: 'offline' }, tapped, { retry: () => void answer(value) });
       return;
     }
     setBusy(true);
@@ -133,7 +133,7 @@ function RemindersForm() {
       // A yes after a STOP is refused, not a failure: nothing is drawn or logged (the screen reads the STOP back and asks nothing).
       if (settled.status === 'ok' && !settled.value.ok && settled.value.stopped) return;
       const code = settled.status === 'ok' && !settled.value.ok ? settled.value.code : settled.status === 'timeout' ? 'timeout' : 'unknown';
-      malfunction.show(action, { code }, tapped);
+      malfunction.show(action, { code }, tapped, { retry: () => void answer(value) });
       return;
     }
     malfunction.clear();

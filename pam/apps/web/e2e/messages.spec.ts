@@ -1038,7 +1038,7 @@ test.describe('a conversation', () => {
     await page.route(REPORT, (route) => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));
     await page.setViewportSize({ width: 320, height: 568 });
     const cleared = async (name: string) => {
-      const alert = page.getByRole('alert').filter({ hasText: "That didn't go through" });
+      const alert = page.getByRole('alert').filter({ hasText: "Something's wrong on our side" });
       await expect(alert).toBeVisible();
       await page.waitForTimeout(300);
       const a = (await alert.boundingBox())!;
@@ -1056,11 +1056,13 @@ test.describe('a conversation', () => {
     await page.getByRole('button', { name: 'Send report' }).click();
     await cleared('Send report');
 
-    // No network: said at once, without waiting for a request to fail.
+    // No network: said at once, without waiting for a request to fail. A fresh screen, as the failure banner stays until the person leaves.
+    await page.goto(`/messages/thread/report/?id=${CONVO}`);
+    await settled(page);
     await page.context().setOffline(true);
     const started = Date.now();
     await page.getByRole('button', { name: 'Send report' }).click();
-    await expect(page.getByRole('alert').filter({ hasText: "That didn't go through" })).toBeVisible({ timeout: 1500 });
+    await expect(page.getByRole('alert').filter({ hasText: "You're offline" })).toBeVisible({ timeout: 1500 });
     expect(Date.now() - started).toBeLessThan(2000);
     await page.context().setOffline(false);
   });

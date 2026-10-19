@@ -82,7 +82,7 @@ function ThreadOptions() {
     // The button just tapped is kept clear of the alert (Iris L1); no network is said at once and no answer in 15 s is a failure (L7).
     const tapped = typeof document === 'undefined' ? null : document.activeElement;
     if (!pair && isOffline()) {
-      malfunction.show(action, { code: 'offline' }, tapped);
+      malfunction.show(action, { code: 'offline' }, tapped, { retry: () => void confirm() });
       return;
     }
     setBusy(true);
@@ -94,7 +94,7 @@ function ThreadOptions() {
       if (settled.status !== 'ok' || !settled.value.ok) {
         // The small alert at the bottom, and the log (D-616); the person stays on this screen to try again.
         const code = settled.status === 'ok' && !settled.value.ok ? settled.value.code : settled.status === 'timeout' ? 'timeout' : 'unknown';
-        malfunction.show(action, { code }, tapped);
+        malfunction.show(action, { code }, tapped, { retry: () => void confirm() });
         // No answer in time: the block may still land, so read where it stands once it has answered.
         if (settled.status === 'timeout') void settled.late.then(() => reload());
         setBusy(false);
@@ -210,7 +210,7 @@ function ThreadReport() {
     if (!latest) return;
     const tapped = typeof document === 'undefined' ? null : document.activeElement;
     if (isOffline()) {
-      malfunction.show('messages.report', { code: 'offline' }, tapped);
+      malfunction.show('messages.report', { code: 'offline' }, tapped, { retry: () => void send() });
       return;
     }
     setPhase('sending');
@@ -222,7 +222,7 @@ function ThreadReport() {
     }
     // The small alert at the bottom, and the log (D-616); the reasons stay as they were, ready to send again.
     const code = settled.status === 'ok' && !settled.value.ok ? settled.value.code : settled.status === 'timeout' ? 'timeout' : 'unknown';
-    malfunction.show('messages.report', { code }, tapped);
+    malfunction.show('messages.report', { code }, tapped, { retry: () => void send() });
     setPhase('choosing');
   };
 

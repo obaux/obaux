@@ -548,10 +548,13 @@ test.describe('The reminders screen with a yes already on file (Iris C2)', () =>
     await page.goto('/reminders/');
     await settled(page);
     for (const name of ['Agree to receive texts', 'Not now']) {
+      // A fresh screen for each button: the failure banner stays until the save works or the person leaves.
+      await page.goto('/reminders/');
+      await settled(page);
       const target = page.getByRole('button', { name }).or(page.getByRole('link', { name })).first();
       await target.scrollIntoViewIfNeeded();
       await target.click();
-      const alert = page.getByRole('alert').filter({ hasText: "That didn't go through" });
+      const alert = page.getByRole('alert').filter({ hasText: "Something's wrong on our side" });
       await expect(alert).toBeVisible();
       await page.waitForTimeout(300);
       const a = (await alert.boundingBox())!;
@@ -567,7 +570,7 @@ test.describe('The reminders screen with a yes already on file (Iris C2)', () =>
     await page.context().setOffline(true);
     const started = Date.now();
     await page.getByRole('button', { name: 'Agree to receive texts' }).click();
-    await expect(page.getByRole('alert').filter({ hasText: "That didn't go through" })).toBeVisible({ timeout: 1500 });
+    await expect(page.getByRole('alert').filter({ hasText: "You're offline" })).toBeVisible({ timeout: 1500 });
     expect(Date.now() - started).toBeLessThan(2000);
     await page.context().setOffline(false);
   });
@@ -585,7 +588,7 @@ test.describe('The reminders screen with a yes already on file (Iris C2)', () =>
     await settled(page);
     await page.getByRole('button', { name: 'Agree to receive texts' }).click();
     await page.clock.fastForward(16_000);
-    await expect(page.getByRole('alert').filter({ hasText: "That didn't go through" })).toBeVisible();
+    await expect(page.getByRole('alert').filter({ hasText: 'That took too long' })).toBeVisible();
     await expect.poll(() => reports.length).toBe(1);
     expect(reports[0]).toMatchObject({ p_action: 'reminders.agree', p_code: 'timeout' });
   });
@@ -603,6 +606,9 @@ test.describe('The reminders screen with a yes already on file (Iris C2)', () =>
     await page.getByRole('button', { name: 'Agree to receive texts' }).click();
     await expect.poll(() => reports.length).toBe(1);
     expect(reports[0]).toMatchObject({ p_action: 'alerts.agree', p_code: '500' });
+    // A fresh screen: the failure banner stays until the save works or the person leaves.
+    await page.goto('/reminders/?next=alerts&kind=message');
+    await settled(page);
     await page.getByRole('button', { name: 'Not now' }).or(page.getByRole('link', { name: 'Not now' })).first().click();
     await expect.poll(() => reports.length).toBe(2);
     expect(reports[1]).toMatchObject({ p_action: 'reminders.decline' });
