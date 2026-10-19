@@ -1719,6 +1719,25 @@
   not live: its constraint change waits for Will's yes at the connector, so the app ships first. Without
   report_app_error a report gets an answer and is dropped, and the Problems list says it cannot load; dispatch-sms is
   redeployed once the migration is live. b75's entry gives 21:56 as its end; its push was at 21:55:18.
+- **Batch b77 (19 October, 00:33 to 01:54).** D-616's follow-ups. The lanes' failed actions move to the bottom alert:
+  Piper's heart, I'm here and I went, the lead's check-in circle and cancel a visit (be3d5ee5; settleWithin's timeout
+  now carries a real abort, so the log names it timeout), Ava's Everyone demo-view switch, Pam's hours, Close/Reopen,
+  New invite and staff review (cdff2806; a number the database refuses is said by its field, not the alert, from
+  Iris's D-618 table), Nico's block, report and reminder saves (df0bbeff). The alert has a surface of its own, so the
+  page no longer reads through it (Dot ef8b19af; Ava found it), and the one-line alert gets the fill and edge colour
+  its design always had (88975d23). Iris's D-616 run on b76 (9ef5b943) passed and found D1 to D4: the error log's
+  migration 20261018211942, never applied, is edited in place so a screen or action name is taken only from closed
+  lists in the database (30 actions, 77 screens), a reply with no code is named by its status, and any answer leaves
+  the queue (Nico a7f240b5); Lena chose (a) for D4 and pinned the counter and the lists (0c15d75c). Lena: Piper's
+  seven names in six languages (ec6ffac2), messages.report.failed retired (80bc9a72), the fit audit reads a header's
+  small title (ac241fbc), the Russian bring-a-friend overlap accepted by design (80cf7827), and the privacy guard
+  taught CheckboxList (cfe3a0f3; the lesson below). Ava's Pam's hours as full-width rows (2d94bff2), Dot's BigButton
+  name (a7061274), Sage's a104 role clause and Piper's names (ec7c8426), Iris's D-618 table and section G (f56ef6cd).
+  Will at 00:13 signed a104 ("Approved on the flow, let's test to ensure it works") and asked for the other banner
+  style with a way to fix each kind of failure (D-618, being built: Sage's words in seven languages at f60ad404,
+  Nico's failureFor, Dot's banner, Wren's help post as a draft); at 00:26 he answered a105: the warning cards become
+  the toast (D-619, Dot). The error log's migration waits for Will's yes in this session, then dispatch-sms is
+  redeployed and one test failure goes through. b76's entry gives 23:30 as its end; its push was at 23:27:47.
 
 ## What was wrong, and what missed it
 
@@ -2075,6 +2094,17 @@
   07d72f08: the client loads inside send(), the way Providers already loads LocaleSync, and the pin reads the new line
   (it still fails with the live check taken out). Lesson: a READY that changes anything Providers imports runs the
   budget, and a READY that changes a line another lane pins runs that lane's tests. Dot and Nico told at 22:45.
+- **A swap of a field's component went past the privacy guard's eye (b77, 00:34).** Ava's C1 (2d94bff2) replaced Pam's
+  hours' CheckboxInput with Astryx's CheckboxList. The guard counts fields by component name and knew CheckboxInput
+  only, so on the assembly it said the screen had no field and asked for it to be taken off the list. Removing it
+  would have been wrong: the field is still there. The READY had run tsc, the e2e and Storybook, not @pam/config.
+  Fixed in cfe3a0f3 (CheckboxList in the pattern, failing without it). Lesson: a READY that changes which component
+  draws a field runs @pam/config. After b77 Lena makes the guard classify every input-looking component it imports, so
+  the next swap fails loudly.
+- **Pictures of an overlay were shot over nothing (b76, found 23:52).** The bottom alert had no surface of its own;
+  every picture in b76's READYs had empty page behind it, so the words of the next card showing through were invisible
+  until Ava shot one on Everyone. Fixed in ef8b19af, and every b77 picture was re-shot over real content. Lesson: a
+  picture of anything that floats over a page is taken over a busy part of that page.
 
 ## Decisions
 
@@ -2361,9 +2391,22 @@
 | 20261018211942 live | Not applied. list_migrations before: last 20261018210554. apply_migration timed out at 60 s at 22:38 and 22:40; after each, no app_errors table, functions or cron jobs, notifications_kind_known unchanged (six kinds), no running query, no waiting lock. The migration drops and re-adds notifications_kind_known, which the connector holds for Will's confirmation (as with P4 on 10 October). Not worked around: it waits for Will in the session (card a104). dispatch-sms is not redeployed until it is live |
 | Batch b76, full run (5e1bcccd: 4d39ccca + Nico ec8085eb (with f71a4665, 4096aba2, 362c0d27, b85c289e); Lena 14bc9d23, 0b7f3ffd, 865928fa, f1b84bac; Ava 18919c74; Dot 72d85ce7, b448c01a; Sage 834facaa, 1d0d2cd5, 34f9444d, 689f92a6, f12e6544, 78b4f078; Iris 39cc6833, eb694a5e; Wren 205c304f with the posts:date dates): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | config 1 failed of 1496 (alert-texts-live.test.ts:46, the pin on the old switch guard); budget over by 76.6 kB (676.6 kB; the lesson below); the rest green: copy in step; ui 130; ui build; site 124; site tsc; build:e2e; tsc; web unit 224; e2e 2603 passed, 22 skipped, 0 failed, no retries (34.5 m); storybook built, no bundle names the live project; site build; site a11y 125 scans, 0 problems |
 | Batch b76, after the fixes (e8616909: 5e1bcccd + bef297c3, 07d72f08 and Lena 5bf287ba) | build:e2e; budget 6.1 kB to spare (593.9 kB); tsc; web unit 224; config 1491 passed (4 skipped, 1 todo); e2e on the specs that report errors (messages, problems, alerts, message-pam on narrow-320, dark-320 and iphone-se) 483 passed, 21 skipped, 0 failed (7.7 m); language fit on the Storybook (en, ar, 760): 5 Arabic findings, all already in fit-known.json, none new |
+| b76 main CI (9aac8b6f, pushed 23:27:47) | Types/unit/build (23:37), Migrations and RLS, Publish Storybook, Accessibility (00:11): all four green; Vercel web (23:31) and pam-site (23:30) success. The watcher was restarted once after the container restarted at 00:01 |
+| Batch b77 db tree (e99e663f: Nico's 20261018211942 as at a7f240b5, edited in place before it was ever applied, md5 7a47c16a; local Postgres 16) | Suite 1899 ok, "All database checks passed". Mutations: the action-list check taken out fails "an action with the shape of a key but not one of the app's is refused: a name cannot be a key (Iris D1)"; the route-list check taken out (00:20, on d9d0496e, the same function) fails "nothing of the name reached the log" |
+| 20261018211942 live | Not applied in b77. It waits for Will's yes in the session (its constraint change); then dispatch-sms is redeployed, the switch and the Privacy line go on together, and one test report is sent |
+| Batch b77, before its last four inputs (37474955; full checks stopped at 1500 of 2655 e2e with 0 failures once every input was in) | build, tsc, web unit 227, budget 5.5 kB, ui 132; config 1 failed: the privacy guard read Pam's hours as having no field (the lesson above; fixed in cfe3a0f3) |
+| Batch b77, full run (e99e663f: 9aac8b6f + Nico a7f240b5; Lena 0c15d75c, 80bc9a72, ac241fbc, 80cf7827, ec6ffac2, cfe3a0f3; Ava 2d94bff2, cdff2806; Dot a7061274, ef8b19af, 88975d23; Piper be3d5ee5; Iris 9ef5b943, f56ef6cd; Sage ec7c8426): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y / language fit | config 1501 passed (4 skipped, 1 todo); copy in step; ui 132; ui build; site 124; site tsc; build:e2e; tsc; web unit 229; budget 4.9 kB to spare; e2e 2669 passed, 22 skipped, 0 failed, no retries (35.0 m); storybook built, no bundle names the live project; site build; site a11y 125 scans, 0 problems; language fit on the Storybook (en, ar, 760): 5 Arabic findings, all in fit-known.json, none new |
 
 ## Left undone
 
+- **As of b77 (19 October, 01:54):** Every failed save in Piper's, Ava's and Nico's lanes is the bottom alert, on a
+  surface of its own. The error log's migration has its closed lists and waits for Will's yes in this session; then
+  dispatch-sms is redeployed, the switch and the Privacy line go on together (Lena 68a81d66, re-dated on the day) and
+  one test failure shows on Will's phone. Next: D-618 (the banner that says what kind of failure and how to fix it;
+  pictures to Will first), then D-619 (the warning cards become the toast). Then Nico's STOP guard (7b980bc6) and the
+  stopped-number list, both before texts go live; Piper's and Ava's second READYs; Lena's guard for choice controls.
+  With Will: the migration's yes; a106 (the STOP line); A30; whether the number ending 5265 is his own; the connect text; a102, a86, the
+  website's photo line; a97/a98, a91, a93, a84, a88.
 - **As of b76 (18 October, 23:30):** D-616 is in: one small alert at the bottom when Pam fails, and switches that move
   only after their save. The error log, its bell and the Problems list are built and stay off until Will signs a104;
   migration 20261018211942 waits for his yes in the session, then dispatch-sms is redeployed. Next (b77): the lanes
