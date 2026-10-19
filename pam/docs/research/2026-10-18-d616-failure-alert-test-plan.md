@@ -218,7 +218,20 @@ gives:
 | changed | A 409 with `23505`, and a function's "already" refusal. |
 | gone | A 406 with `PGRST116` (no row), a 409 with `23503`, and `P0001` with `NOT_FOUND`. |
 | server | A 500 with no code, and a 503. |
-| refused (if Nico adds it) | A 400 with `P0001` and a guard's word the screen doesn't map (for example `ROLE_PAIR_NOT_ALLOWED`), a `23514` and a `22P02`. Also every reachable guard in the table, each checked to give its mapped kind (for example `OUTSIDE_THE_VISIT_WINDOW` on `schedule.checkin`, `VISIT_CANCELLED`, `TRIP_NOT_FOUND`). |
+| refused | A 400 with `P0001` and a guard's word the screen doesn't map (for example `ROLE_PAIR_NOT_ALLOWED`), a `23514` and a `22P02`. Also every reachable guard in the table, each checked to give its mapped kind (for example `OUTSIDE_THE_VISIT_WINDOW` on `schedule.checkin`, `VISIT_CANCELLED`, `TRIP_NOT_FOUND`). |
+
+**The desk's decisions (00:40) that these cases test:**
+
+- `refused` is a kind.
+- Guard words the screen holds map to their real kind:
+  - not-found → gone;
+  - cancelled or decided → changed;
+  - not-active or `ONLY_*` → not-allowed.
+- There's no `wrong-time` kind. Instead, the check-in circle and the "I'm here" card match the
+  database's windows. So **G8** checks that neither is offered outside the window, and that a tap at
+  its edge isn't refused.
+- An outcome that already happened is `done` (Nico's classifier) and shows nothing (G3).
+- `INVITE_NEEDS_PHONE` is inline, by the field (Ava), not the alert.
 
 - **G1. Each kind shows its own words.** The words are Sage's line for that kind, in the person's
   language, and say what to do: wait for the network, sign in again, ask your guide, wait a while,
@@ -261,6 +274,13 @@ gives:
   codes. So PostgREST's own codes (`PGRST116`, `PGRST301`, 8 characters) log as `unknown`, and every
   raised error logs as `P0001`, losing its word. Signed-out and gone then look like a server fault in
   the list. I'll record the code each kind logs, and flag any kind the list can't tell apart.
+- **G8. No wrong-time failures.**
+  - The Schedule circle isn't offered (or is disabled with a reason) on a visit more than 2 h ahead.
+  - The "I'm here" and "I went" card isn't shown once the database's window is closed, including a
+    visit under an hour, at `coalesce(ends_at, start + 1h) + 3h`.
+  - A tap one minute inside each edge succeeds.
+  - With the clock moved past the edge while the page stays open, the tap gives `refused`'s words,
+    not "Pam's side".
 
 ## Needs Will's phone
 
