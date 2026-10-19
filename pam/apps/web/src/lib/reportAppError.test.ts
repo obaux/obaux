@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { APP_ERROR_QUEUE_MAX, codeFromAnswer, codeFromError, createReporter, databaseAnswered } from './reportAppError';
+import { APP_ERROR_QUEUE_MAX, codeFromAnswer, codeFromError, createReporter, databaseAnswered, failureKindOf } from './reportAppError';
 
 /** D-616: a failed action is reported with an action key and a code, never a message; it never throws; it waits offline. */
 function setup(opts: { online?: boolean; reach?: boolean; throws?: boolean } = {}) {
@@ -126,5 +126,20 @@ describe('a report the database answered is not sent again (Iris D3)', () => {
     report({ action: 'messages.photo', code: 'timeout' });
     await settle();
     expect(state.sent.map((w) => w['p_action'])).toEqual(['messages.send', 'messages.photo']);
+  });
+});
+
+describe('failureKindOf (D-618)', () => {
+  it('names the kind from the same code the log holds', () => {
+    expect(failureKindOf({ code: '42501' }, true)).toBe('not-allowed');
+    expect(failureKindOf({ code: '' , status: 401 }, true)).toBe('signed-out');
+    expect(failureKindOf({ code: '23505' }, true)).toBe('changed');
+    expect(failureKindOf({ name: 'AbortError' }, true)).toBe('timeout');
+    expect(failureKindOf({ code: 'whatever', status: 500 }, true)).toBe('server');
+    expect(failureKindOf(undefined, true)).toBe('server');
+  });
+  it('no network is offline, and a send refused for going too fast is too-many', () => {
+    expect(failureKindOf({ code: '500' }, false)).toBe('offline');
+    expect(failureKindOf(new Error('PAM_RATE_LIMITED'), true)).toBe('too-many');
   });
 });

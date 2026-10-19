@@ -1,4 +1,4 @@
-import { appErrorCode, appErrorRoute, isAppErrorAction } from '@pam/config';
+import { appErrorCode, appErrorRoute, classifyFailure, isAppErrorAction, type FailureKind } from '@pam/config';
 
 /**
  * Tells the team that something a person did did not work (D-616; Will: "if something breaks, create an error log so the team can
@@ -118,6 +118,16 @@ export function codeFromError(caught: unknown, online: boolean = typeof navigato
   const own = appErrorCode(typeof error?.code === 'string' || typeof error?.code === 'number' ? error.code : null);
   if (own !== 'unknown') return own;
   return appErrorCode(typeof error?.status === 'number' || typeof error?.status === 'string' ? error.status : null);
+}
+
+/**
+ * The kind of a caught failure, for the alert's words (D-618): the same code the log holds, put through `classifyFailure`. Takes the error
+ * (or the `{ code }` a screen hands `useMalfunction().show`); the one case a code cannot say, a send refused for sending too fast, is read
+ * from its message here, where the message is still in hand, and the message goes no further.
+ */
+export function failureKindOf(caught: unknown, online: boolean = typeof navigator === 'undefined' || navigator.onLine !== false): FailureKind {
+  if (String((caught as { message?: unknown } | null | undefined)?.message ?? '').includes('PAM_RATE_LIMITED')) return 'too-many';
+  return classifyFailure(codeFromError(caught, online), online);
 }
 
 /** The code for a failed call whose answer carries a status: `const { error, status } = await ...; codeFromAnswer(error, status)`. */
