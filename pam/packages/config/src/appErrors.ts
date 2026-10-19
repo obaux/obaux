@@ -33,6 +33,13 @@ export const APP_ERROR_ACTIONS = [
   'directory.demo-view',
   'requests.review',
   'invite.create',
+  'places.save',
+  'places.unsave',
+  'checkin.here',
+  'checkin.went',
+  'trips.cancel',
+  'schedule.checkin',
+  'schedule.undo',
 ] as const;
 
 export type AppErrorAction = (typeof APP_ERROR_ACTIONS)[number];
