@@ -7,11 +7,7 @@ import type { AppErrorAction, FailureKind } from '@pam/config';
 import type { BottomStack as BottomStackType, Failure, StackNotice } from './BottomStack';
 import { NoticeSinkContext, type NoticeSink, type NoticeToastSpec } from '@pam/ui/noticeSink';
 import { PlainStack } from './PlainStack';
-import { SAVE_TIMEOUT_MS, settleWithin, type Settled } from './settle';
 
-// Kept until the callers import from './settle' themselves (b78): re-exported, so they still compile.
-export { SAVE_TIMEOUT_MS, settleWithin };
-export type { Settled };
 
 /**
  * When Pam fails (D-616, Will, 18 October: "Let's use the smaller alert banner. Overlaid below at bottom of page. Let's
@@ -103,7 +99,7 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
       loadBanner();
     };
     import('./classifyFailure').then(
-      (mod) => mod.classifyAndLog(action, error).then((kind) => (kind === 'done' ? undefined : present(kind)), () => present('server')),
+      (mod) => mod.classifyAndLog(action, error).then((kind) => (kind === 'done' ? options?.refresh?.() : present(kind)), () => present('server')),
       () => present('server'),
     );
   }, [loadBanner]);

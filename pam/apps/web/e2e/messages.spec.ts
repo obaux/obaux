@@ -1003,7 +1003,7 @@ test.describe('a conversation', () => {
 
     await page.getByRole('button', { name: 'Block this person' }).click();
     await page.getByRole('button', { name: 'Block', exact: true }).click();
-    const alert = page.getByRole('alert').filter({ hasText: "That didn't go through" });
+    const alert = page.getByRole('alert').filter({ hasText: /Something's wrong on our side|That took too long|Still not working/ });
     await expect(alert).toBeVisible();
     // No card in the page, and the person is still where they can try again.
     await expect(page.getByText('Something went wrong')).toHaveCount(0);
@@ -1015,7 +1015,7 @@ test.describe('a conversation', () => {
     await page.goto(`/messages/thread/report/?id=${CONVO}`);
     await settled(page);
     await page.getByRole('button', { name: 'Send report' }).click();
-    await expect(page.getByRole('alert').filter({ hasText: "That didn't go through" })).toBeVisible();
+    await expect(page.getByRole('alert').filter({ hasText: /Something's wrong on our side|That took too long|Still not working/ })).toBeVisible();
     await expect(page.getByText('Something went wrong')).toHaveCount(0);
     await expect.poll(() => reports.length).toBe(2);
     expect(reports[1]).toMatchObject({ p_action: 'messages.report' });

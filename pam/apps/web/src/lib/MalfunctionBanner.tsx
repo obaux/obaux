@@ -27,6 +27,8 @@ export interface MalfunctionBannerProps {
   readonly title: string;
   readonly body?: string | undefined;
   readonly actions: readonly MalfunctionBannerAction[];
+  /** `fault` is the red card (something failed); `calm` is the inverse-of-the-page card (nothing broke: the person is early, offline, signed out…). */
+  readonly tone: 'fault' | 'calm';
   readonly onClose: () => void;
 }
 
@@ -39,24 +41,26 @@ const styles = stylex.create({
     paddingInlineStart: spacingVars['--spacing-4'],
     paddingInlineEnd: spacingVars['--spacing-1'],
     borderRadius: radiusVars['--radius-container'],
-    backgroundColor: colorVars['--color-error'],
-    color: colorVars['--color-on-error'],
     boxShadow: shadowVars['--shadow-high'],
     // The host takes no taps (the page under it stays usable); the banner does.
     pointerEvents: 'auto',
   },
+  // Red is for a fault: something that failed on Pam's side or in the connection (server, timeout). Everything else (offline, signed out, not
+  // allowed, a limit, already changed, gone, not at this time, check what you chose) is a calm card, the inverse of the page.
+  fault: { backgroundColor: colorVars['--color-error'], color: colorVars['--color-on-error'] },
+  calm: { backgroundColor: colorVars['--color-background-inverted'], color: colorVars['--color-background-body'] },
   words: { flexGrow: 1, minWidth: 0, paddingBlock: spacingVars['--spacing-2'] },
   // 16px is Pam's reading size (A23); Astryx has no token for it.
-  title: { fontSize: '16px', fontWeight: fontWeightVars['--font-weight-semibold'], lineHeight: 1.35, color: colorVars['--color-on-error'] },
-  body: { fontSize: textSizeVars['--font-size-base'], lineHeight: 1.4, color: colorVars['--color-on-error'] },
-  action: { minHeight: spacingVars['--spacing-12'], fontSize: '16px', fontWeight: fontWeightVars['--font-weight-semibold'], paddingInline: spacingVars['--spacing-3'], color: colorVars['--color-on-error'] },
-  close: { minHeight: spacingVars['--spacing-12'], minWidth: spacingVars['--spacing-12'], flexShrink: 0, color: colorVars['--color-on-error'] },
+  title: { fontSize: '16px', fontWeight: fontWeightVars['--font-weight-semibold'], lineHeight: 1.35, color: 'inherit' },
+  body: { fontSize: textSizeVars['--font-size-base'], lineHeight: 1.4, color: 'inherit' },
+  action: { minHeight: spacingVars['--spacing-12'], fontSize: '16px', fontWeight: fontWeightVars['--font-weight-semibold'], paddingInline: spacingVars['--spacing-3'], color: 'inherit' },
+  close: { minHeight: spacingVars['--spacing-12'], minWidth: spacingVars['--spacing-12'], flexShrink: 0, color: 'inherit' },
 });
 
-export function MalfunctionBanner({ title, body, actions, onClose }: MalfunctionBannerProps) {
+export function MalfunctionBanner({ title, body, actions, tone, onClose }: MalfunctionBannerProps) {
   const { tPlain } = useI18n();
   return (
-    <div role="alert" data-pam-malfunction {...stylex.props(styles.banner)}>
+    <div role="alert" data-pam-malfunction {...stylex.props(styles.banner, tone === 'fault' ? styles.fault : styles.calm)}>
       <HStack gap={1} align="start" wrap="nowrap">
         <VStack gap={1} xstyle={styles.words}>
           <Text xstyle={styles.title}>{title}</Text>

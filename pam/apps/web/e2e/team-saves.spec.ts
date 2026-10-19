@@ -11,7 +11,7 @@ import { settled } from './settled';
 const ME = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
 const ASKER = 'a0000000-0000-4000-8000-0000000000c1';
 const PAM_C = 'c0c0c0c0-0000-4000-8000-00000000a002';
-const MALFUNCTION = "That didn't go through. It's not your fault, so try again.";
+const MALFUNCTION = /Something's wrong on our side|That took too long|Still not working/;
 const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
 const refused = { status: 500, contentType: 'application/json', body: JSON.stringify({ message: 'boom' }) };
 
