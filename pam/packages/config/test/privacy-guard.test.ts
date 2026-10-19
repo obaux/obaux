@@ -2,7 +2,15 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { DATA_COLLECTED, DORMANT, INPUT_FILES, PURPOSE_COLLECTS } from '../src/data-collected.js';
+import {
+  COUNTED_COMPONENTS,
+  DATA_COLLECTED,
+  DORMANT,
+  INPUT_FILES,
+  INPUT_LIKE_IMPORTS,
+  PURPOSE_COLLECTS,
+  RAW_TEXT_INPUT_FILES,
+} from '../src/data-collected.js';
 import { EN } from './_bundles.js';
 
 /**
@@ -12,12 +20,14 @@ import { EN } from './_bundles.js';
  * added and the page would go on saying the old thing. This test reads the app and the list in
  * `src/data-collected.ts` together:
  *
- *  1. every file with a field, a file picker, a signature pad, a microphone or a location request is listed, with
- *     how many it has, and says what it gathers (an entry of `DATA_COLLECTED`) or why nothing personal;
+ *  1. every file with a field, a file picker, a signature pad, a microphone, a location request or a choice control
+ *     (a radio list, a switch, a selectable card, a dropdown, a time input) is listed, with how many it has, and says
+ *     what it gathers (an entry of `DATA_COLLECTED`) or why nothing personal;
  *  2. every entry either names the Privacy lines that cover it and the words they must still say, or is an open
  *     gap that names who decides;
- *  3. every kind of `TextField` is classified, and a component nobody uses yet stays unused until the page says
- *     what it would collect.
+ *  3. every kind of `TextField` is classified, a component nobody uses yet stays unused until the page says what it
+ *     would collect, and every input-like component a screen imports is classified (counted, or why not), so a new
+ *     kind of control cannot arrive without a person deciding what it collects.
  *
  * It cannot judge whether a line is enough, or true. It makes sure a person decided, in writing, which line.
  */
@@ -26,9 +36,11 @@ const PAM = fileURLToPath(new URL('../../../', import.meta.url));
 const SCANNED_DIRS = ['apps/web/src', 'packages/ui/src'];
 /** Stories, tests, e2e and the component gallery never reach a person. */
 const SKIPPED = /(^|\/)(stories|__tests__|e2e|gallery)(\/|$)|\.(test|spec|stories)\.(tsx?|mjs)$/;
-/** One match = one field, picker, pad, microphone or location request. */
-const COLLECTOR =
-  /<(TextField|TextArea|SearchField|SearchPill|CheckboxInput|CheckboxList|VoiceInput|SignaturePad|ChatComposerInput|StaffInviteEmailInput|InviteEmailInput|PolicyUploadCard|input|textarea)\b|navigator\.geolocation|SpeechRecognition|getUserMedia|type="file"/g;
+/** One match = one field, picker, pad, microphone, location request or choice control. */
+const COLLECTOR = new RegExp(
+  `<(${COUNTED_COMPONENTS.join('|')})\\b|navigator\\.geolocation|SpeechRecognition|getUserMedia|type="file"`,
+  'g',
+);
 
 const stripComments = (source: string): string =>
   source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
@@ -64,7 +76,7 @@ describe('the privacy guard', () => {
     expect(counts.size).toBeGreaterThan(20);
   });
 
-  it('knows every file that has a field, a picker, a pad, a microphone or a location request, and how many', () => {
+  it('knows every file that has a field, a picker, a pad, a microphone, a location request or a choice control, and how many', () => {
     const listed = new Map(INPUT_FILES.map((f) => [f.file, f.fields]));
     const problems: string[] = [];
     for (const [file, n] of counts) {
@@ -150,6 +162,57 @@ describe('the privacy guard', () => {
       expect(Boolean(c.id) !== Boolean(c.none), `${purpose}: say what it collects or why nothing, not both`).toBe(true);
       if (c.id) expect(IDS.has(c.id), `${purpose}: "${c.id}" is not an entry of DATA_COLLECTED`).toBe(true);
     }
+  });
+
+  it('counts the choice controls: a radio list, a switch, a selectable card, a dropdown and a time input are each one answer', () => {
+    for (const name of ['RadioList', 'Switch', 'SelectableCard', 'Selector', 'Dropdown', 'DropdownMenuRadioGroup', 'TimeInput']) {
+      expect(COUNTED_COMPONENTS, `${name} is counted`).toContain(name);
+    }
+    expect(COUNTED_COMPONENTS, 'SegmentedControl switches views and stores nothing').not.toContain('SegmentedControl');
+    expect(`<RadioList a="1">`.match(COLLECTOR)?.length).toBe(1);
+    expect(`<RadioListItem value="a" />`.match(COLLECTOR), 'a row of a list is not another answer').toBeNull();
+    expect(`<DropdownMenu>`.match(COLLECTOR), 'a menu of actions is not an answer').toBeNull();
+  });
+
+  it('classifies every input-like component a screen imports from Astryx or @pam/ui, so a new kind of control cannot arrive unnoticed', () => {
+    const INPUT_LIKE = /(Input|Field|Radio|Switch|Select|Checkbox|Dropdown|Slider|Picker|Segmented|Time|Date|Upload|Voice|Composer|Pad|Combo|Toggle|Stepper|Rating|Chip)/;
+    const IMPORT = /import\s+(?:type\s+)?\{([^}]*)\}\s+from\s+'(?:@astryxdesign\/[^']+|@pam\/ui)'/g;
+    const problems: string[] = [];
+    const seen = new Map<string, string[]>();
+    for (const file of ALL_FILES) {
+      for (const m of read(file).matchAll(IMPORT)) {
+        for (const part of m[1]!.split(',')) {
+          const name = part.trim().replace(/^type\s+/, '').split(/\s+as\s+/)[0]!.trim();
+          if (!name || /(Props|Handle|Ref)$/.test(name) || !INPUT_LIKE.test(name)) continue;
+          seen.set(name, [...(seen.get(name) ?? []), file]);
+        }
+      }
+    }
+    expect(seen.size, 'the scan found imports').toBeGreaterThan(10);
+    for (const [name, files] of seen) {
+      if (!(name in INPUT_LIKE_IMPORTS)) {
+        problems.push(
+          `${name} (imported in ${files[0]}${files.length > 1 ? ` and ${files.length - 1} more` : ''}) sounds like an input and is not in ` +
+            `INPUT_LIKE_IMPORTS: say whether it is counted (add it to COUNTED_COMPONENTS and list its files in INPUT_FILES) or why it collects nothing.`,
+        );
+      }
+    }
+    for (const [name, how] of Object.entries(INPUT_LIKE_IMPORTS)) {
+      if (how === 'counted') {
+        if (!COUNTED_COMPONENTS.includes(name)) problems.push(`${name} is "counted" in INPUT_LIKE_IMPORTS but not in COUNTED_COMPONENTS`);
+      } else if (!how.not.trim()) problems.push(`${name}: say why it collects nothing`);
+      else if (COUNTED_COMPONENTS.includes(name)) problems.push(`${name} is in COUNTED_COMPONENTS, so it cannot be "not counted"`);
+    }
+    expect(problems).toEqual([]);
+  });
+
+  it('lets only TextField, SearchPill and VoiceInput touch Astryx\'s raw TextInput, because each of them is counted', () => {
+    const users = ALL_FILES.filter((file) =>
+      [...read(file).matchAll(/import\s+(?:type\s+)?\{([^}]*)\}\s+from\s+'@astryxdesign\/[^']+'/g)].some((m) =>
+        m[1]!.split(',').some((part) => part.trim().replace(/^type\s+/, '').split(/\s+as\s+/)[0]!.trim() === 'TextInput'),
+      ),
+    );
+    expect(users.sort(), 'a screen that imports TextInput directly skips the purpose and the count: use TextField').toEqual([...RAW_TEXT_INPUT_FILES].sort());
   });
 
   it('keeps a component that collects but is used nowhere unused, until the page says what it would collect', () => {

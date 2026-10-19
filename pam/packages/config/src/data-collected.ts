@@ -175,12 +175,140 @@ export const DATA_COLLECTED: readonly CollectedData[] = [
       says: ['and description are shown on pam', 'the services it lists', 'with their details and hours'],
     },
   },
+  {
+    id: 'language',
+    what: 'The language a person picks: in the sign-in menu, on Profile, and on Join (`LanguageSwitcher`, `LanguageField`).',
+    covers: { keys: ['privacy.s.what-we-keep.p1'], says: ['the language you pick'] },
+  },
+  {
+    id: 'calendar-details',
+    what: 'The switch on the calendar screen: whether the calendar link shows each place\'s name and address (`CalendarLinkView`).',
+    covers: {
+      keys: ['privacy.s.what-we-keep.p12'],
+      says: ['whether you turned on the place\'s name and address'],
+    },
+  },
+  {
+    id: 'visit-service',
+    what: 'The service a member picks when planning a visit (`ServiceCards`, a selectable card); the program sees it for that visit.',
+    covers: {
+      keys: ['privacy.s.what-we-keep.p2', 'privacy.s.sharing.p2'],
+      says: ['the visits you plan', 'the service you picked'],
+    },
+  },
+  {
+    id: 'text-alerts',
+    what:
+      'A person\'s yes to texts and to each kind of text, the four Text alerts switches (`AlertsView`; `useReminderConsent`): ' +
+      'kept on the account with whether they replied STOP.',
+    covers: null,
+    gap:
+      'For Will (a102, the text line that waits for his signature): `privacy.s.texts.p1` says Pam may text reminders and updates ' +
+      'about an account, not that the yes, which kinds, or a STOP is kept on the account.',
+  },
+  {
+    id: 'message-report',
+    what: 'The reason a person picks when they report a message that is not safe (`ThreadOptionsViews`), kept with the report that staff read.',
+    covers: null,
+    gap:
+      'For Will (the reported-message clause, with a102): `privacy.s.who-can-see.p3` says staff see a reported message; ' +
+      'no line says the reason and the report are kept.',
+  },
+  {
+    id: 'account-region',
+    what:
+      'The city (region) on every account (`profiles.region_id`), copied from the invite or the approval when the account is made ' +
+      '(`redeem_invite`, 0086): picked by a super admin for a staff member (`InviteNewView`, `RequestReviewScreen`) and by the person ' +
+      'who invites a member. It is data about the person, even though a staff member does not choose it, and it is shown in the ' +
+      'Everyone list.',
+    covers: null,
+    gap:
+      'For Will (the desk, Mira 19 October; Sage is redrafting `what-we-keep.p7`): `privacy.s.what-we-keep.p1` covers a city the person ' +
+      'gives about themselves (`home_city`, picked on About you); no line says Pam also keeps the city of the account, which the ' +
+      'invite or the approval sets for a member as well as for staff. Closing `region_id` to other signed-in people, the way ' +
+      '`last_name` and `home_city` were closed (20261016145411), goes to Nico before launch, so a line cannot yet say only the Pam team sees it.',
+  },
+];
+
+/**
+ * The components the guard counts, one for each place a person types, says, picks or switches something on a screen
+ * (`<Name` in the source, comments removed). A field, a file picker, a signature pad and a microphone are here, and so
+ * are the choice controls: a radio list, a switch, a selectable card, a dropdown, a time input. A choice is something
+ * a person tells Pam, even when no word is typed (their language, whether texts are on, which service they want).
+ */
+export const COUNTED_COMPONENTS: readonly string[] = [
+  'TextField',
+  'TextArea',
+  'SearchField',
+  'SearchPill',
+  'CheckboxInput',
+  'CheckboxList',
+  'VoiceInput',
+  'SignaturePad',
+  'ChatComposerInput',
+  'StaffInviteEmailInput',
+  'InviteEmailInput',
+  'PolicyUploadCard',
+  'input',
+  'textarea',
+  // The choice controls (19 October, Mira 00:44): not SegmentedControl, which switches between views and stores nothing.
+  'RadioList',
+  'Switch',
+  'SelectableCard',
+  'Selector',
+  'Dropdown',
+  'DropdownMenuRadioGroup',
+  'TimeInput',
+];
+
+/**
+ * Every component whose name sounds like an input and that a screen imports from `@astryxdesign/*` or `@pam/ui`, and
+ * what the guard does with it: `counted` (it is in `COUNTED_COMPONENTS`, so each use is counted and its file is in
+ * `INPUT_FILES`) or `not` with the reason it collects nothing. A name that is not here fails the guard: whoever
+ * imports a new input-like component says which it is.
+ */
+export const INPUT_LIKE_IMPORTS: Readonly<Record<string, 'counted' | { readonly not: string }>> = {
+  TextField: 'counted',
+  SearchField: 'counted',
+  SearchPill: 'counted',
+  CheckboxList: 'counted',
+  ChatComposerInput: 'counted',
+  RadioList: 'counted',
+  Switch: 'counted',
+  SelectableCard: 'counted',
+  Selector: 'counted',
+  Dropdown: 'counted',
+  DropdownMenuRadioGroup: 'counted',
+  TimeInput: 'counted',
+  VoiceInput: 'counted',
+  CheckboxListItem: { not: 'One row of a CheckboxList; the list is counted.' },
+  RadioListItem: { not: 'One row of a RadioList; the list is counted.' },
+  DropdownMenuRadioItem: { not: 'One row of a DropdownMenuRadioGroup; the group is counted.' },
+  DropdownMenu: { not: 'A menu of actions (open, delete, report); picking one is a tap, not an answer Pam stores.' },
+  SegmentedControl: { not: 'Switches between views of the same screen (tabs); nothing is stored.' },
+  SegmentedControlItem: { not: 'One tab of a SegmentedControl.' },
+  InputGroup: { not: 'Lays out a field and its button side by side; the field inside is counted.' },
+  InputGroupText: { not: 'A label inside an InputGroup.' },
+  ChatComposer: { not: 'The frame around the message box; the box (ChatComposerInput) is counted.' },
+  ChatComposerDrawer: { not: 'The drawer that holds the message box; the box (ChatComposerInput) is counted.' },
+  AreaChip: { not: 'Shows the area a search uses; the words typed into the area picker are counted there (AreaPicker).' },
+  LanguageSwitching: { not: 'Sets the page language and direction as the language changes; no control.' },
+  TextInput: {
+    not: 'Astryx\'s raw input, used only inside TextField, SearchPill and VoiceInput, each counted (the guard fails anywhere else).',
+  },
+};
+
+/** The only files that may import Astryx's raw `TextInput`: each wraps it in a counted component. */
+export const RAW_TEXT_INPUT_FILES: readonly string[] = [
+  'packages/ui/src/TextField.tsx',
+  'packages/ui/src/SearchPill.tsx',
+  'packages/ui/src/VoiceInput.tsx',
 ];
 
 /**
  * Every file in `apps/web/src` and `packages/ui/src` (not stories, tests or the gallery) that has a field, a file
- * picker, a signature pad, a microphone or a location request, with how many (comments removed; the patterns are in
- * the test). `collects` names what it gathers; `notPersonal` says, in one line, why nothing personal is gathered.
+ * picker, a signature pad, a microphone, a location request or a choice control (`COUNTED_COMPONENTS`), with how many
+ * (comments removed). `collects` names what it gathers; `notPersonal` says, in one line, why nothing personal is gathered.
  */
 export interface InputFile {
   readonly file: string;
@@ -191,7 +319,7 @@ export interface InputFile {
 
 export const INPUT_FILES: readonly InputFile[] = [
   { file: 'apps/web/src/app/signin/PhoneSignInCard.tsx', fields: 1, collects: ['phone'] },
-  { file: 'apps/web/src/app/join/JoinScreen.tsx', fields: 4, collects: ['first-name', 'last-name-and-city', 'waiting-list-text'] },
+  { file: 'apps/web/src/app/join/JoinScreen.tsx', fields: 5, collects: ['first-name', 'last-name-and-city', 'waiting-list-text'] },
   { file: 'apps/web/src/screens/AddPersonView.tsx', fields: 2, collects: ['typed-for-someone-new'] },
   { file: 'apps/web/src/screens/InviteForWho.tsx', fields: 3, collects: ['typed-for-someone-new', 'email'] },
   { file: 'apps/web/src/screens/InviteExpiredScreen.tsx', fields: 1, collects: ['email'] },
@@ -202,11 +330,11 @@ export const INPUT_FILES: readonly InputFile[] = [
   { file: 'apps/web/src/screens/MemberPoliciesView.tsx', fields: 2, collects: ['signature'] },
   { file: 'apps/web/src/screens/NewTripView.tsx', fields: 1, collects: ['visit-note'] },
   { file: 'apps/web/src/screens/SupportReplyScreen.tsx', fields: 1, collects: ['help-desk-reply'] },
-  { file: 'apps/web/src/app/flag/page.tsx', fields: 1, collects: ['place-report'] },
+  { file: 'apps/web/src/app/flag/page.tsx', fields: 2, collects: ['place-report'] },
   { file: 'packages/ui/src/ProfileCards.tsx', fields: 2, collects: ['staff-photo'] },
   { file: 'apps/web/src/app/join/ProgramWizard.tsx', fields: 7, collects: ['program-details'] },
   { file: 'apps/web/src/screens/ProgramView.tsx', fields: 5, collects: ['program-details'] },
-  { file: 'apps/web/src/screens/ServiceEditView.tsx', fields: 7, collects: ['program-details'] },
+  { file: 'apps/web/src/screens/ServiceEditView.tsx', fields: 9, collects: ['program-details'] },
   {
     file: 'apps/web/src/app/messages/NewMessagePicker.tsx',
     fields: 1,
@@ -224,7 +352,7 @@ export const INPUT_FILES: readonly InputFile[] = [
   },
   {
     file: 'apps/web/src/screens/PamHoursScreen.tsx',
-    fields: 1,
+    fields: 3,
     notPersonal: "The Pam team's opening and closing times (D-605): a setting for the whole app, nothing about a person.",
   },
   {
@@ -261,6 +389,26 @@ export const INPUT_FILES: readonly InputFile[] = [
     file: 'packages/ui/src/BringFriend.tsx',
     fields: 1,
     notPersonal: 'Shows the link to copy and share; nothing is typed.',
+  },
+  { file: 'apps/web/src/app/LanguageSwitcher.tsx', fields: 1, collects: ['language'] },
+  { file: 'packages/ui/src/LanguageField.tsx', fields: 1, collects: ['language'] },
+  { file: 'apps/web/src/screens/AlertsView.tsx', fields: 1, collects: ['text-alerts'] },
+  { file: 'apps/web/src/screens/CalendarLinkView.tsx', fields: 1, collects: ['calendar-details'] },
+  { file: 'apps/web/src/screens/ServiceCards.tsx', fields: 1, collects: ['visit-service'] },
+  { file: 'apps/web/src/screens/ThreadOptionsViews.tsx', fields: 1, collects: ['message-report'] },
+  {
+    file: 'apps/web/src/app/directory/page.tsx',
+    fields: 2,
+    notPersonal:
+      'A filter for the list already on the phone, and the Pam team\'s switch that makes one account\'s own screens show example data ' +
+      '(0057, `profiles.is_demo`). It says nothing about the person: it changes what that account sees, not what Pam knows about them.',
+  },
+  { file: 'apps/web/src/screens/InviteNewView.tsx', fields: 1, collects: ['account-region'] },
+  { file: 'apps/web/src/screens/RequestReviewScreen.tsx', fields: 1, collects: ['account-region'] },
+  {
+    file: 'packages/ui/src/Dropdown.tsx',
+    fields: 1,
+    notPersonal: 'The shared dropdown; every place that uses it is counted where it is used.',
   },
 ];
 
