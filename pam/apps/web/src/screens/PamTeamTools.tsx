@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type ComponentProps } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
 import { Heading } from '@astryxdesign/core/Heading';
+import { Spinner } from '@astryxdesign/core/Spinner';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -112,7 +113,7 @@ type MenuItem = ComponentProps<typeof MenuList>['items'][number];
  * status is read from the inbox, which the team already has.
  */
 export function PamTeamOptions({ conversationId, more = [] }: { readonly conversationId: string; readonly more?: readonly MenuItem[] }) {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   const [refresh, setRefresh] = useState(0);
   const inbox = usePamInbox(true, refresh);
   const [busy, setBusy] = useState(false);
@@ -135,7 +136,7 @@ export function PamTeamOptions({ conversationId, more = [] }: { readonly convers
       return;
     }
     // The bottom alert, logged (D-616); a late answer is read back, so the row says what the conversation now is.
-    malfunction.show('pam.thread.status', settled.status === 'timeout' ? { code: 'timeout' } : { code: undefined }, control);
+    malfunction.show('pam.thread.status', { code: settled.status === 'timeout' ? 'timeout' : settled.status === 'ok' && !settled.value.ok ? settled.value.code : undefined }, control);
     if (settled.status === 'timeout') void settled.late.then(() => setRefresh((n) => n + 1));
   };
 
@@ -153,7 +154,13 @@ export function PamTeamOptions({ conversationId, more = [] }: { readonly convers
           ...more,
         ]}
       />
-      {said ? (
+      {/* While it saves, the row takes no taps: say so, in Astryx's own busy state, where the result will be (Iris L9). */}
+      {busy ? (
+        <HStack role="status" gap={2} align="center">
+          <Spinner size="sm" aria-label={tPlain('requests.saving')} />
+          <Text xstyle={styles.done}>{t('requests.saving')}</Text>
+        </HStack>
+      ) : said ? (
         <Text role="status" xstyle={styles.done}>
           {t(said === 'closed' ? 'pam.thread.closed' : 'pam.thread.reopened')}
         </Text>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { codeFromAnswer } from './reportAppError';
 
 /**
  * Case-manager and program-lead claims waiting on a super admin (0054).
@@ -151,12 +152,12 @@ export async function reviewStaffRequest(
   try {
     const { createClient } = await import('./supabase');
     const supabase = createClient();
-    const { error } = await supabase.rpc('review_staff_request', {
+    const { error, status } = await supabase.rpc('review_staff_request', {
       p_user_id: userId,
       p_decision: decision,
       ...(regionId ? { p_region_id: regionId } : {}),
     });
-    if (error) return { ok: false, reason: failureOf(error.message ?? ''), cause: error };
+    if (error) return { ok: false, reason: failureOf(error.message ?? ''), cause: { code: codeFromAnswer(error, status) } };
     if (decision === 'denied') return { ok: true, addedToExisting: false };
     // A super admin reads any account's roles: member and provider together means the role was added to an account that existed.
     const { data } = await supabase.from('profile_roles').select('role').eq('profile_id', userId);

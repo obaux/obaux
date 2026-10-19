@@ -267,7 +267,8 @@ test.describe('the case manager screen', () => {
     await expect(page.getByLabel('Their first name')).toHaveValue('Rosa');
     await expect.poll(() => reports.length).toBe(1);
     // Only the action and a code: never the name or number that was typed.
-    expect(reports[0]).toMatchObject({ p_action: 'invite.create' });
+    // A 500 with no database code is logged by its status (Iris L5).
+    expect(reports[0]).toMatchObject({ p_action: 'invite.create', p_code: '500' });
     expect(JSON.stringify(reports[0])).not.toMatch(/Rosa|555/);
   });
 

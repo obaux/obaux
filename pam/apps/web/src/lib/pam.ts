@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { markHasConversation } from './useMessagingReach';
+import { codeFromAnswer, codeFromError } from './reportAppError';
 
 /**
  * Message Pam: the hooks and calls the screens use (D-605, D-606). The database is `20261018071550` to `20261018073016`;
@@ -245,16 +246,19 @@ export function pamErrorFrom(message: string | undefined): PamError {
   return CODES.find((code) => message?.includes(code)) ?? 'OTHER';
 }
 
-export type PamResult<T> = { readonly ok: true; readonly value: T } | { readonly ok: false; readonly error: PamError };
+export type PamResult<T> =
+  | { readonly ok: true; readonly value: T }
+  /** `code` is for the error log only (D-616): the database's SQLSTATE, or the answer's status when it has none, or offline. */
+  | { readonly ok: false; readonly error: PamError; readonly code?: string };
 
 async function call<T>(fn: string, args?: Record<string, unknown>): Promise<PamResult<T>> {
   try {
     const { createClient } = await import('./supabase');
-    const { data, error } = await createClient().rpc(fn, args);
-    if (error) return { ok: false, error: pamErrorFrom(error.message) };
+    const { data, error, status } = await createClient().rpc(fn, args);
+    if (error) return { ok: false, error: pamErrorFrom(error.message), code: codeFromAnswer(error, status) };
     return { ok: true, value: data as T };
-  } catch {
-    return { ok: false, error: 'OTHER' };
+  } catch (caught) {
+    return { ok: false, error: 'OTHER', code: codeFromError(caught) };
   }
 }
 
