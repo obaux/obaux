@@ -99,3 +99,16 @@ What that does to the line:
 
 Before-launch (see the entry) now says: `phone_stops` and `support_texts_log` were read back empty; the old-hash code goes; `support_texts_log` is keyed and gets its own line before answering by text goes on (card a61).
 
+## 6. Final (Mira 01:14; Nico `1b821f37`)
+
+Section 5 recorded Mira's 01:11 choice (an erased account puts its code back). Her 01:14 reversed it, taking the recommendation of section 4b, and Nico's final matches it. **This section is the one that stands.**
+
+- The table is **one column, the keyed hash** (`stopped_at` dropped; no day).
+- The row is **deleted when the stop moves onto an account**; the account then holds the stop and **erasing the account forgets it** (test 86 pins that nothing is added). Twilio's own opt-out still blocks the number.
+- No old-hash form: live counts were 0 and 0; the migration deletes any plain row in `phone_stops` and in `support_texts_log`, and `support_texts_log` is written through the keyed hash too.
+- The service role can call `phone_is_stopped` and nothing else about the list; no audit row or log line on the no-account STOP.
+- **So the Privacy line has no erase clause, `how-long.p3` needs none, and `your-choices.p2` needs no rule for a deletion request.** Section 5, points 2 to 4, no longer apply.
+- Sage's line for Will is her `dcc5fcc2` without "and the date": scrambled code, not the number, kept only so Pam does not text you if you join later, the list has no phone numbers in it, Pam can only check whether a number it already has is on it, deleted when you text START to Pam or when you join and your STOP moves to your account. It goes in `privacy.s.texts.p4`.
+- Pins: `claude/lena-stopped-number-pins` @ `2b9056af` (`test/stopped-number-line.test.ts`; the line's checks run once p4 exists).
+- Still true from sections 1 to 3: the "text START" words wait for `sms-inbound` (the *Texts from Pam* support post, `reminders.stopped.body`); the Vault key `phone_stop_key` goes in every backup, restore and project move; `support_texts_log` is now keyed but still needs its own Privacy line before answering by text goes on (card a61).
+

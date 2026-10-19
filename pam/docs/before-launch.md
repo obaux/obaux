@@ -444,12 +444,12 @@ STATUS row too.
   deployed, and then the post says *text START*. (2) A STOP from a number with no account is kept as a hash of the number
   (`phone_stops`, live since 11 October, D-524; `support_texts_log` keeps one for support texts) and **Privacy names neither**;
   Nico's keyed version also makes the stop count for someone who joins later. It needs one line in *Text messages*
-  (`privacy.s.texts.p4`): Sage writes, Will signs, it goes live the day `sms-inbound` turns on. (3) `phone_stops` and `support_texts_log` were read back empty on 19 October (Mira, 01:11); the old plain-hash code goes, the table is
-  the keyed hash only, and **an erased account that had a STOP puts its keyed hash back in the list**, so the line says the code is kept
-  after the account is deleted, until START. A request to delete everything leaves it and says why (Mira and Will). (4) **The Vault key
-  `phone_stop_key` is part of every backup, restore and project move**; lose it and every keyed stop stops matching, and people who
-  said STOP are texted. Add a restore check that a known stop still matches. (5) `support_texts_log` is keyed the same way and needs
-  its own Privacy line before answering by text goes on (card a61); until then nothing is kept in it.
+  (`privacy.s.texts.p4`): Sage writes, Will signs, it goes live the day `sms-inbound` turns on. (3) `phone_stops` and `support_texts_log` were read back empty on 19 October (0 and 0); the table is the keyed hash and nothing else,
+  the row is deleted when the stop moves onto an account, and **erasing an account forgets its stop** (Mira, 01:14; Twilio's own
+  opt-out still blocks the number), so the line has no erase clause. (4) **The Vault key `phone_stop_key` is part of every backup,
+  restore and project move**; lose it and every keyed stop stops matching, and people who said STOP are texted. Add a restore check that
+  a known stop still matches. (5) `support_texts_log` is keyed the same way and needs its own Privacy line before answering by text goes
+  on (card a61); until then nothing is kept in it.
 
 - [ ] **Review the SMS copy** still waiting for a name in `reviewedBy`
   (STATUS row 2).
