@@ -16,6 +16,7 @@ import { useSession } from '@/lib/useSession';
 import { reviewStaffRequest, useStaffRequests, type ReviewFailure } from '@/lib/useStaffRequests';
 import { listRegions } from '@/lib/useCaseload';
 import { useRoleView } from '@/lib/useViewedRole';
+import { settleWithin, useMalfunction } from '@/lib/malfunction';
 import { ConfirmDialog } from './ConfirmDialog';
 import { HelpButton } from './HelpButton';
 import { useTextRequester } from './TextRequesterButton';
@@ -53,7 +54,8 @@ export function RequestReviewScreen({ userId }: { readonly userId: string | null
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { viewedRole } = useRoleView(trueRole);
   const isSuperAdmin = viewedRole === 'super_admin';
-  const { state } = useStaffRequests(isSuperAdmin);
+  const { state, refresh } = useStaffRequests(isSuperAdmin);
+  const malfunction = useMalfunction();
 
   const [regions, setRegions] = useState<{ id: string; name: string }[]>([]);
   const [regionId, setRegionId] = useState('');
@@ -116,9 +118,18 @@ export function RequestReviewScreen({ userId }: { readonly userId: string | null
     setConfirming(null);
     setFailed(null);
     setBusy(decision);
-    const result = await reviewStaffRequest(row.userId, decision, regionId || undefined);
+    const settled = await settleWithin(reviewStaffRequest(row.userId, decision, regionId || undefined));
     setBusy(null);
-    if (!result.ok) setFailed(result.reason);
+    // Pam failing, not the decision (D-616): the bottom alert, logged; a late answer is read back. A reason the super admin can
+    // act on (another city, a pair Pam does not allow, already decided) stays here, by the buttons.
+    if (settled.status === 'timeout') {
+      malfunction.show('requests.review', { code: 'timeout' }, document.activeElement);
+      void settled.late.then(refresh);
+      return;
+    }
+    const result = settled.status === 'ok' ? settled.value : ({ ok: false, reason: 'other', cause: settled.error } as const);
+    if (!result.ok && result.reason === 'other') malfunction.show('requests.review', result.cause, document.activeElement);
+    else if (!result.ok) setFailed(result.reason);
     else if (result.addedToExisting) setAddedAsLead(true);
     // Said on this screen, then back to the list the way they came (not a new page on top: P2).
     else setDecided(decision);
@@ -227,9 +238,7 @@ export function RequestReviewScreen({ userId }: { readonly userId: string | null
       />
 
       {/* The reader here is Pam's own super admin: say what is wrong and what to do, never "call Pam" (D-491). */}
-      {failed === 'other' ? (
-        <Notice notice="something_went_wrong" title={t('requests.failed.title')} body={t('requests.failed.body')} />
-      ) : failed ? (
+      {failed && failed !== 'other' ? (
         <Notice
           notice="admin_out_of_region"
           title={t(`requests.failed.${failed === 'gone' ? 'decided' : failed}.title`, { name: first })}

@@ -86,6 +86,17 @@ Why each clause is there, and what makes it true:
 - **The shared caps (30 a minute signed out, 200 overall) can be used up** by a script, which would hide real reports for that minute. A robustness
   question for Nico, not a Privacy one.
 
+### The rate-limit counter (Iris D4, 19 October)
+
+`app_error_limits` holds `u:<account id>`, the minute and a number, so that one account cannot send more than ten notes a minute. It is not the note, and the line is still true: **"It has no name, phone number, account, message or place in it" is about the note**, and the note row has none. Choice made (Lena, 19 October): **(a), no clause.**
+
+- Nobody can read the counter: row security is on and forced, there is a deny-all policy, anon and signed-in people have no grant. Only the report function writes it.
+- It is emptied fast: each report drops rows older than five minutes and a job runs every five minutes, so none lives past ten (and nothing is written while `app_errors_live` is off).
+- It adds nothing to who: `p11` already says the servers write down "which account" and the IP address each time a phone asks Pam for something, for a week. The report is one of those calls. A minute's count under the same account, kept for minutes and unreadable, is less than what is already said.
+- Why not (b): a clause about a ten-minute rate counter would read as new tracking and say less than `p11` does. If Will wants one, it is "We also count, for a few minutes, how many notes one account sends, so that a fault cannot flood us" (needs Sage).
+- Why not (c): hashing the account id changes nothing for anyone who can read the table (they can hash the profiles list too), and the one who could not read it still cannot. The way to hold no account id at all is one shared bucket for every signed-in person, as signed-out reports already have: no per-account fairness, so one looping phone could use up the minute for everyone's notes. That costs a real thing for no gain the line needs; it is Nico's to build if Will wants it.
+- Held by a pin: `error-log-line.test.ts` fails if the counter gains a column, is keyed by anything but the account or `s:signed-out` (no address), loses its lock, or its sweep lengthens.
+
 ## 3. What the code had to do (the list I sent to Nico at 21:15; section 3a is the answer)
 
 1. **The detail is never an error's own message.** Not `error.message`, not PostgREST's `details` or `hint`, not a URL. Take the error `code`

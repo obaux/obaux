@@ -44,10 +44,19 @@ export function InviteForWho({
   role,
   busy,
   onSubmit,
+  refused = null,
+  onEdit,
 }: {
   readonly role: 'member' | 'provider' | 'admin';
   readonly busy: boolean;
   readonly onSubmit: (who: InviteWho) => void;
+  /**
+   * A field the database refused although it passed the checks here (D-618, Iris): a number that is not a real mobile number,
+   * an address too long to be one. It is the person's to fix, so it is said here, with the other field lines, not as an alert.
+   */
+  readonly refused?: 'phone' | 'emailInvalid' | null;
+  /** Called when the refused field is edited, so its line goes. */
+  readonly onEdit?: () => void;
 }) {
   const { t } = useI18n();
   const [firstName, setFirstName] = useState('');
@@ -64,6 +73,7 @@ export function InviteForWho({
     ...(staff && email.trim() === '' ? (['email'] as const) : []),
     ...(staff && email.trim() !== '' && !isEmailAddress(email.trim()) ? (['emailInvalid'] as const) : []),
   ];
+  const shown = tried && missing.length > 0 ? missing : refused ? [refused] : [];
 
   return (
     <VStack gap={4}>
@@ -82,7 +92,10 @@ export function InviteForWho({
         type={'tel' as 'text'}
         label={t('invite.who.phone')}
         value={phone}
-        onChange={setPhone}
+        onChange={(next) => {
+          setPhone(next);
+          if (refused === 'phone') onEdit?.();
+        }}
         width="100%"
         xstyle={styles.field}
       />
@@ -95,7 +108,10 @@ export function InviteForWho({
             purpose="theirEmail"
             label={t('invite.who.email')}
             value={email}
-            onChange={setEmail}
+            onChange={(next) => {
+              setEmail(next);
+              if (refused === 'emailInvalid') onEdit?.();
+            }}
             width="100%"
             xstyle={styles.field}
           />
@@ -104,9 +120,9 @@ export function InviteForWho({
       <Text type="supporting" xstyle={styles.note}>
         {t('invite.who.note')}
       </Text>
-      {tried && missing.length > 0 ? (
+      {shown.length > 0 ? (
         <VStack gap={1} role="alert">
-          {missing.map((need) => (
+          {shown.map((need) => (
             <Text key={need} xstyle={styles.error}>
               {t(`invite.who.need.${need}`)}
             </Text>
