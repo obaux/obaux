@@ -1,3 +1,4 @@
+-- contract: this tightens what a client may write (a yes on a stopped row is refused); no column, table or function is removed, and a yes after START still works.
 -- No yes to texts is saved after a STOP, until START (Iris's correction of 19 October; Mira, 00:40: "make the database refuse a yes after
 -- STOP until START"; it gates texts going live).
 --
