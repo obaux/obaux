@@ -8,13 +8,20 @@ import { setReminderConsent, setTextAlert } from './useReminderConsent';
 const writes: Record<string, unknown>[] = [];
 let stoppedAt: string | null = null;
 let upsertError: Record<string, unknown> | null = null;
+let readError: Record<string, unknown> | null = null;
+let readThrows = false;
 
 vi.mock('./supabase', () => ({
   createClient: () => ({
     from: () => ({
       select: () => ({
         eq: () => ({
-          maybeSingle: async () => ({ data: { sms_enabled: true, sms_stopped_at: stoppedAt, alert_message: true } }),
+          maybeSingle: async () => {
+            if (readThrows) throw new Error('network');
+            return readError
+              ? { data: null, error: readError, status: 503 }
+              : { data: { sms_enabled: true, sms_stopped_at: stoppedAt, alert_message: true }, error: null, status: 200 };
+          },
         }),
       }),
       upsert: async (row: Record<string, unknown>) => {
@@ -32,6 +39,8 @@ describe('setTextAlert', () => {
     writes.length = 0;
     stoppedAt = null;
     upsertError = null;
+    readError = null;
+    readThrows = false;
   });
 
   it('turning the last switch off turns only that switch off, for a case manager or a program too', async () => {
@@ -61,5 +70,23 @@ describe('setTextAlert', () => {
   it('a yes to texts after a STOP is marked stopped, so it is not reported as a problem', async () => {
     stoppedAt = '2026-10-08T15:00:00Z';
     expect(await setReminderConsent('u1', true)).toEqual({ ok: false, code: 'unknown', stopped: true });
+  });
+
+  it('a read that fails is "cannot tell", not "not stopped": a yes is not saved on a guess (Iris, 19 October)', async () => {
+    readError = { code: '', message: 'gateway' };
+    expect(await setTextAlert('u1', 'booked', true, flags, false)).toEqual({ ok: false, code: '503' });
+    expect(await setReminderConsent('u1', true)).toEqual({ ok: false, code: '503' });
+    expect(writes).toEqual([]);
+    readError = null;
+    readThrows = true;
+    expect(await setTextAlert('u1', 'booked', true, flags, false)).toMatchObject({ ok: false });
+    expect(writes).toEqual([]);
+  });
+
+  it('...but turning texts off needs no read: a no is always safe to save', async () => {
+    readError = { code: '', message: 'gateway' };
+    expect(await setTextAlert('u1', 'message', false, flags, true)).toEqual({ ok: true });
+    expect(await setReminderConsent('u1', false)).toEqual({ ok: true });
+    expect(writes.length).toBe(2);
   });
 });
