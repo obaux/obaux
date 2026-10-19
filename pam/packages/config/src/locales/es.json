@@ -1787,9 +1787,9 @@
   "common.example": "Ejemplo",
   "appError.action.places.save": "Saving a place",
   "appError.action.places.unsave": "Removing a saved place",
-  "appError.action.checkin.here": "Marking that you are here",
-  "appError.action.checkin.went": "Saying you went",
+  "appError.action.checkin.here": "Marking a visit with “I'm here”",
+  "appError.action.checkin.went": "Marking a visit with “I went”",
   "appError.action.trips.cancel": "Cancelling a visit",
   "appError.action.schedule.checkin": "Marking someone as there",
-  "appError.action.schedule.undo": "Taking back that mark"
+  "appError.action.schedule.undo": "Undoing a mark as there"
 }
