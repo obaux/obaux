@@ -107,6 +107,10 @@ function subscribe(listener: () => void): () => void {
 /** What adding a policy came to: it worked, a file was wrong (before anything was sent), or it could not be saved. */
 export type AddPolicyResult = 'ok' | 'too_many' | 'too_big' | 'bad_type' | 'failed';
 
+/**
+ * Not timed to 15 seconds like the other saves (D-616): an upload on a slow phone can take longer than that and still be fine, and a person
+ * can see it going ("Saving…"). A failure here is the bottom alert; no answer is just a wait. Same for taking a policy off.
+ */
 /** Put the files in the program's folder of the private bucket, then make the policy from them. */
 async function savePolicy(
   programId: string,
