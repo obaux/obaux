@@ -25,11 +25,24 @@ D-618.
 
 `malfunction-banner.spec` and `alerts.spec` 99 passed on all three projects (including not-allowed having no buttons, and going offline before the tap), `@pam/config` 1522, `tsc` clean, bundle budget within with 2.9 kB spare (the drop from 6.0 is mostly Nico's classifier now in the bundle).
 
+## Final inputs (Mira, 01:04)
+
+Nico's classifier is final at `9df19119` (ten kinds, `failureFor(action, caught, { signedIn, online })` returning a kind or `'done'`, `failureKindKey`); Lena's words are final at `f60ad404` (26 keys, `again.title` "Still not working"). Built on both:
+- `show()` looks at the failure once the reporter module is here (fetched at idle, with the supabase client, so offline is covered): `'done'` (a place already saved, a trip already cancelled, a request already decided) shows nothing and logs nothing; the session says whether to turn a 42501 into signed out.
+- The second failure's title is `again.title` and its line `again.body`; "Get help" is always offered for refused (its only way on) and opens the help desk's page `/support/something-didnt-go-through/` (Wren), not Help in the app.
+- The classifier is out of the root bundle (a lazy import), as Mira asked: budget within with 2.5 kB spare on this branch.
+- Specs on the real words: server, second failure (with its title and body and the help-desk request), signed out, not allowed, offline, changed (Show the latest reloads), close with no timer, axe, and the alerts.spec titles. 102 passed on all three projects.
+
+## Mira's two fixes (01:38)
+
+1. The pictures Will sees are of the real Text alerts screen on the e2e build, not a story: `docs/design/review/2026-10-19-d618-banner/` (offline, signed out, server, changed, refused, wrong time and second failure, in light, dark, Arabic and Russian at 320×568). Wrong time cannot be raised from Text alerts (its kind comes from a database guard's words, which the save's result does not carry), so that one was shot from a scratch build with a one-line flag in `AlertsView`, reverted and not committed.
+2. Offline, the second failure keeps the offline words and Try again, with no Get help and no "Still not working": the help desk is on the website and cannot load offline. Test added (`offline, a second failure keeps the offline words…`); it fails without the change on a build of the tree without it.
+
 ## Left undone
 
-- Lena's keys in the seven bundles (`notice.malfunction.*`). Until then the banner says the one line and shows no body; the pictures were drawn with Sage's English patched into `en.json` for the build only (not committed), so the Arabic panels show English words in a right-to-left banner (layout only).
-- The Show the latest button has no signed word to fall back to, so it appears with Lena's key; its test goes in then.
-- Seven-language fit at 320×568 with the real words, once Lena has them.
+- b77 (Piper's `settle.ts`) is not on main yet: merge main when it is, and resolve `malfunction.tsx` there.
+- `@pam/config` has 7 failing tests, `app-error-action-names` (every error-log action has a plain name): the actions Nico's classifier branch adds (7) have no plain names in Lena's branch. A gap between the two merged branches, not in this one.
+- Lena's real ru/ar audit on the banner; her measure at 232px agrees with what the pictures show.
 
 ## Needs a human
 

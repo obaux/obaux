@@ -15,6 +15,7 @@ import { sheet } from '@pam/ui/sheet';
 import { PAM_SAVED_REPLIES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { setPamThreadStatus, usePamInbox } from '@/lib/pam';
+import { settleWithin, useMalfunction } from '@/lib/malfunction';
 
 /**
  * The Pam team's tools in a Pam conversation (card a100, D-605; Dot's x6). Only the team sees them; the person never does.
@@ -115,17 +116,27 @@ export function PamTeamOptions({ conversationId, more = [] }: { readonly convers
   const [refresh, setRefresh] = useState(0);
   const inbox = usePamInbox(true, refresh);
   const [busy, setBusy] = useState(false);
-  const [said, setSaid] = useState<'closed' | 'reopened' | 'failed' | null>(null);
+  const [said, setSaid] = useState<'closed' | 'reopened' | null>(null);
+  const malfunction = useMalfunction();
   const row = inbox.status === 'ready' ? inbox.rows.find((r) => r.conversationId === conversationId) : undefined;
   if (!row) return <MenuList label={t('messages.options.title')} items={[...more]} />;
   const closing = row.status === 'open';
 
   const act = async () => {
+    const control = document.activeElement;
     setBusy(true);
-    const result = await setPamThreadStatus(conversationId, closing ? 'closed' : 'open');
+    setSaid(null);
+    const settled = await settleWithin(setPamThreadStatus(conversationId, closing ? 'closed' : 'open'));
     setBusy(false);
-    setSaid(result.ok ? (closing ? 'closed' : 'reopened') : 'failed');
-    if (result.ok) setRefresh((n) => n + 1);
+    if (settled.status === 'ok' && settled.value.ok) {
+      setSaid(closing ? 'closed' : 'reopened');
+      malfunction.clear();
+      setRefresh((n) => n + 1);
+      return;
+    }
+    // The bottom alert, logged (D-616); a late answer is read back, so the row says what the conversation now is.
+    malfunction.show('pam.thread.status', settled.status === 'timeout' ? { code: 'timeout' } : { code: undefined }, control);
+    if (settled.status === 'timeout') void settled.late.then(() => setRefresh((n) => n + 1));
   };
 
   return (
@@ -144,7 +155,7 @@ export function PamTeamOptions({ conversationId, more = [] }: { readonly convers
       />
       {said ? (
         <Text role="status" xstyle={styles.done}>
-          {t(said === 'failed' ? 'pam.thread.statusFailed' : said === 'closed' ? 'pam.thread.closed' : 'pam.thread.reopened')}
+          {t(said === 'closed' ? 'pam.thread.closed' : 'pam.thread.reopened')}
         </Text>
       ) : null}
     </VStack>

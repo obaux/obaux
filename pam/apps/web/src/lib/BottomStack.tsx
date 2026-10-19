@@ -1,15 +1,15 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
-import type { FailureKind } from '@pam/config';
+import { failureKindKey, type FailureKind } from '@pam/config';
 import type { NoticeToastSpec } from '@pam/ui/noticeSink';
 import { MalfunctionBanner } from './MalfunctionBanner';
 import { NoticeToast } from './NoticeToast';
 import { useI18n } from './i18n';
 import { navigate } from './navigate';
 import { safeNext } from './signinNext';
-import { failureKindOf } from './reportAppError';
+import { HELP_DESK_URL } from './helpDesk';
 
 /**
  * The one stack at the bottom of the screen (D-618, D-619): the toasts for the states a screen is in (a status `Notice`) above, and the banner
@@ -26,10 +26,12 @@ export interface StackNotice {
 /** What failed: the error (only its code is read), what to run again, how to re-read the screen, and whether this is the second time in a row. */
 export interface Failure {
   readonly seq: number;
-  readonly error: unknown;
+  readonly kind: FailureKind;
   readonly retry: (() => void) | undefined;
   readonly refresh: (() => void) | undefined;
   readonly again: boolean;
+  /** The control that failed: it is scrolled clear of the banner. */
+  readonly source: Element | null;
 }
 
 /**
@@ -40,16 +42,6 @@ export interface Failure {
  *   reload  Show the latest, re-reading the screen.
  * The second failure of the same action adds Get help, and says that Help has more ways to sort it out.
  */
-const KIND_KEY: Record<FailureKind, string> = {
-  offline: 'offline',
-  timeout: 'timeout',
-  'signed-out': 'signedOut',
-  'not-allowed': 'notAllowed',
-  'too-many': 'tooMany',
-  changed: 'changed',
-  gone: 'gone',
-  server: 'server',
-};
 const WAY_OUT: Record<FailureKind, 'retry' | 'signIn' | 'reload' | null> = {
   offline: 'retry',
   timeout: 'retry',
@@ -58,10 +50,24 @@ const WAY_OUT: Record<FailureKind, 'retry' | 'signIn' | 'reload' | null> = {
   'too-many': null,
   changed: 'reload',
   gone: null,
+  'wrong-time': null,
+  refused: null,
   server: 'retry',
 };
 
 const styles = stylex.create({
+  // Over the page, under nothing that matters: above sticky headers and the tab bar, taking no taps itself.
+  host: {
+    position: 'fixed',
+    insetInline: 0,
+    zIndex: 60,
+    display: 'flex',
+    justifyContent: 'center',
+    paddingInline: '16px',
+    pointerEvents: 'none',
+  },
+  // How far up it sits: measured (see `useBottomInset`), so a dynamic style, not an inline one.
+  raisedBy: (inset: number) => ({ bottom: `calc(${inset}px + 12px + env(safe-area-inset-bottom, 0px))` }),
   stack: {
     width: '100%',
     maxWidth: '560px',
@@ -73,18 +79,46 @@ const styles = stylex.create({
   },
 });
 
+/** How far up the stack sits: above the tab bar when there is one, and above the keyboard when it is up. */
+function useBottomInset(): number {
+  const [inset, setInset] = useState(0);
+  useEffect(() => {
+    const measure = () => {
+      const bar = document.querySelector('[data-pam-tabbar]');
+      const barTop = bar ? bar.getBoundingClientRect().top : window.innerHeight;
+      const fromBar = Math.max(0, window.innerHeight - barTop);
+      const vv = window.visualViewport;
+      const fromKeyboard = vv ? Math.max(0, window.innerHeight - vv.height - vv.offsetTop) : 0;
+      setInset(Math.max(fromBar, fromKeyboard));
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    window.visualViewport?.addEventListener('resize', measure);
+    window.visualViewport?.addEventListener('scroll', measure);
+    return () => {
+      window.removeEventListener('resize', measure);
+      window.visualViewport?.removeEventListener('resize', measure);
+      window.visualViewport?.removeEventListener('scroll', measure);
+    };
+  }, []);
+  return inset;
+}
+
 function FailureBanner({ failure, onClose }: { readonly failure: Failure; readonly onClose: () => void }) {
   const { t } = useI18n();
-  const kind = failureKindOf(failure.error);
-  const kindKey = KIND_KEY[kind];
+  const kind = failure.kind;
+  const kindKey = failureKindKey(kind);
+  // The second failure of the same action says Help has more, and offers Get help; offline it does not: the help desk is on the website, and
+  // a phone with no network cannot reach it, so offline keeps its own words and Try again (D-618, Mira 19 October).
+  const second = failure.again && kind !== 'offline';
   // A word is a key's, or the one line every failure said before the keys existed; a missing key comes back as itself.
   const said = (key: string, fallback?: string): string | undefined => {
     const text = t(key);
     if (text !== key) return text;
     return fallback ? t(fallback) : undefined;
   };
-  const title = said(`notice.malfunction.${kindKey}.title`, 'notice.malfunction') ?? '';
-  const body = failure.again
+  const title = (second ? said('notice.malfunction.again.title') : undefined) ?? said(`notice.malfunction.${kindKey}.title`, 'notice.malfunction') ?? '';
+  const body = second
     ? (said('notice.malfunction.again.body') ?? said(`notice.malfunction.${kindKey}.body`))
     : said(`notice.malfunction.${kindKey}.body`);
 
@@ -133,14 +167,16 @@ function FailureBanner({ failure, onClose }: { readonly failure: Failure; readon
           },
         });
     }
-    if (failure.again) {
+    // Get help: when the same action fails a second time, and always for "Pam couldn't do that" (Try again would send the same thing). It opens the
+    // help desk's page for this (Wren), and never says "contact Pam".
+    if (kind === 'refused' || second) {
       const text = label('help', 'help.title');
       if (text)
         list.push({
           label: text,
           onPress: () => {
             onClose();
-            navigate('/help/');
+            navigate(`${HELP_DESK_URL}something-didnt-go-through/`);
           },
         });
     }
@@ -163,12 +199,47 @@ export function BottomStack({
   readonly onCloseBanner: () => void;
   readonly onCloseNotice: (id: string) => void;
 }) {
+  const hostRef = useRef<HTMLDivElement | null>(null);
+  const inset = useBottomInset();
+
+  // A failure is gone with the next tap or key, a successful retry, or leaving the screen: never on a timer. A tap inside the stack is its own
+  // (its buttons do their work), and Tab only moves toward them.
+  const seq = failure?.seq;
+  useEffect(() => {
+    if (seq === undefined) return;
+    const inside = (target: EventTarget | null) => target instanceof Node && !!hostRef.current?.contains(target);
+    const onPointer = (event: Event) => {
+      if (!inside(event.target)) onCloseBanner();
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Tab' || event.key === 'Shift' || inside(event.target)) return;
+      onCloseBanner();
+    };
+    document.addEventListener('pointerdown', onPointer, true);
+    document.addEventListener('keydown', onKey, true);
+    return () => {
+      document.removeEventListener('pointerdown', onPointer, true);
+      document.removeEventListener('keydown', onKey, true);
+    };
+  }, [seq, onCloseBanner]);
+
+  // The control that failed is never under the banner: scroll it clear.
+  const source = failure?.source ?? null;
+  useEffect(() => {
+    if (seq === undefined || !source || !hostRef.current) return;
+    const top = hostRef.current.getBoundingClientRect().top;
+    const control = source.getBoundingClientRect();
+    if (control.bottom > top - 8) window.scrollBy({ top: control.bottom - top + 16, behavior: 'auto' });
+  }, [seq, source, inset]);
+
   return (
-    <div {...stylex.props(styles.stack)}>
-      {notices.map((notice) => (
-        <NoticeToast key={notice.id} spec={notice.spec} onClose={() => onCloseNotice(notice.id)} />
-      ))}
-      {failure ? <FailureBanner key={failure.seq} failure={failure} onClose={onCloseBanner} /> : null}
+    <div ref={hostRef} {...stylex.props(styles.host, styles.raisedBy(inset))}>
+      <div {...stylex.props(styles.stack)}>
+        {notices.map((notice) => (
+          <NoticeToast key={notice.id} spec={notice.spec} onClose={() => onCloseNotice(notice.id)} />
+        ))}
+        {failure ? <FailureBanner key={failure.seq} failure={failure} onClose={onCloseBanner} /> : null}
+      </div>
     </div>
   );
 }

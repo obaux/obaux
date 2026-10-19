@@ -11,6 +11,8 @@ import type { NoticeToastSpec } from '@pam/ui/noticeSink';
  * bundle.
  */
 const styles = stylex.create({
+  // The stand-in has no measuring (the tab bar, the keyboard): it sits at the bottom edge until the stack has loaded.
+  host: { position: 'fixed', insetInline: 0, insetBlockEnd: 'calc(12px + env(safe-area-inset-bottom, 0px))', zIndex: 60, display: 'flex', justifyContent: 'center', paddingInline: '16px', pointerEvents: 'none' },
   stack: { width: '100%', maxWidth: '560px', display: 'flex', flexDirection: 'column', gap: '8px', pointerEvents: 'auto' },
   card: { boxSizing: 'border-box', width: '100%', padding: '16px', borderRadius: '12px', boxShadow: '0 4px 16px oklch(0 0 0 / 25%)' },
   // The dark card: the inverse of the page, so its words are the page's own colour (light on dark, and dark on light in dark mode).
@@ -28,6 +30,7 @@ export interface PlainNotice {
 
 export function PlainStack({ notices, lostBanner }: { readonly notices: readonly PlainNotice[]; readonly lostBanner: string | null }) {
   return (
+    <div {...stylex.props(styles.host)}>
     <div {...stylex.props(styles.stack)}>
       {notices.map(({ id, spec }) => {
         const inner = (
@@ -56,6 +59,7 @@ export function PlainStack({ notices, lostBanner }: { readonly notices: readonly
           <p {...stylex.props(styles.title)}>{lostBanner}</p>
         </div>
       ) : null}
+    </div>
     </div>
   );
 }

@@ -107,7 +107,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
   const [isPickingArea, setIsPickingArea] = useState(false);
 
   const now = useNow();
-  const { isSaved, save, unsave, failed: saveFailed } = useSavedPlaces(session.status === 'signed-in', demoRole);
+  const { isSaved, save, unsave } = useSavedPlaces(session.status === 'signed-in', demoRole);
 
   const state = usePlaces({
     lat: area.lat,
@@ -259,16 +259,6 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
           }}
           onClose={() => setIsPickingArea(false)}
         />
-      }
-      notice={
-        saveFailed ? (
-          <Notice
-            notice="something_went_wrong"
-            title={t('saved.failed.title')}
-            body={t('saved.failed.body')}
-            contactLabel={t('help.contact.action')}
-          />
-        ) : null
       }
       query={settled}
       state={state}

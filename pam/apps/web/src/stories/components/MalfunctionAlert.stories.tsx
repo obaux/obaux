@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Card } from '@astryxdesign/core/Card';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -22,7 +22,7 @@ import { useStoryText } from '../support/useStoryText';
  * Try again where the caller can run the action again, Sign in when the person is signed out, and Get help on the second failure of the same
  * action (never "contact Pam" in so many words).
  */
-function FailingSwitch({ busy = false, code = 500 }: { readonly busy?: boolean; readonly code?: string | number }) {
+function FailingSwitch({ busy = false, code = 500, message }: { readonly busy?: boolean; readonly code?: string | number; readonly message?: string }) {
   const tr = useStoryText();
   const malfunction = useMalfunction();
   const [pending, setPending] = useState(false);
@@ -45,7 +45,7 @@ function FailingSwitch({ busy = false, code = 500 }: { readonly busy?: boolean; 
                 window.setTimeout(() => {
                   setPending(false);
                   // "Try again" runs the same action: here it fails the same way, which is the second failure.
-                  malfunction.show('alerts.switch.closed', { code }, event.target, { retry: () => { setPending(true); fail(); } });
+                  malfunction.show('alerts.switch.closed', message ? { code, message } : { code }, event.target, { retry: () => { setPending(true); fail(); } });
                 }, 400);
               fail();
             }}
@@ -97,6 +97,7 @@ const tapSwitch = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
 
 export const Offline: Story = { render: () => <FailingSwitch busy code="offline" />, play: tapSwitch };
 export const SignedOut: Story = { render: () => <FailingSwitch busy code={401} />, play: tapSwitch };
+export const WrongTime: Story = { render: () => <FailingSwitch busy code={400} message="OUTSIDE_THE_VISIT_WINDOW" />, play: tapSwitch };
 export const Changed: Story = { render: () => <FailingSwitch busy code={409} />, play: tapSwitch };
 export const ServerFailed: Story = { render: () => <FailingSwitch busy code={500} />, play: tapSwitch };
 /** The same action failing again after "Try again": the banner adds Get help. */
@@ -104,8 +105,11 @@ export const SecondFailure: Story = {
   render: () => <FailingSwitch busy code={500} />,
   play: async (context) => {
     await tapSwitch(context);
-    await userEvent.click(await within(document.body).findByRole('button', { name: /try again/i }));
-    await expect(await within(document.body).findByRole('button', { name: /get help/i }, { timeout: 3000 })).toBeVisible();
+    // The banner's own buttons, whatever language it is in: the first is Try again, and once the same action fails again there is a second (Get help).
+    const buttons = () => [...document.querySelectorAll<HTMLButtonElement>('[data-pam-malfunction] button')];
+    await waitFor(() => expect(buttons().length).toBeGreaterThanOrEqual(2), { timeout: 3000 });
+    await userEvent.click(buttons()[0]!);
+    await waitFor(() => expect(buttons().length).toBeGreaterThanOrEqual(3), { timeout: 4000 });
   },
 };
 

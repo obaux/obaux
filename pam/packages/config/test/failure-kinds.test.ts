@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { FAILURE_CODES, FAILURE_KINDS, classifyFailure, type FailureKind } from '../src/failureKinds.js';
+import { FAILURE_CODES, FAILURE_KINDS, classifyFailure, classifyGuardMessage, failureKindKey, type FailureKind } from '../src/failureKinds.js';
 import { appErrorCode } from '../src/appErrors.js';
 
 /** D-618: a failure is one of a closed set of kinds, from the codes the error log already holds. */
@@ -12,6 +12,8 @@ describe('classifyFailure', () => {
     [429, 'too-many'], ['PAM_RATE_LIMITED', 'too-many'],
     [409, 'changed'], ['23505', 'changed'], ['40001', 'changed'],
     [404, 'gone'], [406, 'gone'], ['PGRST116', 'gone'], ['23503', 'gone'],
+    ['PGRST303', 'signed-out'],
+    [400, 'refused'], ['P0001', 'refused'], ['22P02', 'refused'], ['22001', 'refused'], ['23502', 'refused'], ['23514', 'refused'],
     [500, 'server'], [502, 'server'], [503, 'server'], [504, 'server'],
   ];
   it.each(table)('%s is %s', (code, kind) => {
@@ -19,7 +21,7 @@ describe('classifyFailure', () => {
   });
 
   it('unknown, empty, unlisted and odd values are server', () => {
-    for (const code of ['unknown', '', '   ', 'P0001', '400', '22P02', 'something else', undefined, null, {}, [], 0]) {
+    for (const code of ['unknown', '', '   ', 'something else', undefined, null, {}, [], 0]) {
       expect(classifyFailure(code), String(code)).toBe('server');
     }
   });
@@ -28,11 +30,12 @@ describe('classifyFailure', () => {
     for (const code of ['403', '500', 'unknown', 'timeout', '42501', undefined]) expect(classifyFailure(code, false), String(code)).toBe('offline');
   });
 
-  it('the set is closed: every code maps into FAILURE_KINDS, every kind is reached, and there are eight', () => {
-    expect(FAILURE_KINDS).toHaveLength(8);
+  it('the set is closed: every code maps into FAILURE_KINDS, every kind is reached, and there are ten', () => {
+    expect(FAILURE_KINDS).toHaveLength(10);
     for (const kind of Object.values(FAILURE_CODES)) expect(FAILURE_KINDS).toContain(kind);
     for (const kind of FAILURE_KINDS) {
-      if (kind === 'server') continue; // the fallback has no code of its own
+      // The fallback has no code of its own, and wrong-time is named by a guard's words, not by a code.
+      if (kind === 'server' || kind === 'wrong-time') continue;
       expect(Object.values(FAILURE_CODES), kind).toContain(kind);
     }
     expect(new Set(FAILURE_KINDS).size).toBe(FAILURE_KINDS.length);
@@ -47,5 +50,36 @@ describe('classifyFailure', () => {
 
   it('does not read the prototype chain', () => {
     for (const code of ['constructor', 'toString', '__proto__', 'hasOwnProperty']) expect(classifyFailure(code), code).toBe('server');
+  });
+});
+
+describe('classifyGuardMessage', () => {
+  const words: [string, FailureKind][] = [
+    ['PAM_RATE_LIMITED', 'too-many'],
+    ['VISIT_CANCELLED', 'changed'], ['REQUEST_ALREADY_DECIDED', 'changed'], ['TRIP_NOT_FOUND', 'changed'],
+    ['VISIT_NOT_FOUND', 'gone'], ['REQUEST_NOT_FOUND', 'gone'], ['NOT_FOUND', 'gone'], ['No such message', 'gone'], ['No such account', 'gone'],
+    ['There is nobody else in that conversation', 'gone'],
+    ['JWT expired', 'signed-out'], ['ACCOUNT_NOT_ACTIVE', 'not-allowed'], ['NOT_A_PROGRAM_LEAD', 'not-allowed'], ['NO_LEAD_HERE', 'not-allowed'], ['ONLY_A_SUPER_ADMIN', 'not-allowed'],
+    ['OUTSIDE_THE_VISIT_WINDOW', 'wrong-time'], ['PLANNED_TOO_LATE', 'wrong-time'], ['ROLE_PAIR_NOT_ALLOWED', 'refused'],
+    ['ACCOUNT_IN_OTHER_CITY', 'refused'], ['INVITE_NEEDS_PHONE', 'refused'],
+  ];
+  it.each(words)('%s is %s', (message, kind) => {
+    expect(classifyGuardMessage(message)).toBe(kind);
+    expect(classifyGuardMessage(`ERROR: ${message}`)).toBe(kind);
+  });
+  it('says nothing for a message with none of the words, or no message', () => {
+    for (const message of ['permission denied for table x', 'Key (phone)=(+12155550100) already exists', '', undefined, null, 42]) {
+      expect(classifyGuardMessage(message), String(message)).toBeNull();
+    }
+  });
+});
+
+describe('failureKindKey', () => {
+  it('turns a kind into the locale key Sage and Lena use', () => {
+    expect(failureKindKey('signed-out')).toBe('signedOut');
+    expect(failureKindKey('not-allowed')).toBe('notAllowed');
+    expect(failureKindKey('too-many')).toBe('tooMany');
+    expect(failureKindKey('wrong-time')).toBe('wrongTime');
+    expect(failureKindKey('offline')).toBe('offline');
   });
 });

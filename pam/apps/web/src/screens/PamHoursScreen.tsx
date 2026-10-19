@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ComponentProps } from 'react';
 import * as stylex from '@stylexjs/stylex';
-import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
+import { CheckboxList, CheckboxListItem } from '@astryxdesign/core/CheckboxList';
 import { Text } from '@astryxdesign/core/Text';
 import { TimeInput } from '@astryxdesign/core/TimeInput';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -15,6 +15,7 @@ import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { setPamHours, usePamStatus } from '@/lib/pam';
 import { pamSystemText } from '@/lib/pamMessages';
+import { settleWithin, useMalfunction } from '@/lib/malfunction';
 import { NotIn } from '../app/NotIn';
 
 /**
@@ -25,6 +26,8 @@ import { NotIn } from '../app/NotIn';
  */
 const styles = stylex.create({
   label: { fontSize: '15px', fontWeight: 700, color: colorVars['--color-text-secondary'] },
+  // A row's words at a row's size (17–18px); the list's own are smaller.
+  day: { fontSize: '17px', lineHeight: 1.35 },
   time: { width: '100%' },
   preview: { fontSize: '17px', lineHeight: 1.45, whiteSpace: 'pre-line' },
   status: { fontSize: '17px', lineHeight: 1.4 },
@@ -44,7 +47,8 @@ export function PamHoursScreen() {
   const pam = usePamStatus(isTeam);
   const [draft, setDraft] = useState<PamHours | null>(null);
   const [saving, setSaving] = useState(false);
-  const [said, setSaid] = useState<'saved' | 'failed' | 'noDays' | 'order' | null>(null);
+  const [said, setSaid] = useState<'saved' | 'noDays' | 'order' | null>(null);
+  const malfunction = useMalfunction();
 
   useEffect(() => {
     if (pam.status === 'ready' && draft === null) {
@@ -99,26 +103,34 @@ export function PamHoursScreen() {
     if (hours.days.length === 0) return setSaid('noDays');
     if (hours.close <= hours.open) return setSaid('order');
     setSaving(true);
-    const result = await setPamHours(hours.tz, hours.days, hours.open, hours.close);
+    const settled = await settleWithin(setPamHours(hours.tz, hours.days, hours.open, hours.close));
     setSaving(false);
-    setSaid(result.ok ? 'saved' : 'failed');
+    if (settled.status === 'ok' && settled.value.ok) {
+      setSaid('saved');
+      malfunction.clear();
+      return;
+    }
+    // Pam failing, not the hours (D-616): the bottom alert, logged. What to fix in the fields stays here, by Save.
+    malfunction.show('pam.hours.save', settled.status === 'timeout' ? { code: 'timeout' } : { code: undefined }, document.activeElement);
   };
 
   return (
     <Page gap={4}>
       {header}
 
-      <VStack gap={2}>
-        <Text xstyle={styles.label}>{t('pam.hours.days')}</Text>
+      {/* Each day a full-width row, the whole row its target (Iris C1): single boxes 32px apart overlapped their 48px targets. */}
+      <CheckboxList
+        label={t('pam.hours.days')}
+        value={hours.days.map(String)}
+        onChange={(values) => change({ days: values.map(Number).sort((a, b) => a - b) })}
+        density="spacious"
+        hasDividers
+        width="100%"
+      >
         {WEEK.map((day) => (
-          <CheckboxInput
-            key={day}
-            label={dayName(day)}
-            value={hours.days.includes(day)}
-            onChange={(on) => change({ days: on ? [...hours.days, day].sort((a, b) => a - b) : hours.days.filter((d) => d !== day) })}
-          />
+          <CheckboxListItem key={day} value={String(day)} label={<Text xstyle={styles.day}>{dayName(day)}</Text>} />
         ))}
-      </VStack>
+      </CheckboxList>
 
       <VStack gap={2}>
         <Text xstyle={styles.label}>{t('pam.hours.times', { zone: t('pam.hours.zone.eastern') })}</Text>

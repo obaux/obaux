@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { APP_ERROR_QUEUE_MAX, codeFromAnswer, codeFromError, createReporter, databaseAnswered, failureKindOf } from './reportAppError';
+import { APP_ERROR_QUEUE_MAX, codeFromAnswer, codeFromError, createReporter, databaseAnswered, failureFor, failureKindOf } from './reportAppError';
 
 /** D-616: a failed action is reported with an action key and a code, never a message; it never throws; it waits offline. */
 function setup(opts: { online?: boolean; reach?: boolean; throws?: boolean } = {}) {
@@ -141,5 +141,62 @@ describe('failureKindOf (D-618)', () => {
   it('no network is offline, and a send refused for going too fast is too-many', () => {
     expect(failureKindOf({ code: '500' }, false)).toBe('offline');
     expect(failureKindOf(new Error('PAM_RATE_LIMITED'), true)).toBe('too-many');
+  });
+});
+
+describe('what Iris found in the codes (D-618)', () => {
+  it('a bare word given as the error is its own code: the "timeout" the saves pass', () => {
+    expect(codeFromError('timeout', true)).toBe('timeout');
+    expect(codeFromError('offline', true)).toBe('offline');
+    expect(codeFromError('some words (phone)=(+12155550100)', true)).toBe('unknown');
+  });
+  it('a supabase-js abort has no name, only a message that begins with it', () => {
+    expect(codeFromError({ message: 'AbortError: signal is aborted without reason', code: '' }, true)).toBe('timeout');
+    expect(failureKindOf({ message: 'AbortError: The operation was aborted', code: '' }, true)).toBe('timeout');
+    expect(codeFromError({ message: 'not an AbortError at the start', code: '' }, true)).toBe('unknown');
+  });
+  it('a guard\'s own word names the kind where the message is in hand; the code alone says refused', () => {
+    expect(failureKindOf({ code: 'P0001', message: 'OUTSIDE_THE_VISIT_WINDOW' }, true)).toBe('wrong-time');
+    expect(failureKindOf({ code: 'P0001', message: 'PLANNED_TOO_LATE' }, true)).toBe('wrong-time');
+    expect(failureKindOf({ code: 'P0001', message: 'ROLE_PAIR_NOT_ALLOWED' }, true)).toBe('refused');
+    expect(failureKindOf({ code: 'P0001', message: 'VISIT_CANCELLED' }, true)).toBe('changed');
+    expect(failureKindOf({ code: 'P0001', message: 'VISIT_NOT_FOUND' }, true)).toBe('gone');
+    expect(failureKindOf({ code: 'P0001', message: 'ONLY_A_SUPER_ADMIN' }, true)).toBe('not-allowed');
+    expect(failureKindOf({ code: 'P0001', message: 'something nobody listed' }, true)).toBe('refused');
+    expect(failureKindOf({ code: 'P0001', message: 'VISIT_CANCELLED' }, false)).toBe('offline');
+  });
+});
+
+describe('the whole error is read before the code is narrowed (D-618, Dot)', () => {
+  it('an expired sign-in and a missing row are told apart by PostgREST\'s own codes and words', () => {
+    expect(failureKindOf({ code: 'PGRST301', message: 'JWT expired' }, true)).toBe('signed-out');
+    expect(failureKindOf({ code: 'PGRST303', message: 'x' }, true)).toBe('signed-out');
+    expect(failureKindOf({ code: '', message: 'JWT expired' }, true)).toBe('signed-out');
+    expect(failureKindOf({ code: 'PGRST116', message: 'The result contains 0 rows' }, true)).toBe('gone');
+    expect(failureKindOf({ code: 'PGRST000', message: 'x' }, true)).toBe('server');
+  });
+  it('42501 is signed-out when there is no session and not-allowed when there is one', () => {
+    expect(failureKindOf({ code: '42501' }, { online: true, signedIn: false })).toBe('signed-out');
+    expect(failureKindOf({ code: '42501' }, { online: true, signedIn: true })).toBe('not-allowed');
+    expect(failureKindOf({ code: '42501' }, { online: true })).toBe('not-allowed');
+    expect(failureKindOf({ code: '403' }, { online: true, signedIn: false })).toBe('not-allowed');
+  });
+  it('a boolean second argument is still the network', () => {
+    expect(failureKindOf({ code: '500' }, false)).toBe('offline');
+  });
+});
+
+describe('failureFor: no alert when the outcome has already happened', () => {
+  it('a place already saved, a visit already cancelled, a request already decided are done', () => {
+    expect(failureFor('places.save', { code: '23505' }, true)).toBe('done');
+    expect(failureFor('trips.cancel', { code: 'P0001', message: 'TRIP_NOT_FOUND' }, true)).toBe('done');
+    expect(failureFor('trips.cancel', { code: 'P0001', message: 'VISIT_CANCELLED' }, true)).toBe('done');
+    expect(failureFor('requests.review', { code: 'P0001', message: 'REQUEST_ALREADY_DECIDED' }, true)).toBe('done');
+  });
+  it('the same words on another action are a kind, not done; and 23505 elsewhere is changed', () => {
+    expect(failureFor('checkin.here', { code: 'P0001', message: 'VISIT_CANCELLED' }, true)).toBe('changed');
+    expect(failureFor('places.unsave', { code: '23505' }, true)).toBe('changed');
+    expect(failureFor('places.save', { code: '500' }, true)).toBe('server');
+    expect(failureFor('places.save', { code: '500' }, false)).toBe('offline');
   });
 });

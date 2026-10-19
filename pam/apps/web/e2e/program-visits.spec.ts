@@ -83,7 +83,8 @@ test('when the database refuses, the circle stays empty', async ({ page }) => {
   await page.goto('/');
   await settled(page);
   await page.getByRole('button', { name: 'Check Tanya in' }).click();
-  await expect(page.getByText('We could not save')).toBeVisible();
+  // The small alert at the bottom, with no reason (D-616); the circle stays empty.
+  await expect(page.getByRole('alert').filter({ hasText: "That didn't go through. It's not your fault, so try again." })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Check Tanya in' })).toBeVisible();
 });
 
@@ -115,7 +116,7 @@ test('a visit the member marked themselves looks like any marked visit: undo ask
   await page.getByRole('button', { name: /Tanya is checked in/ }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Undo check-in' }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
-  await expect(page.getByText('We could not save that')).toHaveCount(0);
+  await expect(page.getByRole('alert').filter({ hasText: "That didn't go through" })).toHaveCount(0);
   await expect(page.getByRole('button', { name: /Tanya is checked in/ })).toBeVisible();
   // Nothing on the screen says who marked it.
   await expect(page.getByText(/themselves|marked it/i)).toHaveCount(0);

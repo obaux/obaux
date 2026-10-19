@@ -2,12 +2,16 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
-import * as stylex from '@stylexjs/stylex';
 import { useI18n } from './i18n';
-import type { AppErrorAction } from '@pam/config';
+import type { AppErrorAction, FailureKind } from '@pam/config';
 import type { BottomStack as BottomStackType, Failure, StackNotice } from './BottomStack';
 import { NoticeSinkContext, type NoticeSink, type NoticeToastSpec } from '@pam/ui/noticeSink';
 import { PlainStack } from './PlainStack';
+import { SAVE_TIMEOUT_MS, settleWithin, type Settled } from './settle';
+
+// Kept until the callers import from './settle' themselves (b78): re-exported, so they still compile.
+export { SAVE_TIMEOUT_MS, settleWithin };
+export type { Settled };
 
 /**
  * When Pam fails (D-616, Will, 18 October: "Let's use the smaller alert banner. Overlaid below at bottom of page. Let's
@@ -46,47 +50,6 @@ interface MalfunctionApi {
 
 const MalfunctionContext = createContext<MalfunctionApi | null>(null);
 
-const styles = stylex.create({
-  // Over the page, under nothing that matters: above sticky headers and the tab bar, taking no taps itself.
-  host: {
-    position: 'fixed',
-    insetInline: 0,
-    zIndex: 60,
-    display: 'flex',
-    justifyContent: 'center',
-    paddingInline: '16px',
-    pointerEvents: 'none',
-  },
-  // How far up it sits: measured (see `useBottomInset`), so a dynamic style, not an inline one.
-  raisedBy: (inset: number) => ({ bottom: `calc(${inset}px + 12px + env(safe-area-inset-bottom, 0px))` }),
-});
-
-/** How far up the alert sits: above the tab bar when there is one, and above the keyboard when it is up. */
-function useBottomInset(active: boolean): number {
-  const [inset, setInset] = useState(0);
-  useEffect(() => {
-    if (!active) return;
-    const measure = () => {
-      const bar = document.querySelector('[data-pam-tabbar]');
-      const barTop = bar ? bar.getBoundingClientRect().top : window.innerHeight;
-      const fromBar = Math.max(0, window.innerHeight - barTop);
-      const vv = window.visualViewport;
-      const fromKeyboard = vv ? Math.max(0, window.innerHeight - vv.height - vv.offsetTop) : 0;
-      setInset(Math.max(fromBar, fromKeyboard));
-    };
-    measure();
-    window.addEventListener('resize', measure);
-    window.visualViewport?.addEventListener('resize', measure);
-    window.visualViewport?.addEventListener('scroll', measure);
-    return () => {
-      window.removeEventListener('resize', measure);
-      window.visualViewport?.removeEventListener('resize', measure);
-      window.visualViewport?.removeEventListener('scroll', measure);
-    };
-  }, [active]);
-  return inset;
-}
-
 export function MalfunctionProvider({ children }: { readonly children: ReactNode }) {
   const { t } = useI18n();
   const pathname = usePathname();
@@ -119,8 +82,8 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
     const idle = (window as { requestIdleCallback?: (fn: () => void) => number }).requestIdleCallback;
     const load = () => {
       loadBanner();
-      // The log is written by a module fetched at idle too: a failure with the phone offline would not be able to fetch it.
-      void import('./reportAppError');
+      // The classifier and the log are fetched at idle too: a failure with the phone offline would not be able to fetch them.
+      void import('./classifyFailure');
     };
     const id = idle ? idle(load) : window.setTimeout(load, 1_500);
     return () => {
@@ -129,41 +92,26 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
   }, [loadBanner]);
 
   const show = useCallback<MalfunctionApi['show']>((action, error, from, options) => {
-    // The log is written after the fact and nothing waits for it, so the reporter (and the classifier it carries) is not in the root bundle.
-    void import('./reportAppError').then((mod) => mod.reportAppError({ action, code: mod.codeFromError(error) }));
-    source.current = from ?? null;
-    const again = lastFailed.current === action;
-    lastFailed.current = action;
-    setSeq((n) => n + 1);
-    setShown({ error, retry: options?.retry, refresh: options?.refresh, again });
-    // The banner's own weight is not in the root bundle: it loads the first time a failure is shown.
-    loadBanner();
+    // The classifier, the log and the session check are in a module fetched at idle (not in the root bundle), so the failure is looked at once it
+    // is here. An outcome that has in fact already happened (a place already saved) shows nothing. If the module could not be fetched (offline
+    // from the start) the banner still comes, saying the one line.
+    const present = (kind: FailureKind) => {
+      const again = lastFailed.current === action;
+      lastFailed.current = action;
+      setSeq((n) => n + 1);
+      setShown({ kind, retry: options?.retry, refresh: options?.refresh, again, source: from ?? null });
+      loadBanner();
+    };
+    import('./classifyFailure').then(
+      (mod) => mod.classifyAndLog(action, error).then((kind) => (kind === 'done' ? undefined : present(kind)), () => present('server')),
+      () => present('server'),
+    );
   }, [loadBanner]);
   const clear = useCallback(() => {
     lastFailed.current = null;
     setShown(null);
   }, []);
 
-  // Gone with the next tap or key, a successful retry, or leaving the screen: never on a timer. A tap inside the banner is its own
-  // (its buttons do their work), and Tab only moves toward them.
-  const open = shown !== null;
-  useEffect(() => {
-    if (!open) return;
-    const inside = (target: EventTarget | null) => target instanceof Node && !!hostRef.current?.contains(target);
-    const onPointer = (event: Event) => {
-      if (!inside(event.target)) setShown(null);
-    };
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Tab' || event.key === 'Shift' || inside(event.target)) return;
-      setShown(null);
-    };
-    document.addEventListener('pointerdown', onPointer, true);
-    document.addEventListener('keydown', onKey, true);
-    return () => {
-      document.removeEventListener('pointerdown', onPointer, true);
-      document.removeEventListener('keydown', onKey, true);
-    };
-  }, [open, seq]);
   useEffect(() => {
     lastFailed.current = null;
     setShown(null);
@@ -171,16 +119,7 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
 
   // The stack is open for a failure (the banner) and for any status `Notice` on screen that has not been closed.
   const visibleNotices = useMemo(() => notices.filter((n) => !closed.has(n.id)), [notices, closed]);
-  const stackOpen = open || visibleNotices.length > 0;
-  const inset = useBottomInset(stackOpen);
-
-  // The control that failed is never under the alert: scroll it clear.
-  useEffect(() => {
-    if (!open || !Stack || !source.current || !hostRef.current) return;
-    const alertTop = hostRef.current.getBoundingClientRect().top;
-    const control = source.current.getBoundingClientRect();
-    if (control.bottom > alertTop - 8) window.scrollBy({ top: control.bottom - alertTop + 16, behavior: 'auto' });
-  }, [open, Stack, seq, inset]);
+  const stackOpen = shown !== null || visibleNotices.length > 0;
 
   const api = useMemo(() => ({ show, clear }), [show, clear]);
 
@@ -206,18 +145,16 @@ export function MalfunctionProvider({ children }: { readonly children: ReactNode
       <NoticeSinkContext.Provider value={sink}>
         {children}
         {stackOpen ? (
-          <div ref={hostRef} {...stylex.props(styles.host, styles.raisedBy(inset))}>
-            {Stack ? (
-              <Stack
-                notices={visibleNotices}
-                failure={shown ? { seq, ...shown } : null}
-                onCloseBanner={() => setShown(null)}
-                onCloseNotice={closeNotice}
-              />
-            ) : (
-              <PlainStack notices={visibleNotices} lostBanner={shown ? t('notice.malfunction') : null} />
-            )}
-          </div>
+          Stack ? (
+            <Stack
+              notices={visibleNotices}
+              failure={shown ? { seq, ...shown } : null}
+              onCloseBanner={() => setShown(null)}
+              onCloseNotice={closeNotice}
+            />
+          ) : (
+            <PlainStack notices={visibleNotices} lostBanner={shown ? t('notice.malfunction') : null} />
+          )
         ) : null}
       </NoticeSinkContext.Provider>
     </MalfunctionContext.Provider>

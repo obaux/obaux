@@ -197,6 +197,107 @@ migration and, where it doesn't need PostGIS, run its functions in a throwaway P
    on sign-in too.
 5. **A save or switch** counts as failed after 15 s. A send keeps its 30 s.
 
+## G. D-618: the alert says what to do, by kind of failure
+
+Will, 19 October 00:13, as the desk passed it on: the failure alert says how to fix the problem by the
+kind of error, and "contact Pam" is only an unspoken last resort. The kinds are offline, timeout,
+signed-out, not-allowed, too-many, changed, gone and server. Which of them each action can really hit,
+and with which codes, is in `2026-10-19-d618-failure-kinds-by-action.md`. These cases run on every
+screen that uses the alert, on the local build and stack only.
+
+**Making each kind.** Each kind is made in the stub, with the answer the real database or PostgREST
+gives:
+
+| Kind | Made by |
+|---|---|
+| offline | The page is offline and every request is refused. |
+| timeout | No answer for 16 s, or 31 s for a send. |
+| signed-out | A 401 with PostgREST's `PGRST301` (JWT expired), and the session cleared. |
+| not-allowed | A 403 with `42501`, and a 400 with `P0001` and the function's own word (for example `NOT_ALLOWED`, `ONLY_A_SUPER_ADMIN`). |
+| too-many | A 400 with `P0001` and `PAM_RATE_LIMITED`, and a 429. |
+| changed | A 409 with `23505`, and a function's "already" refusal. |
+| gone | A 406 with `PGRST116` (no row), a 409 with `23503`, and `P0001` with `NOT_FOUND`. |
+| server | A 500 with no code, and a 503. |
+| wrongTime | `P0001` with `OUTSIDE_THE_VISIT_WINDOW` (and `PLANNED_TOO_LATE` where it isn't inline). |
+| refused | A 400 with `P0001` and a guard's word the screen doesn't map (for example `ROLE_PAIR_NOT_ALLOWED`), a `23514` and a `22P02`. Also every reachable guard in the table, each checked to give its mapped kind (for example `OUTSIDE_THE_VISIT_WINDOW` on `schedule.checkin`, `VISIT_CANCELLED`, `TRIP_NOT_FOUND`). |
+
+**The desk's decisions (00:40) that these cases test:**
+
+- `refused` is a kind.
+- Guard words the screen holds map to their real kind:
+  - not-found → gone;
+  - cancelled or decided → changed;
+  - not-active or `ONLY_*` → not-allowed.
+- **`wrongTime` is a kind** (the desk at 00:42; Sage signed it at `5c1956c9`: "Not at this time / You
+  can only do this near the time of the visit."). A window can still close while the screen is open,
+  even after Piper makes the check-in circle and the "I'm here" card match the database's windows.
+  **G8** checks both.
+- **`refused` has Get help as its only button** (Sage, `98875861`): "Pam couldn't do that / Check
+  what you chose or typed. If it's right, tap Get help." Get help opens
+  `/support/something-didnt-go-through/`.
+- An outcome that already happened is `done` (Nico's classifier) and shows nothing (G3).
+- `INVITE_NEEDS_PHONE` is inline, by the field (Ava), not the alert.
+
+- **G1. Each kind shows its own words.** The words are Sage's line for that kind, in the person's
+  language, and say what to do: wait for the network, sign in again, ask your guide, wait a while,
+  look again. They're the same for every action of that kind, and different from every other kind.
+  "Contact Pam" is never in the first alert, written or spoken.
+- **G2. The buttons do what they say.** Each button is tested by what follows. Today the alert closes
+  on any `pointerdown` (capture), so a tap on its own button must still run the button, not just close
+  the alert.
+  - **Try again:** it re-sends that one action, once, and the request count goes up by exactly one.
+  - **Sign in:** it opens sign-in, and after it brings the person back to the same screen, with the
+    action not done twice.
+  - **Look again / Refresh:** it re-reads, and the screen shows what the database now says.
+  - **Offline:** no button that can't work while offline. If it retries by itself when the network is
+    back, that happens once.
+- **G3. A failure that is really a success shows no alert.** Every row the table flags as "the
+  outcome already happened" gets its code (for example `23505` on a save that was already saved).
+  Expected: no alert, the screen shows the done state, and nothing is announced. Whether it's still
+  logged is the desk's call; I'll record what happens.
+- **G4. A second failure shows Get help.** The same action failing twice in a row on the same screen,
+  with no success between, shows the kind's words plus Get help. Get help opens where the desk says
+  (Help, or the Pam conversation), and Back returns to the screen.
+  - It's not on the first failure.
+  - It's not after a success, then one failure.
+  - A failure of a different action counts from one again.
+  - It isn't kept across leaving the screen, unless the desk says it should be.
+- **G5. It fits at 320.** For every kind, in all seven languages (the longest is usually Russian or
+  Spanish), in light and dark, at 320×568 and 390×844:
+  - nothing is cut and nothing scrolls sideways;
+  - each button is at least 44×44 and inside the alert;
+  - the alert stays inside the screen, above the tab bar and the keyboard;
+  - it never covers the control that failed;
+  - Arabic mirrors.
+  With a button in it, the alert now takes taps, so B8 changes. Only the alert's own box is tappable,
+  and the page around it still takes taps.
+- **G6. A screen reader.** The words and the button are said once for each failure. The button is
+  reachable by Tab and has a name, and focus isn't moved to it unasked. The second failure's Get help
+  is said with it.
+- **G7. The log still says which kind.** The code logged for each kind lets the Problems list tell the
+  kinds apart. Today `appErrorCode` keeps only 3-digit codes, 5-character codes and the three word
+  codes. So PostgREST's own codes (`PGRST116`, `PGRST301`, 8 characters) log as `unknown`, and every
+  raised error logs as `P0001`, losing its word. Signed-out and gone then look like a server fault in
+  the list. I'll record the code each kind logs, and flag any kind the list can't tell apart.
+- **G8. Wrong time: the windows match, and a closed window says so.**
+  - The Schedule circle isn't offered (or is disabled with a reason) on a visit more than 2 h ahead.
+  - The "I'm here" and "I went" card isn't shown once the database's window is closed, including a
+    visit under an hour, at `coalesce(ends_at, start + 1h) + 3h`.
+  - A tap one minute inside each edge succeeds.
+  - With the clock moved past the edge while the page stays open, the tap gives `wrongTime`'s words
+    ("Not at this time / You can only do this near the time of the visit."), not "Pam's side". No
+    Try again is offered, since trying again can't help until the window opens.
+- **G9. `refused` and its Get help.** Sage revised it at `98875861` (claude/sage-signs), replacing
+  `5c1956c9`. A `P0001` the screen can't map, a `23514` and a `22P02` show:
+  - the title "Pam couldn't do that";
+  - the line "Check what you chose or typed. If it's right, tap Get help.";
+  - Get help as the **only** button. There's no Try again, on the first failure or any later one.
+
+  Get help opens the help post `/support/something-didnt-go-through/`, and Back returns to the same
+  screen with what was typed or picked still there. After the person changes the field, the action
+  succeeds and no alert is left. The words fit at 320 in all seven languages, with Get help at least
+  44×44.
+
 ## Needs Will's phone
 
 - A real keyboard over the alert.
