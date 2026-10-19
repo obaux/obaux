@@ -119,8 +119,13 @@ function RemindersForm() {
     if (session.status !== 'signed-in') return;
     // Which action this is for the log: the agree reached from a Text alerts switch is alerts.agree (Iris L10), any other agree is reminders.agree.
     const action = value ? (fromAlerts ? 'alerts.agree' : 'reminders.agree') : 'reminders.decline';
-    // The button just tapped: the alert is kept clear of it (Iris L1, at 320x568 it covered it).
-    const tapped = typeof document === 'undefined' ? null : document.activeElement;
+    // The control just tapped: the alert is kept clear of it (Iris L1, at 320x568 it covered it). Found by its words, not by focus: a link
+    // that is tapped does not always take focus.
+    const label = value ? t('reminders.agree') : t('reminders.skip');
+    const tapped =
+      typeof document === 'undefined'
+        ? null
+        : (Array.from(document.querySelectorAll('button, a')).find((el) => el.textContent?.trim() === label) ?? document.activeElement);
     // No network is said at once (Iris L7: it took 7 s), and no answer in 15 seconds is a failure (settleWithin), like a switch.
     if (isOffline()) {
       malfunction.show(action, { code: 'offline' }, tapped, { retry: () => void answer(value) });
