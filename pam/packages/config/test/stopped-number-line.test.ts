@@ -16,8 +16,8 @@ import { SUPPORTED_LOCALES } from '../src/i18n.js';
  * role ask about a number it did not mean to, or writes a log line about a stopped number makes the line untrue, and this fails until the
  * line (and Will) catch up. Nico's database test 86 holds the behaviour; this holds what the page promises.
  *
- * Whether an erased account puts its code back was still being decided when this was written; the build and the line must agree on it
- * whichever way it goes (last tests of the first block), and the checks on the line's own words apply once `privacy.s.texts.p4` exists.
+ * An erased account is forgotten (Mira's final, 01:14), so the list holds only numbers with no account. The checks on the line's own words
+ * apply once `privacy.s.texts.p4` exists in English.
  */
 const MIGRATIONS = fileURLToPath(new URL('../../db/migrations/', import.meta.url));
 const names = readdirSync(MIGRATIONS);
@@ -117,21 +117,18 @@ describe('the list of stopped numbers keeps what Privacy says it keeps (D-524, 1
     expect(audit).not.toMatch(/phone/);
   });
 
-  // Whether an erased account puts its code back was decided twice in one night (Mira 01:11 then 01:14). The build and the line must agree,
-  // whichever it is: if a trigger puts the code back on erase, the line says so; if not, it does not.
-  const putsBackOnErase = /before delete on public\.profiles/.test(keyed);
-
-  it.runIf(putsBackOnErase)('if an erased account puts its code back, it writes only the keyed code, only for an account that had a STOP, and says nothing in any log', () => {
-    const fn = functionText(keyed, 'keep_the_stop_of_an_erased_account');
-    expect(fn).toMatch(/insert into public\.phone_stops \(phone_hash\) values \(public\.phone_hash\(old\.phone\)\)/);
-    expect(fn).toMatch(/np\.sms_stopped_at is not null/);
-    expect(fn).not.toMatch(/audit_log|raise |notice/i);
+  // Erasing an account forgets its stop (Mira, 19 October 01:14, after 01:11 said the opposite; Nico's 1b821f37 pins it in test 86): the
+  // list holds only numbers that have no account, and Twilio's own opt-out still blocks the number. So Privacy says nothing about an erased
+  // account, and `how-long` and `your-choices` stay true as they are. If this is ever reversed, the line, `how-long.p3` and the rule for a
+  // deletion request change in the same commit.
+  it('adds nothing to the list when an account is erased: no trigger on deleting a profile writes the list', () => {
+    expect(keyed).not.toMatch(/(?:before|after) delete on public\.profiles/);
+    expect(keyed).not.toMatch(/keep_the_stop_of_an_erased_account/);
   });
 
-  it('the build and the line agree on an erased account: the line says "delete your account" only if the code is put back', () => {
-    const line = EN['privacy.s.texts.p4'];
-    if (!line) return; // the line is not in yet: nothing to compare
-    expect(/delete your account/i.test(line), 'p4 mentions deleting the account').toBe(putsBackOnErase);
+  it('deletes the row when the stop moves onto an account, so the list holds only numbers with no account', () => {
+    const carry = functionText(keyed, 'carry_a_stopped_number_onto_the_account');
+    expect(carry).toMatch(/delete from public\.phone_stops where phone_hash = public\.phone_hash\(new\.phone\);/);
   });
 
   describe('the line in Privacy (privacy.s.texts.p4; Sage writes, Will signs, it goes live the day sms-inbound turns on)', () => {
@@ -141,6 +138,11 @@ describe('the list of stopped numbers keeps what Privacy says it keeps (D-524, 1
 
     it.runIf(text)('is the fourth paragraph of “Text messages”', () => {
       expect(texts?.bodyKeys[3]).toBe(KEY);
+    });
+
+    it.runIf(text)('says nothing about deleting an account (an erased account is forgotten) and says what happens when the person joins', () => {
+      expect(text).not.toMatch(/delete your account|erase/i);
+      expect(text).toMatch(/join/i);
     });
 
     it.runIf(text)('says it is a scrambled code and not the number, that Pam can only check a number it already has, and how it ends, and never that nobody can compare', () => {
