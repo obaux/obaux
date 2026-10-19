@@ -662,6 +662,8 @@
   "requests.failed.city.body": "Choose the city their account is in, or deny this request.",
   "requests.failed.decided.title": "This request was already decided",
   "requests.failed.decided.body": "Go back to the list to see where it stands.",
+  "requests.failed.gone.title": "This request is no longer here",
+  "requests.failed.gone.body": "{name}'s sign-in was deleted, so there is nothing to decide. Go back to the list.",
   "requests.done.title": "{name} is now a program lead too",
   "requests.done.body": "We texted them that they are in.",
   "requests.wants.provider": "Wants to add a program",
