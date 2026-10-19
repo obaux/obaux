@@ -53,7 +53,14 @@ const styles = stylex.create({
   },
   // How far up it sits: measured (see `useBottomInset`), so a dynamic style, not an inline one.
   raisedBy: (inset: number) => ({ bottom: `calc(${inset}px + 12px + env(safe-area-inset-bottom, 0px))` }),
-  inner: { width: '100%', maxWidth: '560px', boxShadow: '0 4px 16px oklch(0 0 0 / 25%)' },
+  // It floats over whatever is under it, so it has a surface of its own (CompactNotice has none: inline it is on the page's).
+  inner: {
+    width: '100%',
+    maxWidth: '560px',
+    borderRadius: '8px',
+    backgroundColor: 'var(--color-background-popover)',
+    boxShadow: '0 4px 16px oklch(0 0 0 / 25%)',
+  },
 });
 
 /** How far up the alert sits: above the tab bar when there is one, and above the keyboard when it is up. */
