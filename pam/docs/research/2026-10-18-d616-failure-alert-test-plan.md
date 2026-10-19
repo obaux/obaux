@@ -218,6 +218,7 @@ gives:
 | changed | A 409 with `23505`, and a function's "already" refusal. |
 | gone | A 406 with `PGRST116` (no row), a 409 with `23503`, and `P0001` with `NOT_FOUND`. |
 | server | A 500 with no code, and a 503. |
+| wrongTime | `P0001` with `OUTSIDE_THE_VISIT_WINDOW` (and `PLANNED_TOO_LATE` where it isn't inline). |
 | refused | A 400 with `P0001` and a guard's word the screen doesn't map (for example `ROLE_PAIR_NOT_ALLOWED`), a `23514` and a `22P02`. Also every reachable guard in the table, each checked to give its mapped kind (for example `OUTSIDE_THE_VISIT_WINDOW` on `schedule.checkin`, `VISIT_CANCELLED`, `TRIP_NOT_FOUND`). |
 
 **The desk's decisions (00:40) that these cases test:**
@@ -227,9 +228,11 @@ gives:
   - not-found → gone;
   - cancelled or decided → changed;
   - not-active or `ONLY_*` → not-allowed.
-- There's no `wrong-time` kind. Instead, the check-in circle and the "I'm here" card match the
-  database's windows. So **G8** checks that neither is offered outside the window, and that a tap at
-  its edge isn't refused.
+- **`wrongTime` is a kind** (the desk at 00:42; Sage signed it at `5c1956c9`: "Not at this time / You
+  can only do this near the time of the visit."). A window can still close while the screen is open,
+  even after Piper makes the check-in circle and the "I'm here" card match the database's windows.
+  **G8** checks both.
+- **`refused` carries Try again** in Sage's words: "Check what you entered or picked".
 - An outcome that already happened is `done` (Nico's classifier) and shows nothing (G3).
 - `INVITE_NEEDS_PHONE` is inline, by the field (Ava), not the alert.
 
@@ -279,8 +282,14 @@ gives:
   - The "I'm here" and "I went" card isn't shown once the database's window is closed, including a
     visit under an hour, at `coalesce(ends_at, start + 1h) + 3h`.
   - A tap one minute inside each edge succeeds.
-  - With the clock moved past the edge while the page stays open, the tap gives `refused`'s words,
-    not "Pam's side".
+  - With the clock moved past the edge while the page stays open, the tap gives `wrongTime`'s words
+    ("Not at this time / You can only do this near the time of the visit."), not "Pam's side". No
+    Try again is offered, since trying again can't help until the window opens.
+- **G9. `refused` and its Try again.** A `P0001` the screen can't map, a `23514` and a `22P02` show
+  Sage's line, "Check what you entered or picked", with Try again.
+  - Try again re-sends once, with what's now entered or picked.
+  - After the person changes the field, it succeeds.
+  - Unchanged, a second failure shows Get help (G4).
 
 ## Needs Will's phone
 
