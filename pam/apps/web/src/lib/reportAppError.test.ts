@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { APP_ERROR_QUEUE_MAX, codeFromError, createReporter } from './reportAppError';
+import { APP_ERROR_QUEUE_MAX, codeFromAnswer, codeFromError, createReporter, databaseAnswered, failureKindOf } from './reportAppError';
 
 /** D-616: a failed action is reported with an action key and a code, never a message; it never throws; it waits offline. */
 function setup(opts: { online?: boolean; reach?: boolean; throws?: boolean } = {}) {
@@ -95,5 +95,51 @@ describe('codeFromError', () => {
     expect(codeFromError({ code: 'PGRST202' }, true)).toBe('unknown');
     expect(codeFromError(new Error('duplicate (phone)=(+12155550100)'), true)).toBe('unknown');
     expect(codeFromError(undefined, true)).toBe('unknown');
+  });
+});
+
+describe('the HTTP status names a failure that has no SQLSTATE (Iris D2)', () => {
+  it('uses the answer\'s status when the error has no closed-shape code, and the SQLSTATE when it has one', () => {
+    expect(codeFromAnswer({ code: '', message: '' }, 500)).toBe('500');
+    expect(codeFromAnswer({ code: 'PGRST301', message: 'words' }, 401)).toBe('401');
+    expect(codeFromAnswer({ code: '42501' }, 403)).toBe('42501');
+    expect(codeFromAnswer({ code: '' }, 0)).toBe('unknown');
+    expect(codeFromAnswer(null, undefined)).toBe('unknown');
+    expect(codeFromError({ status: 503 }, true)).toBe('503');
+  });
+});
+
+describe('a report the database answered is not sent again (Iris D3)', () => {
+  it('any HTTP status is an answer, even a 5xx with nothing in it; only status 0, a network failure, is not', () => {
+    expect(databaseAnswered({ status: 200 })).toBe(true);
+    expect(databaseAnswered({ status: 204 })).toBe(true);
+    expect(databaseAnswered({ status: 500 })).toBe(true);
+    expect(databaseAnswered({ status: 404 })).toBe(true);
+    expect(databaseAnswered({ status: 0 })).toBe(false);
+    expect(databaseAnswered({})).toBe(false);
+  });
+
+  it('an answered report leaves the queue, so the next failure does not send it a second time', async () => {
+    const { state, report } = setup();
+    report({ action: 'messages.send', code: 500 });
+    await settle();
+    report({ action: 'messages.photo', code: 'timeout' });
+    await settle();
+    expect(state.sent.map((w) => w['p_action'])).toEqual(['messages.send', 'messages.photo']);
+  });
+});
+
+describe('failureKindOf (D-618)', () => {
+  it('names the kind from the same code the log holds', () => {
+    expect(failureKindOf({ code: '42501' }, true)).toBe('not-allowed');
+    expect(failureKindOf({ code: '' , status: 401 }, true)).toBe('signed-out');
+    expect(failureKindOf({ code: '23505' }, true)).toBe('changed');
+    expect(failureKindOf({ name: 'AbortError' }, true)).toBe('timeout');
+    expect(failureKindOf({ code: 'whatever', status: 500 }, true)).toBe('server');
+    expect(failureKindOf(undefined, true)).toBe('server');
+  });
+  it('no network is offline, and a send refused for going too fast is too-many', () => {
+    expect(failureKindOf({ code: '500' }, false)).toBe('offline');
+    expect(failureKindOf(new Error('PAM_RATE_LIMITED'), true)).toBe('too-many');
   });
 });
