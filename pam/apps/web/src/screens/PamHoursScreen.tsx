@@ -15,7 +15,8 @@ import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { setPamHours, usePamStatus } from '@/lib/pam';
 import { pamSystemText } from '@/lib/pamMessages';
-import { settleWithin, useMalfunction } from '@/lib/malfunction';
+import { settleWithin } from '@/lib/settle';
+import { useMalfunction } from '@/lib/malfunction';
 import { NotIn } from '../app/NotIn';
 
 /**

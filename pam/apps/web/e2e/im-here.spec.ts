@@ -134,7 +134,7 @@ test('at a place with no lead on Pam there is no I\'m here and no I went: nobody
   await expect(page.getByRole('button', { name: 'I went' })).toHaveCount(0);
 });
 
-const ALERT = "That didn't go through. It's not your fault, so try again.";
+const ALERT = /Something's wrong on our side|That took too long|Still not working/;
 
 test("a failed I'm here is the small alert at the bottom, with no reason, and the button is as it was (D-616)", async ({ page, context }) => {
   await context.grantPermissions(['geolocation']);
@@ -167,4 +167,65 @@ test('a visit that could not be cancelled stays, with the small alert at the bot
   await expect(page.getByRole('alert').filter({ hasText: ALERT })).toBeVisible();
   await expect(page.getByText('We could not cancel that visit')).toHaveCount(0);
   await expect(page.getByText('Cancel this visit')).toBeVisible();
+});
+
+test("a failed I'm here leaves the button enabled, focused and on screen, and the log says the HTTP status when the answer has no code (Iris L2, L5)", async ({ page, context }) => {
+  await context.grantPermissions(['geolocation']);
+  await context.setGeolocation({ latitude: 39.95, longitude: -75.16 });
+  await signedIn(page, hoursFromNow(0.5));
+  const reports: Record<string, unknown>[] = [];
+  await page.route('**/rest/v1/rpc/report_app_error*', (route) => {
+    reports.push(route.request().postDataJSON() as Record<string, unknown>);
+    return route.fulfill(json(null));
+  });
+  await page.route('**/rest/v1/rpc/i_am_here*', (route) => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));
+  await open(page);
+  const here = page.getByRole('button', { name: "I'm here" });
+  await here.click();
+  await expect(page.getByRole('alert').filter({ hasText: ALERT })).toBeVisible();
+  await expect(here).toBeEnabled();
+  await expect(here).toBeFocused();
+  await expect(here).toBeInViewport();
+  await expect.poll(() => reports.length).toBe(1);
+  expect(reports[0]).toMatchObject({ p_action: 'checkin.here', p_code: '500' });
+});
+
+test("a second tap on I'm here while the first is out is not a second send (Iris L2)", async ({ page, context }) => {
+  await context.grantPermissions(['geolocation']);
+  await context.setGeolocation({ latitude: 39.95, longitude: -75.16 });
+  await signedIn(page, hoursFromNow(0.5));
+  let asked = 0;
+  let release: (() => void) | undefined;
+  const held = new Promise<void>((resolve) => (release = resolve));
+  await page.route('**/rest/v1/rpc/i_am_here*', async (route) => {
+    asked += 1;
+    await held;
+    await route.fulfill(json([{ appointment_id: VISIT, there: true, points: 100 }]));
+  });
+  await open(page);
+  const here = page.getByRole('button', { name: /I'm here|Checking/ });
+  await here.click();
+  await expect.poll(() => asked).toBe(1);
+  await here.click({ force: true });
+  await page.waitForTimeout(300);
+  release!();
+  await expect(page.getByText('Your visit is marked.')).toBeVisible();
+  expect(asked).toBe(1);
+});
+
+test('a visit already cancelled is no alert, and the visit is read again (D-618 done)', async ({ page }) => {
+  await signedIn(page, hoursFromNow(5));
+  let reads = 0;
+  await page.route('**/rest/v1/rpc/my_trips*', (route) => {
+    reads += 1;
+    return route.fulfill(json([{ id: VISIT, service_id: PLACE, place_name: 'Riverside Job Center', category: 'workforce', address: '1234 Market St', lat: 39.95, lon: -75.16, starts_at: hoursFromNow(5), note: null, status: 'scheduled' }]));
+  });
+  await page.route('**/rest/v1/rpc/cancel_trip*', (route) => route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ message: 'VISIT_CANCELLED' }) }));
+  await open(page);
+  const before = reads;
+  await page.getByText('Cancel this visit').click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Yes, cancel it' }).click();
+  await expect.poll(() => reads).toBeGreaterThan(before);
+  await expect(page.locator('[data-pam-malfunction]')).toHaveCount(0);
+  await expect(page.getByRole('alert').filter({ hasText: /Something's wrong|didn't go through/ })).toHaveCount(0);
 });

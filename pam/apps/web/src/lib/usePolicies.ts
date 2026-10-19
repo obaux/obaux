@@ -16,6 +16,7 @@ import {
 } from './programPolicies';
 import { useOwnProgram } from './useOwnProgram';
 import { useSession } from './useSession';
+import { withStatus } from './settle';
 
 /**
  * A program's policies for participants (D-261), and who has signed them.
@@ -136,13 +137,13 @@ async function savePolicy(
       uploaded.push(path);
       sent.push({ path, name: safeFileName(file.name), content_type: type, size_bytes: file.size });
     }
-    const { error } = await supabase.rpc('add_policy', {
+    const { error, status } = await supabase.rpc('add_policy', {
       p_service_id: programId,
       p_title: titleFromFileName(files[0]!.name),
       p_files: sent,
       ...(replaces ? { p_replaces: replaces } : {}),
     });
-    if (error) throw error;
+    if (error) throw withStatus(error, status);
     await loadPolicies(programId);
     return 'ok';
   } catch (error) {
@@ -221,8 +222,8 @@ export function usePolicies(): {
           const { createClient } = await import('./supabase');
           const supabase = createClient();
           for (const id of ids) {
-            const { error } = await supabase.rpc('archive_policy', { p_id: id });
-            if (error) throw error;
+            const { error, status } = await supabase.rpc('archive_policy', { p_id: id });
+            if (error) throw withStatus(error, status);
           }
           await loadPolicies(programId);
           return true;

@@ -84,8 +84,8 @@ test('when the database refuses, the circle stays empty', async ({ page }) => {
   await page.goto('/');
   await settled(page);
   await page.getByRole('button', { name: 'Check Tanya in' }).click();
-  // The small alert at the bottom, with no reason (D-616); the circle stays empty.
-  await expect(page.getByRole('alert').filter({ hasText: "That didn't go through. It's not your fault, so try again." })).toBeVisible();
+  // The small alert at the bottom (D-616), in the words for a check-in outside the visit's time ("Not at this time", D-618); the circle stays empty.
+  await expect(page.getByRole('alert').filter({ hasText: /Not at this time/ })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Check Tanya in' })).toBeVisible();
 });
 
@@ -117,7 +117,7 @@ test('a visit the member marked themselves looks like any marked visit: undo ask
   await page.getByRole('button', { name: /Tanya is checked in/ }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Undo check-in' }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
-  await expect(page.getByRole('alert').filter({ hasText: "That didn't go through" })).toHaveCount(0);
+  await expect(page.getByRole('alert').filter({ hasText: /Something's wrong on our side|That took too long|Still not working/ })).toHaveCount(0);
   await expect(page.getByRole('button', { name: /Tanya is checked in/ })).toBeVisible();
   // Nothing on the screen says who marked it.
   await expect(page.getByText(/themselves|marked it/i)).toHaveCount(0);
@@ -176,4 +176,26 @@ test('a visit days away has no check-in circle: the database would refuse it, so
   await settled(page);
   await expect(page.getByRole('button', { name: 'Check Tanya in' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Check Luis in' })).toHaveCount(0);
+});
+
+test('a second tap on the circle before the database answers is not a second check_in_visit (Iris L3)', async ({ page }) => {
+  await signedInLead(page, [here()]);
+  let asked = 0;
+  let release: (() => void) | undefined;
+  const held = new Promise<void>((resolve) => (release = resolve));
+  await page.route('**/rest/v1/rpc/check_in_visit*', async (route) => {
+    asked += 1;
+    await held;
+    await route.fulfill(json([{ appointment_id: VISIT, status: 'attended', checked_in_at: new Date().toISOString(), points: 100 }]));
+  });
+  await page.goto('/');
+  await settled(page);
+  const circle = page.getByRole('button', { name: 'Check Tanya in' });
+  await circle.click();
+  await expect.poll(() => asked).toBe(1);
+  await circle.click();
+  await page.waitForTimeout(300);
+  release!();
+  await expect(page.getByRole('button', { name: /Tanya is checked in/ })).toBeVisible();
+  expect(asked).toBe(1);
 });

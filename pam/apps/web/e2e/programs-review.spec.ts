@@ -160,7 +160,7 @@ test.describe('programs to check', () => {
     await settled(page);
     await page.getByRole('button', { name: 'Approve' }).click();
     await page.getByRole('dialog').getByRole('button', { name: 'Yes, approve' }).click();
-    await expect(page.getByRole('alert').filter({ hasText: "That didn't go through. It's not your fault, so try again." })).toBeVisible();
+    await expect(page.getByRole('alert').filter({ hasText: /Something's wrong on our side|That took too long|Still not working/ })).toBeVisible();
     await expect(page.getByText('Hearth Kitchen Training is approved')).toHaveCount(0);
     await expect(page.getByText('Days waiting: 4')).toBeVisible();
   });

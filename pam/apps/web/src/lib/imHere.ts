@@ -1,6 +1,6 @@
 'use client';
 
-import { settleWithin } from './settle';
+import { settleWithin, withStatus } from './settle';
 
 /**
  * "I'm here" and "I went" (D-535): a member marks their own visit.
@@ -71,10 +71,10 @@ export async function markHere(visitId: string): Promise<HereResult> {
     );
     if (settled.status === 'timeout') return { kind: 'error', error: settled.error, late: settled.late };
     if (settled.status === 'failed') return { kind: 'error', error: settled.error };
-    const { data, error } = settled.value;
+    const { data, error, status } = settled.value;
     if (error) {
       const why = refusalOf(error.message);
-      return why === 'too-late' || why === 'no-location' ? { kind: why } : { kind: 'error', error };
+      return why === 'too-late' || why === 'no-location' ? { kind: why } : { kind: 'error', error: withStatus(error, status) };
     }
     const row = (Array.isArray(data) ? data[0] : data) as { there?: boolean; points?: number } | undefined;
     return row?.there ? { kind: 'there', points: row.points ?? 0 } : { kind: 'not-yet' };
@@ -89,10 +89,10 @@ export async function markWent(visitId: string): Promise<WentResult> {
     const settled = await settleWithin(Promise.resolve(createClient().rpc('i_went', { p_appointment_id: visitId })));
     if (settled.status === 'timeout') return { kind: 'error', error: settled.error, late: settled.late };
     if (settled.status === 'failed') return { kind: 'error', error: settled.error };
-    const { data, error } = settled.value;
+    const { data, error, status } = settled.value;
     if (error) {
       const why = refusalOf(error.message);
-      return why === 'too-late' || why === 'limit' ? { kind: why } : { kind: 'error', error };
+      return why === 'too-late' || why === 'limit' ? { kind: why } : { kind: 'error', error: withStatus(error, status) };
     }
     const row = (Array.isArray(data) ? data[0] : data) as { points?: number } | undefined;
     return { kind: 'went', points: row?.points ?? 0 };

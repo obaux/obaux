@@ -24,3 +24,14 @@ describe('settleWithin', () => {
     expect((await settleWithin(Promise.resolve(1))).status).toBe('ok');
   });
 });
+
+describe('withStatus (Iris L5)', () => {
+  it('lets the log name a 500 that has no SQLSTATE', async () => {
+    const { withStatus } = await import('./settle');
+    const { codeFromError } = await import('./reportAppError');
+    const answer = withStatus({ name: 'PostgrestError', code: '', message: 'a person typed this' }, 500);
+    expect(codeFromError(answer)).toBe('500');
+    expect(codeFromError(withStatus({ code: '42501', message: 'x' }, 403))).toBe('42501');
+    expect(withStatus(null, 500)).toBeNull();
+  });
+});

@@ -172,7 +172,7 @@ test('ticking a policy on a service asks the database to make it only for that s
   expect(scoped[0]).toEqual({ p_policy_id: CONF, p_service_ids: [COMPUTERS, GED] });
 });
 
-const ALERT = "That didn't go through. It's not your fault, so try again.";
+const ALERT = /Something's wrong on our side|That took too long|Still not working/;
 const REAL_GED = 'b1b2c3d4-0000-4000-8000-0000000000aa';
 
 test('a policy that could not be added is the small alert at the bottom, with the file taken back (D-616)', async ({ page }) => {

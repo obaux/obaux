@@ -13,7 +13,7 @@ import { Segment } from '@pam/ui/Segment';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BookIcon, Notice } from '@pam/ui';
+import { BookIcon, CompactNotice } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { PolicyUploadCard } from '@pam/ui/PolicyUploadCard';
 import { SubPage } from '@pam/ui/SubPage';
@@ -129,12 +129,7 @@ export function PoliciesScreen() {
       />
       {busy ? <Text type="supporting" xstyle={styles.empty}>{t('policies.upload.saving')}</Text> : null}
       {problem !== 'ok' ? (
-        <Notice
-          notice="something_went_wrong"
-          title={t('policies.upload.problem.title')}
-          body={t(`policies.upload.problem.${problem}`)}
-          contactLabel={t('help.contact.action')}
-        />
+        <CompactNotice text={t(`policies.upload.problem.${problem}`)} />
       ) : null}
 
       <Text xstyle={styles.heading}>{t('policies.list')}</Text>
@@ -260,12 +255,7 @@ export function PolicyScreen({ id }: { readonly id: string | null }) {
               />
               {busy ? <Text type="supporting" xstyle={styles.empty}>{t('policies.upload.saving')}</Text> : null}
               {problem !== 'ok' ? (
-                <Notice
-                  notice="something_went_wrong"
-                  title={t('policies.upload.problem.title')}
-                  body={t(`policies.upload.problem.${problem}`)}
-                  contactLabel={t('help.contact.action')}
-                />
+                <CompactNotice text={t(`policies.upload.problem.${problem}`)} />
               ) : null}
             </VStack>
           ) : null}

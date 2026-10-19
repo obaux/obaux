@@ -90,7 +90,7 @@ test('a decision that did not go through is the small alert at the bottom, and t
   await page.goto('/places/reported/');
   await settled(page);
   await page.getByRole('button', { name: 'Keep it' }).click();
-  await expect(page.getByRole('alert').filter({ hasText: "That didn't go through. It's not your fault, so try again." })).toBeVisible();
+  await expect(page.getByRole('alert').filter({ hasText: /Something's wrong on our side|That took too long|Still not working/ })).toBeVisible();
   await expect(page.getByText('Corner Pantry 0 stays on the list.')).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Keep it' })).toBeVisible();
 });

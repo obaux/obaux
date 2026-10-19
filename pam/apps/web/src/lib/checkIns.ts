@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { settleWithin } from './settle';
+import { settleWithin, withStatus } from './settle';
 
 /**
  * Who has been checked in (D-316, Will, 6 October): a program taps the circle
@@ -64,8 +64,8 @@ async function ask(door: 'check_in_visit' | 'undo_check_in', appointmentId: stri
     const settled = await settleWithin(Promise.resolve(createClient().rpc(door, { p_appointment_id: appointmentId })));
     if (settled.status === 'timeout') return { ok: false, error: settled.error, late: settled.late };
     if (settled.status === 'failed') return { ok: false, error: settled.error };
-    const { data, error } = settled.value;
-    if (error) return { ok: false, error };
+    const { data, error, status } = settled.value;
+    if (error) return { ok: false, error: withStatus(error, status) };
     const row = (Array.isArray(data) ? data[0] : data) as { status?: string } | undefined;
     return { ok: true, stillMarked: row?.status === 'attended' };
   } catch (error) {

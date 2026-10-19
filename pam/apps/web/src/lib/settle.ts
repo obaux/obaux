@@ -17,6 +17,16 @@ export function timeoutError(): Error {
   return Object.assign(new Error('timeout'), { name: 'AbortError' });
 }
 
+/**
+ * A failed answer with the HTTP status it came with. A 500 from the gateway has no SQLSTATE, so the status is what names it; without it
+ * the log says `unknown` (Iris L5). The message stays in hand for the alert's kind (a guard's own words, D-618); the log never sends it.
+ */
+export function withStatus(error: unknown, status: unknown): unknown {
+  if (!error || typeof error !== 'object') return error;
+  const { name, code, message } = error as { name?: unknown; code?: unknown; message?: unknown };
+  return { name, code, message, status };
+}
+
 /** Waits for a save for `ms`; after that it is called failed, and the late answer is handed back to be re-read (Iris's A6). */
 export function settleWithin<T>(save: Promise<T>, ms = SAVE_TIMEOUT_MS): Promise<Settled<T>> {
   return new Promise((resolve) => {
@@ -52,11 +62,11 @@ export const DONE: Outcome = { ok: true };
  * Makes a call that writes, and says how it came out: done, or not done with why. The call may answer `{ error }` (a database call) or throw; one
  * with no answer in 15 seconds counts as failed with a timeout. The error's own words never leave here: callers pass it to the log, which keeps a code.
  */
-export async function attempt(call: () => PromiseLike<{ readonly error?: unknown } | void>): Promise<Outcome> {
+export async function attempt(call: () => PromiseLike<{ readonly error?: unknown; readonly status?: unknown } | void>): Promise<Outcome> {
   const settled = await settleWithin(
     (async () => {
       const answer = await call();
-      if (answer && answer.error) throw answer.error;
+      if (answer && answer.error) throw withStatus(answer.error, answer.status);
     })(),
   );
   if (settled.status === 'ok') return DONE;

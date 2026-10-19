@@ -66,7 +66,7 @@ test('Edit and send again resends the same submission, from what the database ho
   expect(submitted).toBe(0);
 });
 
-const ALERT = "That didn't go through. It's not your fault, so try again.";
+const ALERT = /Something's wrong on our side|That took too long|Still not working/;
 
 test('a send that did not go through is the small alert at the bottom, and what was typed stays (D-616)', async ({ page }) => {
   await asLead(page);

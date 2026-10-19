@@ -190,7 +190,7 @@ test('a radio sits level with the first line of its label, whether the label wra
   expect(wrapped).toBeGreaterThan(0);
 });
 
-const ALERT = "That didn't go through. It's not your fault, so try again.";
+const ALERT = /Something's wrong on our side|That took too long|Still not working/;
 
 test('a report that did not go through is the small alert at the bottom, and what was picked stays (D-616)', async ({ page }) => {
   await signedIn(page);
