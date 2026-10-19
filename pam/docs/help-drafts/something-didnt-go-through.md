@@ -18,7 +18,7 @@ The headings are the alert's own titles (`notice.malfunction.<kind>.title`: `ab6
 **Keywords:** didn't go through, didn't work, not working, error, failed, offline, signed out, try again, slow,
 something's wrong, couldn't use that, not at this time, already changed
 
-**Lead:** When something doesn't work, Pam shows a short message at the top of the screen. Find its title below.
+**Lead:** When something doesn't work, Pam shows a short message at the bottom of the screen. Find its title below.
 
 ## You're offline
 Your phone has no internet right now. (`notice.malfunction.offline`)
@@ -66,7 +66,7 @@ It's not your fault. (`notice.malfunction.server`)
 2. Tap "Try again".
 
 ## Still not working
-This shows when the same thing doesn't go through twice in a row. (`notice.malfunction.again`)
+This shows when the same thing doesn't go through twice in a row, unless you're offline. (`notice.malfunction.again`)
 - Try the steps above for the message you saw first.
 - Tap "Get help" to find more help in Pam.
 
