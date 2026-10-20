@@ -29,7 +29,7 @@
  *   changes  — the newest decisions this flow shows, newest first
  */
 
-export const UPDATED = '2026-10-18';
+export const UPDATED = '2026-10-20';
 
 /**
  * Where each screen opens live: Chromatic's build of `main`, `https://main--<app id>.chromatic.com`.
@@ -866,6 +866,41 @@ export const flows = [
         changed: 'D-593',
         note: 'Counts only, biggest first: where to open next (card a96); nobody yet says so in two lines',
       },
+      pamMessages: {
+        title: 'Messages to Pam',
+        story: 'super-admin-screens--messages-to-pam',
+        path: '/pam/messages/',
+        changed: 'D-606',
+        note: 'What people wrote to Pam, waiting longest first with how long, answered, closed folded at the foot (behind the Message Pam switch, off)',
+      },
+      pamStart: {
+        title: 'Pam writes first',
+        story: 'super-admin-screens--pam-start-person',
+        path: '/pam/start/',
+        changed: 'D-613',
+        note: 'To a person from Everyone, or to a program\'s active leads from its page; a message that does not go stays with Try again',
+      },
+      pamThreadOptions: {
+        title: "A Pam conversation's options",
+        story: 'super-admin-screens--pam-thread-options',
+        path: '/pam/thread/options/',
+        changed: 'D-613',
+        note: 'Close or Reopen, and what was shared; no Report, no Block',
+      },
+      pamHours: {
+        title: "Pam's hours",
+        story: 'super-admin-screens--pam-hours',
+        path: '/pam/hours/',
+        changed: 'D-613',
+        note: 'The days and times Pam is here, and the out-of-hours reply as people get it; the day rows are full width',
+      },
+      problems: {
+        title: 'Problems',
+        story: 'super-admin-screens--problems',
+        path: '/problems/',
+        changed: 'D-616',
+        note: 'What broke in the app this week, newest first, named by screen and action; never a person or free text. From the bell\'s problem row',
+      },
     },
     edges: [
       ['home', 'requestReview', 'A request'],
@@ -884,8 +919,16 @@ export const flows = [
       ['home', 'programsToCheck', 'Programs to check'],
       ['programsToCheck', 'programReview', 'A program'],
       ['home', 'waitingCities', 'Cities people are waiting for'],
+      ['home', 'pamMessages', 'Messages to Pam'],
+      ['pamMessages', 'pamThreadOptions', '⋯ in a conversation'],
+      ['everyone', 'pamStart', 'Message (Pam writes first)'],
+      ['place', 'pamStart', 'Message this program'],
+      ['profile', 'pamHours', "Pam's hours"],
+      ['home', 'problems', "The bell's problem row"],
     ],
     changes: [
+      "D-616 — Problems: what broke in the app this week by screen and action, from the bell; every failed save is a small red alert at the bottom",
+      'D-613 — Messages to Pam, Pam writes first, a conversation\'s Close or Reopen, and Pam\'s hours: the Pam team\'s side of Message Pam (behind its switch, off)',
       'D-593 — Cities people are waiting for: a Home row (with how many people wait) opens a count per city, biggest first (card a96)',
       'D-558 — no "See the app as" row or screen for a super admin (the view-as page is gone)',
       'D-386 — Programs to check: what leaders sent for Pam to look at, with Approve, Ask for changes and Discard',
