@@ -27,3 +27,20 @@ describe('Home words (Mira, 11 October: hold what is untrue today or a new promi
     expect(ADD_PROGRAM_URL).toBe(`${SIGN_IN_URL}?next=/profile/add-program/`);
   });
 });
+
+// The DocuSign tag on the programs row (Will, 23 October).
+describe('the DocuSign tag', () => {
+  it('names DocuSign, and says Coming soon until signing is live', async () => {
+    const { DOCUSIGN } = await import('../src/content/docusign');
+    const { DOCUSIGN_LIVE } = await import('../src/content/flags');
+    expect(DOCUSIGN.label).toBe('DocuSign integration');
+    expect(DOCUSIGN.soon).toBe('Coming soon');
+    expect(DOCUSIGN_LIVE).toBe(false);
+  });
+  it('shows a logo only when the file is there', async () => {
+    const { existsSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const { DOCUSIGN } = await import('../src/content/docusign');
+    if (DOCUSIGN.logo) expect(existsSync(join(__dirname, '..', 'public', DOCUSIGN.logo))).toBe(true);
+  });
+});

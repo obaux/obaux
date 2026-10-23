@@ -387,17 +387,34 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
   }
 }
 
-// Iris H1 (b15): on Home, "Pause pictures" is on the first screen on a phone, and looks like a control (an icon in a pill).
+// Will, 23 October: the hero's pictures are for a desktop only. Under 900px there is no carousel, no Pause button and no hero
+// picture is asked for; from 900px the carousel is there, with its Pause button (Iris H1, b15: a pill with an icon and a fill).
 {
-  for (const [width, height] of [[320, 568], [390, 844]]) {
+  for (const [width, height] of [[320, 568], [390, 844], [899, 844]]) {
     const ctx = await browser.newContext({ viewport: { width, height }, hasTouch: true });
     const page = await ctx.newPage();
+    const asked = [];
+    page.on('request', (r) => {
+      if (/\/art\/hero-/.test(r.url())) asked.push(r.url());
+    });
     await page.goto(base + '/', { waitUntil: 'networkidle' });
+    await page.waitForTimeout(400);
+    if (await page.getByRole('button', { name: /pause pictures|play pictures|show the next picture/i }).count()) fail(`home: the picture carousel is on the page at ${width}px`);
+    if (await page.locator('[aria-roledescription="carousel"]').count()) fail(`home: a carousel is on the page at ${width}px`);
+    if (asked.length) fail(`home: a hero picture was asked for at ${width}px: ${asked.join(', ')}`);
+    const h1 = await page.locator('h1').first().boundingBox();
+    if (!h1 || h1.y > height / 2) fail(`home: the words should start the page at ${width}px (the headline is at y ${Math.round(h1?.y ?? -1)})`);
+    await ctx.close();
+  }
+  for (const [width, height] of [[900, 800], [1280, 800]]) {
+    const ctx = await browser.newContext({ viewport: { width, height } });
+    const page = await ctx.newPage();
+    await page.goto(base + '/', { waitUntil: 'networkidle' });
+    await page.waitForTimeout(600);
     const pause = page.getByRole('button', { name: /pause pictures/i });
     const box = await pause.boundingBox();
-    if (!box) fail(`home: no Pause pictures button at ${width}x${height}`);
+    if (!box) fail(`home: no Pause pictures button at ${width}px`);
     else {
-      if (box.y + box.height > height || box.y < 0) fail(`home: Pause pictures is below the first screen at ${width}x${height} (y ${Math.round(box.y)}-${Math.round(box.y + box.height)})`);
       if (box.height < 47.5) fail(`home: Pause pictures is ${Math.round(box.height)}px tall at ${width}`);
       if (!(await pause.locator('svg').count())) fail('home: Pause pictures has no icon');
       const bg = await pause.evaluate((el) => getComputedStyle(el).backgroundColor);
@@ -405,6 +422,17 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
     }
     await ctx.close();
   }
+}
+
+// The programs row carries the DocuSign tag, and says "Coming soon" beside it while DocuSign signing is not live.
+{
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const page = await ctx.newPage();
+  await page.goto(base + '/', { waitUntil: 'networkidle' });
+  const row = page.locator('h2', { hasText: 'Your services, built around people.' }).locator('xpath=..');
+  if (!(await row.getByText('DocuSign integration').count())) fail('home: the programs row has no "DocuSign integration" tag');
+  if (!(await row.getByText('Coming soon').count())) fail('home: the DocuSign tag does not say "Coming soon"');
+  await ctx.close();
 }
 
 // W3: no page jumps as it loads (layout shift under 0.1 on a cold load), at phone and desktop width. The jump was the

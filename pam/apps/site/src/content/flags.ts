@@ -14,3 +14,10 @@ export const VISIT_REMINDERS_LIVE = false;
  * (D-481, `texts_live` off): the Texts from Pam post lists it as "not yet" until this is true (Lena's A28 list, 11 October).
  */
 export const PLACE_TEXTS_LIVE = false;
+
+/**
+ * Whether signing a program's policies through DocuSign is live in Pam (it is still a test: sandbox only, card a88). The Home
+ * page's programs row carries a "DocuSign integration" tag; while this is false the tag also says "Coming soon" (the app's own
+ * words). Set it to `true` the day DocuSign signing is live, and the "Coming soon" goes.
+ */
+export const DOCUSIGN_LIVE = false;

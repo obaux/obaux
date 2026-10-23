@@ -5,7 +5,8 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { EducationIcon, FamilyServicesIcon, WorkforceIcon } from '@pam/ui/icons';
 import { BandViews } from '../components/BandViews';
-import { FlipCarousel } from '../components/FlipCarousel';
+import { DocuSignTag } from '../components/DocuSignTag';
+import { HeroPictures } from '../components/HeroPictures';
 import { LegalLink } from '../components/LegalLink';
 import { PhonePanel } from '../components/PhonePanel';
 import { Reveal } from '../components/Reveal';
@@ -19,11 +20,10 @@ import { type } from '../lib/website-type.stylex';
 
 const styles = stylex.create({
   page: { backgroundColor: website['--website-surface-page'], color: website['--website-text-primary'], width: '100%' },
-  // Hero: words left, the pictures right from 900px; words first below it.
+  // Hero: words left, the pictures right from 900px. Under 900px there are no pictures, only the words (Will, 23 October).
   hero: {
     display: 'grid',
     alignItems: 'center',
-    // Tighter on a phone so the pictures, and the Pause control on them, are on the first screen (Iris H1).
     gap: { default: '16px', '@media (min-width: 900px)': '32px' },
     paddingBlock: { default: '24px', '@media (min-width: 900px)': '48px' },
     gridTemplateColumns: { default: 'minmax(0, 1fr)', '@media (min-width: 900px)': 'minmax(0, 1fr) minmax(0, 1fr)' },
@@ -153,7 +153,7 @@ export function HomeScreen(_props: { readonly showAbout?: boolean } = {}) {
               {HOME.hero.lead}
             </Text>
           </VStack>
-          <FlipCarousel slides={CAROUSEL} label={HOME.hero.pictures} />
+          <HeroPictures slides={CAROUSEL} label={HOME.hero.pictures} />
         </div>
       </WebFrame>
 
@@ -187,6 +187,7 @@ export function HomeScreen(_props: { readonly showAbout?: boolean } = {}) {
                 <Text as="p" xstyle={[type.lead_17, styles.body]}>
                   {row.body}
                 </Text>
+                {row.id === 'programs' ? <DocuSignTag /> : null}
                 <HStack>
                   <SoftButton label={row.cta.label} href={row.cta.href === 'app' ? `${APP_URL}/` : row.cta.href === 'add-program' ? ADD_PROGRAM_URL : row.cta.href} pill />
                 </HStack>
