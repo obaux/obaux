@@ -7,11 +7,12 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { Card } from '@astryxdesign/core/Card';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@pam/ui/Button';
-import { BigButton, Notice, Page, TextLink } from '@pam/ui';
+import { BigButton, Page, TextLink } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { HelpButton } from '../../screens/HelpButton';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
+import { useMalfunction } from '@/lib/malfunction';
 import { setReminderConsent } from '@/lib/useReminderConsent';
 import { TextKindsList } from '../../screens/TextKindsList';
 
@@ -80,7 +81,7 @@ function RemindersForm() {
   const [stopped, setStopped] = useState(false);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const malfunction = useMalfunction();
 
   // A second visit should say what was chosen last time rather than asking as
   // if nothing had been decided.
@@ -115,14 +116,15 @@ function RemindersForm() {
   const answer = async (value: boolean) => {
     if (session.status !== 'signed-in') return;
     setBusy(true);
-    setFailed(false);
-    const saved = (await setReminderConsent(session.session.userId, value)).ok;
+    const result = await setReminderConsent(session.session.userId, value);
 
-    if (!saved) {
+    if (!result.ok) {
       setBusy(false);
-      setFailed(true);
+      // A yes after a STOP is refused, not a failure: nothing is drawn or logged (the screen reads the STOP back and asks nothing).
+      if (!result.stopped) malfunction.show(value ? 'reminders.agree' : 'reminders.decline', { code: result.code });
       return;
     }
+    malfunction.clear();
 
     setDone(true);
     // Sent here from a switch on Text alerts (D-615): back there, with that switch on after "Agree", off after "Not now".
@@ -175,15 +177,6 @@ function RemindersForm() {
         </Text>
       ) : null}
 
-      {failed ? (
-        <Notice
-          notice="something_went_wrong"
-          title={t('notice.something_went_wrong.title')}
-          body={t('notice.something_went_wrong.body')}
-          contactLabel={t('help.contact.action')}
-        />
-      ) : null}
-
       {/*
           Signed out, the choice is still shown — it is what somebody is being
           asked, and hiding it behind a sign-in explains nothing — but the thing
@@ -206,7 +199,8 @@ function RemindersForm() {
               and nothing here can be pre-selected, because there is nothing to
               select.
             */}
-          <BigButton label={t('reminders.agree')} onPress={() => void answer(true)} isDisabled={busy} />
+          {/* A yes already on file is not asked for again (Iris C2): the line above says it is saved, and the way out is below. */}
+          {already === true ? null : <BigButton label={t('reminders.agree')} onPress={() => void answer(true)} isDisabled={busy} />}
           {/* Saying no is one tap, and it is recorded like any other answer. */}
           <TextLink label={t('reminders.skip')} onClick={() => void answer(false)} isDisabled={busy} />
         </>

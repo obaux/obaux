@@ -1,5 +1,7 @@
 'use client';
 
+import { settleWithin } from './settle';
+
 /**
  * "I'm here" and "I went" (D-535): a member marks their own visit.
  *
@@ -22,13 +24,14 @@ export type HereResult =
   /** No position to compare: said no, no signal, or the place has no stored location. */
   | { readonly kind: 'no-location' }
   | { readonly kind: 'too-late' }
-  | { readonly kind: 'error' };
+  /** The save did not go through, or had no answer in 15 seconds (`late` settles when it finally does: read the visit again then). */
+  | { readonly kind: 'error'; readonly error: unknown; readonly late?: Promise<void> };
 
 export type WentResult =
   | { readonly kind: 'went'; readonly points: number }
   | { readonly kind: 'limit' }
   | { readonly kind: 'too-late' }
-  | { readonly kind: 'error' };
+  | { readonly kind: 'error'; readonly error: unknown; readonly late?: Promise<void> };
 
 /** The database's refusals, as the screen tells them. */
 export function refusalOf(message: string | undefined): 'too-late' | 'limit' | 'no-location' | 'error' {
@@ -58,33 +61,37 @@ export async function markHere(visitId: string): Promise<HereResult> {
   if (!position) return { kind: 'no-location' };
   try {
     const { createClient } = await import('./supabase');
-    const { data, error } = await createClient().rpc('i_am_here', {
-      p_appointment_id: visitId,
-      p_lat: position.lat,
-      p_lon: position.lon,
-    });
+    const settled = await settleWithin(
+      Promise.resolve(createClient().rpc('i_am_here', { p_appointment_id: visitId, p_lat: position.lat, p_lon: position.lon })),
+    );
+    if (settled.status === 'timeout') return { kind: 'error', error: settled.error, late: settled.late };
+    if (settled.status === 'failed') return { kind: 'error', error: settled.error };
+    const { data, error } = settled.value;
     if (error) {
       const why = refusalOf(error.message);
-      return why === 'too-late' || why === 'no-location' ? { kind: why } : { kind: 'error' };
+      return why === 'too-late' || why === 'no-location' ? { kind: why } : { kind: 'error', error };
     }
     const row = (Array.isArray(data) ? data[0] : data) as { there?: boolean; points?: number } | undefined;
     return row?.there ? { kind: 'there', points: row.points ?? 0 } : { kind: 'not-yet' };
-  } catch {
-    return { kind: 'error' };
+  } catch (error) {
+    return { kind: 'error', error };
   }
 }
 
 export async function markWent(visitId: string): Promise<WentResult> {
   try {
     const { createClient } = await import('./supabase');
-    const { data, error } = await createClient().rpc('i_went', { p_appointment_id: visitId });
+    const settled = await settleWithin(Promise.resolve(createClient().rpc('i_went', { p_appointment_id: visitId })));
+    if (settled.status === 'timeout') return { kind: 'error', error: settled.error, late: settled.late };
+    if (settled.status === 'failed') return { kind: 'error', error: settled.error };
+    const { data, error } = settled.value;
     if (error) {
       const why = refusalOf(error.message);
-      return why === 'too-late' || why === 'limit' ? { kind: why } : { kind: 'error' };
+      return why === 'too-late' || why === 'limit' ? { kind: why } : { kind: 'error', error };
     }
     const row = (Array.isArray(data) ? data[0] : data) as { points?: number } | undefined;
     return { kind: 'went', points: row?.points ?? 0 };
-  } catch {
-    return { kind: 'error' };
+  } catch (error) {
+    return { kind: 'error', error };
   }
 }

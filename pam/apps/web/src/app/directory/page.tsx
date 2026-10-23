@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
@@ -21,6 +21,7 @@ import { NotIn } from '../NotIn';
 import { PersonRow } from '../PersonRow';
 import { useSession } from '@/lib/useSession';
 import { useDirectory, setDemoView } from '@/lib/useDirectory';
+import { settleWithin, useMalfunction } from '@/lib/malfunction';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useDemoView } from '@/lib/useDemoView';
 import { usePamStatus } from '@/lib/pam';
@@ -87,12 +88,32 @@ export default function DirectoryPage() {
   // still demonstrates what it does.
   const dummyPeople = filter === 'all' ? DUMMY_EVERYONE : DUMMY_EVERYONE.filter((p) => p.role === filter);
 
-  const [demoBusyId, setDemoBusyId] = useState<string | null>(null);
-  const toggleDemo = async (personId: string, next: boolean) => {
-    setDemoBusyId(personId);
-    await setDemoView(personId, next);
-    setDemoBusyId(null);
-    refreshDirectory();
+  /**
+   * A demo view switch moves only once its save has succeeded (D-616, Dot's rule): while it saves it stays where it was and says it
+   * is working; a failure, or no answer in 15 s, leaves it where it was and the bottom alert says so, and is logged. What it shows
+   * after a success is the save's answer until the directory, read again, says the same; a late answer is read back.
+   */
+  const malfunction = useMalfunction();
+  const [demoBusy, setDemoBusy] = useState<ReadonlySet<string>>(() => new Set());
+  const [demoSaved, setDemoSaved] = useState<Readonly<Record<string, boolean>>>({});
+  useEffect(() => setDemoSaved({}), [directory]);
+  const toggleDemo = async (personId: string, next: boolean, control: Element | null) => {
+    if (demoBusy.has(personId)) return;
+    setDemoBusy((previous) => new Set(previous).add(personId));
+    const settled = await settleWithin(setDemoView(personId, next));
+    setDemoBusy((previous) => {
+      const left = new Set(previous);
+      left.delete(personId);
+      return left;
+    });
+    if (settled.status === 'ok') {
+      setDemoSaved((previous) => ({ ...previous, [personId]: next }));
+      malfunction.clear();
+      refreshDirectory();
+      return;
+    }
+    malfunction.show('directory.demo-view', settled.status === 'timeout' ? { code: 'timeout' } : settled.error, control);
+    if (settled.status === 'timeout') void settled.late.then(() => refreshDirectory());
   };
 
   if (session.status === 'loading') {
@@ -294,9 +315,9 @@ export default function DirectoryPage() {
                         // Each switch says whose it is, or a screen reader hears the same name on every row (Iris, super admin P5).
                         label={tPlain('directory.demoView.for', { name: person.firstName ?? '' })}
                         isLabelHidden
-                        value={person.isDemo}
-                        isDisabled={demoBusyId === person.id}
-                        onChange={(next) => void toggleDemo(person.id, next)}
+                        value={demoSaved[person.id] ?? person.isDemo}
+                        isLoading={demoBusy.has(person.id)}
+                        onChange={(next, event) => void toggleDemo(person.id, next, event.target)}
                       />
                     </HStack>
                   }

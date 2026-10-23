@@ -26,6 +26,7 @@ import { HelpButton } from '../../screens/HelpButton';
 import { categoryLabelKey, displayPhone, distanceLabel, NOTICES, POINTS_RULES, type Category, intlLocale } from '@pam/config';
 import { DUMMY_PLACES_BY_ID, isDummyPlaceId } from '@pam/config/dummy-places';
 import { useI18n } from '@/lib/i18n';
+import { useMalfunction } from '@/lib/malfunction';
 import { addressActionsFor } from '@/lib/addressActions';
 import { useSession } from '@/lib/useSession';
 import { logCall } from '@/lib/logCall';
@@ -43,7 +44,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { examplesOn } from '@/lib/examples';
 import { exampleTrips } from '@/lib/exampleTrips';
 import { readAddedTrips, TRIPS_CHANGED, withMoves, withoutCancelled } from '@/lib/addedTrips';
-import { cancelSavedOrLocalTrip, isSavedPlace } from '@/lib/savedTrips';
+import { cancelSavedOrLocalTrip, isSavedPlace, loadSavedTrips } from '@/lib/savedTrips';
 import { inMarkWindow } from '@/lib/imHere';
 import { ImHereCard } from '../../screens/ImHereCard';
 import { navigate } from '@/lib/navigate';
@@ -254,7 +255,7 @@ function PlaceScreen() {
   const [visit, setVisit] = useState<{ id: string; startsAt: string; serviceId: string | null; attendance: 'attended' | 'missed' | null } | null>(null);
   // Cancel this visit (asks first): the one thing here that takes a plan away.
   const [askingCancel, setAskingCancel] = useState(false);
-  const [cancelFailed, setCancelFailed] = useState(false);
+  const malfunction = useMalfunction();
   // The service a member has picked from the cards (D-313): what Plan a
   // trip is for, and what the rows say. With a visit booked, the visit's.
   const [pickedService, setPickedService] = useState<string | null>(null);
@@ -554,7 +555,6 @@ function PlaceScreen() {
               ) : null}
               {visit && visitAhead && !visit.attendance && !justMarked ? (
                 <>
-                  {cancelFailed ? <Banner status="error" title={t('place.visit.cancel.failed')} /> : null}
                   <TextLink label={t('place.visit.cancel')} onClick={() => setAskingCancel(true)} />
                 </>
               ) : null}
@@ -726,11 +726,15 @@ function PlaceScreen() {
         confirmLabel={t('place.visit.cancel.yes')}
         onConfirm={async () => {
           setAskingCancel(false);
-          if (visit && (await cancelSavedOrLocalTrip(visit.id))) {
+          if (!visit) return;
+          const result = await cancelSavedOrLocalTrip(visit.id);
+          if (result.ok) {
             navigate('/trips/');
-          } else {
-            setCancelFailed(true);
+            return;
           }
+          // Not cancelled (D-616): the small alert at the bottom, the visit as it was, and a late answer read again.
+          malfunction.show('trips.cancel', result.error, document.activeElement);
+          void result.late?.then(() => loadSavedTrips());
         }}
         cancelLabel={t('place.visit.cancel.no')}
         onCancel={() => setAskingCancel(false)}

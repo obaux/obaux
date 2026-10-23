@@ -332,6 +332,44 @@ test.describe("Message Pam, the team's side (card a100)", () => {
     await expect(page.getByRole('button', { name: /^Open (Opens|Closes)/ })).toHaveCount(0);
   });
 
+  test("Pam's hours: each day is a full-width row at least 44px tall, apart from the next, and a tap anywhere on it ticks it (Iris C1)", async ({ page }) => {
+    await team(page);
+    await page.goto('/pam/hours/');
+    await settled(page);
+    const width = page.viewportSize()!.width;
+    let below = 0;
+    for (const day of ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']) {
+      const row = (await page.getByRole('checkbox', { name: day }).locator('xpath=ancestor::li[1]').boundingBox())!;
+      expect(row.height).toBeGreaterThanOrEqual(44);
+      expect(row.width).toBeGreaterThanOrEqual(width - 32 - 1);
+      expect(row.y).toBeGreaterThanOrEqual(below - 1);
+      below = row.y + row.height;
+    }
+    // The far end of the row, nowhere near the box or the day's name.
+    const saturday = page.getByRole('checkbox', { name: 'Saturday' });
+    const row = saturday.locator('xpath=ancestor::li[1]');
+    const box = (await row.boundingBox())!;
+    await row.click({ position: { x: box.width - 8, y: box.height - 4 } });
+    await expect(saturday).toBeChecked();
+    await expect(page.getByText(/Monday to Saturday, 9\sAM to 5\sPM Eastern time/)).toBeVisible();
+  });
+
+  for (const [where, path, name, to] of [
+    ['the inbox', '/pam/messages/', "Pam's hours", /\/pam\/hours\/$/],
+    ['Home', '/', 'Messages to Pam', /\/pam\/messages\/\?from=home$/],
+  ] as const) {
+    test(`${where}: the "${name}" row is a target 44px tall or more, and a tap at its very edge opens it (Iris C3)`, async ({ page }) => {
+      await team(page);
+      await page.goto(path);
+      await settled(page);
+      const row = page.getByRole('link', { name }).locator('xpath=ancestor::li[1]');
+      const box = (await row.boundingBox())!;
+      expect(box.height).toBeGreaterThanOrEqual(44);
+      await row.click({ position: { x: box.width / 2, y: 3 } });
+      await expect(page).toHaveURL(to);
+    });
+  }
+
   for (const path of ['/pam/hours/', `/pam/thread/options/?id=${PAM_C}`, '/pam/start/?service=svc-1&name=Fresh%20Start%20Kitchen']) {
     test(`${path.split('?')[0]} has no WCAG A/AA violations`, async ({ page }) => {
       await team(page);
