@@ -120,6 +120,38 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
   await ctx.close();
 }
 
+// "On this page" (Mira, 23 October): on a long post every entry becomes the current one when its section is reached, the
+// last headings included, and the menu stays where it is (the end of the page used to push it off the top of the screen).
+{
+  for (const [name, viewport] of [['1280', { width: 1280, height: 800 }], ['390', { width: 390, height: 844 }]]) {
+    const ctx = await browser.newContext({ viewport, reducedMotion: 'reduce' });
+    const page = await ctx.newPage();
+    await page.goto(base + '/support/something-didnt-go-through/', { waitUntil: 'networkidle' });
+    const nav = page.locator('nav[aria-label="On this page"]:visible').first();
+    const ids = await page.evaluate(() => [...document.querySelectorAll('[data-post-section]')].map((e) => e.id));
+    for (const id of ids) {
+      if (viewport.width < 1180) {
+        const trigger = nav.locator('button').first();
+        if ((await trigger.getAttribute('aria-expanded')) !== 'true') await trigger.click();
+      }
+      await nav.locator(`a[href="#${id}"]`).click();
+      await page.waitForTimeout(300);
+      const r = await page.evaluate((id) => {
+        const bar = [...document.querySelectorAll('nav[aria-label="On this page"]')].find((n) => n.offsetParent !== null);
+        const section = document.getElementById(id);
+        const top = (section.querySelector('h2') ?? section).getBoundingClientRect().top;
+        const link = bar.querySelector(`a[href="#${id}"]`);
+        return { top, menuTop: bar.getBoundingClientRect().top, barBottom: bar.getBoundingClientRect().bottom, current: link?.getAttribute('aria-current') };
+      }, id);
+      const edge = viewport.width < 1180 ? r.barBottom : 0;
+      if (r.top < edge - 0.5 || r.top > viewport.height) fail(`on this page ${name}: #${id}'s heading is not in view (top ${Math.round(r.top)}px)`);
+      if (viewport.width >= 1180 && r.menuTop < 0) fail(`on this page ${name}: at #${id} the menu is pushed off the top of the screen (${Math.round(r.menuTop)}px)`);
+      if (r.current !== 'location') fail(`on this page ${name}: #${id} is not the current entry when its section is reached`);
+    }
+    await ctx.close();
+  }
+}
+
 // W2 and W6: the search keeps its words in the address, has a landmark, is read out as a count; a skip link; Esc clears.
 {
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });

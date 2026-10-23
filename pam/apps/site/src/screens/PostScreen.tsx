@@ -30,7 +30,17 @@ const styles = stylex.create({
   },
   // One centred reading column for the whole post, as on Figma Learn: header, who it is for, body.
   // The menu comes first in the page (so Tab reaches it before the post, Iris SP4) and sits in the right-hand column; the post takes the first free cell.
-  menuCell: { alignSelf: 'stretch', gridColumn: { default: 'auto', '@media (min-width: 1180px)': 2 }, gridRow: 1, minWidth: 0 },
+  // From 1180px the menu cell runs 56px past the end of the post, into the gap above the footer (nothing else is in that column):
+  // a menu taller than the space left above the end of a short post is then not pushed up off the screen at the very bottom, and
+  // the last entries stay in view while they are the current one (Iris SP1/SP3; Mira, 23 October). The 120px between the
+  // "Still stuck?" card and the footer (a83) is not touched.
+  menuCell: {
+    alignSelf: 'stretch',
+    gridColumn: { default: 'auto', '@media (min-width: 1180px)': 2 },
+    gridRow: 1,
+    minWidth: 0,
+    marginBlockEnd: { default: 0, '@media (min-width: 1180px)': '-56px' },
+  },
   column: { width: '100%', maxWidth: '920px', marginInline: 'auto', minWidth: 0 },
   header: { alignItems: 'center', textAlign: 'center' },
   crumbs: { alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' },

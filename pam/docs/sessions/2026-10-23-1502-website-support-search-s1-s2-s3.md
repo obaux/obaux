@@ -16,6 +16,6 @@ usability (with the new specs), a11y (130 scans, 0 problems), site tests (125), 
 
 ## Left undone
 
-scrollspy fails on `/support/something-didnt-go-through/` at 1280px: `#still-not-working` and `#still-stuck` stay under the “On this page” menu (heading top 158 and 359, menu bottom 532), because the post has eleven entries and the page is too short to scroll them clear. Not fixed here; for the desk to decide (fewer or shorter entries, or room below the last section).
+Nothing from this session. (Fixed after Mira's 15:05 answer: the “On this page” cell runs 56px past the post from 1180px, so the menu is not pushed up at the end of a short post. Mira asked for room below the last section; that would put about 440px between the “Still stuck?” card and the footer and fail the a83 check of 120px, which Will set, so the menu's own cell was extended instead. A check in `usability.mjs` fails on b78 and passes now.)
 
 ## Needs a human
