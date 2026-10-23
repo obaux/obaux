@@ -33,7 +33,7 @@ describe('the DocuSign tag', () => {
   it('names DocuSign, and says Coming soon until signing is live', async () => {
     const { DOCUSIGN } = await import('../src/content/docusign');
     const { DOCUSIGN_LIVE } = await import('../src/content/flags');
-    expect(DOCUSIGN.label).toBe('DocuSign integration');
+    expect(DOCUSIGN.label).toBe('Signing with DocuSign');
     expect(DOCUSIGN.soon).toBe('Coming soon');
     expect(DOCUSIGN_LIVE).toBe(false);
   });

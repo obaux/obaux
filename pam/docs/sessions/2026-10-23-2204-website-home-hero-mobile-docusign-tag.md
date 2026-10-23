@@ -4,7 +4,7 @@
 
 ## What changed
 
-Will, 23 October (Control Room, relayed by Mira). **Hero:** no picture carousel under 900px. `HeroPictures` (client) renders `FlipCarousel` only from 900px, so the images are not asked for on a phone; its place is held from first paint (4:5, up to 440px) so nothing moves on desktop. **DocuSign tag** on the programs row ("Your services, built around people."): Astryx `Badge` "DocuSign integration" and "Coming soon" (until `DOCUSIGN_LIVE` in `content/flags.ts` is true). **The logo is not in:** this machine cannot reach docusign.com, and the logo must be DocuSign's own file unchanged, so `DOCUSIGN.logo` in `content/docusign.ts` is null and the tag shows its words alone until the file is added. Pictures in `docs/design/review/2026-10-23-home-hero-docusign/`.
+Will, 23 October (Control Room, relayed by Mira). **Hero:** no picture carousel under 900px. `HeroPictures` (client) renders `FlipCarousel` only from 900px, so the images are not asked for on a phone; its place is held from first paint (4:5, up to 440px) so nothing moves on desktop. **DocuSign tag** on the programs row ("Your services, built around people."): Astryx `Badge` "Signing with DocuSign" and "Coming soon" (until `DOCUSIGN_LIVE` in `content/flags.ts` is true). **The logo is not in:** this machine cannot reach docusign.com, and the logo must be DocuSign's own file unchanged, so `DOCUSIGN.logo` in `content/docusign.ts` is null and the tag shows its words alone until the file is added. Pictures in `docs/design/review/2026-10-23-home-hero-docusign/`.
 
 ## What was wrong, and what missed it
 
@@ -16,6 +16,6 @@ site tests (127), tsc, build, usability (new: no carousel, no Pause button and n
 
 ## Left undone
 
-The DocuSign logo file (DocuSign's brand page), then set `DOCUSIGN.logo`. Sage signs “DocuSign integration”. Will's “under the dark green card, where the three statements are made” was read as the programs row, the one under the green card that talks about signing policies; say if he meant the green card's own Program Providers line.
+The DocuSign logo file (DocuSign's brand page), then set `DOCUSIGN.logo`. Sage signs “Signing with DocuSign”. Will's “under the dark green card, where the three statements are made” was read as the programs row, the one under the green card that talks about signing policies; say if he meant the green card's own Program Providers line.
 
 ## Needs a human

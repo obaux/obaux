@@ -10,7 +10,7 @@ const styles = stylex.create({
   logo: { display: 'block', height: '16px', width: 'auto' },
 });
 
-/** The small "DocuSign integration" tag on the Home page's programs row: DocuSign's logo and its name, then "Coming soon" until signing is live. */
+/** The small "Signing with DocuSign" tag on the Home page's programs row: DocuSign's logo and its name, then "Coming soon" until signing is live. */
 export function DocuSignTag() {
   return (
     <HStack xstyle={styles.row}>

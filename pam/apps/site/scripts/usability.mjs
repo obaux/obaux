@@ -430,7 +430,7 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
   const page = await ctx.newPage();
   await page.goto(base + '/', { waitUntil: 'networkidle' });
   const row = page.locator('h2', { hasText: 'Your services, built around people.' }).locator('xpath=..');
-  if (!(await row.getByText('DocuSign integration').count())) fail('home: the programs row has no "DocuSign integration" tag');
+  if (!(await row.getByText('Signing with DocuSign').count())) fail('home: the programs row has no "Signing with DocuSign" tag');
   if (!(await row.getByText('Coming soon').count())) fail('home: the DocuSign tag does not say "Coming soon"');
   await ctx.close();
 }

@@ -17,7 +17,7 @@ export const PLACE_TEXTS_LIVE = false;
 
 /**
  * Whether signing a program's policies through DocuSign is live in Pam (it is still a test: sandbox only, card a88). The Home
- * page's programs row carries a "DocuSign integration" tag; while this is false the tag also says "Coming soon" (the app's own
+ * page's programs row carries a "Signing with DocuSign" tag; while this is false the tag also says "Coming soon" (the app's own
  * words). Set it to `true` the day DocuSign signing is live, and the "Coming soon" goes.
  */
 export const DOCUSIGN_LIVE = false;
