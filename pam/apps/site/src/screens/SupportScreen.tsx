@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
 import { Grid } from '@astryxdesign/core/Grid';
@@ -189,7 +190,11 @@ export function SupportScreen() {
   const [typed, setTyped] = useState('');
   // The search lives in the address (`?q=`), so Back from an article, a reload and a shared link all bring it back.
   const [restored, setRestored] = useState('');
+  // A search that stays on this page puts its words back in the box: a fresh box (the key) that opens on them, focused.
+  const [boxRound, setBoxRound] = useState(0);
+  const [boxFocused, setBoxFocused] = useState(false);
   const [clearSignal, setClearSignal] = useState(0);
+  const router = useRouter();
   const ready = useRef(false);
   // A question picked from the suggestions stands in for what was typed until the next keystroke.
   const [picked, setPicked] = useState<string | null>(null);
@@ -236,13 +241,26 @@ export function SupportScreen() {
               }}
             >
               <SearchPill<SuggestionItem>
-                key={restored || 'blank'}
+                key={`${restored || 'blank'}:${boxRound}`}
                 initialQuery={restored}
+                hasAutoFocus={boxFocused}
+                isQuiet
                 clearSignal={clearSignal}
                 label="Ask a question in Support"
                 placeholder="Ask a question"
                 searchSource={SOURCE}
-                onPick={(item) => setPicked(item.auxiliaryData.query)}
+                onPick={(item) => {
+                  const s = item.auxiliaryData;
+                  // A suggested post opens the post. A question, or "Search for…", searches, and the box keeps its words.
+                  if (s.id.startsWith('p:') && s.slug) {
+                    router.push(`/support/${s.slug}/`);
+                    return;
+                  }
+                  setPicked(s.query);
+                  setRestored(s.query);
+                  setBoxFocused(true);
+                  setBoxRound((n) => n + 1);
+                }}
                 onQuery={(v) => {
                   setTyped(v);
                   setPicked(null);

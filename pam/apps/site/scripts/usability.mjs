@@ -20,7 +20,9 @@ const server = createServer((req, res) => {
   let path = normalize(decodeURIComponent(new URL(req.url, 'http://x').pathname));
   if (path.endsWith('/')) path += 'index.html';
   try {
-    res.writeHead(200, { 'content-type': TYPES[extname(path)] ?? 'application/octet-stream' }).end(readFileSync(join(out, path)));
+    // read first: a file that is not there (a page's prefetch) must answer 404, not crash after the headers went out
+    const body = readFileSync(join(out, path));
+    res.writeHead(200, { 'content-type': TYPES[extname(path)] ?? 'application/octet-stream' }).end(body);
   } catch {
     res.writeHead(404).end('not found');
   }
@@ -148,6 +150,44 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
   await page.waitForTimeout(300);
   if ((await input().inputValue()) !== '') fail(`search: Esc should clear the box, it has “${await input().inputValue()}”`);
   if (page.url().includes('q=')) fail(`search: Esc should clear ?q= from the address, it is ${page.url()}`);
+  // S1 (Iris, 22 October): a suggested post opens the post, by tap and by Enter. It used to search for the post's title.
+  for (const how of ['tap', 'Enter']) {
+    await page.goto(base + '/support/', { waitUntil: 'networkidle' });
+    await input().click();
+    await page.keyboard.type('texts from pa');
+    await page.waitForTimeout(600);
+    if (how === 'tap') await page.locator('[role="option"]', { hasText: 'Texts from Pam:' }).first().click();
+    else {
+      await page.locator('[role="option"]', { hasText: 'Texts from Pam:' }).first().waitFor();
+      const at = await page.evaluate(() => [...document.querySelectorAll('[role="option"]')].findIndex((o) => o.textContent.includes('Texts from Pam:')));
+      // the first suggestion is already highlighted when the list opens
+      for (let i = 0; i < at; i += 1) await page.keyboard.press('ArrowDown');
+      await page.keyboard.press('Enter');
+    }
+    await page.waitForTimeout(800);
+    if (!/\/support\/texts-from-pam\/?$/.test(new URL(page.url()).pathname)) fail(`search S1: ${how} on a suggested post should open it, the page is ${page.url()}`);
+  }
+  // S2: after a search the box keeps its words, so a typo can be mended.
+  await page.goto(base + '/support/', { waitUntil: 'networkidle' });
+  await input().click();
+  await page.keyboard.type('xyzzy plumbus');
+  await page.waitForTimeout(600);
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(800);
+  if (!(await page.getByRole('heading', { name: /No results for “xyzzy plumbus”/ }).count())) fail('search S2: Enter should show the results');
+  if ((await input().inputValue()) !== 'xyzzy plumbus') fail(`search S2: after Enter the box should keep “xyzzy plumbus”, it has “${await input().inputValue()}”`);
+  if (!(await page.evaluate(() => document.activeElement?.getAttribute('role') === 'combobox'))) fail('search S2: after Enter the cursor should stay in the box');
+  // S3: one count, said once. Only one live region may hold a result count.
+  await page.goto(base + '/support/', { waitUntil: 'networkidle' });
+  await input().click();
+  await page.keyboard.type('cancel');
+  await page.waitForTimeout(1100);
+  const counts = await page.evaluate(() =>
+    [...document.querySelectorAll('[aria-live], [role="status"], [role="alert"]')]
+      .filter((e) => e.getAttribute('aria-live') !== 'off' && /\bresults?\b/i.test(e.textContent ?? ''))
+      .map((e) => (e.textContent ?? '').trim()),
+  );
+  if (counts.length !== 1) fail(`search S3: a result count should be spoken by one live region, ${counts.length} speak: ${JSON.stringify(counts)}`);
   // The skip link is the first stop, and goes to the page.
   await page.goto(base + '/support/cant-sign-in/', { waitUntil: 'networkidle' });
   await page.keyboard.press('Tab');

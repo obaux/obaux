@@ -61,6 +61,11 @@ export interface SearchPillProps<T extends SearchPillItem> {
    * search keeps its query in the URL, so Back restores it). The next keystroke replaces them.
    */
   readonly initialQuery?: string;
+  /**
+   * The screen says how many results there are, in its own live region, so the bar does not say its own count of
+   * suggestions as well: two numbers read out for one question (the public Support search, Iris, 22 October).
+   */
+  readonly isQuiet?: boolean;
 }
 
 const styles = stylex.create({
@@ -127,8 +132,27 @@ export function SearchPill<T extends SearchPillItem>({
   clearSignal = 0,
   hasAutoFocus = false,
   initialQuery = '',
+  isQuiet = false,
 }: SearchPillProps<T>) {
   const [query, setQuery] = useState(initialQuery);
+  // Astryx says a result count through two page-wide live regions, made on first use. Turn them off while this bar is
+  // on the page (when it is quiet), and give them back when it goes.
+  useEffect(() => {
+    if (!isQuiet) return;
+    const touched = new Set<Element>();
+    const mute = () =>
+      document.querySelectorAll('[data-astryx-live-region]').forEach((el) => {
+        touched.add(el);
+        el.setAttribute('aria-live', 'off');
+      });
+    mute();
+    const watch = new MutationObserver(mute);
+    watch.observe(document.body, { childList: true });
+    return () => {
+      watch.disconnect();
+      touched.forEach((el) => el.setAttribute('aria-live', el.getAttribute('data-astryx-live-region') ?? 'polite'));
+    };
+  }, [isQuiet]);
   const groupRef = useRef<HTMLDivElement>(null);
   // Words that came back from the address go into the box the way typing puts them there: the input's own value is set
   // and an input event tells the Typeahead, which then reports them. (Its `value` prop would show a chosen token instead.)
