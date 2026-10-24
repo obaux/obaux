@@ -19,3 +19,7 @@ site tests (127), tsc, build, usability (new: no carousel, no Pause button and n
 The DocuSign logo file (DocuSign's brand page), then set `DOCUSIGN.logo`. Sage signs “Signing with DocuSign”. Will's “under the dark green card, where the three statements are made” was read as the programs row, the one under the green card that talks about signing policies; say if he meant the green card's own Program Providers line.
 
 ## Needs a human
+
+## 24 October addendum
+
+The logo is in: Will gave it at 17:07 (Mira's `mira/docusign-logo`); the symbol is copied unchanged to `apps/site/public/brand/docusign-symbol.png` and `DOCUSIGN.logo` points at it (16px high, empty alt as the words say Docusign). It reads on the light and dark badge. Sage signed “Signing with Docusign” (2c0e66f9, the company's own spelling since its 2024 rebrand). The earlier “logo is not in” lines above are history. Pictures: `docs/design/review/2026-10-24-docusign-logo-on-tag/`. Checks: site tests, tsc, usability, a11y (130 scans) and scrollspy (0 problems).
