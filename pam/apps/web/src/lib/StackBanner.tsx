@@ -3,7 +3,7 @@
 import { type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Banner } from '@astryxdesign/core/Banner';
-import { colorVars, radiusVars, shadowVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { colorVars, radiusVars, shadowVars, spacingVars, textSizeVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { useI18n } from './i18n';
 
 /**
@@ -20,13 +20,20 @@ const styles = stylex.create({
   action: {
     color: colorVars['--color-text-red'],
     boxShadow: `inset 0 0 0 1px ${colorVars['--color-error']}`,
+    // Compact (Will, 23 October 21:47: "alert banner buttons can be much smaller, there too much too and bottom space"): about the height of its words,
+    // at the line's own 12px (--font-size-sm), with no padding above or below; 24px is the least a target may be (WCAG 2.5.8) and it keeps that.
+    fontSize: textSizeVars['--font-size-sm'],
+    // The app's 48px floor (globals.css) is a custom property, so the alert's buttons set their own.
+    '--pam-touch-target-min': spacingVars['--spacing-6'],
+    minHeight: spacingVars['--spacing-6'],
+    paddingBlock: 0,
     paddingInline: spacingVars['--spacing-2'],
     flexGrow: { default: 1, ':only-child': 0 },
     flexBasis: '5rem',
     minWidth: 'max-content',
   },
   // Side by side at one width when they fit, one above the other when a longer language's labels do not; never a word broken in two.
-  row: { display: 'flex', flexWrap: 'wrap', width: '100%', gap: spacingVars['--spacing-2'], marginBlockStart: spacingVars['--spacing-2'] },
+  row: { display: 'flex', flexWrap: 'wrap', width: '100%', gap: spacingVars['--spacing-2'], marginBlockStart: spacingVars['--spacing-1'] },
   backing: {
     width: '100%',
     backgroundColor: colorVars['--color-background-body'],
