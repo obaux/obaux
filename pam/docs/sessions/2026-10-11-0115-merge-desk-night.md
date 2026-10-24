@@ -1756,6 +1756,12 @@
   and the next push's time is now set by the desk (team.md). Migration 20261019020000 (Piper's ten names) is in the
   tree, not applied: it follows 20261018211942, which still waits for Will's yes. b77's entry gives 01:54 as its end;
   its push was at 01:51:40.
+- **b78 reopened (23 October 21:47 to 24 October 18:40).** Will, 23 October 21:47: "alert banner buttons can be much
+  smaller, there too much too and bottom space". The alert's buttons are now 24px tall at the Banner's line size
+  (12px), with no padding above or below, and 4px between the line and the row (Dot c3bcf2c1). Dot sent one picture
+  first, under the blue note; Will said go at 17:07 on 24 October, and she re-shot the 22 D-621 pictures (39dbebd3)
+  and ran the seven alert specs on three projects three times (1413 passed, 0 failed). Merged at 74a93916, and the
+  full run passed again on it (verified below). Nothing else joined b78.
 
 ## What was wrong, and what missed it
 
@@ -2157,6 +2163,12 @@
   tip one call site of 31 did. Piper's and Ava's pictures both showed the line and only the ×; the desk had passed
   Piper's. Fixed once in the banner (Dot): with no `retry`, Try again presses the control that failed again, else re-reads
   the screen. Lesson: a picture is read word by word against what is on it; a line that says "tap X" needs an X.
+- **A size the desk passed was never measured (b78, 19 to 23 October).** Dot's 04:51 note said the alert's buttons
+  were about 32px; they were 48px, because globals.css gives every button a 48px min-height through
+  `--pam-touch-target-min`, which outranks a component's own minHeight. Nobody measured the built page, and Will saw
+  it four days later as "too much top and bottom space". The alert's buttons now set the custom property themselves,
+  as New trip does. Lesson: a size in a READY is measured on the built page (its bounding box), not read from the
+  style that sets it.
 - **Will's decisions did not show on his page (19 October, 04:51).** Will asked why his decisions and changes were not
   showing as items on the Control Room. They were going only into "What I'm doing", which had not changed since 01:58, and
   into the roadmap's "waiting" lines. Fixed the same hour: Your notes (v49), with the rule in control-room.md that a note
@@ -2473,17 +2485,18 @@
 | b77 main CI (6773c9c4, pushed 01:51:40) | Migrations and RLS (01:53), Publish Storybook, Types/unit/build, Accessibility (02:33): all four green; Vercel web (01:57) and pam-site (01:53) success |
 | b78 trial, full run (6ff54be6 on mira/b78-trial: every READY then in, with Dot ca281b2b) | config 1590 passed; ui 132; site 125; build; tsc; web unit 245; budget 2.0 kB to spare; e2e 2739 passed, 22 skipped, 44 failed (44.5 m), every failure a test waiting for the old failure line ("That didn't go through …"): Nico's alerts and messages specs (adapted in 058e6d68), Ava's invite.spec:123, and nine tests from Piper's second D-616 batch (171268f7), each on all three phone sizes; storybook built, no bundle names the live project; site build; site a11y 125 scans, 0 problems |
 | Batch b78, full run (db1af842: main 6773c9c4 + Dot c7cb9f25; Ava 2654f712, bb20f7a4, 5545e114; Nico 28e1c86d; Lena c7d86f06, 816ba2bf, be0afa15; Piper 45bf55cd; Wren 07cfadb2; Sage efe9ea3f; Iris 3a3f1dea; the desk's draft records): config / copy / ui / ui build / site test / site tsc / build:e2e / tsc / web unit / budget / e2e full / storybook + guard / site build / site a11y | config 1590 passed (4 skipped, 1 todo); copy in step; ui 132; ui build; site 125; site tsc; build:e2e; tsc; web unit 246; budget 1.7 kB to spare; e2e 2810 passed, 22 skipped, 0 failed, no retries (41.5 m); storybook built, no bundle names the live project; site build; site a11y 130 scans, 0 problems. Then Dot's b8373530 (four pictures, no code). Pictures for Will from this tip: the place report and a service save failing, at 320 light and dark, both with Try again (the press fallback) |
+| Batch b78, full run after Will's 21:47 note (74a93916: d8a76afb + Dot c3bcf2c1 and 39dbebd3) | config 1590 passed (4 skipped, 1 todo); copy in step; ui 132; ui build; site 125; site tsc; build:e2e; tsc; web unit 246; budget 1.7 kB to spare; e2e 2810 passed, 22 skipped, 0 failed, no retries (42.3 m); storybook built, no bundle names the live project; site build; site a11y 130 scans, 0 problems. Dot's own runs on 39dbebd3: seven alert specs, three projects, three times, 1413 passed, 0 failed |
 
 ## Left undone
 
-- **As of b78 (19 October, 07:20):** Every alert is the red Banner Will chose, small, with Try again wherever it says
-  so, and the help post that explains it is live. The error log's migration (20261018211942) still waits for Will's
-  yes in this session; then Piper's ten names (20261019020000), dispatch-sms redeployed, the switch and the Privacy
-  line together, and one test report. Next (b79): Ava's invite-once (D-620, its migration first), Nico's region_id add
-  and app (the revoke a day later), the owners' retry on the screens that rely on Try again pressing their control.
-  Then STOP and the stopped-number list before texts. With Will: the migration's yes; whether the number ending 5265
-  is his own; the connect text; a97/a98 and an iPhone try; a86; the website's photo line; a91, a93, a84, a88, a102;
-  the stray Control Room copy.
+- **As of b78 (24 October, 18:40):** Every alert is the red Banner Will chose, small, with 24px buttons (Will, 23
+  October 21:47) and Try again wherever it says so, and the help post that explains it is live. The error log's
+  migration (20261018211942) still waits for Will's yes in this session; then Piper's ten names (20261019020000),
+  dispatch-sms redeployed, the switch and the Privacy line together, and one test report. Next (b79): Ava's
+  invite-once (D-620, its migration first), Nico's region_id add and app (the revoke a day later), the owners' retry
+  on the screens that rely on Try again pressing their control. Then STOP and the stopped-number list before texts.
+  With Will: the migration's yes; whether the number ending 5265 is his own; the connect text; a97/a98 and an iPhone
+  try; a86; the website's photo line; a91, a93, a84, a88, a102; the stray Control Room copy.
 - **As of b77 (19 October, 01:54):** Every failed save in Piper's, Ava's and Nico's lanes is the bottom alert, on a
   surface of its own. The error log's migration has its closed lists and waits for Will's yes in this session; then
   dispatch-sms is redeployed, the switch and the Privacy line go on together (Lena 68a81d66, re-dated on the day) and
