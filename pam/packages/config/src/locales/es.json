@@ -131,7 +131,7 @@
   "directory.filter.all": "Todos",
   "directory.filter.member": "Miembros",
   "directory.filter.provider": "Programas",
-  "directory.filter.super_admin": "Administradores",
+  "directory.filter.super_admin": "Super admins",
   "directory.invite.city": "Qué ciudad",
   "directory.invite.pickCity": "Primero elija una ciudad.",
   "directory.notSuper.body": "Su cuenta no abre esto. Si eso está mal, contacte a Pam.",
