@@ -111,6 +111,8 @@ export interface MockOptions {
   readonly noWaitingCities?: boolean;
   /** Nothing has broken in the app this week (D-616): Problems' empty state. */
   readonly noProblems?: boolean;
+  /** Missing information (D-623): every place has what it needs. */
+  readonly noMissingInfo?: boolean;
   /** Message Pam is switched off (D-605): `pam_status` says so and nothing else about Pam is shown. */
   readonly pamOff?: boolean;
   /** The Pam team's inbox is empty. */
@@ -451,6 +453,37 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
         { place: 'Norristown', people: 1 },
       ],
     })),
+    // How complete the programs are, and the places missing something (D-623). Counts as on 31 October; a short list, by kind
+    // then name, with a long name and a long address for the fit audit.
+    on('/rpc/program_info_gaps', (_url, _method, body) => {
+      const withList = (body as { p_with_list?: boolean } | null)?.p_with_list === true;
+      const places = options.noMissingInfo
+        ? []
+        : [
+            { id: 'svc-1', name: 'Fresh Start Kitchen', address: '1231 N Broad St, Philadelphia, PA 19122', kind: 'hand', missing: ['hours'] },
+            { id: 'gap-h1', name: 'Northeast Community Counseling Center and Recovery Support Services', address: '4900 Frankford Ave, Philadelphia, PA 19124', kind: 'health', missing: ['phone', 'website', 'hours'] },
+            { id: 'gap-h2', name: 'Kensington Wellness', address: '2930 Kensington Ave, Philadelphia, PA 19134', kind: 'health', missing: ['website', 'hours'] },
+            { id: 'gap-h3', name: 'West Philly Recovery House', address: null, kind: 'health', missing: ['address', 'hours'] },
+            { id: 'gap-l1', name: 'Fox Chase Library', address: '501 Rhawn St, Philadelphia, PA 19111', kind: 'library', missing: ['hours'] },
+            { id: 'gap-p1', name: 'Hunting Park Playground', address: null, kind: 'parks', missing: ['address'] },
+          ];
+      const missing = options.noMissingInfo ? 0 : 590;
+      return {
+        body: {
+          total: 754,
+          phone_need: 588,
+          phone_have: options.noMissingInfo ? 588 : 331,
+          website_need: 588,
+          website_have: options.noMissingInfo ? 588 : 207,
+          address_need: 754,
+          address_have: options.noMissingInfo ? 754 : 750,
+          hours_need: 588,
+          hours_have: options.noMissingInfo ? 588 : 6,
+          missing,
+          places: withList ? places : null,
+        },
+      };
+    }),
     // Problems (D-616): what broke, grouped by screen, action and code, newest first. No person, no free text.
     on('/rpc/app_errors_grouped', () => ({
       body: options.noProblems ? [] : [

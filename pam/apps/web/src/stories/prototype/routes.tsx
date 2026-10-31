@@ -42,6 +42,7 @@ import { PrototypeProgramReview } from './PrototypeProgramReview';
 import { ProgramsToCheckScreen } from '../../screens/ProgramsToCheckScreen';
 import { WaitingCitiesScreen } from '../../screens/WaitingCitiesScreen';
 import { ProblemsScreen } from '../../screens/ProblemsScreen';
+import { MissingInfoScreen } from '../../screens/MissingInfoScreen';
 import { PamInboxScreen } from '../../screens/PamInboxScreen';
 import { PamStartScreen } from '../../screens/PamStartScreen';
 import { PamHoursScreen } from '../../screens/PamHoursScreen';
@@ -132,6 +133,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/programs/review/': screen(() => <ProgramsToCheckScreen />),
   '/cities/waiting/': screen(() => <WaitingCitiesScreen />),
   '/problems/': screen(() => <ProblemsScreen />),
+  '/places/missing/': screen(() => <MissingInfoScreen />),
   '/pam/messages/': screen(() => <PamInboxScreen />),
   '/pam/start/': screen(() => <PamStartScreen />),
   '/pam/hours/': screen(() => <PamHoursScreen />),

@@ -99,6 +99,8 @@ const BACK_TARGETS = {
   places: { href: '/', labelKey: 'nav.back.explore' },
   // The places somebody reported, for the people who review them (D-189).
   reported: { href: '/places/reported/', labelKey: 'nav.back.reported' },
+  // Missing information, the super admin's list of places that lack a detail (D-623).
+  missing: { href: '/places/missing/', labelKey: 'nav.back.missingInfo' },
   saved: { href: '/saved/', labelKey: 'nav.back.saved' },
   // All programs, a staff member's secondary path (D-218).
   programs: { href: '/programs/', labelKey: 'nav.back.programs' },

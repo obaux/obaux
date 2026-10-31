@@ -125,6 +125,7 @@ export const APP_ERROR_ROUTES = [
   '/place/policies/',
   '/place/policies/view/',
   '/places/',
+  '/places/missing/',
   '/places/reported/',
   '/points/',
   '/privacy/',

@@ -142,6 +142,14 @@ export const WaitingCitiesEmpty: Story = {
   name: 'Cities people are waiting for — nobody yet',
   render: () => <>{REDESIGN_ROUTES['/cities/waiting/']!.render()}</>,
 };
+/** Missing information (D-623): the places that lack a phone, a website, an address or hours, filtered and searched. */
+export const MissingInfo: Story = screen('super-admin', 'Missing information', '/places/missing/', { from: 'home' });
+/** ...and every place has what it needs: one line. */
+export const MissingInfoNone: Story = {
+  ...asRole('super-admin', '/places/missing/', { from: 'home' }, { noMissingInfo: true }),
+  name: 'Missing information — nothing missing',
+  render: () => <>{REDESIGN_ROUTES['/places/missing/']!.render()}</>,
+};
 /** Problems (D-616): what broke in the app this week, newest first; no person, no free text. */
 export const Problems: Story = screen('super-admin', 'Problems', '/problems/', { from: 'notifications' });
 /** ...and nothing broke: one line. */

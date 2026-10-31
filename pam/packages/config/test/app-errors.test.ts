@@ -50,6 +50,16 @@ describe('the closed lists the database holds', () => {
     const block = migration.split(`-- ${name}: begin`)[1]?.split(`-- ${name}: end`)[0] ?? '';
     return Array.from(block.matchAll(/^\s+\('([^']+)'\),?$/gm), (m) => m[1]!);
   };
+  /** Every route a later migration adds to app_error_routes, the way later ones add actions: a screen made after the error
+   * log's migration (Missing information, D-623) goes in with its own migration, never by editing the first. */
+  const addedRoutes = (): string[] =>
+    migrations
+      .filter((sql) => sql !== migration)
+      .flatMap((sql) =>
+        Array.from(sql.matchAll(/insert\s+into\s+public\.app_error_routes\s*\(route\)\s*values([^;]*);/gi), (m) =>
+          Array.from(m[1]!.matchAll(/\(\s*'([^']+)'\s*\)/g), (k) => k[1]!),
+        ).flat(),
+      );
 
   it('the actions in the migration are APP_ERROR_ACTIONS, no more and no fewer', () => {
     // Across every migration that inserts into the table (the first seeds it; a later one may add keys), not one file.
@@ -57,7 +67,7 @@ describe('the closed lists the database holds', () => {
   });
 
   it('the routes in the migration are APP_ERROR_ROUTES, no more and no fewer', () => {
-    expect(listed('app_error_routes').sort()).toEqual([...APP_ERROR_ROUTES].sort());
+    expect([...new Set([...listed('app_error_routes'), ...addedRoutes()])].sort()).toEqual([...APP_ERROR_ROUTES].sort());
   });
 
   it('APP_ERROR_ROUTES is every screen in the app: a folder with a page', () => {

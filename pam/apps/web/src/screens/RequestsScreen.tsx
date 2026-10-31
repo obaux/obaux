@@ -6,6 +6,7 @@ import { MenuList } from '@pam/ui/MenuList';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { HelpButton } from './HelpButton';
 import { HeaderActions } from './HeaderActions';
+import { ProgramStats } from './ProgramStats';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { NOTICES, intlLocale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
@@ -174,6 +175,9 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
           },
         ]}
       />
+
+      {/* How complete the programs are, and the places missing something (D-623): Home only. */}
+      {isHome ? <ProgramStats /> : null}
 
       {requests.status === 'loading' ? <Loading label={t('common.loading')} variant="inline" /> : null}
 

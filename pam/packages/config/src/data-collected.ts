@@ -346,6 +346,12 @@ export const INPUT_FILES: readonly InputFile[] = [
     notPersonal: 'Filters the conversations already on the phone; the typed words are not sent.',
   },
   {
+    file: 'apps/web/src/screens/MissingInfoScreen.tsx',
+    fields: 1,
+    notPersonal:
+      "A super admin's search over Pam's own list of places, already on the screen (D-623); the typed words are not sent. They are kept, with the filters, in the browser's session storage until the tab closes.",
+  },
+  {
     file: 'apps/web/src/screens/ScheduleView.tsx',
     fields: 1,
     notPersonal: 'Filters the visits already on the phone; the typed words are not sent.',
