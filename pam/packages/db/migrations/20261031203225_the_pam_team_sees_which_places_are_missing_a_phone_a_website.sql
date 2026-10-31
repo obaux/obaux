@@ -1,8 +1,9 @@
 -- The Pam team sees which places are missing a phone, a website, an address or hours (D-623; Will, 31 October, Control Room
 -- note n-20261031-2020: "Let's add these stats on super admin user, so they have visibility on how many programs exist total.
 -- And a list of programs missing info, clicking into it, opens a nested page with list of missing details, filtered and
--- searchable. Add these stats to the super admins homepage."). Expand only: two new functions and one new route, nothing
--- changed or removed.
+-- searchable. Add these stats to the super admins homepage."). Expand only: two new functions, nothing changed or removed.
+-- The new screen's error route is its own migration (20261031214636_missing_information_is_a_route_the_error_log_may_name), held
+-- with the error log, whose table is not live yet.
 --
 --   * `program_info_gaps(p_with_list)`: for a super admin only (checked inside, as `waiting_city_counts()` does, D-593),
 --     `security definer` so it can count every place whatever the caller's own reach. It returns one JSON object:
@@ -143,8 +144,3 @@ comment on function public.program_info_gaps(boolean) is
 
 revoke all on function public.program_info_gaps(boolean) from public, anon;
 grant execute on function public.program_info_gaps(boolean) to authenticated;
-
--- The new screen is a route the error log may name (20261018211942's closed list): added here, not by editing that file.
-insert into public.app_error_routes (route) values
-  ('/places/missing/')
-on conflict do nothing;
