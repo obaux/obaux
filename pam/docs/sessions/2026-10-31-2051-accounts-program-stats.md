@@ -76,3 +76,10 @@ Sage and Lena, for the words.
 - Sage's optional point, "Missing: Phone, Website, and Hours" printing the chip labels capitalised: kept as is. Lowercase would
   need four more keys for Sage to sign and Lena to translate, and in several of Pam's languages the capital carries no meaning.
   Easy to add later if Will asks.
+
+## Live (Mira, 21:57)
+
+- The function migration is live as 20261031215010 (Mira renames the file at assembly). The route insert stays held with the
+  error log.
+- The live check first found 0 real hours where 6 were expected: OIC's hours were stored in a shape `parseHours` does not read.
+  The desk fixed the data (20261031215150); `hours_are_real` now counts 6. Nothing changed here.
