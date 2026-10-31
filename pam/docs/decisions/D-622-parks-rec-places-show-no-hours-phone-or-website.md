@@ -17,7 +17,7 @@ no website and no hours**, anywhere: no Call or Website row, no hours row, no we
   these places said "Open until 9 PM" with a sample-hours note. The app did not know a place was Parks & Rec (the place reads carry no
   source). The smallest honest way to tell it is a value in the column every place read already returns: `services.hours = {"none": true}`
   (`NO_HOURS`, `declaresNoHours` in `@pam/config/hours`). `hoursFor()` returns nothing for it, and every screen that draws an open or
-  closed state goes through `hoursFor()`, so they all stop at once. Migration 20261031200500 writes the marker on those rows (the merge
+  closed state goes through `hoursFor()`, so they all stop at once. Migration 20261031200804 (live since 31 October 20:08) writes the marker on those rows (the merge
   desk applies it; until it is applied those places still show the stand-in).
 - **It is not "unknown".** A place with `hours` null may still get a stand-in or, one day, real hours. A place marked `none` never does, and
   the marker is not a week, so it cannot be read as "closed every day".

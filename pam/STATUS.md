@@ -1297,8 +1297,8 @@ state, hours row, week or "sample hours" note for a place Pam holds no hours for
 
 Piper's lane, `claude/places-programs-parks-no-hours` (off `mira/b78`). Will (31 October): Parks & Rec need no phone, website or times open (D-622). The desk cleared
 phone and website live (20261031193246). The app now shows **no hours** for them: `services.hours = {"none": true}` reads as "none, on purpose" (`NO_HOURS` in
-`@pam/config/hours`), so no stand-in, no open or closed line, no week drawer and no "sample hours" note, anywhere `hoursFor()` is used. **Needs the desk:** migration
-`20261031200500` (written, not applied) writes the marker on the 166 `pprsite:%` rows; until then they still show the stand-in. A future `enrich-places` must not fill
+`@pam/config/hours`), so no stand-in, no open or closed line, no week drawer and no "sample hours" note, anywhere `hoursFor()` is used. **Live:** migration
+`20261031200804` (applied by the desk, 31 October 20:08) wrote the marker on the 166 `pprsite:%` rows; read back 166 of 166. A future `enrich-places` must not fill
 phone, website or hours for them (D-622). Pictures: `docs/design/review/2026-10-31-parks-no-hours/`.
 
 ## Places & programs · a94 and a95 live; the Book a visit list and its refusals; the run-through's three items (17-18 October)
