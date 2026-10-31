@@ -83,3 +83,11 @@ Sage and Lena, for the words.
   error log.
 - The live check first found 0 real hours where 6 were expected: OIC's hours were stored in a shape `parseHours` does not read.
   The desk fixed the data (20261031215150); `hours_are_real` now counts 6. Nothing changed here.
+
+## Lena's translations (22:24)
+
+- Merged Lena's c44d6a5c (the 31 keys in es, pt-BR, zh-CN, zh-HK, ru, ar; her error-log-line test now reads later route
+  inserts). Config is green: 73 files, 1,590 tests.
+- Arabic pictures reshot (home-320-ar, home-1280-ar, missing-filter-search-320-ar). "331 من 588" reads in the right order:
+  `ProgramStats` hands both numbers to one `t('programStats.ofNeeded')`, so the string sets the order. Keep it one call (Lena):
+  two separate elements would take the page's direction and break Arabic again.
