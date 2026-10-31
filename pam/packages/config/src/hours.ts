@@ -1,24 +1,14 @@
 /**
- * When a place is open — and, for now, a stand-in for when Pam does not know.
+ * When a place is open, when Pam knows it.
  *
- * Six places out of 754 have real hours. Until `enrich-places` runs, an
- * open/closed line on a card would be a claim Pam cannot make, which is why
- * D-044 said Pam would show no open/closed state at all.
+ * Six places out of 754 have real hours. For every other place Pam says nothing about when it is open: no stand-in, no guess, no sample
+ * (Will, 31 October 2026: "It's not acceptable to have fake hours on the real app", D-624). That replaces the stand-in week Will asked for
+ * on 16 September (D-044's "show no open/closed state at all" is back for everything but the places that have real hours). A screen that
+ * has no hours shows no hours row, no week and no "Open until…/Closed" line; where a member might want them it can link to the place on
+ * Google ("Check hours on Google"). Real hours come only from the research project (Iris), once Will says yes.
  *
- * Will asked on 16 September for placeholder hours so the screens can be
- * demonstrated. They are here, in one file, behind one flag, and they are
- * **never preferred over a real answer**: `hoursFor()` returns the place's own
- * hours whenever it has them and only falls back when it does not. The day
- * enrich-places writes real hours for a row, that row stops using this file
- * without anybody editing it, and the day every row has them, deleting this
- * file changes nothing on screen.
- *
- * ## Turning it off
- *
- * `USE_PLACEHOLDER_HOURS = false` and no place shows an open/closed state
- * unless its hours are real. That is the switch to flip before this is shown to
- * anybody who might mistake a demo for a promise — a partner organisation
- * reading its own opening times off a screen, for instance.
+ * `hoursFor()` returns the place's own hours when it has them and nothing otherwise, so the day `enrich-places` writes real hours for a
+ * row, that row starts showing them without anybody editing this file.
  */
 
 /** A day's opening, in 24-hour local time. `0000`–`2400`, minutes included. */
@@ -37,70 +27,8 @@ export type WeekHours = readonly (readonly OpeningPeriod[])[];
 
 export interface PlaceHours {
   readonly week: WeekHours;
-  /** False when these are a stand-in. Nothing may claim them as fact. */
+  /** Always true: Pam shows only hours it has (D-624). Kept so a caller that asks does not change. */
   readonly isReal: boolean;
-}
-
-/** Will's switch (16 September). False hides open/closed wherever it is unknown. */
-export const USE_PLACEHOLDER_HOURS = true;
-
-const CLOSED: readonly OpeningPeriod[] = [];
-const nine = (close: string): readonly OpeningPeriod[] => [{ open: '09:00', close }];
-
-/**
- * Four shapes, chosen to look like the places they stand in for rather than
- * like a random number: a weekday office, a place open late, a place open six
- * days, and one open every day. A member seeing "Open now" at 8pm on a Sunday
- * for every place in the list would learn, correctly, not to trust the line.
- */
-const SHAPES: readonly WeekHours[] = [
-  // Weekdays, nine to five. The clinic.
-  [CLOSED, nine('17:00'), nine('17:00'), nine('17:00'), nine('17:00'), nine('17:00'), CLOSED],
-  // Weekdays late, Saturday morning. The training provider.
-  [
-    CLOSED,
-    nine('20:00'),
-    nine('20:00'),
-    nine('20:00'),
-    nine('20:00'),
-    nine('17:00'),
-    [{ open: '10:00', close: '14:00' }],
-  ],
-  // Six days, with a long Saturday. The library.
-  [
-    CLOSED,
-    nine('19:00'),
-    nine('19:00'),
-    nine('19:00'),
-    nine('19:00'),
-    nine('17:00'),
-    nine('17:00'),
-  ],
-  // Every day, dawn to dusk. The recreation center.
-  [
-    [{ open: '08:00', close: '18:00' }],
-    [{ open: '08:00', close: '21:00' }],
-    [{ open: '08:00', close: '21:00' }],
-    [{ open: '08:00', close: '21:00' }],
-    [{ open: '08:00', close: '21:00' }],
-    [{ open: '08:00', close: '21:00' }],
-    [{ open: '08:00', close: '18:00' }],
-  ],
-];
-
-/**
- * The same place gets the same stand-in every time.
- *
- * Derived from the id rather than random: hours that change on every render
- * would have a place open and closed within a minute of each other, and
- * somebody would screenshot it.
- */
-function shapeFor(id: string): WeekHours {
-  let hash = 0;
-  for (let i = 0; i < id.length; i += 1) {
-    hash = (hash * 31 + id.charCodeAt(i)) | 0;
-  }
-  return SHAPES[Math.abs(hash) % SHAPES.length]!;
 }
 
 /**
@@ -146,18 +74,15 @@ export function declaresNoHours(raw: unknown): boolean {
 }
 
 /**
- * The hours to show for a place: the real ones, or a stand-in, or nothing.
+ * The hours to show for a place: the real ones, or nothing.
  *
- * This is the only function a screen should call, and the only place that knows
- * placeholders exist. A place that declares it has no hours (`NO_HOURS`) gets
- * nothing, not a stand-in: no open or closed line, no week, no "sample hours".
+ * This is the only function a screen should call. A place that declares it has no hours (`NO_HOURS`) gets nothing, and so does any place
+ * whose hours Pam does not hold: no stand-in, no open or closed line, no week (D-622, D-624).
  */
-export function hoursFor(id: string, raw: unknown): PlaceHours | null {
+export function hoursFor(_id: string, raw: unknown): PlaceHours | null {
   if (declaresNoHours(raw)) return null;
   const real = parseHours(raw);
-  if (real) return { week: real, isReal: true };
-  if (!USE_PLACEHOLDER_HOURS) return null;
-  return { week: shapeFor(id), isReal: false };
+  return real ? { week: real, isReal: true } : null;
 }
 
 const toMinutes = (hhmm: string): number => {

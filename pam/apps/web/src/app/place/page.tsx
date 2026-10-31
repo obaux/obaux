@@ -12,6 +12,7 @@ import {
   PhoneIcon,
   PlaceDetail,
   PlacesIcon,
+  ClockIcon,
   SignedIcon,
   TextLink,
   directionsHref,
@@ -32,6 +33,7 @@ import { useSession } from '@/lib/useSession';
 import { logCall } from '@/lib/logCall';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { usePlaceStatus, weekLines } from '@/lib/usePlaceStatus';
+import { declaresNoHours } from '@pam/config/hours';
 import { useRoleView } from '@/lib/useViewedRole';
 import { sharePlace } from '@/lib/sharePlace';
 import { usePlacePolicies } from '@/lib/usePlacePolicies';
@@ -529,8 +531,6 @@ function PlaceScreen() {
         weekLines={lines}
         todayIndex={status ? status.today : null}
         hoursRowLabel={status && lines ? t('place.hours.row', { day: lines[status.today]!.day }) : null}
-        hoursArePlaceholder={status ? !status.isReal : false}
-        placeholderNote={t('place.hours.sample')}
         audienceLabel={place!.audience ? t(`place.audience.${place!.audience}`) : null}
         addressFirst={visitWhen !== null}
         hoursHref={googleHref}
@@ -604,6 +604,19 @@ function PlaceScreen() {
                   description: service?.address ?? t('place.quick.directions.body'),
                   icon: <PlacesIcon {...QUICK} />,
                   href: (directions ?? googleHref)!,
+                  isExternal: true,
+                },
+              ]
+            : []),
+          // No hours Pam holds, and not a place that has none on purpose (D-622): the signed line that sends a member to the place on Google, where
+          // the real hours are. Pam claims none (D-624).
+          ...(!status && !declaresNoHours(hoursService?.hours ?? place?.hours ?? null) && googleHref
+            ? [
+                {
+                  id: 'hours-google',
+                  label: t('place.hoursOnGoogle'),
+                  icon: <ClockIcon {...QUICK} />,
+                  href: googleHref,
                   isExternal: true,
                 },
               ]

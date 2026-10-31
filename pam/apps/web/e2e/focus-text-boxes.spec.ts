@@ -124,7 +124,7 @@ test.describe('a section a contents link jumps to', () => {
 test.describe('a sheet', () => {
   test("the place's hours drawer shows no ring on what it focuses, mouse or keyboard; Tab rings the first button", async ({ page }) => {
     await signedIn(page);
-    await page.route('**/rest/v1/rpc/service_detail*', (route) => route.fulfill(json([PLACE])));
+    await page.route('**/rest/v1/rpc/service_detail*', (route) => route.fulfill(json([{ ...PLACE, hours: { week: Array.from({ length: 7 }, () => [{ open: '09:00', close: '17:00' }]) } }])));
     await page.goto(`/place/?id=${PLACE.id}`);
     await settled(page);
 
@@ -142,7 +142,7 @@ test.describe('a sheet', () => {
 
   test('opened by keyboard: no ring on what it focuses; Tab rings the first button', async ({ page }) => {
     await signedIn(page);
-    await page.route('**/rest/v1/rpc/service_detail*', (route) => route.fulfill(json([PLACE])));
+    await page.route('**/rest/v1/rpc/service_detail*', (route) => route.fulfill(json([{ ...PLACE, hours: { week: Array.from({ length: 7 }, () => [{ open: '09:00', close: '17:00' }]) } }])));
     await page.goto(`/place/?id=${PLACE.id}`);
     await settled(page);
 
