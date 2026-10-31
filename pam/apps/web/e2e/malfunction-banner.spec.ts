@@ -142,6 +142,45 @@ test.describe('The failure banner (D-618)', () => {
     expect(parseFloat(size)).toBeLessThanOrEqual(14);
   });
 
+  // Corner controls mirror the opposite inset (Will, 31 October: "the X button is not neatly tucked on corner"). The alert's icon is inset from its start corner;
+  // the close's glyph is inset the same from its end corner, top to top, to within a pixel, in both directions of writing.
+  for (const lang of ['en', 'ar'] as const) {
+    test(`the close glyph sits in the corner as far in as the icon opposite it (${lang}, 320x568)`, async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 568 });
+      await page.addInitScript((l) => window.localStorage.setItem('pam.locale', l), lang);
+      await failing(page, 500);
+      await page.route(PROFILES, (route) =>
+        route.fulfill(json({ id: ME, role: 'member', first_name: 'Will', preferred_language: lang, language: lang, access_status: 'active', region_id: '0195b1c0-0000-4000-8000-000000000001', regions: { name: 'Philadelphia' } })),
+      );
+      await page.reload();
+      await settled(page);
+      await page.getByRole('switch').first().click();
+      const root = page.locator('[data-pam-malfunction]');
+      await root.waitFor();
+      const m = await root.evaluate((el) => {
+        const frame = el.getBoundingClientRect();
+        const svgs = [...el.querySelectorAll('svg')];
+        const ink = (svg: Element) => svg.querySelector('path')!.getBoundingClientRect();
+        const icon = ink(svgs[0]!);
+        const cross = ink(svgs[1]!);
+        const close = el.querySelector('button[aria-label]')!.getBoundingClientRect();
+        const rtl = getComputedStyle(el).direction === 'rtl';
+        return {
+          rtl,
+          iconInset: rtl ? frame.right - icon.right : icon.left - frame.left,
+          crossInset: rtl ? cross.left - frame.left : frame.right - cross.right,
+          iconTop: icon.top - frame.top,
+          crossTop: cross.top - frame.top,
+          target: Math.min(close.width, close.height),
+        };
+      });
+      expect(m.rtl).toBe(lang === 'ar');
+      expect(Math.abs(m.crossInset - m.iconInset), JSON.stringify(m)).toBeLessThanOrEqual(1);
+      expect(Math.abs(m.crossTop - m.iconTop), JSON.stringify(m)).toBeLessThanOrEqual(1);
+      expect(m.target).toBeGreaterThanOrEqual(24);
+    });
+  }
+
   test('the same switch failing twice in a row adds "Get help" (no "contact Pam" words), which opens Help', async ({ page }) => {
     await failing(page, 500);
     await page.getByRole('switch', { name: CLOSED }).click();

@@ -376,6 +376,23 @@
   .astryx-dropdown-menu-item {
     min-height: var(--pam-touch-target-min);
   }
+  /*
+   * The close of an alert sits in its corner (Will, 31 October: "the X button is not neatly tucked on corner ... corner controls mirror the
+   * opposite inset"). The alert's icon is inset 16px from its start and 12px from the top; the close's glyph takes the same from the end and the top.
+   * The app's 48px floor (above) had centred a 16px glyph in a 48px box, then 28px under the alert's own floor, floating it down and in. The close is a
+   * 24px box (the least a target may be, WCAG 2.5.8) pulled into the corner so its glyph, not its box, is what mirrors the icon. Logical properties, so
+   * it is the top-left in Arabic. Checked on the built page by e2e/alert-corner.spec.ts.
+   */
+  [data-pam-alert] .astryx-banner > div:has(> button[aria-label]) {
+    align-self: flex-start;
+    margin-block-start: calc(var(--spacing-1) * -1.5);
+    margin-inline-end: calc(var(--spacing-1) * -1.5);
+  }
+  [data-pam-alert] .astryx-banner > div > button[aria-label] {
+    inline-size: var(--spacing-6);
+    block-size: var(--spacing-6);
+    min-block-size: var(--spacing-6);
+  }
   .astryx-selector-option-row[data-selected] > span:last-child .astryx-icon svg {
     stroke-width: 2.5;
   }

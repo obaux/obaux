@@ -35,6 +35,9 @@ const styles = stylex.create({
   // Side by side at one width when they fit, one above the other when a longer language's labels do not; never a word broken in two.
   row: { display: 'flex', flexWrap: 'wrap', width: '100%', gap: spacingVars['--spacing-2'], marginBlockStart: spacingVars['--spacing-1'] },
   backing: {
+    // The close inside `Banner` is a button too, and the app's 48px floor would centre its small glyph in a 48px box, floating it down and in from the corner;
+    // the alert's controls are 24px (WCAG 2.5.8), so the glyph sits in the corner like the icon opposite it.
+    '--pam-touch-target-min': spacingVars['--spacing-6'],
     width: '100%',
     backgroundColor: colorVars['--color-background-body'],
     borderRadius: radiusVars['--radius-container'],
@@ -66,7 +69,7 @@ export function StackBanner({ title, description, actions, onClose, failure = fa
     </>
   );
   return (
-    <div {...stylex.props(styles.backing)} {...(failure ? { 'data-pam-malfunction': '' } : {})}>
+    <div data-pam-alert="" {...stylex.props(styles.backing)} {...(failure ? { 'data-pam-malfunction': '' } : {})}>
       <Banner
         status="error"
         title={<span role="heading" aria-level={2}>{title}</span>}

@@ -77,3 +77,17 @@ Will, 19 October: *"The blue variant (but in red) is the style of alert banner I
 
 Seen in Components › Feedback › Malfunction alert and Notice toast.
 
+## Corner controls mirror the opposite inset, and small things are symmetrical (D-621; Will, 31 October)
+
+Will, 31 October, on the alert: *"the X button is not neatly tucked on corner ... The layout needs to feel limited. Smaller sections need symmetrical size considerations."*
+
+1. **A control in a corner mirrors the inset of what sits opposite it.** An alert's icon is inset from its start corner and its top; its close glyph is inset the
+   same from its end corner and its top (right and top in English, left and top in Arabic), lined up with the title's first line. The control's *box* may reach past
+   the glyph (it is at least 24px, WCAG 2.5.8), but the glyph is what sits in the corner, never the box's centre.
+2. **A small component is symmetrical**, side to side and top to bottom: two buttons are one width, the space above a row is the space below it, a corner control
+   is as far in from its edge as the icon opposite is from its own.
+3. **The usual cause: the app's 48px floor** (`min-height: var(--pam-touch-target-min)` on every button, `globals.css`) **centres a small glyph in a 48px box**, so a
+   corner close floats down and in. A component that is small by design sets the box itself (`--pam-touch-target-min` and a 24px size) and pulls the box
+   into the corner, with logical properties; it never accepts the 48px box by default.
+4. **It is checked on the built page**, not by eye: `e2e/malfunction-banner.spec.ts` ("the close glyph sits in the corner as far in as the icon opposite it") measures
+   the glyph's inset against the icon's, to a pixel, at 320 wide, in English and Arabic. A new corner control gets the same check.
