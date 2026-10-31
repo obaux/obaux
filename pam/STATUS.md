@@ -1289,6 +1289,14 @@ under the header, which comes and goes; looked at in Russian and Arabic at 320px
 
 ---
 
+## Places & programs · Parks & Rec show no hours (31 October)
+
+Piper's lane, `claude/places-programs-parks-no-hours` (off `mira/b78`). Will (31 October): Parks & Rec need no phone, website or times open (D-622). The desk cleared
+phone and website live (20261031193246). The app now shows **no hours** for them: `services.hours = {"none": true}` reads as "none, on purpose" (`NO_HOURS` in
+`@pam/config/hours`), so no stand-in, no open or closed line, no week drawer and no "sample hours" note, anywhere `hoursFor()` is used. **Needs the desk:** migration
+`20261031200500` (written, not applied) writes the marker on the 166 `pprsite:%` rows; until then they still show the stand-in. A future `enrich-places` must not fill
+phone, website or hours for them (D-622). Pictures: `docs/design/review/2026-10-31-parks-no-hours/`.
+
 ## Places & programs · a94 and a95 live; the Book a visit list and its refusals; the run-through's three items (17-18 October)
 
 Piper's lane, from `claude/places-programs-*`. **Live:** a program books a visit for a member who wrote to it, signed up with it or planned a visit

@@ -212,6 +212,29 @@ test.describe("a place's own screen", () => {
     await expect(page.getByText(/sample hours while Pam checks the real ones/)).toBeVisible();
   });
 
+  test('a Parks & Rec place shows no hours, no open or closed line, no sample note, no phone and no website; another place is unchanged (D-622)', async ({ page }) => {
+    await signedIn(page);
+    // What the database holds for one of them: hours marked "none", phone and website cleared.
+    const PARKS = { ...PLACE, id: 'svc-parks', name: 'Cobbs Creek Recreation Center', lookup_name: 'COBBS CREEK RECREATION CENTER', hours: { none: true }, phone: null, website: null };
+    await page.route(DETAIL, (route) => route.fulfill(json([new URL(route.request().url()).searchParams.get('p_id') === 'svc-parks' || (route.request().postData() ?? '').includes('svc-parks') ? PARKS : PLACE])));
+
+    await page.goto(`/place/?id=${PARKS.id}`);
+    await expect(page.getByRole('heading', { name: 'Cobbs Creek Recreation Center', level: 1 })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Hours: / })).toHaveCount(0);
+    await expect(page.getByText(/^(Open until|Closed)/)).toHaveCount(0);
+    await expect(page.getByText(/sample hours/)).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /^Call/ })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /^Website|^Visit the website/ })).toHaveCount(0);
+    // Getting there is still there.
+    await expect(page.getByRole('link', { name: /^Get directions/ })).toBeVisible();
+
+    // Any other place keeps today's behaviour: the stand-in hours, said to be samples.
+    await page.goto(`/place/?id=${PLACE.id}`);
+    await expect(page.getByRole('heading', { name: 'Kirkbride Center', level: 1 })).toBeVisible();
+    await page.getByRole('button', { name: /^Hours: / }).click();
+    await expect(page.getByText(/sample hours while Pam checks the real ones/)).toBeVisible();
+  });
+
   test('the week drawer opens with nothing chosen, and the bar\'s ⋯ is white with no outline or shadow (D-457)', async ({ page }) => {
     await signedIn(page);
     await page.route(DETAIL, (route) => route.fulfill(json([PLACE])));

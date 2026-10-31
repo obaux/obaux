@@ -133,12 +133,27 @@ export function parseHours(raw: unknown): WeekHours | null {
 }
 
 /**
+ * What `services.hours` holds for a place that has no opening times to give, on purpose (Will, 31 October: Parks & Rec need no phone,
+ * website or times open). It is not "unknown": an unknown place (`hours` null) may get a stand-in or, one day, real hours; this one never
+ * does. The marker is a value in the column the place reads already return, so no read changes, and `enrich-places` (not built yet; it must fill
+ * only rows whose `hours` is null) leaves it alone. See D-622 "Parks & Rec show no hours".
+ */
+export const NO_HOURS = { none: true } as const;
+
+/** Whether `services.hours` says this place has no opening times to show, at all (see `NO_HOURS`). */
+export function declaresNoHours(raw: unknown): boolean {
+  return !!raw && typeof raw === 'object' && !Array.isArray(raw) && (raw as { none?: unknown }).none === true;
+}
+
+/**
  * The hours to show for a place: the real ones, or a stand-in, or nothing.
  *
  * This is the only function a screen should call, and the only place that knows
- * placeholders exist.
+ * placeholders exist. A place that declares it has no hours (`NO_HOURS`) gets
+ * nothing, not a stand-in: no open or closed line, no week, no "sample hours".
  */
 export function hoursFor(id: string, raw: unknown): PlaceHours | null {
+  if (declaresNoHours(raw)) return null;
   const real = parseHours(raw);
   if (real) return { week: real, isReal: true };
   if (!USE_PLACEHOLDER_HOURS) return null;

@@ -103,3 +103,30 @@ describe('open or closed', () => {
     expect(openState(week({}), at(1, '12:00'))).toEqual({ state: 'closed', opensAt: null });
   });
 });
+
+describe('a place that has no hours on purpose (D-622: Parks & Rec)', () => {
+  it('declares it with {"none": true}, and nothing else is read as that', async () => {
+    const { declaresNoHours, NO_HOURS } = await import('../src/hours.js');
+    expect(declaresNoHours(NO_HOURS)).toBe(true);
+    expect(declaresNoHours({ none: true })).toBe(true);
+    for (const other of [null, undefined, {}, { none: false }, { none: 'true' }, [], 'none', 0, { week: [] }]) {
+      expect(declaresNoHours(other), JSON.stringify(other)).toBe(false);
+    }
+  });
+
+  it('gets no hours at all: no stand-in, no open or closed line', async () => {
+    const { NO_HOURS } = await import('../src/hours.js');
+    expect(USE_PLACEHOLDER_HOURS, 'the stand-in is on, so this proves the marker beats it').toBe(true);
+    expect(hoursFor('a-parks-and-rec-place', NO_HOURS)).toBeNull();
+    expect(openState(hoursFor('a-parks-and-rec-place', NO_HOURS), new Date(2026, 9, 31, 12, 0))).toEqual({ state: 'unknown' });
+  });
+
+  it('is not "unknown": a place with null hours still gets its stand-in, so other places are unchanged', () => {
+    expect(hoursFor('any-other-place', null)?.isReal).toBe(false);
+  });
+
+  it('cannot be mistaken for a closed week: a real week of nothing is still hours', () => {
+    const closedAlways = { week: Array.from({ length: 7 }, () => []) };
+    expect(hoursFor('x', closedAlways)?.isReal).toBe(true);
+  });
+});
