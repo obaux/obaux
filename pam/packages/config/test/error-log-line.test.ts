@@ -106,15 +106,19 @@ describe('the error log keeps what Privacy says it keeps (D-616)', () => {
       const block = sql.split(`-- ${name}: begin`)[1]?.split(`-- ${name}: end`)[0] ?? '';
       return Array.from(block.matchAll(/^\s+\('([^']+)'\),?$/gm), (m) => m[1]!);
     };
-    const routes = listed('app_error_routes');
-    // The first migration seeds the list; a later one may add keys with a plain insert (plan C's two calendar actions), so the list is every such insert.
-    const added = readdirSync(MIGRATIONS)
+    // The first migration seeds both lists; a later one may add keys with a plain insert (plan C's two calendar actions; Ava's Missing information screen,
+    // D-623), so each list is the seed and every such insert.
+    const migrations = readdirSync(MIGRATIONS)
       .filter((f) => f.endsWith('.sql'))
-      .map((f) => readFileSync(MIGRATIONS + f, 'utf8'))
-      .flatMap((text) =>
-        Array.from(text.matchAll(/insert\s+into\s+public\.app_error_actions\s*\(action\)\s*values([^;]*);/gi), (m) => Array.from(m[1]!.matchAll(/\(\s*'([^']+)'\s*\)/g), (k) => k[1]!)).flat(),
+      .map((f) => readFileSync(MIGRATIONS + f, 'utf8'));
+    const insertedInto = (table: 'app_error_actions' | 'app_error_routes', column: 'action' | 'route'): string[] =>
+      migrations.flatMap((text) =>
+        Array.from(text.matchAll(new RegExp(`insert\\s+into\\s+public\\.${table}\\s*\\(${column}\\)\\s*values([^;]*);`, 'gi')), (m) =>
+          Array.from(m[1]!.matchAll(/\(\s*'([^']+)'\s*\)/g), (k) => k[1]!),
+        ).flat(),
       );
-    const actions = [...new Set([...listed('app_error_actions'), ...added])];
+    const routes = [...new Set([...listed('app_error_routes'), ...insertedInto('app_error_routes', 'route')])];
+    const actions = [...new Set([...listed('app_error_actions'), ...insertedInto('app_error_actions', 'action')])];
 
     it('has both lists, and they are the app\'s own (the config test holds them equal; this keeps the line honest if that test goes)', () => {
       expect(routes.length).toBeGreaterThan(10);
