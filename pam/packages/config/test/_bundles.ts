@@ -39,6 +39,11 @@ export const NO_PLURAL_VARIANTS = new Set([
   'pam.inbox.replyTime.days.one',
   // And "{count} time" on the super admin's Problems list (Ava, D-616): English picks the singular itself.
   'problems.times.one',
+  // And the super admin's "Missing information" list (Ava, D-623): "{count} place" is English's own singular, and "{count} shown" is
+  // a label and a number, which Russian ("Показано: {count}") and Arabic ("المعروض: {count}") write with no word that agrees with the number.
+  'missingInfo.count.one',
+  'missingInfo.shown',
+  'missingInfo.shown.one',
 ]);
 export const COUNT_KEYS = Object.keys(EN).filter((k) => EN[k]!.includes('{count}') && !NO_PLURAL_VARIANTS.has(k));
 

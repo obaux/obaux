@@ -66,6 +66,7 @@ describe('locale bundles', () => {
     'pam.inbox.sent.two',
     'problems.times.two',
     'notify.app_error.two',
+    'missingInfo.count.two',
   ]);
 
   // Russian's "one" is also 21, 31, 101..., so its `.one` writes the number even where English picks the singular itself and writes none.
