@@ -928,7 +928,7 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Accounts & invites · Programs on Pam and Missing information (31 October) — READY on `claude/pam-program-stats` (D-623)
+## Accounts & invites · Places on Pam and Missing information (31 October) — READY on `claude/pam-program-stats` (D-623)
 
 The super admin's Home counts the listed places and how many have a phone, a website, an address and real hours, over those
 that need it (Parks & Rec need only an address, D-622), with a "Missing information" row. That row opens `/places/missing/`,

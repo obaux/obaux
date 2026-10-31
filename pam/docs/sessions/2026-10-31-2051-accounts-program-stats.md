@@ -10,7 +10,7 @@
     execute. It returns the counts (total; need/have for phone, website, address, hours; how many places lack something) and,
     when asked, the list of places that lack something (`id`, `name`, `address`, `kind`, `missing[]`).
   - It also adds the route `/places/missing/` to `app_error_routes`, in this migration rather than by editing the error log's.
-- **Home** (super admin, `RequestsScreen` with `isHome`): `ProgramStats` shows a "Programs on Pam" card (Astryx `Card` and
+- **Home** (super admin, `RequestsScreen` with `isHome`): `ProgramStats` shows a "Places on Pam" card (Sage, f2ab2f6a; first drafted as "Programs on Pam") (Astryx `Card` and
   `MetadataList`) with the Parks & Rec note, then a "Missing information" row with its count.
 - **`/places/missing/`** (`MissingInfoScreen`, D-213 nested page):
   - a search (`SearchField`, labelled, with Connect's signed "Search by name or address" as its hint);
@@ -69,3 +69,10 @@ D-623.
 ## Needs a human
 
 Sage and Lena, for the words.
+
+## Sage's words (21:50)
+
+- Took Sage's f2ab2f6a: the card's title is "Places on Pam". The e2e finds the heading by the new words.
+- Sage's optional point, "Missing: Phone, Website, and Hours" printing the chip labels capitalised: kept as is. Lowercase would
+  need four more keys for Sage to sign and Lena to translate, and in several of Pam's languages the capital carries no meaning.
+  Easy to add later if Will asks.

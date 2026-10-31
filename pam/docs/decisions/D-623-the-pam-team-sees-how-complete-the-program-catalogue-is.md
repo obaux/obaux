@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-31 · **Branch:** `claude/pam-program-stats`
 
-**What:** the super admin's Home shows a card, "Programs on Pam": how many places are listed, and how many have a phone, a
+**What:** the super admin's Home shows a card, "Places on Pam" (Sage: "Programs on Pam" already means places with a lead, and the card counts every place): how many places are listed, and how many have a phone, a
 website, an address and real opening hours, each counted over the places that need that detail. Under it, one row, "Missing
 information", with how many places lack something. The row opens `/places/missing/`, a nested page (D-213) listing every
 place that lacks something and what it lacks. It has filters for what is missing and for the kind of place, and a search over

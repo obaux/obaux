@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { settled } from './settled';
 
 /**
- * Programs on Pam and Missing information (D-623; Will, 31 October, Control Room note n-20261031-2020: "visibility on how many
+ * Places on Pam and Missing information (D-623; Will, 31 October, Control Room note n-20261031-2020: "visibility on how many
  * programs exist total. And a list of programs missing info, clicking into it, opens a nested page with list of missing
  * details, filtered and searchable"). The super admin's Home counts the places and how many have each detail, over the places
  * that need it (Parks & Rec need only an address, D-622); a row opens every place that lacks something, with filters for what
@@ -54,12 +54,12 @@ async function signedIn(page: Page, { role = 'super_admin', places = PLACES }: {
 
 const rows = (page: Page) => page.getByRole('list', { name: 'Missing information' }).getByRole('listitem');
 
-test.describe('Programs on Pam and Missing information (D-623)', () => {
+test.describe('Places on Pam and Missing information (D-623)', () => {
   test("Home counts the places and each detail over the places that need it, and the row opens the list", async ({ page }) => {
     const asked = await signedIn(page);
     await page.goto('/');
     await settled(page);
-    const card = page.getByRole('heading', { name: 'Programs on Pam', level: 2 }).locator('xpath=ancestor::*[contains(@class,"astryx-card")][1]');
+    const card = page.getByRole('heading', { name: 'Places on Pam', level: 2 }).locator('xpath=ancestor::*[contains(@class,"astryx-card")][1]');
     await expect(card).toContainText('Listed');
     await expect(card).toContainText('754');
     await expect(card).toContainText('331 of 588');
