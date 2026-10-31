@@ -1766,7 +1766,7 @@
   "notify.app_error.one": "{action} didn't go through in the last hour.",
   "waitingCities.empty.title": "Nobody is waiting yet",
   "waitingCities.empty.body": "Cities people ask for show up here.",
-  "programStats.title": "Programs on Pam",
+  "programStats.title": "Places on Pam",
   "programStats.listed": "Listed",
   "programStats.phone": "With a phone",
   "programStats.website": "With a website",
