@@ -381,7 +381,7 @@
    * opposite inset"). The alert's icon is inset 16px from its start and 12px from the top; the close's glyph takes the same from the end and the top.
    * The app's 48px floor (above) had centred a 16px glyph in a 48px box, then 28px under the alert's own floor, floating it down and in. The close is a
    * 24px box (the least a target may be, WCAG 2.5.8) pulled into the corner so its glyph, not its box, is what mirrors the icon. Logical properties, so
-   * it is the top-left in Arabic. Checked on the built page by e2e/alert-corner.spec.ts.
+   * it is the top-left in Arabic. Checked on the built page by e2e/malfunction-banner.spec.ts ("the close glyph sits in the corner").
    */
   [data-pam-alert] .astryx-banner > div:has(> button[aria-label]) {
     align-self: flex-start;
