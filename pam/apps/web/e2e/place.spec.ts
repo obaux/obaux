@@ -45,6 +45,10 @@ const PLACE = {
   hours: null,
 };
 
+/** A real week (the six OIC places have one): the stand-in is gone (D-624), so the tests of the hours row and its drawer bring their own. */
+const WEEK = Array.from({ length: 7 }, (_, d) => (d === 0 || d === 6 ? [] : [{ open: '09:00', close: '17:00' }]));
+const PLACE_WITH_HOURS = { ...PLACE, hours: { week: WEEK } };
+
 async function signedIn(page: import('@playwright/test').Page) {
   await page.addInitScript((userId: string) => {
     const session = {
@@ -130,12 +134,13 @@ test.describe("a place's own screen", () => {
     const directions = page.getByRole('link', { name: /^Get directions/ });
     await expect(directions).toHaveAttribute('href', /destination_place_id=ChIJexample123/);
     await expect(directions).toHaveAttribute('target', '_blank');
-    // Directions, then call, then the website: this place has no lead on Pam, so there is no
+    // Directions, then (no hours Pam holds) the line to Google for them, then call, then the website: this place has no lead on Pam, so there is no
     // message row (D-541, D-544; with one it comes after directions). Bring a friend
     // is not here: it waits for the booked screen (D-333).
     const rows = page.getByRole('list', { name: 'Ways to reach this place' }).getByRole('link');
     await expect(rows.nth(0)).toHaveAccessibleName(/^Get directions/);
-    await expect(rows.nth(1)).toHaveAccessibleName(/^Call/);
+    await expect(rows.nth(1)).toHaveAccessibleName(/^Check hours on Google/);
+    await expect(rows.nth(2)).toHaveAccessibleName(/^Call/);
     await expect(page.getByRole('link', { name: /^Send a message/ })).toHaveCount(0);
     await expect(page.getByText('Bring a friend')).toHaveCount(0);
   });
@@ -170,7 +175,7 @@ test.describe("a place's own screen", () => {
     // as rows with a line each (they were labelled circles, D-224); the hours a row too, the week in a drawer (D-309);
     // Save and the ⋯ menu (Flag something, Share, Message) in the bar.
     await signedIn(page);
-    await page.route(DETAIL, (route) => route.fulfill(json([PLACE])));
+    await page.route(DETAIL, (route) => route.fulfill(json([PLACE_WITH_HOURS])));
     await page.goto(`/place/?id=${PLACE.id}`);
 
     await expect(page.getByRole('link', { name: /^Call/ })).toHaveAttribute('href', 'tel:+12155550100');
@@ -197,24 +202,52 @@ test.describe("a place's own screen", () => {
     await expect(page.getByRole('menuitem', { name: 'Share this place' })).toBeVisible();
   });
 
-  test('says out loud that the hours are samples', async ({ page }) => {
-    // A demo that looks exactly like the real thing is how a partner ends up
-    // reading their own opening times off a screen that made them up. Until
-    // `enrich-places` runs, the screen admits it.
+  test('a place Pam has no hours for shows none: no row, no drawer, no open or closed line, no sample note; it links to Google instead (D-624)', async ({ page }) => {
+    // Will, 31 October: "It's not acceptable to have fake hours on the real app." Pam says nothing about when it is open; the signed line
+    // "Check hours on Google" sends a member to the place on Google Maps, where the real hours are.
     await signedIn(page);
     await page.route(DETAIL, (route) => route.fulfill(json([PLACE])));
     await page.goto(`/place/?id=${PLACE.id}`);
+    await expect(page.getByRole('heading', { name: 'Kirkbride Center', level: 1 })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Hours: / })).toHaveCount(0);
+    await expect(page.getByText(/^(Open until|Closed)/)).toHaveCount(0);
+    await expect(page.getByText(/sample hours/)).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Check hours on Google' })).toHaveAttribute('href', /google\.com\/maps\/search/);
+  });
 
-    // In the week drawer (D-309), with today marked.
+  test('a place with real hours keeps its hours row, its week and its line under the name', async ({ page }) => {
+    await signedIn(page);
+    await page.route(DETAIL, (route) => route.fulfill(json([PLACE_WITH_HOURS])));
+    await page.goto(`/place/?id=${PLACE.id}`);
+    await expect(page.getByText(/^(Open until|Closed)/).first()).toBeVisible();
     await page.getByRole('button', { name: /^Hours: / }).click();
     await expect(page.getByRole('heading', { name: 'Opening hours' })).toBeVisible();
-    await expect(page.getByText('Today', { exact: true })).toBeVisible();
-    await expect(page.getByText(/sample hours while Pam checks the real ones/)).toBeVisible();
+    await expect(page.getByText(/sample hours/)).toHaveCount(0);
+  });
+
+  test('a Parks & Rec place shows no hours, no open or closed line, no sample note, no phone and no website; another place is unchanged (D-622)', async ({ page }) => {
+    await signedIn(page);
+    // What the database holds for one of them: hours marked "none", phone and website cleared.
+    const PARKS = { ...PLACE, id: 'svc-parks', name: 'Cobbs Creek Recreation Center', lookup_name: 'COBBS CREEK RECREATION CENTER', hours: { none: true }, phone: null, website: null };
+    await page.route(DETAIL, (route) => route.fulfill(json([new URL(route.request().url()).searchParams.get('p_id') === 'svc-parks' || (route.request().postData() ?? '').includes('svc-parks') ? PARKS : PLACE])));
+
+    await page.goto(`/place/?id=${PARKS.id}`);
+    await expect(page.getByRole('heading', { name: 'Cobbs Creek Recreation Center', level: 1 })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Hours: / })).toHaveCount(0);
+    await expect(page.getByText(/^(Open until|Closed)/)).toHaveCount(0);
+    await expect(page.getByText(/sample hours/)).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /^Call/ })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /^Website|^Visit the website/ })).toHaveCount(0);
+    // Getting there is still there.
+    await expect(page.getByRole('link', { name: /^Get directions/ })).toBeVisible();
+
+    // A Parks & Rec place says none on purpose, so it does not even link to Google for hours; another place with no hours does.
+    await expect(page.getByRole('link', { name: 'Check hours on Google' })).toHaveCount(0);
   });
 
   test('the week drawer opens with nothing chosen, and the bar\'s ⋯ is white with no outline or shadow (D-457)', async ({ page }) => {
     await signedIn(page);
-    await page.route(DETAIL, (route) => route.fulfill(json([PLACE])));
+    await page.route(DETAIL, (route) => route.fulfill(json([PLACE_WITH_HOURS])));
     await page.goto(`/place/?id=${PLACE.id}`);
 
     // ⋯ and Save are the page's own colour with no grey outline and no shadow (Will, 10 October, D-457:

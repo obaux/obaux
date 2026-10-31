@@ -3,7 +3,6 @@ import {
   hoursFor,
   openState,
   parseHours,
-  USE_PLACEHOLDER_HOURS,
   type PlaceHours,
 } from '../src/hours.js';
 
@@ -41,20 +40,18 @@ describe('what the database gives us', () => {
     expect(answer?.week[3]?.[0]?.open).toBe('11:00');
   });
 
-  it('marks a stand-in as not real, so nothing can present it as fact', () => {
-    const answer = hoursFor('some-place-id', null);
-    if (USE_PLACEHOLDER_HOURS) {
-      expect(answer).not.toBeNull();
-      expect(answer!.isReal).toBe(false);
-    } else {
-      expect(answer).toBeNull();
+  it('never makes hours up: a place Pam holds no hours for gets none, whatever its id (D-624)', () => {
+    // Will, 31 October: "It's not acceptable to have fake hours on the real app." There is no stand-in week any more, so a real account
+    // cannot be shown one, by any screen, however it is signed in.
+    for (const id of ['some-place-id', 'place-a', 'svc-1', '', '4c0f6b64-3a0e-4b8e-9d6c-7a1f0f3c2b11']) {
+      for (const raw of [null, undefined, {}, { week: [] }, 'x', 7, [[], [], []]]) {
+        expect(hoursFor(id, raw), `${id} ${JSON.stringify(raw)}`).toBeNull();
+      }
     }
   });
 
-  it('gives the same place the same stand-in every time', () => {
-    // Hours that change between two renders would show a place open and closed
-    // within a minute of each other.
-    expect(hoursFor('place-a', null)).toEqual(hoursFor('place-a', null));
+  it('and with no hours there is no open or closed line', () => {
+    expect(openState(hoursFor('any-place', null), new Date(2026, 9, 31, 12, 0))).toEqual({ state: 'unknown' });
   });
 });
 
@@ -101,5 +98,34 @@ describe('open or closed', () => {
 
   it('never claims a place is open when it is never open', () => {
     expect(openState(week({}), at(1, '12:00'))).toEqual({ state: 'closed', opensAt: null });
+  });
+});
+
+import { declaresNoHours as declaresNoHoursFor } from '../src/hours.js';
+
+describe('a place that has no hours on purpose (D-622: Parks & Rec)', () => {
+  it('declares it with {"none": true}, and nothing else is read as that', async () => {
+    const { declaresNoHours, NO_HOURS } = await import('../src/hours.js');
+    expect(declaresNoHours(NO_HOURS)).toBe(true);
+    expect(declaresNoHours({ none: true })).toBe(true);
+    for (const other of [null, undefined, {}, { none: false }, { none: 'true' }, [], 'none', 0, { week: [] }]) {
+      expect(declaresNoHours(other), JSON.stringify(other)).toBe(false);
+    }
+  });
+
+  it('gets no hours at all: no stand-in, no open or closed line', async () => {
+    const { NO_HOURS } = await import('../src/hours.js');
+    expect(hoursFor('a-parks-and-rec-place', NO_HOURS)).toBeNull();
+    expect(openState(hoursFor('a-parks-and-rec-place', NO_HOURS), new Date(2026, 9, 31, 12, 0))).toEqual({ state: 'unknown' });
+  });
+
+  it('is told apart from a place with no hours known: that one has null, this one says "none" (the app links the first to Google)', () => {
+    expect(declaresNoHoursFor(null)).toBe(false);
+    expect(declaresNoHoursFor({ none: true })).toBe(true);
+  });
+
+  it('cannot be mistaken for a closed week: a real week of nothing is still hours', () => {
+    const closedAlways = { week: Array.from({ length: 7 }, () => []) };
+    expect(hoursFor('x', closedAlways)?.isReal).toBe(true);
   });
 });

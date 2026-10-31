@@ -114,11 +114,8 @@ test.describe('the places screen', () => {
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'J J Peters' })).toBeVisible();
 
-    // Placeholder hours stand in until `enrich-places` runs, so a card says one
-    // or the other — but never both, and never "Open now" on a place Pam has
-    // no hours for at all. What it must not do is say nothing at all and leave
-    // a member to find a locked door.
-    await expect(page.getByText(/^(Open until|Closed)/).first()).toBeVisible();
+    // Pam holds no hours for these places and makes none up (D-624): a card says nothing about open or closed.
+    await expect(page.getByText(/^(Open until|Closed)/)).toHaveCount(0);
   });
 
   test('a failed query is explained, not left blank', async ({ page }) => {
