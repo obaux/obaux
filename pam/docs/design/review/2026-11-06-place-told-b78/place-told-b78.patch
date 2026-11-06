@@ -1,0 +1,16 @@
+diff --git a/pam/apps/site/src/content/PlaceTold.tsx b/pam/apps/site/src/content/PlaceTold.tsx
+index 1145d4d6..7cf7ddbf 100644
+--- a/pam/apps/site/src/content/PlaceTold.tsx
++++ b/pam/apps/site/src/content/PlaceTold.tsx
+@@ -40,9 +40,10 @@ export function PlaceTold() {
+         <HowTo
+           steps={[
+             'Call ahead if you need an appointment. Open the place in Pam and tap “Call this place”.',
+-            'No Call button? Tap “Check hours on Google”. It usually shows a phone number too.',
++            'No Call button and no hours shown? Tap “Check hours on Google”. It usually shows a phone number too.',
+           ]}
+         />
++        <P>Pam does not show a phone number or hours for city Parks &amp; Rec places.</P>
+       </Section>
+ 
+       <Section title="If they didn’t know you were coming">
