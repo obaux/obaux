@@ -990,5 +990,29 @@
   {
     "key": "ru|overlap|components-actions-bringfriend--just-copied|Копировать ⟷ Ссылка скопирована",
     "reason": "By design (D-338, D-339, Will): \"Link copied\" is drawn over the link field and Copy together, on Copy's own opaque pale green, for 3 seconds, so Copy's label (and the link) are under it and not seen. In Russian the centred words are wide enough to sit over Copy's label, which the detector counts as two lines overlapping; a person sees one line («Ссылка скопирована», with its tick) on a green bar, as in English and the other five languages (looked at 18 Oct 2026 at 320×760, 450 ms after the tap: no text under the words shows). The shorter «Скопировано» would say less (the link, not an address or a name) and the audit would still not see a fault, so the signed words stay."
+  },
+  {
+    "key": "pt-BR|title|member-created--text-alerts|Alertas por mensagem",
+    "reason": "pt-BR «Alertas por mensagem» is the feature's name, in the same words in the Profile row that opens the page (`profile.menu.reminders`), in `reminders.settings`, in the back label «Voltar para Alertas por mensagem» (`nav.back.alerts`), in the promo «Receba alertas por mensagem» and in the error-log names of its switches. A shorter bar title («Alertas de texto», 132px) would not match what the person tapped, and renaming the feature is a wider change than a bar title. It is 186px in the 176px bar (10px over, so the end of «mensagem» is cut) and shows only from the first 48px of scrolling; the large title under it wraps and is always whole. Looked at 13 November 2026 at 320×760. Revisit if the feature is ever renamed in pt-BR."
+  },
+  {
+    "key": "pt-BR|title|member-created-states-texts-stopped--alerts|Alertas por mensagem",
+    "reason": "pt-BR «Alertas por mensagem» is the feature's name, in the same words in the Profile row that opens the page (`profile.menu.reminders`), in `reminders.settings`, in the back label «Voltar para Alertas por mensagem» (`nav.back.alerts`), in the promo «Receba alertas por mensagem» and in the error-log names of its switches. A shorter bar title («Alertas de texto», 132px) would not match what the person tapped, and renaming the feature is a wider change than a bar title. It is 186px in the 176px bar (10px over, so the end of «mensagem» is cut) and shows only from the first 48px of scrolling; the large title under it wraps and is always whole. Looked at 13 November 2026 at 320×760. Revisit if the feature is ever renamed in pt-BR."
+  },
+  {
+    "key": "pt-BR|title|case-manager-screens--text-alerts|Alertas por mensagem",
+    "reason": "pt-BR «Alertas por mensagem» is the feature's name, in the same words in the Profile row that opens the page (`profile.menu.reminders`), in `reminders.settings`, in the back label «Voltar para Alertas por mensagem» (`nav.back.alerts`), in the promo «Receba alertas por mensagem» and in the error-log names of its switches. A shorter bar title («Alertas de texto», 132px) would not match what the person tapped, and renaming the feature is a wider change than a bar title. It is 186px in the 176px bar (10px over, so the end of «mensagem» is cut) and shows only from the first 48px of scrolling; the large title under it wraps and is always whole. Looked at 13 November 2026 at 320×760. Revisit if the feature is ever renamed in pt-BR."
+  },
+  {
+    "key": "pt-BR|title|program-lead-screens--text-alerts|Alertas por mensagem",
+    "reason": "pt-BR «Alertas por mensagem» is the feature's name, in the same words in the Profile row that opens the page (`profile.menu.reminders`), in `reminders.settings`, in the back label «Voltar para Alertas por mensagem» (`nav.back.alerts`), in the promo «Receba alertas por mensagem» and in the error-log names of its switches. A shorter bar title («Alertas de texto», 132px) would not match what the person tapped, and renaming the feature is a wider change than a bar title. It is 186px in the 176px bar (10px over, so the end of «mensagem» is cut) and shows only from the first 48px of scrolling; the large title under it wraps and is always whole. Looked at 13 November 2026 at 320×760. Revisit if the feature is ever renamed in pt-BR."
+  },
+  {
+    "key": "es|title|super-admin-screens--invite-program|Enlace para programa",
+    "reason": "es «Enlace para programa» is 181px in the 176px bar (5px over: «programa» is cut after scrolling). It has the same shape as the member title («Enlace para miembro», 174px) and the case-manager one, so the three invite titles match. The only shorter wording, «Enlace de programa» (165px), reads as the program's own link and not a link for a program. The large title under the bar is whole. Looked at 13 November 2026 at 320×760."
+  },
+  {
+    "key": "ru|title|super-admin-screens--invite-program|Ссылка для программы",
+    "reason": "The bar title (SubPage `barTitle`, 18px, one line, from the first 48px of scrolling) is cut with an ellipsis when it is long, by design; the large title under it wraps and is always whole. Russian titles are longer than English, so 24 are cut today. Looked at 18 October 2026 at 320px. Shorten the Russian title or let the bar wrap before adding more."
   }
 ]

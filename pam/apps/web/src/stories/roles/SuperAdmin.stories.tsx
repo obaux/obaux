@@ -167,6 +167,7 @@ export const ThreadWithProgramLead: Story = screen('super-admin', 'A conversatio
 export const InvitesLog: Story = screen('super-admin', 'Invited people', '/invites/');
 export const Invite: Story = screen('super-admin', 'Invite someone', '/invite/');
 export const InviteOne: Story = screen('super-admin', 'A link for a member', '/invite/new/', { role: 'member' });
+export const InviteProgram: Story = screen('super-admin', 'A link for a program', '/invite/new/', { role: 'provider' });
 export const InviteCaseManager: Story = screen('super-admin', 'A link for a case manager', '/invite/new/', { role: 'admin' });
 export const Person: Story = screen('super-admin', 'A person', '/person/', { id: 'dummy-m1' });
 export const Notifications: Story = screen('super-admin', 'Notifications', '/notifications/');
