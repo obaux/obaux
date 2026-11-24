@@ -264,6 +264,8 @@ describe('who else the app talks to (a67)', () => {
         const text = bundle[terms!.key];
         expect(text, `${locale} has ${terms!.key}`).toBeDefined();
         for (const holds of terms!.holds) expect(text, `${locale} ${terms!.key} must hold ${holds}`).toMatch(holds);
+        // The other half of §3.2.2(a)(i): the terms must NOTIFY users that the app includes Google Maps features and content (a107, signed 24 November).
+        expect(bundle['terms.s.google-maps.p1'], `${locale} terms.s.google-maps.p1 must name Google Maps`).toMatch(/Google Maps/);
       }
     }
   });

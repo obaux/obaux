@@ -2,8 +2,10 @@
 
 **Written by:** Lena (Languages & legal), 31 October 2026, for Mira and then Will. **Asked:** Mira, 21:00 UTC, after reading Iris's research
 (`docs/research/2026-10-31-real-opening-hours.md`, section 1).
-**Status:** the English in section 4 is a held draft; nothing is in the bundles, nothing is translated, and `legal:date` is not run. Will signs it (A29: Terms are his),
-then I translate it into six languages and it ships with the date of the day it goes live.
+**Status, 24 November:** Will signed section 4 at 06:53 with the one word "Sign" (Control Room note n-20261124-0653, relayed by Mira at 07:00), which Mira
+read as **p1 and p2 only: p3 is not signed and is not in the app**. p1, p2 and the title are in the seven bundles, translated, and listed in `legal.ts`
+(`section('terms', 'google-maps', 2)`); `legal:date terms` is **not** run, it waits for the day b78 goes live (see section 6). Until then, one test is red by design:
+`legal-updated.test.ts` ("terms: the recorded fingerprint…"). Written 31 October as a held draft.
 
 ## The short version
 
@@ -78,7 +80,7 @@ A new Terms section after "Limits" and before "Changes": id `google-maps`, three
 >
 > **p2** Using them is subject to Google's own terms, in the versions in force when you use them: the Google Maps/Google Earth Additional Terms of Service (https://maps.google.com/help/terms_maps/) and the Google Privacy Policy (https://policies.google.com/privacy).
 >
-> **p3** Our Privacy page says what Google gets when you use them.
+> **p3** Our Privacy page says what Google gets when you use them. *(Not signed; left out.)*
 
 Why it reads this way: p1 is Google's "(A) notify users that the app includes Google Maps features and content"; p2 is "(B) … subject to the then-current
 versions of …" with both addresses exactly as Google names them ("in the versions in force when you use them" is "then-current versions"); p3 is Pam's own
@@ -113,3 +115,15 @@ addresses tappable is a small change to `LegalPage` (a link under the paragraph)
 3. The guard in `test/third-party-hosts.test.ts` then applies on its own (the Terms key exists, so every language must hold both addresses); remove nothing.
 4. The line goes live in the same batch as the next Terms or Privacy date; it does not need the street-search key (`GOOGLE_MAPS_SERVER_KEY`) to be set, because the Trips
    map already uses Google where a browser key is set.
+
+## 7. Shipped on the branch, 24 November (`claude/lena-google-maps-terms-section`)
+
+- `terms.s.google-maps.title` ("Google Maps"), `.p1` and `.p2` in en, es, pt-BR, zh-CN, zh-HK, ru and ar, exactly the signed English in the first. The two addresses and Google's two
+  document names are written as in English in every language (no translation beside them, as Mira asked); the sentence round them is translated. "Google Maps" stays
+  in Latin letters in every language, including the title, because that is the name Google's notice asks the app to give.
+- `legal.ts`: `section('terms', 'google-maps', 2)` between `limits` and `changes`. `copy:ack` run.
+- The guard (`third-party-hosts.test.ts`) now applies: every language's `terms.s.google-maps.p2` must hold both addresses, and, new today, `.p1` must name "Google Maps" (the notify half of §3.2.2(a)(i)).
+- Arabic: the two addresses sit in plain parentheses inside the right-to-left sentence; checked in Chromium that each "(" stays left of its address, each ")" right of it, and the
+  full stop falls at the line's left end, so no direction marks are needed.
+- **On the day b78 goes live:** `pnpm --filter @pam/config legal:date terms <that day, YYYY-MM-DD, UTC>` then `pnpm --filter @pam/config copy:ack`, then the config suite. That moves "Last updated"
+  on the Terms to that day in all seven languages and records the new fingerprint; nothing else moves (Privacy keeps its date).

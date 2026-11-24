@@ -55,7 +55,9 @@ STATUS row too.
   **Update, 31 October (Lena, Mira's request):** the Maps Platform Terms of Service (26 August 2026) and the Maps Service Specific Terms (28 October 2026) were
   read from `cloud.google.com` and are summarised in `docs/legal/2026-10-31-google-maps-notice-in-the-terms.md`. Found: **Pam's Terms carry no Google Maps
   notice**, which ToS §3.2.2(a)(i) requires; the English is drafted there for Will (a new Terms section "Google Maps", `terms.s.google-maps.p1` to `p3`), held until he
-  signs; `test/third-party-hosts.test.ts` now fails the day the key exists in English but is missing in any language. Still open: Google's Places
+  signs; `test/third-party-hosts.test.ts` now fails the day the key exists in English but is missing in any language.
+  **Update, 24 November:** Will signed p1 and p2 (p3 is out); the section is built in all seven languages on `claude/lena-google-maps-terms-section` for b78, and the guard applies.
+  **Open on the push day:** `legal:date terms <that day>` then `copy:ack` (the Terms date waits for the day b78 goes live; one test is red until then, by design). Still open: Google's Places
   *Documentation* (the logo and third-party attribution rules, `developers.google.com`) is not reachable from the sessions' sandbox; someone who can read it
   should check the two points in section 5 of that note.
 

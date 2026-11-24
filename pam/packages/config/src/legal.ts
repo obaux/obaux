@@ -84,6 +84,7 @@ export const TERMS: LegalDocument = {
     section('terms', 'programs', 3),
     section('terms', 'points', 2),
     section('terms', 'limits', 3),
+    section('terms', 'google-maps', 2),
     section('terms', 'changes', 2),
   ],
 };
