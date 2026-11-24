@@ -52,6 +52,12 @@ STATUS row too.
   terms for Places once** (what may be stored beyond a place id, the required "powered by Google" mark, which Dot draws): nobody on the team has read
   them (not reachable from the sessions' sandbox), and the Privacy line says Pam keeps neither the words nor the answer, so the day anyone wants to
   save a picked address the terms and the line both have to be looked at first. Then tick this with the date.
+  **Update, 31 October (Lena, Mira's request):** the Maps Platform Terms of Service (26 August 2026) and the Maps Service Specific Terms (28 October 2026) were
+  read from `cloud.google.com` and are summarised in `docs/legal/2026-10-31-google-maps-notice-in-the-terms.md`. Found: **Pam's Terms carry no Google Maps
+  notice**, which ToS §3.2.2(a)(i) requires; the English is drafted there for Will (a new Terms section "Google Maps", `terms.s.google-maps.p1` to `p3`), held until he
+  signs; `test/third-party-hosts.test.ts` now fails the day the key exists in English but is missing in any language. Still open: Google's Places
+  *Documentation* (the logo and third-party attribution rules, `developers.google.com`) is not reachable from the sessions' sandbox; someone who can read it
+  should check the two points in section 5 of that note.
 
 - [ ] **The native apps ask for location with Pam's own reason** (Lena, 11 October 2026; Mira asked for this to be listed). Pam
   asks the phone for where it is in two places: "Use my current location" in Explore's area picker, and "I'm here" on a visit

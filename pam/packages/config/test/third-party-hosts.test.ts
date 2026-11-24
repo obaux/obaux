@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { join, relative } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { EN } from './_bundles.js';
+import { BUNDLES, EN } from './_bundles.js';
 
 /**
  * Every outside company the app's code can reach, and what Privacy says about it (a67, Mira, 11 October 2026).
@@ -25,6 +25,12 @@ import { EN } from './_bundles.js';
  * reaches (`FUNCTIONS`), each such host is a `server` entry whose Privacy line must name the company, and a new function that
  * makes requests, or a new host in one, fails until it is listed. A host Privacy does not name yet is entered `pending` (its
  * card) and is reported to the merge desk, which puts the missing line in front of Will.
+ *
+ * Google Maps Platform adds one more duty, and it is Terms, not Privacy (Maps Platform Terms of Service §3.2.2(a)(i), 31 October): the
+ * app's own terms must say it includes Google Maps features and content, and that using them is subject to the then-current Google Maps
+ * /Google Earth Additional Terms of Service (https://maps.google.com/help/terms_maps/) and Google Privacy Policy
+ * (https://policies.google.com/privacy). A Maps Platform host here carries `terms`: the Terms key that says it and the two addresses it
+ * must hold, in every language. Until that key exists the entry names the card that waits on Will's signature.
  */
 const ROOTS = [
   { dir: '../../../apps/web', skip: ['node_modules', '.next', 'out', 'storybook-static', 'test-results', 'user-flows-out', 'e2e', 'stories', 'public', 'scripts'] },
@@ -55,11 +61,17 @@ interface HostEntry {
   readonly privacy?: { readonly key: string; readonly names: RegExp };
   /** Privacy's line waits on a card; until the key exists in English the check is skipped, then it applies. */
   readonly pending?: string;
+  /** For a Google Maps Platform host: the Terms paragraph Google requires (ToS §3.2.2), the card that waits on it, and what it must hold. */
+  readonly terms?: { readonly key: string; readonly pending: string; readonly holds: readonly RegExp[] };
   /** Going away in this decision; not an error if the sources no longer name it. */
   readonly removing?: string;
   /** Not in the sources yet: a branch that has not landed. Allowed to be absent; the checks apply once it is there. */
   readonly arriving?: string;
 }
+
+/** The two addresses Google's terms name for an app's own terms (Maps Platform ToS §3.2.2(a)(i)). */
+const TERMS_MAPS = /https:\/\/maps\.google\.com\/help\/terms_maps\//;
+const GOOGLE_PRIVACY = /https:\/\/policies\.google\.com\/privacy/;
 
 const HOSTS: Record<string, HostEntry> = {
   // Pam's own.
@@ -74,6 +86,7 @@ const HOSTS: Record<string, HostEntry> = {
     why: 'the Trips map: Google’s Maps script and tiles (TripsMap.tsx, only where a key is set)',
     privacy: { key: 'privacy.s.sharing.p5', names: /Google/ },
     pending: 'a67',
+    terms: { key: 'terms.s.google-maps.p2', pending: 'the Google Maps notice in the Terms (Mira, 31 October)', holds: [TERMS_MAPS, GOOGLE_PRIVACY] },
   },
 
   // Called by Pam's server on a member's behalf: the company gets what the server sends it.
@@ -98,6 +111,7 @@ const HOSTS: Record<string, HostEntry> = {
     privacy: { key: 'privacy.s.sharing.p7', names: /Google/ },
     pending: 'a74, the street-address search line (Sage signs, then Will)',
     arriving: 'a74',
+    terms: { key: 'terms.s.google-maps.p2', pending: 'the Google Maps notice in the Terms (Mira, 31 October)', holds: [TERMS_MAPS, GOOGLE_PRIVACY] },
   },
   'accounts.google.com': {
     kind: 'server',
@@ -231,6 +245,26 @@ describe('who else the app talks to (a67)', () => {
       if (words === undefined && entry.pending) continue; // the line waits on card ${entry.pending}; it applies the day it lands
       expect(words, `${privacy!.key} (Privacy’s line for ${host}) does not exist`).toBeDefined();
       expect(words, `${privacy!.key} must name the company that ${host} belongs to`).toMatch(privacy!.names);
+    }
+  });
+
+  it('has the Terms carry the notice Google Maps Platform requires, for every Google Maps Platform host, in every language', () => {
+    const platform = Object.entries(HOSTS).filter(([host, entry]) => /^(maps|places)\.googleapis\.com$/.test(host) && !entry.removing);
+    expect(platform.map(([host]) => host).sort(), 'a Google Maps Platform host: it needs `terms` (ToS 3.2.2)').toEqual([
+      'maps.googleapis.com',
+      'places.googleapis.com',
+    ]);
+    for (const [host, entry] of platform) {
+      const { terms } = entry;
+      expect(terms, `${host} is Google Maps Platform: give it \`terms\` (the Terms key and the card that waits on Will)`).toBeDefined();
+      expect(terms!.pending.trim(), `${host}: name the card`).not.toBe('');
+      const words = EN[terms!.key];
+      if (words === undefined) continue; // the paragraph waits on Will's signature; it applies the day it lands
+      for (const [locale, bundle] of Object.entries(BUNDLES)) {
+        const text = bundle[terms!.key];
+        expect(text, `${locale} has ${terms!.key}`).toBeDefined();
+        for (const holds of terms!.holds) expect(text, `${locale} ${terms!.key} must hold ${holds}`).toMatch(holds);
+      }
     }
   });
 
